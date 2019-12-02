@@ -1,0 +1,12 @@
+.settings
+.project
+target
+.classpath
+/ex-fund-account-def/.project
+/ex-fund-account-def/.classpath
+/ex-pc-base/.project
+/ex-pc-base/.classpath
+/ex-fund-account/src/test
+/ex-common/src/test
+/ex-pc-base/src/test
+package.bat

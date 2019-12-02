@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.fund.cash.dao.WithdrawalAddrDAO">
+
+	<resultMap type="com.hp.sh.expv3.fund.cash.entity.WithdrawalAddr" id="WithdrawalAddr">
+		<result column="id" property="id" />
+		<result column="asset" property="asset" />
+		<result column="address" property="address" />
+		<result column="remark" property="remark" />
+		<result column="enabled" property="enabled" />
+		<result column="user_id" property="userId" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		id,asset,address,remark,enabled,user_id,created,modified
+	</sql>
+
+	<sql id="simple_where">
+		<where>
+			<if test="idList!=null">
+				and id in
+				<foreach item="item" index="i" collection="idList" open="("
+					separator="," close=")">
+					#{idList[${i}]}
+				</foreach>
+			</if>
+			<if test="enabled!=null"> and enabled=#{enabled}</if>
+			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+			<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
+			<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+			<if test="keyword!=null and keyword!=''"> and address like CONCAT('%',#{keyword},'%')</if>
+		</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from withdrawal_addr
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="WithdrawalAddr">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="WithdrawalAddr">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="WithdrawalAddr">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from withdrawal_addr
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="WithdrawalAddr">
+		select
+			<include refid="Base_Column_List" />
+		from withdrawal_addr
+			where id=#{id} and user_id=#{userId}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			withdrawal_addr
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into withdrawal_addr (
+			id,asset,address,remark,enabled,user_id,created,modified
+		)values(
+			#{id},#{asset},#{address},#{remark},#{enabled},#{userId},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			withdrawal_addr
+		set 
+			asset=#{asset},address=#{address},remark=#{remark},enabled=#{enabled},user_id=#{userId},created=#{created},modified=#{modified}
+		where 
+			id=#{id} and user_id=#{userId}
+	</update>
+
+	<delete id="delete">
+        delete from withdrawal_addr where id=#{id} and user_id=#{userId}
+    </delete>
+
+    <delete id="condDelete">
+        delete from withdrawal_addr
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+</mapper>

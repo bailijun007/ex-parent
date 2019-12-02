@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+	<artifactId>ex-common3</artifactId>
+	<packaging>jar</packaging>
+    <description>exchange-common</description>
+
+	<parent>
+		<groupId>com.hp.sh</groupId>
+		<artifactId>ex-parent</artifactId>
+		<version>3.0.0</version>
+	</parent>
+    
+    <dependencies>
+    
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.hp.sh.expv3</groupId>
+            <artifactId>chainserver-client-sdk</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+			<groupId>com.hp.sh</groupId>
+			<artifactId>hp-rocketmq</artifactId>
+            <version>1.1.0-SNAPSHOT</version>
+        </dependency>
+        
+	</dependencies>
+
+</project>

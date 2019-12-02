@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO">
+
+	<resultMap type="com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol" id="PcAccountSymbol">
+		<result column="id" property="id" />
+		<result column="account_id" property="accountId" />
+		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="short_leverage" property="shortLeverage" />
+		<result column="long_leverage" property="longLeverage" />
+		<result column="margin_mode" property="marginMode" />
+		<result column="cross_leverage" property="crossLeverage" />
+		<result column="hold_margin_ratio" property="holdMarginRatio" />
+		<result column="max_leverage" property="maxLeverage" />
+		<result column="version" property="version" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		id,account_id,asset,symbol,short_leverage,long_leverage,margin_mode,cross_leverage,hold_margin_ratio,max_leverage,version,created,modified
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="idList!=null">
+		and id in
+		<foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+		#{idList[${i}]}
+		</foreach>
+		</if>
+		<if test="accountId!=null"> and account_id=#{accountId}</if>
+		<if test="marginMode!=null"> and margin_mode=#{marginMode}</if>
+		<if test="version!=null"> and version=#{version}</if>
+		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
+		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(asset,''),IFNULL(symbol,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from pc_account_symbol
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="PcAccountSymbol">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="PcAccountSymbol">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="PcAccountSymbol">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from pc_account_symbol
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="PcAccountSymbol">
+		select
+			<include refid="Base_Column_List" />
+		from pc_account_symbol
+			where id=#{id}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			pc_account_symbol
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into pc_account_symbol (
+			id,account_id,asset,symbol,short_leverage,long_leverage,margin_mode,cross_leverage,hold_margin_ratio,max_leverage,version,created,modified
+		)values(
+			#{id},#{accountId},#{asset},#{symbol},#{shortLeverage},#{longLeverage},#{marginMode},#{crossLeverage},#{holdMarginRatio},#{maxLeverage},#{version},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			pc_account_symbol
+		set 
+			account_id=#{accountId},asset=#{asset},symbol=#{symbol},short_leverage=#{shortLeverage},long_leverage=#{longLeverage},margin_mode=#{marginMode},cross_leverage=#{crossLeverage},hold_margin_ratio=#{holdMarginRatio},max_leverage=#{maxLeverage},version=#{version},created=#{created},modified=#{modified}
+		where 
+			id=#{id}
+	</update>
+
+	<delete id="delete">
+        delete from pc_account_symbol where id=#{id}
+    </delete>
+
+    <delete id="condDelete">
+        delete from pc_account_symbol
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+</mapper>

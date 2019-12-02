@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.pc.module.account.dao.PcAccountDAO">
+
+	<resultMap type="com.hp.sh.expv3.pc.module.account.entity.PcAccount" id="PcAccount">
+		<result column="asset" property="asset" />
+		<result column="balance" property="balance" />
+		<result column="version" property="version" />
+		<result column="user_id" property="userId" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		asset,balance,version,user_id,created,modified
+	</sql>
+
+	<sql id="simple_where">
+		<where>
+			<if test="idList!=null">
+				and id in
+				<foreach item="item" index="i" collection="idList" open="("
+					separator="," close=")">
+					#{idList[${i}]}
+				</foreach>
+			</if>
+			<if test="version!=null"> and version=#{version}</if>
+			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+			<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
+			<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+			<if test="keyword!=null and keyword!=''"> and asset like CONCAT('%',#{keyword},'%')</if>
+		</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from pc_account
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="PcAccount">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="PcAccount">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="PcAccount">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from pc_account
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="PcAccount">
+		select
+			<include refid="Base_Column_List" />
+		from pc_account
+			where id=#{id} and user_id=#{userId}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			pc_account
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		insert into pc_account (
+			asset,balance,version,user_id,created,modified
+		)values(
+			#{asset},#{balance},#{version},#{userId},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			pc_account
+		set 
+			asset=#{asset},balance=#{balance},version=${version}+1,user_id=#{userId},created=#{created},modified=#{modified}
+		where 
+			user_id=#{userId} and asset=#{asset}
+	</update>
+
+	<delete id="delete">
+        delete from pc_account where id=#{id} and user_id=#{userId}
+    </delete>
+
+    <delete id="condDelete">
+        delete from pc_account
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+
+	<select id="get" resultMap="PcAccount">
+		select
+			<include refid="Base_Column_List" />
+		from pc_account
+			where user_id=#{userId} and asset=#{asset}
+	</select>
+
+	<select id="getAndLock" resultMap="PcAccount">
+		select
+			<include refid="Base_Column_List" />
+		from pc_account
+			where user_id=#{userId} and asset=#{asset} for update
+	</select>
+	
+</mapper>

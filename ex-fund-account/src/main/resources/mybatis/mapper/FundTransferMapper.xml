@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.fund.transfer.dao.FundTransferDAO">
+
+	<resultMap type="com.hp.sh.expv3.fund.transfer.entity.FundTransfer" id="FundTransfer">
+		<result column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="sn" property="sn" />
+		<result column="asset" property="asset" />
+		<result column="amount" property="amount" />
+		<result column="src_account_type" property="srcAccountType" />
+		<result column="target_account_type" property="targetAccountType" />
+		<result column="src_account_id" property="srcAccountId" />
+		<result column="target_account_id" property="targetAccountId" />
+		<result column="remark" property="remark" />
+		<result column="status" property="status" />
+		<result column="request_id" property="requestId" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		id,user_id,sn,asset,amount,src_account_type,target_account_type,src_account_id,target_account_id,remark,status,request_id,created,modified
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="idList!=null">
+		and id in
+		<foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+		#{idList[${i}]}
+		</foreach>
+		</if>
+		<if test="userId!=null"> and user_id=#{userId}</if>
+		<if test="srcAccountType!=null"> and src_account_type=#{srcAccountType}</if>
+		<if test="targetAccountType!=null"> and target_account_type=#{targetAccountType}</if>
+		<if test="srcAccountId!=null"> and src_account_id=#{srcAccountId}</if>
+		<if test="targetAccountId!=null"> and target_account_id=#{targetAccountId}</if>
+		<if test="status!=null"> and status=#{status}</if>
+		<if test="requestId!=null"> and request_id=#{requestId}</if>
+		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
+		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+		<if test="keyword!=null and keyword!=''"> and sn like CONCAT('%',#{keyword},'%')</if>	
+		</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from fund_transfer
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="queryPending" resultMap="FundTransfer">
+		select
+			<include refid="Base_Column_List" />
+		from 
+			fund_transfer
+		where 
+			status!=8
+		order by created asc
+	</select>
+
+	<select id="queryList" resultMap="FundTransfer">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="FundTransfer">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from fund_transfer
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="FundTransfer">
+		select
+			<include refid="Base_Column_List" />
+		from fund_transfer
+			where id=#{id} and user_id=#{userId}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			fund_transfer
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into fund_transfer(
+			id,user_id,sn,asset,amount,src_account_type,target_account_type,src_account_id,target_account_id,remark,status,request_id,created,modified
+		)values(
+			#{id},#{userId},#{sn},#{asset},#{amount},#{srcAccountType},#{targetAccountType},#{srcAccountId},#{targetAccountId},#{remark},#{status},#{requestId},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			fund_transfer
+		set 
+			user_id=#{userId},sn=#{sn},asset=#{asset},amount=#{amount},src_account_type=#{srcAccountType},target_account_type=#{targetAccountType},src_account_id=#{srcAccountId},target_account_id=#{targetAccountId},remark=#{remark},status=#{status},request_id=#{requestId},created=#{created},modified=#{modified}
+		where 
+			id=#{id} and user_id=#{userId}
+	</update>
+
+	<!--  -->
+	
+	<update id="changeStatus">
+		update 
+			fund_transfer
+		set 
+			status=#{newStatus},modified=#{modified}
+		where 
+			id=#{id} and user_id=#{userId} and status=#{oldStatus}
+	</update>
+	
+</mapper>

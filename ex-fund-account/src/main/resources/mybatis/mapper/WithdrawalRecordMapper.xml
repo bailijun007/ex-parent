@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.fund.cash.dao.WithdrawalRecordDAO">
+
+	<resultMap type="com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord" id="WithdrawalRecord">
+		<result column="id" property="id" />
+		<result column="approval_status" property="approvalStatus" />
+		<result column="sn" property="sn" />
+		<result column="asset" property="asset" />
+		<result column="amount" property="amount" />
+		<result column="channel_id" property="channelId" />
+		<result column="account" property="account" />
+		<result column="transaction_id" property="transactionId" />
+		<result column="pay_status" property="payStatus" />
+		<result column="pay_status_desc" property="payStatusDesc" />
+		<result column="pay_time" property="payTime" />
+		<result column="pay_finish_time" property="payFinishTime" />
+		<result column="synch_status" property="synchStatus" />
+		<result column="user_id" property="userId" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+	
+	
+	<resultMap type="com.hp.sh.expv3.fund.cash.vo.SumAmount" id="SumAmount">
+		<result column="asset" property="asset" />
+		<result column="amount" property="amount" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		id,approval_status,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified
+	</sql>
+
+	<sql id="simple_where">
+		<where>
+			<if test="idList!=null">
+				and id in
+				<foreach item="item" index="i" collection="idList" open="("
+					separator="," close=")">
+					#{idList[${i}]}
+				</foreach>
+			</if>
+			<if test="approvalStatus!=null"> and approval_status=#{approvalStatus}</if>
+			<if test="channelId!=null"> and channel_id=#{channelId}</if>
+			<if test="payStatus!=null"> and pay_status=#{payStatus}</if>
+			<if test="payTimeStart!=null"> and pay_time &gt;= #{payTimeStart}</if>
+			<if test="payTimeEnd!=null"> and pay_time &lt;= #{payTimeEnd}</if>
+			<if test="payFinishTimeStart!=null"> and pay_finish_time &gt;= #{payFinishTimeStart}</if>
+			<if test="payFinishTimeEnd!=null"> and pay_finish_time &lt;= #{payFinishTimeEnd}</if>
+			<if test="synchStatus!=null"> and synch_status=#{synchStatus}</if>
+			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+			<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
+			<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+			<if test="keyword!=null and keyword!=''"> and sn like CONCAT('%',#{keyword},'%')</if>
+		</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from withdrawal_record
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="WithdrawalRecord">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="WithdrawalRecord">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="WithdrawalRecord">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from withdrawal_record
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="WithdrawalRecord">
+		select
+			<include refid="Base_Column_List" />
+		from withdrawal_record
+			where id=#{id} and user_id=#{userId}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			withdrawal_record
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into withdrawal_record (
+			id,approval_status,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified
+		)values(
+			#{id},#{approvalStatus},#{sn},#{asset},#{amount},#{channelId},#{account},#{transactionId},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{userId},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			withdrawal_record
+		set 
+			approval_status=#{approvalStatus},sn=#{sn},asset=#{asset},amount=#{amount},channel_id=#{channelId},account=#{account},transaction_id=#{transactionId},pay_status=#{payStatus},pay_status_desc=#{payStatusDesc},pay_time=#{payTime},pay_finish_time=#{payFinishTime},synch_status=#{synchStatus},user_id=#{userId},created=#{created},modified=#{modified}
+		where 
+			id=#{id} and user_id=#{userId}
+	</update>
+
+	<delete id="delete">
+        delete from withdrawal_record where id=#{id} and user_id=#{userId}
+    </delete>
+
+    <delete id="condDelete">
+        delete from withdrawal_record
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+	<select id="findBySn" resultMap="WithdrawalRecord">
+		select
+			<include refid="Base_Column_List" />
+		from withdrawal_record
+			where user_id=#{userId} and sn=#{sn}
+	</select>
+	
+	<select id="sumAmount" resultMap="SumAmount">
+		select 
+			asset, SUM(amount) 
+		from fund_withdrawal_record
+			where user_id=#{userId} 
+			and pay_status=#{payStatus}
+			and asset=#{asset}
+		group by asset 
+	</select>
+	
+
+</mapper>

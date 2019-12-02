@@ -1,0 +1,427 @@
+/**
+ * @author zw
+ * @date 2019/7/19
+ */
+package com.hp.sh.expv3.pc.module.order.entity;
+
+
+import java.math.BigDecimal;
+
+import com.hp.sh.expv3.base.entity.UserDataEntity;
+
+/**
+ * 永续合约_订单（委托）
+ */
+public class PcOrder extends UserDataEntity {
+	
+	public static final int OPEN = 0 ;
+	public static final int CLOSE = 1 ;
+	
+	public static final int PENDING_NEW = 1;
+	
+//	int _______记录_______;
+
+    /**
+     * 永续合约账户
+     */
+    private Long accountId;
+
+    /**
+     * 
+     * 资产
+     */
+    private String asset;
+    /**
+     * 合约交易品种
+     */
+    private String symbol;
+    /**
+     * 是否:1-平仓,0-开
+     */
+    private Integer closeFlag;
+    /**
+     * 是否：1-多仓，0-空仓
+     */
+    private Integer longFlag;
+    /**
+     * 保证金模式:1-全仓,2-逐仓
+     */
+    private Integer marginMode;
+    /**
+     * 杠杆
+     */
+    private BigDecimal leverage;
+    /**
+	 * 委托价格
+	 */
+	private BigDecimal price;
+
+    /**
+     * 永续合约委托类型，{@link com.hupa.exp.base.enums.pc.PcOrderTypeEnum}
+     */
+    private Integer orderType;
+    
+	/**
+	 * 委托金额，初始设置后，后续不会修改
+	 */
+	private BigDecimal amt;
+	
+//	int ______系统计算_______;
+
+    /**
+	 * 保证金率，初始为 杠杆的倒数
+	 */
+	private BigDecimal marginRatio;
+	/**
+	 * 开仓手续费率
+	 */
+	private BigDecimal openFeeRatio;
+	/**
+	 * 强平手续费率
+	 */
+	private BigDecimal closeFeeRatio;
+
+    
+//    int ________系统下单后计算_________;
+	/**
+     * 实收手续费,成交后计算(可能部分成交，按比例收取)
+     */
+    private BigDecimal feeCost;
+    /**
+     * @deprecated
+     * 总押金：委托保证金 + 开仓手续费 + 强平手续费 
+     */
+    private BigDecimal grossMargin;
+    /**
+     * 委托保证金
+     */
+    private BigDecimal orderMargin;
+    /**
+     * 开仓手续费,成交时修改(可能部分成交，按比例收取)
+     */
+    private BigDecimal openFee;
+    /**
+     * 平仓手续费，在下委托时提前收取(可能部分成交，按比例收取)
+     */
+    private BigDecimal closeFee;
+
+	/**
+     * 已成交金额
+     */
+    private BigDecimal filledAmt;
+    /**
+	 * 已成交量
+	 */
+	private BigDecimal filledVolume;
+	/**
+     * @deprecated
+     * 取消金额 (撤单时计算保存)：amt - filledAmt
+     */
+    private BigDecimal cancelAmt;
+    
+    /**
+	 * 平仓委托对应的仓位Id
+	 */
+	private Long closePosId;
+	/**
+     * 委托状态，{@link com.hupa.exp.base.enums.pc.PcOrderStatusEnum}
+     */
+    private Integer status;
+    /**
+     * 委托有效时间，{@link com.hupa.exp.base.enums.pc.PcOrderTimeInForceEnum}
+     */
+    private Integer timeInForce;
+    /**
+     * 是否已触发，用于止盈止损等触发式委托
+     */
+    private Integer triggerFlag;
+
+    /**
+     * 取消时间
+     */
+    private Long cancelTime;
+    
+//    int ________强平_________;
+
+    /**
+     * 可见性，强平委托，自动减仓委托 都不可见
+     */
+    private Integer visibleFlag;
+
+    // 是否活动委托
+    private Integer activeFlag;
+    
+//    int ________log__________;
+
+    private String createOperator;
+    
+    private String cancelOperator;
+
+    private String remark;
+
+    /**
+     * 客户自定义委托ID，用于与客户系统关联 （open api）
+     */
+    private String clientOrderId;
+
+	public PcOrder() {
+	}
+
+	public Long getAccountId() {
+		return accountId;
+	}
+
+	public void setAccountId(Long accountId) {
+		this.accountId = accountId;
+	}
+
+	public String getAsset() {
+		return asset;
+	}
+
+	public void setAsset(String asset) {
+		this.asset = asset;
+	}
+
+	public String getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
+	}
+
+	public Integer getCloseFlag() {
+		return closeFlag;
+	}
+
+	public void setCloseFlag(Integer closeFlag) {
+		this.closeFlag = closeFlag;
+	}
+
+	public Integer getLongFlag() {
+		return longFlag;
+	}
+
+	public void setLongFlag(Integer longFlag) {
+		this.longFlag = longFlag;
+	}
+
+	public Integer getMarginMode() {
+		return marginMode;
+	}
+
+	public void setMarginMode(Integer marginMode) {
+		this.marginMode = marginMode;
+	}
+
+	public BigDecimal getLeverage() {
+		return leverage;
+	}
+
+	public void setLeverage(BigDecimal leverage) {
+		this.leverage = leverage;
+	}
+
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+
+	public Integer getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(Integer orderType) {
+		this.orderType = orderType;
+	}
+
+	public BigDecimal getAmt() {
+		return amt;
+	}
+
+	public void setAmt(BigDecimal amt) {
+		this.amt = amt;
+	}
+
+	public BigDecimal getMarginRatio() {
+		return marginRatio;
+	}
+
+	public void setMarginRatio(BigDecimal marginRatio) {
+		this.marginRatio = marginRatio;
+	}
+
+	public BigDecimal getOpenFeeRatio() {
+		return openFeeRatio;
+	}
+
+	public void setOpenFeeRatio(BigDecimal openFeeRatio) {
+		this.openFeeRatio = openFeeRatio;
+	}
+
+	public BigDecimal getCloseFeeRatio() {
+		return closeFeeRatio;
+	}
+
+	public void setCloseFeeRatio(BigDecimal closeFeeRatio) {
+		this.closeFeeRatio = closeFeeRatio;
+	}
+
+	public BigDecimal getFeeCost() {
+		return feeCost;
+	}
+
+	public void setFeeCost(BigDecimal feeCost) {
+		this.feeCost = feeCost;
+	}
+
+	public BigDecimal getGrossMargin() {
+		return grossMargin;
+	}
+
+	public void setGrossMargin(BigDecimal grossMargin) {
+		this.grossMargin = grossMargin;
+	}
+
+	public BigDecimal getOrderMargin() {
+		return orderMargin;
+	}
+
+	public void setOrderMargin(BigDecimal orderMargin) {
+		this.orderMargin = orderMargin;
+	}
+
+	public BigDecimal getOpenFee() {
+		return openFee;
+	}
+
+	public void setOpenFee(BigDecimal openFee) {
+		this.openFee = openFee;
+	}
+
+	public BigDecimal getCloseFee() {
+		return closeFee;
+	}
+
+	public void setCloseFee(BigDecimal closeFee) {
+		this.closeFee = closeFee;
+	}
+
+	public BigDecimal getFilledAmt() {
+		return filledAmt;
+	}
+
+	public void setFilledAmt(BigDecimal filledAmt) {
+		this.filledAmt = filledAmt;
+	}
+
+	public BigDecimal getFilledVolume() {
+		return filledVolume;
+	}
+
+	public void setFilledVolume(BigDecimal filledVolume) {
+		this.filledVolume = filledVolume;
+	}
+
+	public BigDecimal getCancelAmt() {
+		return cancelAmt;
+	}
+
+	public void setCancelAmt(BigDecimal cancelAmt) {
+		this.cancelAmt = cancelAmt;
+	}
+
+	public Long getClosePosId() {
+		return closePosId;
+	}
+
+	public void setClosePosId(Long closePosId) {
+		this.closePosId = closePosId;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public Integer getTimeInForce() {
+		return timeInForce;
+	}
+
+	public void setTimeInForce(Integer timeInForce) {
+		this.timeInForce = timeInForce;
+	}
+
+	public Integer getTriggerFlag() {
+		return triggerFlag;
+	}
+
+	public void setTriggerFlag(Integer triggerFlag) {
+		this.triggerFlag = triggerFlag;
+	}
+
+	public Long getCancelTime() {
+		return cancelTime;
+	}
+
+	public void setCancelTime(Long cancelTime) {
+		this.cancelTime = cancelTime;
+	}
+
+	public Integer getVisibleFlag() {
+		return visibleFlag;
+	}
+
+	public void setVisibleFlag(Integer visibleFlag) {
+		this.visibleFlag = visibleFlag;
+	}
+
+	public Integer getActiveFlag() {
+		return activeFlag;
+	}
+
+	public void setActiveFlag(Integer activeFlag) {
+		this.activeFlag = activeFlag;
+	}
+
+	public String getCreateOperator() {
+		return createOperator;
+	}
+
+	public void setCreateOperator(String createOperator) {
+		this.createOperator = createOperator;
+	}
+
+	public String getCancelOperator() {
+		return cancelOperator;
+	}
+
+	public void setCancelOperator(String cancelOperator) {
+		this.cancelOperator = cancelOperator;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getClientOrderId() {
+		return clientOrderId;
+	}
+
+	public void setClientOrderId(String clientOrderId) {
+		this.clientOrderId = clientOrderId;
+	}
+
+
+}
