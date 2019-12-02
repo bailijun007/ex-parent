@@ -3,6 +3,8 @@ package com.hp.sh.expv3.fund.cash.entity;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.persistence.MappedSuperclass;
+
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 
 /**
@@ -10,6 +12,7 @@ import com.hp.sh.expv3.base.entity.UserDataEntity;
  * @author wangjg
  *
  */
+@MappedSuperclass
 public abstract class PaymentRecord extends UserDataEntity {
 	
 	private static final long serialVersionUID = 1L;

@@ -8,8 +8,7 @@ import org.apache.rocketmq.remoting.common.RemotingHelper;
 import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.json.JsonUtils;
-
-import test.rocketmq.Constant;
+import com.hp.sh.expv3.fund.transfer.constant.MQConstant;
 
 @Component
 public class MqSender {
@@ -17,8 +16,8 @@ public class MqSender {
     
 	public MqSender() {
 	    try {
-			producer = new DefaultMQProducer(Constant.GROUP);
-		    producer.setNamesrvAddr(Constant.ADDR);
+			producer = new DefaultMQProducer(MQConstant.GROUP);
+		    producer.setNamesrvAddr(MQConstant.ADDR);
 			producer.start();
 		} catch (MQClientException e) {
 			throw new RuntimeException(e);
@@ -28,7 +27,7 @@ public class MqSender {
 	public void send(Object msg) throws Exception{
 		String json = JsonUtils.toJson(msg);
         byte[] msgBuff = json.getBytes(RemotingHelper.DEFAULT_CHARSET);
-		Message mqMsg = new Message(Constant.TOPIC, "TagA", msgBuff);
+		Message mqMsg = new Message(MQConstant.TOPIC, "TagA", msgBuff);
         SendResult sendResult = producer.send(mqMsg);
         System.out.printf("%s%n", sendResult);
 	}
