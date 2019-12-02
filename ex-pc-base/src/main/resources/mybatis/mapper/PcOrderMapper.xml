@@ -116,7 +116,7 @@
 		select
 			<include refid="Base_Column_List" />
 		from pc_order
-			where id=#{id}
+			where id=#{id} and user_id=#{userId}
 	</select>
 
 	<select id="exist" resultType="boolean">

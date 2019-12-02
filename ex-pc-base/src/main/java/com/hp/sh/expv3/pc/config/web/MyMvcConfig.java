@@ -20,8 +20,8 @@ import com.gitee.hupadev.base.spring.plugin.HpLocaleResolver;
  */
 @Configuration
 @ComponentScan
-public class ChatMvcConfig implements WebMvcConfigurer {
-	private static final Logger logger = LoggerFactory.getLogger(ChatMvcConfig.class);
+public class MyMvcConfig implements WebMvcConfigurer {
+	private static final Logger logger = LoggerFactory.getLogger(MyMvcConfig.class);
 	
 	@Autowired
 	public ObjectMapper objectMapper;

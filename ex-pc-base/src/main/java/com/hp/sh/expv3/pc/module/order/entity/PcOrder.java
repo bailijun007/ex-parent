@@ -6,6 +6,7 @@ package com.hp.sh.expv3.pc.module.order.entity;
 
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 
@@ -18,6 +19,8 @@ public class PcOrder extends UserDataEntity {
 	public static final int CLOSE = 1 ;
 	
 	public static final int PENDING_NEW = 1;
+	
+	public static final Integer PENDING_CANCEL = 2;
 	
 //	int _______记录_______;
 
@@ -139,7 +142,7 @@ public class PcOrder extends UserDataEntity {
     /**
      * 取消时间
      */
-    private Long cancelTime;
+    private Date cancelTime;
     
 //    int ________强平_________;
 
@@ -367,11 +370,11 @@ public class PcOrder extends UserDataEntity {
 		this.triggerFlag = triggerFlag;
 	}
 
-	public Long getCancelTime() {
+	public Date getCancelTime() {
 		return cancelTime;
 	}
 
-	public void setCancelTime(Long cancelTime) {
+	public void setCancelTime(Date cancelTime) {
 		this.cancelTime = cancelTime;
 	}
 

@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.fund.transfer.constant;
+package com.hp.sh.expv3.pc.module.order.mq;
 
 @Deprecated
 public class MQConstant {
