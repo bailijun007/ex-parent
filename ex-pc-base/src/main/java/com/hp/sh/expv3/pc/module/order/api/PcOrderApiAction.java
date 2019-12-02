@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiOperation;
 
 @Api(tags="订单接口")
 @RestController
-public class PcOrderApi {
+public class PcOrderApiAction {
 	
 	@Autowired
 	private PcOrderService pcOrderService;
@@ -31,7 +31,7 @@ public class PcOrderApi {
 	 * @param amt 委托金额
 	 */
 	@ApiOperation(value = "创建订单")
-	@GetMapping(value = "/api/order/create")
+	@GetMapping(value = "/api/pc/order/create")
 	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal amt){
 		pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, amt);
 	}
