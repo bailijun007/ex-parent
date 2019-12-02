@@ -10,3 +10,10 @@ target
 /ex-common/src/test
 /ex-pc-base/src/test
 package.bat
+
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
