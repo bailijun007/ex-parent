@@ -134,7 +134,7 @@ public class PcOrderService {
 		//交易量
 		BigDecimal volume = MarginFeeCalc.calcVolume(pcOrder.getAmt(), pcOrder.getPrice());
 		
- 
+		pcOrder.setOrderMargin(MarginFeeCalc.calcMargin(IntBool.isTrue(pcOrder.getCloseFlag()), pcOrder.getMarginRatio(), volume));
 		pcOrder.setOpenFee(MarginFeeCalc.calcOpenFee(pcOrder.getOpenFeeRatio(), volume));
 		pcOrder.setCloseFee(MarginFeeCalc.calcCloseFee(pcOrder.getCloseFeeRatio(), volume));
 		pcOrder.setGrossMargin(pcOrder.getOrderMargin().add(pcOrder.getOpenFee()).add(pcOrder.getCloseFee()));
