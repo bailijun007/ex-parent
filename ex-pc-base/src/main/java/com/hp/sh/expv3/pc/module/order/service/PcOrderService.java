@@ -46,7 +46,7 @@ public class PcOrderService {
 	 * @param price 委托价格
 	 * @param amt 委托金额
 	 */
-	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal amt){
+	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal amt){
 		
 		Date now = new Date();
 		PcOrder pcOrder = new PcOrder();
@@ -100,6 +100,8 @@ public class PcOrderService {
 		pcOrder.setCancelAmt(BigDecimal.ZERO);
 		
 		pcOrderDAO.save(pcOrder);
+		
+		return pcOrder;
 	}
 
 	//设置平仓订单的各种费率
@@ -145,6 +147,19 @@ public class PcOrderService {
 		}else{		//空
 			return as.getShortLeverage();
 		}
+	}
+	
+	public void cancel(long userId, String asset, String symbol, long orderId){
+		Date now = new Date();
+		
+		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		
+		order.setStatus(PcOrder.PENDING_CANCEL);
+		order.setActiveFlag(PcOrder.NO);
+		order.setCancelTime(now);
+		order.setModified(now);
+        
+		
 	}
 
 }

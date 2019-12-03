@@ -9,5 +9,10 @@ public class IntBool {
 	public static final boolean isTrue(int value){
 		return value == YES;
 	} 
+	
+	//取反
+	public static final int not(int value){
+		return isTrue(value)?NO:YES;
+	} 
 
 }

@@ -25,7 +25,7 @@ public class DepositeSynchJob {
 	 * 处理已付款，未同步余额的记录
 	 */
 	@Scheduled(cron = "0 0/10 * * * ?")
-	public void handlePendingPay() {
+	public void handlePendingSynch() {
 		Page page = new Page(0, 10, 1000L);
 		while(true){
 			List<DepositRecord> list = this.depositService.findPendingSynch(page);

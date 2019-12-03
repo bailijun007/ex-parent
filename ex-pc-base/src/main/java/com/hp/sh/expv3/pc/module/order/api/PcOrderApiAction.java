@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.order.mq.MqSender;
+import com.hp.sh.expv3.pc.module.order.mq.msg.NewOrderMsg;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 
 import io.swagger.annotations.Api;
@@ -18,6 +21,9 @@ public class PcOrderApiAction {
 	@Autowired
 	private PcOrderService pcOrderService;
 	
+	@Autowired
+	private MqSender mqSender;
+	
 	/**
 	 * 创建订单
 	 * @param userId 用户ID
@@ -29,11 +35,23 @@ public class PcOrderApiAction {
 	 * @param timeInForce 生效机制
 	 * @param price 委托价格
 	 * @param amt 委托金额
+	 * @throws Exception 
 	 */
 	@ApiOperation(value = "创建订单")
 	@GetMapping(value = "/api/pc/order/create")
-	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal amt){
-		pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, amt);
+	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal amt) throws Exception{
+		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, amt);
+		NewOrderMsg msg = new NewOrderMsg();
+		msg.setAccountId(userId);
+		msg.setAsset(asset);
+		msg.setBidFlag(BidUtils.getBidFlag(closeFlag, longFlag));
+		msg.setCloseFlag(closeFlag);
+		msg.setDisplayNumber(amt);
+		msg.setNumber(amt);
+		msg.setOrderId(order.getId());
+		msg.setPrice(order.getPrice());
+		msg.setSymbol(symbol);
+		mqSender.send(msg);
 	}
 
 }

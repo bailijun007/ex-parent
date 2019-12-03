@@ -24,7 +24,7 @@ public class TransferJob {
 	 */
     @MQListener(topic = MQConstant.TOPIC)
 	@Scheduled(cron = "0 0/10 * * * ?")
-	public void handlePendingPay() {
+	public void handlePendingSynch() {
 		fundTransferCoreApi.handlePending();
 	}
 
