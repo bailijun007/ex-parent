@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 public class PcOrder4MatchBo {
 
-    private Long id;
+    private Long orderId;
     private String asset;
     private String symbol;
     private Long accountId;
@@ -21,12 +21,12 @@ public class PcOrder4MatchBo {
     private Integer orderType;
     private Long orderTime;
 
-    public Long getId() {
-        return id;
+    public Long getOrderId() {
+        return orderId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 
     public String getSymbol() {

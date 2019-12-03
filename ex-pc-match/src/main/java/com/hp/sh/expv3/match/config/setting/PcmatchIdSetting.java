@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = PcmatchConst.MODULE_NAME)
+@ConfigurationProperties(prefix = PcmatchConst.MODULE_NAME + ".id")
 public class PcmatchIdSetting {
 
     private Integer dataCenterId;

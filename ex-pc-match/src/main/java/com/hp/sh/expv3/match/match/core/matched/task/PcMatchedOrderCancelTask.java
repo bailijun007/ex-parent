@@ -9,8 +9,8 @@ import com.hp.sh.expv3.match.enums.EventEnum;
 import com.hp.sh.expv3.match.match.core.match.task.service.PcOrderBookEventService;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
 import com.hp.sh.expv3.match.msg.BookMsgDto.BookEntry;
-import com.hp.sh.expv3.match.util.PcAccountContractMqNotify;
-import com.hp.sh.expv3.match.util.PcNotify;
+import com.hp.sh.expv3.match.component.notify.PcMatchMqNotify;
+import com.hp.sh.expv3.match.component.notify.PcNotify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class PcMatchedOrderCancelTask extends PcMatchedBaseTask {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private PcAccountContractMqNotify pcOrderMqNotify;
+    private PcMatchMqNotify pcOrderMqNotify;
     @Autowired
     private PcOrderBookEventService pcOrderBookEventService;
     @Autowired

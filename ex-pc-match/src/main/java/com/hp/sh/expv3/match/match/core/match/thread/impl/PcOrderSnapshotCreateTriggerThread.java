@@ -5,7 +5,7 @@
 package com.hp.sh.expv3.match.match.core.match.thread.impl;
 
 import com.hp.sh.expv3.match.config.setting.PcmatchSetting;
-import com.hp.sh.expv3.match.util.PcOrderMqNotify;
+import com.hp.sh.expv3.match.component.notify.PcOrderMqNotify;
 import com.hp.sh.expv3.match.util.PcUtil;
 import com.hp.sh.expv3.match.util.Tuple2;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class PcOrderSnapshotCreateTriggerThread {
     @Autowired
     private PcmatchSetting pcmatchSetting;
 
-    @Scheduled(initialDelay = 300000, fixedDelay = 3600000)
+    @Scheduled(initialDelay = 5000, fixedDelay = 3600000)
     private void process() {
         trigger();
     }

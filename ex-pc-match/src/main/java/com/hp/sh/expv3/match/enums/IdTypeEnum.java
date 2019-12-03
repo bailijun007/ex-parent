@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.match.util;
+package com.hp.sh.expv3.match.enums;
 
 import java.util.EnumSet;
 import java.util.Map;

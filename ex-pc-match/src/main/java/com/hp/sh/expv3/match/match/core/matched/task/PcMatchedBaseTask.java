@@ -4,7 +4,7 @@
  */
 package com.hp.sh.expv3.match.match.core.matched.task;
 
-import com.hp.sh.expv3.match.config.setting.RedisKeySetting;
+import com.hp.sh.expv3.match.config.setting.PcmatchRedisKeySetting;
 import com.hp.sh.expv3.match.constant.PcmatchConst;
 import com.hp.sh.expv3.match.thread.def.BaseTask;
 import com.hp.sh.expv3.match.util.RedisKeyUtil;
@@ -71,14 +71,14 @@ public abstract class PcMatchedBaseTask extends BaseTask {
     }
 
     @Autowired
-    private RedisKeySetting pcmatchRedisKeySetting;
+    private PcmatchRedisKeySetting pcmatchPcmatchRedisKeySetting;
 
     @Autowired
     @Qualifier(PcmatchConst.MODULE_NAME + "RedisUtil")
     private RedisUtil pcRedisUtil;
 
     protected void updateSentMqOffset() {
-        String key = RedisKeyUtil.buildOrderSentMqOffsetRedisKeyPattern(pcmatchRedisKeySetting.getOrderSentMqOffsetRedisKeyPattern(), this.getAsset(), this.getSymbol());
+        String key = RedisKeyUtil.buildOrderSentMqOffsetRedisKeyPattern(pcmatchPcmatchRedisKeySetting.getPcOrderSentMqOffsetRedisKeyPattern(), this.getAsset(), this.getSymbol());
         pcRedisUtil.set(key, "" + this.getCurrentMsgOffset());
     }
 

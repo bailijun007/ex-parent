@@ -12,7 +12,7 @@ import com.hp.sh.expv3.match.match.core.match.handler.PcOrderHandler;
 import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.matched.task.def.PcMatchedTaskService;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
-import com.hp.sh.expv3.match.util.IdTypeEnum;
+import com.hp.sh.expv3.match.enums.IdTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;

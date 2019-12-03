@@ -42,7 +42,7 @@ public class PcOrderBookEventService {
         List<BookEntry> ens = new ArrayList<>();
         for (PcOrder4MatchBo order : orders) {
             BookEntry bookEntry = new BookEntry();
-            bookEntry.setOrderId(order.getId());
+            bookEntry.setOrderId(order.getOrderId());
             bookEntry.setAmt(BigDecimal.ZERO);
             ens.add(bookEntry);
         }
@@ -54,17 +54,17 @@ public class PcOrderBookEventService {
         Map<Long, PcOrder4MatchBo> entries = new HashMap<>();
         for (PriorityQueue<PcOrder4MatchBo> queue : queues) {
             for (PcOrder4MatchBo order : queue) {
-                if (entries.containsKey(order.getId())) {
-                    logger.error("order duplicated,asset:{},symbol:{},accountId:{},orderId:{}.", order.getAsset(), order.getSymbol(), order.getAccountId(), order.getId());
+                if (entries.containsKey(order.getOrderId())) {
+                    logger.error("order duplicated,asset:{},symbol:{},accountId:{},orderId:{}.", order.getAsset(), order.getSymbol(), order.getAccountId(), order.getOrderId());
                     throw new RuntimeException();
                 }
-                entries.put(order.getId(), order);
+                entries.put(order.getOrderId(), order);
                 BigDecimal dispalyAmt = order.getNumber().subtract(order.getFilledNumber());
                 if (dispalyAmt.compareTo(BigDecimal.ZERO) > 0) {
-                    BookEntry entry = new BookEntry(order.getId(), order.getPrice(), dispalyAmt, order.getBidFlag());
+                    BookEntry entry = new BookEntry(order.getOrderId(), order.getPrice(), dispalyAmt, order.getBidFlag());
                     ens.add(entry);
                 } else {
-                    logger.error("display amt<0,asset:{},symbol:{},accountId:{},orderId:{}", order.getAsset(), order.getSymbol(), order.getAccountId(), order.getId());
+                    logger.error("display amt<0,asset:{},symbol:{},accountId:{},orderId:{}", order.getAsset(), order.getSymbol(), order.getAccountId(), order.getOrderId());
                     throw new RuntimeException();
                 }
             }

@@ -60,31 +60,31 @@ public class PcOrderCancel4LiqTask extends PcOrderBaseTask implements Applicatio
         if (null != context.limitAskQueue && (!context.limitAskQueue.isEmpty())) {
             for (PcOrder4MatchBo order : context.limitAskQueue) {
                 if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag())) {
-                    id2OrderToCancel.put(order.getId(), order);
+                    id2OrderToCancel.put(order.getOrderId(), order);
                 }
             }
         }
         if (null != context.limitBidQueue && (!context.limitBidQueue.isEmpty())) {
             for (PcOrder4MatchBo order : context.limitBidQueue) {
                 if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag())) {
-                    id2OrderToCancel.put(order.getId(), order);
+                    id2OrderToCancel.put(order.getOrderId(), order);
                 }
             }
         }
 
         for (PcOrder4MatchBo order : context.allOpenOrders.values()) {
             if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag())) {
-                if (!id2OrderToCancel.containsKey(order.getId())) {
-                    logger.warn("order {} in all order,but not in priority queue", order.getId());
-                    id2OrderToCancel.put(order.getId(), order);
+                if (!id2OrderToCancel.containsKey(order.getOrderId())) {
+                    logger.warn("order {} in all order,but not in priority queue", order.getOrderId());
+                    id2OrderToCancel.put(order.getOrderId(), order);
                 }
             }
         }
 
         for (PcOrder4MatchBo order : id2OrderToCancel.values()) {
             if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag())) {
-                if (!context.allOpenOrders.containsKey(order.getId())) {
-                    logger.warn("order {} in priority queue but not in all order.", order.getId());
+                if (!context.allOpenOrders.containsKey(order.getOrderId())) {
+                    logger.warn("order {} in priority queue but not in all order.", order.getOrderId());
                 }
             }
         }
@@ -92,7 +92,7 @@ public class PcOrderCancel4LiqTask extends PcOrderBaseTask implements Applicatio
         // 从queue 中删除
         // context.allOpenOrders 中删除
         for (PcOrder4MatchBo order : id2OrderToCancel.values()) {
-            context.allOpenOrders.remove(order.getId());
+            context.allOpenOrders.remove(order.getOrderId());
             context.getQueue(order.getBidFlag()).remove(order);
         }
 

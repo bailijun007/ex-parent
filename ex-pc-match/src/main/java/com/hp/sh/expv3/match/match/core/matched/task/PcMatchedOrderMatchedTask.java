@@ -4,17 +4,14 @@
  */
 package com.hp.sh.expv3.match.match.core.matched.task;
 
-import com.hp.sh.expv3.match.PcTradeDao;
-import com.hp.sh.expv3.match.PcTradeReadService;
+import com.hp.sh.expv3.match.bo.PcOrderNotMatchedBo;
 import com.hp.sh.expv3.match.bo.PcTradeBo;
+import com.hp.sh.expv3.match.component.notify.PcMatchMqNotify;
+import com.hp.sh.expv3.match.component.notify.PcNotify;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.enums.EventEnum;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
-import com.hp.sh.expv3.match.bo.PcOrderNotMatchedBo;
 import com.hp.sh.expv3.match.msg.TradeListMsgDto;
-import com.hp.sh.expv3.match.util.PcAccountContractMqNotify;
-import com.hp.sh.expv3.match.util.PcNotify;
-import com.hp.sh.expv3.match.util.PcOrderMqNotify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -47,12 +44,7 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
     }
 
     @Autowired
-    private PcTradeReadService pcTradeReadService;
-    @Autowired
-    private PcTradeDao pcTradeDao;
-
-    @Autowired
-    private PcAccountContractMqNotify pcAccountContractMqNotify;
+    private PcMatchMqNotify pcMatchMqNotify;
     @Autowired
     private PcNotify pcNotify;
 
@@ -98,7 +90,7 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
 
         if (null != notMatchedTakerOrder) {
             // 未匹配的委托
-            pcAccountContractMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), notMatchedTakerOrder.getAccountId(), notMatchedTakerOrder.getOrderId());
+            pcMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), notMatchedTakerOrder.getAccountId(), notMatchedTakerOrder.getOrderId());
         } else {
             if (null != tradeList && (!tradeList.isEmpty())) {
 //                long takerAccountId = tradeList.get(0).getTkOrderId();
@@ -124,8 +116,7 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
 //                pcAccountContractMqNotify.sendOrderMatched(this.getAsset(), this.getSymbol(), tradeList);
 //                pcNotify.safeNotify(this.getAsset(), this.getSymbol(), this.getLastPrice());
 
-                new PcOrderMqNotify().sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
-
+                pcMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
             }
         }
 

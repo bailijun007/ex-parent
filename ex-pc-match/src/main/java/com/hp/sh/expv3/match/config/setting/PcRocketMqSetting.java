@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
+
 @Configuration
 @ConfigurationProperties(prefix = PcmatchConst.MODULE_NAME + ".rmq")
 public class PcRocketMqSetting {
@@ -20,32 +22,37 @@ public class PcRocketMqSetting {
     private String pcOrderProducerGroupName;
     private String pcOrderProducerInstanceName;
 
-    private String pcAccountContractTopicNamePattern;
-    private String pcAccountContractProducerGroupName;
-    private String pcAccountContractProducerInstanceName;
+    private String pcMatchTopicNamePattern;
+    private String pcMatchProducerGroupName;
+    private String pcMatchProducerInstanceName;
 
-    public String getPcAccountContractProducerGroupName() {
-        return pcAccountContractProducerGroupName;
+    @PostConstruct
+    private void init(){
+//        System.out.println(this.getPcMatchProducerInstanceName());
     }
 
-    public void setPcAccountContractProducerGroupName(String pcAccountContractProducerGroupName) {
-        this.pcAccountContractProducerGroupName = pcAccountContractProducerGroupName;
+    public String getPcMatchProducerGroupName() {
+        return pcMatchProducerGroupName;
     }
 
-    public String getPcAccountContractProducerInstanceName() {
-        return pcAccountContractProducerInstanceName;
+    public void setPcMatchProducerGroupName(String pcMatchProducerGroupName) {
+        this.pcMatchProducerGroupName = pcMatchProducerGroupName;
     }
 
-    public void setPcAccountContractProducerInstanceName(String pcAccountContractProducerInstanceName) {
-        this.pcAccountContractProducerInstanceName = pcAccountContractProducerInstanceName;
+    public String getPcMatchProducerInstanceName() {
+        return pcMatchProducerInstanceName;
     }
 
-    public String getPcAccountContractTopicNamePattern() {
-        return pcAccountContractTopicNamePattern;
+    public void setPcMatchProducerInstanceName(String pcMatchProducerInstanceName) {
+        this.pcMatchProducerInstanceName = pcMatchProducerInstanceName;
     }
 
-    public void setPcAccountContractTopicNamePattern(String pcAccountContractTopicNamePattern) {
-        this.pcAccountContractTopicNamePattern = pcAccountContractTopicNamePattern;
+    public String getPcMatchTopicNamePattern() {
+        return pcMatchTopicNamePattern;
+    }
+
+    public void setPcMatchTopicNamePattern(String pcMatchTopicNamePattern) {
+        this.pcMatchTopicNamePattern = pcMatchTopicNamePattern;
     }
 
     public Logger getLogger() {

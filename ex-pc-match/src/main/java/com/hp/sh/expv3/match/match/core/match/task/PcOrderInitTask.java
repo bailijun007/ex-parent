@@ -7,7 +7,7 @@ package com.hp.sh.expv3.match.match.core.match.task;
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.PcOrderSnapshotBo;
-import com.hp.sh.expv3.match.config.setting.RedisKeySetting;
+import com.hp.sh.expv3.match.config.setting.PcmatchRedisKeySetting;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.constant.PcmatchConst;
 import com.hp.sh.expv3.match.match.core.match.task.def.PcMatchTaskService;
@@ -127,8 +127,8 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
                 BigDecimal askMinPrice = askOrder.getPrice();
 
                 if (bidMaxPrice.compareTo(askMinPrice) >= 0) {
-                    logger.error("asset:{},symbol:{},accountId:{},orderId:{},bid order price >= top ask order.", bidOrder.getAsset(), bidOrder.getSymbol(), bidOrder.getAccountId(), bidOrder.getId());
-                    logger.error("asset:{},symbol:{},accountId:{},orderId:{},ask order price <= top bid order.", askOrder.getAsset(), askOrder.getSymbol(), askOrder.getAccountId(), askOrder.getId());
+                    logger.error("asset:{},symbol:{},accountId:{},orderId:{},bid order price >= top ask order.", bidOrder.getAsset(), bidOrder.getSymbol(), bidOrder.getAccountId(), bidOrder.getOrderId());
+                    logger.error("asset:{},symbol:{},accountId:{},orderId:{},ask order price <= top bid order.", askOrder.getAsset(), askOrder.getSymbol(), askOrder.getAccountId(), askOrder.getOrderId());
                     throw new RuntimeException();
                 }
             }
@@ -143,25 +143,21 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
         orderConsumer.start();
         setSentMqOffset(context);
 
-        if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
-            // TODO zw , 重启之后，重放数据，这里还要bookreset吗？
-            worker.addTask(pcMatchTaskService.buildPcOrderBookReset(this.getAssetSymbol(), this.getAsset(), this.getSymbol(), getCurrentMsgOffset()));
-        }
     }
 
     private void setSentMqOffset(PcMatchHandlerContext context) {
-        String sentMqOffsetRedisKey = RedisKeyUtil.buildOrderSentMqOffsetRedisKeyPattern(pcmatchRedisKeySetting.getOrderSentMqOffsetRedisKeyPattern(), this.getAsset(), this.getSymbol());
+        String sentMqOffsetRedisKey = RedisKeyUtil.buildOrderSentMqOffsetRedisKeyPattern(pcmatchPcmatchRedisKeySetting.getPcOrderSentMqOffsetRedisKeyPattern(), this.getAsset(), this.getSymbol());
         if (pcRedisUtil.exists(sentMqOffsetRedisKey)) {
             String s = pcRedisUtil.get(sentMqOffsetRedisKey);
             long sentOffset = Long.valueOf(s);
             context.setSentMqOffset(sentOffset);
         } else {
-            context.setSentMqOffset(0L);
+            context.setSentMqOffset(-1L);
         }
     }
 
     @Autowired
-    private RedisKeySetting pcmatchRedisKeySetting;
+    private PcmatchRedisKeySetting pcmatchPcmatchRedisKeySetting;
 
     @Autowired
     @Qualifier(PcmatchConst.MODULE_NAME + "RedisUtil")
@@ -169,7 +165,7 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
 
     void loadData(PcMatchHandlerContext context) {
 
-        String snapshotRedisKey = RedisKeyUtil.buildPcOrderSnapshotRedisKey(pcmatchRedisKeySetting.getOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
+        String snapshotRedisKey = RedisKeyUtil.buildPcOrderSnapshotRedisKey(pcmatchPcmatchRedisKeySetting.getPcOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
 
         boolean exists = pcRedisUtil.exists(snapshotRedisKey);
         if (exists) {
@@ -183,22 +179,22 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
 
             if (null != limitAskOrders) {
                 for (PcOrder4MatchBo askOrder : limitAskOrders) {
-                    if (context.allOpenOrders.containsKey(askOrder.getId())) {
-                        logger.error("order in snapshot duplicated,asset:{},symbol:{},accountId:{},orderId:{}.", this.getAsset(), this.getSymbol(), askOrder.getAccountId(), askOrder.getId());
+                    if (context.allOpenOrders.containsKey(askOrder.getOrderId())) {
+                        logger.error("order in snapshot duplicated,asset:{},symbol:{},accountId:{},orderId:{}.", this.getAsset(), this.getSymbol(), askOrder.getAccountId(), askOrder.getOrderId());
                     } else {
                         context.limitAskQueue.add(askOrder);
-                        context.allOpenOrders.put(askOrder.getId(), askOrder);
+                        context.allOpenOrders.put(askOrder.getOrderId(), askOrder);
                     }
                 }
             }
 
             if (null != limitBidOrders) {
                 for (PcOrder4MatchBo bidOrder : limitBidOrders) {
-                    if (context.allOpenOrders.containsKey(bidOrder.getId())) {
-                        logger.error("order in snapshot duplicated,asset:{},symbol:{},accountId:{},orderId:{}.", this.getAsset(), this.getSymbol(), bidOrder.getAccountId(), bidOrder.getId());
+                    if (context.allOpenOrders.containsKey(bidOrder.getOrderId())) {
+                        logger.error("order in snapshot duplicated,asset:{},symbol:{},accountId:{},orderId:{}.", this.getAsset(), this.getSymbol(), bidOrder.getAccountId(), bidOrder.getOrderId());
                     } else {
                         context.limitBidQueue.add(bidOrder);
-                        context.allOpenOrders.put(bidOrder.getId(), bidOrder);
+                        context.allOpenOrders.put(bidOrder.getOrderId(), bidOrder);
                     }
                 }
             }

@@ -35,12 +35,12 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     public void process(PcMatchHandlerContext matcherProcessorContext, PcOrder4MatchBo order) {
-        if (matcherProcessorContext.allOpenOrders.containsKey(order.getId())) {
+        if (matcherProcessorContext.allOpenOrders.containsKey(order.getOrderId())) {
             // 已存在，忽略
         } else if (isOrderComplete(order)) {
             // 已完成的，忽略
         } else {
-            matcherProcessorContext.allOpenOrders.put(order.getId(), order);
+            matcherProcessorContext.allOpenOrders.put(order.getOrderId(), order);
             match(matcherProcessorContext, order);
 //            checkOrder(matcherProcessorContext, order);
         }
@@ -74,17 +74,17 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
                     , matcherProcessorContext.limitAskQueue.size(),
                     matcherProcessorContext.limitBidQueue.size(),
                     matcherProcessorContext.allOpenOrders.size()
-                    , order.getId(), BidUtil.getPcBidCloseDesc(order.getBidFlag()), order.getAccountId(), DecimalUtil.toTrimLiteral(order.getNumber()), DecimalUtil.toTrimLiteral(order.getPrice()), DecimalUtil.toTrimLiteral(order.getFilledNumber()));
+                    , order.getOrderId(), BidUtil.getPcBidCloseDesc(order.getBidFlag()), order.getAccountId(), DecimalUtil.toTrimLiteral(order.getNumber()), DecimalUtil.toTrimLiteral(order.getPrice()), DecimalUtil.toTrimLiteral(order.getFilledNumber()));
 
             Set<Long> askOrderId = new HashSet<>();
             logger.error("=======limit ask queue:====================");
             if (null != matcherProcessorContext.limitAskQueue && !matcherProcessorContext.limitAskQueue.isEmpty()) {
                 for (PcOrder4MatchBo orderBo : matcherProcessorContext.limitAskQueue) {
-                    logger.error("oid:{} {},u:{},{}@{}", orderBo.getId(), BidUtil.getPcBidCloseDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
-                    if (!matcherProcessorContext.allOpenOrders.containsKey(orderBo.getId())) {
-                        logger.error("ask oid:{} not in map", orderBo.getId());
+                    logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BidUtil.getPcBidCloseDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
+                    if (!matcherProcessorContext.allOpenOrders.containsKey(orderBo.getOrderId())) {
+                        logger.error("ask oid:{} not in map", orderBo.getOrderId());
                     }
-                    askOrderId.add(orderBo.getId());
+                    askOrderId.add(orderBo.getOrderId());
                 }
             }
 
@@ -92,23 +92,23 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
             logger.error("=======limit bid queue:====================");
             if (null != matcherProcessorContext.limitBidQueue && !matcherProcessorContext.limitBidQueue.isEmpty()) {
                 for (PcOrder4MatchBo orderBo : matcherProcessorContext.limitBidQueue) {
-                    logger.error("oid:{} {},u:{},{}@{}", orderBo.getId(), BidUtil.getPcBidCloseDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
-                    if (!matcherProcessorContext.allOpenOrders.containsKey(orderBo.getId())) {
-                        logger.error("bid oid:{} not in map", orderBo.getId());
+                    logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BidUtil.getPcBidCloseDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
+                    if (!matcherProcessorContext.allOpenOrders.containsKey(orderBo.getOrderId())) {
+                        logger.error("bid oid:{} not in map", orderBo.getOrderId());
                     }
-                    bidOrderId.add(orderBo.getId());
+                    bidOrderId.add(orderBo.getOrderId());
                 }
             }
 
             logger.error("=======all orders in map:====================");
             if (null != matcherProcessorContext.allOpenOrders && !matcherProcessorContext.allOpenOrders.isEmpty()) {
                 for (PcOrder4MatchBo orderBo : matcherProcessorContext.allOpenOrders.values()) {
-                    logger.error("oid:{} {},u:{},{}@{}", orderBo.getId(), BidUtil.getPcBidCloseDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
-                    if (orderBo.getBidFlag() == CommonConst.BID && !bidOrderId.contains(orderBo.getId())) {
-                        logger.error("bid oid:{} not in queue. check!!!", orderBo.getId());
+                    logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BidUtil.getPcBidCloseDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
+                    if (orderBo.getBidFlag() == CommonConst.BID && !bidOrderId.contains(orderBo.getOrderId())) {
+                        logger.error("bid oid:{} not in queue. check!!!", orderBo.getOrderId());
                     }
-                    if (orderBo.getBidFlag() == CommonConst.ASK && !askOrderId.contains(orderBo.getId())) {
-                        logger.error("ask oid:{} not in queue. check!!!", orderBo.getId());
+                    if (orderBo.getBidFlag() == CommonConst.ASK && !askOrderId.contains(orderBo.getOrderId())) {
+                        logger.error("ask oid:{} not in queue. check!!!", orderBo.getOrderId());
                     }
                 }
             }
@@ -123,7 +123,7 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
         }
 //        pcExDef.doOrderNew(context.asset, context.symbol, takerOrder.getAccountId(), takerOrder.getId());
         BigDecimal displayAmt = takerOrder.getNumber().subtract(takerOrder.getFilledNumber());
-        bookUpdate(context, takerOrder.getId(), takerOrder.getBidFlag(), takerOrder.getPrice(), displayAmt);
+        bookUpdate(context, takerOrder.getOrderId(), takerOrder.getBidFlag(), takerOrder.getPrice(), displayAmt);
         context.setOrderNew(takerOrder);
     }
 
@@ -136,7 +136,7 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
     }
 
     protected void completeOrder(PcMatchHandlerContext context, PcOrder4MatchBo order) {
-        context.allOpenOrders.remove(order.getId());
+        context.allOpenOrders.remove(order.getOrderId());
     }
 
     /**
@@ -201,12 +201,12 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
         trade.setTradeTime(ctime);
 
         trade.setTkAccountId(takerOrder.getAccountId());
-        trade.setTkOrderId(takerOrder.getId());
+        trade.setTkOrderId(takerOrder.getOrderId());
         trade.setTkBidFlag(takerOrder.getBidFlag());
         trade.setTkCloseFlag(takerOrder.getCloseFlag());
 
         trade.setMkAccountId(makerOrder.getAccountId());
-        trade.setMkOrderId(makerOrder.getId());
+        trade.setMkOrderId(makerOrder.getOrderId());
         trade.setMkCloseFlag(makerOrder.getCloseFlag());
 
         return trade;

@@ -6,5 +6,5 @@ package com.hp.sh.expv3.match.component.rocketmq;
 
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 
-public class BasePcAccountContractProducer extends DefaultMQProducer {
+public class PcMatchProducer extends DefaultMQProducer {
 }

@@ -18,7 +18,6 @@ import static com.hp.sh.expv3.match.constant.CommonConst.*;
  */
 public final class PcUtil {
 
-
     public static final boolean isLiq(boolean isLong, BigDecimal liqPrice, BigDecimal markPrice) {
         if (isLong) {
             return markPrice.compareTo(liqPrice) <= 0;

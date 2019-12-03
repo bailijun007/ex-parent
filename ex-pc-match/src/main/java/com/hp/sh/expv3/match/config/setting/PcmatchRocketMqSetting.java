@@ -20,9 +20,13 @@ public class PcmatchRocketMqSetting {
     private String pcOrderConsumerInstanceName;
     private long matchPullTimeoutInMs;
 
-    public Logger getLogger() {
-        return logger;
-    }
+    private String pcOrderTopicNamePattern;
+    private String pcOrderProducerGroupName;
+    private String pcOrderProducerInstanceName;
+
+    private String pcMatchTopicNamePattern;
+    private String pcMatchProducerGroupName;
+    private String pcMatchProducerInstanceName;
 
     public String getPcOrderConsumerGroupName() {
         return pcOrderConsumerGroupName;
@@ -46,5 +50,53 @@ public class PcmatchRocketMqSetting {
 
     public void setMatchPullTimeoutInMs(long matchPullTimeoutInMs) {
         this.matchPullTimeoutInMs = matchPullTimeoutInMs;
+    }
+
+    public String getPcOrderTopicNamePattern() {
+        return pcOrderTopicNamePattern;
+    }
+
+    public void setPcOrderTopicNamePattern(String pcOrderTopicNamePattern) {
+        this.pcOrderTopicNamePattern = pcOrderTopicNamePattern;
+    }
+
+    public String getPcOrderProducerGroupName() {
+        return pcOrderProducerGroupName;
+    }
+
+    public void setPcOrderProducerGroupName(String pcOrderProducerGroupName) {
+        this.pcOrderProducerGroupName = pcOrderProducerGroupName;
+    }
+
+    public String getPcOrderProducerInstanceName() {
+        return pcOrderProducerInstanceName;
+    }
+
+    public void setPcOrderProducerInstanceName(String pcOrderProducerInstanceName) {
+        this.pcOrderProducerInstanceName = pcOrderProducerInstanceName;
+    }
+
+    public String getPcMatchTopicNamePattern() {
+        return pcMatchTopicNamePattern;
+    }
+
+    public void setPcMatchTopicNamePattern(String pcMatchTopicNamePattern) {
+        this.pcMatchTopicNamePattern = pcMatchTopicNamePattern;
+    }
+
+    public String getPcMatchProducerGroupName() {
+        return pcMatchProducerGroupName;
+    }
+
+    public void setPcMatchProducerGroupName(String pcMatchProducerGroupName) {
+        this.pcMatchProducerGroupName = pcMatchProducerGroupName;
+    }
+
+    public String getPcMatchProducerInstanceName() {
+        return pcMatchProducerInstanceName;
+    }
+
+    public void setPcMatchProducerInstanceName(String pcMatchProducerInstanceName) {
+        this.pcMatchProducerInstanceName = pcMatchProducerInstanceName;
     }
 }

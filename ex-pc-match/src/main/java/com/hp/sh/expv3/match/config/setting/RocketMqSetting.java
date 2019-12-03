@@ -4,12 +4,11 @@
  */
 package com.hp.sh.expv3.match.config.setting;
 
-import com.hp.sh.expv3.match.constant.PcmatchConst;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = PcmatchConst.MODULE_NAME + "rmq")
+@ConfigurationProperties(prefix = "rmq")
 public class RocketMqSetting {
 
     private String nameSrvAddr;

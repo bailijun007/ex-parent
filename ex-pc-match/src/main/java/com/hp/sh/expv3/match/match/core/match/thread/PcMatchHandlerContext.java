@@ -40,22 +40,22 @@ public class PcMatchHandlerContext {
     private Boolean PendingNewIgnoreReasonAlreadyCompleted;
     private Boolean PendingCancelIgnoreReasonNotInQueue;
 
-    private long sentMqOffset;
-    private long matchTxId;
+    private Long sentMqOffset;
+    private Long matchTxId;
 
-    public long getMatchTxId() {
+    public Long getMatchTxId() {
         return matchTxId;
     }
 
-    public void setMatchTxId(long matchTxId) {
+    public void setMatchTxId(Long matchTxId) {
         this.matchTxId = matchTxId;
     }
 
-    public long getSentMqOffset() {
+    public Long getSentMqOffset() {
         return sentMqOffset;
     }
 
-    public void setSentMqOffset(long sentMqOffset) {
+    public void setSentMqOffset(Long sentMqOffset) {
         this.sentMqOffset = sentMqOffset;
     }
 

@@ -7,7 +7,6 @@ package com.hp.sh.expv3.match.match.core.match.thread.impl;
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.PcOrderSnapshotCreateDto;
-import com.hp.sh.expv3.match.config.setting.PcRocketMqSetting;
 import com.hp.sh.expv3.match.config.setting.PcmatchRocketMqSetting;
 import com.hp.sh.expv3.match.config.setting.RocketMqSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
@@ -49,8 +48,6 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
     private RocketMqSetting rocketMqSetting;
     @Autowired
     private PcmatchRocketMqSetting pcmatchRocketMqSetting;
-    @Autowired
-    private PcRocketMqSetting pcRocketMqSetting;
     @Autowired
     private PcMatchTaskService pcMatchTaskService;
 
@@ -144,7 +141,7 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
 
             Map<String, Long> topic2Offset = new HashMap<>();
             Tuple2<String, String> assetSymbolTuple = PcUtil.splitAssetAndSymbol(assetSymbol);
-            String topicName = PcRocketMqUtil.buildPcOrderTopicName(pcRocketMqSetting.getPcOrderTopicNamePattern(), assetSymbolTuple.first, assetSymbolTuple.second);
+            String topicName = PcRocketMqUtil.buildPcOrderTopicName(pcmatchRocketMqSetting.getPcOrderTopicNamePattern(), assetSymbolTuple.first, assetSymbolTuple.second);
 
             while (true) {
                 try {
@@ -161,7 +158,7 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                     if (e.getCause() instanceof MQClientException) {
                         MQClientException o = (MQClientException) e.getCause();
                         if (o.getResponseCode() == 17) {
-                            logger.warn("wait topic {} created for {} {}.", topicName, consumerGroup, instanceName);
+                            logger.warn("wait topic {} created at namespace:{} for {} {}.", topicName, rocketMqSetting.getNameSpace(), consumerGroup, instanceName);
                             Thread.sleep(5000L);
                             continue;
                         }

@@ -138,7 +138,7 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
                 pcOrderNotMatchedBo.setAsset(order.getAsset());
                 pcOrderNotMatchedBo.setSymbol(order.getSymbol());
                 pcOrderNotMatchedBo.setAccountId(order.getAccountId());
-                pcOrderNotMatchedBo.setOrderId(order.getId());
+                pcOrderNotMatchedBo.setOrderId(order.getOrderId());
                 task.setNotMatchedTakerOrder(pcOrderNotMatchedBo);
             }
         }

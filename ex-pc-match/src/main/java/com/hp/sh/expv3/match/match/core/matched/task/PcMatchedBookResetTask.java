@@ -7,7 +7,7 @@ package com.hp.sh.expv3.match.match.core.matched.task;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.enums.EventEnum;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
-import com.hp.sh.expv3.match.util.PcNotify;
+import com.hp.sh.expv3.match.component.notify.PcNotify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

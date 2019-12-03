@@ -4,9 +4,9 @@
  */
 package com.hp.sh.expv3.match.config;
 
-import com.hp.sh.expv3.match.component.rocketmq.BasePcAccountContractProducer;
+import com.hp.sh.expv3.match.component.rocketmq.PcMatchProducer;
 import com.hp.sh.expv3.match.component.rocketmq.BasePcOrderProducer;
-import com.hp.sh.expv3.match.config.setting.PcRocketMqSetting;
+import com.hp.sh.expv3.match.config.setting.PcmatchRocketMqSetting;
 import com.hp.sh.expv3.match.config.setting.RocketMqSetting;
 import com.hp.sh.expv3.match.constant.PcmatchConst;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -22,7 +22,7 @@ public class PcmatchRmqBeans {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private PcRocketMqSetting pcRocketMqSetting;
+    private PcmatchRocketMqSetting pcmatchRocketMqSetting;
     @Autowired
     private RocketMqSetting rocketMqSetting;
 
@@ -30,9 +30,9 @@ public class PcmatchRmqBeans {
     BasePcOrderProducer buildOrderProducer() throws MQClientException {
         BasePcOrderProducer producer = new BasePcOrderProducer();
         producer.setNamespace(rocketMqSetting.getNameSpace());
-        producer.setProducerGroup(pcRocketMqSetting.getPcOrderProducerGroupName());
+        producer.setProducerGroup(pcmatchRocketMqSetting.getPcOrderProducerGroupName());
         producer.setNamesrvAddr(rocketMqSetting.getNameSrvAddr());
-        producer.setInstanceName(pcRocketMqSetting.getPcOrderProducerInstanceName());
+        producer.setInstanceName(pcmatchRocketMqSetting.getPcOrderProducerInstanceName());
         producer.setVipChannelEnabled(false);
         producer.setDefaultTopicQueueNums(1);
         producer.setRetryTimesWhenSendAsyncFailed(3);
@@ -43,12 +43,12 @@ public class PcmatchRmqBeans {
     }
 
     @Bean(PcmatchConst.MODULE_NAME + "AccountContractProducer")
-    BasePcAccountContractProducer buildAccountContractProducer() throws MQClientException {
-        BasePcAccountContractProducer producer = new BasePcAccountContractProducer();
+    PcMatchProducer buildAccountContractProducer() throws MQClientException {
+        PcMatchProducer producer = new PcMatchProducer();
         producer.setNamespace(rocketMqSetting.getNameSpace());
-        producer.setProducerGroup(pcRocketMqSetting.getPcAccountContractProducerGroupName());
+        producer.setProducerGroup(pcmatchRocketMqSetting.getPcMatchProducerGroupName());
         producer.setNamesrvAddr(rocketMqSetting.getNameSrvAddr());
-        producer.setInstanceName(pcRocketMqSetting.getPcAccountContractProducerInstanceName());
+        producer.setInstanceName(pcmatchRocketMqSetting.getPcMatchProducerInstanceName());
         producer.setVipChannelEnabled(false);
         producer.setDefaultTopicQueueNums(8);
         producer.setRetryTimesWhenSendAsyncFailed(3);

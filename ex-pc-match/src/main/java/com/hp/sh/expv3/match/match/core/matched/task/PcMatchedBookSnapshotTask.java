@@ -6,7 +6,7 @@ package com.hp.sh.expv3.match.match.core.matched.task;
 
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.PcOrderSnapshotBo;
-import com.hp.sh.expv3.match.config.setting.RedisKeySetting;
+import com.hp.sh.expv3.match.config.setting.PcmatchRedisKeySetting;
 import com.hp.sh.expv3.match.constant.PcmatchConst;
 import com.hp.sh.expv3.match.util.JsonUtil;
 import com.hp.sh.expv3.match.util.RedisKeyUtil;
@@ -61,7 +61,7 @@ public class PcMatchedBookSnapshotTask extends PcMatchedBaseTask {
     }
 
     @Autowired
-    private RedisKeySetting pcmatchRedisKeySetting;
+    private PcmatchRedisKeySetting pcmatchPcmatchRedisKeySetting;
 
     @Autowired
     @Qualifier(PcmatchConst.MODULE_NAME + "RedisUtil")
@@ -76,7 +76,7 @@ public class PcMatchedBookSnapshotTask extends PcMatchedBaseTask {
         snapshot.setLimitBidOrders(limitBidOrders);
         snapshot.setRmqNextOffset(this.getCurrentMsgOffset() + 1);
 
-        String snapshotRedisKey = RedisKeyUtil.buildPcOrderSnapshotRedisKey(pcmatchRedisKeySetting.getOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
+        String snapshotRedisKey = RedisKeyUtil.buildPcOrderSnapshotRedisKey(pcmatchPcmatchRedisKeySetting.getPcOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
 
         pcRedisUtil.set(snapshotRedisKey, JsonUtil.toJsonString(snapshot));
 

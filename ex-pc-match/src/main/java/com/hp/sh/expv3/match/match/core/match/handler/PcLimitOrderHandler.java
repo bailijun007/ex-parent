@@ -9,7 +9,7 @@ import com.hp.sh.expv3.match.bo.PcTradeBo;
 import com.hp.sh.expv3.match.component.id.def.IdService;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
-import com.hp.sh.expv3.match.util.IdTypeEnum;
+import com.hp.sh.expv3.match.enums.IdTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,11 +70,11 @@ public class PcLimitOrderHandler extends PcOrderHandler {
             if (makerCompleted) {
                 makerLimitQueue.poll();
                 completeOrder(context, makerOrder);
-                bookUpdate(context, makerOrder.getId(), makerOrder.getBidFlag(), makerOrder.getPrice(), BigDecimal.ZERO);
+                bookUpdate(context, makerOrder.getOrderId(), makerOrder.getBidFlag(), makerOrder.getPrice(), BigDecimal.ZERO);
                 continue;
             } else {
                 BigDecimal makerDisplayAmt = makerUnfilledAmount;
-                bookUpdate(context, makerOrder.getId(), makerOrder.getBidFlag(), makerOrder.getPrice(), makerDisplayAmt);
+                bookUpdate(context, makerOrder.getOrderId(), makerOrder.getBidFlag(), makerOrder.getPrice(), makerDisplayAmt);
                 break;
             }
         }
