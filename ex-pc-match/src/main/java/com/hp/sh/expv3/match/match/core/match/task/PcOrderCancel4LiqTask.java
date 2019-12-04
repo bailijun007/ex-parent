@@ -59,21 +59,21 @@ public class PcOrderCancel4LiqTask extends PcOrderBaseTask implements Applicatio
 
         if (null != context.limitAskQueue && (!context.limitAskQueue.isEmpty())) {
             for (PcOrder4MatchBo order : context.limitAskQueue) {
-                if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag())) {
+                if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag()) && PcUtil.isClose(order.getCloseFlag())) {
                     id2OrderToCancel.put(order.getOrderId(), order);
                 }
             }
         }
         if (null != context.limitBidQueue && (!context.limitBidQueue.isEmpty())) {
             for (PcOrder4MatchBo order : context.limitBidQueue) {
-                if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag())) {
+                if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag()) && PcUtil.isClose(order.getCloseFlag())) {
                     id2OrderToCancel.put(order.getOrderId(), order);
                 }
             }
         }
 
         for (PcOrder4MatchBo order : context.allOpenOrders.values()) {
-            if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag())) {
+            if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag()) && PcUtil.isClose(order.getCloseFlag())) {
                 if (!id2OrderToCancel.containsKey(order.getOrderId())) {
                     logger.warn("order {} in all order,but not in priority queue", order.getOrderId());
                     id2OrderToCancel.put(order.getOrderId(), order);
@@ -82,7 +82,7 @@ public class PcOrderCancel4LiqTask extends PcOrderBaseTask implements Applicatio
         }
 
         for (PcOrder4MatchBo order : id2OrderToCancel.values()) {
-            if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag())) {
+            if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag()) && PcUtil.isClose(order.getCloseFlag())) {
                 if (!context.allOpenOrders.containsKey(order.getOrderId())) {
                     logger.warn("order {} in priority queue but not in all order.", order.getOrderId());
                 }

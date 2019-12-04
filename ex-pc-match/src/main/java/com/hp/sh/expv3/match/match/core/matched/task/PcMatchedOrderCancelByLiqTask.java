@@ -79,13 +79,13 @@ public class PcMatchedOrderCancelByLiqTask extends PcMatchedBaseTask {
             bookMsgDto.setOrders(bookEntries);
             // prepared book end
 
-            pcOrderMqNotify.sendSameSideOrderCancelled(this.getAsset(), this.getSymbol(), orders);
+            pcOrderMqNotify.sendSameSideCloseOrderCancelled(this.getAsset(), this.getSymbol(), orders);
 
             pcNotify.safeNotify(this.getAsset(), this.getSymbol(), bookMsgDto);
         }
 
         // 不管是否有委托被取消，都要发送此消息，以便后续执行强平操作
-        pcOrderMqNotify.sendSameSideOrderAllCancelled(this.getAsset(), this.getSymbol(), msg);
+        pcOrderMqNotify.sendSameSideCloseOrderAllCancelled(this.getAsset(), this.getSymbol(), msg);
 
         updateSentMqOffset();
 

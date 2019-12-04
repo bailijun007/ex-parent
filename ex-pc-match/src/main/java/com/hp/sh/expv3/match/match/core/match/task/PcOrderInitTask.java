@@ -7,6 +7,7 @@ package com.hp.sh.expv3.match.match.core.match.task;
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.PcOrderSnapshotBo;
+import com.hp.sh.expv3.match.component.notify.PcOrderMqNotify;
 import com.hp.sh.expv3.match.config.setting.PcmatchRedisKeySetting;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.constant.PcmatchConst;
@@ -143,6 +144,8 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
         orderConsumer.start();
         setSentMqOffset(context);
 
+        pcOrderMqNotify.sendMatchStart(this.getAsset(), this.getSymbol());
+
     }
 
     private void setSentMqOffset(PcMatchHandlerContext context) {
@@ -158,6 +161,8 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
 
     @Autowired
     private PcmatchRedisKeySetting pcmatchPcmatchRedisKeySetting;
+    @Autowired
+    private PcOrderMqNotify pcOrderMqNotify;
 
     @Autowired
     @Qualifier(PcmatchConst.MODULE_NAME + "RedisUtil")

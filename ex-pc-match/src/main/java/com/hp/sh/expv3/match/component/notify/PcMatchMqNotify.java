@@ -88,7 +88,7 @@ public class PcMatchMqNotify {
         return true;
     }
 
-    public boolean sendSameSideOrderCancelled(String asset, String symbol, Collection<PcOrder4MatchBo> orders) {
+    public boolean sendSameSideCloseOrderCancelled(String asset, String symbol, Collection<PcOrder4MatchBo> orders) {
         String topic = PcRocketMqUtil.buildPcAccountContractMqTopicName(pcmatchRocketMqSetting.getPcMatchTopicNamePattern(), asset, symbol);
 
         if (null == orders || orders.isEmpty()) {
@@ -104,7 +104,7 @@ public class PcMatchMqNotify {
                 msg.setCancelNumber(cancelDeltaAmt);
                 Message message = new Message(
                         topic,// topic
-                        "" + RmqTagEnum.PC_MATCH_ORDER_CANCELLED.getConstant(),// tag
+                        "" + RmqTagEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_CANCELLED.getConstant(),// tag
                         "" + order.getOrderId(),
                         JsonUtil.toJsonString(msg).getBytes()// body
                 );
@@ -114,12 +114,12 @@ public class PcMatchMqNotify {
         return true;
     }
 
-    public boolean sendSameSideOrderAllCancelled(String asset, String symbol, PcPosLockedMqMsgDto msg) {
+    public boolean sendSameSideCloseOrderAllCancelled(String asset, String symbol, PcPosLockedMqMsgDto msg) {
         String topic = PcRocketMqUtil.buildPcAccountContractMqTopicName(pcmatchRocketMqSetting.getPcMatchTopicNamePattern(), asset, symbol);
 
         Message message = new Message(
                 topic,// topic
-                "" + RmqTagEnum.PC_SAME_SIDE_ORDER_ALL_CANCELLED.getConstant(),// tag
+                "" + RmqTagEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED.getConstant(),// tag
                 "" + msg.getId(), // pos id
                 JsonUtil.toJsonString(msg).getBytes()// body
         );

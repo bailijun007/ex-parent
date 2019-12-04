@@ -48,6 +48,23 @@ public class PcOrderMqNotify {
         return true;
     }
 
+    public boolean sendMatchStart(String asset, String symbol) {
+        String topic = PcRocketMqUtil.buildPcOrderTopicName(pcmatchRocketMqSetting.getPcOrderTopicNamePattern(), asset, symbol);
+
+        PcMatchOrderSnapshotMqMsgDto msg = new PcMatchOrderSnapshotMqMsgDto();
+        msg.setAsset(asset);
+        msg.setSymbol(symbol);
+
+        Message message = new Message(
+                topic,// topic
+                "" + RmqTagEnum.PC_MATCH_CONSUMER_START.getConstant(),// tag
+                "" + RmqTagEnum.PC_MATCH_CONSUMER_START.getConstant(),// tag
+                JsonUtil.toJsonString(msg).getBytes()// body
+        );
+        safeSend2OrderTopic(message);
+        return true;
+    }
+
     private boolean safeSend2OrderTopic(Message message) {
         while (true) {
             try {

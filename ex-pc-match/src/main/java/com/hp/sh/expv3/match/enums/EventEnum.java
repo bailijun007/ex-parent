@@ -118,12 +118,6 @@ public enum EventEnum implements EnumDescribe {
      * 委托 pending cancel，发给撮合的消息，用于通知撮合将该委托剩余未成交部分取消 并移除 bookOrder 列表
      */
     PC_ORDER_PENDING_CANCEL(26, "PC_ORDER_PENDING_CANCEL"),
-
-
-    /**
-     * 委托 匹配成功，由撮合发出，用于通知下游将 委托状态修改为 部分成交或者全部成交
-     */
-    PC_MATCH_ORDER_MATCHED(27, "PC_MATCH_ORDER_MATCHED"),
     /**
      * 委托 未匹配，由撮合发出，用于通知下游将 委托状态修改为 NEW
      */
@@ -136,36 +130,20 @@ public enum EventEnum implements EnumDescribe {
      * 撮合引擎中 book list 创建快照
      */
     PC_MATCH_ORDER_SNAPSHOT_CREATE(30, "PC_MATCH_ORDER_SNAPSHOT_CREATE"),
-
-    /**
-     * 仓位维持保证金不足，强平引擎探测出强平征兆
-     */
-    PC_POS_MARGIN_NOT_ENOUGH(31, "PC_POS_MARGIN_NOT_ENOUGH"),
     /**
      * 仓位被冻结
      */
     PC_POS_LIQ_LOCKED(32, "PC_POS_LIQ_LOCKED"),
+    /**
+     * 撮合引擎启动
+     */
+    PC_MATCH_CONSUMER_START(37, "PC_MATCH_CONSUMER_START"),
+    /**
+     * 仓位维持保证金不足，待强平仓位同向 平仓委托 已取消，margin 监听此消息后，转发给 liq
+     */
+    PC_MATCH_SAME_SIDE_CLOSE_ORDER_CANCELLED(38, "PC_MATCH_SAME_SIDE_CLOSE_ORDER_CANCELLED"),
 
-    /**
-     * 仓位维持保证金不足，待强平仓位同向委托 已取消，单个，lastFlag
-     */
-    PC_ORDER_CANCELLED_4_POS_MARGIN_NOT_ENOUGH(33, "PC_ORDER_CANCELLED_4_POS_MARGIN_NOT_ENOUGH"),
-    /**
-     * 仓位维持保证金不足，待强平仓位同向委托 全部已取消，margin 监听此消息后，转发给 margin
-     */
-    PC_SAME_SIDE_ORDER_ALL_CANCELLED(34, "PC_SAME_SIDE_ORDER_ALL_CANCELLED"),
-    /**
-     * 仓位维持保证金不足，待强平仓位同向委托 已取消，margin 监听此消息后，转发给 liq
-     */
-    PC_PREPARED_2_LIQ(35, "PC_PREPARED_2_LIQ"),
-    /**
-     * 仓位维持保证金不足，待强平仓位同向委托 已取消，margin 监听此消息后，转发给 liq
-     */
-    PC_SAME_SIDE_ORDER_CANCELLED(36, "PC_SAME_SIDE_ORDER_CANCELLED"),
-    /**
-     * 仓位维持保证金不足，待强平仓位同向委托 已取消，margin 监听此消息后，转发给 liq
-     */
-    PC_MARGIN_CONSUMER_START(37, "PC_MARGIN_CONSUMER_START"),
+    PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED(39, "PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED"),
 
 
     // TODO zw，新增防御性事件
