@@ -6,13 +6,11 @@ package com.hp.sh.expv3.match.match.core.match.thread.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
-import com.hp.sh.expv3.match.bo.PcOrderSnapshotCreateDto;
 import com.hp.sh.expv3.match.config.setting.PcmatchRocketMqSetting;
 import com.hp.sh.expv3.match.config.setting.RocketMqSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
 import com.hp.sh.expv3.match.match.core.match.task.PcOrderBaseTask;
 import com.hp.sh.expv3.match.match.core.match.task.def.PcMatchTaskService;
-import com.hp.sh.expv3.match.mqmsg.BookResetMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.PcOrderMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.PcPosLockedMqMsgDto;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
@@ -104,7 +102,11 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
 //        while (!isStart.get()) {
 //        }
 //        isStart.set(true);
-        startListener();
+        try {
+            startListener();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
 
         while (true) {
             try {
@@ -233,28 +235,16 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                                     task.setCurrentMsgOffset(m.getQueueOffset());
                                     matchWorker.addTask(task);
                                 } else if (RmqTagEnum.PC_BOOK_RESET.getConstant().equals(m.getTags())) {
-                                    BookResetMqMsgDto dto = JSON.parseObject(body, BookResetMqMsgDto.class);
-                                    if (dto.getAsset().equalsIgnoreCase(asset) && dto.getSymbol().equalsIgnoreCase(symbol)) {
-                                        task = pcMatchTaskService.buildPcOrderBookReset(assetSymbol, asset, symbol, queueOffset);
-                                    } else {
-                                        // TODO zw , asset symbol 不一致，告警
-                                    }
+//                                    BookResetMqMsgDto dto = JSON.parseObject(body, BookResetMqMsgDto.class);
+                                    task = pcMatchTaskService.buildPcOrderBookReset(assetSymbol, asset, symbol, queueOffset);
                                     matchWorker.addTask(task);
                                 } else if (RmqTagEnum.PC_MATCH_ORDER_SNAPSHOT_CREATE.getConstant().equals(m.getTags())) {
-                                    PcOrderSnapshotCreateDto dto = JSON.parseObject(body, PcOrderSnapshotCreateDto.class);
-                                    if (dto.getAsset().equalsIgnoreCase(asset) && dto.getSymbol().equalsIgnoreCase(symbol)) {
-                                        task = pcMatchTaskService.buildOrderSnapshotTask(assetSymbol, asset, symbol, queueOffset);
-                                    } else {
-                                        // TODO zw , asset symbol 不一致，告警
-                                    }
+//                                    PcOrderSnapshotCreateDto dto = JSON.parseObject(body, PcOrderSnapshotCreateDto.class);
+                                    task = pcMatchTaskService.buildOrderSnapshotTask(assetSymbol, asset, symbol, queueOffset);
                                     matchWorker.addTask(task);
                                 } else if (RmqTagEnum.PC_POS_LIQ_LOCKED.getConstant().equals(m.getTags())) {
                                     PcPosLockedMqMsgDto dto = JSON.parseObject(body, PcPosLockedMqMsgDto.class);
-                                    if (dto.getAsset().equalsIgnoreCase(asset) && dto.getSymbol().equalsIgnoreCase(symbol)) {
-                                        task = pcMatchTaskService.buildPcOrderCancelByLiqTask(assetSymbol, asset, symbol, queueOffset, dto);
-                                    } else {
-                                        // TODO zw , asset symbol 不一致，告警
-                                    }
+                                    task = pcMatchTaskService.buildPcOrderCancelByLiqTask(assetSymbol, asset, symbol, queueOffset, dto);
                                     matchWorker.addTask(task);
                                 } else {
                                     logger.error("get tags {} not define,go to exit -1", m.getTags());
@@ -264,7 +254,7 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                             try {
                                 Thread.sleep(2L);
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                logger.error(e.getMessage(), e);
                             }
                         }
                     } catch (MQBrokerException e) {
