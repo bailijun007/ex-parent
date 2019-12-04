@@ -8,13 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.module.order.constant.IntBool;
+import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
+import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.constant.MarginMode;
+import com.hp.sh.expv3.pc.module.order.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.module.order.constant.PcOrderType;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
+import com.hp.sh.expv3.utils.IntBool;
 
 /**
  * 委托
@@ -33,6 +36,9 @@ public class PcOrderService {
 	
 	@Autowired
 	private MarginRatioService marginRatioService;
+	
+	@Autowired
+	private PcAccountCoreService pcAccountCoreService;
 	
 	/**
 	 * 创建订单
@@ -66,8 +72,10 @@ public class PcOrderService {
 		pcOrder.setAmt(amt);
 		pcOrder.setOrderType(PcOrderType.LIMIT);
 		pcOrder.setMarginMode(MarginMode.FIXED);
+		pcOrder.setTimeInForce(timeInForce);
+		pcOrder.setClientOrderId(cliOrderId);
 		
-		/////////系统计算/////////
+		/////////押金设置/////////
 		
 		if (IntBool.isTrue(closeFlag)) {
 			this.setCloseOrderFee(pcOrder);
@@ -75,12 +83,23 @@ public class PcOrderService {
 			this.setOpenOrderFee(pcOrder);
 		}
 		
+		////////其他字段，后面随状态修改////////
+		this.setOther(pcOrder);
+		
+		pcOrderDAO.save(pcOrder);
+
+		//押金扣除
+		this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin());
+		
+		return pcOrder;
+	}
+	
+	private void setOther(PcOrder pcOrder){
 		pcOrder.setFeeCost(BigDecimal.ZERO);
 		pcOrder.setFilledAmt(BigDecimal.ZERO);
 		pcOrder.setFilledVolume(BigDecimal.ZERO);
 		pcOrder.setCancelAmt(null);
 		pcOrder.setClosePosId(null);
-		pcOrder.setTimeInForce(timeInForce);
 		pcOrder.setTriggerFlag(IntBool.NO);
 		pcOrder.setCancelTime(null);
 		pcOrder.setStatus(PcOrder.PENDING_NEW);
@@ -94,14 +113,33 @@ public class PcOrderService {
 		pcOrder.setCreateOperator(null);
 		pcOrder.setCancelOperator(null);
 		pcOrder.setRemark(null);
-		pcOrder.setClientOrderId(cliOrderId);
 		
 		///////////其他///
 		pcOrder.setCancelAmt(BigDecimal.ZERO);
-		
-		pcOrderDAO.save(pcOrder);
-		
-		return pcOrder;
+	}
+	
+	private void cutBalance(Long userId, String asset, Long orderId, BigDecimal amount){
+		CutMoneyRequest request = new CutMoneyRequest();
+		request.setAmount(amount);
+		request.setAsset(asset);
+		request.setRemark("开仓扣除");
+		request.setTradeNo("O"+orderId);
+		request.setTradeType(PcAccountTradeType.ORDER_OPEN);
+		request.setUserId(userId);
+		request.setAssociatedId(orderId);
+		this.pcAccountCoreService.cut(request);
+	}
+	
+	private void returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal amount){
+		CutMoneyRequest request = new CutMoneyRequest();
+		request.setAmount(amount);
+		request.setAsset(asset);
+		request.setRemark("撤单还余额");
+		request.setTradeNo("C"+orderId);
+		request.setTradeType(PcAccountTradeType.ORDER_CANCEL);
+		request.setUserId(userId);
+		request.setAssociatedId(orderId);
+		this.pcAccountCoreService.cut(request);
 	}
 
 	//设置平仓订单的各种费率
@@ -149,17 +187,41 @@ public class PcOrderService {
 		}
 	}
 	
-	public void cancel(long userId, String asset, String symbol, long orderId){
+	public PcOrder getOrder(Long userId, Long orderId){
+		return this.pcOrderDAO.findById(userId, orderId);
+	}
+	
+	public void cancel(long userId, String asset, long orderId, BigDecimal cancelAmt){
+		//修改订单状态（撤销）
+		Date now = new Date();
+		this.setCancelStatus(userId, asset, orderId, PcOrder.CANCELED);
+		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		order.setCancelTime(now);
+		order.setCancelAmt(cancelAmt);
+		order.setActiveFlag(PcOrder.NO);
+		order.setStatus(PcOrder.CANCELED);
+		this.pcOrderDAO.update(order);
+		
+		//返还余额
+		this.returnCancelAmt(userId, asset, orderId, cancelAmt);
+	}
+	
+	public void setCancelStatus(long userId, String asset, long orderId, Integer cancelStatsus){
 		Date now = new Date();
 		
-		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		long count = this.pcOrderDAO.cancelOrder(userId, orderId, cancelStatsus, now);
 		
-		order.setStatus(PcOrder.PENDING_CANCEL);
-		order.setActiveFlag(PcOrder.NO);
-		order.setCancelTime(now);
-		order.setModified(now);
+		if(count!=1){
+			throw new RuntimeException("更新失败，更新行数："+count);
+		}
         
-		
+	}
+	
+	public void changeStatus(Long userId, Long orderId, Integer newStatus, Integer desiredOldStatus){
+		long count = this.pcOrderDAO.changeStatus(userId, orderId, newStatus, desiredOldStatus, new Date());
+		if(count!=1){
+			throw new RuntimeException("更新失败，更新行数："+count);
+		}
 	}
 
 }

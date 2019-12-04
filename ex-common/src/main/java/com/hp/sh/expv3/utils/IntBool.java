@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.order.constant;
+package com.hp.sh.expv3.utils;
 
 public class IntBool {
 

@@ -2,7 +2,7 @@
  * @author zw
  * @date 2019/8/21
  */
-package com.hp.sh.expv3.constant;
+package com.hp.sh.expv3.fund.cash.constant;
 
 import java.util.EnumSet;
 import java.util.Map;

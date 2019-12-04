@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.account.constant;
+package com.hp.sh.expv3.constant;
 
 /**
  * 资金流向

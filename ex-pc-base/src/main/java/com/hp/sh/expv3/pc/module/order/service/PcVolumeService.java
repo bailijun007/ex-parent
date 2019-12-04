@@ -6,7 +6,7 @@ package com.hp.sh.expv3.pc.module.order.service;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.module.order.constant.IntBool;
+import com.hp.sh.expv3.utils.IntBool;
 
 public class PcVolumeService {
 

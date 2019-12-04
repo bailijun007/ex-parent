@@ -17,10 +17,17 @@ public class PcOrder extends UserDataEntity {
 	
 	public static final int OPEN = 0 ;
 	public static final int CLOSE = 1 ;
-	
+
 	public static final int PENDING_NEW = 1;
+	public static final int NEW = 2;
+
+	public static final int PENDING_CANCEL = 3;
+	public static final int CANCELED = 4;
 	
-	public static final Integer PENDING_CANCEL = 2;
+	//部分成交
+	public static final int PARTIALLY_FILLED = 5;
+	//全部成交
+	public static final int FILLED = 6;
 	
 //	int _______记录_______;
 
@@ -64,6 +71,10 @@ public class PcOrder extends UserDataEntity {
      */
     private Integer orderType;
     
+	/**
+	 * 委托有效时间，{@link com.hupa.exp.base.enums.pc.PcOrderTimeInForceEnum}
+	 */
+	private Integer timeInForce;
 	/**
 	 * 委托金额，初始设置后，后续不会修改
 	 */
@@ -130,10 +141,6 @@ public class PcOrder extends UserDataEntity {
      * 委托状态，{@link com.hupa.exp.base.enums.pc.PcOrderStatusEnum}
      */
     private Integer status;
-    /**
-     * 委托有效时间，{@link com.hupa.exp.base.enums.pc.PcOrderTimeInForceEnum}
-     */
-    private Integer timeInForce;
     /**
      * 是否已触发，用于止盈止损等触发式委托
      */

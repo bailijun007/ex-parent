@@ -1,7 +1,7 @@
 package com.hp.sh.expv3.constant;
 
 /**
- * 执行结果
+ * 幂等接口，执行结果
  * @author lw
  *
  */

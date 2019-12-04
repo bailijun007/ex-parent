@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.constant.FundFlowDirection;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.pc.module.account.api.PcAccountCoreApi;
 import com.hp.sh.expv3.pc.module.account.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
-import com.hp.sh.expv3.pc.module.account.constant.FundFlowDirection;
-import com.hp.sh.expv3.pc.module.account.constant.WalletError;
+import com.hp.sh.expv3.pc.module.account.constant.AccountError;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountDAO;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountRecordDAO;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccount;
@@ -47,7 +47,7 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 		if(fa!=null){
 			return InvokeResult.NOCHANGE;
 		}
-		this.createPcAccount(userId, asset, BigDecimal.ZERO, new Date());
+		this.newPcAccount(userId, asset, BigDecimal.ZERO, new Date());
 		
 		return InvokeResult.SUCCESS;
 	}
@@ -87,14 +87,6 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 		this.newRecord(record);
 	}
 	
-	PcAccountRecord queryRecord(Long userId, String tradeNo){
-		PcAccountRecord record = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);
-		if(record==null){
-			throw new ExException(CommonError.OBJ_DONT_EXIST);
-		}
-		return record;
-	}
-
 	@Override
 	public Boolean checkTradNo(Long userId, String tradeNo) {
 		PcAccountRecord rcd = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);
@@ -102,6 +94,14 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 			return Boolean.FALSE;
 		}
 		return Boolean.TRUE;
+	}
+
+	PcAccountRecord queryRecord(Long userId, String tradeNo){
+		PcAccountRecord record = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);
+		if(record==null){
+			throw new ExException(CommonError.OBJ_DONT_EXIST);
+		}
+		return record;
 	}
 
 	protected int newRecord(PcAccountRecord record){
@@ -117,24 +117,25 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 			return InvokeResult.NOCHANGE;
 		}
 		
-		PcAccount cTotal = this.fundAccountDAO.getAndLock(record.getUserId(), record.getAsset());
+		PcAccount pcAccount = this.fundAccountDAO.getAndLock(record.getUserId(), record.getAsset());
 		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
-		long serialNo;
-		if(cTotal==null){
-			cTotal = this.createPcAccount(record.getUserId(), record.getAsset(), recordAmount, now);
-			serialNo = 0L;
+		if(pcAccount==null){
+			pcAccount = this.newPcAccount(record.getUserId(), record.getAsset(), recordAmount, now);
 		}else{
-			cTotal.setModified(now);
-			cTotal.setBalance(cTotal.getBalance().add(recordAmount));
-			this.fundAccountDAO.update(cTotal);
-			serialNo = cTotal.getVersion()+1;
+			BigDecimal newBalance = pcAccount.getBalance().add(recordAmount);
+			//检查余额
+			this.checkBalance(record, newBalance);
+			//更新余额
+			pcAccount.setModified(now);
+			pcAccount.setBalance(newBalance);
+			this.fundAccountDAO.update(pcAccount);
 		}
 		
-		//balance
-		record.setSerialNo(serialNo);
-		record.setBalance(cTotal.getBalance());
+		//设置本比余额
+		record.setSerialNo(pcAccount.getVersion());
+		record.setBalance(pcAccount.getBalance());
 		
-		//date
+		//保存记录
 		record.setCreated(now);
 		record.setModified(now);
 		this.fundAccountRecordDAO.save(record);
@@ -142,7 +143,16 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 		return InvokeResult.SUCCESS;
 	}
 	
-	private PcAccount createPcAccount(Long userId, String asset, BigDecimal balance, Date now){
+	private void checkBalance(PcAccountRecord record, BigDecimal newBalance){
+		//检查余额
+		if(FundFlowDirection.EXPENSES==record.getType()){
+			if(newBalance.compareTo(BigDecimal.ZERO) < 0){
+				throw new ExException(AccountError.BALANCE_NOT_ENOUGH);
+			}
+		}
+	}
+	
+	private PcAccount newPcAccount(Long userId, String asset, BigDecimal balance, Date now){
 		PcAccount account = new PcAccount();
 		account.setAsset(asset);
 		account.setBalance(balance);
@@ -164,7 +174,7 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 			String ov = oldRcd.toValueString();
 			String nv = record.toValueString();
 			if(!ov.equals(nv)){
-				throw new ExException(WalletError.INCONSISTENT_REQUESTS);
+				throw new ExException(AccountError.INCONSISTENT_REQUESTS);
 			}
 		}
 		
@@ -179,6 +189,7 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 		record.setTradeNo(request.getTradeNo());
 		record.setTradeType(request.getTradeType());
 		record.setUserId(request.getUserId());
+		record.setAssociatedId(request.getAssociatedId());
 		return record;
 	}
 	
