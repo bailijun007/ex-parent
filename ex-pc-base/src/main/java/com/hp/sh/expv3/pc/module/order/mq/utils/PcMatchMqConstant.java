@@ -20,6 +20,9 @@ public class PcMatchMqConstant {
 	
 	public static final String TAGS_MATCHED = "PC_MATCH_ORDER_MATCHED";
 	
+	public static final String TAGS_CANCELLED = "PC_MATCH_ORDER_CANCELLED";
+
+	
 	
 	
 }

@@ -89,7 +89,7 @@ public class PcOrderService {
 		pcOrderDAO.save(pcOrder);
 
 		//押金扣除
-		this.cutBalance(userId, asset, pcOrder.getId().toString(), pcOrder.getGrossMargin());
+		this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin());
 		
 		return pcOrder;
 	}
@@ -118,14 +118,27 @@ public class PcOrderService {
 		pcOrder.setCancelAmt(BigDecimal.ZERO);
 	}
 	
-	private void cutBalance(Long userId, String asset, String tradeNo, BigDecimal amount){
+	private void cutBalance(Long userId, String asset, Long orderId, BigDecimal amount){
 		CutMoneyRequest request = new CutMoneyRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
 		request.setRemark("开仓扣除");
-		request.setTradeNo(tradeNo);
+		request.setTradeNo("O"+orderId);
 		request.setTradeType(PcAccountTradeType.ORDER_OPEN);
 		request.setUserId(userId);
+		request.setAssociatedId(orderId);
+		this.pcAccountCoreService.cut(request);
+	}
+	
+	private void returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal amount){
+		CutMoneyRequest request = new CutMoneyRequest();
+		request.setAmount(amount);
+		request.setAsset(asset);
+		request.setRemark("撤单还余额");
+		request.setTradeNo("C"+orderId);
+		request.setTradeType(PcAccountTradeType.ORDER_CANCEL);
+		request.setUserId(userId);
+		request.setAssociatedId(orderId);
 		this.pcAccountCoreService.cut(request);
 	}
 
@@ -178,9 +191,19 @@ public class PcOrderService {
 		return this.pcOrderDAO.findById(userId, orderId);
 	}
 	
-	public void cancel(long userId, String asset, long orderId){
+	public void cancel(long userId, String asset, long orderId, BigDecimal cancelAmt){
+		//修改订单状态（撤销）
+		Date now = new Date();
 		this.setCancelStatus(userId, asset, orderId, PcOrder.CANCELED);
+		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		order.setCancelTime(now);
+		order.setCancelAmt(cancelAmt);
+		order.setActiveFlag(PcOrder.NO);
+		order.setStatus(PcOrder.CANCELED);
+		this.pcOrderDAO.update(order);
 		
+		//返还余额
+		this.returnCancelAmt(userId, asset, orderId, cancelAmt);
 	}
 	
 	public void setCancelStatus(long userId, String asset, long orderId, Integer cancelStatsus){
@@ -191,12 +214,6 @@ public class PcOrderService {
 		if(count!=1){
 			throw new RuntimeException("更新失败，更新行数："+count);
 		}
-		
-//		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
-//		order.setStatus(PcOrder.PENDING_CANCEL);
-//		order.setActiveFlag(PcOrder.NO);
-//		order.setCancelTime(now);
-//		order.setModified(now);
         
 	}
 	

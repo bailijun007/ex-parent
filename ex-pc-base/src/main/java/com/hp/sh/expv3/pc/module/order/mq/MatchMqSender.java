@@ -48,6 +48,7 @@ public class MatchMqSender {
 		String topic = this.getOrderTopic(msg.getAsset(), msg.getSymbol());
 		String tags = PcMatchMqConstant.TAGS_PC_BOOK_RESET;
 		Message mqMsg = new Message(topic, tags, msgBuff);
+		mqMsg.setKeys(tags);
 	    this.send(mqMsg);
 	}
 
