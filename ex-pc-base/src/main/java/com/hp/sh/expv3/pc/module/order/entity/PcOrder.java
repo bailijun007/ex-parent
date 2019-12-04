@@ -20,8 +20,14 @@ public class PcOrder extends UserDataEntity {
 
 	public static final int PENDING_NEW = 1;
 	public static final int NEW = 2;
+
+	public static final int PENDING_CANCEL = 3;
+	public static final int CANCELED = 4;
 	
-	public static final Integer PENDING_CANCEL = 2;
+	//部分成交
+	public static final int PARTIALLY_FILLED = 5;
+	//全部成交
+	public static final int FILLED = 6;
 	
 //	int _______记录_______;
 

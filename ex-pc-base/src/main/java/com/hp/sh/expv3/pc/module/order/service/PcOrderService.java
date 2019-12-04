@@ -174,20 +174,37 @@ public class PcOrderService {
 		}
 	}
 	
-	public void cancel(long userId, String asset, String symbol, long orderId){
+	public PcOrder getOrder(Long userId, Long orderId){
+		return this.pcOrderDAO.findById(userId, orderId);
+	}
+	
+	public void cancel(long userId, String asset, long orderId){
+		this.setCancelStatus(userId, asset, orderId, PcOrder.CANCELED);
+		
+	}
+	
+	public void setCancelStatus(long userId, String asset, long orderId, Integer cancelStatsus){
 		Date now = new Date();
 		
-		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		long count = this.pcOrderDAO.cancelOrder(userId, orderId, cancelStatsus, now);
 		
-		order.setStatus(PcOrder.PENDING_CANCEL);
-		order.setActiveFlag(PcOrder.NO);
-		order.setCancelTime(now);
-		order.setModified(now);
+		if(count!=1){
+			throw new RuntimeException("更新失败，更新行数："+count);
+		}
+		
+//		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+//		order.setStatus(PcOrder.PENDING_CANCEL);
+//		order.setActiveFlag(PcOrder.NO);
+//		order.setCancelTime(now);
+//		order.setModified(now);
         
 	}
 	
-	public void changeStatus(Long userId, Long orderId, Integer newStatus, Integer oldStatus){
-		this.pcOrderDAO.changeStatus(userId, orderId, newStatus, oldStatus, new Date());
+	public void changeStatus(Long userId, Long orderId, Integer newStatus, Integer desiredOldStatus){
+		long count = this.pcOrderDAO.changeStatus(userId, orderId, newStatus, desiredOldStatus, new Date());
+		if(count!=1){
+			throw new RuntimeException("更新失败，更新行数："+count);
+		}
 	}
 
 }

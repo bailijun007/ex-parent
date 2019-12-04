@@ -26,14 +26,6 @@ public class OrderPendingNewMsg {
 	public OrderPendingNewMsg() {
 	}
 
-	public String topic() {
-		return "pcOrder_"+asset+"__"+symbol;
-	}
-
-	public String tags() {
-		return "PC_ORDER_PENDING_NEW";
-	}
-
 	public String getAsset() {
 		return asset;
 	}

@@ -6,8 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.pc.module.order.constant.OrderError;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
-import com.hp.sh.expv3.pc.module.order.mq.MqSender;
+import com.hp.sh.expv3.pc.module.order.mq.MatchMqSender;
+import com.hp.sh.expv3.pc.module.order.mq.msg.BookResetMsg;
+import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 
@@ -22,7 +26,7 @@ public class PcOrderApiAction {
 	private PcOrderService pcOrderService;
 	
 	@Autowired
-	private MqSender mqSender;
+	private MatchMqSender matchMqSender;
 	
 	/**
 	 * 创建订单
@@ -56,7 +60,41 @@ public class PcOrderApiAction {
 		msg.setSymbol(symbol);
 		msg.setOrderType(order.getOrderType());
 		msg.setOrderTime(order.getCreated().getTime());
-		mqSender.send(msg);
+		matchMqSender.sendPendingNew(msg);
+	}
+	
+	@ApiOperation(value = "取消订单")
+	@GetMapping(value = "/api/pc/order/cancel")
+	public void cancel(long userId, String asset, String symbol, Long orderId) throws Exception{
+		PcOrder order = this.pcOrderService.getOrder(userId, orderId);
+		if(order.getStatus() == PcOrder.CANCELED){
+			throw new ExException(OrderError.CANCELED);
+		}
+		if(order.getStatus() == PcOrder.FILLED){
+			throw new ExException(OrderError.FILLED);
+		}
+		this.pcOrderService.setCancelStatus(userId, asset, orderId, PcOrder.PENDING_CANCEL);
+
+		//发送消息
+		OrderPendingCancelMsg mqMsg = new OrderPendingCancelMsg(userId, asset, symbol, orderId);
+		mqMsg.setAccountId(userId);
+		mqMsg.setAsset(asset);
+		mqMsg.setOrderId(orderId);
+		mqMsg.setSymbol(order.getSymbol());
+		this.matchMqSender.sendPendingCancel(mqMsg);
+		
+		//redis 消息
+		
+	}
+	
+	@ApiOperation(value = "重置深度")
+	@GetMapping(value = "/api/pc/order/pcBookReset")
+	public void pcBookReset (String asset, String symbol) throws Exception{
+		//发送消息
+		BookResetMsg msg = new BookResetMsg(asset, symbol);
+		msg.setAsset(asset);
+		msg.setSymbol(symbol);
+		this.matchMqSender.sendBookResetMsg(msg);
 	}
 
 }
