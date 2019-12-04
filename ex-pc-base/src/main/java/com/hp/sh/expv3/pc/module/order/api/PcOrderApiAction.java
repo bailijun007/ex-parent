@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.mq.MqSender;
-import com.hp.sh.expv3.pc.module.order.mq.msg.NewOrderMsg;
+import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 
 import io.swagger.annotations.Api;
@@ -40,8 +40,11 @@ public class PcOrderApiAction {
 	@ApiOperation(value = "创建订单")
 	@GetMapping(value = "/api/pc/order/create")
 	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal amt) throws Exception{
+		//create
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, amt);
-		NewOrderMsg msg = new NewOrderMsg();
+
+		//send mq
+		OrderPendingNewMsg msg = new OrderPendingNewMsg();
 		msg.setAccountId(userId);
 		msg.setAsset(asset);
 		msg.setBidFlag(BidUtils.getBidFlag(closeFlag, longFlag));
@@ -51,6 +54,8 @@ public class PcOrderApiAction {
 		msg.setOrderId(order.getId());
 		msg.setPrice(order.getPrice());
 		msg.setSymbol(symbol);
+		msg.setOrderType(order.getOrderType());
+		msg.setOrderTime(order.getCreated().getTime());
 		mqSender.send(msg);
 	}
 

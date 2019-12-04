@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  * @author lw
  *
  */
-public class NewOrderMsg {
+public class OrderPendingNewMsg {
 
 	private String asset;
 	private String symbol;
@@ -21,8 +21,17 @@ public class NewOrderMsg {
 	private BigDecimal displayNumber;
 	private BigDecimal price;
 	private Integer orderType;
+	private Long orderTime;
 	
-	public NewOrderMsg() {
+	public OrderPendingNewMsg() {
+	}
+
+	public String topic() {
+		return "pcOrder_"+asset+"__"+symbol;
+	}
+
+	public String tags() {
+		return "PC_ORDER_PENDING_NEW";
 	}
 
 	public String getAsset() {
@@ -103,6 +112,14 @@ public class NewOrderMsg {
 
 	public void setOrderType(Integer orderType) {
 		this.orderType = orderType;
+	}
+
+	public Long getOrderTime() {
+		return orderTime;
+	}
+
+	public void setOrderTime(Long orderTime) {
+		this.orderTime = orderTime;
 	}
 	
 }

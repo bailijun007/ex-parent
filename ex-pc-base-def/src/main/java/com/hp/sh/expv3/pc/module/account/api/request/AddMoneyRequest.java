@@ -29,6 +29,9 @@ public class AddMoneyRequest {
 
 	@ApiModelProperty(value = "调用方支付单号")
 	private String tradeNo;
+	
+	@ApiModelProperty(value = "关联对象ID")
+	private Long associatedId;
 		
 	public AddMoneyRequest() {
 	}
@@ -79,6 +82,14 @@ public class AddMoneyRequest {
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+
+	public Long getAssociatedId() {
+		return associatedId;
+	}
+
+	public void setAssociatedId(Long associatedId) {
+		this.associatedId = associatedId;
 	}
 
 }

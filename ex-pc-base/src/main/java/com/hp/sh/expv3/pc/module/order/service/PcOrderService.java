@@ -8,13 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.module.order.constant.IntBool;
+import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
+import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.constant.MarginMode;
+import com.hp.sh.expv3.pc.module.order.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.module.order.constant.PcOrderType;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
+import com.hp.sh.expv3.utils.IntBool;
 
 /**
  * 委托
@@ -33,6 +36,9 @@ public class PcOrderService {
 	
 	@Autowired
 	private MarginRatioService marginRatioService;
+	
+	@Autowired
+	private PcAccountCoreService pcAccountCoreService;
 	
 	/**
 	 * 创建订单
@@ -66,8 +72,10 @@ public class PcOrderService {
 		pcOrder.setAmt(amt);
 		pcOrder.setOrderType(PcOrderType.LIMIT);
 		pcOrder.setMarginMode(MarginMode.FIXED);
+		pcOrder.setTimeInForce(timeInForce);
+		pcOrder.setClientOrderId(cliOrderId);
 		
-		/////////系统计算/////////
+		/////////押金设置/////////
 		
 		if (IntBool.isTrue(closeFlag)) {
 			this.setCloseOrderFee(pcOrder);
@@ -75,12 +83,23 @@ public class PcOrderService {
 			this.setOpenOrderFee(pcOrder);
 		}
 		
+		////////其他字段，后面随状态修改////////
+		this.setOther(pcOrder);
+		
+		pcOrderDAO.save(pcOrder);
+
+		//押金扣除
+		this.cutBalance(userId, asset, pcOrder.getId().toString(), pcOrder.getGrossMargin());
+		
+		return pcOrder;
+	}
+	
+	private void setOther(PcOrder pcOrder){
 		pcOrder.setFeeCost(BigDecimal.ZERO);
 		pcOrder.setFilledAmt(BigDecimal.ZERO);
 		pcOrder.setFilledVolume(BigDecimal.ZERO);
 		pcOrder.setCancelAmt(null);
 		pcOrder.setClosePosId(null);
-		pcOrder.setTimeInForce(timeInForce);
 		pcOrder.setTriggerFlag(IntBool.NO);
 		pcOrder.setCancelTime(null);
 		pcOrder.setStatus(PcOrder.PENDING_NEW);
@@ -94,14 +113,20 @@ public class PcOrderService {
 		pcOrder.setCreateOperator(null);
 		pcOrder.setCancelOperator(null);
 		pcOrder.setRemark(null);
-		pcOrder.setClientOrderId(cliOrderId);
 		
 		///////////其他///
 		pcOrder.setCancelAmt(BigDecimal.ZERO);
-		
-		pcOrderDAO.save(pcOrder);
-		
-		return pcOrder;
+	}
+	
+	private void cutBalance(Long userId, String asset, String tradeNo, BigDecimal amount){
+		CutMoneyRequest request = new CutMoneyRequest();
+		request.setAmount(amount);
+		request.setAsset(asset);
+		request.setRemark("开仓扣除");
+		request.setTradeNo(tradeNo);
+		request.setTradeType(PcAccountTradeType.ORDER_OPEN);
+		request.setUserId(userId);
+		this.pcAccountCoreService.cut(request);
 	}
 
 	//设置平仓订单的各种费率
@@ -159,7 +184,10 @@ public class PcOrderService {
 		order.setCancelTime(now);
 		order.setModified(now);
         
-		
+	}
+	
+	public void changeStatus(Long userId, Long orderId, Integer newStatus, Integer oldStatus){
+		this.pcOrderDAO.changeStatus(userId, orderId, newStatus, oldStatus, new Date());
 	}
 
 }

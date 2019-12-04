@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hp.sh.expv3.constant;
+package com.hp.sh.expv3.fund.cash.constant;
 
 /**
  * @author wangjg

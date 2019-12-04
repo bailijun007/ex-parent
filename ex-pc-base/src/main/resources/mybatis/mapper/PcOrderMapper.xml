@@ -159,5 +159,14 @@
     </delete>
 
 	<!--  -->
+		
+	<update id="changeStatus">
+		update 
+			pc_order
+		set 
+			status=#{status}, modified=#{modified}
+		where 
+			id=#{id} and user_id=#{userId} and status=#{oldStatus}
+	</update>
 	
 </mapper>

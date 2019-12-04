@@ -1,34 +1,42 @@
 package com.hp.sh.expv3.pc.module.order.mq;
 
-import org.apache.rocketmq.client.exception.MQClientException;
-import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.client.producer.MQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
-import org.apache.rocketmq.remoting.common.RemotingHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.gitee.hupadev.commons.json.JsonUtils;
-import com.hp.sh.expv3.pc.module.order.mq.msg.NewOrderMsg;
+import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingNewMsg;
+import com.hp.sh.rocketmq.codec.MsgCodec;
+import com.hp.sh.rocketmq.msg.RocketAttrMsg;
 
 @Component
 public class MqSender {
-    private DefaultMQProducer producer;
+	
+	@Autowired
+    private MQProducer producer;
+	
+	@Autowired
+	private MsgCodec msgCodec;
     
 	public MqSender() {
-	    try {
-			producer = new DefaultMQProducer(MQConstant.GROUP);
-		    producer.setNamesrvAddr(MQConstant.ADDR);
-			producer.start();
-		} catch (MQClientException e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
-	public void send(NewOrderMsg msg) throws Exception{
-		String json = JsonUtils.toJson(msg);
-        byte[] msgBuff = json.getBytes(RemotingHelper.DEFAULT_CHARSET);
-		Message mqMsg = new Message(MQConstant.TOPIC, msg.getClass().getSimpleName(), msgBuff);
-        SendResult sendResult = producer.send(mqMsg);
+	public void send(RocketAttrMsg msg) throws Exception{
+		byte[] msgBuff = (byte[]) msgCodec.encode(msg);
+		Message mqMsg = new Message(msg.getTopic(), msg.getTags(), msg.getKeys(), msgBuff);
+		this.send(mqMsg);
+	}
+	
+	public void send(OrderPendingNewMsg msg) throws Exception{
+		byte[] msgBuff = (byte[]) msgCodec.encode(msg);
+		Message mqMsg = new Message(msg.topic(), msg.tags(), msgBuff);
+		mqMsg.setKeys(""+msg.getOrderId());
+        this.send(mqMsg);
+	}
+	
+	public void send(Message mqMsg) throws Exception{
+        SendResult sendResult = producer.send(mqMsg, new OrderMessageQueueSelector(), 0);
         System.out.printf("%s%n", sendResult);
 	}
     
