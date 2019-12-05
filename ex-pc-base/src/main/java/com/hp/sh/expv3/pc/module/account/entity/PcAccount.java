@@ -29,7 +29,6 @@ public class PcAccount extends BaseAccountEntity {
 	private BigDecimal balance;
 	
 	//版本
-	@Version
 	private Long version;
 
 	public PcAccount() {
@@ -59,6 +58,7 @@ public class PcAccount extends BaseAccountEntity {
 		this.balance = balance;
 	}
 
+	@Version
 	public Long getVersion() {
 		return version;
 	}

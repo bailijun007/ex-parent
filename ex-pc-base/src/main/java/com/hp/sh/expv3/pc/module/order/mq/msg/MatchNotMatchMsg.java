@@ -5,11 +5,9 @@ package com.hp.sh.expv3.pc.module.order.mq.msg;
  * @author lw
  *
  */
-public class MatchNotMatchMsg {
+public class MatchNotMatchMsg extends BaseOrderMsg{
 
 	private Long accountId;
-	private String asset;
-	private String symbol;
 	private Long orderId;
 	
 	public MatchNotMatchMsg() {
@@ -23,22 +21,6 @@ public class MatchNotMatchMsg {
 		this.accountId = accountId;
 	}
 
-	public String getAsset() {
-		return asset;
-	}
-
-	public void setAsset(String asset) {
-		this.asset = asset;
-	}
-
-	public String getSymbol() {
-		return symbol;
-	}
-
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
-	}
-
 	public Long getOrderId() {
 		return orderId;
 	}
@@ -49,8 +31,8 @@ public class MatchNotMatchMsg {
 
 	@Override
 	public String toString() {
-		return "MatchNotMatchMsg [accountId=" + accountId + ", asset=" + asset + ", symbol=" + symbol + ", orderId="
-				+ orderId + "]";
+		return "MatchNotMatchMsg [accountId=" + accountId + ", orderId=" + orderId + ", asset=" + asset + ", symbol="
+				+ symbol + "]";
 	}
-	
+
 }

@@ -8,14 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.cash.api.ChainCasehApi;
 import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
-import com.hp.sh.expv3.fund.cash.constant.FundError;
 import com.hp.sh.expv3.fund.cash.constant.PayChannel;
 import com.hp.sh.expv3.fund.cash.service.complex.DepositService;
 import com.hp.sh.expv3.fund.cash.service.complex.WithdrawalService;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
+import com.hp.sh.expv3.fund.wallet.constant.WalletError;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -84,7 +83,7 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	public void createDraw(Long userId, String asset, String address, BigDecimal amount) {
 		BigDecimal balance = fundAccountCoreApi.getBalance(userId, asset);
 		if(balance==null || balance.compareTo(amount)<0){
-			throw new ExException(FundError.NOT_ENOUGH);
+			throw new ExException(WalletError.NOT_ENOUGH);
 		}
 		this.withdrawalService.createWithdrawal(userId, asset, address, amount, null, PayChannel.BYS);
 	}

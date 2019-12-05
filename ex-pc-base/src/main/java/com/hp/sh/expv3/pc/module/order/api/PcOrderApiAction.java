@@ -44,6 +44,10 @@ public class PcOrderApiAction {
 	@ApiOperation(value = "创建订单")
 	@GetMapping(value = "/api/pc/order/create")
 	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal amt) throws Exception{
+		
+		//check 检查可平仓位
+		//checkShortPosition();
+		
 		//create
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, amt);
 

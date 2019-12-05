@@ -65,26 +65,26 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 	 * 加钱
 	 */
 	@Override
-	public void add(@RequestBody AddMoneyRequest request){
+	public Integer add(@RequestBody AddMoneyRequest request){
 		PcAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.INCOME);
 		record.setSn(SnUtils.genRecordSn());
 		
-		this.newRecord(record);
+		return this.newRecord(record);
 	}
 	
 	/**
 	 * 减钱
 	 */
 	@Override
-	public void cut(@RequestBody CutMoneyRequest request){
+	public Integer cut(@RequestBody CutMoneyRequest request){
 		PcAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.EXPENSES);
 		record.setSn(SnUtils.genRecordSn());
 		
-		this.newRecord(record);
+		return this.newRecord(record);
 	}
 	
 	@Override

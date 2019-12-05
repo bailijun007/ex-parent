@@ -4,15 +4,18 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
 
 /**
  * 错误码
- * 
+ * 02-01-00
  * @author wangjg
  *
  */
 public class OrderError extends ErrorCode {
 
-	//user
-	public static final OrderError CANCELED = new OrderError(10301, "订单已经取消!");
-	public static final OrderError FILLED = new OrderError(10301, "订单已成交!");
+	//order
+	public static final OrderError CREATED = new OrderError(020100, "订单已经创建过了!");
+	
+	public static final OrderError CANCELED = new OrderError(020101, "订单已经取消!");
+	
+	public static final OrderError FILLED = new OrderError(020102, "订单已成交!");
 	
 	private OrderError(int code, String message) {
 		super(code, message);

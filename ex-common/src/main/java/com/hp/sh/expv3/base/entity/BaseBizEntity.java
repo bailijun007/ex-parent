@@ -21,7 +21,6 @@ public class BaseBizEntity implements Serializable {
 	public static final int YES = 1;
 
 	@Id
-	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "id", unique = true, nullable = false)
 	protected Long id;
 
@@ -30,6 +29,8 @@ public class BaseBizEntity implements Serializable {
 	// 修改时间
 	private Date modified;
 
+	@Id
+	@GeneratedValue(strategy = IDENTITY)
 	public Long getId() {
 		return id;
 	}

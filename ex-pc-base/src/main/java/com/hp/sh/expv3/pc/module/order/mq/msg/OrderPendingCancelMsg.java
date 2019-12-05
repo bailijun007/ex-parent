@@ -5,11 +5,9 @@ package com.hp.sh.expv3.pc.module.order.mq.msg;
  * @author lw
  *
  */
-public class OrderPendingCancelMsg {
+public class OrderPendingCancelMsg extends BaseOrderMsg{
 
 	private Long accountId;
-	private String asset;
-	private String symbol;
 	private Long orderId;
 	
 	public OrderPendingCancelMsg(Long accountId, String asset, String symbol, Long orderId) {
@@ -19,20 +17,12 @@ public class OrderPendingCancelMsg {
 		this.orderId = orderId;
 	}
 
-	public String getAsset() {
-		return asset;
+	public Long getAccountId() {
+		return accountId;
 	}
 
-	public void setAsset(String asset) {
-		this.asset = asset;
-	}
-
-	public String getSymbol() {
-		return symbol;
-	}
-
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
+	public void setAccountId(Long accountId) {
+		this.accountId = accountId;
 	}
 
 	public Long getOrderId() {
@@ -43,12 +33,10 @@ public class OrderPendingCancelMsg {
 		this.orderId = orderId;
 	}
 
-	public Long getAccountId() {
-		return accountId;
-	}
-
-	public void setAccountId(Long accountId) {
-		this.accountId = accountId;
+	@Override
+	public String toString() {
+		return "OrderPendingCancelMsg [accountId=" + accountId + ", orderId=" + orderId + ", asset=" + asset
+				+ ", symbol=" + symbol + "]";
 	}
 	
 }

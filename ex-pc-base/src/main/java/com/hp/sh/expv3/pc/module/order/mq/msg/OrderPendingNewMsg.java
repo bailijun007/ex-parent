@@ -7,10 +7,7 @@ import java.math.BigDecimal;
  * @author lw
  *
  */
-public class OrderPendingNewMsg {
-
-	private String asset;
-	private String symbol;
+public class OrderPendingNewMsg extends BaseOrderMsg{
 
 	private Long orderId;
 	private Long accountId;
@@ -24,22 +21,6 @@ public class OrderPendingNewMsg {
 	private Long orderTime;
 	
 	public OrderPendingNewMsg() {
-	}
-
-	public String getAsset() {
-		return asset;
-	}
-
-	public void setAsset(String asset) {
-		this.asset = asset;
-	}
-
-	public String getSymbol() {
-		return symbol;
-	}
-
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
 	}
 
 	public Long getOrderId() {
@@ -112,6 +93,14 @@ public class OrderPendingNewMsg {
 
 	public void setOrderTime(Long orderTime) {
 		this.orderTime = orderTime;
+	}
+
+	@Override
+	public String toString() {
+		return "OrderPendingNewMsg [orderId=" + orderId + ", accountId=" + accountId + ", closeFlag=" + closeFlag
+				+ ", bidFlag=" + bidFlag + ", number=" + number + ", displayNumber=" + displayNumber + ", price="
+				+ price + ", orderType=" + orderType + ", orderTime=" + orderTime + ", asset=" + asset + ", symbol="
+				+ symbol + "]";
 	}
 	
 }
