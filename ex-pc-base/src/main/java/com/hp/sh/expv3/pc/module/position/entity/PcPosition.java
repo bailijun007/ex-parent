@@ -6,16 +6,15 @@ package com.hp.sh.expv3.pc.module.position.entity;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.base.entity.BaseBizEntity;
+import com.hp.sh.expv3.base.entity.UserDataEntity;
 
 /**
  * 永续合约_仓位
  */
-public class PcPosition extends BaseBizEntity {
+public class PcPosition extends UserDataEntity {
 
-	// 账号ID（注册用户ID）
-    private Long accountId;
-    
+	private static final long serialVersionUID = 1L;
+
     // 资产
 	private String asset;
 
@@ -99,14 +98,6 @@ public class PcPosition extends BaseBizEntity {
 
 	public PcPosition() {
 		super();
-	}
-
-	public Long getAccountId() {
-		return accountId;
-	}
-
-	public void setAccountId(Long accountId) {
-		this.accountId = accountId;
 	}
 
 	public String getSymbol() {

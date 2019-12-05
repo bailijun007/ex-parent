@@ -55,6 +55,7 @@
 		#{idList[${i}]}
 		</foreach>
 		</if>
+		<if test="userId!=null"> and user_id=#{userId}</if>
 		<if test="accountId!=null"> and account_id=#{accountId}</if>
 		<if test="closeFlag!=null"> and close_flag=#{closeFlag}</if>
 		<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
@@ -67,12 +68,12 @@
 		<if test="cancelTime!=null"> and cancel_time=#{cancelTime}</if>
 		<if test="visibleFlag!=null"> and visible_flag=#{visibleFlag}</if>
 		<if test="activeFlag!=null"> and active_flag=#{activeFlag}</if>
-		<if test="userId!=null"> and user_id=#{userId}</if>
+		<if test="clientOrderId!=null and clientOrderId!=''">and client_order_id=#{clientOrderId}</if>
 		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
 		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
 		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
-		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(asset,''),IFNULL(symbol,''),IFNULL(create_operator,''),IFNULL(cancel_operator,''),IFNULL(remark,''),IFNULL(client_order_id,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
+		<if test="keyword!=null and keyword!=''"> and remark like CONCAT('%',#{keyword},'%')</if>	</where>
 	</sql>
 
 	<sql id="simple_query" >

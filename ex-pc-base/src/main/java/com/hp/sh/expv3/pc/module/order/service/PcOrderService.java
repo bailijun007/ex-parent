@@ -2,6 +2,8 @@ package com.hp.sh.expv3.pc.module.order.service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.constant.MarginMode;
+import com.hp.sh.expv3.pc.module.order.constant.OrderError;
 import com.hp.sh.expv3.pc.module.order.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.module.order.constant.PcOrderType;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
@@ -59,6 +62,10 @@ public class PcOrderService {
 	 */
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal amt){
 		
+		if(this.existClientOrderId(cliOrderId)){
+			throw new ExException(OrderError.CREATED);
+		}
+		
 		Date now = new Date();
 		PcOrder pcOrder = new PcOrder();
 		
@@ -99,6 +106,13 @@ public class PcOrderService {
 		return pcOrder;
 	}
 	
+	private boolean existClientOrderId(String clientOrderId) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("clientOrderId", clientOrderId);
+		Long count = this.pcOrderDAO.queryCount(params);
+		return count>0;
+	}
+
 	private void setOther(PcOrder pcOrder){
 		pcOrder.setFeeCost(BigDecimal.ZERO);
 		pcOrder.setFilledAmt(BigDecimal.ZERO);

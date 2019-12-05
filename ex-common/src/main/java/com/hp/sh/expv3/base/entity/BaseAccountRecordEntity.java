@@ -1,7 +1,5 @@
 package com.hp.sh.expv3.base.entity;
 
-import static javax.persistence.GenerationType.IDENTITY;
-
 import java.io.Serializable;
 
 import javax.persistence.GeneratedValue;

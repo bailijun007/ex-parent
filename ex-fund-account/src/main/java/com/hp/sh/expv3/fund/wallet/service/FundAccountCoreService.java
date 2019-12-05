@@ -117,22 +117,23 @@ public class FundAccountCoreService implements FundAccountCoreApi {
 			return InvokeResult.NOCHANGE;
 		}
 		
-		FundAccount cTotal = this.fundAccountDAO.getAndLock(record.getUserId(), record.getAsset());
+		FundAccount fundAccount = this.fundAccountDAO.getAndLock(record.getUserId(), record.getAsset());
 		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
-		long serialNo;
-		if(cTotal==null){
-			cTotal = this.createFundAccount(record.getUserId(), record.getAsset(), recordAmount, now);
-			serialNo = 0L;
+		if(fundAccount==null){
+			fundAccount = this.createFundAccount(record.getUserId(), record.getAsset(), recordAmount, now);
 		}else{
-			cTotal.setModified(now);
-			cTotal.setBalance(cTotal.getBalance().add(recordAmount));
-			this.fundAccountDAO.update(cTotal);
-			serialNo = cTotal.getVersion()+1;
+			BigDecimal newBalance = fundAccount.getBalance().add(recordAmount);
+			//检查余额
+			this.checkBalance(record, newBalance);
+			
+			fundAccount.setModified(now);
+			fundAccount.setBalance(newBalance);
+			this.fundAccountDAO.update(fundAccount);
 		}
 		
 		//balance
-		record.setSerialNo(serialNo);
-		record.setBalance(cTotal.getBalance());
+		record.setSerialNo(fundAccount.getVersion());
+		record.setBalance(fundAccount.getBalance());
 		
 		//date
 		record.setCreated(now);
@@ -140,6 +141,15 @@ public class FundAccountCoreService implements FundAccountCoreApi {
 		this.fundAccountRecordDAO.save(record);
 	
 		return InvokeResult.SUCCESS;
+	}
+	
+	private void checkBalance(FundAccountRecord record, BigDecimal newBalance){
+		//检查余额
+		if(FundFlowDirection.EXPENSES==record.getType()){
+			if(newBalance.compareTo(BigDecimal.ZERO) < 0){
+				throw new ExException(WalletError.NOT_ENOUGH);
+			}
+		}
 	}
 	
 	private FundAccount createFundAccount(Long userId, String asset, BigDecimal balance, Date now){
