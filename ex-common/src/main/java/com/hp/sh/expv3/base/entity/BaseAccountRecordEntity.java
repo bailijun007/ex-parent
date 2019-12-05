@@ -17,13 +17,14 @@ import javax.persistence.MappedSuperclass;
 public abstract class BaseAccountRecordEntity extends BaseAccountEntity implements UserData, Serializable{
 
 	private static final long serialVersionUID = 1L;
-	@Id
-	@GeneratedValue(strategy = IDENTITY)
+	
 	private Long id;
 	
 	//请求ID
 	protected long requestId;
 
+	@Id
+	@GeneratedValue(generator="snowflake")
 	public Long getId() {
 		return id;
 	}

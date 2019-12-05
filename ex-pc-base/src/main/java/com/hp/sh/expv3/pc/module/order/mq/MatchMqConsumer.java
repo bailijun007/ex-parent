@@ -14,7 +14,7 @@ import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
-@MQListener(topic = PcMatchMqConstant.PCMATCH_BTC__BTC_USD)
+@MQListener(topic = PcMatchMqConstant.PCMATCH_BTC__BTC_USD, orderly=MQListener.ORDERLY_YES)
 public class MatchMqConsumer {
 	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer.class);
 	
@@ -34,7 +34,8 @@ public class MatchMqConsumer {
 		this.pcOrderService.cancel(msg.getAccountId(), msg.getAsset(), msg.getOrderId(), msg.getCancelNumber());
 	}
 	
-	@MQListener(tags=PcMatchMqConstant.TAGS_MATCHED)
+	//成交
+	@MQListener(tags=PcMatchMqConstant.TAGS_PC_TRADE)
 	public void handleMatch(MatchedMsg msg){
 		logger.info("收到消息:{}", msg);
 		
