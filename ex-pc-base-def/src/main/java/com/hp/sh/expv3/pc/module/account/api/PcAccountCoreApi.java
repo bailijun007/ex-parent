@@ -26,11 +26,11 @@ public interface PcAccountCoreApi {
 
 	@ApiOperation(value = "加钱")
 	@PostMapping(value = "/api/fund_account/money/add")
-	public void add(@RequestBody AddMoneyRequest request);
+	public Integer add(@RequestBody AddMoneyRequest request);
 
 	@ApiOperation(value = "扣钱")
 	@PostMapping(value = "/api/fund_account/money/cut")
-	public void cut(@RequestBody CutMoneyRequest request);
+	public Integer cut(@RequestBody CutMoneyRequest request);
 
 	@ApiOperation(value = "查询资金记录是否存在")
 	@GetMapping(value = "/api/fund_account/record/check_exist")

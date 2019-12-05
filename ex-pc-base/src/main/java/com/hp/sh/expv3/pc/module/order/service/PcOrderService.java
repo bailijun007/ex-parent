@@ -3,11 +3,14 @@ package com.hp.sh.expv3.pc.module.order.service;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.constant.MarginMode;
@@ -15,6 +18,7 @@ import com.hp.sh.expv3.pc.module.order.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.module.order.constant.PcOrderType;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.order.mq.MatchMqConsumer;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.utils.IntBool;
@@ -27,6 +31,7 @@ import com.hp.sh.expv3.utils.IntBool;
 @Service
 @Transactional
 public class PcOrderService {
+	private static final Logger logger = LoggerFactory.getLogger(PcOrderService.class);
 	
 	@Autowired
 	private PcAccountSymbolService pcAccountSymbolService;
@@ -130,7 +135,7 @@ public class PcOrderService {
 		this.pcAccountCoreService.cut(request);
 	}
 	
-	private void returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal amount){
+	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal amount){
 		CutMoneyRequest request = new CutMoneyRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
@@ -139,7 +144,7 @@ public class PcOrderService {
 		request.setTradeType(PcAccountTradeType.ORDER_CANCEL);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
-		this.pcAccountCoreService.cut(request);
+		return this.pcAccountCoreService.add(request);
 	}
 
 	//设置平仓订单的各种费率
@@ -192,9 +197,17 @@ public class PcOrderService {
 	}
 	
 	public void cancel(long userId, String asset, long orderId, BigDecimal cancelAmt){
+		//返还余额
+		int result = this.returnCancelAmt(userId, asset, orderId, cancelAmt);
+		if(result==InvokeResult.NOCHANGE){
+			//利用合约账户的幂等性实现本方法的幂等性
+			logger.warn("已经执行过了");
+			return;
+		}
+
 		//修改订单状态（撤销）
 		Date now = new Date();
-		this.setCancelStatus(userId, asset, orderId, PcOrder.CANCELED);
+//		this.setCancelStatus(userId, asset, orderId, PcOrder.CANCELED);
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
 		order.setCancelTime(now);
 		order.setCancelAmt(cancelAmt);
@@ -202,8 +215,7 @@ public class PcOrderService {
 		order.setStatus(PcOrder.CANCELED);
 		this.pcOrderDAO.update(order);
 		
-		//返还余额
-		this.returnCancelAmt(userId, asset, orderId, cancelAmt);
+		return;
 	}
 	
 	public void setCancelStatus(long userId, String asset, long orderId, Integer cancelStatsus){
