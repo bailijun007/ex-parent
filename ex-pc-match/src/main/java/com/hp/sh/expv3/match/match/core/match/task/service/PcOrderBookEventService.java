@@ -8,6 +8,7 @@ import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
 import com.hp.sh.expv3.match.msg.BookMsgDto.BookEntry;
+import com.hp.sh.expv3.match.util.PcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -59,7 +60,7 @@ public class PcOrderBookEventService {
                     throw new RuntimeException();
                 }
                 entries.put(order.getOrderId(), order);
-                BigDecimal dispalyAmt = order.getNumber().subtract(order.getFilledNumber());
+                BigDecimal dispalyAmt = PcUtil.calcDisplay(order.getNumber(), order.getFilledNumber(), order.getDisplayNumber());
                 if (dispalyAmt.compareTo(BigDecimal.ZERO) > 0) {
                     BookEntry entry = new BookEntry(order.getOrderId(), order.getPrice(), dispalyAmt, order.getBidFlag());
                     ens.add(entry);

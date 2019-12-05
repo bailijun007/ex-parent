@@ -4,13 +4,14 @@
  */
 package com.hp.sh.expv3.match.match.core.matched.task.impl;
 
+import com.hp.sh.expv3.match.bo.PcOrder2CancelBo;
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
-import com.hp.sh.expv3.match.enums.EventEnum;
+import com.hp.sh.expv3.match.bo.PcOrderNotMatchedBo;
+import com.hp.sh.expv3.match.enums.PcOrderTypeEnum;
 import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.matched.task.*;
 import com.hp.sh.expv3.match.match.core.matched.task.def.PcMatchedTaskService;
 import com.hp.sh.expv3.match.mqmsg.PcPosLockedMqMsgDto;
-import com.hp.sh.expv3.match.bo.PcOrderNotMatchedBo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -112,11 +113,7 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
     }
 
     @Override
-    public void addMatchedOrderMatchedTask(PcMatchHandlerContext context, long currentMsgOffset) {
-
-//        当前线程是matcher，可读到matcher的线程信息，由此来判断是否需要重新发送消息
-        // TODO zw ，这里加 matcher 重启之后读的 上次已消费的消息的偏移量的判断，若偏移量在上次的之前，则忽略
-
+    public void addMatchedOrderMatchedTask(PcMatchHandlerContext context, long currentMsgOffset, PcOrder4MatchBo takerOrder) {
         PcMatchedOrderMatchedTask task = applicationContext.getBean(PcMatchedOrderMatchedTask.class);
         task.setAsset(context.getAsset());
         task.setSymbol(context.getSymbol());
@@ -126,20 +123,28 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
         task.setLastPrice(context.getLastPrice());
         task.setMatchTxId(context.getMatchTxId());
         task.setCurrentMsgOffset(currentMsgOffset);
+        task.setTakerOrder(takerOrder);
 
         PcOrder4MatchBo order = context.getOrderNew();
         if (null != order) {
-            /**
-             *已成交情况，通过 建平仓事件来触发，不在此多述
-             */
-            if (order.getFilledNumber().compareTo(BigDecimal.ZERO) == 0) {
-                // 若没有成交
-                PcOrderNotMatchedBo pcOrderNotMatchedBo = new PcOrderNotMatchedBo();
-                pcOrderNotMatchedBo.setAsset(order.getAsset());
-                pcOrderNotMatchedBo.setSymbol(order.getSymbol());
-                pcOrderNotMatchedBo.setAccountId(order.getAccountId());
-                pcOrderNotMatchedBo.setOrderId(order.getOrderId());
-                task.setNotMatchedTakerOrder(pcOrderNotMatchedBo);
+            if (PcOrderTypeEnum.MARKET.getCode() == order.getOrderType()) {
+                PcOrder2CancelBo order2CancelBo = new PcOrder2CancelBo();
+                order2CancelBo.setAsset(order.getAsset());
+                order2CancelBo.setSymbol(order.getSymbol());
+                order2CancelBo.setAccountId(order.getAccountId());
+                order2CancelBo.setOrderId(order.getOrderId());
+                order2CancelBo.setCancelNumber(order.getNumber().subtract(order.getFilledNumber()));
+                task.setCancelTakerOrder(order2CancelBo);
+            } else if (PcOrderTypeEnum.LIMIT.getCode() == order.getOrderType()) {
+                if (order.getFilledNumber().compareTo(BigDecimal.ZERO) == 0) {
+                    // 若完全没有成交
+                    PcOrderNotMatchedBo pcOrderNotMatchedBo = new PcOrderNotMatchedBo();
+                    pcOrderNotMatchedBo.setAsset(order.getAsset());
+                    pcOrderNotMatchedBo.setSymbol(order.getSymbol());
+                    pcOrderNotMatchedBo.setAccountId(order.getAccountId());
+                    pcOrderNotMatchedBo.setOrderId(order.getOrderId());
+                    task.setNotMatchedTakerOrder(pcOrderNotMatchedBo);
+                }
             }
         }
         context.matchedThreadWorker.addTask(task);

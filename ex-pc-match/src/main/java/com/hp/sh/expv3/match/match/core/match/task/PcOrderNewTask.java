@@ -8,6 +8,7 @@ import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.component.id.def.IdService;
 import com.hp.sh.expv3.match.enums.PcOrderTypeEnum;
 import com.hp.sh.expv3.match.match.core.match.handler.PcLimitOrderHandler;
+import com.hp.sh.expv3.match.match.core.match.handler.PcMarketOrderHandler;
 import com.hp.sh.expv3.match.match.core.match.handler.PcOrderHandler;
 import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.matched.task.def.PcMatchedTaskService;
@@ -37,6 +38,8 @@ public class PcOrderNewTask extends PcOrderBaseTask implements ApplicationContex
 
     @Autowired
     private PcLimitOrderHandler pcLimitOrderHandler;
+    @Autowired
+    private PcMarketOrderHandler pcMarketOrderHandler;
     @Autowired
     private PcMatchedTaskService pcMatchedTaskService;
 
@@ -80,6 +83,8 @@ public class PcOrderNewTask extends PcOrderBaseTask implements ApplicationContex
             PcOrderHandler handler = null;
             if (PcOrderTypeEnum.LIMIT.getCode() == todo.getOrderType()) {
                 handler = pcLimitOrderHandler;
+            } else if (PcOrderTypeEnum.LIMIT.getCode() == todo.getOrderType()) {
+                handler = pcMarketOrderHandler;
             } else {
                 throw new RuntimeException();
             }
@@ -93,7 +98,7 @@ public class PcOrderNewTask extends PcOrderBaseTask implements ApplicationContex
             logger.warn("pending new task,no order,no trade,please check.offset:{},{}", this.getCurrentMsgOffset(), this.getAssetSymbol());
         }
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
-            pcMatchedTaskService.addMatchedOrderMatchedTask(context, this.getCurrentMsgOffset());
+            pcMatchedTaskService.addMatchedOrderMatchedTask(context, this.getCurrentMsgOffset(), todo);
             context.setSentMqOffset(this.getCurrentMsgOffset());
         }
 

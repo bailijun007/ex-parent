@@ -18,6 +18,11 @@ import static com.hp.sh.expv3.match.constant.CommonConst.*;
  */
 public final class PcUtil {
 
+    public static final BigDecimal calcDisplay(BigDecimal number, BigDecimal filledNumber, BigDecimal displayNumber) {
+        BigDecimal unfilledNumber = number.subtract(filledNumber);
+        return unfilledNumber.min(displayNumber).stripTrailingZeros();
+    }
+
     public static final boolean isLiq(boolean isLong, BigDecimal liqPrice, BigDecimal markPrice) {
         if (isLong) {
             return markPrice.compareTo(liqPrice) <= 0;

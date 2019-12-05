@@ -22,7 +22,7 @@ public interface PcMatchedTaskService {
 
     void addMatchedOrderCancelByLiqTask(PcMatchHandlerContext context, long currentMsgOffset, Collection<PcOrder4MatchBo> order2CancelByLiq, PcPosLockedMqMsgDto msg);
 
-    void addMatchedOrderMatchedTask(PcMatchHandlerContext context, long currentMsgOffset);
+    void addMatchedOrderMatchedTask(PcMatchHandlerContext context, long currentMsgOffset, PcOrder4MatchBo takerOrder);
 
     void addMatchedOrderCancelTask(PcMatchHandlerContext context, long currentMsgOffset, long accountId, long orderId, BigDecimal cancelDeltaAmt);
 
