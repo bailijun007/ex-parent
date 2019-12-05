@@ -24,50 +24,47 @@ public class PcPosition extends UserDataEntity {
     // 是否多仓(side)
 	private Integer longFlag;
 
-	// 触发强平的标记价格
-    private BigDecimal liqMarkPrice;
+	// 保证金模式:1-全仓,2-逐仓
+	private int marginMode;
 
-    // 触发强平的标记时间
-    private Long liqMarkTime;
+	// 开仓杠杆 @see PcOrder#leverage
+	private BigDecimal entryLeverage;
 
-    // 仓位强平状态，0：未触发平仓，1：仓位被冻结，
-    private Integer liqStatus;
-    
-    // 保证金模式:1-全仓,2-逐仓
-    private int marginMode;
-    
-    // 仓位，合约金额
-    private BigDecimal amt;
+	int ________________;
 
-    // 最新杠杆
-    private BigDecimal leverage;
-    
-    // 开仓杠杆 @see PcOrder#leverage
-    private BigDecimal entryLeverage;
-    
-    /*
-     * 币的数量，用于计算均价.
-     * 建仓加仓时直接累加，算出均价
-     * 平仓时均价不变，由 amt / price 得到最新的量，平仓时均价是不变的，价差是利润；也可以按照amt变化同比例减少
-     */
-    private BigDecimal volume;
-    
-    int ________________;
-    
-    /**
+	/*
+	 * 币的数量，用于计算均价.
+	 * 建仓加仓时直接累加，算出均价
+	 * 平仓时均价不变，由 amt / price 得到最新的量，平仓时均价是不变的，价差是利润；也可以按照amt变化同比例减少
+	 */
+	private BigDecimal volume;
+
+	// 仓位，合约金额
+	private BigDecimal amt;
+
+	// 当前杠杆
+	private BigDecimal leverage;
+
+	/**
+	 * 仓位保证金， （ 基础维持保证金 ，包括用户充入的保证金 ）
+	 */
+	private BigDecimal posMargin;
+
+	// 是否自动追加保证金标识
+	private Integer autoAddFlag;
+
+	/**
      * 均价，仓位为0时，表示最后一次仓位变动时的均价
+     * averagePrice
      */
     private BigDecimal entryPrice;
     
     /**
-     * 仓位保证金， （ 基础维持保证金 ，包括用户充入的保证金 ）
-     */
-    private BigDecimal posMargin;
-    
-    /**
-     * 强平价，仓位为0时，表示最后一次仓位变动时的强平价
-     */
-    private BigDecimal liqPrice;
+	 * 初始保证金，平仓的时候要减去对应的比例，以维持收益率一致
+	 */
+	private BigDecimal initMargin;
+
+	int _____________________________________________________;
     
     /**
      * 破产价，仓位为0时，表示最后一次仓位变动时的破产价
@@ -79,15 +76,7 @@ public class PcPosition extends UserDataEntity {
      */
     private BigDecimal holdRatio;
     
-    /**
-     * 初始保证金，平仓的时候要减去对应的比例，以维持收益率一致
-     */
-    private BigDecimal initMargin;
-    
-    // 是否自动追加保证金标识
-	private Integer autoAddFlag;
-
-	// 已实现盈亏
+    // 已实现盈亏
     private BigDecimal realisedPnl;
     
     // 手续费
@@ -95,6 +84,20 @@ public class PcPosition extends UserDataEntity {
 
     //备注
     private String remark;
+
+	/**
+	 * 强平价，仓位为0时，表示最后一次仓位变动时的强平价
+	 */
+	private BigDecimal liqPrice;
+
+	// 触发强平的标记价格
+	private BigDecimal liqMarkPrice;
+
+	// 触发强平的标记时间
+	private Long liqMarkTime;
+
+	// 仓位强平状态，0：未触发平仓，1：仓位被冻结，
+	private Integer liqStatus;
 
 	public PcPosition() {
 		super();
