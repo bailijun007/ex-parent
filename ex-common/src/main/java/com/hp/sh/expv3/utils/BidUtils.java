@@ -1,6 +1,4 @@
-package com.hp.sh.expv3.pc.module.order.api;
-
-import com.hp.sh.expv3.utils.IntBool;
+package com.hp.sh.expv3.utils;
 
 public class BidUtils {
 	
@@ -16,6 +14,8 @@ public class BidUtils {
 		}else{
 			return longFlag;
 		}
+		
+//		return closeFlag^longFlag; //同上
 	}
 
 }

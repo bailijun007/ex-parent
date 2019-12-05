@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.pc.module.trade.dao.PcTradeDAO">
+
+	<resultMap type="com.hp.sh.expv3.pc.module.trade.entity.PcTrade" id="PcTrade">
+		<result column="id" property="id" />
+		<result column="match_tx_id" property="matchTxId" />
+		<result column="symbol" property="symbol" />
+		<result column="asset" property="asset" />
+		<result column="tk_bid_flag" property="tkBidFlag" />
+		<result column="tk_account_id" property="tkAccountId" />
+		<result column="tk_order_id" property="tkOrderId" />
+		<result column="tk_close_flag" property="tkCloseFlag" />
+		<result column="mk_account_id" property="mkAccountId" />
+		<result column="mk_order_id" property="mkOrderId" />
+		<result column="mk_close_flag" property="mkCloseFlag" />
+		<result column="price" property="price" />
+		<result column="number" property="number" />
+		<result column="trade_time" property="tradeTime" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,number,trade_time
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="id!=null"> and id=#{id}</if>
+		<if test="matchTxId!=null"> and match_tx_id=#{matchTxId}</if>
+		<if test="tkBidFlag!=null"> and tk_bid_flag=#{tkBidFlag}</if>
+		<if test="tkAccountId!=null"> and tk_account_id=#{tkAccountId}</if>
+		<if test="tkOrderId!=null"> and tk_order_id=#{tkOrderId}</if>
+		<if test="tkCloseFlag!=null"> and tk_close_flag=#{tkCloseFlag}</if>
+		<if test="mkAccountId!=null"> and mk_account_id=#{mkAccountId}</if>
+		<if test="mkOrderId!=null"> and mk_order_id=#{mkOrderId}</if>
+		<if test="mkCloseFlag!=null"> and mk_close_flag=#{mkCloseFlag}</if>
+		<if test="tradeTime!=null"> and trade_time=#{tradeTime}</if>
+		</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from pc_trade
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="PcTrade">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="PcTrade">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="PcTrade">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from pc_trade
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="PcTrade">
+		select
+			<include refid="Base_Column_List" />
+		from pc_trade
+			where id=#{id}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			pc_trade
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into pc_trade (
+			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,number,trade_time
+		)values(
+			#{id},#{matchTxId},#{symbol},#{asset},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{tkCloseFlag},#{mkAccountId},#{mkOrderId},#{mkCloseFlag},#{price},#{number},#{tradeTime}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			pc_trade
+		set 
+			id=#{id},match_tx_id=#{matchTxId},symbol=#{symbol},asset=#{asset},tk_bid_flag=#{tkBidFlag},tk_account_id=#{tkAccountId},tk_order_id=#{tkOrderId},tk_close_flag=#{tkCloseFlag},mk_account_id=#{mkAccountId},mk_order_id=#{mkOrderId},mk_close_flag=#{mkCloseFlag},price=#{price},number=#{number},trade_time=#{tradeTime}
+		where 
+			id=#{id}
+	</update>
+
+	<delete id="delete">
+        delete from pc_trade where id=#{id}
+    </delete>
+
+    <delete id="condDelete">
+        delete from pc_trade
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+</mapper>

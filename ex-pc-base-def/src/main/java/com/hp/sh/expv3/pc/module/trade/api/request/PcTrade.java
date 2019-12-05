@@ -2,7 +2,7 @@
  * @author zw
  * @date 2019/8/23
  */
-package com.hp.sh.expv3.pc.module.order.vo;
+package com.hp.sh.expv3.pc.module.trade.api.request;
 
 import java.math.BigDecimal;
 
@@ -12,6 +12,7 @@ import java.math.BigDecimal;
  */
 public class PcTrade {
 
+	//id
 	private Long id;
 	//事务Id
     private Long matchTxId;
