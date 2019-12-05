@@ -119,6 +119,10 @@ public enum EventEnum implements EnumDescribe {
      */
     PC_ORDER_PENDING_CANCEL(26, "PC_ORDER_PENDING_CANCEL"),
     /**
+     * 委托 匹配成功，由撮合发出，用于通知下游将 委托状态修改为 部分成交或者全部成交
+     */
+    PC_MATCH_ORDER_MATCHED(27, "PC_MATCH_ORDER_MATCHED"),
+    /**
      * 委托 未匹配，由撮合发出，用于通知下游将 委托状态修改为 NEW
      */
     PC_MATCH_ORDER_NOT_MATCHED(28, "PC_MATCH_ORDER_NOT_MATCHED"),

@@ -8,9 +8,11 @@ import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.PcTradeBo;
 import com.hp.sh.expv3.match.component.rocketmq.PcMatchProducer;
 import com.hp.sh.expv3.match.config.setting.PcmatchRocketMqSetting;
+import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
 import com.hp.sh.expv3.match.mqmsg.PcOrderCancelMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.PcOrderMqMsgDto;
+import com.hp.sh.expv3.match.mqmsg.PcOrderTradeMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.PcPosLockedMqMsgDto;
 import com.hp.sh.expv3.match.util.JsonUtil;
 import com.hp.sh.expv3.match.util.PcRocketMqUtil;
@@ -35,9 +37,9 @@ public class PcMatchMqNotify {
     @Autowired
     private PcmatchRocketMqSetting pcmatchRocketMqSetting;
 
+    @Deprecated
     public boolean sendTrade(String asset, String symbol, List<PcTradeBo> tradeList) {
         String topic = PcRocketMqUtil.buildPcAccountContractMqTopicName(pcmatchRocketMqSetting.getPcMatchTopicNamePattern(), asset, symbol);
-
         if (null != tradeList && !tradeList.isEmpty()) {
 
             Message message = new Message(
@@ -46,7 +48,7 @@ public class PcMatchMqNotify {
                     "" + tradeList.get(0).getTkOrderId(),
                     JsonUtil.toJsonString(tradeList).getBytes()// body
             );
-            safeSend2AccountContractTopic(message, tradeList.get(0).getTkAccountId());
+            safeSend2MatchTopic(message, tradeList.get(0).getTkAccountId());
         }
         return true;
     }
@@ -66,7 +68,7 @@ public class PcMatchMqNotify {
                 JsonUtil.toJsonString(msg).getBytes()// body
         );
 //        SendResult send =
-        safeSend2AccountContractTopic(message, accountId);
+        safeSend2MatchTopic(message, accountId);
         return true;
     }
 
@@ -84,7 +86,7 @@ public class PcMatchMqNotify {
                 "" + orderId,
                 JsonUtil.toJsonString(msg).getBytes()// body
         );
-        safeSend2AccountContractTopic(message, accountId);
+        safeSend2MatchTopic(message, accountId);
         return true;
     }
 
@@ -108,8 +110,56 @@ public class PcMatchMqNotify {
                         "" + order.getOrderId(),
                         JsonUtil.toJsonString(msg).getBytes()// body
                 );
-                safeSend2AccountContractTopic(message, order.getAccountId());
+                safeSend2MatchTopic(message, order.getAccountId());
             }
+        }
+        return true;
+    }
+
+    public boolean sendOrderMatched(String asset, String symbol, List<PcTradeBo> tradeList) {
+        String topic = PcRocketMqUtil.buildPcAccountContractMqTopicName(pcmatchRocketMqSetting.getPcMatchTopicNamePattern(), asset, symbol);
+
+        for (PcTradeBo trade : tradeList) {
+
+            PcOrderTradeMqMsgDto maker = new PcOrderTradeMqMsgDto();
+
+            maker.setMakerFlag(CommonConst.MAKER);
+            maker.setAccountId(trade.getMkAccountId());
+            maker.setNumber(trade.getNumber());
+            maker.setAsset(trade.getAsset());
+            maker.setMatchTxId(trade.getMatchTxId());
+            maker.setOrderId(trade.getMkOrderId());
+            maker.setPrice(trade.getPrice());
+            maker.setSymbol(trade.getSymbol());
+            maker.setTradeTime(trade.getTradeTime());
+            maker.setTradeId(trade.getId());
+            Message makerMsg = new Message(
+                    topic,// topic
+                    "" + RmqTagEnum.PC_MATCH_ORDER_MATCHED.getConstant(),// tag
+                    "" + maker.getOrderId(),
+                    JsonUtil.toJsonString(maker).getBytes()// body
+            );
+            safeSend2MatchTopic(makerMsg, maker.getAccountId());
+
+            PcOrderTradeMqMsgDto taker = new PcOrderTradeMqMsgDto();
+            taker.setMakerFlag(CommonConst.TAKER);
+            taker.setAccountId(trade.getTkAccountId());
+            taker.setNumber(trade.getNumber());
+            taker.setAsset(trade.getAsset());
+            taker.setMatchTxId(trade.getMatchTxId());
+            taker.setOrderId(trade.getTkOrderId());
+            taker.setPrice(trade.getPrice());
+            taker.setSymbol(trade.getSymbol());
+            taker.setTradeTime(trade.getTradeTime());
+            taker.setTradeId(trade.getId());
+
+            Message takerMsg = new Message(
+                    topic,// topic
+                    "" + RmqTagEnum.PC_MATCH_ORDER_MATCHED.getConstant(),// tag
+                    "" + taker.getOrderId(),
+                    JsonUtil.toJsonString(taker).getBytes()                    // body
+            );
+            safeSend2MatchTopic(takerMsg, taker.getAccountId());
         }
         return true;
     }
@@ -123,12 +173,12 @@ public class PcMatchMqNotify {
                 "" + msg.getId(), // pos id
                 JsonUtil.toJsonString(msg).getBytes()// body
         );
-        safeSend2AccountContractTopic(message, msg.getAccountId());
+        safeSend2MatchTopic(message, msg.getAccountId());
 
         return true;
     }
 
-    private boolean safeSend2AccountContractTopic(Message message, long accountId) {
+    private boolean safeSend2MatchTopic(Message message, long accountId) {
         while (true) {
             try {
                 pcmatchProducer.send(message,

@@ -103,10 +103,6 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
     @Override
     public void run() {
 
-        /**
-         * new:
-         * (matchList | orderNew ) , bookUpdateList,bookResetFlag
-         */
         if (PcOrderTypeEnum.LIMIT.getCode() == takerOrder.getOrderType()) {
             doLimit();
         } else if (PcOrderTypeEnum.MARKET.getCode() == takerOrder.getOrderType()) {
@@ -124,7 +120,7 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
             pcMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), notMatchedTakerOrder.getAccountId(), notMatchedTakerOrder.getOrderId());
         } else {
             if (null != tradeList && (!tradeList.isEmpty())) {
-                pcMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
+                pcMatchMqNotify.sendOrderMatched(this.getAsset(), this.getSymbol(), this.tradeList);
             }
         }
         sendBookMsg();
@@ -135,9 +131,11 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
         if (null == cancelTakerOrder && (null == tradeList || tradeList.isEmpty())) {
             throw new RuntimeException();
         }
+
         // 先发成交消息
         if (null != tradeList && (!tradeList.isEmpty())) {
-            pcMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
+
+            pcMatchMqNotify.sendOrderMatched(this.getAsset(), this.getSymbol(), this.tradeList);
         }
 
         // 后发取消消息
