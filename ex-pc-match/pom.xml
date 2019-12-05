@@ -37,7 +37,7 @@
         <mybatis-spring-boot-starter.version>2.0.1</mybatis-spring-boot-starter.version>
         <pagehelper-spring-boot-starter.version>1.2.12</pagehelper-spring-boot-starter.version>
         <druid-spring-boot-starter.version>1.1.17</druid-spring-boot-starter.version>
-        <spring-boot-dependencies.version>2.1.6.RELEASE</spring-boot-dependencies.version>
+        <spring-boot-dependencies.version>2.0.3.RELEASE</spring-boot-dependencies.version>
         <guava.version>28.0-jre</guava.version>
         <zookeeper.version>3.5.5</zookeeper.version>
         <rocketmq-client.version>4.5.2</rocketmq-client.version>
@@ -49,6 +49,24 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot-dependencies.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
+            <version>${spring-boot-dependencies.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot-dependencies.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
             <version>${spring-boot-dependencies.version}</version>
         </dependency>
 
@@ -82,6 +100,36 @@
             <artifactId>jedis</artifactId>
             <version>${jedis.version}</version>
         </dependency>
+        
+        <!-- spring-cloud -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <version>2.0.0.RELEASE</version>
+            
+                <exclusions>
+                    <exclusion>
+					    <groupId>com.google.code.gson</groupId>
+					    <artifactId>gson</artifactId>
+                    </exclusion>
+                </exclusions>
+            
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <version>2.0.0.RELEASE</version>
+        </dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+			<version>2.0.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hp.sh</groupId>
+			<artifactId>ex-pc-base-def</artifactId>
+			<version>3.0.0</version>
+		</dependency>
 
     </dependencies>
 
