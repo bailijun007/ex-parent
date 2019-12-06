@@ -26,9 +26,6 @@ public class PcOrderTrade extends BaseBizEntity {
 	// 1-marker， 0-taker
 	private Integer makerFlag;
 
-	// 撮合事务ID
-	private Long matchTxId;
-
 	//合约交易品种
 	private String symbol;
 
