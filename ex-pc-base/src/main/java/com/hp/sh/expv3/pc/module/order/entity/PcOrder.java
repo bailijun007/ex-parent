@@ -15,6 +15,8 @@ import com.hp.sh.expv3.base.entity.UserDataEntity;
  */
 public class PcOrder extends UserDataEntity {
 	
+	private static final long serialVersionUID = 1L;
+	
 	public static final int OPEN = 0 ;
 	public static final int CLOSE = 1 ;
 
@@ -30,11 +32,6 @@ public class PcOrder extends UserDataEntity {
 	public static final int FILLED = 6;
 	
 //	int _______记录_______;
-
-    /**
-     * 永续合约账户
-     */
-    private Long accountId;
 
     /**
      * 
@@ -76,9 +73,12 @@ public class PcOrder extends UserDataEntity {
 	 */
 	private Integer timeInForce;
 	/**
-	 * 委托金额，初始设置后，后续不会修改
+	 * 合约张数
 	 */
-	private BigDecimal amt;
+	private BigDecimal volume;
+	
+	//面值
+	private BigDecimal faceValue;
 	
 //	int ______系统计算_______;
 
@@ -119,19 +119,15 @@ public class PcOrder extends UserDataEntity {
      */
     private BigDecimal closeFee;
 
-	/**
-     * 已成交金额
-     */
-    private BigDecimal filledAmt;
     /**
 	 * 已成交量
 	 */
 	private BigDecimal filledVolume;
 	/**
      * @deprecated
-     * 取消金额 (撤单时计算保存)：amt - filledAmt
+     * 取消张数 (撤单时计算保存)：volume - filledVolume
      */
-    private BigDecimal cancelAmt;
+    private BigDecimal cancelVolume;
     
     /**
 	 * 平仓委托对应的仓位Id
@@ -175,14 +171,6 @@ public class PcOrder extends UserDataEntity {
     private String clientOrderId;
 
 	public PcOrder() {
-	}
-
-	public Long getAccountId() {
-		return accountId;
-	}
-
-	public void setAccountId(Long accountId) {
-		this.accountId = accountId;
 	}
 
 	public String getAsset() {
@@ -249,12 +237,20 @@ public class PcOrder extends UserDataEntity {
 		this.orderType = orderType;
 	}
 
-	public BigDecimal getAmt() {
-		return amt;
+	public BigDecimal getVolume() {
+		return volume;
 	}
 
-	public void setAmt(BigDecimal amt) {
-		this.amt = amt;
+	public void setVolume(BigDecimal volume) {
+		this.volume = volume;
+	}
+
+	public BigDecimal getFaceValue() {
+		return faceValue;
+	}
+
+	public void setFaceValue(BigDecimal faceValue) {
+		this.faceValue = faceValue;
 	}
 
 	public BigDecimal getMarginRatio() {
@@ -321,28 +317,12 @@ public class PcOrder extends UserDataEntity {
 		this.closeFee = closeFee;
 	}
 
-	public BigDecimal getFilledAmt() {
-		return filledAmt;
-	}
-
-	public void setFilledAmt(BigDecimal filledAmt) {
-		this.filledAmt = filledAmt;
-	}
-
 	public BigDecimal getFilledVolume() {
 		return filledVolume;
 	}
 
 	public void setFilledVolume(BigDecimal filledVolume) {
 		this.filledVolume = filledVolume;
-	}
-
-	public BigDecimal getCancelAmt() {
-		return cancelAmt;
-	}
-
-	public void setCancelAmt(BigDecimal cancelAmt) {
-		this.cancelAmt = cancelAmt;
 	}
 
 	public Long getClosePosId() {
@@ -431,6 +411,14 @@ public class PcOrder extends UserDataEntity {
 
 	public void setClientOrderId(String clientOrderId) {
 		this.clientOrderId = clientOrderId;
+	}
+
+	public BigDecimal getCancelVolume() {
+		return cancelVolume;
+	}
+
+	public void setCancelVolume(BigDecimal cancelVolume) {
+		this.cancelVolume = cancelVolume;
 	}
 
 
