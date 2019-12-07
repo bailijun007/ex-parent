@@ -199,15 +199,6 @@ public class PcOrderService {
 		
 		pcOrder.setGrossMargin(closeFee.add(openFee).add(orderMargin));
 	}
-
-	private BigDecimal getLeverage(long userId, String asset, String symbol, boolean isLong){
-		PcAccountSymbol as = pcSymbolService.get(userId, asset, symbol);
-		if(isLong){	//多
-			return as.getLongLeverage();
-		}else{		//空
-			return as.getShortLeverage();
-		}
-	}
 	
 	public PcOrder getOrder(Long userId, Long orderId){
 		return this.pcOrderDAO.findById(userId, orderId);
