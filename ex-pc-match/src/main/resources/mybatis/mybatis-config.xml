@@ -5,10 +5,11 @@
     <settings>
         <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
-
+<!--
 	<plugins>
 		<plugin interceptor="com.gitee.hupadev.commons.mybatis.PageInterceptor">
 		</plugin>
 	</plugins>  
+-->
 
 </configuration>

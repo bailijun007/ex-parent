@@ -64,7 +64,7 @@
 	</select>
 
 	<select id="queryCount" resultType="long">
-		select 
+		select
 		<choose>
 			<when test="SUM!=null">
 				sum(${SUM})
@@ -85,9 +85,9 @@
 	</select>
 
 	<select id="exist" resultType="boolean">
-		select 
+		select
 			count(1)
-		from 
+		from
 			pc_trade
 		<include refid="simple_where" />
 		limit 1
@@ -99,12 +99,29 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into pc_trade (
-			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,number,trade_time
+			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,`number`,trade_time
 		)values(
 			#{id},#{matchTxId},#{symbol},#{asset},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{tkCloseFlag},#{mkAccountId},#{mkOrderId},#{mkCloseFlag},#{price},#{number},#{tradeTime}
 		)
 	</insert>
-	
+
+	<insert id="batchSave">
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into pc_trade (
+			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,`number`,trade_time
+		) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},#{item.matchTxId},#{item.symbol},#{item.asset},#{item.tkBidFlag},
+            #{item.tkAccountId},#{item.tkOrderId},#{item.tkCloseFlag},
+            #{item.mkAccountId},#{item.mkOrderId},#{item.mkCloseFlag},
+            #{item.price},#{item.number},#{item.tradeTime}
+            )
+        </foreach>
+	</insert>
+
 	<update id="update">
 		update 
 			pc_trade
@@ -124,5 +141,5 @@
     </delete>
 
 	<!--  -->
-	
+
 </mapper>
