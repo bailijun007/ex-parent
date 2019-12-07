@@ -4,6 +4,7 @@
  */
 package com.hp.sh.expv3.match.match.core.matched.task;
 
+import com.google.common.collect.Lists;
 import com.hp.sh.expv3.match.bo.PcOrder2CancelBo;
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.PcOrderNotMatchedBo;
@@ -15,16 +16,23 @@ import com.hp.sh.expv3.match.enums.EventEnum;
 import com.hp.sh.expv3.match.enums.PcOrderTypeEnum;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
 import com.hp.sh.expv3.match.msg.TradeListMsgDto;
+import com.hp.sh.expv3.pc.module.trade.dao.PcTradeDAO;
+import com.hp.sh.expv3.pc.module.trade.entity.PcTrade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Scope("prototype")
@@ -67,6 +75,8 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
         this.cancelTakerOrder = cancelTakerOrder;
     }
 
+    @Autowired
+    private PcTradeDAO pcTradeDAO;
     @Autowired
     private PcMatchMqNotify pcMatchMqNotify;
     @Autowired
@@ -120,6 +130,10 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
             pcMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), notMatchedTakerOrder.getAccountId(), notMatchedTakerOrder.getOrderId());
         } else {
             if (null != tradeList && (!tradeList.isEmpty())) {
+                List<PcTradeBo> notSavedTrade = filterNotSavedTrade(this.tradeList);
+                if (null != notSavedTrade && !notSavedTrade.isEmpty()) {
+                    saveTradeList(notSavedTrade);
+                }
                 pcMatchMqNotify.sendOrderMatched(this.getAsset(), this.getSymbol(), this.tradeList);
             }
         }
@@ -134,7 +148,10 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
 
         // 先发成交消息
         if (null != tradeList && (!tradeList.isEmpty())) {
-
+            List<PcTradeBo> notSavedTrade = filterNotSavedTrade(this.tradeList);
+            if (null != notSavedTrade && !notSavedTrade.isEmpty()) {
+                saveTradeList(notSavedTrade);
+            }
             pcMatchMqNotify.sendOrderMatched(this.getAsset(), this.getSymbol(), this.tradeList);
         }
 
@@ -153,6 +170,54 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
         return msg;
     }
 
+    @Value("${pcmatch.trade.batchSize:10}")
+    private int batchSize;
+
+    private void saveTradeList(List<PcTradeBo> tradeList) {
+        List<List<PcTradeBo>> batchTrade = Lists.partition(tradeList, batchSize);
+        for (List<PcTradeBo> trades : batchTrade) {
+            pcTradeDAO.batchSave(trades);
+        }
+    }
+
+    /**
+     * 查询匹配结果是否已经入库，若已经入库，则使用已入库的记录的matchId 作为本批次入库的matchId。同时返回未入库的成交记录
+     *
+     * @param tradeList
+     * @return
+     */
+    private List<PcTradeBo> filterNotSavedTrade(List<PcTradeBo> tradeList) {
+        long takerAccountId = tradeList.get(0).getTkOrderId();
+        long takerOrderId = tradeList.get(0).getTkOrderId();
+
+        List<PcTrade> existMatches = pcTradeDAO.queryList(new HashMap<String, Object>() {
+            {
+                put("tkAccountId", takerAccountId);
+                put("tkOrderId", takerOrderId);
+            }
+        });
+
+        List<PcTradeBo> needSave;
+
+        if (null == existMatches || existMatches.isEmpty()) {
+            needSave = tradeList;
+        } else {
+            // 使用上次的matchTxId覆盖
+            Long existMatchTxId = existMatches.get(0).getMatchTxId();
+            for (PcTradeBo pcMatchBo : tradeList) {
+                pcMatchBo.setMatchTxId(existMatchTxId);
+            }
+            needSave = new ArrayList<>(tradeList.size());
+            Map<Long, PcTrade> id2Match = existMatches.stream().collect(Collectors.toMap(PcTrade::getMkOrderId, Function.identity()));
+            for (PcTradeBo match : tradeList) {
+                if (!id2Match.containsKey(match.getMkOrderId())) {
+                    needSave.add(match);
+                }
+            }
+        }
+        return needSave;
+    }
+
     private void sendBookMsg() {
         // send book
         BookMsgDto bookMsgDto = new BookMsgDto();
@@ -164,7 +229,6 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
         bookMsgDto.setOrders(this.bookUpdateList);
         // prepared book end
         pcNotify.safeNotify(this.getAsset(), this.getSymbol(), bookMsgDto);
-
     }
 
     private void sendTradeMsg() {
