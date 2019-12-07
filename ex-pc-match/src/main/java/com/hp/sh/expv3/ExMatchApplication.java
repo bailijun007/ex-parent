@@ -19,7 +19,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import javax.annotation.PostConstruct;
 import java.util.concurrent.Executor;
 
 //@EnableDiscoveryClient
