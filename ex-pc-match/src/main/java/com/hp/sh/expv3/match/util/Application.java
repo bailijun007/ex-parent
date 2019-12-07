@@ -2,8 +2,8 @@ package com.hp.sh.expv3.match.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
+//import sun.misc.Signal;
+//import sun.misc.SignalHandler;
 
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -74,8 +74,8 @@ public class Application {
     final Logger logger = LoggerFactory.getLogger(getClass());
 
     private void hookQuit() {
-        SignalHandler handler = signal -> logger.warn("input quit instead");
-        Signal.handle(new Signal("INT"), handler);
-        Signal.handle(new Signal("TERM"), handler);
+//        SignalHandler handler = signal -> logger.warn("input quit instead");
+//        Signal.handle(new Signal("INT"), handler);
+//        Signal.handle(new Signal("TERM"), handler);
     }
 }
