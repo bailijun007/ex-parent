@@ -23,8 +23,8 @@ import com.hp.sh.expv3.match.match.core.order.OrderInitializer;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
 import com.hp.sh.expv3.match.util.Application;
 
-@EnableDiscoveryClient
-@EnableFeignClients({"com.hp.sh.expv3"})
+//@EnableDiscoveryClient
+//@EnableFeignClients({"com.hp.sh.expv3"})
 @ComponentScan("com.hp.sh.expv3")
 //@SpringBootApplication
 
