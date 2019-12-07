@@ -23,6 +23,10 @@ public class PcTradeMsg extends BaseOrderMsg{
 	
 	public PcTradeMsg() {
 	}
+	
+	public String uniqueKey(){
+		return this.mkOrderId+"-"+this.tkOrderId;
+	}
 
 	public Long getId() {
 		return id;

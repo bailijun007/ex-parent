@@ -59,9 +59,6 @@ public class PcAccountSymbol extends UserDataEntity {
 	@Version
 	private Long version;
 	
-	@SuppressWarnings("unused")
-	private Long accountId;
-
 	public PcAccountSymbol() {
 	}
 
@@ -135,14 +132,6 @@ public class PcAccountSymbol extends UserDataEntity {
 
 	public void setVersion(Long version) {
 		this.version = version;
-	}
-
-	public Long getAccountId() {
-		return accountId;
-	}
-
-	public void setAccountId(Long accountId) {
-		this.accountId = accountId;
 	}
 
 }

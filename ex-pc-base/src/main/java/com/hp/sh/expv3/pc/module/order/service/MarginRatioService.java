@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 import org.springframework.stereotype.Service;
 
+import com.hp.sh.expv3.pc.constant.Precision;
+
 /**
  * 费率,查询获取，redis或db
  * @author lw
@@ -18,7 +20,7 @@ public class MarginRatioService {
 	 * @return
 	 */
     public BigDecimal getInitedMarginRatio(BigDecimal leverage) {
-        return BigDecimal.ONE.divide(leverage, Precision.DIVIDE_SCALE, Precision.LESS);
+        return BigDecimal.ONE.divide(leverage, Precision.PERCENT_PRECISION, Precision.LESS);
     }
 
     /**
@@ -37,6 +39,10 @@ public class MarginRatioService {
 	 */
 	public BigDecimal getCloseFeeRatio(long userId) {
 		return new BigDecimal("0.0075");
+	}
+
+	public BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume) {
+		return new BigDecimal("0.005");
 	}
 	
 }

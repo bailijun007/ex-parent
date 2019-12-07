@@ -21,9 +21,10 @@ public class PcTrade {
     //资产
     private String asset;
 
-    //买卖标志
+    //买卖标志 0-卖，1-买
     private Integer tkBidFlag;
 
+    /*** taker ***/
     //taker账户ID
     private Long tkAccountId;
     //taker订单ID
@@ -31,6 +32,7 @@ public class PcTrade {
     //taker是否平仓
     private Integer tkCloseFlag;
 
+    /*** maker ***/
     //maker账户Id
     private Long mkAccountId;
     //maker订单ID
@@ -38,6 +40,7 @@ public class PcTrade {
     //maker是否平仓
     private Integer mkCloseFlag;
 
+    /*** data ***/
     //成交价格
     private BigDecimal price;
     //数量

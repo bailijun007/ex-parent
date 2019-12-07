@@ -27,6 +27,7 @@
 		<module>ex-pc-base</module>
 		<module>ex-pc-base-def</module>
 		<module>ex-pc-match</module>
+		<module>ex-pc-extend</module>
 	</modules>
 
     <dependencies>

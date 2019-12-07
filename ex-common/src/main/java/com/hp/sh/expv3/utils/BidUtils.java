@@ -10,7 +10,7 @@ public class BidUtils {
 	 */
 	public static int getBidFlag(int closeFlag, int longFlag){
 		if(IntBool.isTrue(closeFlag)){
-			return IntBool.not(longFlag);
+			return IntBool.reverse(longFlag);
 		}else{
 			return longFlag;
 		}
@@ -18,4 +18,12 @@ public class BidUtils {
 //		return closeFlag^longFlag; //同上
 	}
 
+	public static int getLongFlag(int bidFlag, int closeFlag){
+		if(IntBool.isTrue(bidFlag)){
+			return IntBool.isTrue(closeFlag)?IntBool.NO:IntBool.YES;
+		}else{
+			return IntBool.isTrue(closeFlag)?IntBool.YES:IntBool.NO;
+		}
+	}
+	
 }

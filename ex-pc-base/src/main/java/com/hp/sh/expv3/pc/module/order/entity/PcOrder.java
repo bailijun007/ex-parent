@@ -59,7 +59,7 @@ public class PcOrder extends UserDataEntity {
      */
     private BigDecimal leverage;
     /**
-	 * 委托价格
+	 * 委托价格（单位：报价货币）
 	 */
 	private BigDecimal price;
 
@@ -77,7 +77,7 @@ public class PcOrder extends UserDataEntity {
 	 */
 	private BigDecimal volume;
 	
-	//面值
+	// 面值(单位：)
 	private BigDecimal faceValue;
 	
 //	int ______系统计算_______;

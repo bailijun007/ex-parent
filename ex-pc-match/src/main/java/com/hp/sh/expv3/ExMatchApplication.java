@@ -1,9 +1,7 @@
 package com.hp.sh.expv3;
 
-import com.hp.sh.expv3.match.match.core.match.thread.impl.PcOrderSnapshotCreateTriggerThread;
-import com.hp.sh.expv3.match.match.core.order.OrderInitializer;
-import com.hp.sh.expv3.match.thread.def.IThreadManager;
-import com.hp.sh.expv3.match.util.Application;
+import java.util.concurrent.Executor;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,17 +12,22 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import javax.annotation.PostConstruct;
-import java.util.concurrent.Executor;
+import com.hp.sh.expv3.match.match.core.match.thread.impl.PcOrderSnapshotCreateTriggerThread;
+import com.hp.sh.expv3.match.match.core.order.OrderInitializer;
+import com.hp.sh.expv3.match.thread.def.IThreadManager;
+import com.hp.sh.expv3.match.util.Application;
 
-//@EnableDiscoveryClient
-//@EnableFeignClients({"com.hp.sh.expv3"})
-//@ComponentScan("com.hp.sh.expv3")
+@EnableDiscoveryClient
+@EnableFeignClients({"com.hp.sh.expv3"})
+@ComponentScan("com.hp.sh.expv3")
 //@SpringBootApplication
 
 @EnableAutoConfiguration

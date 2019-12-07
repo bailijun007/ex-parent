@@ -82,7 +82,7 @@
 		select
 			<include refid="Base_Column_List" />
 		from pc_account_symbol
-			where id=#{id}
+			where id=#{id} and user_id=#{userId}
 	</select>
 
 	<select id="exist" resultType="boolean">

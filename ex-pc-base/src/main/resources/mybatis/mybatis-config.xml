@@ -8,6 +8,7 @@
 
 	<plugins>
 		<plugin interceptor="com.gitee.hupadev.commons.mybatis.PageInterceptor"></plugin>
+		<plugin interceptor="com.gitee.hupadev.commons.mybatis.UpdateInterceptor"></plugin>
 	</plugins>  
 
 </configuration>

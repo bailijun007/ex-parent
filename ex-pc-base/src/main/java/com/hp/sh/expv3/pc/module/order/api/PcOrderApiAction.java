@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.module.order.constant.OrderError;
+import com.hp.sh.expv3.pc.error.OrderError;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.module.order.mq.msg.BookResetMsg;
@@ -44,13 +44,13 @@ public class PcOrderApiAction {
 	 */
 	@ApiOperation(value = "创建订单")
 	@GetMapping(value = "/api/pc/order/create")
-	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal amt) throws Exception{
+	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number) throws Exception{
 		
 		//check 检查可平仓位
 		//checkShortPosition();
 		
 		//create
-		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, amt);
+		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
 
 		//send mq
 		OrderPendingNewMsg msg = new OrderPendingNewMsg();
@@ -58,8 +58,8 @@ public class PcOrderApiAction {
 		msg.setAsset(asset);
 		msg.setBidFlag(BidUtils.getBidFlag(closeFlag, longFlag));
 		msg.setCloseFlag(closeFlag);
-		msg.setDisplayNumber(amt);
-		msg.setNumber(amt);
+		msg.setDisplayNumber(number);
+		msg.setNumber(number);
 		msg.setOrderId(order.getId());
 		msg.setPrice(order.getPrice());
 		msg.setSymbol(symbol);

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hp.sh.expv3.pc.module.symbol.component.PcDefaultSetting;
+import com.hp.sh.expv3.pc.component.PcDefaultSymbolSetting;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
@@ -27,19 +27,19 @@ public class PcAccountSymbolServiceImpl implements PcAccountSymbolService{
 	private PcAccountSymbolDAO pcAccountSymbolDAO;
 	
 	@Autowired
-	private PcDefaultSetting pcDefaultSetting;
+	private PcDefaultSymbolSetting pcDefaultSymbolSetting;
 
 	@Override
 	public void create(Long userId, String asset, String symbol){
 		Date now = new Date();
 		PcAccountSymbol entity = new PcAccountSymbol();
 		entity.setAsset(asset);
-		entity.setMarginMode(pcDefaultSetting.getMarginMode());
-		entity.setMaxLeverage(pcDefaultSetting.getMaxLeverage());
-		entity.setCrossLeverage(pcDefaultSetting.getCrossLeverage());
-		entity.setLongLeverage(pcDefaultSetting.getLongLeverage());
-		entity.setShortLeverage(pcDefaultSetting.getShortLeverage());
-		entity.setHoldMarginRatio(pcDefaultSetting.getHoldMarginRatio());
+		entity.setMarginMode(pcDefaultSymbolSetting.getMarginMode());
+		entity.setMaxLeverage(pcDefaultSymbolSetting.getMaxLeverage());
+		entity.setCrossLeverage(pcDefaultSymbolSetting.getCrossLeverage());
+		entity.setLongLeverage(pcDefaultSymbolSetting.getLongLeverage());
+		entity.setShortLeverage(pcDefaultSymbolSetting.getShortLeverage());
+		entity.setHoldMarginRatio(pcDefaultSymbolSetting.getHoldMarginRatio());
 		entity.setSymbol(symbol);
 		entity.setUserId(userId);
 		entity.setVersion(0L);
