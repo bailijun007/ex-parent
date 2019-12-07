@@ -33,14 +33,12 @@ public class PcPosition extends UserDataEntity {
 	int ________________;
 
 	/*
-	 * 币的数量，用于计算均价.
-	 * 建仓加仓时直接累加，算出均价
-	 * 平仓时均价不变，由 amt / price 得到最新的量，平仓时均价是不变的，价差是利润；也可以按照amt变化同比例减少
+	 * 仓位 张数
 	 */
 	private BigDecimal volume;
-
-	// 仓位，合约金额
-	private BigDecimal amt;
+	
+	//仓位 基础货币 总价值  
+	private BigDecimal baseValue;
 
 	// 当前杠杆
 	private BigDecimal leverage;
@@ -49,15 +47,18 @@ public class PcPosition extends UserDataEntity {
 	 * 仓位保证金， （ 基础维持保证金 ，包括用户充入的保证金 ）
 	 */
 	private BigDecimal posMargin;
+	
+	//平仓手续费
+	private BigDecimal closeFee;
 
 	// 是否自动追加保证金标识
 	private Integer autoAddFlag;
 
 	/**
      * 均价，仓位为0时，表示最后一次仓位变动时的均价
-     * averagePrice
+     * meanPrice
      */
-    private BigDecimal entryPrice;
+    private BigDecimal meanPrice;
     
     /**
 	 * 初始保证金，平仓的时候要减去对应的比例，以维持收益率一致
@@ -67,11 +68,6 @@ public class PcPosition extends UserDataEntity {
 	int _____________________________________________________;
     
     /**
-     * 破产价，仓位为0时，表示最后一次仓位变动时的破产价
-     */
-    private BigDecimal bankruptPrice;
-    
-    /**
      * 维持保证金比率
      */
     private BigDecimal holdRatio;
@@ -79,16 +75,15 @@ public class PcPosition extends UserDataEntity {
     // 已实现盈亏
     private BigDecimal realisedPnl;
     
-    // 手续费
+    // 已扣手续费
     private BigDecimal feeCost;
-
-    //备注
-    private String remark;
 
 	/**
 	 * 强平价，仓位为0时，表示最后一次仓位变动时的强平价
 	 */
 	private BigDecimal liqPrice;
+	
+	/* 强平 */
 
 	// 触发强平的标记价格
 	private BigDecimal liqMarkPrice;
@@ -159,12 +154,12 @@ public class PcPosition extends UserDataEntity {
 		this.marginMode = marginMode;
 	}
 
-	public BigDecimal getAmt() {
-		return amt;
+	public BigDecimal getBaseValue() {
+		return baseValue;
 	}
 
-	public void setAmt(BigDecimal amt) {
-		this.amt = amt;
+	public void setBaseValue(BigDecimal baseValue) {
+		this.baseValue = baseValue;
 	}
 
 	public BigDecimal getLeverage() {
@@ -191,12 +186,12 @@ public class PcPosition extends UserDataEntity {
 		this.volume = volume;
 	}
 
-	public BigDecimal getEntryPrice() {
-		return entryPrice;
+	public BigDecimal getMeanPrice() {
+		return meanPrice;
 	}
 
-	public void setEntryPrice(BigDecimal entryPrice) {
-		this.entryPrice = entryPrice;
+	public void setMeanPrice(BigDecimal averagePrice) {
+		this.meanPrice = averagePrice;
 	}
 
 	public BigDecimal getPosMargin() {
@@ -213,14 +208,6 @@ public class PcPosition extends UserDataEntity {
 
 	public void setLiqPrice(BigDecimal liqPrice) {
 		this.liqPrice = liqPrice;
-	}
-
-	public BigDecimal getBankruptPrice() {
-		return bankruptPrice;
-	}
-
-	public void setBankruptPrice(BigDecimal bankruptPrice) {
-		this.bankruptPrice = bankruptPrice;
 	}
 
 	public BigDecimal getHoldRatio() {
@@ -263,12 +250,12 @@ public class PcPosition extends UserDataEntity {
 		this.feeCost = feeCost;
 	}
 
-	public String getRemark() {
-		return remark;
+	public BigDecimal getCloseFee() {
+		return closeFee;
 	}
 
-	public void setRemark(String remark) {
-		this.remark = remark;
+	public void setCloseFee(BigDecimal closeFee) {
+		this.closeFee = closeFee;
 	}
 
 }
