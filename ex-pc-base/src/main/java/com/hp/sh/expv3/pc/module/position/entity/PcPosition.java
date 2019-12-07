@@ -33,11 +33,15 @@ public class PcPosition extends UserDataEntity {
 	int ________________;
 
 	/*
-	 * 仓位 张数
+	 * 仓位 张数 
+	 * posVolume
 	 */
 	private BigDecimal volume;
 	
-	//仓位 基础货币 总价值  
+	/*
+	 * 仓位 基础货币 总价值
+	 * posBaseValue  
+	 */
 	private BigDecimal baseValue;
 
 	// 当前杠杆
@@ -60,23 +64,23 @@ public class PcPosition extends UserDataEntity {
      */
     private BigDecimal meanPrice;
     
+    int _____________________________________________________;
+    
     /**
 	 * 初始保证金，平仓的时候要减去对应的比例，以维持收益率一致
 	 */
 	private BigDecimal initMargin;
 
-	int _____________________________________________________;
-    
-    /**
+	/**
      * 维持保证金比率
      */
     private BigDecimal holdRatio;
     
-    // 已实现盈亏
-    private BigDecimal realisedPnl;
-    
     // 已扣手续费
     private BigDecimal feeCost;
+    
+    // 已实现盈亏
+    private BigDecimal realisedPnl;
 
 	/**
 	 * 强平价，仓位为0时，表示最后一次仓位变动时的强平价

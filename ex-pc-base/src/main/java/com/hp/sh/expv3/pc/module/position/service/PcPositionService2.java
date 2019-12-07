@@ -17,7 +17,6 @@ import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
-import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
@@ -34,7 +33,7 @@ import com.hp.sh.expv3.utils.IntBool;
 
 @Service
 @Transactional
-public class PcPositionService {
+public class PcPositionService2 {
 
 	@Autowired
 	private PcPositionDAO pcPositionDAO;
@@ -59,9 +58,6 @@ public class PcPositionService {
 	
 	@Autowired
 	private PcBaseValueService baseValueCalc;
-	
-	@Autowired
-	private PcAccountCoreService pcAccountCoreService;
 	/**
 	 * 处理成交
 	 */
@@ -110,12 +106,11 @@ public class PcPositionService {
 		this.chekOrderStatus(order, matchedVo);
 		Integer actionType = order.getCloseFlag();
 		
-		if(actionType == OrderFlag.ACTION_OPEN){
-			BigDecimal meanPrice = this.modOpenPos(matchedVo, order);
-			this.saveOrderTrade(matchedVo, order, meanPrice);
-		}else{
+		if(actionType == OrderFlag.ACTION_CLOSE){
 			BigDecimal meanPrice = this.modClosePos(matchedVo, order);
 			this.saveOrderTrade(matchedVo, order, meanPrice);
+		}else{
+			
 		}
 	}
 
@@ -158,79 +153,6 @@ public class PcPositionService {
 		this.pcOrderTradeDAO.save(orderTrade);
 	}
 	
-	private BigDecimal modOpenPos(MatchedMsg matchedVo, PcOrder order) {
-		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
-		PcPosition pcPosition = this.getCurrentPosition(order.getUserId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
-
-		// TODO,精度问题，如果全部成交完，则无需按比例，全部转移即可
-		BigDecimal unfilledVolume = order.getVolume().subtract(order.getFilledVolume());
-		boolean isOrderCompleted = (unfilledVolume.compareTo(matchedVo.getNumber()) ==0); 
-		
-		BigDecimal origManPrice = null;
-		
-		if(pcPosition==null){
-			pcPosition = new PcPosition();
-			pcPosition.setAsset(order.getAsset());
-			pcPosition.setSymbol(order.getSymbol());
-			pcPosition.setLongFlag(order.getLongFlag());
-			pcPosition.setMarginMode(as.getMarginMode());
-			pcPosition.setEntryLeverage(order.getLeverage());
-			
-			//
-			pcPosition.setVolume(matchedVo.getNumber());
-			pcPosition.setBaseValue(BaseValueCalc.calcValue(order.getVolume().multiply(order.getFaceValue()), matchedVo.getPrice())); //TODO
-			pcPosition.setLeverage(order.getLeverage());
-			pcPosition.setPosMargin(isOrderCompleted?order.getOrderMargin(): FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOrderMargin()));
-			pcPosition.setCloseFee(isOrderCompleted?order.getCloseFee():FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getCloseFee()));
-			pcPosition.setAutoAddFlag(IntBool.NO);
-			pcPosition.setMeanPrice(matchedVo.getPrice());
-			pcPosition.setInitMargin(isOrderCompleted?order.getOrderMargin():FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOrderMargin()));
-			pcPosition.setHoldRatio(marginRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), order.getVolume()));
-			
-			pcPosition.setRealisedPnl(BigDecimal.ZERO);
-			
-			BigDecimal releaseOpenFee = FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOpenFee());
-			pcPosition.setFeeCost(releaseOpenFee);
-			
-			BigDecimal amount = order.getFaceValue().multiply(matchedVo.getNumber());
-			pcPosition.setLiqPrice(pcPriceServiceAabbImpl.calcLiqPrice(pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getMeanPrice(), amount, pcPosition.getPosMargin(), Precision.COMMON_PRECISION));
-			
-			pcPosition.setLiqMarkPrice(null);
-			pcPosition.setLiqMarkTime(null);
-			pcPosition.setLiqStatus(LiqStatus.NO);
-			
-			this.pcPositionDAO.save(pcPosition);
-		}else{
-			origManPrice = pcPosition.getMeanPrice();
-			//
-			pcPosition.setVolume(pcPosition.getVolume().add(matchedVo.getNumber()));
-			pcPosition.setBaseValue(pcPosition.getBaseValue().add(BaseValueCalc.calcValue(order.getVolume().multiply(order.getFaceValue()), matchedVo.getPrice()))); //TODO
-//			pcPosition.setLeverage(order.getLeverage());
-			pcPosition.setPosMargin(pcPosition.getPosMargin().add(isOrderCompleted?order.getOrderMargin(): FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOrderMargin())));
-			pcPosition.setCloseFee(pcPosition.getCloseFee().add(isOrderCompleted?order.getCloseFee():FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getCloseFee())));
-//			pcPosition.setAutoAddFlag(IntBool.NO);
-			
-			BigDecimal amount = order.getFaceValue().multiply(matchedVo.getNumber());
-			
-			BigDecimal meanPrice = pcPriceServiceAabbImpl.calcEntryPrice(IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getBaseValue(), amount, Precision.COMMON_PRECISION);
-			pcPosition.setMeanPrice(meanPrice);
-			pcPosition.setInitMargin(pcPosition.getInitMargin().add(isOrderCompleted?order.getOrderMargin():FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOrderMargin())));
-//			pcPosition.setHoldRatio(marginRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), order.getVolume()));
-			
-//			pcPosition.setRealisedPnl(BigDecimal.ZERO);
-			
-			pcPosition.setFeeCost(pcPosition.getFeeCost().add(FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOpenFee())));
-			
-			pcPosition.setLiqPrice(pcPriceServiceAabbImpl.calcLiqPrice(pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getMeanPrice(), amount, pcPosition.getPosMargin(), Precision.COMMON_PRECISION));
-			
-			this.pcPositionDAO.update(pcPosition);
-		}
-
-		this.pcAccountSymbolDAO.update(as);
-		
-		return origManPrice;
-	}
-	
 	private BigDecimal modClosePos(MatchedMsg matchedVo, PcOrder order) {
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		PcPosition pcPosition = this.getCurrentPosition(order.getUserId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
@@ -252,9 +174,9 @@ public class PcPositionService {
 				pcPosition.setCloseFee(BigDecimal.ZERO);
 				pcPosition.setInitMargin(BigDecimal.ZERO);
 			}else{
-				pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOrderMargin())));
-				pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getCloseFee())));
-				pcPosition.setInitMargin(pcPosition.getInitMargin().subtract(FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOrderMargin())));
+				pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(isOrderCompleted?order.getOrderMargin(): FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOrderMargin())));
+				pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(isOrderCompleted?order.getCloseFee():FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getCloseFee())));
+				pcPosition.setInitMargin(pcPosition.getInitMargin().subtract(isOrderCompleted?order.getOrderMargin():FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOrderMargin())));
 			}
 //			pcPosition.setHoldRatio(marginRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), order.getVolume()));
 			
@@ -267,10 +189,14 @@ public class PcPositionService {
 			
 			this.pcPositionDAO.update(pcPosition);
 		}
-		
+
 		this.pcAccountSymbolDAO.update(as);
 		
 		return origManPrice;
+	}
+	
+	private void cutPos(MatchedMsg matchedVo, PcOrder order) {
+		
 	}
 
 	/**
