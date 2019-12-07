@@ -22,13 +22,14 @@ import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.utils.IntBool;
 
 /**
  * 委托
- * @author lw
+ * @author wangjg
  *
  */
 @Service
@@ -50,6 +51,10 @@ public class PcOrderService {
 	
 	@Autowired
 	private FaceValueQuery faceValueQuery;
+
+	@Autowired
+	private PcPositionDAO pcPositionDAO;
+	
 	/**
 	 * 创建订单
 	 * @param userId 用户ID
@@ -64,7 +69,7 @@ public class PcOrderService {
 	 */
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		
-		if(this.existClientOrderId(cliOrderId)){
+		if(this.existClientOrderId(userId, cliOrderId)){
 			throw new ExException(OrderError.CREATED);
 		}
 		
@@ -107,8 +112,9 @@ public class PcOrderService {
 		return pcOrder;
 	}
 	
-	private boolean existClientOrderId(String clientOrderId) {
+	private boolean existClientOrderId(long userId, String clientOrderId) {
 		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
 		params.put("clientOrderId", clientOrderId);
 		Long count = this.pcOrderDAO.queryCount(params);
 		return count>0;
@@ -164,12 +170,8 @@ public class PcOrderService {
 	//设置平仓订单的各种费率
 	private void setCloseOrderFee(PcOrder pcOrder) {
         //判断可平仓位是否足够
-        if (false) {
-            throw new ExException(null);
-        }
-
-        if (null == null) {
-            
+        if (pcOrder.getVolume().compareTo(this.getClosablePos(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()))>0) {
+            throw new ExException(OrderError.POS_NOT_ENOUGH);
         }
         
 		pcOrder.setMarginRatio(BigDecimal.ZERO);
@@ -180,6 +182,19 @@ public class PcOrderService {
 		pcOrder.setOpenFee(BigDecimal.ZERO);
 		pcOrder.setCloseFee(BigDecimal.ZERO);
 		pcOrder.setGrossMargin(BigDecimal.ZERO);
+	}
+	
+	public BigDecimal getClosablePos(Long userId, String asset, String symbol){
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
+		params.put("asset", asset);
+		params.put("symbol", symbol);
+		params.put("SUM", "volume");
+		BigDecimal amount = this.pcPositionDAO.queryAmount(params);
+		if(amount==null){
+			return BigDecimal.ZERO;
+		}
+		return amount;
 	}
 
 	//设置开仓订单的各种费率

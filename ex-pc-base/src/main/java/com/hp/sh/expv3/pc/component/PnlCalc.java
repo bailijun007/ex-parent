@@ -12,7 +12,7 @@ import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.utils.IntBool;
 
 @Service
-public class PcBaseValueService {
+public class PnlCalc {
 
 	/**
 	 * 计算成交量
