@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.order.mq.utils;
+package com.hp.sh.expv3.pc.mq.utils;
 
 import java.util.List;
 

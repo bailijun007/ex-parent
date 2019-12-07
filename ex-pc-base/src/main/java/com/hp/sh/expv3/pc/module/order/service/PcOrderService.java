@@ -24,7 +24,6 @@ import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
-import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.utils.IntBool;
@@ -40,7 +39,7 @@ public class PcOrderService {
 	private static final Logger logger = LoggerFactory.getLogger(PcOrderService.class);
 	
 	@Autowired
-	private PcAccountSymbolService pcAccountSymbolService;
+	private PcAccountSymbolService pcSymbolService;
 
 	@Autowired
 	private PcOrderDAO pcOrderDAO;
@@ -54,9 +53,6 @@ public class PcOrderService {
 	@Autowired
 	private FaceValueQuery faceValueQuery;
 
-	@Autowired
-	private PcPositionDAO pcPositionDAO;
-	
 	/**
 	 * 创建订单
 	 * @param userId 用户ID
@@ -86,7 +82,7 @@ public class PcOrderService {
 		pcOrder.setSymbol(symbol);
 		pcOrder.setCloseFlag(closeFlag);
 		pcOrder.setLongFlag(longFlag);
-		pcOrder.setLeverage(this.getLeverage(userId, asset, symbol, IntBool.isTrue(longFlag)));
+		pcOrder.setLeverage(pcSymbolService.getLeverage(userId, asset, symbol, longFlag));
 		pcOrder.setPrice(price);
 		pcOrder.setVolume(number);
 		pcOrder.setFaceValue(faceValueQuery.get(pcOrder.getSymbol()));
@@ -205,7 +201,7 @@ public class PcOrderService {
 	}
 
 	private BigDecimal getLeverage(long userId, String asset, String symbol, boolean isLong){
-		PcAccountSymbol as = pcAccountSymbolService.get(userId, asset, symbol);
+		PcAccountSymbol as = pcSymbolService.get(userId, asset, symbol);
 		if(isLong){	//多
 			return as.getLongLeverage();
 		}else{		//空

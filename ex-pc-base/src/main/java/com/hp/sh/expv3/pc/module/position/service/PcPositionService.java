@@ -13,7 +13,6 @@ import com.hp.sh.expv3.pc.calc.BaseValueCalc;
 import com.hp.sh.expv3.pc.calc.FeeCalc;
 import com.hp.sh.expv3.pc.calc.PcPriceCalc;
 import com.hp.sh.expv3.pc.calc.PnlCalc;
-import com.hp.sh.expv3.pc.component.FaceValueQuery;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
@@ -24,13 +23,13 @@ import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
-import com.hp.sh.expv3.pc.module.order.mq.msg.MatchedMsg;
 import com.hp.sh.expv3.pc.module.order.service.MarginRatioService;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcTrade;
+import com.hp.sh.expv3.pc.mq.msg.MatchedMsg;
 import com.hp.sh.expv3.utils.IntBool;
 
 @Service
@@ -47,9 +46,6 @@ public class PcPositionService {
 	private PcOrderDAO pcOrderDAO;
 	
 	@Autowired
-	private FeeCollectorSelector feeCollectorSelector;
-	
-	@Autowired
 	private PcAccountSymbolDAO pcAccountSymbolDAO;
 
 	@Autowired
@@ -63,6 +59,9 @@ public class PcPositionService {
 	
 	@Autowired
 	private PcAccountCoreService pcAccountCoreService;
+	
+	@Autowired
+	private FeeCollectorSelector feeCollectorSelector;
 	
 	
 	/**
