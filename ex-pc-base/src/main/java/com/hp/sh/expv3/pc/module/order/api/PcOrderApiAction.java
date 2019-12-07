@@ -14,6 +14,7 @@ import com.hp.sh.expv3.pc.module.order.mq.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
+import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.utils.BidUtils;
 
 import io.swagger.annotations.Api;
@@ -25,6 +26,9 @@ public class PcOrderApiAction {
 	
 	@Autowired
 	private PcOrderService pcOrderService;
+	
+	@Autowired
+	private PcPositionService pcPositionService;
 	
 	@Autowired
 	private MatchMqSender matchMqSender;
@@ -47,9 +51,9 @@ public class PcOrderApiAction {
 	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number) throws Exception{
 		
 		//check 检查可平仓位
-		//checkShortPosition();
+		checkShortPosition(userId, asset, symbol, number);
 		
-		//create
+		//create TODO 可平仓位，内部要加锁
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
 
 		//send mq
@@ -100,6 +104,13 @@ public class PcOrderApiAction {
 		msg.setAsset(asset);
 		msg.setSymbol(symbol);
 		this.matchMqSender.sendBookResetMsg(msg);
+	}
+
+	private void checkShortPosition(long userId, String asset, String symbol, BigDecimal volume) {
+        //判断可平仓位是否足够
+        if (volume.compareTo(pcPositionService.getClosablePos(userId, asset, symbol))>0) {
+            throw new ExException(OrderError.POS_NOT_ENOUGH);
+        }
 	}
 
 }

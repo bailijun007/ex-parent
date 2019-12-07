@@ -171,11 +171,6 @@ public class PcOrderService {
 
 	//设置平仓订单的各种费率
 	private void setCloseOrderFee(PcOrder pcOrder) {
-        //判断可平仓位是否足够
-        if (pcOrder.getVolume().compareTo(this.getClosablePos(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()))>0) {
-            throw new ExException(OrderError.POS_NOT_ENOUGH);
-        }
-        
 		pcOrder.setMarginRatio(BigDecimal.ZERO);
 		pcOrder.setOpenFeeRatio(BigDecimal.ZERO);
 		pcOrder.setCloseFeeRatio(BigDecimal.ZERO);
@@ -184,19 +179,6 @@ public class PcOrderService {
 		pcOrder.setOpenFee(BigDecimal.ZERO);
 		pcOrder.setCloseFee(BigDecimal.ZERO);
 		pcOrder.setGrossMargin(BigDecimal.ZERO);
-	}
-	
-	public BigDecimal getClosablePos(Long userId, String asset, String symbol){
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", userId);
-		params.put("asset", asset);
-		params.put("symbol", symbol);
-		params.put("SUM", "volume");
-		BigDecimal amount = this.pcPositionDAO.queryAmount(params);
-		if(amount==null){
-			return BigDecimal.ZERO;
-		}
-		return amount;
 	}
 
 	//设置开仓订单的各种费率

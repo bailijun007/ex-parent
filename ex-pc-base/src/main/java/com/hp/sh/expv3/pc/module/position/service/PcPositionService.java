@@ -157,7 +157,7 @@ public class PcPositionService {
 		orderTrade.setTradeId(matchedVo.getTradeId());
 		orderTrade.setTradeTime(matchedVo.getTradeTime());
 		orderTrade.setUserId(order.getUserId());
-		orderTrade.setVolume(null);
+		orderTrade.setVolume(matchedVo.getNumber());
 		this.pcOrderTradeDAO.save(orderTrade);
 	}
 	
@@ -303,4 +303,17 @@ public class PcPositionService {
 		
 	}
 
+	public BigDecimal getClosablePos(Long userId, String asset, String symbol){
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
+		params.put("asset", asset);
+		params.put("symbol", symbol);
+		params.put("SUM", "volume");
+		BigDecimal amount = this.pcPositionDAO.queryAmount(params);
+		if(amount==null){
+			return BigDecimal.ZERO;
+		}
+		return amount;
+	}
+	
 }
