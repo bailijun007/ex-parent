@@ -119,6 +119,9 @@ public class PcPositionService {
 			BigDecimal meanPrice = this.modClosePos(matchedVo, order);
 			this.saveOrderTrade(matchedVo, order, meanPrice);
 		}
+		//TODO
+		//修改订单状态：部分成交
+		
 	}
 
 	private void saveOrderTrade(MatchedMsg matchedVo, PcOrder order, BigDecimal meanPrice) {

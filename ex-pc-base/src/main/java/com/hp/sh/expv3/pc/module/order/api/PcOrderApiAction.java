@@ -97,8 +97,8 @@ public class PcOrderApiAction {
 	}
 	
 	@ApiOperation(value = "重置深度")
-	@GetMapping(value = "/api/pc/order/pcBookReset")
-	public void pcBookReset (String asset, String symbol) throws Exception{
+	@GetMapping(value = "/api/pc/order/bookReset")
+	public void bookReset (String asset, String symbol) throws Exception{
 		//发送消息
 		BookResetMsg msg = new BookResetMsg(asset, symbol);
 		msg.setAsset(asset);
