@@ -5,25 +5,50 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import com.gitee.hupadev.commons.cache.Lock;
 
 @Order(1)
 @Aspect
 @Component
 public class LockAdvice {
+	
+	@Autowired(required=false)
+	private Lock lock;
 
     public LockAdvice() {
 		super();
 	}
+    
+    @Pointcut("@annotation(com.hp.sh.expv3.pc.component.lock.LockIt)")
+    public void lockAnnoPointcut() {
 
+    }
+    
+    @Pointcut("execution(public * com.hp.sh.expv3.pc.*.*(..))")
+    public void lockPackagePointcut() {
+
+    }
+    
+    @Pointcut("lockAnnoPointcut() && lockPackagePointcut()")
+    public void lockPointcut() {
+
+    }
+
+//    @Around("lockPointcut()")
 	@Around("@annotation(com.hp.sh.expv3.pc.component.lock.LockIt)")
     public Object exeLock(ProceedingJoinPoint joinPoint) throws Throwable {
+		if(lock == null){
+			return joinPoint.proceed(joinPoint.getArgs());
+		}
 		String realKey=null;
 		try{
 			Object[] args = joinPoint.getArgs();

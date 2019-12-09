@@ -64,6 +64,9 @@ public class PcPosition extends UserDataEntity {
      */
     private BigDecimal meanPrice;
     
+    //平均成本价：包含手续费
+    private BigDecimal avgCostPrice;
+    
     int _____________________________________________________;
     
     /**

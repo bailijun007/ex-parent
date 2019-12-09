@@ -30,6 +30,7 @@ import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcTrade;
 import com.hp.sh.expv3.pc.mq.msg.MatchedMsg;
+import com.hp.sh.expv3.pc.strategy.impl.AABBOrderStrategy;
 import com.hp.sh.expv3.utils.IntBool;
 
 @Service
@@ -55,14 +56,13 @@ public class PcPositionService {
 	private PcPriceCalc pcPriceCalc;
 	
 	@Autowired
-	private PnlCalc pnlCalc;
-	
-	@Autowired
 	private PcAccountCoreService pcAccountCoreService;
 	
 	@Autowired
 	private FeeCollectorSelector feeCollectorSelector;
 	
+	@Autowired
+	private AABBOrderStrategy orderStrategy;
 	
 	/**
 	 * 处理成交
@@ -106,8 +106,6 @@ public class PcPositionService {
 	
 	//处理成交订单
 	public void handleMatchedOrder(MatchedMsg matchedVo){
-		int tradingRole = matchedVo.getMakerFlag();
-		
 		PcOrder order = this.pcOrderDAO.findById(matchedVo.getAccountId(), matchedVo.getOrderId());
 		this.chekOrderStatus(order, matchedVo);
 		Integer actionType = order.getCloseFlag();
@@ -148,7 +146,7 @@ public class PcPositionService {
 		orderTrade.setOrderId(order.getId());
 		
 		if(IntBool.isTrue(order.getCloseFlag())){
-			BigDecimal pnl = pnlCalc.calcPnl(order.getLongFlag(), matchedVo.getNumber().multiply(order.getFaceValue()), meanPrice, matchedVo.getPrice(), Precision.COMMON_PRECISION);
+			BigDecimal pnl = PnlCalc.calcPnl(order.getLongFlag(), matchedVo.getNumber().multiply(order.getFaceValue()), meanPrice, matchedVo.getPrice(), Precision.COMMON_PRECISION);
 			orderTrade.setPnl(pnl);	
 		}else{
 			orderTrade.setPnl(BigDecimal.ZERO);
@@ -265,7 +263,7 @@ public class PcPositionService {
 			
 			pcPosition.setFeeCost(pcPosition.getFeeCost().add(FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOpenFee())));
 			
-			BigDecimal pnl = pnlCalc.calcPnl(order.getLongFlag(), matchedVo.getNumber().multiply(order.getFaceValue()), origManPrice, matchedVo.getPrice(), Precision.COMMON_PRECISION);
+			BigDecimal pnl = PnlCalc.calcPnl(order.getLongFlag(), matchedVo.getNumber().multiply(order.getFaceValue()), origManPrice, matchedVo.getPrice(), Precision.COMMON_PRECISION);
 			pcPosition.setRealisedPnl(pcPosition.getRealisedPnl().add(pnl));
 			
 //			pcPosition.setLiqPrice(pcPriceCalc.calcLiqPrice(pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getMeanPrice(), amount, pcPosition.getPosMargin(), Precision.COMMON_PRECISION));

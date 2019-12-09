@@ -21,9 +21,6 @@ import com.hp.sh.expv3.pc.constant.Precision;
 @Service
 public class PcPriceCalc {
 
-    @Autowired
-    private PnlCalc pnlCalc;
-
     /**
      * 求强平价：即在 强平价时 平仓，收回的保证金占整个仓位价值 的比率 = 维持仓位保证金（纯粹的仓位维持保证金率，不包括其他的手续费率）
      *
@@ -35,7 +32,7 @@ public class PcPriceCalc {
      * @return
      */
     public BigDecimal calcLiqPrice(BigDecimal posHoldMarginRatio, boolean isLong, BigDecimal openPrice, BigDecimal amt, BigDecimal posMargin, int scale) {
-        BigDecimal holdVolume = pnlCalc.calcVolume(amt, openPrice, scale);
+        BigDecimal holdVolume = PnlCalc.calcVolume(amt, openPrice, scale);
         /**
          * op: open price
          * cp: close price
@@ -78,7 +75,7 @@ public class PcPriceCalc {
      * @return
      */
     public BigDecimal calcBankruptPrice(boolean isLong, BigDecimal openPrice, BigDecimal amt, BigDecimal margin, int scale) {
-        BigDecimal volume = pnlCalc.calcVolume(amt, openPrice, scale);
+        BigDecimal volume = PnlCalc.calcVolume(amt, openPrice, scale);
         if (isLong) {
             return amt.divide(volume.add(margin), scale, DecimalUtil.MORE).max(BigDecimal.ZERO).stripTrailingZeros();
         } else {
