@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -70,17 +71,16 @@ public class LockAdvice {
     }
 	
 	private void lock(String realKey) {
-		// TODO Auto-generated method stub
-		
+		this.lock.lock("t-"+Thread.currentThread().getId(), realKey, 30);
 	}
 
 	private void unlock(String realKey) {
-		// TODO Auto-generated method stub
-		
+		this.lock.unlock("t-"+Thread.currentThread().getId(), realKey);
 	}
 
-	private static String getRealKey(String key, Object[] args, String[] names){
-		Pattern pattern = Pattern.compile("\\$?\\{(\\w+)\\}", Pattern.MULTILINE|Pattern.DOTALL);
+	private static String getRealKey(String key, Object[] args, String[] names) throws Exception{
+//		Pattern pattern = Pattern.compile("\\$?\\{(\\w+)\\}", Pattern.MULTILINE|Pattern.DOTALL);
+		Pattern pattern = Pattern.compile("\\$?\\{(\\w+)(?:\\.(\\w+))?\\}", Pattern.MULTILINE|Pattern.DOTALL);
 		Matcher matcher = pattern.matcher(key);
 		StringBuilder sb = new StringBuilder();
 		int start = 0;
@@ -94,6 +94,11 @@ public class LockAdvice {
 				index = findIndex(var, names);
 			}
 			Object val = args[index];
+			
+			String pvar = matcher.group(2);
+			if(pvar!=null && pvar.length()>0){
+				val = PropertyUtils.getSimpleProperty(val, pvar);
+			}
 			sb.append(val);
 			start = matcher.end();
 		}
@@ -109,7 +114,7 @@ public class LockAdvice {
 		return -1;
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(getRealKey("xx-{1}-{id}", new Object[]{100,200}, new String[]{"id","name"}));
+	public static void main(String[] args) throws Exception {
+		System.out.println(getRealKey("xx-{1}-{name.empty}", new Object[]{100,"test"}, new String[]{"id","name"}));
 	}
 }
