@@ -1,18 +1,20 @@
-package com.hp.sh.expv3.pc.module.order.service;
+package com.hp.sh.expv3.pc.component;
 
 import java.math.BigDecimal;
 
 import org.springframework.stereotype.Service;
 
+import com.hp.sh.expv3.pc.atemp.Question;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.utils.IntBool;
 
 /**
- * 费率,查询获取，redis或db
+ * 查询获取保证金，redis或db
  * 
  * @author lw
  *
  */
+@Question("是否随玩法不同")
 @Service
 public class MarginRatioService {
 

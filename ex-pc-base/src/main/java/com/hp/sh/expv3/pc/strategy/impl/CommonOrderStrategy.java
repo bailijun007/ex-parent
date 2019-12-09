@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.pc.calc.CompositeFieldCalc;
 import com.hp.sh.expv3.pc.calc.FeeCalc;
 import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
+import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
-import com.hp.sh.expv3.pc.strategy.vo.OrderBasicData2;
-import com.hp.sh.expv3.pc.strategy.vo.OrderFee;
+import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
 
 /**
  * 
@@ -18,14 +18,14 @@ import com.hp.sh.expv3.pc.strategy.vo.OrderFee;
  *
  */
 @Component
-public class AABBOrderStrategy implements OrderStrategy {
+public class CommonOrderStrategy implements OrderStrategy {
 	
 	/**
 	 * 计算新订单费用
 	 * @param pcOrder
 	 * @return
 	 */
-	public OrderFee calcFee(PcOrder pcOrder){
+	public OrderAmount calcOrderAmt(PcOrder pcOrder){
 		//交易金额
 		BigDecimal amount = CompositeFieldCalc.calcAmount(pcOrder.getVolume(), pcOrder.getFaceValue());
 		//基础货币价值
@@ -43,14 +43,17 @@ public class AABBOrderStrategy implements OrderStrategy {
 		//总押金
 		BigDecimal grossMargin = MarginFeeCalc.sum(closeFee, openFee, orderMargin);
 
-		OrderFee orderFee = new OrderFee();
-		orderFee.setOrderMargin(orderMargin);
-		orderFee.setOpenFee(openFee);
-		orderFee.setCloseFee(closeFee);
-		orderFee.setOrderMargin(orderMargin);
-		orderFee.setGrossMargin(grossMargin);
+		OrderAmount orderAmount = new OrderAmount();
+		orderAmount.setAmount(amount);
+		orderAmount.setBaseValue(baseValue);
 		
-		return orderFee;
+		orderAmount.setOrderMargin(orderMargin);
+		orderAmount.setOpenFee(openFee);
+		orderAmount.setCloseFee(closeFee);
+		orderAmount.setOrderMargin(orderMargin);
+		orderAmount.setGrossMargin(grossMargin);
+		
+		return orderAmount;
 	}
 	
 	/**
@@ -59,18 +62,48 @@ public class AABBOrderStrategy implements OrderStrategy {
 	 * @param volume 分量
 	 * @return
 	 */
-	public OrderFee calcRaitoFee(PcOrder order, BigDecimal number){
+	public OrderAmount calcRaitoAmt(PcOrder order, BigDecimal number){
+		OrderAmount orderAmount = new OrderAmount();
+		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
+			this.calcOpenRaitoAmt(order, number, orderAmount);
+		}else{
+			this.calcCloseRaitoAmt(order, number, orderAmount);
+		}
+		return orderAmount;
+	}
+	
+	protected void calcCloseRaitoAmt(PcOrder order, BigDecimal number, OrderAmount orderAmount) {
+		orderAmount.setOpenFee(BigDecimal.ZERO);
+		orderAmount.setCloseFee(BigDecimal.ZERO);
+		orderAmount.setOrderMargin(BigDecimal.ZERO);
+		orderAmount.setGrossMargin(BigDecimal.ZERO);
+		
+		BigDecimal amount = number.multiply(order.getFaceValue());
+		BigDecimal baseValue = CompositeFieldCalc.calcBaseValue(amount, order.getPrice());
+
+		orderAmount.setAmount(amount);
+		orderAmount.setBaseValue(baseValue);
+	}
+
+	/**
+	 * 按比例计算开仓订单费用
+	 * @param order
+	 * @param number
+	 * @return
+	 */
+	protected void calcOpenRaitoAmt(PcOrder order, BigDecimal number, OrderAmount orderAmount){
 		
 		BigDecimal openFee; 
 		BigDecimal closeFee; 
 		BigDecimal orderMargin;
 		BigDecimal grossMargin;
+
 		if(BigMath.eq(number, BigDecimal.ZERO)){
 			openFee = BigDecimal.ZERO;
 			closeFee = BigDecimal.ZERO;
 			orderMargin = BigDecimal.ZERO;
 			grossMargin = BigDecimal.ZERO;
-		}else if(BigMath.eq(number, order.getVolume())){
+		}else if(BigMath.eq(number, order.getVolume().subtract(order.getFilledVolume()))){
 			openFee = order.getOpenFee();
 			closeFee = order.getCloseFee();
 			orderMargin = order.getOrderMargin();
@@ -82,14 +115,18 @@ public class AABBOrderStrategy implements OrderStrategy {
 			grossMargin = slope(number, order.getVolume(), order.getGrossMargin());
 		}
 		
-		OrderFee orderFee = new OrderFee();
-		orderFee.setOrderMargin(orderMargin);
-		orderFee.setOpenFee(openFee);
-		orderFee.setCloseFee(closeFee);
-		orderFee.setOrderMargin(orderMargin);
-		orderFee.setGrossMargin(grossMargin);
+		orderAmount.setOrderMargin(orderMargin);
+		orderAmount.setOpenFee(openFee);
+		orderAmount.setCloseFee(closeFee);
+		orderAmount.setOrderMargin(orderMargin);
+		orderAmount.setGrossMargin(grossMargin);
+
 		
-		return orderFee;
+		BigDecimal amount = number.multiply(order.getFaceValue());
+		BigDecimal baseValue = CompositeFieldCalc.calcBaseValue(amount, order.getPrice());
+
+		orderAmount.setAmount(amount);
+		orderAmount.setBaseValue(baseValue);
 	}
 	
 	/**

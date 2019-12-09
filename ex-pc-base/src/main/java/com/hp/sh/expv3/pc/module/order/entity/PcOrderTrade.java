@@ -7,6 +7,7 @@ package com.hp.sh.expv3.pc.module.order.entity;
 import java.math.BigDecimal;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
+import com.hp.sh.expv3.pc.atemp.Question;
 
 /**
  * 永续合约_用户订单成交记录
@@ -51,7 +52,8 @@ public class PcOrderTrade extends UserDataEntity {
 	//手续费
 	private BigDecimal fee;
 	
-	//盈亏
+	//盈亏(此次成交的盈亏)
+	@Question("没有用到，老项目里也没这个字段")
 	private BigDecimal pnl;
 
 	public PcOrderTrade() {
