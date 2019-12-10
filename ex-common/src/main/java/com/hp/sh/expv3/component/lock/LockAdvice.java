@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class LockAdvice {
 	
 	@Autowired(required=false)
-	private Lock lock;
+	private DistributedLocker distributedLocker;
 
     public LockAdvice() {
 		super();
@@ -45,7 +45,7 @@ public class LockAdvice {
 //    @Around("lockPointcut()")
 	@Around("@annotation(com.hp.sh.expv3.component.lock.LockIt)")
     public Object exeLock(ProceedingJoinPoint joinPoint) throws Throwable {
-		if(lock == null){
+		if(distributedLocker == null){
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
 		String realKey=null;
@@ -69,11 +69,11 @@ public class LockAdvice {
     }
 	
 	private void lock(String realKey) {
-		this.lock.lock(realKey, 30);
+		this.distributedLocker.lock(realKey, 30);
 	}
 
 	private void unlock(String realKey) {
-		this.lock.unlock(realKey);
+		this.distributedLocker.unlock(realKey);
 	}
 
 	private static String getRealKey(String key, Object[] args, String[] names) throws Exception{

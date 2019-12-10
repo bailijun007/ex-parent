@@ -16,7 +16,6 @@ public class RedissonDistributedLocker {
     @Autowired
     private RedissonClient redissonClient;
 
-
     /**
      * 拿不到lock就不罢休，不然线程就一直block或超时
      * @param lockKey
@@ -37,10 +36,10 @@ public class RedissonDistributedLocker {
      * @param leaseTime
      * @return
      */
-    public boolean tryLock(String lockKey, TimeUnit unit, long waitTime, long leaseTime) {
+    public boolean tryLock(String lockKey, long waitTime, long leaseTime) {
         RLock lock = redissonClient.getLock(lockKey);
         try {
-            return lock.tryLock(waitTime, leaseTime, unit);
+            return lock.tryLock(waitTime, leaseTime, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             return false;
         }
