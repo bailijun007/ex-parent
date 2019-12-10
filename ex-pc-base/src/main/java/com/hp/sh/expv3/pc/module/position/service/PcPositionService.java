@@ -263,7 +263,7 @@ public class PcPositionService {
 		}
 	}
 	
-	private void synchFee(Long tradeOrderId, Long feeCollectorId, BigDecimal fee){
+	private void synchCollector(Long tradeOrderId, Long feeCollectorId, BigDecimal fee){
 		
 	}
 
