@@ -1,7 +1,12 @@
-package com.hp.sh.expv3.pc.strategy.impl;
+package com.hp.sh.expv3.pc.component;
 
 import java.math.BigDecimal;
 
+/**
+ * 
+ * @author wangjg
+ *
+ */
 public class BigMath {
 	
 	public static boolean isZero(BigDecimal v1){
