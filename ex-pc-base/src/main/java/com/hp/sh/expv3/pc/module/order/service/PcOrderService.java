@@ -72,9 +72,9 @@ public class PcOrderService {
 	 */
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		
-		if(this.existClientOrderId(userId, cliOrderId)){
-			throw new ExException(OrderError.CREATED);
-		}
+//		if(this.existClientOrderId(userId, cliOrderId)){
+//			throw new ExException(OrderError.CREATED);
+//		}
 		
 		Date now = new Date();
 		
