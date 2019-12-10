@@ -134,7 +134,7 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
                 if (null != notSavedTrade && !notSavedTrade.isEmpty()) {
                     saveTradeList(notSavedTrade);
                 }
-                pcMatchMqNotify.sendOrderMatched(this.getAsset(), this.getSymbol(), this.tradeList);
+                pcMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
             }
         }
         sendBookMsg();
@@ -152,7 +152,7 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
             if (null != notSavedTrade && !notSavedTrade.isEmpty()) {
                 saveTradeList(notSavedTrade);
             }
-            pcMatchMqNotify.sendOrderMatched(this.getAsset(), this.getSymbol(), this.tradeList);
+            pcMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
         }
 
         // 后发取消消息
