@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+
 <mapper namespace="com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO">
 
 	<resultMap type="com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol" id="PcAccountSymbol">
 		<result column="id" property="id" />
-		<result column="account_id" property="accountId" />
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
 		<result column="short_leverage" property="shortLeverage" />
@@ -15,12 +15,13 @@
 		<result column="hold_margin_ratio" property="holdMarginRatio" />
 		<result column="max_leverage" property="maxLeverage" />
 		<result column="version" property="version" />
+		<result column="user_id" property="userId" />
 		<result column="created" property="created" />
 		<result column="modified" property="modified" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,account_id,asset,symbol,short_leverage,long_leverage,margin_mode,cross_leverage,hold_margin_ratio,max_leverage,version,created,modified
+		id,asset,symbol,short_leverage,long_leverage,margin_mode,cross_leverage,hold_margin_ratio,max_leverage,version,user_id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -31,9 +32,9 @@
 		#{idList[${i}]}
 		</foreach>
 		</if>
-		<if test="accountId!=null"> and account_id=#{accountId}</if>
 		<if test="marginMode!=null"> and margin_mode=#{marginMode}</if>
 		<if test="version!=null"> and version=#{version}</if>
+		<if test="userId!=null"> and user_id=#{userId}</if>
 		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
 		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
@@ -82,7 +83,7 @@
 		select
 			<include refid="Base_Column_List" />
 		from pc_account_symbol
-			where id=#{id} and user_id=#{userId}
+			where id=#{id}
 	</select>
 
 	<select id="exist" resultType="boolean">
@@ -100,9 +101,9 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into pc_account_symbol (
-			id,account_id,asset,symbol,short_leverage,long_leverage,margin_mode,cross_leverage,hold_margin_ratio,max_leverage,version,created,modified
+			id,asset,symbol,short_leverage,long_leverage,margin_mode,cross_leverage,hold_margin_ratio,max_leverage,version,user_id,created,modified
 		)values(
-			#{id},#{accountId},#{asset},#{symbol},#{shortLeverage},#{longLeverage},#{marginMode},#{crossLeverage},#{holdMarginRatio},#{maxLeverage},#{version},#{created},#{modified}
+			#{id},#{asset},#{symbol},#{shortLeverage},#{longLeverage},#{marginMode},#{crossLeverage},#{holdMarginRatio},#{maxLeverage},#{version},#{userId},#{created},#{modified}
 		)
 	</insert>
 	
@@ -110,7 +111,7 @@
 		update 
 			pc_account_symbol
 		set 
-			account_id=#{accountId},asset=#{asset},symbol=#{symbol},short_leverage=#{shortLeverage},long_leverage=#{longLeverage},margin_mode=#{marginMode},cross_leverage=#{crossLeverage},hold_margin_ratio=#{holdMarginRatio},max_leverage=#{maxLeverage},version=#{version},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},short_leverage=#{shortLeverage},long_leverage=#{longLeverage},margin_mode=#{marginMode},cross_leverage=#{crossLeverage},hold_margin_ratio=#{holdMarginRatio},max_leverage=#{maxLeverage},version=#{version},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
 			id=#{id}
 	</update>
