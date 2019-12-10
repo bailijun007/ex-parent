@@ -176,7 +176,7 @@
 		set 
 			status=#{cancelStatus}, modified=#{modified}, cancel_time=#{modified}, active_flag=0
 		where 
-			id=#{orderId} and user_id=#{userId} and status &lt; 3 and status!=6
+			id=#{orderId} and user_id=#{userId} and status &lt; 3 and filled_volume &lt; volume
 	</update>
 
 </mapper>

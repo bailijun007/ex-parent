@@ -16,6 +16,7 @@ import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.mq.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.mq.msg.OrderPendingNewMsg;
+import com.hp.sh.expv3.pc.strategy.impl.BigMath;
 import com.hp.sh.expv3.utils.BidUtils;
 
 import io.swagger.annotations.Api;
@@ -80,7 +81,7 @@ public class PcOrderApiAction {
 		if(order.getStatus() == PcOrder.CANCELED){
 			throw new ExException(OrderError.CANCELED);
 		}
-		if(order.getStatus() == PcOrder.FILLED){
+		if(BigMath.eq(order.getVolume(), order.getFilledVolume())){
 			throw new ExException(OrderError.FILLED);
 		}
 		this.pcOrderService.setCancelStatus(userId, asset, orderId, PcOrder.PENDING_CANCEL);
