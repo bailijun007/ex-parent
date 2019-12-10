@@ -13,18 +13,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.constant.InvokeResult;
-import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
 import com.hp.sh.expv3.pc.component.AABBMetadataService;
 import com.hp.sh.expv3.pc.component.MarginRatioService;
 import com.hp.sh.expv3.pc.constant.MarginMode;
+import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.constant.PcOrderType;
-import com.hp.sh.expv3.pc.error.OrderError;
+import com.hp.sh.expv3.pc.error.PositonError;
 import com.hp.sh.expv3.pc.module.account.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
+import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.pc.strategy.impl.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
@@ -56,7 +58,10 @@ public class PcOrderService {
 	private AABBMetadataService metadataService;
 	
 	@Autowired
-	private CommonOrderStrategy orderStrategy;
+	private CommonOrderStrategy orderStrategy;	
+	
+	@Autowired
+	private PcPositionService pcPositionService;
 
 	/**
 	 * 创建订单
@@ -75,6 +80,9 @@ public class PcOrderService {
 //		if(this.existClientOrderId(userId, cliOrderId)){
 //			throw new ExException(OrderError.CREATED);
 //		}
+		
+		//check 检查可平仓位
+		checkShortPosition(userId, asset, symbol, number, closeFlag, longFlag);
 		
 		Date now = new Date();
 		
@@ -207,10 +215,9 @@ public class PcOrderService {
 
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
 		
-		BigDecimal ratio = MarginFeeCalc.calcRatio(number, order.getVolume());
-		BigDecimal cancelledOpenFee = MarginFeeCalc.calcFee(order.getOpenFee(), ratio);
-		BigDecimal cancelledCloseFee = MarginFeeCalc.calcFee(order.getOpenFee(), ratio);
-		BigDecimal cancelledGrossFee = MarginFeeCalc.sum(cancelledOpenFee, cancelledCloseFee);
+		OrderAmount ratioAmt = orderStrategy.calcRaitoAmt(order, number);
+		
+		BigDecimal cancelledGrossFee = ratioAmt.getGrossMargin();
 		
 		int result = this.returnCancelAmt(userId, asset, orderId, cancelledGrossFee);
 		if(result==InvokeResult.NOCHANGE){
@@ -249,4 +256,24 @@ public class PcOrderService {
 		}
 	}
 
+	private void checkShortPosition(long userId, String asset, String symbol, BigDecimal volume, int closeFlag, int longFlag) {
+		if(closeFlag!=OrderFlag.ACTION_CLOSE){
+			return;
+		}
+		
+		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+		if(pos==null){
+			throw new ExException(PositonError.POS_NOT_ENOUGH);
+		}
+		
+		BigDecimal cpv = this.pcOrderDAO.getClosedPosVolume(userId, pos.getId());
+		
+		BigDecimal availablePos = pos.getVolume().subtract(cpv);
+		
+        //判断可平仓位是否足够
+        if (availablePos.compareTo(BigDecimal.ZERO)>0) {
+            throw new ExException(PositonError.POS_NOT_ENOUGH);
+        }
+	}
+	
 }

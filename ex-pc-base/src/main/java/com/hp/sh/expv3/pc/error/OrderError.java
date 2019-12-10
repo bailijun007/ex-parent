@@ -17,8 +17,6 @@ public class OrderError extends ErrorCode {
 
 	public static final OrderError FILLED = new OrderError(020102, "订单已成交!");
 	
-	public static final OrderError POS_NOT_ENOUGH = new OrderError(020103, "超过了仓位!");
-	
 	private OrderError(int code, String message) {
 		super(code, message);
 	}

@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.atemp.Question;
 import com.hp.sh.expv3.pc.calc.PcPriceCalc;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.MarginRatioService;
@@ -102,7 +101,7 @@ public class PcPositionService {
 			this.pcPositionDAO.update(pcPosition);
 		}
 		
-		//修改订单状态：部分成交
+		//修改订单状态
 		this.updateOrder(order, tradeData);
 		
 		//pc account
@@ -238,14 +237,8 @@ public class PcPositionService {
 	 * @param longFlag 多/空
 	 * @return
 	 */
-	@Question("没有活动仓位字段")
-	private PcPosition getCurrentPosition(Long userId, String asset, String symbol, int longFlag){
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", userId);
-		params.put("asset", asset);
-		params.put("symbol", symbol);
-		params.put("longFlag", longFlag);
-		PcPosition pos = this.pcPositionDAO.queryOne(params);
+	public PcPosition getCurrentPosition(Long userId, String asset, String symbol, int longFlag){
+		PcPosition pos = this.pcPositionDAO.getActivePos(userId, asset, symbol, longFlag);
 		return pos;
 	}
 
@@ -265,19 +258,6 @@ public class PcPositionService {
 	
 	private void synchCollector(Long tradeOrderId, Long feeCollectorId, BigDecimal fee){
 		
-	}
-
-	public BigDecimal getClosablePos(Long userId, String asset, String symbol){
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", userId);
-		params.put("asset", asset);
-		params.put("symbol", symbol);
-		params.put("SUM", "volume");
-		BigDecimal amount = this.pcPositionDAO.queryAmount(params);
-		if(amount==null){
-			return BigDecimal.ZERO;
-		}
-		return amount;
 	}
 
 	/**

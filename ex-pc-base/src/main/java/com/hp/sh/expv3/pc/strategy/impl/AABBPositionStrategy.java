@@ -39,11 +39,11 @@ public class AABBPositionStrategy implements PositionStrategy {
 	private CommonOrderStrategy orderStrategy;
 	
 	/**
-	 * 按比例计算订单的各种金额、比率和费用
-	 * @param order 订单数据
-	 * @param volume 分量
-	 * @param closeFeeRaito 
-	 * @return 
+	 * 计算本单的各项数据
+	 * @param order
+	 * @param matchedVo
+	 * @param pcPosition
+	 * @return
 	 */
 	public TradeData getTradeData(PcOrder order, PcTradeMsg matchedVo, PcPosition pcPosition){
 		OrderAmount tradeRatioAmt = orderStrategy.calcRaitoAmt(order, matchedVo.getNumber());

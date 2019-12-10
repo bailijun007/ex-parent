@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.hp.sh.expv3.base.mapper.BaseUserDataMapper;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 
@@ -22,5 +24,11 @@ public interface PcPositionDAO extends BaseUserDataMapper<PcPosition,Long> {
 	public Long queryCount(Map<String,Object> params);
 	
 	public BigDecimal queryAmount(Map<String,Object> params);
+	
+	public PcPosition getActivePos(
+			@Param("userId") long userId, 
+			@Param("asset") String asset,
+			@Param("symbol") String symbol, 
+			@Param("longFlag") int longFlag);
 
 }

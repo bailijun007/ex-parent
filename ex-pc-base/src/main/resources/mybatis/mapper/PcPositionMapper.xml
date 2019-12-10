@@ -99,7 +99,7 @@
 		select
 			<include refid="Base_Column_List" />
 		from pc_position
-			where id=#{id}
+			where id=#{id} and user_id=#{userId}
 	</select>
 
 	<select id="exist" resultType="boolean">
@@ -129,17 +129,8 @@
 		set 
 			asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},volume=#{volume},base_value=#{baseValue},leverage=#{leverage},pos_margin=#{posMargin},close_fee=#{closeFee},auto_add_flag=#{autoAddFlag},mean_price=#{meanPrice},avg_cost_price=#{avgCostPrice},init_margin=#{initMargin},hold_ratio=#{holdRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},liq_status=#{liqStatus},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
-			id=#{id}
+			id=#{id} and user_id=#{userId}
 	</update>
-
-	<delete id="delete">
-        delete from pc_position where id=#{id}
-    </delete>
-
-    <delete id="condDelete">
-        delete from pc_position
-		<include refid="simple_where" />
-    </delete>
 
 	<!--  -->
 	
@@ -156,5 +147,15 @@
 		from pc_position
 		<include refid="simple_where" />
 	</select>
-	
+
+	<select id="getActivePos" resultMap="PcPosition">
+		select
+			<include refid="Base_Column_List" />
+		from 
+			pc_position
+		where
+			user_id=#{userId} and asset=#{asset} and symbol=#{symbol} and long_flag=#{longFlag}
+		and volume &lt; 0;
+	</select>
+
 </mapper>

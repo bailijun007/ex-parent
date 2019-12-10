@@ -100,6 +100,9 @@ public class PcPosition extends UserDataEntity {
 
 	// 仓位强平状态，0：未触发平仓，1：仓位被冻结，
 	private Integer liqStatus;
+	
+	//仓位已平空
+	private Integer closed;
 
 	public PcPosition() {
 		super();
@@ -263,6 +266,14 @@ public class PcPosition extends UserDataEntity {
 
 	public void setCloseFee(BigDecimal closeFee) {
 		this.closeFee = closeFee;
+	}
+
+	public Integer getClosed() {
+		return closed;
+	}
+
+	public void setClosed(Integer closed) {
+		this.closed = closed;
 	}
 
 }

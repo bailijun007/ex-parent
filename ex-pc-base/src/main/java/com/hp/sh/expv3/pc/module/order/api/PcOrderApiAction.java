@@ -52,10 +52,6 @@ public class PcOrderApiAction {
 	@GetMapping(value = "/api/pc/order/create")
 	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number) throws Exception{
 		
-		//check 检查可平仓位
-		checkShortPosition(userId, asset, symbol, number, closeFlag);
-		
-		//create TODO 可平仓位，内部要加锁
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
 
 		//send mq
@@ -106,16 +102,6 @@ public class PcOrderApiAction {
 		msg.setAsset(asset);
 		msg.setSymbol(symbol);
 		this.matchMqSender.sendBookResetMsg(msg);
-	}
-
-	private void checkShortPosition(long userId, String asset, String symbol, BigDecimal volume, int closeFlag) {
-		if(closeFlag!=OrderFlag.ACTION_CLOSE){
-			return;
-		}
-        //判断可平仓位是否足够
-        if (volume.compareTo(pcPositionService.getClosablePos(userId, asset, symbol))>0) {
-            throw new ExException(OrderError.POS_NOT_ENOUGH);
-        }
 	}
 
 }
