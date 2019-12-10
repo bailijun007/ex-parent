@@ -28,11 +28,7 @@ public class BookMsgDto extends BaseMessageDto {
         /**
          * 挂单的数量
          */
-        BigDecimal volume;
-        /**
-         * 挂单的金额
-         */
-        BigDecimal amt;
+        BigDecimal number;
 
         public BookEntry() {
         }
@@ -41,14 +37,12 @@ public class BookMsgDto extends BaseMessageDto {
             this.orderId = orderId;
             this.bidFlag = bidFlag;
             this.price = price;
-            this.amt = amt;
+            this.number = amt;
         }
 
-        public BookEntry(Long orderId, Integer bidFlag, BigDecimal price, BigDecimal volume) {
+        public BookEntry(Long orderId, BigDecimal amt) {
             this.orderId = orderId;
-            this.bidFlag = bidFlag;
-            this.price = price;
-            this.volume = volume;
+            this.number = amt;
         }
 
         public Long getOrderId() {
@@ -78,26 +72,17 @@ public class BookMsgDto extends BaseMessageDto {
             return this;
         }
 
-        public BigDecimal getVolume() {
-            return volume;
+        public BigDecimal getNumber() {
+            return number;
         }
 
-        public BookEntry setVolume(BigDecimal volume) {
-            this.volume = volume;
-            return this;
-        }
-
-        public BigDecimal getAmt() {
-            return amt;
-        }
-
-        public void setAmt(BigDecimal amt) {
-            this.amt = amt;
+        public void setNumber(BigDecimal number) {
+            this.number = number;
         }
     }
 
     /**
-     * @see {@linkplain BookTypeConst}
+     * @see {@linkplain 0|1}
      */
     private Integer resetFlag;
 

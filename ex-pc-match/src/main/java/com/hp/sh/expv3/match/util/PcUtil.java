@@ -18,7 +18,7 @@ import static com.hp.sh.expv3.match.constant.CommonConst.*;
  */
 public final class PcUtil {
 
-    public static final BigDecimal calcDisplay(BigDecimal number, BigDecimal filledNumber, BigDecimal displayNumber) {
+    public static final BigDecimal calcBookNumber(BigDecimal number, BigDecimal filledNumber, BigDecimal displayNumber) {
         BigDecimal unfilledNumber = number.subtract(filledNumber);
         return unfilledNumber.min(displayNumber).stripTrailingZeros();
     }
