@@ -106,12 +106,14 @@ public class PcPositionService {
 		this.updateOrder(order, tradeData);
 		
 		//pc account
-		this.transfer(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeData);
+		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
+			this.transfer(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeData);
+		}
 	}
 	
 	private void transfer(Long userId, Long orderTradeId, String asset, TradeData tradeData) {
 		AddMoneyRequest request = new AddMoneyRequest();
-		request.setAmount(tradeData.getOrderMargin().add(tradeData.getPnl()));
+		request.setAmount(tradeData.getOrderMargin().add(tradeData.getPnl()).subtract(tradeData.getFee()));
 		request.setAsset(asset);
 		request.setRemark("平仓");
 		request.setTradeNo("CLOSE"+orderTradeId);
