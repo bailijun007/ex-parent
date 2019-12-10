@@ -14,7 +14,6 @@ import com.hp.sh.expv3.match.util.PcUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -72,8 +71,8 @@ public class PcLimitOrderHandler extends PcOrderHandler {
                 bookUpdate(context, makerOrder.getOrderId(), makerOrder.getBidFlag(), makerOrder.getPrice(), BigDecimal.ZERO);
                 continue;
             } else {
-                BigDecimal makerDisplayAmt = PcUtil.calcDisplay(makerOrder.getNumber(), makerOrder.getFilledNumber(), makerOrder.getDisplayNumber());
-                bookUpdate(context, makerOrder.getOrderId(), makerOrder.getBidFlag(), makerOrder.getPrice(), makerDisplayAmt);
+                BigDecimal makerBookNumber = PcUtil.calcBookNumber(makerOrder.getNumber(), makerOrder.getFilledNumber(), makerOrder.getDisplayNumber());
+                bookUpdate(context, makerOrder.getOrderId(), makerOrder.getBidFlag(), makerOrder.getPrice(), makerBookNumber);
                 break;
             }
         }

@@ -120,8 +120,8 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
     protected void handleTakerNotFinishedOrder(PcMatchHandlerContext context, PcOrder4MatchBo takerOrder, PriorityQueue<PcOrder4MatchBo> sameSideQueue) {
         if (PcOrderTypeEnum.LIMIT.getCode() == takerOrder.getOrderType()) {
             sameSideQueue.offer(takerOrder);
-            BigDecimal displayNumber = PcUtil.calcDisplay(takerOrder.getNumber(), takerOrder.getFilledNumber(), takerOrder.getDisplayNumber());
-            bookUpdate(context, takerOrder.getOrderId(), takerOrder.getBidFlag(), takerOrder.getPrice(), displayNumber);
+            BigDecimal bookNumber = PcUtil.calcBookNumber(takerOrder.getNumber(), takerOrder.getFilledNumber(), takerOrder.getDisplayNumber());
+            bookUpdate(context, takerOrder.getOrderId(), takerOrder.getBidFlag(), takerOrder.getPrice(), bookNumber);
             context.setOrderNew(takerOrder);
         } else if (PcOrderTypeEnum.MARKET.getCode() == takerOrder.getOrderType()) {
             context.allOpenOrders.remove(takerOrder.getOrderId());
@@ -130,8 +130,8 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
 //        pcExDef.doOrderNew(context.asset, context.symbol, takerOrder.getAccountId(), takerOrder.getId());
     }
 
-    protected void bookUpdate(PcMatchHandlerContext matchHandlerContext, long orderId, int bidFlag, BigDecimal price, BigDecimal displayAmt) {
-        BookMsgDto.BookEntry entry = new BookMsgDto.BookEntry(orderId, price, displayAmt, bidFlag);
+    protected void bookUpdate(PcMatchHandlerContext matchHandlerContext, long orderId, int bidFlag, BigDecimal price, BigDecimal bookNumber) {
+        BookMsgDto.BookEntry entry = new BookMsgDto.BookEntry(orderId, price, bookNumber, bidFlag);
         if (null == matchHandlerContext.getBookUpdateList()) {
             matchHandlerContext.setBookUpdateList(new ArrayList<>());
         }

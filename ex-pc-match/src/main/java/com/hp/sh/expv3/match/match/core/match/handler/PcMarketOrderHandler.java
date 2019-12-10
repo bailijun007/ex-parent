@@ -77,8 +77,8 @@ public class PcMarketOrderHandler extends PcOrderHandler {
                 bookUpdate(context, makerOrder.getOrderId(), makerOrder.getBidFlag(), makerOrder.getPrice(), BigDecimal.ZERO);
                 continue;
             } else {
-                BigDecimal makerDisplayAmt = PcUtil.calcDisplay(makerOrder.getNumber(), makerOrder.getFilledNumber(), makerOrder.getDisplayNumber());
-                bookUpdate(context, makerOrder.getOrderId(), makerOrder.getBidFlag(), makerOrder.getPrice(), makerDisplayAmt);
+                BigDecimal makerBookNumber = PcUtil.calcBookNumber(makerOrder.getNumber(), makerOrder.getFilledNumber(), makerOrder.getDisplayNumber());
+                bookUpdate(context, makerOrder.getOrderId(), makerOrder.getBidFlag(), makerOrder.getPrice(), makerBookNumber);
                 break;
             }
         }
