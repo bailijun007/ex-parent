@@ -18,6 +18,7 @@ public class PcOrderTradeMqMsgDto {
     private Long orderId;
     private Long tradeTime;
     private Long tradeId;
+    private Long opponentOrderId;
 
     public Integer getMakerFlag() {
         return makerFlag;
@@ -99,4 +100,11 @@ public class PcOrderTradeMqMsgDto {
         this.tradeTime = tradeTime;
     }
 
+    public Long getOpponentOrderId() {
+        return opponentOrderId;
+    }
+
+    public void setOpponentOrderId(Long opponentOrderId) {
+        this.opponentOrderId = opponentOrderId;
+    }
 }

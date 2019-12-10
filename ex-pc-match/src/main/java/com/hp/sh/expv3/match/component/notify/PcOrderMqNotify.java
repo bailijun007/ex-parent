@@ -45,6 +45,10 @@ public class PcOrderMqNotify {
                 JsonUtil.toJsonString(msg).getBytes()// body
         );
         safeSend2OrderTopic(message);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+        }
         return true;
     }
 
@@ -62,6 +66,9 @@ public class PcOrderMqNotify {
                 JsonUtil.toJsonString(msg).getBytes()// body
         );
         safeSend2OrderTopic(message);
+        if (logger.isDebugEnabled()) {
+            logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+        }
         return true;
     }
 
@@ -77,6 +84,5 @@ public class PcOrderMqNotify {
         }
         return true;
     }
-
 
 }
