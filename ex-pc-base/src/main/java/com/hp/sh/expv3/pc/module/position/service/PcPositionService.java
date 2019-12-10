@@ -116,8 +116,8 @@ public class PcPositionService {
 		request.setAmount(tradeData.getOrderMargin().add(tradeData.getPnl()).subtract(tradeData.getFee()));
 		request.setAsset(asset);
 		request.setRemark("平仓");
-		request.setTradeNo("CLOSE"+orderTradeId);
-		request.setTradeType(PcAccountTradeType.ORDER_CANCEL);
+		request.setTradeNo("CLOSE-"+orderTradeId);
+		request.setTradeType(PcAccountTradeType.ORDER_CLOSE);
 		request.setUserId(userId);
 		request.setAssociatedId(orderTradeId);
 		this.pcAccountCoreService.add(request);

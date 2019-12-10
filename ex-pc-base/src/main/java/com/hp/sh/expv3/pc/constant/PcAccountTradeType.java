@@ -10,6 +10,8 @@ public class PcAccountTradeType {
 	public static final int ORDER_OPEN = 1;	//开仓
 	
 	public static final int ORDER_CANCEL = 2;	//撤单
+	
+	public static final int ORDER_CLOSE = 3;	//平仓
 
 
 }
