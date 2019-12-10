@@ -3,7 +3,7 @@ package com.hp.sh.expv3.pc.strategy.vo;
 import java.math.BigDecimal;
 
 /**
- * 订单数据变化
+ * 订单的等比例数据
  * @author wangjg
  *
  */

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.hp.sh.expv3.pc.calc.CompositeFieldCalc;
 import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
 import com.hp.sh.expv3.pc.calc.PcPriceCalc;
 import com.hp.sh.expv3.pc.calc.PnlCalc;
@@ -50,7 +51,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 
 		tradeData.setVolume(matchedVo.getNumber());
 		tradeData.setAmount(tradeRatioAmt.getAmount());
-		tradeData.setBaseValue(tradeRatioAmt.getBaseValue());
+		tradeData.setBaseValue(CompositeFieldCalc.calcBaseValue(tradeData.getAmount(), matchedVo.getPrice()));
 		tradeData.setOrderMargin(tradeRatioAmt.getOrderMargin());//保证金
 		tradeData.setCompleted(BigMath.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		

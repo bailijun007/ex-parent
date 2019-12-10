@@ -112,7 +112,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 			openFee = slope(number, order.getVolume(), order.getOpenFee());
 			closeFee = slope(number, order.getVolume(), order.getCloseFee());
 			orderMargin = slope(number, order.getVolume(), order.getOrderMargin());
-			grossMargin = slope(number, order.getVolume(), order.getGrossMargin());
+			grossMargin = MarginFeeCalc.sum(openFee, closeFee, orderMargin);
 		}
 		
 		orderAmount.setOrderMargin(orderMargin);

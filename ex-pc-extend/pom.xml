@@ -33,6 +33,19 @@
 			<version>3.0.0</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>com.hp.sh</groupId>
+			<artifactId>ex-pc-base</artifactId>
+			<version>3.0.0</version>
+			<scope>provided</scope>
+            <exclusions>
+                <exclusion>
+					<groupId>com.hp.sh</groupId>
+					<artifactId>ex-pc-extend</artifactId>
+                </exclusion>
+            </exclusions>
+		</dependency>
+		
 	</dependencies>
 	
     <build>
