@@ -8,6 +8,6 @@ package com.hp.sh.expv3.pc.module.trade.entity;
  * 永续合约_成交(撮合结果)
  *
  */
-public class PcTrade extends com.hp.sh.expv3.pc.module.trade.api.request.PcTrade	{
+public class PcMatchedResult extends com.hp.sh.expv3.pc.module.trade.api.request.PcMatchedResult	{
 
 }

@@ -3,136 +3,107 @@ package com.hp.sh.expv3.pc.mq.msg;
 import java.math.BigDecimal;
 
 /**
- * 撮合成功消息
+ * 成交
  * @author wangjg
  *
  */
-public class MatchedMsg extends BaseOrderMsg {
-	
-	//用户ID
-	private Long accountId;
-	
-	//资产
-	private String asset;
-	
-	//交易对（合约品种）
-	private String symbol;
-
-	/* 成交价格 */
-	private BigDecimal price;
-
-	/* 成交数量 */
-	private BigDecimal number;
-
-	//订单Id
-	private Long orderId;
-
-	//交易ID
-	private Long tradeId;
-
-	//成交时间
-	private Long tradeTime;
-
-	//是否maker
-	private Integer makerFlag;
-	
-	//撮合事务Id
+public class MatchedMsg extends BaseOrderMsg{
+	private Long id;
 	private Long matchTxId;
-
+	private Long mkAccountId;
+	private Long mkCloseFlag;
+	private Long mkOrderId;
+	private BigDecimal number;
+	private BigDecimal price;
+	private Long tkAccountId;
+	private Long tkBidFlag;
+	private Long tkCloseFlag;
+	private Long tkOrderId;
+	private Long tradeTime;
+	
 	public MatchedMsg() {
 	}
 
-	public MatchedMsg(String asset, String symbol, Long tradeId) {
-		this.asset = asset;
-		this.symbol = symbol;
-		this.tradeId = tradeId;
+	public Long getId() {
+		return id;
 	}
-
-	public Long getAccountId() {
-		return accountId;
+	public void setId(Long id) {
+		this.id = id;
 	}
-
-	public void setAccountId(Long accountId) {
-		this.accountId = accountId;
+	public Long getMatchTxId() {
+		return matchTxId;
 	}
-
-	public String getAsset() {
-		return asset;
+	public void setMatchTxId(Long matchTxId) {
+		this.matchTxId = matchTxId;
 	}
-
-	public void setAsset(String asset) {
-		this.asset = asset;
+	public Long getMkAccountId() {
+		return mkAccountId;
 	}
-
-	public String getSymbol() {
-		return symbol;
+	public void setMkAccountId(Long mkAccountId) {
+		this.mkAccountId = mkAccountId;
 	}
-
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
+	public Long getMkCloseFlag() {
+		return mkCloseFlag;
 	}
-
-	public BigDecimal getPrice() {
-		return price;
+	public void setMkCloseFlag(Long mkCloseFlag) {
+		this.mkCloseFlag = mkCloseFlag;
 	}
-
-	public void setPrice(BigDecimal price) {
-		this.price = price;
+	public Long getMkOrderId() {
+		return mkOrderId;
 	}
-
+	public void setMkOrderId(Long mkOrderId) {
+		this.mkOrderId = mkOrderId;
+	}
 	public BigDecimal getNumber() {
 		return number;
 	}
-
 	public void setNumber(BigDecimal number) {
 		this.number = number;
 	}
-
-	public Long getOrderId() {
-		return orderId;
+	public BigDecimal getPrice() {
+		return price;
 	}
-
-	public void setOrderId(Long orderId) {
-		this.orderId = orderId;
+	public void setPrice(BigDecimal price) {
+		this.price = price;
 	}
-
-	public Long getTradeId() {
-		return tradeId;
+	public Long getTkAccountId() {
+		return tkAccountId;
 	}
-
-	public void setTradeId(Long tradeId) {
-		this.tradeId = tradeId;
+	public void setTkAccountId(Long tkAccountId) {
+		this.tkAccountId = tkAccountId;
 	}
-
+	public Long getTkBidFlag() {
+		return tkBidFlag;
+	}
+	public void setTkBidFlag(Long tkBidFlag) {
+		this.tkBidFlag = tkBidFlag;
+	}
+	public Long getTkCloseFlag() {
+		return tkCloseFlag;
+	}
+	public void setTkCloseFlag(Long tkCloseFlag) {
+		this.tkCloseFlag = tkCloseFlag;
+	}
+	public Long getTkOrderId() {
+		return tkOrderId;
+	}
+	public void setTkOrderId(Long tkOrderId) {
+		this.tkOrderId = tkOrderId;
+	}
 	public Long getTradeTime() {
 		return tradeTime;
 	}
-
 	public void setTradeTime(Long tradeTime) {
 		this.tradeTime = tradeTime;
 	}
 
-	public Integer getMakerFlag() {
-		return makerFlag;
-	}
-
-	public void setMakerFlag(Integer makerFlag) {
-		this.makerFlag = makerFlag;
-	}
-
-	public Long getMatchTxId() {
-		return matchTxId;
-	}
-
-	public void setMatchTxId(Long matchTxId) {
-		this.matchTxId = matchTxId;
-	}
-
 	@Override
 	public String toString() {
-		return "MatchedMsg [accountId=" + accountId + ", asset=" + asset + ", symbol=" + symbol + ", price=" + price
-				+ ", number=" + number + ", orderId=" + orderId + ", tradeId=" + tradeId + ", tradeTime=" + tradeTime
-				+ ", makerFlag=" + makerFlag + ", matchTxId=" + matchTxId + "]";
+		return "MatchedMsg [id=" + id + ", matchTxId=" + matchTxId + ", mkAccountId=" + mkAccountId + ", mkCloseFlag="
+				+ mkCloseFlag + ", mkOrderId=" + mkOrderId + ", number=" + number + ", price=" + price
+				+ ", tkAccountId=" + tkAccountId + ", tkBidFlag=" + tkBidFlag + ", tkCloseFlag=" + tkCloseFlag
+				+ ", tkOrderId=" + tkOrderId + ", tradeTime=" + tradeTime + ", asset=" + asset + ", symbol=" + symbol
+				+ "]";
 	}
-
+	
 }

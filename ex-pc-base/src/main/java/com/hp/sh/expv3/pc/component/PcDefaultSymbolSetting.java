@@ -31,7 +31,7 @@ public class PcDefaultSymbolSetting {
 
 	@Deprecated
 	public BigDecimal getHoldMarginRatio() {
-		return new BigDecimal("0.5");
+		return new BigDecimal("0.0005");
 	};
 
 }

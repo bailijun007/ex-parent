@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.base.exceptions.CommonError;
+import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.atemp.Question;
 import com.hp.sh.expv3.pc.calc.PcPriceCalc;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
@@ -27,8 +29,8 @@ import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
-import com.hp.sh.expv3.pc.module.trade.entity.PcTrade;
-import com.hp.sh.expv3.pc.mq.msg.MatchedMsg;
+import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
+import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.impl.AABBPositionStrategy;
 import com.hp.sh.expv3.pc.strategy.impl.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.TradeData;
@@ -70,7 +72,7 @@ public class PcPositionService {
 	
 	
 	//处理成交订单
-	public void handleMatchedOrder(MatchedMsg matchedVo){
+	public void handleTradeOrder(PcTradeMsg matchedVo){
 		PcOrder order = this.pcOrderDAO.findById(matchedVo.getAccountId(), matchedVo.getOrderId());
 		this.chekOrderStatus(order, matchedVo);
 		
@@ -83,7 +85,7 @@ public class PcPositionService {
 		//如果仓位不存在则创建新仓位
 		boolean isNewPos = false;
 		if(pcPosition==null){
-			pcPosition = this.newEmptyPostion(as.getUserId(), as.getAsset(), as.getSymbol(), pcPosition.getLongFlag(), order.getLeverage(), as.getMarginMode());
+			pcPosition = this.newEmptyPostion(as.getUserId(), as.getAsset(), as.getSymbol(), order.getLongFlag(), order.getLeverage(), as.getMarginMode());
 			isNewPos = true;
 		}
 		
@@ -132,17 +134,17 @@ public class PcPositionService {
 		this.pcOrderDAO.update(order);
 	}
 
-	private PcOrderTrade saveOrderTrade(MatchedMsg matchedVo, PcOrder order, TradeData tradeData) {
+	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeData tradeData) {
 		Date now = new Date();
 		
 		PcOrderTrade orderTrade = new PcOrderTrade();
 
 		orderTrade.setId(null);
-		orderTrade.setAsset(matchedVo.getAsset());
-		orderTrade.setSymbol(matchedVo.getSymbol());
-		orderTrade.setPrice(matchedVo.getPrice());
-		orderTrade.setVolume(matchedVo.getNumber());
-		orderTrade.setMakerFlag(matchedVo.getMakerFlag());
+		orderTrade.setAsset(tradeMsg.getAsset());
+		orderTrade.setSymbol(tradeMsg.getSymbol());
+		orderTrade.setPrice(tradeMsg.getPrice());
+		orderTrade.setVolume(tradeMsg.getNumber());
+		orderTrade.setMakerFlag(tradeMsg.getMakerFlag());
 
 		orderTrade.setFee(tradeData.getFee());
 		orderTrade.setFeeRatio(tradeData.getFeeRatio());
@@ -150,8 +152,8 @@ public class PcPositionService {
 		
 		orderTrade.setOrderId(order.getId());
 		
-		orderTrade.setTradeId(matchedVo.getTradeId());
-		orderTrade.setTradeTime(matchedVo.getTradeTime());
+		orderTrade.setTradeSn(tradeMsg.uniqueKey());
+		orderTrade.setTradeTime(tradeMsg.getTradeTime());
 		orderTrade.setUserId(order.getUserId());
 		orderTrade.setCreated(now);
 		orderTrade.setModified(now);
@@ -165,6 +167,7 @@ public class PcPositionService {
 	
 	private PcPosition newEmptyPostion(long userId, String asset, String symbol, int longFlag, BigDecimal entryLeverage, int marginMode) {
 		PcPosition pcPosition = new PcPosition();
+		pcPosition.setUserId(userId);
 		pcPosition.setAsset(asset);
 		pcPosition.setSymbol(symbol);
 		pcPosition.setLongFlag(longFlag);
@@ -173,7 +176,9 @@ public class PcPositionService {
 		pcPosition.setLeverage(entryLeverage);
 		pcPosition.setAutoAddFlag(IntBool.NO);
 		pcPosition.setHoldRatio(marginRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
-		
+		Date now = new Date();
+		pcPosition.setCreated(now );
+		pcPosition.setModified(now);
 		//
 		pcPosition.setVolume(BigDecimal.ZERO);
 		pcPosition.setBaseValue(BigDecimal.ZERO);
@@ -243,9 +248,17 @@ public class PcPositionService {
 	}
 
 	//检查订单状态
-	private void chekOrderStatus(PcOrder order, MatchedMsg matchedVo) {
-		// TODO Auto-generated method stub
-		
+	private void chekOrderStatus(PcOrder order, PcTradeMsg tradeMsg) {
+		if(order==null){
+			throw new ExException(CommonError.OBJ_DONT_EXIST);
+		}
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", order.getUserId());
+		params.put("tradeSn", tradeMsg.uniqueKey());
+		Long count = this.pcOrderTradeDAO.queryCount(params);
+		if(count>0){
+			throw new ExException(CommonError.OBJ_EXIST);
+		}
 	}
 	
 	private void synchFee(Long tradeOrderId, Long feeCollectorId, BigDecimal fee){
@@ -268,40 +281,40 @@ public class PcPositionService {
 	/**
 	 * 处理成交
 	 */
-	public void handleTrade(PcTrade pcTrade){
+	public void handleMatchedResult(PcMatchedResult pcMatchedResult){
 		//taker
-		MatchedMsg takerMatchedVo = new MatchedMsg();
-		takerMatchedVo.setMakerFlag(TradingRoles.TAKER);
-		takerMatchedVo.setAsset(pcTrade.getAsset());
-		takerMatchedVo.setSymbol(pcTrade.getSymbol());
-		takerMatchedVo.setPrice(pcTrade.getPrice());
-		takerMatchedVo.setNumber(pcTrade.getNumber());
-		takerMatchedVo.setTradeId(pcTrade.getId());
-		takerMatchedVo.setTradeTime(pcTrade.getTradeTime());
+		PcTradeMsg takerTradeVo = new PcTradeMsg();
+		takerTradeVo.setMakerFlag(TradingRoles.TAKER);
+		takerTradeVo.setAsset(pcMatchedResult.getAsset());
+		takerTradeVo.setSymbol(pcMatchedResult.getSymbol());
+		takerTradeVo.setPrice(pcMatchedResult.getPrice());
+		takerTradeVo.setNumber(pcMatchedResult.getNumber());
+		takerTradeVo.setTradeId(pcMatchedResult.getId());
+		takerTradeVo.setTradeTime(pcMatchedResult.getTradeTime());
 		
-		takerMatchedVo.setAccountId(pcTrade.getTkAccountId());
-		takerMatchedVo.setMatchTxId(pcTrade.getMatchTxId());
-		takerMatchedVo.setOrderId(pcTrade.getTkOrderId());
+		takerTradeVo.setAccountId(pcMatchedResult.getTkAccountId());
+		takerTradeVo.setMatchTxId(pcMatchedResult.getMatchTxId());
+		takerTradeVo.setOrderId(pcMatchedResult.getTkOrderId());
 		
 		//maker
-		MatchedMsg makerMatchedVo = new MatchedMsg();
-		makerMatchedVo.setMakerFlag(TradingRoles.TAKER);
-		makerMatchedVo.setAsset(pcTrade.getAsset());
-		makerMatchedVo.setSymbol(pcTrade.getSymbol());
-		makerMatchedVo.setPrice(pcTrade.getPrice());
-		makerMatchedVo.setNumber(pcTrade.getNumber());
-		makerMatchedVo.setTradeId(pcTrade.getId());
-		makerMatchedVo.setTradeTime(pcTrade.getTradeTime());
+		PcTradeMsg makerTradeVo = new PcTradeMsg();
+		makerTradeVo.setMakerFlag(TradingRoles.TAKER);
+		makerTradeVo.setAsset(pcMatchedResult.getAsset());
+		makerTradeVo.setSymbol(pcMatchedResult.getSymbol());
+		makerTradeVo.setPrice(pcMatchedResult.getPrice());
+		makerTradeVo.setNumber(pcMatchedResult.getNumber());
+		makerTradeVo.setTradeId(pcMatchedResult.getId());
+		makerTradeVo.setTradeTime(pcMatchedResult.getTradeTime());
 		
-		makerMatchedVo.setAccountId(pcTrade.getMkAccountId());
-		makerMatchedVo.setMatchTxId(pcTrade.getMatchTxId());
-		makerMatchedVo.setOrderId(pcTrade.getMkOrderId());
+		makerTradeVo.setAccountId(pcMatchedResult.getMkAccountId());
+		makerTradeVo.setMatchTxId(pcMatchedResult.getMatchTxId());
+		makerTradeVo.setOrderId(pcMatchedResult.getMkOrderId());
 	
 		//taker
-		this.handleMatchedOrder(takerMatchedVo);
+		this.handleTradeOrder(takerTradeVo);
 		
 		//maker
-		this.handleMatchedOrder(makerMatchedVo);
+		this.handleTradeOrder(makerTradeVo);
 		
 	}
 	

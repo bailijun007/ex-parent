@@ -13,7 +13,7 @@ import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
-import com.hp.sh.expv3.pc.mq.msg.MatchedMsg;
+import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.PositionStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
 import com.hp.sh.expv3.pc.strategy.vo.TradeData;
@@ -43,7 +43,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 	 * @param closeFeeRaito 
 	 * @return 
 	 */
-	public TradeData getTradeData(PcOrder order, MatchedMsg matchedVo, PcPosition pcPosition){
+	public TradeData getTradeData(PcOrder order, PcTradeMsg matchedVo, PcPosition pcPosition){
 		OrderAmount tradeRatioAmt = orderStrategy.calcRaitoAmt(order, matchedVo.getNumber());
 		
 		TradeData tradeData = new TradeData();
@@ -81,9 +81,30 @@ public class AABBPositionStrategy implements PositionStrategy {
 		}
 		
 		//强平价
-		tradeData.setLiqPrice(pcPriceCalc.calcLiqPrice(pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getMeanPrice(), tradeData.getAmount(), pcPosition.getPosMargin(), Precision.COMMON_PRECISION));
+		if(pcPosition!=null){
+			tradeData.setLiqPrice(
+				pcPriceCalc.calcLiqPrice(
+					pcPosition.getHoldRatio(),
+					IntBool.isTrue(pcPosition.getLongFlag()), 
+					tradeData.getNewMeanPrice(), 
+					tradeData.getAmount(),
+					pcPosition.getPosMargin(), 
+					Precision.COMMON_PRECISION)
+			);
+		}else{
+			BigDecimal holdRatio = marginRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), matchedVo.getNumber());
+			tradeData.setLiqPrice(
+					pcPriceCalc.calcLiqPrice(
+						holdRatio,
+						IntBool.isTrue(order.getLongFlag()), 
+						tradeData.getNewMeanPrice(), 
+						tradeData.getAmount(),
+						tradeData.getOrderMargin(), 
+						Precision.COMMON_PRECISION)
+				);
+		}
 		
-		tradeData.setAvgCostPrice(null);
+		tradeData.setAvgCostPrice(BigDecimal.ZERO);
 		
 		return tradeData;
 	}

@@ -4,7 +4,7 @@ package com.hp.sh.expv3.pc.module.order.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.sh.expv3.base.mapper.BaseMapper;
+import com.hp.sh.expv3.base.mapper.BaseUserDataMapper;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 
 /**
@@ -12,7 +12,7 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
  * @author wangjg
  *
  */
-public interface PcOrderTradeDAO extends BaseMapper<PcOrderTrade,Long> {
+public interface PcOrderTradeDAO extends BaseUserDataMapper<PcOrderTrade,Long> {
 
 	public List<PcOrderTrade> queryList(Map<String,Object> params);
 	

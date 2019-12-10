@@ -33,7 +33,7 @@ public class PcOrderTrade extends UserDataEntity {
 	private BigDecimal volume;
 
 	//交易ID
-	private Long tradeId;
+	private String tradeSn;
 
 	// 1-marker， 0-taker
 	private Integer makerFlag;
@@ -41,7 +41,7 @@ public class PcOrderTrade extends UserDataEntity {
 	//成交时间
 	private Long tradeTime;
 	
-	int ______________;
+//	int ______________;
 
 	//手续费收取人
 	private Long feeCollectorId;
@@ -100,12 +100,12 @@ public class PcOrderTrade extends UserDataEntity {
 		this.volume = volume;
 	}
 
-	public Long getTradeId() {
-		return tradeId;
+	public String getTradeSn() {
+		return tradeSn;
 	}
 
-	public void setTradeId(Long tradeId) {
-		this.tradeId = tradeId;
+	public void setTradeSn(String tradeId) {
+		this.tradeSn = tradeId;
 	}
 
 	public Integer getMakerFlag() {
@@ -159,7 +159,7 @@ public class PcOrderTrade extends UserDataEntity {
 	@Override
 	public String toString() {
 		return "PcOrderTrade [asset=" + asset + ", symbol=" + symbol + ", orderId=" + orderId + ", price=" + price
-				+ ", volume=" + volume + ", tradeId=" + tradeId + ", makerFlag=" + makerFlag + ", tradeTime="
+				+ ", volume=" + volume + ", tradeSn=" + tradeSn + ", makerFlag=" + makerFlag + ", tradeTime="
 				+ tradeTime + ", feeCollectorId=" + feeCollectorId + ", feeRatio=" + feeRatio + ", fee=" + fee
 				+ ", pnl=" + pnl + "]";
 	}

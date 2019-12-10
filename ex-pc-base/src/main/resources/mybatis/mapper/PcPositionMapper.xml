@@ -6,34 +6,34 @@
 
 	<resultMap type="com.hp.sh.expv3.pc.module.position.entity.PcPosition" id="PcPosition">
 		<result column="id" property="id" />
-		<result column="account_id" property="accountId" />
-		<result column="symbol" property="symbol" />
 		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="long_flag" property="longFlag" />
+		<result column="margin_mode" property="marginMode" />
+		<result column="entry_leverage" property="entryLeverage" />
+		<result column="volume" property="volume" />
+		<result column="base_value" property="baseValue" />
+		<result column="leverage" property="leverage" />
+		<result column="pos_margin" property="posMargin" />
+		<result column="close_fee" property="closeFee" />
+		<result column="auto_add_flag" property="autoAddFlag" />
+		<result column="mean_price" property="meanPrice" />
+		<result column="avg_cost_price" property="avgCostPrice" />
+		<result column="init_margin" property="initMargin" />
+		<result column="hold_ratio" property="holdRatio" />
+		<result column="fee_cost" property="feeCost" />
+		<result column="realised_pnl" property="realisedPnl" />
+		<result column="liq_price" property="liqPrice" />
 		<result column="liq_mark_price" property="liqMarkPrice" />
 		<result column="liq_mark_time" property="liqMarkTime" />
 		<result column="liq_status" property="liqStatus" />
-		<result column="long_flag" property="longFlag" />
-		<result column="margin_mode" property="marginMode" />
-		<result column="amt" property="amt" />
-		<result column="leverage" property="leverage" />
-		<result column="entry_leverage" property="entryLeverage" />
-		<result column="volume" property="volume" />
-		<result column="entry_price" property="entryPrice" />
-		<result column="pos_margin" property="posMargin" />
-		<result column="liq_price" property="liqPrice" />
-		<result column="bankrupt_price" property="bankruptPrice" />
-		<result column="hold_ratio" property="holdRatio" />
-		<result column="init_margin" property="initMargin" />
-		<result column="realised_pnl" property="realisedPnl" />
-		<result column="auto_add_flag" property="autoAddFlag" />
-		<result column="fee_cost" property="feeCost" />
-		<result column="remark" property="remark" />
+		<result column="user_id" property="userId" />
 		<result column="created" property="created" />
 		<result column="modified" property="modified" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,account_id,symbol,asset,liq_mark_price,liq_mark_time,liq_status,long_flag,margin_mode,amt,leverage,entry_leverage,volume,entry_price,pos_margin,liq_price,bankrupt_price,hold_ratio,init_margin,realised_pnl,auto_add_flag,fee_cost,remark,created,modified
+		id,asset,symbol,long_flag,margin_mode,entry_leverage,volume,base_value,leverage,pos_margin,close_fee,auto_add_flag,mean_price,avg_cost_price,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -44,17 +44,18 @@
 		#{idList[${i}]}
 		</foreach>
 		</if>
-		<if test="accountId!=null"> and account_id=#{accountId}</if>
-		<if test="liqMarkTime!=null"> and liq_mark_time=#{liqMarkTime}</if>
-		<if test="liqStatus!=null"> and liq_status=#{liqStatus}</if>
 		<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
 		<if test="marginMode!=null"> and margin_mode=#{marginMode}</if>
 		<if test="autoAddFlag!=null"> and auto_add_flag=#{autoAddFlag}</if>
+		<if test="liqMarkTime!=null"> and liq_mark_time=#{liqMarkTime}</if>
+		<if test="liqStatus!=null"> and liq_status=#{liqStatus}</if>
+		<if test="userId!=null"> and user_id=#{userId}</if>
 		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
 		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
 		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
-		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(symbol,''),IFNULL(asset,''),IFNULL(remark,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
+		<if test="keyword!=null and keyword!=''"> and symbol like CONCAT('%',#{keyword},'%')</if>
+		</where>
 	</sql>
 
 	<sql id="simple_query" >
@@ -116,9 +117,9 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into pc_position (
-			id,account_id,symbol,asset,liq_mark_price,liq_mark_time,liq_status,long_flag,margin_mode,amt,leverage,entry_leverage,volume,entry_price,pos_margin,liq_price,bankrupt_price,hold_ratio,init_margin,realised_pnl,auto_add_flag,fee_cost,remark,created,modified
+			id,asset,symbol,long_flag,margin_mode,entry_leverage,volume,base_value,leverage,pos_margin,close_fee,auto_add_flag,mean_price,avg_cost_price,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
 		)values(
-			#{id},#{accountId},#{symbol},#{asset},#{liqMarkPrice},#{liqMarkTime},#{liqStatus},#{longFlag},#{marginMode},#{amt},#{leverage},#{entryLeverage},#{volume},#{entryPrice},#{posMargin},#{liqPrice},#{bankruptPrice},#{holdRatio},#{initMargin},#{realisedPnl},#{autoAddFlag},#{feeCost},#{remark},#{created},#{modified}
+			#{id},#{asset},#{symbol},#{longFlag},#{marginMode},#{entryLeverage},#{volume},#{baseValue},#{leverage},#{posMargin},#{closeFee},#{autoAddFlag},#{meanPrice},#{avgCostPrice},#{initMargin},#{holdRatio},#{feeCost},#{realisedPnl},#{liqPrice},#{liqMarkPrice},#{liqMarkTime},#{liqStatus},#{userId},#{created},#{modified}
 		)
 	</insert>
 	
@@ -126,7 +127,7 @@
 		update 
 			pc_position
 		set 
-			account_id=#{accountId},symbol=#{symbol},asset=#{asset},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},liq_status=#{liqStatus},long_flag=#{longFlag},margin_mode=#{marginMode},amt=#{amt},leverage=#{leverage},entry_leverage=#{entryLeverage},volume=#{volume},entry_price=#{entryPrice},pos_margin=#{posMargin},liq_price=#{liqPrice},bankrupt_price=#{bankruptPrice},hold_ratio=#{holdRatio},init_margin=#{initMargin},realised_pnl=#{realisedPnl},auto_add_flag=#{autoAddFlag},fee_cost=#{feeCost},remark=#{remark},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},volume=#{volume},base_value=#{baseValue},leverage=#{leverage},pos_margin=#{posMargin},close_fee=#{closeFee},auto_add_flag=#{autoAddFlag},mean_price=#{meanPrice},avg_cost_price=#{avgCostPrice},init_margin=#{initMargin},hold_ratio=#{holdRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},liq_status=#{liqStatus},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
 			id=#{id}
 	</update>
@@ -141,6 +142,7 @@
     </delete>
 
 	<!--  -->
+	
 	<select id="queryAmount" resultType="java.math.BigDecimal">
 		select 
 		<choose>

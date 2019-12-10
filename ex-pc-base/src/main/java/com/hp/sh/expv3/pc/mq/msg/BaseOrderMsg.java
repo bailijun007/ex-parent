@@ -2,7 +2,10 @@ package com.hp.sh.expv3.pc.mq.msg;
 
 public class BaseOrderMsg {
 
+	//资产
 	protected String asset;
+	
+	//交易对（合约品种）
 	protected String symbol;
 	
 	public BaseOrderMsg() {

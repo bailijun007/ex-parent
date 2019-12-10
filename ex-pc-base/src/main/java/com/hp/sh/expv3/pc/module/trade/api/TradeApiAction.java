@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.bean.BeanHelper;
-import com.hp.sh.expv3.pc.module.trade.api.request.PcTrade;
+import com.hp.sh.expv3.pc.module.trade.api.request.PcMatchedResult;
 import com.hp.sh.expv3.pc.module.trade.service.TradeService;
 
 import io.swagger.annotations.Api;
@@ -22,8 +22,8 @@ public class TradeApiAction implements TradeApi {
 
 	@Override
 	@ApiOperation(value = "保存成交")
-	public void save(@RequestBody List<PcTrade> list) throws Exception{
-		tradeService.batchSave(BeanHelper.copyList(list, com.hp.sh.expv3.pc.module.trade.entity.PcTrade.class));
+	public void save(@RequestBody List<PcMatchedResult> list) throws Exception{
+		tradeService.batchSave(BeanHelper.copyList(list, com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult.class));
 	}
 
 }

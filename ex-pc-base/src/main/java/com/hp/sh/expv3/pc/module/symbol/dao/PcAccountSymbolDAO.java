@@ -4,6 +4,8 @@ package com.hp.sh.expv3.pc.module.symbol.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.hp.sh.expv3.base.mapper.BaseUserDataMapper;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 
@@ -20,8 +22,8 @@ public interface PcAccountSymbolDAO extends BaseUserDataMapper<PcAccountSymbol,L
 
 	public Long queryCount(Map<String,Object> params);
 
-	public PcAccountSymbol getUserSymbol(Long userId, String asset, String symbol);
+	public PcAccountSymbol getUserSymbol(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol);
 	
-	public PcAccountSymbol lockUserSymbol(Long userId, String asset, String symbol);
+	public PcAccountSymbol lockUserSymbol(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol);
 
 }

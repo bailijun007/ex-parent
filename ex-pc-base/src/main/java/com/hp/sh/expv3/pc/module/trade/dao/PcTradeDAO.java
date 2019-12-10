@@ -6,14 +6,14 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.hp.sh.expv3.base.mapper.BaseMapper;
-import com.hp.sh.expv3.pc.module.trade.entity.PcTrade;
+import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 
 @Mapper
-public interface PcTradeDAO extends BaseMapper<PcTrade, Long> {
+public interface PcTradeDAO extends BaseMapper<PcMatchedResult, Long> {
 
-	public List<PcTrade> queryList(Map<String,Object> params);
+	public List<PcMatchedResult> queryList(Map<String,Object> params);
 	
-	public PcTrade queryOne(Map<String,Object> params);
+	public PcMatchedResult queryOne(Map<String,Object> params);
 
 	public Long queryCount(Map<String,Object> params);
 

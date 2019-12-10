@@ -39,7 +39,7 @@
 		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
 		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
-		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(asset,''),IFNULL(symbol,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
+		<if test="keyword!=null and keyword!=''"> and asset like CONCAT('%',#{keyword},'%')</if>	</where>
 	</sql>
 
 	<sql id="simple_query" >
@@ -83,7 +83,7 @@
 		select
 			<include refid="Base_Column_List" />
 		from pc_account_symbol
-			where id=#{id}
+			where id=#{id} and user_id=#{userId}
 	</select>
 
 	<select id="exist" resultType="boolean">
@@ -113,11 +113,11 @@
 		set 
 			asset=#{asset},symbol=#{symbol},short_leverage=#{shortLeverage},long_leverage=#{longLeverage},margin_mode=#{marginMode},cross_leverage=#{crossLeverage},hold_margin_ratio=#{holdMarginRatio},max_leverage=#{maxLeverage},version=#{version},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
-			id=#{id}
+			id=#{id} and user_id=#{userId}
 	</update>
 
 	<delete id="delete">
-        delete from pc_account_symbol where id=#{id}
+        delete from pc_account_symbol where id=#{id} and user_id=#{userId}
     </delete>
 
     <delete id="condDelete">
@@ -126,5 +126,20 @@
     </delete>
 
 	<!--  -->
+
+	<select id="getUserSymbol" resultMap="PcAccountSymbol">
+		select
+			<include refid="Base_Column_List" />
+		from pc_account_symbol
+			where id=#{id} and user_id=#{userId}
+	</select>
+
+	<select id="lockUserSymbol" resultMap="PcAccountSymbol">
+		select
+			<include refid="Base_Column_List" />
+		from pc_account_symbol
+			where user_id=#{userId} and asset=#{asset} and symbol=#{symbol}
+		for update
+	</select>
 	
 </mapper>

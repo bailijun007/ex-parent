@@ -3,111 +3,128 @@ package com.hp.sh.expv3.pc.mq.msg;
 import java.math.BigDecimal;
 
 /**
- * 成交
+ * 撮合成功消息
  * @author wangjg
  *
  */
-public class PcTradeMsg extends BaseOrderMsg{
-	private Long id;
-	private Long matchTxId;
-	private Long mkAccountId;
-	private Long mkCloseFlag;
-	private Long mkOrderId;
-	private BigDecimal number;
-	private BigDecimal price;
-	private Long tkAccountId;
-	private Long tkBidFlag;
-	private Long tkCloseFlag;
-	private Long tkOrderId;
-	private Long tradeTime;
+public class PcTradeMsg extends BaseOrderMsg {
 	
+	//用户ID
+	private Long accountId;
+	
+	/* 成交价格 */
+	private BigDecimal price;
+
+	/* 成交数量 */
+	private BigDecimal number;
+
+	//订单Id
+	private Long orderId;
+
+	//交易ID
+	private Long tradeId;
+
+	//成交时间
+	private Long tradeTime;
+
+	//是否maker
+	private Integer makerFlag;
+	
+	//撮合事务Id
+	private Long matchTxId;
+	
+	//对手订单ID
+	private Long opponentOrderId;
+
 	public PcTradeMsg() {
+	}
+
+	public PcTradeMsg(String asset, String symbol, Long tradeId) {
+		this.tradeId = tradeId;
 	}
 	
 	public String uniqueKey(){
-		return this.mkOrderId+"-"+this.tkOrderId;
+		return "TRADEMSG-"+this.tradeId+"-"+opponentOrderId;
 	}
 
-	public Long getId() {
-		return id;
+	public Long getAccountId() {
+		return accountId;
 	}
-	public void setId(Long id) {
-		this.id = id;
+
+	public void setAccountId(Long accountId) {
+		this.accountId = accountId;
 	}
-	public Long getMatchTxId() {
-		return matchTxId;
-	}
-	public void setMatchTxId(Long matchTxId) {
-		this.matchTxId = matchTxId;
-	}
-	public Long getMkAccountId() {
-		return mkAccountId;
-	}
-	public void setMkAccountId(Long mkAccountId) {
-		this.mkAccountId = mkAccountId;
-	}
-	public Long getMkCloseFlag() {
-		return mkCloseFlag;
-	}
-	public void setMkCloseFlag(Long mkCloseFlag) {
-		this.mkCloseFlag = mkCloseFlag;
-	}
-	public Long getMkOrderId() {
-		return mkOrderId;
-	}
-	public void setMkOrderId(Long mkOrderId) {
-		this.mkOrderId = mkOrderId;
-	}
-	public BigDecimal getNumber() {
-		return number;
-	}
-	public void setNumber(BigDecimal number) {
-		this.number = number;
-	}
+
 	public BigDecimal getPrice() {
 		return price;
 	}
+
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
-	public Long getTkAccountId() {
-		return tkAccountId;
+
+	public BigDecimal getNumber() {
+		return number;
 	}
-	public void setTkAccountId(Long tkAccountId) {
-		this.tkAccountId = tkAccountId;
+
+	public void setNumber(BigDecimal number) {
+		this.number = number;
 	}
-	public Long getTkBidFlag() {
-		return tkBidFlag;
+
+	public Long getOrderId() {
+		return orderId;
 	}
-	public void setTkBidFlag(Long tkBidFlag) {
-		this.tkBidFlag = tkBidFlag;
+
+	public void setOrderId(Long orderId) {
+		this.orderId = orderId;
 	}
-	public Long getTkCloseFlag() {
-		return tkCloseFlag;
+
+	public Long getTradeId() {
+		return tradeId;
 	}
-	public void setTkCloseFlag(Long tkCloseFlag) {
-		this.tkCloseFlag = tkCloseFlag;
+
+	public void setTradeId(Long tradeId) {
+		this.tradeId = tradeId;
 	}
-	public Long getTkOrderId() {
-		return tkOrderId;
-	}
-	public void setTkOrderId(Long tkOrderId) {
-		this.tkOrderId = tkOrderId;
-	}
+
 	public Long getTradeTime() {
 		return tradeTime;
 	}
+
 	public void setTradeTime(Long tradeTime) {
 		this.tradeTime = tradeTime;
 	}
 
+	public Integer getMakerFlag() {
+		return makerFlag;
+	}
+
+	public void setMakerFlag(Integer makerFlag) {
+		this.makerFlag = makerFlag;
+	}
+
+	public Long getMatchTxId() {
+		return matchTxId;
+	}
+
+	public void setMatchTxId(Long matchTxId) {
+		this.matchTxId = matchTxId;
+	}
+
+	public Long getOpponentOrderId() {
+		return opponentOrderId;
+	}
+
+	public void setOpponentOrderId(Long opponentOrderId) {
+		this.opponentOrderId = opponentOrderId;
+	}
+
 	@Override
 	public String toString() {
-		return "PcTradeMsg [id=" + id + ", matchTxId=" + matchTxId + ", mkAccountId=" + mkAccountId + ", mkCloseFlag="
-				+ mkCloseFlag + ", mkOrderId=" + mkOrderId + ", number=" + number + ", price=" + price
-				+ ", tkAccountId=" + tkAccountId + ", tkBidFlag=" + tkBidFlag + ", tkCloseFlag=" + tkCloseFlag
-				+ ", tkOrderId=" + tkOrderId + ", tradeTime=" + tradeTime + ", asset=" + asset + ", symbol=" + symbol
-				+ "]";
+		return "PcTradeMsg [accountId=" + accountId + ", price=" + price + ", number=" + number + ", orderId=" + orderId
+				+ ", tradeId=" + tradeId + ", tradeTime=" + tradeTime + ", makerFlag=" + makerFlag + ", matchTxId="
+				+ matchTxId + ", asset=" + asset + ", symbol=" + symbol + "]";
 	}
-	
+
+
 }

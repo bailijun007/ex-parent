@@ -83,7 +83,7 @@ public class PcOrder extends UserDataEntity{
 	 */
 	private Integer marginMode;
 
-	int ______系统设置_______;
+//	int ______系统设置_______;
 
     /**
 	 * 开仓手续费率
@@ -105,7 +105,7 @@ public class PcOrder extends UserDataEntity{
 	 */
 	private String clientOrderId;
 
-	int ______下单时计算_成交或撤单时可能会修改_______;
+//	int ______下单时计算_成交或撤单时可能会修改_______;
 	
 	/**
 	 * 开仓手续费,成交时修改(可能部分成交，按比例收取)
@@ -149,7 +149,7 @@ public class PcOrder extends UserDataEntity{
 	 */
 	private BigDecimal cancelVolume;
 
-	int ________系统下单后计算_成交或撤单时修改_________;
+//	int ________系统下单后计算_成交或撤单时修改_________;
 	
 	/**
      * 已收手续费(可能部分成交，按比例收取)
