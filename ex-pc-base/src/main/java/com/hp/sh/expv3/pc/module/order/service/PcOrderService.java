@@ -24,6 +24,7 @@ import com.hp.sh.expv3.pc.module.account.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
+import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
@@ -105,7 +106,7 @@ public class PcOrderService {
 		pcOrder.setUserId(userId);
 		pcOrder.setCreated(now);
 		pcOrder.setModified(now);
-		pcOrder.setStatus(PcOrder.PENDING_NEW);
+		pcOrder.setStatus(OrderStatus.PENDING_NEW);
 		pcOrder.setActiveFlag(IntBool.YES);
 		pcOrder.setClientOrderId(cliOrderId);
 		
@@ -210,38 +211,10 @@ public class PcOrderService {
 		return this.pcOrderDAO.findById(userId, orderId);
 	}
 	
-	public void cancel(long userId, String asset, long orderId, BigDecimal number){
-		//返还余额
-
-		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
-		
-		OrderAmount ratioAmt = orderStrategy.calcRaitoAmt(order, number);
-		
-		BigDecimal cancelledGrossFee = ratioAmt.getGrossMargin();
-		
-		int result = this.returnCancelAmt(userId, asset, orderId, cancelledGrossFee);
-		if(result==InvokeResult.NOCHANGE){
-			//利用合约账户的幂等性实现本方法的幂等性
-			logger.warn("已经执行过了");
-			return;
-		}
-
-		//修改订单状态（撤销）
-		Date now = new Date();
-//		this.setCancelStatus(userId, asset, orderId, PcOrder.CANCELED);
-		order.setCancelTime(now);
-		order.setCancelVolume(number);
-		order.setActiveFlag(PcOrder.NO);
-		order.setStatus(PcOrder.CANCELED);
-		this.pcOrderDAO.update(order);
-		
-		return;
-	}
-	
 	public void setCancelStatus(long userId, String asset, long orderId, Integer cancelStatsus){
 		Date now = new Date();
 		
-		long count = this.pcOrderDAO.cancelOrder(userId, orderId, cancelStatsus, now);
+		long count = this.pcOrderDAO.setCancelStatus(userId, orderId, cancelStatsus, now);
 		
 		if(count!=1){
 			throw new RuntimeException("更新失败，更新行数："+count);
@@ -249,6 +222,34 @@ public class PcOrderService {
         
 	}
 	
+	public void cancel(long userId, String asset, long orderId, BigDecimal number){
+			//返还余额
+	
+			PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+			
+			OrderAmount ratioAmt = orderStrategy.calcRaitoAmt(order, number);
+			
+			BigDecimal cancelledGrossFee = ratioAmt.getGrossMargin();
+			
+			int result = this.returnCancelAmt(userId, asset, orderId, cancelledGrossFee);
+			if(result==InvokeResult.NOCHANGE){
+				//利用合约账户的幂等性实现本方法的幂等性
+				logger.warn("已经执行过了");
+				return;
+			}
+	
+			//修改订单状态（撤销）
+			Date now = new Date();
+	//		this.setCancelStatus(userId, asset, orderId, PcOrder.CANCELED);
+			order.setCancelTime(now);
+			order.setCancelVolume(number);
+			order.setActiveFlag(PcOrder.NO);
+			order.setStatus(OrderStatus.CANCELED);
+			this.pcOrderDAO.update(order);
+			
+			return;
+		}
+
 	public void changeStatus(Long userId, Long orderId, Integer newStatus, Integer desiredOldStatus){
 		long count = this.pcOrderDAO.changeStatus(userId, orderId, newStatus, desiredOldStatus, new Date());
 		if(count!=1){

@@ -6,13 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MqTopic;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.mq.msg.MatchNotMatchMsg;
-import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
-import com.hp.sh.expv3.pc.mq.msg.MatchedOrderCancelledMsg;
 import com.hp.sh.expv3.pc.mq.msg.MatchedMsg;
+import com.hp.sh.expv3.pc.mq.msg.MatchedOrderCancelledMsg;
+import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
@@ -28,7 +28,7 @@ public class MatchMqConsumer {
 
 	@MQListener(tags=MqTopic.TAGS_NOT_MATCHED)
 	public void handleNotMatch(MatchNotMatchMsg msg){
-		this.pcOrderService.changeStatus(msg.getAccountId(), msg.getOrderId(), PcOrder.NEW, PcOrder.PENDING_NEW);
+		this.pcOrderService.changeStatus(msg.getAccountId(), msg.getOrderId(), OrderStatus.NEW, OrderStatus.PENDING_NEW);
 		System.out.println(msg);
 	}
 	

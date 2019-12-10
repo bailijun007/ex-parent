@@ -22,6 +22,7 @@ import com.hp.sh.expv3.pc.module.account.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
+import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
@@ -128,7 +129,7 @@ public class PcPositionService {
 	        order.setOpenFee(order.getOpenFee().subtract(tradeData.getFee()));
 		}
 		order.setFeeCost(order.getFeeCost().add(tradeData.getFee()));
-        order.setStatus(tradeData.isCompleted()?PcOrder.FILLED:PcOrder.PARTIALLY_FILLED);
+        order.setStatus(tradeData.isCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeData.isCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setFilledVolume(tradeData.getVolume());
 		order.setModified(new Date());

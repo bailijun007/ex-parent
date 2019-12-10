@@ -31,7 +31,7 @@ public interface PcOrderDAO extends BaseAccountDataMapper<PcOrder, Long> {
 			@Param("oldStatus") Integer oldStatus,
 			@Param("modified") Date modified);
 
-	public long cancelOrder(
+	public long setCancelStatus(
 			@Param("userId") Long userId, 
 			@Param("orderId") Long orderId,
 			@Param("cancelStatus") Integer cancelStatus, 

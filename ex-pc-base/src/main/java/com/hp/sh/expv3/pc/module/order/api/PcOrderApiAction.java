@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.component.BigMath;
-import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.error.OrderError;
+import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
@@ -74,13 +74,13 @@ public class PcOrderApiAction {
 	@GetMapping(value = "/api/pc/order/cancel")
 	public void cancel(long userId, String asset, String symbol, Long orderId) throws Exception{
 		PcOrder order = this.pcOrderService.getOrder(userId, orderId);
-		if(order.getStatus() == PcOrder.CANCELED){
+		if(order.getStatus() == OrderStatus.CANCELED){
 			throw new ExException(OrderError.CANCELED);
 		}
 		if(BigMath.eq(order.getVolume(), order.getFilledVolume())){
 			throw new ExException(OrderError.FILLED);
 		}
-		this.pcOrderService.setCancelStatus(userId, asset, orderId, PcOrder.PENDING_CANCEL);
+		this.pcOrderService.setCancelStatus(userId, asset, orderId, OrderStatus.PENDING_CANCEL);
 
 		//发送消息
 		OrderPendingCancelMsg mqMsg = new OrderPendingCancelMsg(userId, asset, symbol, orderId);

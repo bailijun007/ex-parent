@@ -17,20 +17,6 @@ public class PcOrder extends UserDataEntity{
 	
 	private static final long serialVersionUID = 1L;
 	
-	public static final int OPEN = 0 ;
-	public static final int CLOSE = 1 ;
-
-	public static final int PENDING_NEW = 1;
-	public static final int NEW = 2;
-
-	public static final int PENDING_CANCEL = 3;
-	public static final int CANCELED = 4;
-	
-	//部分成交
-	public static final int PARTIALLY_FILLED = 5;
-	//全部成交
-	public static final int FILLED = 6;
-	
 //	int _______记录_______;
 
     /**
@@ -129,11 +115,12 @@ public class PcOrder extends UserDataEntity{
 	private BigDecimal grossMargin;
 
 	/**
-	 * 委托状态，{@link com.hupa.exp.base.enums.pc.PcOrderStatusEnum}
+	 * 委托状态，OrderStatus#*
 	 */
 	private Integer status;
 
 	// 是否活动委托
+	@Deprecated
 	private Integer activeFlag;
 
 	private String remark;

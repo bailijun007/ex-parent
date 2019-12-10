@@ -170,7 +170,7 @@
 			id=#{orderId} and user_id=#{userId} and status=#{oldStatus}
 	</update>
 
-	<update id="cancelOrder">
+	<update id="setCancelStatus">
 		update 
 			pc_order
 		set 
