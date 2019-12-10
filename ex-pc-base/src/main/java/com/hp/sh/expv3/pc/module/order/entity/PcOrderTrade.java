@@ -7,6 +7,7 @@ package com.hp.sh.expv3.pc.module.order.entity;
 import java.math.BigDecimal;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
+import com.hp.sh.expv3.pc.atemp.Question;
 
 /**
  * 永续合约_用户订单成交记录
@@ -32,7 +33,7 @@ public class PcOrderTrade extends UserDataEntity {
 	private BigDecimal volume;
 
 	//交易ID
-	private Long tradeId;
+	private String tradeSn;
 
 	// 1-marker， 0-taker
 	private Integer makerFlag;
@@ -40,7 +41,7 @@ public class PcOrderTrade extends UserDataEntity {
 	//成交时间
 	private Long tradeTime;
 	
-	int ______________;
+//	int ______________;
 
 	//手续费收取人
 	private Long feeCollectorId;
@@ -51,7 +52,8 @@ public class PcOrderTrade extends UserDataEntity {
 	//手续费
 	private BigDecimal fee;
 	
-	//盈亏
+	//盈亏(此次成交的盈亏)
+	@Question("没有用到，老项目里也没这个字段")
 	private BigDecimal pnl;
 
 	public PcOrderTrade() {
@@ -98,12 +100,12 @@ public class PcOrderTrade extends UserDataEntity {
 		this.volume = volume;
 	}
 
-	public Long getTradeId() {
-		return tradeId;
+	public String getTradeSn() {
+		return tradeSn;
 	}
 
-	public void setTradeId(Long tradeId) {
-		this.tradeId = tradeId;
+	public void setTradeSn(String tradeId) {
+		this.tradeSn = tradeId;
 	}
 
 	public Integer getMakerFlag() {
@@ -157,7 +159,7 @@ public class PcOrderTrade extends UserDataEntity {
 	@Override
 	public String toString() {
 		return "PcOrderTrade [asset=" + asset + ", symbol=" + symbol + ", orderId=" + orderId + ", price=" + price
-				+ ", volume=" + volume + ", tradeId=" + tradeId + ", makerFlag=" + makerFlag + ", tradeTime="
+				+ ", volume=" + volume + ", tradeSn=" + tradeSn + ", makerFlag=" + makerFlag + ", tradeTime="
 				+ tradeTime + ", feeCollectorId=" + feeCollectorId + ", feeRatio=" + feeRatio + ", fee=" + fee
 				+ ", pnl=" + pnl + "]";
 	}

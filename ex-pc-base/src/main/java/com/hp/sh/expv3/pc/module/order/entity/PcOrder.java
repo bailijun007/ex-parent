@@ -13,7 +13,7 @@ import com.hp.sh.expv3.base.entity.UserDataEntity;
 /**
  * 永续合约_订单（委托）
  */
-public class PcOrder extends UserDataEntity {
+public class PcOrder extends UserDataEntity{
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -51,101 +51,124 @@ public class PcOrder extends UserDataEntity {
      */
     private Integer longFlag;
     /**
-     * 保证金模式:1-全仓,2-逐仓
-     */
-    private Integer marginMode;
-    /**
      * 杠杆
      */
     private BigDecimal leverage;
     /**
+	 * 合约张数
+	 */
+	private BigDecimal volume;
+
+	// 面值(单位：)
+	private BigDecimal faceValue;
+
+	/**
 	 * 委托价格（单位：报价货币）
 	 */
 	private BigDecimal price;
 
     /**
-     * 永续合约委托类型，{@link com.hupa.exp.base.enums.pc.PcOrderTypeEnum}
+     * 永续合约委托类型 @see PcOrderType#*
      */
     private Integer orderType;
     
 	/**
-	 * 委托有效时间，{@link com.hupa.exp.base.enums.pc.PcOrderTimeInForceEnum}
+	 * 委托有效时间 @see TimeInForce#*
 	 */
 	private Integer timeInForce;
+	
+	
 	/**
-	 * 合约张数
+	 * 保证金模式:1-全仓,2-逐仓
 	 */
-	private BigDecimal volume;
-	
-	// 面值(单位：)
-	private BigDecimal faceValue;
-	
-//	int ______系统计算_______;
+	private Integer marginMode;
+
+//	int ______系统设置_______;
 
     /**
-	 * 保证金率，初始为 杠杆的倒数
-	 */
-	private BigDecimal marginRatio;
-	/**
 	 * 开仓手续费率
 	 */
 	private BigDecimal openFeeRatio;
+
 	/**
 	 * 强平手续费率
 	 */
 	private BigDecimal closeFeeRatio;
 
-    
-//    int ________系统下单后计算_________;
 	/**
-     * 实收手续费,成交后计算(可能部分成交，按比例收取)
+	 * 保证金率，初始为 杠杆的倒数
+	 */
+	private BigDecimal marginRatio;
+	
+	/**
+	 * 客户自定义委托ID，用于与客户系统关联 （open api）
+	 */
+	private String clientOrderId;
+
+//	int ______下单时计算_成交或撤单时可能会修改_______;
+	
+	/**
+	 * 开仓手续费,成交时修改(可能部分成交，按比例收取)
+	 */
+	private BigDecimal openFee;
+
+	/**
+	 * 平仓手续费，在下委托时提前收取(可能部分成交，按比例收取)
+	 */
+	private BigDecimal closeFee;
+
+	/**
+	 * 委托保证金
+	 */
+	private BigDecimal orderMargin;
+
+	/**
+	 * @deprecated
+	 * 总押金：委托保证金 + 开仓手续费 + 强平手续费 
+	 */
+	private BigDecimal grossMargin;
+
+	/**
+	 * 委托状态，{@link com.hupa.exp.base.enums.pc.PcOrderStatusEnum}
+	 */
+	private Integer status;
+
+	// 是否活动委托
+	private Integer activeFlag;
+
+	private String remark;
+
+	/**
+	 * 取消时间
+	 */
+	private Date cancelTime;
+
+	/**
+	 * @deprecated
+	 * 取消张数 (撤单时计算保存)：volume - filledVolume
+	 */
+	private BigDecimal cancelVolume;
+
+//	int ________系统下单后计算_成交或撤单时修改_________;
+	
+	/**
+     * 已收手续费(可能部分成交，按比例收取)
      */
     private BigDecimal feeCost;
-    /**
-     * @deprecated
-     * 总押金：委托保证金 + 开仓手续费 + 强平手续费 
-     */
-    private BigDecimal grossMargin;
-    /**
-     * 委托保证金
-     */
-    private BigDecimal orderMargin;
-    /**
-     * 开仓手续费,成交时修改(可能部分成交，按比例收取)
-     */
-    private BigDecimal openFee;
-    /**
-     * 平仓手续费，在下委托时提前收取(可能部分成交，按比例收取)
-     */
-    private BigDecimal closeFee;
-
     /**
 	 * 已成交量
 	 */
 	private BigDecimal filledVolume;
 	/**
-     * @deprecated
-     * 取消张数 (撤单时计算保存)：volume - filledVolume
-     */
-    private BigDecimal cancelVolume;
-    
-    /**
 	 * 平仓委托对应的仓位Id
 	 */
 	private Long closePosId;
 	/**
-     * 委托状态，{@link com.hupa.exp.base.enums.pc.PcOrderStatusEnum}
-     */
-    private Integer status;
-    /**
      * 是否已触发，用于止盈止损等触发式委托
      */
     private Integer triggerFlag;
 
-    /**
-     * 取消时间
-     */
-    private Date cancelTime;
+    
     
 //    int ________强平_________;
 
@@ -154,23 +177,13 @@ public class PcOrder extends UserDataEntity {
      */
     private Integer visibleFlag;
 
-    // 是否活动委托
-    private Integer activeFlag;
-    
 //    int ________log__________;
 
     private String createOperator;
     
     private String cancelOperator;
 
-    private String remark;
-
-    /**
-     * 客户自定义委托ID，用于与客户系统关联 （open api）
-     */
-    private String clientOrderId;
-
-	public PcOrder() {
+    public PcOrder() {
 	}
 
 	public String getAsset() {

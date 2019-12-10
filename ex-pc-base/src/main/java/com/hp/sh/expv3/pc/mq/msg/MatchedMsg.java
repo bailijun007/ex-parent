@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.order.mq.msg;
+package com.hp.sh.expv3.pc.mq.msg;
 
 import java.math.BigDecimal;
 
@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  * @author wangjg
  *
  */
-public class PcTradeMsg extends BaseOrderMsg{
+public class MatchedMsg extends BaseOrderMsg{
 	private Long id;
 	private Long matchTxId;
 	private Long mkAccountId;
@@ -21,11 +21,7 @@ public class PcTradeMsg extends BaseOrderMsg{
 	private Long tkOrderId;
 	private Long tradeTime;
 	
-	public PcTradeMsg() {
-	}
-	
-	public String uniqueKey(){
-		return this.mkOrderId+"-"+this.tkOrderId;
+	public MatchedMsg() {
 	}
 
 	public Long getId() {
@@ -103,7 +99,7 @@ public class PcTradeMsg extends BaseOrderMsg{
 
 	@Override
 	public String toString() {
-		return "PcTradeMsg [id=" + id + ", matchTxId=" + matchTxId + ", mkAccountId=" + mkAccountId + ", mkCloseFlag="
+		return "MatchedMsg [id=" + id + ", matchTxId=" + matchTxId + ", mkAccountId=" + mkAccountId + ", mkCloseFlag="
 				+ mkCloseFlag + ", mkOrderId=" + mkOrderId + ", number=" + number + ", price=" + price
 				+ ", tkAccountId=" + tkAccountId + ", tkBidFlag=" + tkBidFlag + ", tkCloseFlag=" + tkCloseFlag
 				+ ", tkOrderId=" + tkOrderId + ", tradeTime=" + tradeTime + ", asset=" + asset + ", symbol=" + symbol

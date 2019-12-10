@@ -1,15 +1,16 @@
-package com.hp.sh.expv3.pc.module.order.mq.msg;
+package com.hp.sh.expv3.pc.mq.msg;
 
 /**
- * 取消订单
+ * 未匹配
  * @author lw
  *
  */
-public class MatchedOrderCancelMsg extends BaseOrderMsg{
+public class MatchNotMatchMsg extends BaseOrderMsg{
+
 	private Long accountId;
 	private Long orderId;
 	
-	public MatchedOrderCancelMsg() {
+	public MatchNotMatchMsg() {
 	}
 
 	public Long getAccountId() {
@@ -30,8 +31,8 @@ public class MatchedOrderCancelMsg extends BaseOrderMsg{
 
 	@Override
 	public String toString() {
-		return "MatchedOrderCancelMsg [accountId=" + accountId + ", orderId=" + orderId + ", asset=" + asset
-				+ ", symbol=" + symbol + "]";
+		return "MatchNotMatchMsg [accountId=" + accountId + ", orderId=" + orderId + ", asset=" + asset + ", symbol="
+				+ symbol + "]";
 	}
 
 }

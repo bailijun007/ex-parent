@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.order.mq.msg;
+package com.hp.sh.expv3.pc.mq.msg;
 
 import java.math.BigDecimal;
 
@@ -7,17 +7,11 @@ import java.math.BigDecimal;
  * @author wangjg
  *
  */
-public class MatchedMsg extends BaseOrderMsg {
+public class PcTradeMsg extends BaseOrderMsg {
 	
 	//用户ID
 	private Long accountId;
 	
-	//资产
-	private String asset;
-	
-	//交易对（合约品种）
-	private String symbol;
-
 	/* 成交价格 */
 	private BigDecimal price;
 
@@ -38,14 +32,19 @@ public class MatchedMsg extends BaseOrderMsg {
 	
 	//撮合事务Id
 	private Long matchTxId;
+	
+	//对手订单ID
+	private Long opponentOrderId;
 
-	public MatchedMsg() {
+	public PcTradeMsg() {
 	}
 
-	public MatchedMsg(String asset, String symbol, Long tradeId) {
-		this.asset = asset;
-		this.symbol = symbol;
+	public PcTradeMsg(String asset, String symbol, Long tradeId) {
 		this.tradeId = tradeId;
+	}
+	
+	public String uniqueKey(){
+		return "TRADEMSG-"+this.tradeId+"-"+opponentOrderId;
 	}
 
 	public Long getAccountId() {
@@ -54,22 +53,6 @@ public class MatchedMsg extends BaseOrderMsg {
 
 	public void setAccountId(Long accountId) {
 		this.accountId = accountId;
-	}
-
-	public String getAsset() {
-		return asset;
-	}
-
-	public void setAsset(String asset) {
-		this.asset = asset;
-	}
-
-	public String getSymbol() {
-		return symbol;
-	}
-
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
 	}
 
 	public BigDecimal getPrice() {
@@ -128,11 +111,20 @@ public class MatchedMsg extends BaseOrderMsg {
 		this.matchTxId = matchTxId;
 	}
 
+	public Long getOpponentOrderId() {
+		return opponentOrderId;
+	}
+
+	public void setOpponentOrderId(Long opponentOrderId) {
+		this.opponentOrderId = opponentOrderId;
+	}
+
 	@Override
 	public String toString() {
-		return "MatchedMsg [accountId=" + accountId + ", asset=" + asset + ", symbol=" + symbol + ", price=" + price
-				+ ", number=" + number + ", orderId=" + orderId + ", tradeId=" + tradeId + ", tradeTime=" + tradeTime
-				+ ", makerFlag=" + makerFlag + ", matchTxId=" + matchTxId + "]";
+		return "PcTradeMsg [accountId=" + accountId + ", price=" + price + ", number=" + number + ", orderId=" + orderId
+				+ ", tradeId=" + tradeId + ", tradeTime=" + tradeTime + ", makerFlag=" + makerFlag + ", matchTxId="
+				+ matchTxId + ", asset=" + asset + ", symbol=" + symbol + "]";
 	}
+
 
 }

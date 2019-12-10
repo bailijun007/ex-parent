@@ -1,23 +1,25 @@
-package com.hp.sh.expv3.pc.module.order.service;
+package com.hp.sh.expv3.pc.component;
 
 import java.math.BigDecimal;
 
 import org.springframework.stereotype.Service;
 
+import com.hp.sh.expv3.pc.atemp.Question;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.utils.IntBool;
 
 /**
- * 费率,查询获取，redis或db
+ * 查询获取保证金，redis或db
  * 
  * @author lw
  *
  */
+@Question("是否随玩法不同")
 @Service
 public class MarginRatioService {
 
 	/**
-	 * 初始化保证金率
+	 * 获取初始化保证金率
 	 * 
 	 * @param leverage
 	 * @return
@@ -27,23 +29,7 @@ public class MarginRatioService {
 	}
 
 	/**
-	 * 开仓手续费率
-	 * 
-	 * @param userId
-	 * @return
-	 */
-	public BigDecimal getFeeRatio(long userId, Integer makerFlag) {
-		if (IntBool.isTrue(makerFlag)) {
-			// TODO get from cache
-			return new BigDecimal("0.0025");
-		} else {
-			return new BigDecimal("0.0075");
-		}
-
-	}
-
-	/**
-	 * 开仓手续费率
+	 * 获取开仓手续费率
 	 * 
 	 * @param userId
 	 * @return
@@ -60,6 +46,22 @@ public class MarginRatioService {
 	 */
 	public BigDecimal getCloseFeeRatio(long userId) {
 		return getFeeRatio(userId, IntBool.NO);
+	}
+
+	/**
+	 * 获取开仓手续费率
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	private BigDecimal getFeeRatio(long userId, Integer makerFlag) {
+		if (IntBool.isTrue(makerFlag)) {
+			// TODO get from cache
+			return new BigDecimal("0.0025");
+		} else {
+			return new BigDecimal("0.0075");
+		}
+	
 	}
 
 	public BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume) {

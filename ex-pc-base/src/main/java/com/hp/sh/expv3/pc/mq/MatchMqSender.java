@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.order.mq;
+package com.hp.sh.expv3.pc.mq;
 
 import org.apache.rocketmq.client.producer.MQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
@@ -7,10 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MqTopic;
-import com.hp.sh.expv3.pc.module.order.mq.msg.BookResetMsg;
-import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingCancelMsg;
-import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingNewMsg;
-import com.hp.sh.expv3.pc.module.order.mq.utils.OrderMessageQueueSelector;
+import com.hp.sh.expv3.pc.mq.msg.BookResetMsg;
+import com.hp.sh.expv3.pc.mq.msg.OrderPendingCancelMsg;
+import com.hp.sh.expv3.pc.mq.msg.OrderPendingNewMsg;
+import com.hp.sh.expv3.pc.mq.utils.OrderMessageQueueSelector;
 import com.hp.sh.rocketmq.codec.MsgCodec;
 
 @Component

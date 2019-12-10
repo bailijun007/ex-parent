@@ -10,7 +10,7 @@ import java.math.BigDecimal;
  * 永续合约_成交(撮合结果)
  *
  */
-public class PcTrade {
+public class PcMatchedResult {
 
 	//id
 	private Long id;
@@ -48,7 +48,7 @@ public class PcTrade {
     //成交时间
     private Long tradeTime;
     
-	public PcTrade() {
+	public PcMatchedResult() {
 	}
 
 	public Long getId() {

@@ -7,14 +7,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.error.OrderError;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
-import com.hp.sh.expv3.pc.module.order.mq.MatchMqSender;
-import com.hp.sh.expv3.pc.module.order.mq.msg.BookResetMsg;
-import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingCancelMsg;
-import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
+import com.hp.sh.expv3.pc.mq.MatchMqSender;
+import com.hp.sh.expv3.pc.mq.msg.BookResetMsg;
+import com.hp.sh.expv3.pc.mq.msg.OrderPendingCancelMsg;
+import com.hp.sh.expv3.pc.mq.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.utils.BidUtils;
 
 import io.swagger.annotations.Api;
@@ -51,7 +52,7 @@ public class PcOrderApiAction {
 	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number) throws Exception{
 		
 		//check 检查可平仓位
-		checkShortPosition(userId, asset, symbol, number);
+		checkShortPosition(userId, asset, symbol, number, closeFlag);
 		
 		//create TODO 可平仓位，内部要加锁
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
@@ -97,8 +98,8 @@ public class PcOrderApiAction {
 	}
 	
 	@ApiOperation(value = "重置深度")
-	@GetMapping(value = "/api/pc/order/pcBookReset")
-	public void pcBookReset (String asset, String symbol) throws Exception{
+	@GetMapping(value = "/api/pc/order/bookReset")
+	public void bookReset (String asset, String symbol) throws Exception{
 		//发送消息
 		BookResetMsg msg = new BookResetMsg(asset, symbol);
 		msg.setAsset(asset);
@@ -106,7 +107,10 @@ public class PcOrderApiAction {
 		this.matchMqSender.sendBookResetMsg(msg);
 	}
 
-	private void checkShortPosition(long userId, String asset, String symbol, BigDecimal volume) {
+	private void checkShortPosition(long userId, String asset, String symbol, BigDecimal volume, int closeFlag) {
+		if(closeFlag!=OrderFlag.ACTION_CLOSE){
+			return;
+		}
         //判断可平仓位是否足够
         if (volume.compareTo(pcPositionService.getClosablePos(userId, asset, symbol))>0) {
             throw new ExException(OrderError.POS_NOT_ENOUGH);

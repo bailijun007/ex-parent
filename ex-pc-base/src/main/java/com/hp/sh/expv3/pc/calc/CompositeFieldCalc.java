@@ -17,7 +17,7 @@ public class CompositeFieldCalc {
 	 * @param faceValue 面值
 	 * @return`
 	 */
-	public BigDecimal calcAmount(BigDecimal volume, BigDecimal faceValue){
+	public static BigDecimal calcAmount(BigDecimal volume, BigDecimal faceValue){
 		return volume.multiply(faceValue);
 	}
 
@@ -28,7 +28,7 @@ public class CompositeFieldCalc {
 	 * @param price 成交价格
 	 * @return
 	 */
-	public BigDecimal calcBaseValue(BigDecimal volume, BigDecimal faceValue, BigDecimal price){
+	public static BigDecimal calcBaseValue(BigDecimal volume, BigDecimal faceValue, BigDecimal price){
 		return volume.multiply(faceValue).divide(price, Precision.COMMON_PRECISION, Precision.LESS);
 	}
 
@@ -36,7 +36,7 @@ public class CompositeFieldCalc {
 	 * 计算交易合约 基础货币总价值
 	 * 
 	 */
-	public BigDecimal calcBaseValue(BigDecimal amount, BigDecimal price){
+	public static BigDecimal calcBaseValue(BigDecimal amount, BigDecimal price){
 		return amount.divide(price, Precision.COMMON_PRECISION, Precision.LESS);
 	}
 	

@@ -30,7 +30,7 @@ public class PcPosition extends UserDataEntity {
 	// 开仓杠杆 @see PcOrder#leverage
 	private BigDecimal entryLeverage;
 
-	int ________________;
+//	int ________________;
 
 	/*
 	 * 仓位 张数 
@@ -64,7 +64,10 @@ public class PcPosition extends UserDataEntity {
      */
     private BigDecimal meanPrice;
     
-    int _____________________________________________________;
+    //平均成本价：包含手续费 累计开仓金额amount/累计的baseValue
+    private BigDecimal avgCostPrice;
+    
+//    int _____________________________________________________;
     
     /**
 	 * 初始保证金，平仓的时候要减去对应的比例，以维持收益率一致

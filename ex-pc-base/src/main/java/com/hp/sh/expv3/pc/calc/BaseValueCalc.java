@@ -4,9 +4,10 @@ import java.math.BigDecimal;
 
 import com.hp.sh.expv3.pc.constant.Precision;
 
+@Deprecated
 public class BaseValueCalc {
 
-	public static final BigDecimal calcValue(BigDecimal amount, BigDecimal price){
+	public static final BigDecimal calcValue(BigDecimal amount, BigDecimal price) {
 		return amount.divide(price, Precision.COMMON_PRECISION, Precision.LESS);
-			}	
+	}
 }

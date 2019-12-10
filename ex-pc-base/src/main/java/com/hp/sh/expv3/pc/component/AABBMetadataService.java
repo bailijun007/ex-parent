@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class FaceValueQuery {
+public class AABBMetadataService {
 	
-	public BigDecimal get(String symbol){
+	public BigDecimal getFaceValue(String symbol){
 		
 		return BigDecimal.ONE;
 	}
