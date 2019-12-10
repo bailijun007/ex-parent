@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.component.lock;
+package com.hp.sh.expv3.component.lock;
 
 import java.lang.reflect.Method;
 import java.util.regex.Matcher;
@@ -15,8 +15,6 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.gitee.hupadev.commons.cache.Lock;
-
 @Order(1)
 @Aspect
 @Component
@@ -29,7 +27,7 @@ public class LockAdvice {
 		super();
 	}
     
-    @Pointcut("@annotation(com.hp.sh.expv3.pc.component.lock.LockIt)")
+    @Pointcut("@annotation(com.hp.sh.expv3.component.lock.LockIt)")
     public void lockAnnoPointcut() {
 
     }
@@ -45,7 +43,7 @@ public class LockAdvice {
     }
 
 //    @Around("lockPointcut()")
-	@Around("@annotation(com.hp.sh.expv3.pc.component.lock.LockIt)")
+	@Around("@annotation(com.hp.sh.expv3.component.lock.LockIt)")
     public Object exeLock(ProceedingJoinPoint joinPoint) throws Throwable {
 		if(lock == null){
 			return joinPoint.proceed(joinPoint.getArgs());
@@ -71,11 +69,11 @@ public class LockAdvice {
     }
 	
 	private void lock(String realKey) {
-		this.lock.lock("t-"+Thread.currentThread().getId(), realKey, 30);
+		this.lock.lock(realKey, 30);
 	}
 
 	private void unlock(String realKey) {
-		this.lock.unlock("t-"+Thread.currentThread().getId(), realKey);
+		this.lock.unlock(realKey);
 	}
 
 	private static String getRealKey(String key, Object[] args, String[] names) throws Exception{
