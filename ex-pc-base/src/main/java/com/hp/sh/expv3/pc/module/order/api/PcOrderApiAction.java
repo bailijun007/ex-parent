@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.error.OrderError;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
-import com.hp.sh.expv3.pc.module.order.mq.MatchMqSender;
-import com.hp.sh.expv3.pc.module.order.mq.msg.BookResetMsg;
-import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingCancelMsg;
-import com.hp.sh.expv3.pc.module.order.mq.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
+import com.hp.sh.expv3.pc.mq.MatchMqSender;
+import com.hp.sh.expv3.pc.mq.msg.BookResetMsg;
+import com.hp.sh.expv3.pc.mq.msg.OrderPendingCancelMsg;
+import com.hp.sh.expv3.pc.mq.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.utils.BidUtils;
 
 import io.swagger.annotations.Api;
@@ -97,8 +97,8 @@ public class PcOrderApiAction {
 	}
 	
 	@ApiOperation(value = "重置深度")
-	@GetMapping(value = "/api/pc/order/pcBookReset")
-	public void pcBookReset (String asset, String symbol) throws Exception{
+	@GetMapping(value = "/api/pc/order/bookReset")
+	public void bookReset (String asset, String symbol) throws Exception{
 		//发送消息
 		BookResetMsg msg = new BookResetMsg(asset, symbol);
 		msg.setAsset(asset);

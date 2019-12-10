@@ -1,6 +1,7 @@
 
 package com.hp.sh.expv3.pc.module.symbol.service.impl;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import com.hp.sh.expv3.pc.component.PcDefaultSymbolSetting;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
+import com.hp.sh.expv3.utils.IntBool;
 
 /**
  * 
@@ -56,6 +58,16 @@ public class PcAccountSymbolServiceImpl implements PcAccountSymbolService{
 		params.put("symbol", symbol);
 		PcAccountSymbol as = this.pcAccountSymbolDAO.queryOne(params);
 		return as;
+	}
+	
+	@Override
+	public BigDecimal getLeverage(long userId, String asset, String symbol, int longFlag){
+		PcAccountSymbol as = this.get(userId, asset, symbol);
+		if(IntBool.isTrue(longFlag)){	//多
+			return as.getLongLeverage();
+		}else{		//空
+			return as.getShortLeverage();
+		}
 	}
 
 }

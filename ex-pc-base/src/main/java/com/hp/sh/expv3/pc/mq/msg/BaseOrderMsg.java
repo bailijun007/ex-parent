@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.order.mq.msg;
+package com.hp.sh.expv3.pc.mq.msg;
 
 public class BaseOrderMsg {
 

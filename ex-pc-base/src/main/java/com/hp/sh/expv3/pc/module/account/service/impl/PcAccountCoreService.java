@@ -17,6 +17,7 @@ import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.constant.FundFlowDirection;
 import com.hp.sh.expv3.constant.InvokeResult;
+import com.hp.sh.expv3.pc.component.lock.LockIt;
 import com.hp.sh.expv3.pc.error.AccountError;
 import com.hp.sh.expv3.pc.module.account.api.PcAccountCoreApi;
 import com.hp.sh.expv3.pc.module.account.api.request.AddMoneyRequest;
@@ -87,6 +88,7 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 		return this.newRecord(record);
 	}
 	
+	@LockIt(key="test")
 	@Override
 	public Boolean checkTradNo(Long userId, String tradeNo) {
 		PcAccountRecord rcd = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);

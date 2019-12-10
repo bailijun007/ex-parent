@@ -67,14 +67,32 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+             <exclusions>
+                 <exclusion>
+                     <groupId>com.netflix.eureka</groupId>
+                     <artifactId>eureka-client</artifactId>
+                 </exclusion>
+             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
+             <exclusions>
+                 <exclusion>
+                     <groupId>com.netflix.eureka</groupId>
+                     <artifactId>eureka-client</artifactId>
+                 </exclusion>
+             </exclusions>
         </dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+             <exclusions>
+                 <exclusion>
+                     <groupId>com.netflix.eureka</groupId>
+                     <artifactId>eureka-client</artifactId>
+                 </exclusion>
+             </exclusions>
 		</dependency>
         
 		<!-- springfox-swagger2 -->
@@ -151,6 +169,8 @@
 
 	</dependencies>
 
+	
+<!-- 
 	<repositories>
 		<repository>
 			<id>nexus</id>
@@ -164,7 +184,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	
+
 	<distributionManagement>
 		<repository>
 			<id>releases</id>
@@ -178,7 +198,8 @@
 			<url>http://192.168.0.46:8081/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
+ -->
+
 	<dependencyManagement>
 	    <dependencies>
 	        <dependency>
@@ -187,6 +208,12 @@
 	            <version>Finchley.RELEASE</version>
 	            <type>pom</type>
 	            <scope>import</scope>
+             <exclusions>
+                 <exclusion>
+                     <groupId>com.google.code.gson</groupId>
+                     <artifactId>gson</artifactId>
+                 </exclusion>
+             </exclusions>
 	        </dependency>
 	    </dependencies>
 	</dependencyManagement>
@@ -202,6 +229,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
+					<compilerArgument>-parameters</compilerArgument>
 					<encoding>utf-8</encoding>
 					<source>1.8</source>
 					<target>1.8</target>

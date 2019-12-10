@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.order.mq;
+package com.hp.sh.expv3.pc.mq;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MqTopic;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
-import com.hp.sh.expv3.pc.module.order.mq.msg.MatchNotMatchMsg;
-import com.hp.sh.expv3.pc.module.order.mq.msg.MatchedOrderCancelledMsg;
-import com.hp.sh.expv3.pc.module.order.mq.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
+import com.hp.sh.expv3.pc.mq.msg.MatchNotMatchMsg;
+import com.hp.sh.expv3.pc.mq.msg.MatchedOrderCancelledMsg;
+import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
