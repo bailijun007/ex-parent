@@ -2,6 +2,11 @@ package com.hp.sh.expv3.pc.constant;
 
 import java.math.RoundingMode;
 
+/**
+ * 计算精度
+ * @author wangjg
+ *
+ */
 public class Precision {
 
     public static final int COMMON_PRECISION = 18;

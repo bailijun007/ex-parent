@@ -1,13 +1,15 @@
-package com.hp.sh.expv3.pc.component;
+package com.hp.sh.expv3.pc.calc;
 
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hp.sh.expv3.pc.component.DecimalUtil;
 import com.hp.sh.expv3.pc.constant.Precision;
 
 /**
+ * AABB价格计算器
  * asset : A
  * symbol : A_B
  * contract : nB
@@ -17,10 +19,10 @@ import com.hp.sh.expv3.pc.constant.Precision;
  * case : AABB
  */
 @Service
-public class PcPriceServiceAabbImpl {
+public class PcPriceCalc {
 
     @Autowired
-    private PcBaseValueService pcBaseValueService;
+    private PnlCalc pnlCalc;
 
     /**
      * 求强平价：即在 强平价时 平仓，收回的保证金占整个仓位价值 的比率 = 维持仓位保证金（纯粹的仓位维持保证金率，不包括其他的手续费率）
@@ -33,7 +35,7 @@ public class PcPriceServiceAabbImpl {
      * @return
      */
     public BigDecimal calcLiqPrice(BigDecimal posHoldMarginRatio, boolean isLong, BigDecimal openPrice, BigDecimal amt, BigDecimal posMargin, int scale) {
-        BigDecimal holdVolume = pcBaseValueService.calcVolume(amt, openPrice, scale);
+        BigDecimal holdVolume = pnlCalc.calcVolume(amt, openPrice, scale);
         /**
          * op: open price
          * cp: close price
@@ -76,7 +78,7 @@ public class PcPriceServiceAabbImpl {
      * @return
      */
     public BigDecimal calcBankruptPrice(boolean isLong, BigDecimal openPrice, BigDecimal amt, BigDecimal margin, int scale) {
-        BigDecimal volume = pcBaseValueService.calcVolume(amt, openPrice, scale);
+        BigDecimal volume = pnlCalc.calcVolume(amt, openPrice, scale);
         if (isLong) {
             return amt.divide(volume.add(margin), scale, DecimalUtil.MORE).max(BigDecimal.ZERO).stripTrailingZeros();
         } else {

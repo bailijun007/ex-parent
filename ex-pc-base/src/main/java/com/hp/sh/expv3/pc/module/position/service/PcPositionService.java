@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hp.sh.expv3.pc.calc.BaseValueCalc;
+import com.hp.sh.expv3.pc.calc.FeeCalc;
+import com.hp.sh.expv3.pc.calc.PcPriceCalc;
+import com.hp.sh.expv3.pc.calc.PnlCalc;
 import com.hp.sh.expv3.pc.component.FaceValueQuery;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
-import com.hp.sh.expv3.pc.component.PcBaseValueService;
-import com.hp.sh.expv3.pc.component.PcPriceServiceAabbImpl;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.Precision;
@@ -23,7 +25,6 @@ import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.order.mq.msg.MatchedMsg;
-import com.hp.sh.expv3.pc.module.order.service.BaseValueCalc;
 import com.hp.sh.expv3.pc.module.order.service.MarginRatioService;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
@@ -55,13 +56,15 @@ public class PcPositionService {
 	private MarginRatioService marginRatioService;
 	
 	@Autowired
-	private PcPriceServiceAabbImpl pcPriceServiceAabbImpl;
+	private PcPriceCalc pcPriceCalc;
 	
 	@Autowired
-	private PcBaseValueService baseValueCalc;
+	private PnlCalc pnlCalc;
 	
 	@Autowired
 	private PcAccountCoreService pcAccountCoreService;
+	
+	
 	/**
 	 * 处理成交
 	 */
@@ -143,7 +146,7 @@ public class PcPositionService {
 		orderTrade.setOrderId(order.getId());
 		
 		if(IntBool.isTrue(order.getCloseFlag())){
-			BigDecimal pnl = baseValueCalc.calcPnl(order.getLongFlag(), matchedVo.getNumber().multiply(order.getFaceValue()), meanPrice, matchedVo.getPrice(), Precision.COMMON_PRECISION);
+			BigDecimal pnl = pnlCalc.calcPnl(order.getLongFlag(), matchedVo.getNumber().multiply(order.getFaceValue()), meanPrice, matchedVo.getPrice(), Precision.COMMON_PRECISION);
 			orderTrade.setPnl(pnl);	
 		}else{
 			orderTrade.setPnl(BigDecimal.ZERO);
@@ -154,7 +157,7 @@ public class PcPositionService {
 		orderTrade.setTradeId(matchedVo.getTradeId());
 		orderTrade.setTradeTime(matchedVo.getTradeTime());
 		orderTrade.setUserId(order.getUserId());
-		orderTrade.setVolume(null);
+		orderTrade.setVolume(matchedVo.getNumber());
 		this.pcOrderTradeDAO.save(orderTrade);
 	}
 	
@@ -193,7 +196,7 @@ public class PcPositionService {
 			pcPosition.setFeeCost(releaseOpenFee);
 			
 			BigDecimal amount = order.getFaceValue().multiply(matchedVo.getNumber());
-			pcPosition.setLiqPrice(pcPriceServiceAabbImpl.calcLiqPrice(pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getMeanPrice(), amount, pcPosition.getPosMargin(), Precision.COMMON_PRECISION));
+			pcPosition.setLiqPrice(pcPriceCalc.calcLiqPrice(pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getMeanPrice(), amount, pcPosition.getPosMargin(), Precision.COMMON_PRECISION));
 			
 			pcPosition.setLiqMarkPrice(null);
 			pcPosition.setLiqMarkTime(null);
@@ -212,7 +215,7 @@ public class PcPositionService {
 			
 			BigDecimal amount = order.getFaceValue().multiply(matchedVo.getNumber());
 			
-			BigDecimal meanPrice = pcPriceServiceAabbImpl.calcEntryPrice(IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getBaseValue(), amount, Precision.COMMON_PRECISION);
+			BigDecimal meanPrice = pcPriceCalc.calcEntryPrice(IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getBaseValue(), amount, Precision.COMMON_PRECISION);
 			pcPosition.setMeanPrice(meanPrice);
 			pcPosition.setInitMargin(pcPosition.getInitMargin().add(isOrderCompleted?order.getOrderMargin():FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOrderMargin())));
 //			pcPosition.setHoldRatio(marginRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), order.getVolume()));
@@ -221,7 +224,7 @@ public class PcPositionService {
 			
 			pcPosition.setFeeCost(pcPosition.getFeeCost().add(FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOpenFee())));
 			
-			pcPosition.setLiqPrice(pcPriceServiceAabbImpl.calcLiqPrice(pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getMeanPrice(), amount, pcPosition.getPosMargin(), Precision.COMMON_PRECISION));
+			pcPosition.setLiqPrice(pcPriceCalc.calcLiqPrice(pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getMeanPrice(), amount, pcPosition.getPosMargin(), Precision.COMMON_PRECISION));
 			
 			this.pcPositionDAO.update(pcPosition);
 		}
@@ -260,10 +263,10 @@ public class PcPositionService {
 			
 			pcPosition.setFeeCost(pcPosition.getFeeCost().add(FeeCalc.slope(order.getVolume(), matchedVo.getNumber(), order.getOpenFee())));
 			
-			BigDecimal pnl = baseValueCalc.calcPnl(order.getLongFlag(), matchedVo.getNumber().multiply(order.getFaceValue()), origManPrice, matchedVo.getPrice(), Precision.COMMON_PRECISION);
+			BigDecimal pnl = pnlCalc.calcPnl(order.getLongFlag(), matchedVo.getNumber().multiply(order.getFaceValue()), origManPrice, matchedVo.getPrice(), Precision.COMMON_PRECISION);
 			pcPosition.setRealisedPnl(pcPosition.getRealisedPnl().add(pnl));
 			
-//			pcPosition.setLiqPrice(pcPriceServiceAabbImpl.calcLiqPrice(pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getMeanPrice(), amount, pcPosition.getPosMargin(), Precision.COMMON_PRECISION));
+//			pcPosition.setLiqPrice(pcPriceCalc.calcLiqPrice(pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getMeanPrice(), amount, pcPosition.getPosMargin(), Precision.COMMON_PRECISION));
 			
 			this.pcPositionDAO.update(pcPosition);
 		}
@@ -300,4 +303,17 @@ public class PcPositionService {
 		
 	}
 
+	public BigDecimal getClosablePos(Long userId, String asset, String symbol){
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
+		params.put("asset", asset);
+		params.put("symbol", symbol);
+		params.put("SUM", "volume");
+		BigDecimal amount = this.pcPositionDAO.queryAmount(params);
+		if(amount==null){
+			return BigDecimal.ZERO;
+		}
+		return amount;
+	}
+	
 }

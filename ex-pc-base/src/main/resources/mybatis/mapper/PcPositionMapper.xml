@@ -141,5 +141,18 @@
     </delete>
 
 	<!--  -->
+	<select id="queryAmount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from pc_position
+		<include refid="simple_where" />
+	</select>
 	
 </mapper>

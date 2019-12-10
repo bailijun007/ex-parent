@@ -2,7 +2,7 @@
  * @author 10086
  * @date 2019/10/15
  */
-package com.hp.sh.expv3.pc.component;
+package com.hp.sh.expv3.pc.calc;
 
 import java.math.BigDecimal;
 
@@ -12,7 +12,7 @@ import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.utils.IntBool;
 
 @Service
-public class PcBaseValueService {
+public class PnlCalc {
 
 	/**
 	 * 计算成交量

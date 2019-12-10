@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.constant.InvokeResult;
+import com.hp.sh.expv3.pc.calc.BaseValueCalc;
+import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
 import com.hp.sh.expv3.pc.component.FaceValueQuery;
 import com.hp.sh.expv3.pc.constant.MarginMode;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
@@ -22,13 +24,14 @@ import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.utils.IntBool;
 
 /**
  * 委托
- * @author lw
+ * @author wangjg
  *
  */
 @Service
@@ -50,6 +53,10 @@ public class PcOrderService {
 	
 	@Autowired
 	private FaceValueQuery faceValueQuery;
+
+	@Autowired
+	private PcPositionDAO pcPositionDAO;
+	
 	/**
 	 * 创建订单
 	 * @param userId 用户ID
@@ -64,7 +71,7 @@ public class PcOrderService {
 	 */
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		
-		if(this.existClientOrderId(cliOrderId)){
+		if(this.existClientOrderId(userId, cliOrderId)){
 			throw new ExException(OrderError.CREATED);
 		}
 		
@@ -107,8 +114,9 @@ public class PcOrderService {
 		return pcOrder;
 	}
 	
-	private boolean existClientOrderId(String clientOrderId) {
+	private boolean existClientOrderId(long userId, String clientOrderId) {
 		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
 		params.put("clientOrderId", clientOrderId);
 		Long count = this.pcOrderDAO.queryCount(params);
 		return count>0;
@@ -163,15 +171,6 @@ public class PcOrderService {
 
 	//设置平仓订单的各种费率
 	private void setCloseOrderFee(PcOrder pcOrder) {
-        //判断可平仓位是否足够
-        if (false) {
-            throw new ExException(null);
-        }
-
-        if (null == null) {
-            
-        }
-        
 		pcOrder.setMarginRatio(BigDecimal.ZERO);
 		pcOrder.setOpenFeeRatio(BigDecimal.ZERO);
 		pcOrder.setCloseFeeRatio(BigDecimal.ZERO);
