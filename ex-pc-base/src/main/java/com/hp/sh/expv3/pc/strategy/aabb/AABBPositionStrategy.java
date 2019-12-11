@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.strategy.impl;
+package com.hp.sh.expv3.pc.strategy.aabb;
 
 import java.math.BigDecimal;
 
@@ -9,7 +9,6 @@ import com.hp.sh.expv3.pc.calc.CompositeFieldCalc;
 import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
 import com.hp.sh.expv3.pc.calc.PcPriceCalc;
 import com.hp.sh.expv3.pc.calc.PnlCalc;
-import com.hp.sh.expv3.pc.component.BigMath;
 import com.hp.sh.expv3.pc.component.MarginRatioService;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.Precision;
@@ -17,8 +16,10 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.PositionStrategy;
+import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
 import com.hp.sh.expv3.pc.strategy.vo.TradeData;
+import com.hp.sh.expv3.utils.BigMathUtils;
 import com.hp.sh.expv3.utils.IntBool;
 
 /**
@@ -31,9 +32,6 @@ public class AABBPositionStrategy implements PositionStrategy {
 	
 	@Autowired
 	private MarginRatioService marginRatioService;
-	
-	@Autowired
-	private PcPriceCalc pcPriceCalc;
 	
 	@Autowired
 	private CommonOrderStrategy orderStrategy;
@@ -54,7 +52,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 		tradeData.setAmount(tradeRatioAmt.getAmount());
 		tradeData.setBaseValue(CompositeFieldCalc.calcBaseValue(tradeData.getAmount(), matchedVo.getPrice()));
 		tradeData.setOrderMargin(tradeRatioAmt.getOrderMargin());//保证金
-		tradeData.setCompleted(BigMath.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
+		tradeData.setCompleted(BigMathUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN){
 			tradeData.setFeeRatio(order.getOpenFeeRatio());
@@ -69,13 +67,13 @@ public class AABBPositionStrategy implements PositionStrategy {
 
 		//新的开仓均价
 		if(pcPosition!=null){
-			BigDecimal newMeanPrice = pcPriceCalc.calcEntryPrice(IntBool.isTrue(order.getLongFlag()), pcPosition.getBaseValue(), tradeData.getAmount(), Precision.COMMON_PRECISION);
+			BigDecimal newMeanPrice = PcPriceCalc.calcEntryPrice(IntBool.isTrue(order.getLongFlag()), pcPosition.getBaseValue(), tradeData.getAmount(), Precision.COMMON_PRECISION);
 			tradeData.setNewMeanPrice(newMeanPrice);			
 		}else{
 			tradeData.setNewMeanPrice(matchedVo.getPrice());
 		}
 
-		if(IntBool.isTrue(order.getCloseFlag()) && pcPosition!=null && BigMath.gt(pcPosition.getMeanPrice(), BigDecimal.ZERO)){
+		if(IntBool.isTrue(order.getCloseFlag()) && pcPosition!=null && BigMathUtils.gt(pcPosition.getMeanPrice(), BigDecimal.ZERO)){
 			BigDecimal pnl = PnlCalc.calcPnl(order.getLongFlag(), tradeRatioAmt.getAmount(), pcPosition.getMeanPrice(), matchedVo.getPrice(), Precision.COMMON_PRECISION);
 			tradeData.setPnl(pnl);	
 		}else{
@@ -85,7 +83,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 		//强平价
 		if(pcPosition!=null){
 			tradeData.setLiqPrice(
-				pcPriceCalc.calcLiqPrice(
+					PcPriceCalc.calcLiqPrice(
 					pcPosition.getHoldRatio(),
 					IntBool.isTrue(pcPosition.getLongFlag()), 
 					tradeData.getNewMeanPrice(), 
@@ -96,7 +94,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 		}else{
 			BigDecimal holdRatio = marginRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), matchedVo.getNumber());
 			tradeData.setLiqPrice(
-					pcPriceCalc.calcLiqPrice(
+					PcPriceCalc.calcLiqPrice(
 						holdRatio,
 						IntBool.isTrue(order.getLongFlag()), 
 						tradeData.getNewMeanPrice(), 

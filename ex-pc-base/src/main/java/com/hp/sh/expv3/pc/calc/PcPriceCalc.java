@@ -2,9 +2,6 @@ package com.hp.sh.expv3.pc.calc;
 
 import java.math.BigDecimal;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.hp.sh.expv3.pc.component.DecimalUtil;
 import com.hp.sh.expv3.pc.constant.Precision;
 
@@ -18,7 +15,6 @@ import com.hp.sh.expv3.pc.constant.Precision;
  * <p>
  * case : AABB
  */
-@Service
 public class PcPriceCalc {
 
     /**
@@ -31,7 +27,7 @@ public class PcPriceCalc {
      * @param posHoldMarginRatio
      * @return
      */
-    public BigDecimal calcLiqPrice(BigDecimal posHoldMarginRatio, boolean isLong, BigDecimal openPrice, BigDecimal amt, BigDecimal posMargin, int scale) {
+    public static BigDecimal calcLiqPrice(BigDecimal posHoldMarginRatio, boolean isLong, BigDecimal openPrice, BigDecimal amt, BigDecimal posMargin, int scale) {
         BigDecimal holdVolume = PnlCalc.calcVolume(amt, openPrice, scale);
         /**
          * op: open price
@@ -74,7 +70,7 @@ public class PcPriceCalc {
      * @param margin    实际保证金
      * @return
      */
-    public BigDecimal calcBankruptPrice(boolean isLong, BigDecimal openPrice, BigDecimal amt, BigDecimal margin, int scale) {
+    public static BigDecimal calcBankruptPrice(boolean isLong, BigDecimal openPrice, BigDecimal amt, BigDecimal margin, int scale) {
         BigDecimal volume = PnlCalc.calcVolume(amt, openPrice, scale);
         if (isLong) {
             return amt.divide(volume.add(margin), scale, DecimalUtil.MORE).max(BigDecimal.ZERO).stripTrailingZeros();
@@ -91,7 +87,7 @@ public class PcPriceCalc {
      * @param amt
      * @return
      */
-    public BigDecimal calcEntryPrice(boolean isLong, BigDecimal baseValue, BigDecimal amt, int scale) {
+    public static BigDecimal calcEntryPrice(boolean isLong, BigDecimal baseValue, BigDecimal amt, int scale) {
         if (isLong) {
             return amt.divide(baseValue, scale, DecimalUtil.MORE).stripTrailingZeros();
         } else {

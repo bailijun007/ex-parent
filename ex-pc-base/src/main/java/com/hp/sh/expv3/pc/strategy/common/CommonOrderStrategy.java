@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.strategy.impl;
+package com.hp.sh.expv3.pc.strategy.common;
 
 import java.math.BigDecimal;
 
@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.pc.calc.CompositeFieldCalc;
 import com.hp.sh.expv3.pc.calc.FeeCalc;
 import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
-import com.hp.sh.expv3.pc.component.BigMath;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
+import com.hp.sh.expv3.utils.BigMathUtils;
 
 /**
  * 
@@ -99,12 +99,12 @@ public class CommonOrderStrategy implements OrderStrategy {
 		BigDecimal orderMargin;
 		BigDecimal grossMargin;
 
-		if(BigMath.eq(number, BigDecimal.ZERO)){
+		if(BigMathUtils.eq(number, BigDecimal.ZERO)){
 			openFee = BigDecimal.ZERO;
 			closeFee = BigDecimal.ZERO;
 			orderMargin = BigDecimal.ZERO;
 			grossMargin = BigDecimal.ZERO;
-		}else if(BigMath.eq(number, order.getVolume().subtract(order.getFilledVolume()))){
+		}else if(BigMathUtils.eq(number, order.getVolume().subtract(order.getFilledVolume()))){
 			openFee = order.getOpenFee();
 			closeFee = order.getCloseFee();
 			orderMargin = order.getOrderMargin();

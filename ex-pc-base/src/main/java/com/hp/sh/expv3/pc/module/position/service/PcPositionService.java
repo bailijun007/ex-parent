@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.calc.PcPriceCalc;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.MarginRatioService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -31,8 +30,7 @@ import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
-import com.hp.sh.expv3.pc.strategy.impl.AABBPositionStrategy;
-import com.hp.sh.expv3.pc.strategy.impl.CommonOrderStrategy;
+import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.TradeData;
 import com.hp.sh.expv3.utils.IntBool;
 
@@ -56,16 +54,10 @@ public class PcPositionService {
 	private MarginRatioService marginRatioService;
 	
 	@Autowired
-	private PcPriceCalc pcPriceCalc;
-	
-	@Autowired
 	private PcAccountCoreService pcAccountCoreService;
 	
 	@Autowired
 	private FeeCollectorSelector feeCollectorSelector;
-	
-	@Autowired
-	private CommonOrderStrategy orderStrategy;
 	
 	@Autowired
 	private AABBPositionStrategy positionStrategy;

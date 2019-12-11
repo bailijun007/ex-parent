@@ -15,7 +15,6 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.pc.component.AABBMetadataService;
-import com.hp.sh.expv3.pc.component.BigMath;
 import com.hp.sh.expv3.pc.component.MarginRatioService;
 import com.hp.sh.expv3.pc.constant.MarginMode;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
@@ -32,8 +31,9 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
-import com.hp.sh.expv3.pc.strategy.impl.CommonOrderStrategy;
+import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
+import com.hp.sh.expv3.utils.BigMathUtils;
 import com.hp.sh.expv3.utils.IntBool;
 
 /**
@@ -219,7 +219,7 @@ public class PcOrderService {
 		if(order.getStatus() == OrderStatus.CANCELED){
 			throw new ExException(OrderError.CANCELED);
 		}
-		if(BigMath.eq(order.getVolume(), order.getFilledVolume())){
+		if(BigMathUtils.eq(order.getVolume(), order.getFilledVolume())){
 			throw new ExException(OrderError.FILLED);
 		}
 		

@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.component;
+package com.hp.sh.expv3.utils;
 
 import java.math.BigDecimal;
 
@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  * @author wangjg
  *
  */
-public class BigMath {
+public class BigMathUtils {
 	
 	public static boolean isZero(BigDecimal v1){
 		return v1.compareTo(BigDecimal.ZERO)==0;
