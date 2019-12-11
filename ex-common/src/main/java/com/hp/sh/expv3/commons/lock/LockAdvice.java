@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.component.lock;
+package com.hp.sh.expv3.commons.lock;
 
 import java.lang.reflect.Method;
 import java.util.regex.Matcher;
@@ -7,45 +7,41 @@ import java.util.regex.Pattern;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
-@Order(1)
-@Aspect
-@Component
 public class LockAdvice {
+	private static final Logger logger = LoggerFactory.getLogger(LockAdvice.class);
 	
 	@Autowired(required=false)
-	private DistributedLocker distributedLocker;
+	private Locker locker;
 
     public LockAdvice() {
 		super();
 	}
     
-    @Pointcut("@annotation(com.hp.sh.expv3.component.lock.LockIt)")
-    public void lockAnnoPointcut() {
+    @Pointcut("@annotation(com.hp.sh.expv3.commons.lock.LockIt)")
+    private void lockAnnoPointcut() {
 
     }
     
-    @Pointcut("execution(public * com.hp.sh.expv3.pc.*.*(..))")
-    public void lockPackagePointcut() {
+    @Pointcut("execution(public * com.hp.sh.expv3..*.*(..))")
+    private void lockPackagePointcut() {
 
     }
     
-    @Pointcut("lockAnnoPointcut() && lockPackagePointcut()")
-    public void lockPointcut() {
+    @Pointcut("lockPackagePointcut() && lockAnnoPointcut()")
+    protected void lockPointcut() {
 
     }
 
-//    @Around("lockPointcut()")
-	@Around("@annotation(com.hp.sh.expv3.component.lock.LockIt)")
+    @Around("lockPointcut()")
     public Object exeLock(ProceedingJoinPoint joinPoint) throws Throwable {
-		if(distributedLocker == null){
+		if(locker == null){
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
 		String realKey=null;
@@ -57,6 +53,7 @@ public class LockAdvice {
 			String configKey = lockIt.key();
 			String[] names = signature.getParameterNames();
 			realKey = getRealKey(configKey, args, names);
+			logger.debug("lock:{},{}", realKey, method);
 			this.lock(realKey);
 			Object result = joinPoint.proceed(args);
 			return result;
@@ -69,11 +66,11 @@ public class LockAdvice {
     }
 	
 	private void lock(String realKey) {
-		this.distributedLocker.lock(realKey, 30);
+		this.locker.lock(realKey, 30);
 	}
 
 	private void unlock(String realKey) {
-		this.distributedLocker.unlock(realKey);
+		this.locker.unlock(realKey);
 	}
 
 	private static String getRealKey(String key, Object[] args, String[] names) throws Exception{
@@ -100,6 +97,7 @@ public class LockAdvice {
 			sb.append(val);
 			start = matcher.end();
 		}
+		sb.append(key.substring(start));
 		return sb.toString();
 	}
 	
@@ -113,6 +111,7 @@ public class LockAdvice {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		System.out.println(getRealKey("xx-{1}-{name.empty}", new Object[]{100,"test"}, new String[]{"id","name"}));
+		System.out.println(getRealKey("xx-{1}-{name.empty}-oo", new Object[]{100,"test"}, new String[]{"id","name"}));
+		System.out.println(getRealKey("test", null, null));
 	}
 }

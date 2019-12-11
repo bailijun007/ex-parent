@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.component.lock;
+package com.hp.sh.expv3.commons.lock;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

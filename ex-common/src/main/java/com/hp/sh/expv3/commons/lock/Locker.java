@@ -1,6 +1,6 @@
-package com.hp.sh.expv3.component.lock;
+package com.hp.sh.expv3.commons.lock;
 
-public interface DistributedLocker {
+public interface Locker {
 
 	public boolean lock(String lockId, Integer timeout);
 	

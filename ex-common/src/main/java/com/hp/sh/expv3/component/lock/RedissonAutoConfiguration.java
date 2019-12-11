@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.config;
+package com.hp.sh.expv3.component.lock;
 
 import java.io.IOException;
 
@@ -7,14 +7,15 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnClass(Config.class)
 public class RedissonAutoConfiguration {
+	private static final Logger logger = LoggerFactory.getLogger(RedissonAutoConfiguration.class);
 
 	@Value("${spring.redis.host}")
 	private String redisHost;
@@ -26,7 +27,7 @@ public class RedissonAutoConfiguration {
 	private String redisPassword;
 	
     @Bean
-    public  RedissonClient getRedisson() {
+    public  RedissonClient getRedisson() throws IOException {
 
         Config config = new Config();
 
@@ -41,11 +42,8 @@ public class RedissonAutoConfiguration {
 
         RedissonClient redisson = Redisson.create(config);
 
-        try {
-            System.out.println("检测是否配置完成:"+redisson.getConfig().toJSON().toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        logger.debug("redisson配置完成:"+redisson.getConfig().toJSON().toString());
+        
         return redisson;
     }
     
