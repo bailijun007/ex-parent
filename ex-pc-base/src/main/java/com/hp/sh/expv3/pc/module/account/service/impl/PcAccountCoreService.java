@@ -15,11 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.FundFlowDirection;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.pc.error.AccountError;
-import com.hp.sh.expv3.pc.module.account.api.PcAccountCoreApi;
 import com.hp.sh.expv3.pc.module.account.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountDAO;
@@ -33,7 +31,7 @@ import com.hp.sh.expv3.utils.SnUtils;
  */
 @Service
 @Transactional(rollbackFor=Exception.class)
-public class PcAccountCoreService implements PcAccountCoreApi {
+public class PcAccountCoreService{
 	private static final Logger logger = LoggerFactory.getLogger(PcAccountCoreService.class);
 
 	@Autowired
@@ -42,7 +40,6 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 	@Autowired
 	private PcAccountRecordDAO fundAccountRecordDAO;
 
-	@Override
 	public int createAccount(Long userId, String asset){
 		PcAccount fa = this.fundAccountDAO.get(userId, asset);
 		if(fa!=null){
@@ -53,7 +50,6 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 		return InvokeResult.SUCCESS;
 	}
 	
-	@Override
 	public BigDecimal getBalance(Long userId, String asset){
 		PcAccount fa = this.fundAccountDAO.get(userId, asset);
 		if(fa==null){
@@ -65,7 +61,6 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 	/**
 	 * 加钱
 	 */
-	@Override
 	public Integer add(@RequestBody AddMoneyRequest request){
 		PcAccountRecord record = this.req2record(request);
 		
@@ -78,7 +73,6 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 	/**
 	 * 减钱
 	 */
-	@Override
 	public Integer cut(@RequestBody CutMoneyRequest request){
 		PcAccountRecord record = this.req2record(request);
 		
@@ -88,8 +82,6 @@ public class PcAccountCoreService implements PcAccountCoreApi {
 		return this.newRecord(record);
 	}
 	
-	@LockIt(key="test")
-	@Override
 	public Boolean checkTradNo(Long userId, String tradeNo) {
 		PcAccountRecord rcd = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);
 		if (rcd == null) {

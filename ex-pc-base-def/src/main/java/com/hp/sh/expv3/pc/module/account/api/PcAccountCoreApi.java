@@ -20,7 +20,7 @@ import io.swagger.annotations.ApiOperation;
 /**
  * @author wangjg
  */
-@Api(tags = "合约账户接口")
+@Api(tags = "合约账户核心接口")
 @FeignClient(value="ex-pc-base")
 public interface PcAccountCoreApi {
 

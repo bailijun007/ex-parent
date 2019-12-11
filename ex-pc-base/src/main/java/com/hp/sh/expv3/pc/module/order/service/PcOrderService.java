@@ -12,13 +12,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.pc.component.AABBMetadataService;
+import com.hp.sh.expv3.pc.component.BigMath;
 import com.hp.sh.expv3.pc.component.MarginRatioService;
 import com.hp.sh.expv3.pc.constant.MarginMode;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.constant.PcOrderType;
+import com.hp.sh.expv3.pc.error.OrderError;
 import com.hp.sh.expv3.pc.error.PositonError;
 import com.hp.sh.expv3.pc.module.account.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
@@ -76,6 +79,7 @@ public class PcOrderService {
 	 * @param price 委托价格
 	 * @param amt 委托金额
 	 */
+	@LockIt(key="${userId}-${asset}-${symbol}")
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		
 //		if(this.existClientOrderId(userId, cliOrderId)){
@@ -207,12 +211,17 @@ public class PcOrderService {
 		pcOrder.setGrossMargin(orderAmount.getGrossMargin());
 	}
 	
-	public PcOrder getOrder(Long userId, Long orderId){
-		return this.pcOrderDAO.findById(userId, orderId);
-	}
-	
-	public void setCancelStatus(long userId, String asset, long orderId, Integer cancelStatsus){
+	@LockIt(key="${userId}-${asset}-${symbol}")
+	public void setCancelStatus(long userId, String asset, String symbol, long orderId, Integer cancelStatsus){
 		Date now = new Date();
+		
+		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		if(order.getStatus() == OrderStatus.CANCELED){
+			throw new ExException(OrderError.CANCELED);
+		}
+		if(BigMath.eq(order.getVolume(), order.getFilledVolume())){
+			throw new ExException(OrderError.FILLED);
+		}
 		
 		long count = this.pcOrderDAO.setCancelStatus(userId, orderId, cancelStatsus, now);
 		

@@ -111,4 +111,8 @@ public class AABBPositionStrategy implements PositionStrategy {
 		return tradeData;
 	}
 	
+	public String getStrategyId(){
+		return "AABB";
+	}
+	
 }

@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.order.api;
+package com.hp.sh.expv3.pc.api;
 
 import java.math.BigDecimal;
 
@@ -6,13 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.component.BigMath;
-import com.hp.sh.expv3.pc.error.OrderError;
 import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
-import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.mq.msg.OrderPendingCancelMsg;
@@ -28,9 +24,6 @@ public class PcOrderApiAction {
 	
 	@Autowired
 	private PcOrderService pcOrderService;
-	
-	@Autowired
-	private PcPositionService pcPositionService;
 	
 	@Autowired
 	private MatchMqSender matchMqSender;
@@ -50,7 +43,7 @@ public class PcOrderApiAction {
 	 */
 	@ApiOperation(value = "创建订单")
 	@GetMapping(value = "/api/pc/order/create")
-	public void create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number) throws Exception{
+	public void create(long userId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, String cliOrderId) throws Exception{
 		
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
 
@@ -73,21 +66,15 @@ public class PcOrderApiAction {
 	@ApiOperation(value = "取消订单")
 	@GetMapping(value = "/api/pc/order/cancel")
 	public void cancel(long userId, String asset, String symbol, Long orderId) throws Exception{
-		PcOrder order = this.pcOrderService.getOrder(userId, orderId);
-		if(order.getStatus() == OrderStatus.CANCELED){
-			throw new ExException(OrderError.CANCELED);
-		}
-		if(BigMath.eq(order.getVolume(), order.getFilledVolume())){
-			throw new ExException(OrderError.FILLED);
-		}
-		this.pcOrderService.setCancelStatus(userId, asset, orderId, OrderStatus.PENDING_CANCEL);
+
+		this.pcOrderService.setCancelStatus(userId, asset, symbol, orderId, OrderStatus.PENDING_CANCEL);
 
 		//发送消息
 		OrderPendingCancelMsg mqMsg = new OrderPendingCancelMsg(userId, asset, symbol, orderId);
 		mqMsg.setAccountId(userId);
 		mqMsg.setAsset(asset);
 		mqMsg.setOrderId(orderId);
-		mqMsg.setSymbol(order.getSymbol());
+		mqMsg.setSymbol(symbol);
 		this.matchMqSender.sendPendingCancel(mqMsg);
 		
 		//redis 消息

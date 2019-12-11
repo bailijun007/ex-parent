@@ -38,4 +38,8 @@ public class RedissonDistributedLocker implements Locker{
             return false;
         }
     }
+
+	public void setRedissonClient(RedissonClient redissonClient) {
+		this.redissonClient = redissonClient;
+	}
 }

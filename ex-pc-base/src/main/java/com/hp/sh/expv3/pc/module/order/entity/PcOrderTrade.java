@@ -7,7 +7,7 @@ package com.hp.sh.expv3.pc.module.order.entity;
 import java.math.BigDecimal;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
-import com.hp.sh.expv3.pc.atemp.Question;
+import com.hp.sh.expv3.dev.Question;
 
 /**
  * 永续合约_用户订单成交记录

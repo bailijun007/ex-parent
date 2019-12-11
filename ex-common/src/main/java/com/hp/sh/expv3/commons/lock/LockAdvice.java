@@ -41,7 +41,7 @@ public class LockAdvice {
 
     @Around("lockPointcut()")
     public Object exeLock(ProceedingJoinPoint joinPoint) throws Throwable {
-		if(locker == null){
+		if(this.locker == null){
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
 		String realKey=null;
@@ -90,9 +90,12 @@ public class LockAdvice {
 			}
 			Object val = args[index];
 			
-			String pvar = matcher.group(2);
-			if(pvar!=null && pvar.length()>0){
-				val = PropertyUtils.getSimpleProperty(val, pvar);
+			String varpp = matcher.group(2);
+			if(varpp!=null && varpp.length()>0){
+				val = PropertyUtils.getSimpleProperty(val, varpp);
+			}
+			if(val==null){
+				logger.warn("lock key var is null：key={},var={},pvar={}", key, var, varpp);
 			}
 			sb.append(val);
 			start = matcher.end();
