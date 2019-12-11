@@ -3,6 +3,7 @@ package com.hp.sh.expv3.config.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import com.gitee.hupadev.base.spring.plugin.HpLocaleResolver;
  * @author wangjg
  *
  */
+@ServletComponentScan(basePackages = {"com.hp.sh.expv3"})
 @Configuration
 @ComponentScan
 public class MyMvcConfig implements WebMvcConfigurer {

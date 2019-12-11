@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.config.web;
+package com.hp.sh.expv3.commons.web;
 
 /**
  * 请求上下文
@@ -7,16 +7,16 @@ package com.hp.sh.expv3.config.web;
  */
 public class RequestContext {
 	
-	private static final ThreadLocal<Long> txIdVar = new ThreadLocal<Long>();
+	private static final ThreadLocal<Long> requestIdVar = new ThreadLocal<Long>();
 	
 	private static final ThreadLocal<String> operatorVar = new ThreadLocal<String>();
 
-	public static void setTxId(long txId){
-		txIdVar.set(txId);
+	public static void setRequestId(Long txId){
+		requestIdVar.set(txId);
 	}
 	
-	public static long getTxId(){
-		return txIdVar.get();
+	public static long getRequestId(){
+		return requestIdVar.get();
 	}
 
 	public static void setOperator(String operator){
@@ -28,7 +28,7 @@ public class RequestContext {
 	}
 	
 	public static void reset(){
-		txIdVar.set(null);
+		requestIdVar.set(null);
 		operatorVar.set(null);
 	}
 }
