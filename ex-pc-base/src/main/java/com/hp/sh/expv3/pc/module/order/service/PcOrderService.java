@@ -83,7 +83,7 @@ public class PcOrderService {
 //		}
 		
 		//check 检查可平仓位
-		checkShortPosition(userId, asset, symbol, number, closeFlag, longFlag);
+		checkClosablePosition(userId, asset, symbol, number, closeFlag, longFlag);
 		
 		Date now = new Date();
 		
@@ -257,7 +257,7 @@ public class PcOrderService {
 		}
 	}
 
-	private void checkShortPosition(long userId, String asset, String symbol, BigDecimal volume, int closeFlag, int longFlag) {
+	private void checkClosablePosition(long userId, String asset, String symbol, BigDecimal volume, int closeFlag, int longFlag) {
 		if(closeFlag!=OrderFlag.ACTION_CLOSE){
 			return;
 		}
