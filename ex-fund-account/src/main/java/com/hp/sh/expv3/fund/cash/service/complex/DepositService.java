@@ -25,6 +25,7 @@ import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
+import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -40,7 +41,7 @@ public class DepositService {
 	@Autowired
 	private DepositRecordDAO depositRecordDAO;
 	
-	public String deposit(Long userId, String asset, String account, BigDecimal amount, String chainOrderId, Integer channelId) {
+	public String deposit(Long userId, String asset, String account, BigDecimal amount, String chainOrderId, Integer channelId, String txHash) {
 		this.checkExist(userId, asset, chainOrderId, channelId);
 		Date now = new Date();
 		DepositRecord rr = new DepositRecord();
@@ -60,6 +61,9 @@ public class DepositService {
 		rr.setPayStatusDesc(null);
 		
 		rr.setSynchStatus(SynchStatus.NO);
+		
+		rr.setTxHash(txHash);
+		
 		depositRecordDAO.save(rr);
 		return rr.getSn();
 	}
@@ -147,7 +151,7 @@ public class DepositService {
 	}
 	
 	@Autowired
-	private FundAccountCoreApi fundAccountCoreApi;
+	private FundAccountCoreService fundAccountCoreApi;
 
 	public List<DepositRecord> findPendingSynch(Page page) {
 		Map<String, Object> params = new HashMap<String, Object>();

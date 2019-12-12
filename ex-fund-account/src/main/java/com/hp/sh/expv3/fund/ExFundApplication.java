@@ -12,7 +12,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 
 @EnableDiscoveryClient
-@EnableFeignClients({"com.hp.sh.expv3"})
+@EnableFeignClients({"com.hp.sh.expv3.pc"})
 @ComponentScan("com.hp.sh.expv3")
 @SpringBootApplication
 public class ExFundApplication {

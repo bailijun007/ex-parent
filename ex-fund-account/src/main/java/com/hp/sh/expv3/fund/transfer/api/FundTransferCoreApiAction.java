@@ -18,7 +18,7 @@ import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.fund.wallet.api.request.CutMoneyRequest;
-import com.hp.sh.expv3.pc.module.account.api.PcAccountCoreApi;
+import com.hp.sh.expv3.pc.api.PcAccountCoreApi;
 
 import io.swagger.annotations.Api;
 
@@ -101,7 +101,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	}
 
 	private void addPc(FundTransfer record){
-		com.hp.sh.expv3.pc.module.account.api.request.AddMoneyRequest request = new com.hp.sh.expv3.pc.module.account.api.request.AddMoneyRequest();
+		com.hp.sh.expv3.pc.api.request.AddMoneyRequest request = new com.hp.sh.expv3.pc.api.request.AddMoneyRequest();
 		request.setAmount(record.getAmount());
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
@@ -123,7 +123,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	}
 
 	private void cutPc(FundTransfer record){
-		com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest request = new com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest();
+		com.hp.sh.expv3.pc.api.request.CutMoneyRequest request = new com.hp.sh.expv3.pc.api.request.CutMoneyRequest();
 		request.setAmount(record.getAmount());
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());

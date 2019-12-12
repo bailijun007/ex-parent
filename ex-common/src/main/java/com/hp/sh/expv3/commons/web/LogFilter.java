@@ -12,11 +12,9 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.id.IdGenerator;
 
-@Component
 @WebFilter(filterName = "myLogFilter", urlPatterns = { "/api/**" })
 public class LogFilter implements Filter {
 	

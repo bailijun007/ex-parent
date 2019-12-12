@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.commons.exception.ExException;
@@ -61,8 +62,8 @@ public class ChainCasehApiAction implements ChainCasehApi{
 
 	//bys callback
 	@ApiOperation(value = "3、创建Bys充值记录")
-	public String createDeposit(Long userId, String chainOrderId, String asset, String account, BigDecimal amount) {
-		String sn = this.depositService.deposit(userId, asset, account, amount, chainOrderId, PayChannel.BYS);
+	public String createDeposit(Long userId, String chainOrderId, String asset, String account, BigDecimal amount, String txHash) {
+		String sn = this.depositService.deposit(userId, asset, account, amount, chainOrderId, PayChannel.BYS, txHash);
 		return sn;
 	}
 	

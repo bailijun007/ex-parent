@@ -19,10 +19,11 @@
 		<result column="user_id" property="userId" />
 		<result column="created" property="created" />
 		<result column="modified" property="modified" />
+		<result column="tx_hash" property="txHash" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified
+		id,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified,tx_hash
 	</sql>
 
 	<sql id="simple_where" >
@@ -109,9 +110,9 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into deposit_record (
-			id,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified
+			id,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified,tx_hash
 		)values(
-			#{id},#{sn},#{asset},#{amount},#{channelId},#{account},#{transactionId},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{userId},#{created},#{modified}
+			#{id},#{sn},#{asset},#{amount},#{channelId},#{account},#{transactionId},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{userId},#{created},#{modified},#{txHash}
 		)
 	</insert>
 	
@@ -119,7 +120,7 @@
 		update 
 			deposit_record
 		set 
-			sn=#{sn},asset=#{asset},amount=#{amount},channel_id=#{channelId},account=#{account},transaction_id=#{transactionId},pay_status=#{payStatus},pay_status_desc=#{payStatusDesc},pay_time=#{payTime},pay_finish_time=#{payFinishTime},synch_status=#{synchStatus},user_id=#{userId},created=#{created},modified=#{modified}
+			sn=#{sn},asset=#{asset},amount=#{amount},channel_id=#{channelId},account=#{account},transaction_id=#{transactionId},pay_status=#{payStatus},pay_status_desc=#{payStatusDesc},pay_time=#{payTime},pay_finish_time=#{payFinishTime},synch_status=#{synchStatus},user_id=#{userId},created=#{created},modified=#{modified},tx_hash=#{txHash}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>

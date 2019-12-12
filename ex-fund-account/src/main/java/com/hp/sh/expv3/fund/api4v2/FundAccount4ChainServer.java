@@ -19,7 +19,7 @@ public class FundAccount4ChainServer extends BaseApiAction implements FundAccoun
 	@Override
 	public long createDepositOrder(String operator, long accountId, String asset, String chainServerOrderId,
 			String txHash, BigDecimal volume, long depositTime, String address, String token) {
-		chainCasehApiAction.createDeposit(accountId, chainServerOrderId, asset, address, volume);
+		chainCasehApiAction.createDeposit(accountId, chainServerOrderId, asset, address, volume, txHash);
 		return 0;
 	}
 

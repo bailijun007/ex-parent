@@ -24,6 +24,7 @@ import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.fund.wallet.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
+import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -156,7 +157,7 @@ public class WithdrawalService {
 	}
 	
 	@Autowired
-	private FundAccountCoreApi fundAccountCoreApi;
+	private FundAccountCoreService fundAccountCoreApi;
 
 	public List<WithdrawalRecord> findPendingSynch(Page page) {
 		Map<String, Object> params = new HashMap<String, Object>();

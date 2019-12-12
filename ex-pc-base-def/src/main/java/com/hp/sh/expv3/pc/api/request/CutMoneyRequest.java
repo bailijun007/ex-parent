@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.account.api.request;
+package com.hp.sh.expv3.pc.api.request;
 
 import io.swagger.annotations.ApiModel;
 
