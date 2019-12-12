@@ -14,7 +14,7 @@ import com.hp.sh.expv3.utils.IntBool;
  * @author lw
  *
  */
-@Question("是否随玩法不同")
+@Question(ask="是否随玩法不同", answer="NO")
 @Service
 public class MarginRatioService {
 

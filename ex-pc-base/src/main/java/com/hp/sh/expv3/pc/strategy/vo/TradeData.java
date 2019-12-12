@@ -34,9 +34,6 @@ public class TradeData {
 	//订单完成(此次成交后，对应订单已全部成交)
 	private boolean orderCompleted;
 
-    //平均成本价：包含手续费
-    private BigDecimal avgCostPrice;
-	
 	public TradeData() {
 		super();
 	}
@@ -103,14 +100,6 @@ public class TradeData {
 
 	public void setNewMeanPrice(BigDecimal newMeanPrice) {
 		this.newMeanPrice = newMeanPrice;
-	}
-
-	public BigDecimal getAvgCostPrice() {
-		return avgCostPrice;
-	}
-
-	public void setAvgCostPrice(BigDecimal avgCostPrice) {
-		this.avgCostPrice = avgCostPrice;
 	}
 
 	public BigDecimal getLiqPrice() {

@@ -2,7 +2,7 @@
  * @author corleone
  * @date 2018/7/6 0006
  */
-package com.hp.sh.expv3.pc.component;
+package com.hp.sh.expv3.utils.math;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

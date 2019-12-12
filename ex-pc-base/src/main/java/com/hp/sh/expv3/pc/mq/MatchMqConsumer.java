@@ -39,14 +39,14 @@ public class MatchMqConsumer {
 		this.pcOrderService.cancel(msg.getAccountId(), msg.getAsset(), msg.getOrderId(), msg.getCancelNumber());
 	}
 	
-	//撮合
+	//成交
 	@MQListener(tags=MqTopic.TAGS_PC_TRADE)
 	public void handleTradeMsg(PcTradeMsg msg){
 		logger.info("收到消息:{}", msg);
 		pcPositionService.handleTradeOrder(msg);
 	}
 	
-	//成交
+	//撮合成功
 	@MQListener(tags=MqTopic.TAGS_MATCHED)
 	public void handleMatch(MatchedMsg msg){
 		logger.info("收到消息:{}", msg);

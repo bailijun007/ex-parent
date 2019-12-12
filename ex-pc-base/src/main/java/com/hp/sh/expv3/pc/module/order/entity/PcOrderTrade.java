@@ -32,7 +32,7 @@ public class PcOrderTrade extends UserDataEntity {
 	//成交量（单位：【结算货币】）
 	private BigDecimal volume;
 
-	//交易ID
+	//交易序号
 	private String tradeSn;
 
 	// 1-marker， 0-taker
@@ -53,7 +53,7 @@ public class PcOrderTrade extends UserDataEntity {
 	private BigDecimal fee;
 	
 	//盈亏(此次成交的盈亏)
-	@Question("没有用到，老项目里也没这个字段")
+	@Question(ask="没有用到，老项目里也没这个字段", answer="老杜用")
 	private BigDecimal pnl;
 
 	public PcOrderTrade() {

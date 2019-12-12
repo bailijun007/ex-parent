@@ -4,14 +4,14 @@ import java.math.BigDecimal;
 
 import org.springframework.stereotype.Component;
 
-import com.hp.sh.expv3.pc.calc.CompositeFieldCalc;
+import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
-import com.hp.sh.expv3.utils.BigMathUtils;
+import com.hp.sh.expv3.utils.math.BigMathUtils;
 
 /**
  * 
@@ -28,9 +28,9 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 */
 	public OrderAmount calcOrderAmt(PcOrder pcOrder){
 		//交易金额
-		BigDecimal amount = CompositeFieldCalc.calcAmount(pcOrder.getVolume(), pcOrder.getFaceValue());
+		BigDecimal amount = CompFieldCalc.calcAmount(pcOrder.getVolume(), pcOrder.getFaceValue());
 		//基础货币价值
-		BigDecimal baseValue = CompositeFieldCalc.calcBaseValue(amount, pcOrder.getPrice());
+		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, pcOrder.getPrice());
 		
 		//开仓手续费
 		BigDecimal openFee = MarginFeeCalc.calcFee(baseValue, pcOrder.getOpenFeeRatio());
@@ -80,7 +80,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 		orderAmount.setGrossMargin(BigDecimal.ZERO);
 		
 		BigDecimal amount = number.multiply(order.getFaceValue());
-		BigDecimal baseValue = CompositeFieldCalc.calcBaseValue(amount, order.getPrice());
+		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, order.getPrice());
 
 		orderAmount.setAmount(amount);
 		orderAmount.setBaseValue(baseValue);
@@ -124,7 +124,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 
 		
 		BigDecimal amount = number.multiply(order.getFaceValue());
-		BigDecimal baseValue = CompositeFieldCalc.calcBaseValue(amount, order.getPrice());
+		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, order.getPrice());
 
 		orderAmount.setAmount(amount);
 		orderAmount.setBaseValue(baseValue);

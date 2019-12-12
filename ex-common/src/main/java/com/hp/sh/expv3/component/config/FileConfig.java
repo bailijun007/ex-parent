@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.component;
+package com.hp.sh.expv3.component.config;
 
 import java.io.File;
 import java.io.FileInputStream;

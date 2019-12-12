@@ -5,9 +5,8 @@ import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hp.sh.expv3.pc.calc.CompositeFieldCalc;
+import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
-import com.hp.sh.expv3.pc.calc.PcPriceCalc;
 import com.hp.sh.expv3.pc.calc.PnlCalc;
 import com.hp.sh.expv3.pc.component.MarginRatioService;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
@@ -19,8 +18,8 @@ import com.hp.sh.expv3.pc.strategy.PositionStrategy;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
 import com.hp.sh.expv3.pc.strategy.vo.TradeData;
-import com.hp.sh.expv3.utils.BigMathUtils;
 import com.hp.sh.expv3.utils.IntBool;
+import com.hp.sh.expv3.utils.math.BigMathUtils;
 
 /**
  * 
@@ -50,7 +49,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 
 		tradeData.setVolume(matchedVo.getNumber());
 		tradeData.setAmount(tradeRatioAmt.getAmount());
-		tradeData.setBaseValue(CompositeFieldCalc.calcBaseValue(tradeData.getAmount(), matchedVo.getPrice()));
+		tradeData.setBaseValue(CompFieldCalc.calcBaseValue(tradeData.getAmount(), matchedVo.getPrice()));
 		tradeData.setOrderMargin(tradeRatioAmt.getOrderMargin());//保证金
 		tradeData.setOrderCompleted(BigMathUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		
@@ -94,8 +93,6 @@ public class AABBPositionStrategy implements PositionStrategy {
 					holdRatio, IntBool.isTrue(order.getLongFlag()), tradeData.getNewMeanPrice(), tradeData.getAmount(), tradeData.getOrderMargin(), Precision.COMMON_PRECISION)
 				);
 		}
-		
-		tradeData.setAvgCostPrice(BigDecimal.ZERO);
 		
 		return tradeData;
 	}

@@ -53,7 +53,6 @@ public class PcOrderTrade extends UserDataEntity {
 	private BigDecimal fee;
 	
 	//盈亏(此次成交的盈亏)
-	@Question("没有用到，老项目里也没这个字段")
 	private BigDecimal pnl;
 
 	public PcOrderTrade() {

@@ -1,10 +1,10 @@
-package com.hp.sh.expv3.pc.component;
+package com.hp.sh.expv3.component.config;
 
 import java.math.BigDecimal;
 
 /**
  * 
- * @author lw
+ * @author wangjg
  *
  */
 public interface SysConfig {
