@@ -52,7 +52,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 		tradeData.setAmount(tradeRatioAmt.getAmount());
 		tradeData.setBaseValue(CompositeFieldCalc.calcBaseValue(tradeData.getAmount(), matchedVo.getPrice()));
 		tradeData.setOrderMargin(tradeRatioAmt.getOrderMargin());//保证金
-		tradeData.setCompleted(BigMathUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
+		tradeData.setOrderCompleted(BigMathUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN){
 			tradeData.setFeeRatio(order.getOpenFeeRatio());
@@ -83,24 +83,15 @@ public class AABBPositionStrategy implements PositionStrategy {
 		//强平价
 		if(pcPosition!=null){
 			tradeData.setLiqPrice(
-					PcPriceCalc.calcLiqPrice(
-					pcPosition.getHoldRatio(),
-					IntBool.isTrue(pcPosition.getLongFlag()), 
-					tradeData.getNewMeanPrice(), 
-					tradeData.getAmount(),
-					pcPosition.getPosMargin(), 
-					Precision.COMMON_PRECISION)
+				PcPriceCalc.calcLiqPrice(
+					pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), tradeData.getNewMeanPrice(), tradeData.getAmount(), pcPosition.getPosMargin(), Precision.COMMON_PRECISION
+				)
 			);
 		}else{
 			BigDecimal holdRatio = marginRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), matchedVo.getNumber());
 			tradeData.setLiqPrice(
-					PcPriceCalc.calcLiqPrice(
-						holdRatio,
-						IntBool.isTrue(order.getLongFlag()), 
-						tradeData.getNewMeanPrice(), 
-						tradeData.getAmount(),
-						tradeData.getOrderMargin(), 
-						Precision.COMMON_PRECISION)
+				PcPriceCalc.calcLiqPrice(
+					holdRatio, IntBool.isTrue(order.getLongFlag()), tradeData.getNewMeanPrice(), tradeData.getAmount(), tradeData.getOrderMargin(), Precision.COMMON_PRECISION)
 				);
 		}
 		

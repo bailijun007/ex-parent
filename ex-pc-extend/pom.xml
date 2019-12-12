@@ -23,13 +23,7 @@
 		
 		<dependency>
 			<groupId>com.hp.sh</groupId>
-			<artifactId>ex-fund-account-def</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.hp.sh</groupId>
-			<artifactId>ex-pc-base-def</artifactId>
+			<artifactId>ex-pc-extend-def</artifactId>
 			<version>3.0.0</version>
 		</dependency>
 		

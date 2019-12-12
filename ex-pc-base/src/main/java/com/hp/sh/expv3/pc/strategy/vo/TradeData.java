@@ -24,14 +24,18 @@ public class TradeData {
 	//此次成交的盈亏（平仓才有）
 	private BigDecimal pnl;
 
-	//新均价
+	/* 以下为累计结果 */
+	
+	//新均价(此次成交后，仓位的均价)
 	private BigDecimal newMeanPrice;
-    //平均成本价：包含手续费
-    private BigDecimal avgCostPrice;
-	//强平价
+	//强平价(此次成交后，仓位的强平价)
 	private BigDecimal liqPrice;
 	
-	private boolean completed;
+	//订单完成(此次成交后，对应订单已全部成交)
+	private boolean orderCompleted;
+
+    //平均成本价：包含手续费
+    private BigDecimal avgCostPrice;
 	
 	public TradeData() {
 		super();
@@ -117,12 +121,12 @@ public class TradeData {
 		this.liqPrice = liqPrice;
 	}
 
-	public boolean isCompleted() {
-		return completed;
+	public boolean isOrderCompleted() {
+		return orderCompleted;
 	}
 
-	public void setCompleted(boolean completed) {
-		this.completed = completed;
+	public void setOrderCompleted(boolean completed) {
+		this.orderCompleted = completed;
 	}
 
 }

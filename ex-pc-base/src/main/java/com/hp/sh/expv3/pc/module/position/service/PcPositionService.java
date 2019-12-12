@@ -121,8 +121,8 @@ public class PcPositionService {
 	        order.setOpenFee(order.getOpenFee().subtract(tradeData.getFee()));
 		}
 		order.setFeeCost(order.getFeeCost().add(tradeData.getFee()));
-        order.setStatus(tradeData.isCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
-        order.setActiveFlag(tradeData.isCompleted()?PcOrder.NO:PcOrder.YES);
+        order.setStatus(tradeData.isOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
+        order.setActiveFlag(tradeData.isOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setFilledVolume(tradeData.getVolume());
 		order.setModified(new Date());
 		this.pcOrderDAO.update(order);

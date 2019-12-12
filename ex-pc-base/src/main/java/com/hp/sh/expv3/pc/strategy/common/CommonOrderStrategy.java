@@ -5,9 +5,9 @@ import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.calc.CompositeFieldCalc;
-import com.hp.sh.expv3.pc.calc.FeeCalc;
 import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
+import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
@@ -134,11 +134,11 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * 按比例计算amount
 	 * @param number 比例分子
 	 * @param volume 比例分母
-	 * @param amount 求值分母
+	 * @param amount 求值对象
 	 * @return
 	 */
 	private BigDecimal slope(BigDecimal number, BigDecimal volume, BigDecimal amount){
-		return FeeCalc.slope(volume, number, amount);
+		return number.multiply(amount).divide(volume, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
 	}
 	
 }
