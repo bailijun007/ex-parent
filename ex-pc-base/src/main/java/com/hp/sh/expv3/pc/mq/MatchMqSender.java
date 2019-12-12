@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MqTopic;
+import com.hp.sh.expv3.pc.mq.msg.BaseOrderMsg;
 import com.hp.sh.expv3.pc.mq.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.mq.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.mq.msg.OrderPendingNewMsg;
@@ -49,6 +50,14 @@ public class MatchMqSender {
 		String tags = MqTopic.TAGS_PC_BOOK_RESET;
 		Message mqMsg = new Message(topic, tags, msgBuff);
 		mqMsg.setKeys(tags);
+	    this.send(mqMsg);
+	}
+	
+	void sendOrderMsg(BaseOrderMsg msg, String tags, String keys) throws Exception{
+		String topic = this.getOrderTopic(msg.getAsset(), msg.getSymbol());
+		byte[] msgBuff = (byte[]) msgCodec.encode(msg);
+		Message mqMsg = new Message(topic, tags, msgBuff);
+		mqMsg.setKeys(keys);
 	    this.send(mqMsg);
 	}
 

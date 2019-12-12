@@ -130,7 +130,7 @@ public class FundAccountCoreService implements FundAccountCoreApi {
 			
 			fundAccount.setModified(now);
 			fundAccount.setBalance(newBalance);
-			this.fundAccountDAO.update(fundAccount);
+			this.updateAccount(fundAccount);
 		}
 		
 		//balance
@@ -143,6 +143,13 @@ public class FundAccountCoreService implements FundAccountCoreApi {
 		this.fundAccountRecordDAO.save(record);
 	
 		return InvokeResult.SUCCESS;
+	}
+	
+	private void updateAccount(FundAccount fundAccount){
+		int updatedRows = this.fundAccountDAO.update(fundAccount);
+		if(updatedRows==0){
+			throw new RuntimeException("更新失败");
+		}
 	}
 	
 	private void checkBalance(FundAccountRecord record, BigDecimal newBalance){

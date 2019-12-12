@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hp.sh.expv3.pc.api.PcAccountCoreApi;
 import com.hp.sh.expv3.pc.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.pc.api.request.CutMoneyRequest;
-import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
+import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 
 /**
  * 永续合约账户核心接口

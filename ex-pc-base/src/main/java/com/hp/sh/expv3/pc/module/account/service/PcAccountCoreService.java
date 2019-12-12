@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hp.sh.expv3.pc.module.account.service.impl;
+package com.hp.sh.expv3.pc.module.account.service;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -35,13 +35,13 @@ public class PcAccountCoreService{
 	private static final Logger logger = LoggerFactory.getLogger(PcAccountCoreService.class);
 
 	@Autowired
-	private PcAccountDAO fundAccountDAO;
+	private PcAccountDAO pcAccountDAO;
 
 	@Autowired
 	private PcAccountRecordDAO fundAccountRecordDAO;
 
 	public int createAccount(Long userId, String asset){
-		PcAccount fa = this.fundAccountDAO.get(userId, asset);
+		PcAccount fa = this.pcAccountDAO.get(userId, asset);
 		if(fa!=null){
 			return InvokeResult.NOCHANGE;
 		}
@@ -51,7 +51,7 @@ public class PcAccountCoreService{
 	}
 	
 	public BigDecimal getBalance(Long userId, String asset){
-		PcAccount fa = this.fundAccountDAO.get(userId, asset);
+		PcAccount fa = this.pcAccountDAO.get(userId, asset);
 		if(fa==null){
 			return null;
 		}
@@ -111,7 +111,7 @@ public class PcAccountCoreService{
 			return InvokeResult.NOCHANGE;
 		}
 		
-		PcAccount pcAccount = this.fundAccountDAO.getAndLock(record.getUserId(), record.getAsset());
+		PcAccount pcAccount = this.pcAccountDAO.getAndLock(record.getUserId(), record.getAsset());
 		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
 		if(pcAccount==null){
 			pcAccount = this.newPcAccount(record.getUserId(), record.getAsset(), recordAmount, now);
@@ -122,7 +122,7 @@ public class PcAccountCoreService{
 			//更新余额
 			pcAccount.setModified(now);
 			pcAccount.setBalance(newBalance);
-			this.fundAccountDAO.update(pcAccount);
+			this.updateAccount(pcAccount);
 		}
 		
 		//设置本比余额
@@ -135,6 +135,13 @@ public class PcAccountCoreService{
 		this.fundAccountRecordDAO.save(record);
 	
 		return InvokeResult.SUCCESS;
+	}
+	
+	private void updateAccount(PcAccount pcAccount){
+		int updatedRows = this.pcAccountDAO.update(pcAccount);
+		if(updatedRows==0){
+			throw new RuntimeException("更新失败");
+		}
 	}
 	
 	private void checkBalance(PcAccountRecord record, BigDecimal newBalance){
@@ -154,7 +161,7 @@ public class PcAccountCoreService{
 		account.setCreated(now);
 		account.setModified(now);
 		account.setVersion(0L);
-		this.fundAccountDAO.save(account);
+		this.pcAccountDAO.save(account);
 		return account;
 	}
 

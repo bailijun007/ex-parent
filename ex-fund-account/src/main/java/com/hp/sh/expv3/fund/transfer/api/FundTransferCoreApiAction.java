@@ -53,7 +53,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 
 	@Override
 	public void handlePending() {
-		Page page = new Page(0, 10, 1000L);
+		Page page = new Page(1, 10, 1000L);
 		while(true){
 			List<FundTransfer> list = this.fundTransferCoreService.findPending(page);
 			if(list==null || list.isEmpty()){

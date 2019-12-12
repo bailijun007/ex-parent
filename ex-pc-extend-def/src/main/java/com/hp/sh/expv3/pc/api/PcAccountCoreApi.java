@@ -25,23 +25,23 @@ import io.swagger.annotations.ApiOperation;
 public interface PcAccountCoreApi {
 
 	@ApiOperation(value = "加钱")
-	@PostMapping(value = "/api/pc/pc_account/money/add")
+	@PostMapping(value = "/api/pc/fund_account/money/add")
 	public Integer add(@RequestBody AddMoneyRequest request);
 
 	@ApiOperation(value = "扣钱")
-	@PostMapping(value = "/api/pc/pc_account/money/cut")
+	@PostMapping(value = "/api/pc/fund_account/money/cut")
 	public Integer cut(@RequestBody CutMoneyRequest request);
 
 	@ApiOperation(value = "查询资金记录是否存在")
-	@GetMapping(value = "/api/pc/pc_account/record/check_exist")
+	@GetMapping(value = "/api/pc/fund_account/record/check_exist")
 	public Boolean checkTradNo(@RequestParam("userId") Long userId, @RequestParam("tradeNo") String tradeNo);
 
 	@ApiOperation(value = "创建资金账户")
-	@GetMapping(value = "/api/pc/pc_account/account/create")
+	@GetMapping(value = "/api/pc/fund_account/account/create")
 	public int createAccount(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
 	@ApiOperation(value = "获取账户余额")
-	@GetMapping(value = "/api/pc/pc_account/account/balance")
+	@GetMapping(value = "/api/pc/fund_account/account/balance")
 	BigDecimal getBalance(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
 }

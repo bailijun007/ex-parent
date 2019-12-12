@@ -35,11 +35,11 @@ public class TestApiAction extends BaseApiAction{
 		return false;
 	}
 
-	
+	 
 	@ApiOperation(value = "测试接口2")
 	@PostMapping("/post2")
-	public Object post2(@RequestBody Object...params){
-		Object b = pcAccountCoreApi.getBalance(1L, "BTC");
+	public BigDecimal post2(@RequestBody Object...params){
+		BigDecimal b = pcAccountCoreApi.getBalance(1L, "BTC");
 		return b;
 	}
 	
