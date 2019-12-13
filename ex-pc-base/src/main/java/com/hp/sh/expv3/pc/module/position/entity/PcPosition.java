@@ -48,7 +48,7 @@ public class PcPosition extends UserDataEntity {
 	private BigDecimal leverage;
 
 	/**
-	 * 仓位保证金， （ 基础维持保证金 ，包括用户充入的保证金 ）
+	 * 仓位保证金， （ 随开仓平仓加减 ）
 	 */
 	private BigDecimal posMargin;
 	
@@ -66,6 +66,12 @@ public class PcPosition extends UserDataEntity {
     
     //平均成本价：包含手续费 累计开仓金额amount/累计的baseValue
     private BigDecimal avgCostPrice;
+    
+    //累积总价值
+    private BigDecimal accuBaseValue;
+    
+    //累计成交量
+    private BigDecimal accuVolume;
     
 //    int _____________________________________________________;
     
@@ -274,6 +280,22 @@ public class PcPosition extends UserDataEntity {
 
 	public void setClosed(Integer closed) {
 		this.closed = closed;
+	}
+
+	public BigDecimal getAccuBaseValue() {
+		return accuBaseValue;
+	}
+
+	public void setAccuBaseValue(BigDecimal accuBaseValue) {
+		this.accuBaseValue = accuBaseValue;
+	}
+
+	public BigDecimal getAccuVolume() {
+		return accuVolume;
+	}
+
+	public void setAccuVolume(BigDecimal accuVolume) {
+		this.accuVolume = accuVolume;
 	}
 
 }

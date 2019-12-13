@@ -2,8 +2,10 @@ package com.hp.sh.expv3.pc.component;
 
 import java.math.BigDecimal;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.gitee.hupadev.commons.cache.Cache;
 import com.hp.sh.expv3.dev.Question;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.utils.IntBool;
@@ -16,7 +18,10 @@ import com.hp.sh.expv3.utils.IntBool;
  */
 @Question(ask="是否随玩法不同", answer="NO")
 @Service
-public class MarginRatioService {
+public class FeeRatioService {
+
+	@Autowired
+	private Cache cache;
 
 	/**
 	 * 获取初始化保证金率
@@ -35,7 +40,7 @@ public class MarginRatioService {
 	 * @return
 	 */
 	public BigDecimal getOpenFeeRatio(long userId) {
-		return getFeeRatio(userId, IntBool.NO);
+		return getFeeRatio(userId, false);
 	}
 
 	/**
@@ -45,7 +50,7 @@ public class MarginRatioService {
 	 * @return
 	 */
 	public BigDecimal getCloseFeeRatio(long userId) {
-		return getFeeRatio(userId, IntBool.NO);
+		return getFeeRatio(userId, false);
 	}
 
 	/**
@@ -54,8 +59,8 @@ public class MarginRatioService {
 	 * @param userId
 	 * @return
 	 */
-	private BigDecimal getFeeRatio(long userId, Integer makerFlag) {
-		if (IntBool.isTrue(makerFlag)) {
+	private BigDecimal getFeeRatio(long userId, boolean isMaker) {
+		if (isMaker) {
 			// TODO get from cache
 			return new BigDecimal("0.0025");
 		} else {
@@ -66,6 +71,29 @@ public class MarginRatioService {
 
 	public BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume) {
 		return new BigDecimal("0.005");
+	}
+	
+	int ___________;
+	
+
+	/**
+	 * 获取maker开仓手续费率
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public BigDecimal getMakerOpenFeeRatio(long userId) {
+		return getFeeRatio(userId, true);
+	}
+
+	/**
+	 * 获取maker平仓手续费率
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public BigDecimal getMakerCloseFeeRatio(long userId) {
+		return getFeeRatio(userId, true);
 	}
 
 }

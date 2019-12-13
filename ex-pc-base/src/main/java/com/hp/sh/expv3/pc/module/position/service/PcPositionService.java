@@ -13,7 +13,7 @@ import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
-import com.hp.sh.expv3.pc.component.MarginRatioService;
+import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
@@ -51,7 +51,7 @@ public class PcPositionService {
 	private PcAccountSymbolDAO pcAccountSymbolDAO;
 
 	@Autowired
-	private MarginRatioService marginRatioService;
+	private FeeRatioService feeRatioService;
 	
 	@Autowired
 	private PcAccountCoreService pcAccountCoreService;
@@ -169,7 +169,7 @@ public class PcPositionService {
 		pcPosition.setEntryLeverage(entryLeverage);
 		pcPosition.setLeverage(entryLeverage);
 		pcPosition.setAutoAddFlag(IntBool.NO);
-		pcPosition.setHoldRatio(marginRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
+		pcPosition.setHoldRatio(feeRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
 		Date now = new Date();
 		pcPosition.setCreated(now );
 		pcPosition.setModified(now);

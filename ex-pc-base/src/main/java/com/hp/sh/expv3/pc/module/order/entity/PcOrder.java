@@ -94,12 +94,12 @@ public class PcOrder extends UserDataEntity{
 //	int ______下单时计算_成交或撤单时可能会修改_______;
 	
 	/**
-	 * 开仓手续费,成交时修改(可能部分成交，按比例收取)
+	 * 开仓手续费,成交时修改(可能部分成交，按比例释放)
 	 */
 	private BigDecimal openFee;
 
 	/**
-	 * 平仓手续费，在下委托时提前收取(可能部分成交，按比例收取)
+	 * 平仓手续费，在下委托时提前收取(可能部分成交，按比例释放至仓位)
 	 */
 	private BigDecimal closeFee;
 

@@ -29,7 +29,7 @@ public class PcOrderTrade extends UserDataEntity {
 	//成交价
 	private BigDecimal price;
 
-	//成交量（单位：【结算货币】）
+	//成交量（张数）
 	private BigDecimal volume;
 
 	//交易序号

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
 import com.hp.sh.expv3.pc.calc.PnlCalc;
-import com.hp.sh.expv3.pc.component.MarginRatioService;
+import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
@@ -30,7 +30,7 @@ import com.hp.sh.expv3.utils.math.BigMathUtils;
 public class AABBPositionStrategy implements PositionStrategy {
 	
 	@Autowired
-	private MarginRatioService marginRatioService;
+	private FeeRatioService feeRatioService;
 	
 	@Autowired
 	private CommonOrderStrategy orderStrategy;
@@ -57,7 +57,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 			tradeResult.setFeeRatio(order.getOpenFeeRatio());
 			tradeResult.setFee(tradeRatioAmt.getOpenFee());
 		}else{
-			BigDecimal closeFeeRatio = this.marginRatioService.getCloseFeeRatio(order.getUserId());
+			BigDecimal closeFeeRatio = this.feeRatioService.getCloseFeeRatio(order.getUserId());
 			BigDecimal closeFee = MarginFeeCalc.calcFee(tradeResult.getBaseValue(), closeFeeRatio);
 
 			tradeResult.setFeeRatio(closeFeeRatio);
@@ -87,7 +87,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 				)
 			);
 		}else{
-			BigDecimal holdRatio = marginRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), matchedVo.getNumber());
+			BigDecimal holdRatio = feeRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), matchedVo.getNumber());
 			tradeResult.setLiqPrice(
 				PcPriceCalc.calcLiqPrice(
 					holdRatio, IntBool.isTrue(order.getLongFlag()), tradeResult.getNewMeanPrice(), tradeResult.getAmount(), tradeResult.getOrderMargin(), Precision.COMMON_PRECISION)

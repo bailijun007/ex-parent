@@ -16,7 +16,7 @@ import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.pc.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.pc.api.request.CutMoneyRequest;
-import com.hp.sh.expv3.pc.component.MarginRatioService;
+import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.MarginMode;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
@@ -53,7 +53,7 @@ public class PcOrderService {
 	private PcOrderDAO pcOrderDAO;
 	
 	@Autowired
-	private MarginRatioService marginRatioService;
+	private FeeRatioService feeRatioService;
 	
 	@Autowired
 	private PcAccountCoreService pcAccountCoreService;
@@ -200,15 +200,15 @@ public class PcOrderService {
 
 	//设置开仓订单的各种费率
 	private void setOpenOrderFee(PcOrder pcOrder) {
-		pcOrder.setMarginRatio(marginRatioService.getInitedMarginRatio(pcOrder.getLeverage()));
-		pcOrder.setOpenFeeRatio(marginRatioService.getOpenFeeRatio(pcOrder.getUserId()));
-		pcOrder.setCloseFeeRatio(marginRatioService.getCloseFeeRatio(pcOrder.getUserId()));
+		pcOrder.setMarginRatio(feeRatioService.getInitedMarginRatio(pcOrder.getLeverage()));
+		pcOrder.setOpenFeeRatio(feeRatioService.getOpenFeeRatio(pcOrder.getUserId()));
+		pcOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(pcOrder.getUserId()));
 		
-		OrderRatioData orderAmount = orderStrategy.calcOrderAmt(pcOrder);
-		pcOrder.setOpenFee(orderAmount.getOpenFee());
-		pcOrder.setCloseFee(orderAmount.getCloseFee());
-		pcOrder.setOrderMargin(orderAmount.getGrossMargin());
-		pcOrder.setGrossMargin(orderAmount.getGrossMargin());
+		OrderRatioData ratioData = orderStrategy.calcOrderAmt(pcOrder);
+		pcOrder.setOpenFee(ratioData.getOpenFee());
+		pcOrder.setCloseFee(ratioData.getCloseFee());
+		pcOrder.setOrderMargin(ratioData.getGrossMargin());
+		pcOrder.setGrossMargin(ratioData.getGrossMargin());
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
