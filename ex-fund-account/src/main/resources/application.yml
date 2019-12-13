@@ -25,7 +25,7 @@ endpoints:
 
 mybatis: 
   config-location: classpath:mybatis/mybatis-config.xml
-  mapper-locations: classpath:mybatis/mapper/*.xml
+  mapper-locations: classpath:mybatis/mapper/*.xml,classpath:mybatis/mapper/extension/*.xml
   typeAliasesPackage: com.hp.sh.expv3.**.entity
 
 
