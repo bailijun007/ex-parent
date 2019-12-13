@@ -41,7 +41,7 @@ public abstract class PaymentRecord extends UserDataEntity {
 	//支付状态描述
 	protected String payStatusDesc;
 	
-	//支付完成时间
+	//支付时间
 	protected Date payTime;
 	
 	//支付完成时间

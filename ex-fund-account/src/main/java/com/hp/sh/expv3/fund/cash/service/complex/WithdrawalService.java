@@ -89,9 +89,10 @@ public class WithdrawalService {
 		this.withdrawalRecordDAO.update(record);
 	}
 
-	public void onDrawSuccess(Long userId, Long id){
+	public void onDrawSuccess(Long userId, Long id, String txHash){
 		Date now = new Date();
 		WithdrawalRecord rr = this.withdrawalRecordDAO.findById(userId, id);
+		rr.setTxHash(txHash);
 		rr.setPayTime(now);
 		rr.setPayFinishTime(now);
 		rr.setPayStatusDesc("提现成功");
