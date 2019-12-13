@@ -32,6 +32,12 @@ public class PcPosition extends UserDataEntity {
 
 //	int ________________;
 
+	// 是否自动追加保证金标识
+	private Integer autoAddFlag;
+
+	// 当前杠杆
+	private BigDecimal leverage;
+
 	/*
 	 * 仓位 张数 
 	 * posVolume
@@ -44,19 +50,13 @@ public class PcPosition extends UserDataEntity {
 	 */
 	private BigDecimal baseValue;
 
-	// 当前杠杆
-	private BigDecimal leverage;
-
 	/**
-	 * 仓位保证金， （ 随开仓平仓加减 ）
+	 * 仓位保证金，  随开仓平仓加减 ;追加保证金也加
 	 */
 	private BigDecimal posMargin;
 	
 	//平仓手续费
 	private BigDecimal closeFee;
-
-	// 是否自动追加保证金标识
-	private Integer autoAddFlag;
 
 	/**
      * 均价，仓位为0时，表示最后一次仓位变动时的均价
@@ -64,21 +64,18 @@ public class PcPosition extends UserDataEntity {
      */
     private BigDecimal meanPrice;
     
-    //平均成本价：包含手续费 累计开仓金额amount/累计的baseValue
-    private BigDecimal avgCostPrice;
-    
     //累积总价值
     private BigDecimal accuBaseValue;
     
     //累计成交量
     private BigDecimal accuVolume;
     
-//    int _____________________________________________________;
-    
     /**
-	 * 初始保证金，平仓的时候要减去对应的比例，以维持收益率一致
+	 * 初始保证金，随开仓平仓加减；追加保证金不变
 	 */
 	private BigDecimal initMargin;
+    
+//  int _____________________________________________________;
 
 	/**
      * 维持保证金比率
@@ -90,13 +87,13 @@ public class PcPosition extends UserDataEntity {
     
     // 已实现盈亏
     private BigDecimal realisedPnl;
+	
+	/****************** 强平 ****************/
 
 	/**
 	 * 强平价，仓位为0时，表示最后一次仓位变动时的强平价
 	 */
 	private BigDecimal liqPrice;
-	
-	/* 强平 */
 
 	// 触发强平的标记价格
 	private BigDecimal liqMarkPrice;

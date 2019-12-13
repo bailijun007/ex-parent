@@ -26,6 +26,16 @@ public class PcAccountSymbol extends UserDataEntity {
     private String symbol;
     
     /**
+	 * 保证金模式,
+	 */
+	private Integer marginMode;
+
+	/**
+	 * 维持保证金比例(系统设置)
+	 */
+	private BigDecimal holdMarginRatio;
+
+	/**
      * 做空杠杆
      */
     private BigDecimal shortLeverage;
@@ -36,30 +46,33 @@ public class PcAccountSymbol extends UserDataEntity {
     private BigDecimal longLeverage;
     
     /**
-     * 保证金模式,
+     * 最大多仓杠杆
      */
-    private Integer marginMode;
+    private BigDecimal longMaxLeverage;
     
     /**
-     * 全仓杠杆
+     * 最大多空杠杆
      */
-    private BigDecimal crossLeverage;
-    
-    /**
-     * 维持保证金比例(系统设置)
-     */
-    private BigDecimal holdMarginRatio;
-    
-    /**
-     * 最大杠杆
-     */
-    private BigDecimal maxLeverage;
+    private BigDecimal shortMaxLeverage;
+
+	/**
+	 * 全仓杠杆
+	 */
+	private BigDecimal crossLeverage;
 
 	//版本
 	@Version
 	private Long version;
 	
 	public PcAccountSymbol() {
+	}
+
+	public BigDecimal getShortMaxLeverage() {
+		return shortMaxLeverage;
+	}
+
+	public void setShortMaxLeverage(BigDecimal shortMaxLeverage) {
+		this.shortMaxLeverage = shortMaxLeverage;
 	}
 
 	public String getAsset() {
@@ -118,12 +131,12 @@ public class PcAccountSymbol extends UserDataEntity {
 		this.holdMarginRatio = holdMarginRatio;
 	}
 
-	public BigDecimal getMaxLeverage() {
-		return maxLeverage;
+	public BigDecimal getLongMaxLeverage() {
+		return longMaxLeverage;
 	}
 
-	public void setMaxLeverage(BigDecimal maxLeverage) {
-		this.maxLeverage = maxLeverage;
+	public void setLongMaxLeverage(BigDecimal maxLeverage) {
+		this.longMaxLeverage = maxLeverage;
 	}
 
 	public Long getVersion() {
