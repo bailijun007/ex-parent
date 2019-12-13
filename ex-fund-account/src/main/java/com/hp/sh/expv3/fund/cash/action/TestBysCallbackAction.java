@@ -36,7 +36,7 @@ public class TestBysCallbackAction extends BaseApiAction{
 	@PostMapping("/deposit/create")
 	public void create(@RequestBody Map map){
 		NotifyCreateParams cp = ChainUtil.getCreateParams(map);
-		chainCasehApi.createDeposit(Long.parseLong(cp.getUserId()), cp.getChainOrderId(), cp.getSymbolId(), cp.getAddress(), new BigDecimal(cp.getVolume()));
+		chainCasehApi.createDeposit(Long.parseLong(cp.getUserId()), cp.getChainOrderId(), cp.getSymbolId(), cp.getAddress(), new BigDecimal(cp.getVolume()), cp.getTxHash());
 	}
 	
 	@ApiOperation(value = "支付结果通知")

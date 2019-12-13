@@ -34,7 +34,7 @@ public class ChatMvcConfig implements WebMvcConfigurer {
 	}
 	
 	@Bean
-    public LocaleResolver localeResolver(){
+    public LocaleResolver myLocaleResolver(){
         return new HpLocaleResolver();
     }
 

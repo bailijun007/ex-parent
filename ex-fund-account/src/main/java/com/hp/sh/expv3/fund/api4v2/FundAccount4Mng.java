@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hp.sh.expv3.base.BaseApiAction;
 import com.hp.sh.expv3.fund.cash.api.ChainCasehApiAction;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
+import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApiAction;
 import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.utils.SnUtils;
@@ -21,7 +22,7 @@ public class FundAccount4Mng extends BaseApiAction implements FundAccount4MngDef
 	private ChainCasehApiAction chainCasehApiAction;
 	
 	@Autowired
-	private FundAccountCoreApi fundAccountCoreApi;
+	private FundAccountCoreApiAction fundAccountCoreApi;
 
 	@Override
 	public boolean addAvailableByManager(String operator, long accountId, String asset, BigDecimal delta, String token) {

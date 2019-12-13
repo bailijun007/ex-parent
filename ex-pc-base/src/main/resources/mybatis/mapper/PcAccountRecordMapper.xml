@@ -38,7 +38,7 @@
 		<if test="tradeType!=null"> and trade_type=#{tradeType}</if>
 		<if test="serialNo!=null"> and serial_no=#{serialNo}</if>
 		<if test="associatedId!=null"> and associated_id=#{associatedId}</if>
-		<if test="requestId!=null"> and request_id=#{requestId}</if>
+		<if test="requestId!=null and requestId!=''"> and request_id=#{requestId}</if>
 		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
 		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>

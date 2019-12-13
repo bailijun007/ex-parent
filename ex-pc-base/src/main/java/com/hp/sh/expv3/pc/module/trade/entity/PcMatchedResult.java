@@ -21,7 +21,7 @@ public class PcMatchedResult {
     //资产
     private String asset;
 
-    //买卖标志 0-卖，1-买
+    //taker是否买：1-是，0-否
     private Integer tkBidFlag;
 
     /*** taker ***/

@@ -11,15 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.calc.PcPriceCalc;
+import com.hp.sh.expv3.pc.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
-import com.hp.sh.expv3.pc.component.MarginRatioService;
+import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
-import com.hp.sh.expv3.pc.module.account.api.request.AddMoneyRequest;
-import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
+import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
@@ -31,9 +30,8 @@ import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
-import com.hp.sh.expv3.pc.strategy.impl.AABBPositionStrategy;
-import com.hp.sh.expv3.pc.strategy.impl.CommonOrderStrategy;
-import com.hp.sh.expv3.pc.strategy.vo.TradeData;
+import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
+import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.IntBool;
 
 @Service
@@ -53,19 +51,13 @@ public class PcPositionService {
 	private PcAccountSymbolDAO pcAccountSymbolDAO;
 
 	@Autowired
-	private MarginRatioService marginRatioService;
-	
-	@Autowired
-	private PcPriceCalc pcPriceCalc;
+	private FeeRatioService feeRatioService;
 	
 	@Autowired
 	private PcAccountCoreService pcAccountCoreService;
 	
 	@Autowired
 	private FeeCollectorSelector feeCollectorSelector;
-	
-	@Autowired
-	private CommonOrderStrategy orderStrategy;
 	
 	@Autowired
 	private AABBPositionStrategy positionStrategy;
@@ -79,8 +71,8 @@ public class PcPositionService {
 		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
-		TradeData tradeData = this.positionStrategy.getTradeData(order, matchedVo, pcPosition);
-		PcOrderTrade pcOrderTrade = this.saveOrderTrade(matchedVo, order, tradeData);
+		TradeResult tradeResult = this.positionStrategy.getTradeData(order, matchedVo, pcPosition);
+		PcOrderTrade pcOrderTrade = this.saveOrderTrade(matchedVo, order, tradeResult);
 		
 		//如果仓位不存在则创建新仓位
 		boolean isNewPos = false;
@@ -91,9 +83,9 @@ public class PcPositionService {
 		
 		//仓位数量加减
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
-			this.modOpenPos(pcPosition, tradeData);
+			this.modOpenPos(pcPosition, tradeResult);
 		}else{
-			this.modClosePos(pcPosition, tradeData);
+			this.modClosePos(pcPosition, tradeResult);
 		}
 		//保存
 		if(isNewPos){
@@ -103,19 +95,19 @@ public class PcPositionService {
 		}
 		
 		//修改订单状态
-		this.updateOrder(order, tradeData);
+		this.updateOrder(order, tradeResult);
 		
 		//pc account
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
-			this.transfer(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeData);
+			this.transfer(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult);
 		}
 	}
 	
-	private void transfer(Long userId, Long orderTradeId, String asset, TradeData tradeData) {
+	private void transfer(Long userId, Long orderTradeId, String asset, TradeResult tradeData) {
 		AddMoneyRequest request = new AddMoneyRequest();
 		request.setAmount(tradeData.getOrderMargin().add(tradeData.getPnl()).subtract(tradeData.getFee()));
 		request.setAsset(asset);
-		request.setRemark("平仓");
+		request.setRemark(String.format("平仓,保证金：%d,收益:%s,手续费：-%d", tradeData.getOrderMargin(), tradeData.getPnl(), tradeData.getFee()));
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(PcAccountTradeType.ORDER_CLOSE);
 		request.setUserId(userId);
@@ -123,20 +115,20 @@ public class PcPositionService {
 		this.pcAccountCoreService.add(request);
 	}
 
-	private void updateOrder(PcOrder order, TradeData tradeData){
+	private void updateOrder(PcOrder order, TradeResult tradeData){
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeData.getOrderMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeData.getFee()));
 		}
 		order.setFeeCost(order.getFeeCost().add(tradeData.getFee()));
-        order.setStatus(tradeData.isCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
-        order.setActiveFlag(tradeData.isCompleted()?PcOrder.NO:PcOrder.YES);
+        order.setStatus(tradeData.isOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
+        order.setActiveFlag(tradeData.isOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setFilledVolume(tradeData.getVolume());
 		order.setModified(new Date());
 		this.pcOrderDAO.update(order);
 	}
 
-	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeData tradeData) {
+	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeData) {
 		Date now = new Date();
 		
 		PcOrderTrade orderTrade = new PcOrderTrade();
@@ -177,7 +169,7 @@ public class PcPositionService {
 		pcPosition.setEntryLeverage(entryLeverage);
 		pcPosition.setLeverage(entryLeverage);
 		pcPosition.setAutoAddFlag(IntBool.NO);
-		pcPosition.setHoldRatio(marginRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
+		pcPosition.setHoldRatio(feeRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
 		Date now = new Date();
 		pcPosition.setCreated(now );
 		pcPosition.setModified(now);
@@ -201,7 +193,7 @@ public class PcPositionService {
 		return pcPosition;
 	}
 
-	private void modOpenPos(PcPosition pcPosition, TradeData tradeData) {
+	private void modOpenPos(PcPosition pcPosition, TradeResult tradeData) {
 		pcPosition.setVolume(pcPosition.getVolume().add(tradeData.getVolume()));
 		pcPosition.setBaseValue(pcPosition.getBaseValue().add(tradeData.getBaseValue()));
 		pcPosition.setPosMargin(pcPosition.getPosMargin().add(tradeData.getOrderMargin()));
@@ -215,7 +207,7 @@ public class PcPositionService {
 		
 	}
 
-	private void modClosePos(PcPosition pcPosition, TradeData tradeData) {
+	private void modClosePos(PcPosition pcPosition, TradeResult tradeData) {
 		pcPosition.setVolume(pcPosition.getVolume().subtract(tradeData.getVolume()));
 		pcPosition.setBaseValue(pcPosition.getBaseValue().subtract(tradeData.getBaseValue()));
 		pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(tradeData.getOrderMargin()));

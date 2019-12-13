@@ -38,7 +38,7 @@
 		<if test="srcAccountId!=null"> and src_account_id=#{srcAccountId}</if>
 		<if test="targetAccountId!=null"> and target_account_id=#{targetAccountId}</if>
 		<if test="status!=null"> and status=#{status}</if>
-		<if test="requestId!=null"> and request_id=#{requestId}</if>
+		<if test="requestId!=null and requestId!=''"> and request_id=#{requestId}</if>
 		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
 		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>

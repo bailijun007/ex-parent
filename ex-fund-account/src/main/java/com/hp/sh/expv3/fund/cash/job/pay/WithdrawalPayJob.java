@@ -35,7 +35,7 @@ public class WithdrawalPayJob {
 	 */
 	@Scheduled(cron = "0 0/10 * * * ?")
 	public void handlePendingWithDrawal() {
-		Page page = new Page(0, 10, 1000L);
+		Page page = new Page(1, 10, 1000L);
 		while(true){
 			List<WithdrawalRecord> list = this.withdrawalService.findPendingWithDrawal(page);
 			if(list==null || list.isEmpty()){

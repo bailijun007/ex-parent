@@ -7,17 +7,21 @@ import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Component
-@WebFilter(filterName = "FilterDemo01", urlPatterns = { "/*" })
+import com.gitee.hupadev.commons.id.IdGenerator;
+
+@WebFilter(filterName = "myLogFilter", urlPatterns = { "/api/**" })
 public class LogFilter implements Filter {
+	
+	@Autowired(required=false)
+	private IdGenerator idGenerator;
+	
+	private String sequenceName = "LogFilter";;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -27,16 +31,27 @@ public class LogFilter implements Filter {
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		HttpServletRequestWrapper newRequest = new HttpServletRequestWrapper((HttpServletRequest) request);
-		
-		chain.doFilter(newRequest, response);
-		
+		HttpServletRequest httpReq = (HttpServletRequest)request;
+//		httpReq = new MyCachedServletRequest(httpReq);
+		System.out.println(httpReq.getServletPath());
+		System.out.println(httpReq.getHeader("X-Request-Id"));
+		RequestContext.setRequestId(this.getRequestId());
+		chain.doFilter(httpReq, response);
+		RequestContext.setRequestId(null);
 	}
 
 	@Override
 	public void destroy() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private Long getRequestId(){
+		if(idGenerator!=null){
+			Long id = idGenerator.nextId(sequenceName);
+			return id;
+		}
+		return null;
 	}
 
 }
