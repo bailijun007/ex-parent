@@ -32,7 +32,7 @@ import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBMetadataService;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
-import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
+import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigMathUtils;
 
@@ -204,7 +204,7 @@ public class PcOrderService {
 		pcOrder.setOpenFeeRatio(marginRatioService.getOpenFeeRatio(pcOrder.getUserId()));
 		pcOrder.setCloseFeeRatio(marginRatioService.getCloseFeeRatio(pcOrder.getUserId()));
 		
-		OrderAmount orderAmount = orderStrategy.calcOrderAmt(pcOrder);
+		OrderRatioData orderAmount = orderStrategy.calcOrderAmt(pcOrder);
 		pcOrder.setOpenFee(orderAmount.getOpenFee());
 		pcOrder.setCloseFee(orderAmount.getCloseFee());
 		pcOrder.setOrderMargin(orderAmount.getGrossMargin());
@@ -231,14 +231,22 @@ public class PcOrderService {
         
 	}
 	
-	public void cancel(long userId, String asset, long orderId, BigDecimal number){
+	/**
+	 * 
+	 * @param userId
+	 * @param asset
+	 * @param orderId 订单ID
+	 * @param number 撤几张合约
+	 */
+	@LockIt(key="${userId}-${asset}-${symbol}")
+	public void cancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
 			//返还余额
 	
 			PcOrder order = this.pcOrderDAO.findById(userId, orderId);
 			
-			OrderAmount ratioAmt = orderStrategy.calcRaitoAmt(order, number);
+			OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, number);
 			
-			BigDecimal cancelledGrossFee = ratioAmt.getGrossMargin();
+			BigDecimal cancelledGrossFee = ratioData.getGrossMargin();
 			
 			int result = this.returnCancelAmt(userId, asset, orderId, cancelledGrossFee);
 			if(result==InvokeResult.NOCHANGE){

@@ -3,11 +3,11 @@ package com.hp.sh.expv3.pc.strategy.vo;
 import java.math.BigDecimal;
 
 /**
- * 一次成交的数据
+ * 一次成交的结果
  * @author wangjg
  *
  */
-public class TradeData {
+public class TradeResult {
 	
 	//成交量
 	private BigDecimal volume;
@@ -34,7 +34,7 @@ public class TradeData {
 	//订单完成(此次成交后，对应订单已全部成交)
 	private boolean orderCompleted;
 
-	public TradeData() {
+	public TradeResult() {
 		super();
 	}
 

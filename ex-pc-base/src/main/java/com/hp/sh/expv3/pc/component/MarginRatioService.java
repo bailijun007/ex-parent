@@ -9,7 +9,7 @@ import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.utils.IntBool;
 
 /**
- * 查询获取保证金，redis或db
+ * 查询保证金费率，redis或db
  * 
  * @author lw
  *

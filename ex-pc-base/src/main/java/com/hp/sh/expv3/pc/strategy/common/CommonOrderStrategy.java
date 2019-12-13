@@ -10,7 +10,7 @@ import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
-import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
+import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.utils.math.BigMathUtils;
 
 /**
@@ -26,7 +26,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * @param pcOrder
 	 * @return
 	 */
-	public OrderAmount calcOrderAmt(PcOrder pcOrder){
+	public OrderRatioData calcOrderAmt(PcOrder pcOrder){
 		//交易金额
 		BigDecimal amount = CompFieldCalc.calcAmount(pcOrder.getVolume(), pcOrder.getFaceValue());
 		//基础货币价值
@@ -44,7 +44,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 		//总押金
 		BigDecimal grossMargin = MarginFeeCalc.sum(closeFee, openFee, orderMargin);
 
-		OrderAmount orderAmount = new OrderAmount();
+		OrderRatioData orderAmount = new OrderRatioData();
 		orderAmount.setAmount(amount);
 		orderAmount.setBaseValue(baseValue);
 		
@@ -63,8 +63,8 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * @param volume 分量
 	 * @return
 	 */
-	public OrderAmount calcRaitoAmt(PcOrder order, BigDecimal number){
-		OrderAmount orderAmount = new OrderAmount();
+	public OrderRatioData calcRaitoAmt(PcOrder order, BigDecimal number){
+		OrderRatioData orderAmount = new OrderRatioData();
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 			this.calcOpenRaitoAmt(order, number, orderAmount);
 		}else{
@@ -73,7 +73,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 		return orderAmount;
 	}
 	
-	protected void calcCloseRaitoAmt(PcOrder order, BigDecimal number, OrderAmount orderAmount) {
+	protected void calcCloseRaitoAmt(PcOrder order, BigDecimal number, OrderRatioData orderAmount) {
 		orderAmount.setOpenFee(BigDecimal.ZERO);
 		orderAmount.setCloseFee(BigDecimal.ZERO);
 		orderAmount.setOrderMargin(BigDecimal.ZERO);
@@ -92,7 +92,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * @param number
 	 * @return
 	 */
-	protected void calcOpenRaitoAmt(PcOrder order, BigDecimal number, OrderAmount orderAmount){
+	protected void calcOpenRaitoAmt(PcOrder order, BigDecimal number, OrderRatioData orderAmount){
 		
 		BigDecimal openFee; 
 		BigDecimal closeFee; 

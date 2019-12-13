@@ -36,7 +36,7 @@ public class MatchMqConsumer {
 	@MQListener(tags=MqTopic.TAGS_CANCELLED)
 	public void handleCancelledMsg(MatchedOrderCancelledMsg msg){
 		logger.info("收到消息:{}", msg);
-		this.pcOrderService.cancel(msg.getAccountId(), msg.getAsset(), msg.getOrderId(), msg.getCancelNumber());
+		this.pcOrderService.cancel(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId(), msg.getCancelNumber());
 	}
 	
 	//成交
