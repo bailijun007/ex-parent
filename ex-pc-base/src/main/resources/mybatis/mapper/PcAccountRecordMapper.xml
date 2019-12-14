@@ -34,6 +34,8 @@
 		</foreach>
 		</if>
 		<if test="userId!=null"> and user_id=#{userId}</if>
+		<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+		<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
 		<if test="type!=null"> and type=#{type}</if>
 		<if test="tradeType!=null"> and trade_type=#{tradeType}</if>
 		<if test="serialNo!=null"> and serial_no=#{serialNo}</if>
