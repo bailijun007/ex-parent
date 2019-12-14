@@ -9,17 +9,17 @@ import java.math.BigDecimal;
  */
 public class TradeResult {
 	
-	//成交量
+	//此次成交的成交量
 	private BigDecimal volume;
-	//成交金额
+	//此次成交的成交金额
 	private BigDecimal amount;
-	//成交合约价值
+	//此次成交的成交合约价值
 	private BigDecimal baseValue;
-	//手续费率
+	//此次成交的手续费率
 	private BigDecimal feeRatio ;
-	//手续费
+	//此次成交的手续费
 	private BigDecimal fee;
-	//保证金
+	//此次成交的保证金
 	private BigDecimal orderMargin;
 	//此次成交的盈亏（平仓才有）
 	private BigDecimal pnl;
@@ -33,9 +33,30 @@ public class TradeResult {
 	
 	//订单完成(此次成交后，对应订单已全部成交)
 	private boolean orderCompleted;
-
+	
+	//maker手续费率
+	private BigDecimal makerFeeRatio;
+	//maker手续费
+	private BigDecimal makerFee;
+	
 	public TradeResult() {
 		super();
+	}
+
+	//maker 手续费差额
+	public BigDecimal getMakerFeeDiff(){
+		if(makerFee==null){
+			return BigDecimal.ZERO;
+		}
+		return fee.subtract(makerFee);
+	}
+	
+	//应收手续费（考虑到maker收费优惠）
+	public BigDecimal getFeeReceivable(){
+		if(makerFee!=null){
+			return makerFee;
+		}
+		return fee;
 	}
 
 	public BigDecimal getFeeRatio() {
@@ -116,6 +137,22 @@ public class TradeResult {
 
 	public void setOrderCompleted(boolean completed) {
 		this.orderCompleted = completed;
+	}
+
+	public BigDecimal getMakerFee() {
+		return makerFee;
+	}
+
+	public void setMakerFee(BigDecimal makerFee) {
+		this.makerFee = makerFee;
+	}
+
+	public BigDecimal getMakerFeeRatio() {
+		return makerFeeRatio;
+	}
+
+	public void setMakerFeeRatio(BigDecimal makerFeeRatio) {
+		this.makerFeeRatio = makerFeeRatio;
 	}
 
 }

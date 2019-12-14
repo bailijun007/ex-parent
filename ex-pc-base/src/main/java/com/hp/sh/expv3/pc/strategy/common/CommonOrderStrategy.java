@@ -33,10 +33,10 @@ public class CommonOrderStrategy implements OrderStrategy {
 		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, pcOrder.getPrice());
 		
 		//开仓手续费
-		BigDecimal openFee = MarginFeeCalc.calcFee(baseValue, pcOrder.getOpenFeeRatio());
+		BigDecimal openFee = this.calcFee(baseValue, pcOrder.getOpenFeeRatio());
 		
 		//平仓手续费
-		BigDecimal closeFee = MarginFeeCalc.calcFee(baseValue, pcOrder.getCloseFeeRatio());
+		BigDecimal closeFee = this.calcFee(baseValue, pcOrder.getCloseFeeRatio());
 		
 		//保证金
 		BigDecimal orderMargin = MarginFeeCalc.calMargin(baseValue, pcOrder.getMarginRatio());
@@ -55,6 +55,11 @@ public class CommonOrderStrategy implements OrderStrategy {
 		orderAmount.setGrossMargin(grossMargin);
 		
 		return orderAmount;
+	}
+	
+	public BigDecimal calcFee(BigDecimal baseValue, BigDecimal feeRatio){
+		BigDecimal fee = MarginFeeCalc.calcFee(baseValue, feeRatio);
+		return fee;
 	}
 	
 	/**

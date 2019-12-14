@@ -58,6 +58,7 @@ public class PcOrderApiAction implements PcOrderApi {
 		msg.setSymbol(symbol);
 		msg.setOrderType(order.getOrderType());
 		msg.setOrderTime(order.getCreated().getTime());
+		msg.setTimeInForce(order.getTimeInForce());
 		matchMqSender.sendPendingNew(msg);
 	}
 	

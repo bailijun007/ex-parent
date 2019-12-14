@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import com.gitee.hupadev.commons.mybatis.PageInterceptor;
 
 @Configuration
-@MapperScan({"com.hp.sh.expv3.fund.*.dao", "com.hp.sh.expv3.fund.*.mapper",    "com.hp.sh.expv3.fund.*.extension", "com.hp.sh.expv3.fund.extension.*.mapper"})
+@MapperScan({"com.hp.sh.expv3.fund.*.dao", "com.hp.sh.expv3.fund.*.mapper",   "com.hp.sh.expv3.fund.*.extension", "com.hp.sh.expv3.fund.extension.*.mapper"})
 public class MybatisConfig implements ApplicationContextAware {
 	private ApplicationContext ctx;
 

@@ -33,9 +33,10 @@ import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.IntBool;
+import com.hp.sh.expv3.utils.math.BigMathUtils;
 
 @Service
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class PcPositionService {
 
 	@Autowired
@@ -62,7 +63,6 @@ public class PcPositionService {
 	@Autowired
 	private AABBPositionStrategy positionStrategy;
 	
-	
 	//处理成交订单
 	public void handleTradeOrder(PcTradeMsg matchedVo){
 		PcOrder order = this.pcOrderDAO.findById(matchedVo.getAccountId(), matchedVo.getOrderId());
@@ -71,7 +71,7 @@ public class PcPositionService {
 		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
-		TradeResult tradeResult = this.positionStrategy.getTradeData(order, matchedVo, pcPosition);
+		TradeResult tradeResult = this.positionStrategy.getTradeResult(order, matchedVo, pcPosition);
 		PcOrderTrade pcOrderTrade = this.saveOrderTrade(matchedVo, order, tradeResult);
 		
 		//如果仓位不存在则创建新仓位
@@ -99,18 +99,34 @@ public class PcPositionService {
 		
 		//pc account
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
-			this.transfer(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult);
+			this.closeFeeToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult);
+		}else{
+			if(BigMathUtils.isNegative(tradeResult.getFeeReceivable())){
+				this.openFeeDiffToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult);
+			}
 		}
 	}
 	
-	private void transfer(Long userId, Long orderTradeId, String asset, TradeResult tradeData) {
+	private void closeFeeToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeData) {
 		AddMoneyRequest request = new AddMoneyRequest();
-		request.setAmount(tradeData.getOrderMargin().add(tradeData.getPnl()).subtract(tradeData.getFee()));
+		request.setAmount(tradeData.getOrderMargin().add(tradeData.getPnl()).subtract(tradeData.getFeeReceivable()));
+		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("平仓,保证金：%d,收益:%s,手续费：-%d", tradeData.getOrderMargin(), tradeData.getPnl(), tradeData.getFee()));
+		request.setRemark(String.format("平仓,保证金：%d,收益:%s,手续费：%d", tradeData.getOrderMargin(), tradeData.getPnl(), tradeData.getFeeReceivable()));
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(PcAccountTradeType.ORDER_CLOSE);
+		request.setAssociatedId(orderTradeId);
+		this.pcAccountCoreService.add(request);
+	}
+	
+	private void openFeeDiffToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeData) {
+		AddMoneyRequest request = new AddMoneyRequest();
+		request.setAmount(tradeData.getMakerFeeDiff());
 		request.setUserId(userId);
+		request.setAsset(asset);
+		request.setRemark(String.format("返还开仓手续费差额：%d", tradeData.getMakerFeeDiff()));
+		request.setTradeNo("CLOSE-"+orderTradeId);
+		request.setTradeType(PcAccountTradeType.RETURN_FEE_DIFF);
 		request.setAssociatedId(orderTradeId);
 		this.pcAccountCoreService.add(request);
 	}
@@ -120,7 +136,7 @@ public class PcPositionService {
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeData.getOrderMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeData.getFee()));
 		}
-		order.setFeeCost(order.getFeeCost().add(tradeData.getFee()));
+		order.setFeeCost(order.getFeeCost().add(tradeData.getFeeReceivable()));
         order.setStatus(tradeData.isOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeData.isOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setFilledVolume(tradeData.getVolume());
@@ -140,7 +156,7 @@ public class PcPositionService {
 		orderTrade.setVolume(tradeMsg.getNumber());
 		orderTrade.setMakerFlag(tradeMsg.getMakerFlag());
 
-		orderTrade.setFee(tradeData.getFee());
+		orderTrade.setFee(tradeData.getFeeReceivable());
 		orderTrade.setFeeRatio(tradeData.getFeeRatio());
 		orderTrade.setPnl(tradeData.getPnl());
 		
@@ -197,11 +213,11 @@ public class PcPositionService {
 		pcPosition.setVolume(pcPosition.getVolume().add(tradeData.getVolume()));
 		pcPosition.setBaseValue(pcPosition.getBaseValue().add(tradeData.getBaseValue()));
 		pcPosition.setPosMargin(pcPosition.getPosMargin().add(tradeData.getOrderMargin()));
-		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeData.getFee()));
+		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeData.getFeeReceivable()));
 		
 		pcPosition.setMeanPrice(tradeData.getNewMeanPrice());
 		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeData.getOrderMargin()));
-		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeData.getFee()));
+		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeData.getFeeReceivable()));
 		
 		pcPosition.setLiqPrice(tradeData.getLiqPrice());
 		
@@ -211,11 +227,11 @@ public class PcPositionService {
 		pcPosition.setVolume(pcPosition.getVolume().subtract(tradeData.getVolume()));
 		pcPosition.setBaseValue(pcPosition.getBaseValue().subtract(tradeData.getBaseValue()));
 		pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(tradeData.getOrderMargin()));
-		pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(tradeData.getFee()));
+		pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(tradeData.getFeeReceivable()));
 		
 		pcPosition.setMeanPrice(tradeData.getNewMeanPrice());
 		pcPosition.setInitMargin(pcPosition.getInitMargin().subtract(tradeData.getOrderMargin()));
-		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeData.getFee()));
+		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeData.getFeeReceivable()));
 		
 //		pcPosition.setLiqPrice(tradeData.getLiqPrice());
 		
