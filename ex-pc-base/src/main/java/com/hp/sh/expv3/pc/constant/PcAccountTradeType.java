@@ -17,7 +17,7 @@ public class PcAccountTradeType {
 
 	public static final int ORDER_CLOSE = 5;	//+平仓	//保证金+收益-手续费
 	
-	public static final int ADD_MARGIN = 6;		//-追加保证金
+	public static final int ADD_TO_MARGIN = 6;		//-追加保证金
 	
 	public static final int ADD_MARGIN2 = 7;	//-修改杠杆追加保证金
 	

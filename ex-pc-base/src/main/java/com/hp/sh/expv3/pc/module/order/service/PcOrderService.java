@@ -42,7 +42,7 @@ import com.hp.sh.expv3.utils.math.BigMathUtils;
  *
  */
 @Service
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class PcOrderService {
 	private static final Logger logger = LoggerFactory.getLogger(PcOrderService.class);
 	
@@ -86,8 +86,12 @@ public class PcOrderService {
 //			throw new ExException(OrderError.CREATED);
 //		}
 		
+		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+		
 		//check 检查可平仓位
-		checkClosablePosition(userId, asset, symbol, number, closeFlag, longFlag);
+		if(closeFlag!=OrderFlag.ACTION_CLOSE){
+			this.checkClosablePosition(pos);
+		}
 		
 		Date now = new Date();
 		
@@ -123,7 +127,7 @@ public class PcOrderService {
 		}
 		
 		////////其他字段，后面随状态修改////////
-		this.setOther(pcOrder);
+		this.setOther(pcOrder, pos.getId());
 		
 		pcOrderDAO.save(pcOrder);
 
@@ -141,11 +145,13 @@ public class PcOrderService {
 		return count>0;
 	}
 
-	private void setOther(PcOrder pcOrder){
+	private void setOther(PcOrder pcOrder, Long posId){
 		pcOrder.setFeeCost(BigDecimal.ZERO);
 		pcOrder.setFilledVolume(BigDecimal.ZERO);
 		pcOrder.setCancelVolume(null);
-		pcOrder.setClosePosId(null);
+		if(pcOrder.getCloseFlag()==OrderFlag.ACTION_CLOSE){
+			pcOrder.setClosePosId(posId);
+		}
 		pcOrder.setTriggerFlag(IntBool.NO);
 		pcOrder.setCancelTime(null);
 
@@ -274,17 +280,12 @@ public class PcOrderService {
 		}
 	}
 
-	private void checkClosablePosition(long userId, String asset, String symbol, BigDecimal volume, int closeFlag, int longFlag) {
-		if(closeFlag!=OrderFlag.ACTION_CLOSE){
-			return;
-		}
-		
-		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+	private void checkClosablePosition(PcPosition pos) {
 		if(pos==null){
 			throw new ExException(PositonError.POS_NOT_ENOUGH);
 		}
 		
-		BigDecimal cpv = this.pcOrderDAO.getClosedPosVolume(userId, pos.getId());
+		BigDecimal cpv = this.pcOrderDAO.getClosedPosVolume(pos.getUserId(), pos.getId());
 		
 		BigDecimal availablePos = pos.getVolume().subtract(cpv);
 		

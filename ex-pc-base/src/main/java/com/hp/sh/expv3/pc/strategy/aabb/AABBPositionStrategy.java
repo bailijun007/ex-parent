@@ -9,8 +9,10 @@ import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
 import com.hp.sh.expv3.pc.calc.PnlCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
+import com.hp.sh.expv3.pc.constant.BidFlag;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.Precision;
+import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
@@ -35,6 +37,10 @@ public class AABBPositionStrategy implements PositionStrategy {
 	@Autowired
 	private CommonOrderStrategy orderStrategy;
 	
+	@Autowired
+	private AABBMetadataService metadataService;
+	
+	
 	/**
 	 * 计算本单的各项数据
 	 * @param order
@@ -42,11 +48,11 @@ public class AABBPositionStrategy implements PositionStrategy {
 	 * @param pcPosition
 	 * @return
 	 */
-	public TradeResult getTradeData(PcOrder order, PcTradeMsg matchedVo, PcPosition pcPosition){
+	public TradeResult getTradeResult(PcOrder order, PcTradeMsg matchedVo, PcPosition pcPosition){
 		OrderRatioData tradeRatioAmt = orderStrategy.calcRaitoAmt(order, matchedVo.getNumber());
 		
 		TradeResult tradeResult = new TradeResult();
-
+  
 		tradeResult.setVolume(matchedVo.getNumber());
 		tradeResult.setAmount(tradeRatioAmt.getAmount());
 		tradeResult.setBaseValue(CompFieldCalc.calcBaseValue(tradeResult.getAmount(), matchedVo.getPrice()));
@@ -81,20 +87,42 @@ public class AABBPositionStrategy implements PositionStrategy {
 		
 		//强平价
 		if(pcPosition!=null){
+			BigDecimal amount = pcPosition.getVolume().multiply(order.getFaceValue());
 			tradeResult.setLiqPrice(
-				PcPriceCalc.calcLiqPrice(
-					pcPosition.getHoldRatio(), IntBool.isTrue(pcPosition.getLongFlag()), tradeResult.getNewMeanPrice(), tradeResult.getAmount(), pcPosition.getPosMargin(), Precision.COMMON_PRECISION
-				)
+				this.calcLiqPrice(pcPosition.getLongFlag(), amount, tradeResult.getNewMeanPrice(), pcPosition.getHoldRatio(), pcPosition.getPosMargin())
 			);
 		}else{
 			BigDecimal holdRatio = feeRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), matchedVo.getNumber());
 			tradeResult.setLiqPrice(
-				PcPriceCalc.calcLiqPrice(
-					holdRatio, IntBool.isTrue(order.getLongFlag()), tradeResult.getNewMeanPrice(), tradeResult.getAmount(), tradeResult.getOrderMargin(), Precision.COMMON_PRECISION)
-				);
+				this.calcLiqPrice(order.getLongFlag(), tradeResult.getAmount(), tradeResult.getNewMeanPrice(), holdRatio, tradeResult.getOrderMargin())
+			);
+		}
+		
+		//maker fee
+		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN && matchedVo.getMakerFlag()==TradingRoles.MAKER){
+			BigDecimal makerFeeRatio = feeRatioService.getMakerOpenFeeRatio(order.getUserId());
+			tradeResult.setMakerFeeRatio(makerFeeRatio);
+			tradeResult.setMakerFee(orderStrategy.calcFee(tradeResult.getBaseValue(), makerFeeRatio));
+		}else{
+			BigDecimal makerFeeRatio = feeRatioService.getMakerCloseFeeRatio(order.getUserId());
+			tradeResult.setMakerFeeRatio(makerFeeRatio);
+			tradeResult.setMakerFee(orderStrategy.calcFee(tradeResult.getBaseValue(), makerFeeRatio));
 		}
 		
 		return tradeResult;
+	}
+	
+	public BigDecimal calcLiqPrice(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
+		return PcPriceCalc.calcLiqPrice(
+			holdMarginRatio, IntBool.isTrue(longFlag), openPrice, amount, posMargin, Precision.COMMON_PRECISION
+		);
+	}
+	
+	public BigDecimal calcLiqPrice(String symbol, int longFlag, BigDecimal volume, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
+		BigDecimal amount = CompFieldCalc.calcAmount(volume, this.metadataService.getFaceValue(symbol));
+		return PcPriceCalc.calcLiqPrice(
+			holdMarginRatio, IntBool.isTrue(longFlag), openPrice, amount, posMargin, Precision.COMMON_PRECISION
+		);
 	}
 	
 	public String getStrategyId(){
