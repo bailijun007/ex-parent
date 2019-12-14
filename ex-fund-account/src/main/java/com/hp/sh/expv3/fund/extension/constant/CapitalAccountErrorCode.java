@@ -12,6 +12,8 @@ public class CapitalAccountErrorCode extends ErrorCode {
 
     public static final CapitalAccountErrorCode PARAM_EMPTY = new CapitalAccountErrorCode(9000, "缺少必填参数!");
 
+    public static final CapitalAccountErrorCode DATA_EMPTY = new CapitalAccountErrorCode(9001, "没有查询到数据!");
+
 
 
 

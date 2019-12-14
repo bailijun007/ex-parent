@@ -24,9 +24,9 @@ import java.util.Optional;
  * @author BaiLiJun  on 2019/12/13
  */
 @RestController
-@Api(tags ="资金账户相关请求")
+@Api(tags ="资金账户扩展Api")
 @RequestMapping("/baseUrl/account/total")
-public class CapitalAccountApi {
+public class CapitalAccountExtApi {
     @Autowired
     private FundAccountExtendServer fundAccountExtendServer;
 
@@ -35,7 +35,7 @@ public class CapitalAccountApi {
 
     @ApiOperation("获取资金账户")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "用户id",example = "1"),
+            @ApiImplicitParam(name = "userId", value = "用户id",example = "1",required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型",example = "BTC")
     })
     @GetMapping(value = "/query")
