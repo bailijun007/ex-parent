@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.fund.extension.dao.WithdrawalAddrExtMapper">
+
+    <select id="getAddressByUserIdAndAsset" resultType="java.lang.String">
+        SELECT address FROM withdrawal_addr
+        <where>
+            enabled=1
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                AND asset=#{asset}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>
