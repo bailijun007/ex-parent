@@ -11,7 +11,7 @@ import com.hp.sh.expv3.fund.cash.api.ChainCasehApiAction;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApiAction;
 import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
-import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.AddMoneyRequest;
 import com.hp.sh.expv3.utils.SnUtils;
 
 @RestController

@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
-import com.hp.sh.expv3.pc.api.request.AddMoneyRequest;
-import com.hp.sh.expv3.pc.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.MarginMode;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
@@ -33,6 +31,8 @@ import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBMetadataService;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
+import com.hp.sh.expv3.pc.vo.request.AddMoneyRequest;
+import com.hp.sh.expv3.pc.vo.request.CutMoneyRequest;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
 

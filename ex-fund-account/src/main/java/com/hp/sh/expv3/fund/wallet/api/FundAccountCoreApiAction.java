@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
-import com.hp.sh.expv3.fund.wallet.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
+import com.hp.sh.expv3.fund.wallet.vo.request.AddMoneyRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.CutMoneyRequest;
 
 /**
  * 账户核心服务

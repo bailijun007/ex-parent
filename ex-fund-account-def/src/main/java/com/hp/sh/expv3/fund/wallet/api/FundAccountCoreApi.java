@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
-import com.hp.sh.expv3.fund.wallet.api.request.CutMoneyRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.AddMoneyRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.CutMoneyRequest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

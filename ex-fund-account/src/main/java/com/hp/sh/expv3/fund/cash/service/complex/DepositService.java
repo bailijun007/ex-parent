@@ -22,10 +22,10 @@ import com.hp.sh.expv3.fund.cash.dao.DepositRecordDAO;
 import com.hp.sh.expv3.fund.cash.entity.DepositRecord;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
-import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
 import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
+import com.hp.sh.expv3.fund.wallet.vo.request.AddMoneyRequest;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**

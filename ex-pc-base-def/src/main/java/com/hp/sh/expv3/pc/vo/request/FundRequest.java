@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.api.request;
+package com.hp.sh.expv3.pc.vo.request;
 
 import java.math.BigDecimal;
 
@@ -6,11 +6,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * 加钱请求
+ * 资金请求
  * @author wangjg
  */
-@ApiModel(value = "加钱请求")
-public class AddMoneyRequest {
+@ApiModel(value = "资金请求")
+public class FundRequest {
 
 	@ApiModelProperty(value = "用户ID")
 	private Long userId;
@@ -33,7 +33,7 @@ public class AddMoneyRequest {
 	@ApiModelProperty(value = "关联对象ID")
 	private Long associatedId;
 		
-	public AddMoneyRequest() {
+	public FundRequest() {
 	}
 
 	public BigDecimal getAmount() {

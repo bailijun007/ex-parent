@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -32,6 +31,7 @@ import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
+import com.hp.sh.expv3.pc.vo.request.AddMoneyRequest;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
 

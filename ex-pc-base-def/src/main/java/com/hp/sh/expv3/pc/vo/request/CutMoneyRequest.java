@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.fund.wallet.api.request;
+package com.hp.sh.expv3.pc.vo.request;
 
 import io.swagger.annotations.ApiModel;
 
@@ -7,6 +7,6 @@ import io.swagger.annotations.ApiModel;
  * @author wangjg
  */
 @ApiModel(value = "扣钱请求")
-public class CutMoneyRequest extends AddMoneyRequest {
+public class CutMoneyRequest extends FundRequest {
 
 }
