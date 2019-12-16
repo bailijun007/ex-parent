@@ -28,7 +28,7 @@ public interface PcAccountExtendApi {
     BigDecimal getBalance(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
     @ApiOperation(value = "获取合约账户")
-    @GetMapping(value = "/baseUrl/account/pc/query")
+    @GetMapping(value = "/api/extension/account/pc/query")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userIds", value = "多个用户id，以逗号分割", example = "1,2", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true)

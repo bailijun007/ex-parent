@@ -27,7 +27,7 @@ public interface FundTransferExtApi {
             @ApiImplicitParam(name = "pageStatus", value = "翻页状态：-1：上一页，1：下一页", example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
-    @GetMapping(value = "/baseUrl/account/transfer/queryHistory")
+    @GetMapping(value = "/api/extension/account/transfer/queryHistory")
     public List<FundTransferExtVo> queryHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset") String asset,
                                                 @RequestParam(value = "queryId") Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
                                                 @RequestParam(value = "pageStatus") Integer pageStatus);
