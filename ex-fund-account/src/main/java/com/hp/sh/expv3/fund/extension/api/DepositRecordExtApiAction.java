@@ -1,7 +1,8 @@
 package com.hp.sh.expv3.fund.extension.api;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.constant.CapitalAccountErrorCode;
+import com.hp.sh.expv3.fund.extension.constant.DepositRecordExtErrorCode;
+import com.hp.sh.expv3.fund.extension.constant.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.service.DepositAddrExtService;
 import com.hp.sh.expv3.fund.extension.service.DepositRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo;
@@ -33,7 +34,7 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi{
                                                      @RequestParam(value = "pageStatus") Integer pageStatus) {
 
         if (userId == null || pageSize == null || queryId == null) {
-            throw new ExException(CapitalAccountErrorCode.PARAM_EMPTY);
+            throw new ExException(DepositRecordExtErrorCode.PARAM_EMPTY);
         }
         List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize,pageStatus);
         String addr = depositAddrExtService.getAddressByUserIdAndAsset(userId, asset);

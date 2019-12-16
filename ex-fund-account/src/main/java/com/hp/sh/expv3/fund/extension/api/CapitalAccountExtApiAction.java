@@ -1,7 +1,7 @@
 package com.hp.sh.expv3.fund.extension.api;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.constant.CapitalAccountErrorCode;
+import com.hp.sh.expv3.fund.extension.constant.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.service.FundAccountExtendService;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
@@ -35,7 +35,7 @@ public class CapitalAccountExtApiAction implements CapitalAccountExtApi {
     })
     public CapitalAccountVo getCapitalAccount(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset) {
         if (userId == null) {
-            throw new ExException(CapitalAccountErrorCode.PARAM_EMPTY);
+            throw new ExException(FundAccountExtErrorCode.PARAM_EMPTY);
         }
         CapitalAccountVo capitalAccount = fundAccountExtendServer.getCapitalAccount(userId, asset);
 
