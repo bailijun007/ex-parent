@@ -56,7 +56,7 @@ public class ExChainService{
 		return response.getIsOk();
 	}
 	
-	public boolean draw(Long userId, Integer symbol, BigDecimal amount){
+	public WithDrawResponse draw(Long userId, Integer symbol, BigDecimal amount){
 		WithDrawRequest request = new WithDrawRequest();
 		request.setAccount(""+userId);
 		request.setAddress(self.getAddress(userId, symbol));
@@ -65,7 +65,7 @@ public class ExChainService{
 		request.setSymbol(symbol);
 		request.setValue(amount.toString());
 		WithDrawResponse response = this.client().draw(request);
-		return response.getStatus()!=WithDrawResponse.STATUS_FAIL;
+		return response;
 	}
 	
 	private ChainClient client(){

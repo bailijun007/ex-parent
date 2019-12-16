@@ -1,30 +1,43 @@
 package com.hp.sh.expv3.commons.web;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestWrapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 
-public class MyCachedServletRequest extends ServletRequestWrapper{
+import org.apache.commons.io.IOUtils;
 
-	public MyCachedServletRequest(ServletRequest request) {
+public class MyCachedServletRequest extends HttpServletRequestWrapper{
+
+	private ServletInputStream newServletInputStream;
+	
+	public MyCachedServletRequest(HttpServletRequest request) {
 		super(request);
 	}
-	
-	private ServletInputStream in;
-	
+
 	public ServletInputStream getInputStream() throws IOException{
-		if(in!=null){
-			return in;
+		if(newServletInputStream==null){
+			InputStream input = super.getInputStream();
+			ByteArrayOutputStream output = new ByteArrayOutputStream(this.getContentLength());
+			IOUtils.copy(input, output);
+			byte[] buf = output.toByteArray();
+			ByteArrayInputStream newInputStream = new ByteArrayInputStream(buf);
+			this.newServletInputStream = new MyServletInputStream(newInputStream);
 		}
-		return super.getInputStream(); 
+		return this.newServletInputStream; 
 	}
 
 	class MyServletInputStream extends ServletInputStream{
-		private ServletInputStream in;
+		private InputStream in;
+
+		public MyServletInputStream(InputStream in) {
+			this.in = in;
+		}
 
 		@Override
 		public boolean isFinished() {

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcAccountDAO">
+
+	<resultMap type="com.hp.sh.expv3.pc.module.account.entity.PcAccount" id="PcAccount">
+		<result column="asset" property="asset" />
+		<result column="balance" property="balance" />
+		<result column="version" property="version" />
+		<result column="user_id" property="userId" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		asset,balance,version,user_id,created,modified
+	</sql>
+
+	<select id="get" resultMap="PcAccount">
+		select
+			<include refid="Base_Column_List" />
+		from pc_account
+			where user_id=#{userId} and asset=#{asset}
+	</select>
+	
+</mapper>

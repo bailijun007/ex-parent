@@ -14,10 +14,10 @@ import com.hp.sh.expv3.fund.transfer.constant.MQConstant;
 @Component
 public class MqSender {
 	
-	@Value("${rocketmq.default.namesrvAddr}")
+	@Value("${hp.rocketmq.namesrvAddr}")
 	private String namesrvAddr;
 	
-	@Value("${rocketmq.default.namespace}")
+	@Value("${hp.rocketmq.namespace}")
 	private String namespace;
 	
     private DefaultMQProducer producer;

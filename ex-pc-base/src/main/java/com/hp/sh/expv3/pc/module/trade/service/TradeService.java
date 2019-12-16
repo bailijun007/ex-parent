@@ -10,7 +10,7 @@ import com.hp.sh.expv3.pc.module.trade.dao.PcTradeDAO;
 import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 
 @Service
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class TradeService {
 	@Autowired
 	private PcTradeDAO pcTradeDAO;

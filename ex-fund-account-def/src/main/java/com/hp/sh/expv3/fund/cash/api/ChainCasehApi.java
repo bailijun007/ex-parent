@@ -24,7 +24,8 @@ public interface ChainCasehApi {
 			@RequestParam("chainOrderId") String chainOrderId, 
 			@RequestParam("symbolId") String symbolId, 
 			@RequestParam("account") String account,
-			@RequestParam("amount") BigDecimal amount);
+			@RequestParam("amount") BigDecimal amount, 
+			@RequestParam("txHash") String txHash);
 
 	@GetMapping(value = "/api/cash/bys/createBysDraw")
 	public void createDraw(

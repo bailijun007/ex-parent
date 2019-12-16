@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.fund.extension.dao.DepositRecordExtMapper">
+
+    <select id="queryHistory" resultType="com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo">
+        select id,asset,tx_hash txHash,amount volume, pay_status status,modified ,pay_time payTime,user_id userId
+        FROM deposit_record
+        <where>
+            <if test="userId!=null">
+                 user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+
+            <choose>
+                <when test="pageStatus==1 and pageSize!=null and queryId!=null">
+                    and id &gt; #{queryId}
+                    ORDER BY id asc
+                    LIMIT 0,${pageSize}
+                </when>
+                <otherwise>
+                    and id &lt; #{queryId}
+                    ORDER BY id desc
+                    LIMIT 0,${pageSize}
+                </otherwise>
+            </choose>
+
+
+
+        </where>
+    </select>
+
+
+</mapper>

@@ -24,6 +24,7 @@ import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.fund.wallet.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
+import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -88,9 +89,10 @@ public class WithdrawalService {
 		this.withdrawalRecordDAO.update(record);
 	}
 
-	public void onDrawSuccess(Long userId, Long id){
+	public void onDrawSuccess(Long userId, Long id, String txHash){
 		Date now = new Date();
 		WithdrawalRecord rr = this.withdrawalRecordDAO.findById(userId, id);
+		rr.setTxHash(txHash);
 		rr.setPayTime(now);
 		rr.setPayFinishTime(now);
 		rr.setPayStatusDesc("提现成功");
@@ -156,7 +158,7 @@ public class WithdrawalService {
 	}
 	
 	@Autowired
-	private FundAccountCoreApi fundAccountCoreApi;
+	private FundAccountCoreService fundAccountCoreApi;
 
 	public List<WithdrawalRecord> findPendingSynch(Page page) {
 		Map<String, Object> params = new HashMap<String, Object>();

@@ -13,7 +13,8 @@
 		<result column="margin_mode" property="marginMode" />
 		<result column="cross_leverage" property="crossLeverage" />
 		<result column="hold_margin_ratio" property="holdMarginRatio" />
-		<result column="max_leverage" property="maxLeverage" />
+		<result column="long_max_leverage" property="longMaxLeverage" />
+		<result column="short_max_leverage" property="shortMaxLeverage" />
 		<result column="version" property="version" />
 		<result column="user_id" property="userId" />
 		<result column="created" property="created" />
@@ -21,7 +22,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,asset,symbol,short_leverage,long_leverage,margin_mode,cross_leverage,hold_margin_ratio,max_leverage,version,user_id,created,modified
+		id,asset,symbol,short_leverage,long_leverage,margin_mode,cross_leverage,hold_margin_ratio,long_max_leverage,short_max_leverage,version,user_id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -32,9 +33,11 @@
 		#{idList[${i}]}
 		</foreach>
 		</if>
+		<if test="userId!=null"> and user_id=#{userId}</if>
+		<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+		<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
 		<if test="marginMode!=null"> and margin_mode=#{marginMode}</if>
 		<if test="version!=null"> and version=#{version}</if>
-		<if test="userId!=null"> and user_id=#{userId}</if>
 		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
 		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
@@ -101,9 +104,9 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into pc_account_symbol (
-			id,asset,symbol,short_leverage,long_leverage,margin_mode,cross_leverage,hold_margin_ratio,max_leverage,version,user_id,created,modified
+			id,asset,symbol,short_leverage,long_leverage,margin_mode,cross_leverage,hold_margin_ratio,long_max_leverage,short_max_leverage,version,user_id,created,modified
 		)values(
-			#{id},#{asset},#{symbol},#{shortLeverage},#{longLeverage},#{marginMode},#{crossLeverage},#{holdMarginRatio},#{maxLeverage},#{version},#{userId},#{created},#{modified}
+			#{id},#{asset},#{symbol},#{shortLeverage},#{longLeverage},#{marginMode},#{crossLeverage},#{holdMarginRatio},#{longMaxLeverage},#{shortMaxLeverage},#{version},#{userId},#{created},#{modified}
 		)
 	</insert>
 	
@@ -111,7 +114,7 @@
 		update 
 			pc_account_symbol
 		set 
-			asset=#{asset},symbol=#{symbol},short_leverage=#{shortLeverage},long_leverage=#{longLeverage},margin_mode=#{marginMode},cross_leverage=#{crossLeverage},hold_margin_ratio=#{holdMarginRatio},max_leverage=#{maxLeverage},version=#{version},user_id=#{userId},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},short_leverage=#{shortLeverage},long_leverage=#{longLeverage},margin_mode=#{marginMode},cross_leverage=#{crossLeverage},hold_margin_ratio=#{holdMarginRatio},long_max_leverage=#{longMaxLeverage},short_max_leverage=#{shortMaxLeverage},version=#{version},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>

@@ -12,26 +12,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
-import com.hp.sh.expv3.pc.component.AABBMetadataService;
-import com.hp.sh.expv3.pc.component.MarginRatioService;
+import com.hp.sh.expv3.pc.api.request.AddMoneyRequest;
+import com.hp.sh.expv3.pc.api.request.CutMoneyRequest;
+import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.MarginMode;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.constant.PcOrderType;
+import com.hp.sh.expv3.pc.error.OrderError;
 import com.hp.sh.expv3.pc.error.PositonError;
-import com.hp.sh.expv3.pc.module.account.api.request.AddMoneyRequest;
-import com.hp.sh.expv3.pc.module.account.api.request.CutMoneyRequest;
-import com.hp.sh.expv3.pc.module.account.service.impl.PcAccountCoreService;
+import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
-import com.hp.sh.expv3.pc.strategy.impl.CommonOrderStrategy;
-import com.hp.sh.expv3.pc.strategy.vo.OrderAmount;
+import com.hp.sh.expv3.pc.strategy.aabb.AABBMetadataService;
+import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
+import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.utils.IntBool;
+import com.hp.sh.expv3.utils.math.BigMathUtils;
 
 /**
  * 委托
@@ -39,7 +42,7 @@ import com.hp.sh.expv3.utils.IntBool;
  *
  */
 @Service
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class PcOrderService {
 	private static final Logger logger = LoggerFactory.getLogger(PcOrderService.class);
 	
@@ -50,7 +53,7 @@ public class PcOrderService {
 	private PcOrderDAO pcOrderDAO;
 	
 	@Autowired
-	private MarginRatioService marginRatioService;
+	private FeeRatioService feeRatioService;
 	
 	@Autowired
 	private PcAccountCoreService pcAccountCoreService;
@@ -76,14 +79,19 @@ public class PcOrderService {
 	 * @param price 委托价格
 	 * @param amt 委托金额
 	 */
+	@LockIt(key="${userId}-${asset}-${symbol}")
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		
 //		if(this.existClientOrderId(userId, cliOrderId)){
 //			throw new ExException(OrderError.CREATED);
 //		}
 		
+		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+		
 		//check 检查可平仓位
-		checkShortPosition(userId, asset, symbol, number, closeFlag, longFlag);
+		if(closeFlag!=OrderFlag.ACTION_CLOSE){
+			this.checkClosablePosition(pos);
+		}
 		
 		Date now = new Date();
 		
@@ -119,7 +127,7 @@ public class PcOrderService {
 		}
 		
 		////////其他字段，后面随状态修改////////
-		this.setOther(pcOrder);
+		this.setOther(pcOrder, pos.getId());
 		
 		pcOrderDAO.save(pcOrder);
 
@@ -137,11 +145,13 @@ public class PcOrderService {
 		return count>0;
 	}
 
-	private void setOther(PcOrder pcOrder){
+	private void setOther(PcOrder pcOrder, Long posId){
 		pcOrder.setFeeCost(BigDecimal.ZERO);
 		pcOrder.setFilledVolume(BigDecimal.ZERO);
 		pcOrder.setCancelVolume(null);
-		pcOrder.setClosePosId(null);
+		if(pcOrder.getCloseFlag()==OrderFlag.ACTION_CLOSE){
+			pcOrder.setClosePosId(posId);
+		}
 		pcOrder.setTriggerFlag(IntBool.NO);
 		pcOrder.setCancelTime(null);
 
@@ -196,23 +206,28 @@ public class PcOrderService {
 
 	//设置开仓订单的各种费率
 	private void setOpenOrderFee(PcOrder pcOrder) {
-		pcOrder.setMarginRatio(marginRatioService.getInitedMarginRatio(pcOrder.getLeverage()));
-		pcOrder.setOpenFeeRatio(marginRatioService.getOpenFeeRatio(pcOrder.getUserId()));
-		pcOrder.setCloseFeeRatio(marginRatioService.getCloseFeeRatio(pcOrder.getUserId()));
+		pcOrder.setMarginRatio(feeRatioService.getInitedMarginRatio(pcOrder.getLeverage()));
+		pcOrder.setOpenFeeRatio(feeRatioService.getOpenFeeRatio(pcOrder.getUserId()));
+		pcOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(pcOrder.getUserId()));
 		
-		OrderAmount orderAmount = orderStrategy.calcOrderAmt(pcOrder);
-		pcOrder.setOpenFee(orderAmount.getOpenFee());
-		pcOrder.setCloseFee(orderAmount.getCloseFee());
-		pcOrder.setOrderMargin(orderAmount.getGrossMargin());
-		pcOrder.setGrossMargin(orderAmount.getGrossMargin());
+		OrderRatioData ratioData = orderStrategy.calcOrderAmt(pcOrder);
+		pcOrder.setOpenFee(ratioData.getOpenFee());
+		pcOrder.setCloseFee(ratioData.getCloseFee());
+		pcOrder.setOrderMargin(ratioData.getGrossMargin());
+		pcOrder.setGrossMargin(ratioData.getGrossMargin());
 	}
 	
-	public PcOrder getOrder(Long userId, Long orderId){
-		return this.pcOrderDAO.findById(userId, orderId);
-	}
-	
-	public void setCancelStatus(long userId, String asset, long orderId, Integer cancelStatsus){
+	@LockIt(key="${userId}-${asset}-${symbol}")
+	public void setCancelStatus(long userId, String asset, String symbol, long orderId, Integer cancelStatsus){
 		Date now = new Date();
+		
+		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		if(order.getStatus() == OrderStatus.CANCELED){
+			throw new ExException(OrderError.CANCELED);
+		}
+		if(BigMathUtils.eq(order.getVolume(), order.getFilledVolume())){
+			throw new ExException(OrderError.FILLED);
+		}
 		
 		long count = this.pcOrderDAO.setCancelStatus(userId, orderId, cancelStatsus, now);
 		
@@ -222,14 +237,22 @@ public class PcOrderService {
         
 	}
 	
-	public void cancel(long userId, String asset, long orderId, BigDecimal number){
+	/**
+	 * 
+	 * @param userId
+	 * @param asset
+	 * @param orderId 订单ID
+	 * @param number 撤几张合约
+	 */
+	@LockIt(key="${userId}-${asset}-${symbol}")
+	public void cancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
 			//返还余额
 	
 			PcOrder order = this.pcOrderDAO.findById(userId, orderId);
 			
-			OrderAmount ratioAmt = orderStrategy.calcRaitoAmt(order, number);
+			OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, number);
 			
-			BigDecimal cancelledGrossFee = ratioAmt.getGrossMargin();
+			BigDecimal cancelledGrossFee = ratioData.getGrossMargin();
 			
 			int result = this.returnCancelAmt(userId, asset, orderId, cancelledGrossFee);
 			if(result==InvokeResult.NOCHANGE){
@@ -257,17 +280,12 @@ public class PcOrderService {
 		}
 	}
 
-	private void checkShortPosition(long userId, String asset, String symbol, BigDecimal volume, int closeFlag, int longFlag) {
-		if(closeFlag!=OrderFlag.ACTION_CLOSE){
-			return;
-		}
-		
-		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+	private void checkClosablePosition(PcPosition pos) {
 		if(pos==null){
 			throw new ExException(PositonError.POS_NOT_ENOUGH);
 		}
 		
-		BigDecimal cpv = this.pcOrderDAO.getClosedPosVolume(userId, pos.getId());
+		BigDecimal cpv = this.pcOrderDAO.getClosedPosVolume(pos.getUserId(), pos.getId());
 		
 		BigDecimal availablePos = pos.getVolume().subtract(cpv);
 		

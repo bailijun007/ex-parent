@@ -39,10 +39,10 @@ public interface FundAccountCoreApi {
 
 	@ApiOperation(value = "创建资金账户")
 	@GetMapping(value = "/api/fund_account/account/create")
-	public int createAccount(@RequestParam("userId") Long userId, @RequestParam("userId") String asset);
+	public int createAccount(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
 	@ApiOperation(value = "获取账户余额")
 	@GetMapping(value = "/api/fund_account/account/balance")
-	BigDecimal getBalance(@RequestParam("userId") Long userId, @RequestParam("userId") String asset);
+	BigDecimal getBalance(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
 }

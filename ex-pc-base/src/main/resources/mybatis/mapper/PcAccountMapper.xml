@@ -25,12 +25,14 @@
 					#{idList[${i}]}
 				</foreach>
 			</if>
-			<if test="version!=null"> and version=#{version}</if>
 			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+			<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
 			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
 			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 			<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
 			<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+			<if test="version!=null"> and version=#{version}</if>
 			<if test="keyword!=null and keyword!=''"> and asset like CONCAT('%',#{keyword},'%')</if>
 		</where>
 	</sql>
@@ -103,7 +105,7 @@
 		set 
 			asset=#{asset},balance=#{balance},version=${version}+1,user_id=#{userId},created=#{created},modified=#{modified}
 		where 
-			user_id=#{userId} and asset=#{asset}
+			user_id=#{userId} and asset=#{asset} and version=#{version}
 	</update>
 
 	<delete id="delete">

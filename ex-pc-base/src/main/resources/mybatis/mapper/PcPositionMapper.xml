@@ -44,12 +44,14 @@
 		#{idList[${i}]}
 		</foreach>
 		</if>
+		<if test="userId!=null"> and user_id=#{userId}</if>
+		<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+		<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
 		<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
 		<if test="marginMode!=null"> and margin_mode=#{marginMode}</if>
 		<if test="autoAddFlag!=null"> and auto_add_flag=#{autoAddFlag}</if>
 		<if test="liqMarkTime!=null"> and liq_mark_time=#{liqMarkTime}</if>
 		<if test="liqStatus!=null"> and liq_status=#{liqStatus}</if>
-		<if test="userId!=null"> and user_id=#{userId}</if>
 		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
 		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>

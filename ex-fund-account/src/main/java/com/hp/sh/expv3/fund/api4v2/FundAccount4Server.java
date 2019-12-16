@@ -11,7 +11,7 @@ import com.hp.sh.expv3.fund.cash.api.ChainCasehApiAction;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalAddr;
 import com.hp.sh.expv3.fund.cash.service.DepositAddrService;
 import com.hp.sh.expv3.fund.cash.service.WithdrawAddrService;
-import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
+import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApiAction;
 
 @RestController
 @RequestMapping("/inner/api/msg/send3")
@@ -21,7 +21,7 @@ public class FundAccount4Server extends BaseApiAction implements FundAccount4Ser
 	private ChainCasehApiAction chainCasehApiAction;
 	
 	@Autowired
-	private FundAccountCoreApi fundAccountCoreApi;
+	private FundAccountCoreApiAction fundAccountCoreApi;
 	
 	@Autowired
 	private WithdrawAddrService withdrawAddrService;

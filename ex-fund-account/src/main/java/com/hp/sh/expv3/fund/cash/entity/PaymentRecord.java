@@ -41,7 +41,7 @@ public abstract class PaymentRecord extends UserDataEntity {
 	//支付状态描述
 	protected String payStatusDesc;
 	
-	//支付完成时间
+	//支付时间
 	protected Date payTime;
 	
 	//支付完成时间
@@ -49,6 +49,8 @@ public abstract class PaymentRecord extends UserDataEntity {
 	
 	//同步状态
 	protected Integer synchStatus;
+	
+	private String txHash;
 
 	public String getSn() {
 		return sn;
@@ -136,6 +138,14 @@ public abstract class PaymentRecord extends UserDataEntity {
 
 	public void setSynchStatus(Integer synchStatus) {
 		this.synchStatus = synchStatus;
+	}
+
+	public String getTxHash() {
+		return txHash;
+	}
+
+	public void setTxHash(String txHash) {
+		this.txHash = txHash;
 	}
 
 }

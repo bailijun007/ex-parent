@@ -20,6 +20,9 @@ public class OrderPendingNewMsg extends BaseOrderMsg{
 	private Integer orderType;
 	private Long orderTime;
 	
+	private Integer timeInForce;
+	
+	
 	public OrderPendingNewMsg() {
 	}
 
@@ -93,6 +96,14 @@ public class OrderPendingNewMsg extends BaseOrderMsg{
 
 	public void setOrderTime(Long orderTime) {
 		this.orderTime = orderTime;
+	}
+
+	public Integer getTimeInForce() {
+		return timeInForce;
+	}
+
+	public void setTimeInForce(Integer timeInForce) {
+		this.timeInForce = timeInForce;
 	}
 
 	@Override

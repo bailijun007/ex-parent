@@ -19,7 +19,7 @@ public abstract class BaseAccountRecordEntity extends BaseAccountEntity implemen
 	private Long id;
 	
 	//请求ID
-	protected long requestId;
+	protected String requestId;
 
 	@Id
 	@GeneratedValue(generator="snowflake")
@@ -31,11 +31,11 @@ public abstract class BaseAccountRecordEntity extends BaseAccountEntity implemen
 		this.id = id;
 	}
 
-	public long getRequestId() {
+	public String getRequestId() {
 		return requestId;
 	}
 
-	public void setRequestId(long requestId) {
+	public void setRequestId(String requestId) {
 		this.requestId = requestId;
 	}
 	

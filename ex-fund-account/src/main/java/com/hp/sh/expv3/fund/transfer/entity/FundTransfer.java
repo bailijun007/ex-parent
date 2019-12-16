@@ -48,7 +48,7 @@ public class FundTransfer extends BaseAccountRecordEntity {
     //备注
     private String remark;
 
-    //状态
+    //状态 @see #STATUS_*
     private Integer status;
 
 	public FundTransfer() {

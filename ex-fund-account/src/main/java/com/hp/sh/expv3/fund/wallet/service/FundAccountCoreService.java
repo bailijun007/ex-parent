@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.constant.InvokeResult;
-import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
 import com.hp.sh.expv3.fund.wallet.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.fund.wallet.constant.FundFlowDirection;
@@ -32,7 +31,7 @@ import com.hp.sh.expv3.utils.SnUtils;
  */
 @Service
 @Transactional(rollbackFor=Exception.class)
-public class FundAccountCoreService implements FundAccountCoreApi {
+public class FundAccountCoreService{
 	private static final Logger logger = LoggerFactory.getLogger(FundAccountCoreService.class);
 
 	@Autowired
@@ -41,7 +40,6 @@ public class FundAccountCoreService implements FundAccountCoreApi {
 	@Autowired
 	private FundAccountRecordDAO fundAccountRecordDAO;
 
-	@Override
 	public int createAccount(Long userId, String asset){
 		FundAccount fa = this.fundAccountDAO.get(userId, asset);
 		if(fa!=null){
@@ -52,7 +50,6 @@ public class FundAccountCoreService implements FundAccountCoreApi {
 		return InvokeResult.SUCCESS;
 	}
 	
-	@Override
 	public BigDecimal getBalance(Long userId, String asset){
 		FundAccount fa = this.fundAccountDAO.get(userId, asset);
 		if(fa==null){
@@ -64,7 +61,6 @@ public class FundAccountCoreService implements FundAccountCoreApi {
 	/**
 	 * 加钱
 	 */
-	@Override
 	public void add(@RequestBody AddMoneyRequest request){
 		FundAccountRecord record = this.req2record(request);
 		
@@ -77,7 +73,6 @@ public class FundAccountCoreService implements FundAccountCoreApi {
 	/**
 	 * 减钱
 	 */
-	@Override
 	public void cut(@RequestBody CutMoneyRequest request){
 		FundAccountRecord record = this.req2record(request);
 		
@@ -95,7 +90,6 @@ public class FundAccountCoreService implements FundAccountCoreApi {
 		return record;
 	}
 
-	@Override
 	public Boolean checkTradNo(Long userId, String tradeNo) {
 		FundAccountRecord rcd = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);
 		if (rcd == null) {
@@ -128,7 +122,7 @@ public class FundAccountCoreService implements FundAccountCoreApi {
 			
 			fundAccount.setModified(now);
 			fundAccount.setBalance(newBalance);
-			this.fundAccountDAO.update(fundAccount);
+			this.updateAccount(fundAccount);
 		}
 		
 		//balance
@@ -141,6 +135,13 @@ public class FundAccountCoreService implements FundAccountCoreApi {
 		this.fundAccountRecordDAO.save(record);
 	
 		return InvokeResult.SUCCESS;
+	}
+	
+	private void updateAccount(FundAccount fundAccount){
+		int updatedRows = this.fundAccountDAO.update(fundAccount);
+		if(updatedRows==0){
+			throw new RuntimeException("更新失败");
+		}
 	}
 	
 	private void checkBalance(FundAccountRecord record, BigDecimal newBalance){
