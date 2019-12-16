@@ -29,7 +29,7 @@ public interface CapitalAccountExtApi {
             @ApiImplicitParam(name = "userId", value = "用户id",example = "1",required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型",example = "BTC")
     })
-    @GetMapping(value = "/baseUrl/account/total/query")
+    @GetMapping(value = "/api/extension/account/total/query")
     public CapitalAccountVo getCapitalAccount(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset);
 
 

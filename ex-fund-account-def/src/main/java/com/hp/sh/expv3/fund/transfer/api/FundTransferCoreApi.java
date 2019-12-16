@@ -26,4 +26,6 @@ public interface FundTransferCoreApi {
 	@GetMapping(value = "/api/fund/transfer/handlePending")
 	void handlePending();
 
+	void handleOne(Long userId, Long id);
+
 }

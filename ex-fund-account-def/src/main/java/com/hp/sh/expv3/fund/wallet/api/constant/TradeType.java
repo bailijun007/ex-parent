@@ -16,7 +16,9 @@ public class TradeType {
 	public static final int ADD = 11;				//后台充值
 	public static final int CUT = 12;				//后台扣款
 	
-	public static final int TRANSFER_IN = 13;					//资金转入
-	public static final int TRANSFER_OUT = 14;				//资金转出
+	public static final int TRANSFER_IN = 13;		//资金转入
+	public static final int TRANSFER_OUT = 14;		//资金转出
+	
+	
 
 }

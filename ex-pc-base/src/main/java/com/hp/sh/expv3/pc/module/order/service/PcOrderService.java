@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
-import com.hp.sh.expv3.pc.api.request.AddMoneyRequest;
-import com.hp.sh.expv3.pc.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.MarginMode;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
@@ -33,8 +31,10 @@ import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBMetadataService;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
+import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
+import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.utils.IntBool;
-import com.hp.sh.expv3.utils.math.BigMathUtils;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
  * 委托
@@ -105,7 +105,7 @@ public class PcOrderService {
 		pcOrder.setLongFlag(longFlag);
 		pcOrder.setLeverage(pcSymbolService.getLeverage(userId, asset, symbol, longFlag));
 		pcOrder.setVolume(number);
-		pcOrder.setFaceValue(metadataService.getFaceValue(pcOrder.getSymbol()));
+		pcOrder.setFaceValue(metadataService.getFaceValue(symbol));
 		pcOrder.setPrice(price);
 		
 		pcOrder.setOrderType(PcOrderType.LIMIT);
@@ -132,7 +132,7 @@ public class PcOrderService {
 		pcOrderDAO.save(pcOrder);
 
 		//押金扣除
-		this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin());
+		this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin(), longFlag);
 		
 		return pcOrder;
 	}
@@ -168,20 +168,20 @@ public class PcOrderService {
 		pcOrder.setCancelVolume(BigDecimal.ZERO);
 	}
 	
-	private void cutBalance(Long userId, String asset, Long orderId, BigDecimal amount){
-		CutMoneyRequest request = new CutMoneyRequest();
+	private void cutBalance(Long userId, String asset, Long orderId, BigDecimal amount, int longFlag){
+		PcCutRequest request = new PcCutRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
 		request.setRemark("开仓扣除");
 		request.setTradeNo("O"+orderId);
-		request.setTradeType(PcAccountTradeType.ORDER_OPEN);
+		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_OPEN_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
 		this.pcAccountCoreService.cut(request);
 	}
 	
 	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal amount){
-		AddMoneyRequest request = new AddMoneyRequest();
+		PcAddRequest request = new PcAddRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
 		request.setRemark("撤单还余额");
@@ -225,7 +225,7 @@ public class PcOrderService {
 		if(order.getStatus() == OrderStatus.CANCELED){
 			throw new ExException(OrderError.CANCELED);
 		}
-		if(BigMathUtils.eq(order.getVolume(), order.getFilledVolume())){
+		if(BigUtils.eq(order.getVolume(), order.getFilledVolume())){
 			throw new ExException(OrderError.FILLED);
 		}
 		
@@ -268,6 +268,12 @@ public class PcOrderService {
 			order.setCancelVolume(number);
 			order.setActiveFlag(PcOrder.NO);
 			order.setStatus(OrderStatus.CANCELED);
+			
+			//清空押金
+			order.setOrderMargin(BigDecimal.ZERO);
+			order.setOpenFee(BigDecimal.ZERO);
+			order.setCloseFee(BigDecimal.ZERO);
+			
 			this.pcOrderDAO.update(order);
 			
 			return;

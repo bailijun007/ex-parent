@@ -45,7 +45,7 @@ public class PcOrder extends UserDataEntity{
 	 */
 	private BigDecimal volume;
 
-	// 面值(单位：)
+	// 面值(单位：报价货币)
 	private BigDecimal faceValue;
 
 	/**

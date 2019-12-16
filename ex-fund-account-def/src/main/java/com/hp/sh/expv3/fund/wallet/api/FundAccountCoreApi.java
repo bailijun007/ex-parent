@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
-import com.hp.sh.expv3.fund.wallet.api.request.CutMoneyRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,11 +27,11 @@ public interface FundAccountCoreApi {
 
 	@ApiOperation(value = "加钱")
 	@PostMapping(value = "/api/fund_account/money/add")
-	public void add(@RequestBody AddMoneyRequest request);
+	public void add(@RequestBody FundAddRequest request);
 
 	@ApiOperation(value = "扣钱")
 	@PostMapping(value = "/api/fund_account/money/cut")
-	public void cut(@RequestBody CutMoneyRequest request);
+	public void cut(@RequestBody FundCutRequest request);
 
 	@ApiOperation(value = "查询资金记录是否存在")
 	@GetMapping(value = "/api/fund_account/record/check_exist")

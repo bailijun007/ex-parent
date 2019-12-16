@@ -16,14 +16,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.constant.InvokeResult;
-import com.hp.sh.expv3.fund.wallet.api.request.AddMoneyRequest;
-import com.hp.sh.expv3.fund.wallet.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.fund.wallet.constant.FundFlowDirection;
 import com.hp.sh.expv3.fund.wallet.constant.WalletError;
 import com.hp.sh.expv3.fund.wallet.dao.FundAccountDAO;
 import com.hp.sh.expv3.fund.wallet.dao.FundAccountRecordDAO;
 import com.hp.sh.expv3.fund.wallet.entity.FundAccount;
 import com.hp.sh.expv3.fund.wallet.entity.FundAccountRecord;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundRequest;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -61,7 +62,7 @@ public class FundAccountCoreService{
 	/**
 	 * 加钱
 	 */
-	public void add(@RequestBody AddMoneyRequest request){
+	public void add(@RequestBody FundAddRequest request){
 		FundAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.INCOME);
@@ -73,7 +74,7 @@ public class FundAccountCoreService{
 	/**
 	 * 减钱
 	 */
-	public void cut(@RequestBody CutMoneyRequest request){
+	public void cut(@RequestBody FundCutRequest request){
 		FundAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.EXPENSES);
@@ -182,7 +183,7 @@ public class FundAccountCoreService{
 		return true;
 	}
 
-	private FundAccountRecord req2record(AddMoneyRequest request){
+	private FundAccountRecord req2record(FundRequest request){
 		FundAccountRecord record = new FundAccountRecord();
 		record.setAmount(request.getAmount());
 		record.setAsset(request.getAsset());

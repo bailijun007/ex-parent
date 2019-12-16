@@ -16,7 +16,7 @@
 
             <choose>
                 <when test="pageStatus==1 and pageSize!=null and queryId!=null">
-                    and id &gt; #{queryId}
+                    and id &gt;= #{queryId}
                     ORDER BY id asc
                     LIMIT 0,${pageSize}
                 </when>
@@ -26,9 +26,6 @@
                     LIMIT 0,${pageSize}
                 </otherwise>
             </choose>
-
-
-
         </where>
     </select>
 

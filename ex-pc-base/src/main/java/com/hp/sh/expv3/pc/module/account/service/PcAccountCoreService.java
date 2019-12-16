@@ -17,13 +17,14 @@ import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.constant.FundFlowDirection;
 import com.hp.sh.expv3.constant.InvokeResult;
-import com.hp.sh.expv3.pc.api.request.AddMoneyRequest;
-import com.hp.sh.expv3.pc.api.request.CutMoneyRequest;
 import com.hp.sh.expv3.pc.error.AccountError;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountDAO;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountRecordDAO;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccount;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
+import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
+import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
+import com.hp.sh.expv3.pc.vo.request.FundRequest;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -61,7 +62,7 @@ public class PcAccountCoreService{
 	/**
 	 * 加钱
 	 */
-	public Integer add(@RequestBody AddMoneyRequest request){
+	public Integer add(@RequestBody PcAddRequest request){
 		PcAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.INCOME);
@@ -73,7 +74,7 @@ public class PcAccountCoreService{
 	/**
 	 * 减钱
 	 */
-	public Integer cut(@RequestBody CutMoneyRequest request){
+	public Integer cut(@RequestBody PcCutRequest request){
 		PcAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.EXPENSES);
@@ -182,7 +183,7 @@ public class PcAccountCoreService{
 		return true;
 	}
 
-	private PcAccountRecord req2record(AddMoneyRequest request){
+	private PcAccountRecord req2record(FundRequest request){
 		PcAccountRecord record = new PcAccountRecord();
 		record.setAmount(request.getAmount());
 		record.setAsset(request.getAsset());

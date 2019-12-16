@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hp.sh.expv3.pc.api.request.AddMoneyRequest;
-import com.hp.sh.expv3.pc.api.request.CutMoneyRequest;
+import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
+import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,11 +30,11 @@ public interface PcAccountCoreApi {
 
 	@ApiOperation(value = "加钱")
 	@PostMapping(value = "/api/pc/pc_account/balance/add")
-	public Integer add(@RequestBody AddMoneyRequest request);
+	public Integer add(@RequestBody PcAddRequest request);
 
 	@ApiOperation(value = "扣钱")
 	@PostMapping(value = "/api/pc/pc_account/balance/cut")
-	public Integer cut(@RequestBody CutMoneyRequest request);
+	public Integer cut(@RequestBody PcCutRequest request);
 
 	@ApiOperation(value = "获取账户余额")
 	@GetMapping(value = "/api/pc/pc_account/balance/query")

@@ -32,7 +32,7 @@ public class FundTransferCoreService {
 	 * @param targetAccountType
 	 * @param amount
 	 */
-	public void transfer(Long userId, String asset, Integer srcAccountType, Integer targetAccountType, BigDecimal amount) {
+	public FundTransfer transfer(Long userId, String asset, Integer srcAccountType, Integer targetAccountType, BigDecimal amount) {
 		Date now = new Date();
 		
 		FundTransfer transfer = new FundTransfer();
@@ -51,6 +51,7 @@ public class FundTransferCoreService {
 		
 		fundTransferDAO.save(transfer);
 		
+		return transfer;
 	}
 	
 	public void changeStatus(FundTransfer tr, Integer newStatsus){
@@ -59,12 +60,19 @@ public class FundTransferCoreService {
 	}
 	
 	public void changeStatus(Long userId, Long id, Integer newStatsus, Integer oldStatsus, Date modified) {
-		this.fundTransferDAO.changeStatus(userId, id, newStatsus, oldStatsus, modified);
+		int n = this.fundTransferDAO.changeStatus(userId, id, newStatsus, oldStatsus, modified);
+		if(n==0){
+			throw new RuntimeException("更新失败");
+		}
 	}
 
 	public List<FundTransfer> findPending(Page page) {
 		List<FundTransfer> list = this.fundTransferDAO.queryPending(page);
 		return list;
+	}
+
+	public FundTransfer findById(Long userId, Long id) {
+		return this.fundTransferDAO.findById(userId, id);
 	}
 	
 }

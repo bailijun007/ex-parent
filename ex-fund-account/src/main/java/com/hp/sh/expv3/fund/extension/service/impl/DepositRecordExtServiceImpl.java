@@ -1,7 +1,8 @@
 package com.hp.sh.expv3.fund.extension.service.impl;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.constant.CapitalAccountErrorCode;
+import com.hp.sh.expv3.fund.extension.constant.DepositRecordExtErrorCode;
+import com.hp.sh.expv3.fund.extension.constant.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.dao.DepositRecordExtMapper;
 import com.hp.sh.expv3.fund.extension.dao.FundAccountExtendMapper;
 import com.hp.sh.expv3.fund.extension.service.DepositRecordExtService;
@@ -35,7 +36,7 @@ public class DepositRecordExtServiceImpl implements DepositRecordExtService {
         }
         List<DepositRecordHistoryVo> list=depositRecordExtMapper.queryHistory(userId,asset,queryId,pageSize,pageStatus);
         if (CollectionUtils.isEmpty(list)){
-            new ExException(CapitalAccountErrorCode.DATA_EMPTY);
+            throw   new ExException(DepositRecordExtErrorCode.DATA_EMPTY);
         }
         for (DepositRecordHistoryVo historyVo : list) {
             Optional<DepositRecordHistoryVo> vo=Optional.ofNullable(historyVo);
