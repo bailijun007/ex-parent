@@ -36,7 +36,7 @@ public interface FundAccount4ChainServerDef {
      * @return
      * @throws FundAccountException
      */
-    boolean depositOrderConfirm(String operator,long accountId, String asset, long depositId, String token);
+    boolean depositOrderConfirm(String operator,long accountId, String asset, String sn, String token);
 
     /**
      * 充币订单失败，充币失败
@@ -49,7 +49,7 @@ public interface FundAccount4ChainServerDef {
      * @return
      * @throws FundAccountException
      */
-    boolean depositOrderFail(String operator,long accountId, String asset, long depositId, String token);
+    boolean depositOrderFail(String operator,long accountId, String asset, String sn, String token);
 
     /**
      * 更新提币状态

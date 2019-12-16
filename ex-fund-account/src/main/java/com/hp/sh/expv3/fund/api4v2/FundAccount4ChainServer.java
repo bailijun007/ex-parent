@@ -24,14 +24,14 @@ public class FundAccount4ChainServer extends BaseApiAction implements FundAccoun
 	}
 
 	@Override
-	public boolean depositOrderConfirm(String operator, long accountId, String asset, long depositId, String token) {
-//		chainCasehApiAction.depositSuccess(accountId, depositId);
+	public boolean depositOrderConfirm(String operator, long accountId, String asset, String sn, String token) {
+		chainCasehApiAction.depositSuccess(accountId, sn);
 		return true;
 	}
 
 	@Override
-	public boolean depositOrderFail(String operator, long accountId, String asset, long depositId, String token) {
-//		chainCasehApiAction.depositFail(accountId, depositId);
+	public boolean depositOrderFail(String operator, long accountId, String asset, String sn, String token) {
+		chainCasehApiAction.depositFail(accountId, sn);
 		return true;
 	}
 
