@@ -23,7 +23,7 @@ import java.util.List;
 public interface WithdrawalAddrExtApi {
 
     @ApiOperation("查询提币地址")
-    @PostMapping(value = "/baseUrl/account/withdraw/address/query")
+    @PostMapping(value = "/api/extension/account/withdraw/address/query")
     public List<WithdrawalAddrVo> findWithdrawalAddr(@RequestBody WithdrawalAddrParam param);
 
 

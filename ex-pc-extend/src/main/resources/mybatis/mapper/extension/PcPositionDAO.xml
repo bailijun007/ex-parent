@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcPositionDAO">
+
+    <select id="getPosMargin" resultType="java.math.BigDecimal">
+        select  IFNULL(SUM(pos_margin),0)from pc_position
+        where volume &gt;  0
+        and user_id=#{userId}
+        and asset=#{asset}
+    </select>
+</mapper>
