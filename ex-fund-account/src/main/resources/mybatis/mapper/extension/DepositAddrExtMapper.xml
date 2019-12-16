@@ -5,14 +5,15 @@
 
     <select id="getAddressByUserIdAndAsset" resultType="java.lang.String">
         SELECT address FROM deposit_addr
-        WHERE 1=1
+       <where>
+           enabled=1
         <if test="userId!=null">
             and user_id=#{userId}
         </if>
         <if test="asset!=null and asset!=''">
             AND asset=#{asset}
         </if>
-
+       </where>
     </select>
 
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.fund.extension.dao.WithdrawalRecordExtMapper">
+
+    <select id="getFrozenCapital" resultType="java.math.BigDecimal">
+      SELECT IFNULL(SUM(amount),0) from withdrawal_record
+        WHERE 1=1
+        <if test="userId!=null">
+            and  user_id=#{userId}
+        </if>
+        <if test="asset!=null and asset!=''">
+            AND asset=#{asset}
+        </if>
+        AND pay_status NOT IN (1,2);
+    </select>
+
+    <select id="queryHistory" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
+        select id,asset symbol,  amount, pay_status  status,created,account
+        FROM withdrawal_record
+        <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+
+            <choose>
+                <when test="pageStatus==1 and pageSize!=null and queryId!=null">
+                    and id &gt; #{queryId}
+                    ORDER BY id asc
+                    LIMIT 0,${pageSize}
+                </when>
+                <otherwise>
+                    and id &lt; #{queryId}
+                    ORDER BY id desc
+                    LIMIT 0,${pageSize}
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+</mapper>

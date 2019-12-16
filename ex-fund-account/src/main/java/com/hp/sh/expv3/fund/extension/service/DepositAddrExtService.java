@@ -10,13 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author BaiLiJun  on 2019/12/14
  */
-@Service
-@Transactional(rollbackFor = Exception.class)
-public class DepositAddrExtService {
-    @Autowired
-    private DepositAddrExtMapper depositAddrExtMapper;
+public interface DepositAddrExtService {
 
-    public String getAddressByUserIdAndAsset(Long userId, String asset) {
-        return depositAddrExtMapper.getAddressByUserIdAndAsset(userId,asset);
-    }
+    public String getAddressByUserIdAndAsset(Long userId, String asset);
 }

@@ -9,14 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author BaiLiJun  on 2019/12/13
  */
-@Service
-@Transactional(rollbackFor = Exception.class)
-public class FundAccountExtendServer {
-    @Autowired
-    private FundAccountExtendMapper fundAccountExtendMapper;
+public interface FundAccountExtendService {
 
 
-    public CapitalAccountVo getCapitalAccount(Long userId, String asset) {
-        return fundAccountExtendMapper.getCapitalAccount(userId,asset);
-    }
+
+    public CapitalAccountVo getCapitalAccount(Long userId, String asset) ;
 }
