@@ -5,16 +5,13 @@
 package com.hp.sh.expv3.match.match.core.match.thread;
 
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
-import com.hp.sh.expv3.match.bo.PcTradeBo;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.match.core.match.vo.PcOrderMatchResultVo;
-import com.hp.sh.expv3.match.msg.BookMsgDto;
 import com.hp.sh.expv3.match.thread.def.IThreadWorker;
 import com.hp.sh.expv3.match.util.PcUtil;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,7 +25,6 @@ public class PcMatchHandlerContext {
     public PcOrderMatchResultVo getMatchResult() {
         return matchResult;
     }
-
 
     // last price
     private BigDecimal lastPrice;
