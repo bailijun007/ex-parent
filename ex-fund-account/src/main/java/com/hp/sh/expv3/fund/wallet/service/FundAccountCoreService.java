@@ -22,8 +22,8 @@ import com.hp.sh.expv3.fund.wallet.dao.FundAccountDAO;
 import com.hp.sh.expv3.fund.wallet.dao.FundAccountRecordDAO;
 import com.hp.sh.expv3.fund.wallet.entity.FundAccount;
 import com.hp.sh.expv3.fund.wallet.entity.FundAccountRecord;
-import com.hp.sh.expv3.fund.wallet.vo.request.AddMoneyRequest;
-import com.hp.sh.expv3.fund.wallet.vo.request.CutMoneyRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundRequest;
 import com.hp.sh.expv3.utils.SnUtils;
 
@@ -62,7 +62,7 @@ public class FundAccountCoreService{
 	/**
 	 * 加钱
 	 */
-	public void add(@RequestBody AddMoneyRequest request){
+	public void add(@RequestBody FundAddRequest request){
 		FundAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.INCOME);
@@ -74,7 +74,7 @@ public class FundAccountCoreService{
 	/**
 	 * 减钱
 	 */
-	public void cut(@RequestBody CutMoneyRequest request){
+	public void cut(@RequestBody FundCutRequest request){
 		FundAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.EXPENSES);

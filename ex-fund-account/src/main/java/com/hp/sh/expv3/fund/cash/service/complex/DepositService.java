@@ -25,7 +25,7 @@ import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
 import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
-import com.hp.sh.expv3.fund.wallet.vo.request.AddMoneyRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -137,7 +137,7 @@ public class DepositService {
 	
 	@Deprecated
 	public void synchBalance(DepositRecord rr){
-		AddMoneyRequest addRequest = new AddMoneyRequest();
+		FundAddRequest addRequest = new FundAddRequest();
 		addRequest.setAsset(rr.getAsset());
 		addRequest.setAmount(rr.getAmount());
 		addRequest.setRemark("充值:"+ PayChannel.getName(rr.getChannelId()));

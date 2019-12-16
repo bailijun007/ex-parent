@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
-import com.hp.sh.expv3.fund.wallet.vo.request.AddMoneyRequest;
-import com.hp.sh.expv3.fund.wallet.vo.request.CutMoneyRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 
 /**
  * 账户核心服务
@@ -23,12 +23,12 @@ public class FundAccountCoreApiAction implements FundAccountCoreApi{
 	private FundAccountCoreService fundAccountCoreService;
 
 	@Override
-	public void add(AddMoneyRequest request) {
+	public void add(FundAddRequest request) {
 		fundAccountCoreService.add(request);
 	}
 
 	@Override
-	public void cut(CutMoneyRequest request) {
+	public void cut(FundCutRequest request) {
 		fundAccountCoreService.cut(request);
 	}
 

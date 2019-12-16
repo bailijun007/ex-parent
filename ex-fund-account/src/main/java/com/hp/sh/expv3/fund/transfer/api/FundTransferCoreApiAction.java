@@ -16,9 +16,10 @@ import com.hp.sh.expv3.fund.transfer.mq.msg.NewTransfer;
 import com.hp.sh.expv3.fund.transfer.service.FundTransferCoreService;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
-import com.hp.sh.expv3.fund.wallet.vo.request.AddMoneyRequest;
-import com.hp.sh.expv3.fund.wallet.vo.request.CutMoneyRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 import com.hp.sh.expv3.pc.api.PcAccountCoreApi;
+import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 
 import io.swagger.annotations.Api;
 
@@ -44,11 +45,9 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			throw new ExException(TransferError.ACCOUNT_TYPE);
 		}
 		
-		fundTransferCoreService.transfer(userId, asset, srcAccountType, targetAccountType, amount);
+		FundTransfer transfer = fundTransferCoreService.transfer(userId, asset, srcAccountType, targetAccountType, amount);
 		
-		this.handlePending();
-		
-		mqSender.send(NewTransfer.instance);
+		mqSender.send(new NewTransfer(transfer.getUserId(), transfer.getId()));
 	}
 
 	@Override
@@ -65,6 +64,12 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 		}
 	}
 	
+	@Override
+	public void handleOne(Long userId, Long id){
+		FundTransfer transfer = this.fundTransferCoreService.findById(userId, id);
+		this.handleOne(transfer);
+	}
+	
 	private void handleOne(FundTransfer record){
 		switch (record.getStatus()) {
 		case FundTransfer.STATUS_NEW:
@@ -72,7 +77,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			if(record.getSrcAccountType()==AccountType.FUND){
 				this.cutFund(record);
 			}else if(record.getSrcAccountType()==AccountType.PC){
-				this.cutPc(record);
+				this.cutPcFund(record);
 			}
 			//修改状态
 			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SRC_COMPLETE);
@@ -81,7 +86,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			if(record.getTargetAccountType()==AccountType.FUND){
 				this.addFund(record);
 			}else if(record.getTargetAccountType()==AccountType.PC){
-				this.addPc(record);
+				this.addPcFund(record);
 			}
 //			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SUCCESS);
 		case FundTransfer.STATUS_TARGET_COMPLETE:
@@ -90,7 +95,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	}
 
 	private void addFund(FundTransfer record){
-		AddMoneyRequest request = new AddMoneyRequest();
+		FundAddRequest request = new FundAddRequest();
 		request.setAmount(record.getAmount());
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
@@ -100,19 +105,19 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 		fundAccountCoreApi.add(request);
 	}
 
-	private void addPc(FundTransfer record){
-		com.hp.sh.expv3.pc.vo.request.AddMoneyRequest request = new com.hp.sh.expv3.pc.vo.request.AddMoneyRequest();
+	private void addPcFund(FundTransfer record){
+		com.hp.sh.expv3.pc.vo.request.PcAddRequest request = new com.hp.sh.expv3.pc.vo.request.PcAddRequest();
 		request.setAmount(record.getAmount());
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
 		request.setTradeNo(record.getSn());
-		request.setTradeType(TradeType.TRANSFER_IN);
+		request.setTradeType(PcAccountTradeType.FUND_TO_PC);
 		request.setUserId(record.getUserId());
 		pcAccountCoreApi.add(request);
 	}
 
 	private void cutFund(FundTransfer record){
-		CutMoneyRequest request = new CutMoneyRequest();
+		FundCutRequest request = new FundCutRequest();
 		request.setAmount(record.getAmount());
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
@@ -122,13 +127,13 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 		fundAccountCoreApi.cut(request);
 	}
 
-	private void cutPc(FundTransfer record){
-		com.hp.sh.expv3.pc.vo.request.CutMoneyRequest request = new com.hp.sh.expv3.pc.vo.request.CutMoneyRequest();
+	private void cutPcFund(FundTransfer record){
+		com.hp.sh.expv3.pc.vo.request.PcCutRequest request = new com.hp.sh.expv3.pc.vo.request.PcCutRequest();
 		request.setAmount(record.getAmount());
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
 		request.setTradeNo(record.getSn());
-		request.setTradeType(TradeType.TRANSFER_IN);
+		request.setTradeType(PcAccountTradeType.PC_TO_FUND);
 		request.setUserId(record.getUserId());
 		pcAccountCoreApi.cut(request);
 	}

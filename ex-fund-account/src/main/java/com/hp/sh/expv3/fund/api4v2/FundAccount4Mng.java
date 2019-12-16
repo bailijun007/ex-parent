@@ -11,7 +11,7 @@ import com.hp.sh.expv3.fund.cash.api.ChainCasehApiAction;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApiAction;
 import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
-import com.hp.sh.expv3.fund.wallet.vo.request.AddMoneyRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.utils.SnUtils;
 
 @RestController
@@ -26,7 +26,7 @@ public class FundAccount4Mng extends BaseApiAction implements FundAccount4MngDef
 
 	@Override
 	public boolean addAvailableByManager(String operator, long accountId, String asset, BigDecimal delta, String token) {
-		AddMoneyRequest request = new AddMoneyRequest();
+		FundAddRequest request = new FundAddRequest();
 		request.setAmount(delta);
 		request.setAsset(asset);
 		request.setRemark("后台修改可用余额");

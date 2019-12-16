@@ -31,8 +31,8 @@ import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBMetadataService;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
-import com.hp.sh.expv3.pc.vo.request.AddMoneyRequest;
-import com.hp.sh.expv3.pc.vo.request.CutMoneyRequest;
+import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
+import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
@@ -169,7 +169,7 @@ public class PcOrderService {
 	}
 	
 	private void cutBalance(Long userId, String asset, Long orderId, BigDecimal amount, int longFlag){
-		CutMoneyRequest request = new CutMoneyRequest();
+		PcCutRequest request = new PcCutRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
 		request.setRemark("开仓扣除");
@@ -181,7 +181,7 @@ public class PcOrderService {
 	}
 	
 	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal amount){
-		AddMoneyRequest request = new AddMoneyRequest();
+		PcAddRequest request = new PcAddRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
 		request.setRemark("撤单还余额");

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.pc.api.PcAccountCoreApi;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
-import com.hp.sh.expv3.pc.vo.request.AddMoneyRequest;
-import com.hp.sh.expv3.pc.vo.request.CutMoneyRequest;
+import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
+import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 
 /**
  * 永续合约账户核心接口
@@ -24,12 +24,12 @@ public class PcAccountCoreApiAction implements PcAccountCoreApi {
 	private PcAccountCoreService pcAccountCoreService;
 	
 	@Override
-	public Integer add(AddMoneyRequest request) {
+	public Integer add(PcAddRequest request) {
 		return pcAccountCoreService.add(request);
 	}
 
 	@Override
-	public Integer cut(CutMoneyRequest request) {
+	public Integer cut(PcCutRequest request) {
 		return pcAccountCoreService.cut(request);
 	}
 

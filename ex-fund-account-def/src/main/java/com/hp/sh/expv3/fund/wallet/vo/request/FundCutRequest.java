@@ -7,6 +7,6 @@ import io.swagger.annotations.ApiModel;
  * @author wangjg
  */
 @ApiModel(value = "扣钱请求")
-public class CutMoneyRequest extends FundRequest {
+public class FundCutRequest extends FundRequest {
 
 }

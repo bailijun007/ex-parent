@@ -3,10 +3,10 @@ package com.hp.sh.expv3.pc.vo.request;
 import io.swagger.annotations.ApiModel;
 
 /**
- * 加钱请求
+ * 扣钱请求
  * @author wangjg
  */
-@ApiModel(value = "加钱请求")
-public class AddMoneyRequest extends FundRequest{
+@ApiModel(value = "扣钱请求")
+public class PcCutRequest extends FundRequest {
 
 }

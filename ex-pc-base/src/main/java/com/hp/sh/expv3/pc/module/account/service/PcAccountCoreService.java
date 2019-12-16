@@ -22,8 +22,8 @@ import com.hp.sh.expv3.pc.module.account.dao.PcAccountDAO;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountRecordDAO;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccount;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
-import com.hp.sh.expv3.pc.vo.request.AddMoneyRequest;
-import com.hp.sh.expv3.pc.vo.request.CutMoneyRequest;
+import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
+import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.pc.vo.request.FundRequest;
 import com.hp.sh.expv3.utils.SnUtils;
 
@@ -62,7 +62,7 @@ public class PcAccountCoreService{
 	/**
 	 * 加钱
 	 */
-	public Integer add(@RequestBody AddMoneyRequest request){
+	public Integer add(@RequestBody PcAddRequest request){
 		PcAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.INCOME);
@@ -74,7 +74,7 @@ public class PcAccountCoreService{
 	/**
 	 * 减钱
 	 */
-	public Integer cut(@RequestBody CutMoneyRequest request){
+	public Integer cut(@RequestBody PcCutRequest request){
 		PcAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.EXPENSES);

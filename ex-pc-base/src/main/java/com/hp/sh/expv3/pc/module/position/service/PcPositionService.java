@@ -31,7 +31,7 @@ import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
-import com.hp.sh.expv3.pc.vo.request.AddMoneyRequest;
+import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
@@ -108,7 +108,7 @@ public class PcPositionService {
 	}
 	
 	private void closeFeeToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeResult, int longFlag) {
-		AddMoneyRequest request = new AddMoneyRequest();
+		PcAddRequest request = new PcAddRequest();
 		request.setAmount(tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFeeReceivable()));
 		request.setUserId(userId);
 		request.setAsset(asset);
@@ -120,7 +120,7 @@ public class PcPositionService {
 	}
 	
 	private void openFeeDiffToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeData) {
-		AddMoneyRequest request = new AddMoneyRequest();
+		PcAddRequest request = new PcAddRequest();
 		request.setAmount(tradeData.getMakerFeeDiff());
 		request.setUserId(userId);
 		request.setAsset(asset);

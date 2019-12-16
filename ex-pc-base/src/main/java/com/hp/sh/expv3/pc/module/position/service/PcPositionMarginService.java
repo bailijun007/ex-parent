@@ -31,8 +31,8 @@ import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBMetadataService;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
 import com.hp.sh.expv3.pc.strategy.aabb.PnlCalc;
-import com.hp.sh.expv3.pc.vo.request.AddMoneyRequest;
-import com.hp.sh.expv3.pc.vo.request.CutMoneyRequest;
+import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
+import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
@@ -261,7 +261,7 @@ public class PcPositionMarginService {
 	}
 	
 	private void cutPcAccount(Long userId, String asset, Long posId, BigDecimal amount) {
-		CutMoneyRequest request = new CutMoneyRequest();
+		PcCutRequest request = new PcCutRequest();
 		request.setAmount(request.getAmount());
 		request.setUserId(userId);
 		request.setAsset(asset);
@@ -273,7 +273,7 @@ public class PcPositionMarginService {
 	}
 	
 	private void addPcAccount(Long userId, String asset, Long posId, BigDecimal amount) {
-		AddMoneyRequest request = new AddMoneyRequest();
+		PcAddRequest request = new PcAddRequest();
 		request.setAmount(request.getAmount());
 		request.setUserId(userId);
 		request.setAsset(asset);

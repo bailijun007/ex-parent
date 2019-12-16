@@ -21,7 +21,7 @@ public interface FundTransferDAO extends BaseAccountDataMapper<FundTransfer, Lon
 
 	public FundTransfer findByTradeNo(@Param("userId") Long userId, @Param("tradeNo") String tradeNo);
 
-	public void changeStatus(
+	public int changeStatus(
 		@Param("userId") Long userId, 
 		@Param("id") Long id,
 		@Param("newStatus") Integer newStatus, 

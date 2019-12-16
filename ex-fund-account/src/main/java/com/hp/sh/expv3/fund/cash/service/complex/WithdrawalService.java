@@ -23,8 +23,8 @@ import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
 import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
-import com.hp.sh.expv3.fund.wallet.vo.request.AddMoneyRequest;
-import com.hp.sh.expv3.fund.wallet.vo.request.CutMoneyRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -128,7 +128,7 @@ public class WithdrawalService {
 	
 	@Deprecated
 	private void cutBalance(WithdrawalRecord record){
-		CutMoneyRequest request = new CutMoneyRequest();
+		FundCutRequest request = new FundCutRequest();
 		request.setAmount(record.getAmount());
 		request.setRemark("提现扣款:"+ PayChannel.getName(record.getChannelId()));
 		request.setTradeNo(record.getSn());
@@ -148,7 +148,7 @@ public class WithdrawalService {
 	
 	@Deprecated
 	public void returnBalance(WithdrawalRecord rr){
-		AddMoneyRequest addRequest = new AddMoneyRequest();
+		FundAddRequest addRequest = new FundAddRequest();
 		addRequest.setAmount(rr.getAmount());
 		addRequest.setRemark("提现失败返回账户:"+ PayChannel.getName(rr.getChannelId()));
 		addRequest.setTradeNo(rr.getSn());
