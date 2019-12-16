@@ -16,6 +16,7 @@ import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.match.thread.impl.PcmatchOrderRmqConsumerThread;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
 import com.hp.sh.expv3.match.thread.def.IThreadWorker;
+import com.hp.sh.expv3.match.util.PcOrder4MatchBoUtil;
 import com.hp.sh.expv3.match.util.RedisKeyUtil;
 import com.hp.sh.expv3.match.util.RedisUtil;
 import org.slf4j.Logger;
@@ -187,6 +188,7 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
                     if (context.allOpenOrders.containsKey(askOrder.getOrderId())) {
                         logger.error("order in snapshot duplicated,asset:{},symbol:{},accountId:{},orderId:{}.", this.getAsset(), this.getSymbol(), askOrder.getAccountId(), askOrder.getOrderId());
                     } else {
+                        PcOrder4MatchBoUtil.extendSetter(askOrder);
                         context.limitAskQueue.add(askOrder);
                         context.allOpenOrders.put(askOrder.getOrderId(), askOrder);
                     }
@@ -198,6 +200,7 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
                     if (context.allOpenOrders.containsKey(bidOrder.getOrderId())) {
                         logger.error("order in snapshot duplicated,asset:{},symbol:{},accountId:{},orderId:{}.", this.getAsset(), this.getSymbol(), bidOrder.getAccountId(), bidOrder.getOrderId());
                     } else {
+                        PcOrder4MatchBoUtil.extendSetter(bidOrder);
                         context.limitBidQueue.add(bidOrder);
                         context.allOpenOrders.put(bidOrder.getOrderId(), bidOrder);
                     }

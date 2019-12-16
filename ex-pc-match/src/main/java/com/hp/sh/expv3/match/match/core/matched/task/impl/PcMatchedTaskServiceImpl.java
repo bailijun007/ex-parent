@@ -12,6 +12,7 @@ import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.matched.task.*;
 import com.hp.sh.expv3.match.match.core.matched.task.def.PcMatchedTaskService;
 import com.hp.sh.expv3.match.mqmsg.PcPosLockedMqMsgDto;
+import com.hp.sh.expv3.match.util.PcOrder4MatchBoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -76,15 +77,13 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
 
         List<PcOrder4MatchBo> asks = new ArrayList<>();
         for (PcOrder4MatchBo pcOrder4MatchBo : context.limitAskQueue) {
-            PcOrder4MatchBo bo = new PcOrder4MatchBo();
-            BeanUtils.copyProperties(pcOrder4MatchBo, bo);
+            PcOrder4MatchBo bo = PcOrder4MatchBoUtil.deepClone(pcOrder4MatchBo);
             asks.add(bo);
         }
 
         List<PcOrder4MatchBo> bids = new ArrayList<>();
         for (PcOrder4MatchBo pcOrder4MatchBo : context.limitBidQueue) {
-            PcOrder4MatchBo bo = new PcOrder4MatchBo();
-            BeanUtils.copyProperties(pcOrder4MatchBo, bo);
+            PcOrder4MatchBo bo = PcOrder4MatchBoUtil.deepClone(pcOrder4MatchBo);
             bids.add(bo);
         }
 

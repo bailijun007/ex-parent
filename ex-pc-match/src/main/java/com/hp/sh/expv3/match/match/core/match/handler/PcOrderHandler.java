@@ -150,6 +150,7 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
      */
     protected boolean isOrderComplete(PcOrder4MatchBo order) {
         // 不用考虑取消的情况，取消会直接在任务中取消
+        
         return DecimalUtil.toTrimLiteral(order.getNumber()).equals(DecimalUtil.toTrimLiteral(order.getFilledNumber()));
     }
 
@@ -202,6 +203,10 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
         trade.setNumber(amt);
 
         trade.setTradeTime(ctime);
+
+        long now = System.currentTimeMillis();
+        trade.setCreated(now);
+        trade.setModified(now);
 
         trade.setTkAccountId(takerOrder.getAccountId());
         trade.setTkOrderId(takerOrder.getOrderId());

@@ -14,6 +14,7 @@ public class PcOrder4MatchBo {
     private Long accountId;
     private Integer closeFlag;
     private Integer bidFlag;
+    private Integer timeInForce;
     private BigDecimal number;
     private BigDecimal filledNumber;
     private BigDecimal displayNumber;
@@ -115,5 +116,13 @@ public class PcOrder4MatchBo {
 
     public void setDisplayNumber(BigDecimal displayNumber) {
         this.displayNumber = displayNumber;
+    }
+
+    public Integer getTimeInForce() {
+        return timeInForce;
+    }
+
+    public void setTimeInForce(Integer timeInForce) {
+        this.timeInForce = timeInForce;
     }
 }

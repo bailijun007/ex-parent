@@ -15,6 +15,7 @@ import com.hp.sh.expv3.match.mqmsg.PcOrderMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.PcPosLockedMqMsgDto;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
 import com.hp.sh.expv3.match.thread.def.IThreadWorker;
+import com.hp.sh.expv3.match.util.PcOrder4MatchBoUtil;
 import com.hp.sh.expv3.match.util.PcRocketMqUtil;
 import com.hp.sh.expv3.match.util.PcUtil;
 import com.hp.sh.expv3.match.util.Tuple2;
@@ -26,7 +27,6 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -225,8 +225,7 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                                     if (null == dto.getFilledNumber()) {
                                         dto.setFilledNumber(BigDecimal.ZERO);
                                     }
-                                    PcOrder4MatchBo pcOrder4Match = new PcOrder4MatchBo();
-                                    BeanUtils.copyProperties(dto, pcOrder4Match);
+                                    PcOrder4MatchBo pcOrder4Match = PcOrder4MatchBoUtil.convert(dto);
                                     task = pcMatchTaskService.buildPcOrderNewTask(assetSymbol, asset, symbol, queueOffset, pcOrder4Match);
                                     matchWorker.addTask(task);
                                 } else if (RmqTagEnum.PC_ORDER_PENDING_CANCEL.getConstant().equals(m.getTags())) {

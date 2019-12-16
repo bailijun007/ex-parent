@@ -8,9 +8,8 @@ import java.math.BigDecimal;
 
 /**
  * 永续合约_成交(撮合结果)
- *
  */
-public class PcTrade 	{
+public class PcTrade {
 
     //id
     private Long id;
@@ -44,6 +43,9 @@ public class PcTrade 	{
     private BigDecimal number;
     //成交时间
     private Long tradeTime;
+
+    private Long created;
+    private Long modified;
 
     public PcTrade() {
     }
@@ -158,5 +160,21 @@ public class PcTrade 	{
 
     public void setTradeTime(Long tradeTime) {
         this.tradeTime = tradeTime;
+    }
+
+    public Long getCreated() {
+        return created;
+    }
+
+    public void setCreated(Long created) {
+        this.created = created;
+    }
+
+    public Long getModified() {
+        return modified;
+    }
+
+    public void setModified(Long modified) {
+        this.modified = modified;
     }
 }
