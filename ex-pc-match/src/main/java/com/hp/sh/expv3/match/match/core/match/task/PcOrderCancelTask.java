@@ -77,7 +77,6 @@ public class PcOrderCancelTask extends PcOrderBaseTask implements ApplicationCon
         if (null == order) {
             if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
                 pcMatchedTaskService.addMatchedOrderCancelTask(context, this.getCurrentMsgOffset(), accountId, orderId, null);
-                context.setSentMqOffset(this.getCurrentMsgOffset());
             }
         } else {
             PriorityQueue<PcOrder4MatchBo> queue = context.getQueue(order.getBidFlag());
@@ -85,10 +84,8 @@ public class PcOrderCancelTask extends PcOrderBaseTask implements ApplicationCon
             context.allOpenOrders.remove(orderId);
             if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
                 pcMatchedTaskService.addMatchedOrderCancelTask(context, this.getCurrentMsgOffset(), accountId, orderId, order.getNumber().subtract(order.getFilledNumber()));
-                context.setSentMqOffset(this.getCurrentMsgOffset());
             }
         }
-        context.clear();
     }
 
     private ApplicationContext applicationContext;

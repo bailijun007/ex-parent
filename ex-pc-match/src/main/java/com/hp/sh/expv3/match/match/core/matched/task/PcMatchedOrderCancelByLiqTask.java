@@ -4,21 +4,20 @@
  */
 package com.hp.sh.expv3.match.match.core.matched.task;
 
-import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
-import com.hp.sh.expv3.match.constant.CommonConst;
-import com.hp.sh.expv3.match.enums.EventEnum;
-import com.hp.sh.expv3.match.match.core.match.task.service.PcOrderBookEventService;
-import com.hp.sh.expv3.match.mqmsg.PcPosLockedMqMsgDto;
-import com.hp.sh.expv3.match.msg.BookMsgDto;
 import com.hp.sh.expv3.match.component.notify.PcMatchMqNotify;
 import com.hp.sh.expv3.match.component.notify.PcNotify;
+import com.hp.sh.expv3.match.constant.CommonConst;
+import com.hp.sh.expv3.match.enums.EventEnum;
+import com.hp.sh.expv3.match.mqmsg.PcOrderCancelMqMsgDto;
+import com.hp.sh.expv3.match.mqmsg.PcPosLockedMqMsgDto;
+import com.hp.sh.expv3.match.msg.BookMsgDto;
+import com.hp.sh.expv3.match.msg.BookMsgDto.BookEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -30,9 +29,17 @@ public class PcMatchedOrderCancelByLiqTask extends PcMatchedBaseTask {
     @Autowired
     private PcMatchMqNotify pcOrderMqNotify;
     @Autowired
-    private PcOrderBookEventService pcOrderBookEventService;
-    @Autowired
     private PcNotify pcNotify;
+
+    private List<PcOrderCancelMqMsgDto> cancelMqMsgs;
+
+    public List<PcOrderCancelMqMsgDto> getCancelMqMsgs() {
+        return cancelMqMsgs;
+    }
+
+    public void setCancelMqMsgs(List<PcOrderCancelMqMsgDto> cancelMqMsgs) {
+        this.cancelMqMsgs = cancelMqMsgs;
+    }
 
     private PcPosLockedMqMsgDto msg;
 
@@ -44,25 +51,24 @@ public class PcMatchedOrderCancelByLiqTask extends PcMatchedBaseTask {
         this.msg = msg;
     }
 
-    private Collection<PcOrder4MatchBo> orders;
+    private List<BookEntry> bookEntries;
 
-    public Collection<PcOrder4MatchBo> getOrders() {
-        return orders;
+    public List<BookEntry> getBookEntries() {
+        return bookEntries;
     }
 
-    public void setOrders(Collection<PcOrder4MatchBo> orders) {
-        this.orders = orders;
+    public void setBookEntries(List<BookEntry> bookEntries) {
+        this.bookEntries = bookEntries;
     }
 
     @Override
     public void onSucess() {
     }
 
-
     @Override
     public void run() {
 
-        if (null == orders || orders.isEmpty()) {
+        if (null == cancelMqMsgs || cancelMqMsgs.isEmpty()) {
         } else {
 
             // send book
@@ -73,14 +79,9 @@ public class PcMatchedOrderCancelByLiqTask extends PcMatchedBaseTask {
             bookMsgDto.setResetFlag(CommonConst.NO);
             bookMsgDto.setMsgType(EventEnum.PC_BOOK.getCode());
 
-            // book 加入到上下文中，
-            List<BookMsgDto.BookEntry> bookEntries = pcOrderBookEventService.buildBookEntry4CancelByLiq(orders);
-
             bookMsgDto.setOrders(bookEntries);
             // prepared book end
-
-            pcOrderMqNotify.sendSameSideCloseOrderCancelled(this.getAsset(), this.getSymbol(), orders);
-
+            pcOrderMqNotify.sendSameSideCloseOrderCancelled(this.getAsset(), this.getSymbol(), cancelMqMsgs);
             pcNotify.safeNotify(this.getAsset(), this.getSymbol(), bookMsgDto);
         }
 

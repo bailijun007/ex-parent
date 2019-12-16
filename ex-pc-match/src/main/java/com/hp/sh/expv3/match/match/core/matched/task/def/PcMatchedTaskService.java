@@ -8,17 +8,20 @@ import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.matched.task.PcMatchedInitTask;
 import com.hp.sh.expv3.match.mqmsg.PcPosLockedMqMsgDto;
+import com.hp.sh.expv3.match.msg.BookMsgDto.BookEntry;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
+import java.util.PriorityQueue;
 
 public interface PcMatchedTaskService {
 
     PcMatchedInitTask buildMatchedInitTask(String assetSymbol, String asset, String symbol);
 
-    void addMatchedBookResetTask(PcMatchHandlerContext context, long currentMsgOffset);
+    void addMatchedBookResetTask(PcMatchHandlerContext context, List<BookEntry> entries, BigDecimal lastPrice, long currentMsgOffset);
 
-    void addOrderSnapshotTask(PcMatchHandlerContext context, long currentMsgOffset);
+    void addOrderSnapshotTask(PcMatchHandlerContext context, PriorityQueue<PcOrder4MatchBo> limitBidQueue, PriorityQueue<PcOrder4MatchBo> limitAskQueue, long currentMsgOffset);
 
     void addMatchedOrderCancelByLiqTask(PcMatchHandlerContext context, long currentMsgOffset, Collection<PcOrder4MatchBo> order2CancelByLiq, PcPosLockedMqMsgDto msg);
 

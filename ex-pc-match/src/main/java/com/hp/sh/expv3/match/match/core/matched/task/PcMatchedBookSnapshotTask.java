@@ -82,5 +82,6 @@ public class PcMatchedBookSnapshotTask extends PcMatchedBaseTask {
 
         logger.info("save snapshot at {}", System.currentTimeMillis());
 
+        updateSentMqOffset();
     }
 }

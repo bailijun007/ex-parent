@@ -122,20 +122,18 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
             sameSideQueue.offer(takerOrder);
             BigDecimal bookNumber = PcUtil.calcBookNumber(takerOrder.getNumber(), takerOrder.getFilledNumber(), takerOrder.getDisplayNumber());
             bookUpdate(context, takerOrder.getOrderId(), takerOrder.getBidFlag(), takerOrder.getPrice(), bookNumber);
-            context.setOrderNew(takerOrder);
         } else if (PcOrderTypeEnum.MARKET.getCode() == takerOrder.getOrderType()) {
             context.allOpenOrders.remove(takerOrder.getOrderId());
-            context.setOrderNew(takerOrder);
         }
 //        pcExDef.doOrderNew(context.asset, context.symbol, takerOrder.getAccountId(), takerOrder.getId());
     }
 
     protected void bookUpdate(PcMatchHandlerContext matchHandlerContext, long orderId, int bidFlag, BigDecimal price, BigDecimal bookNumber) {
         BookMsgDto.BookEntry entry = new BookMsgDto.BookEntry(orderId, price, bookNumber, bidFlag);
-        if (null == matchHandlerContext.getBookUpdateList()) {
-            matchHandlerContext.setBookUpdateList(new ArrayList<>());
+        if (null == matchHandlerContext.getMatchResult().getBookUpdateList()) {
+            matchHandlerContext.getMatchResult().setBookUpdateList(new ArrayList<>());
         }
-        matchHandlerContext.getBookUpdateList().add(entry);
+        matchHandlerContext.getMatchResult().getBookUpdateList().add(entry);
     }
 
     protected void completeOrder(PcMatchHandlerContext context, PcOrder4MatchBo order) {
@@ -150,7 +148,7 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
      */
     protected boolean isOrderComplete(PcOrder4MatchBo order) {
         // 不用考虑取消的情况，取消会直接在任务中取消
-        
+
         return DecimalUtil.toTrimLiteral(order.getNumber()).equals(DecimalUtil.toTrimLiteral(order.getFilledNumber()));
     }
 
@@ -161,10 +159,11 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
      * @return
      */
     protected void appendMatchResult(PcMatchHandlerContext context, PcTradeBo trade) {
-        if (null == context.getTradeList()) {
-            context.setTradeList(new ArrayList<>());
+        if (null == context.getMatchResult().getTradeList()) {
+            context.getMatchResult().setTradeList(new ArrayList<>());
         }
-        context.getTradeList().add(trade);
+        context.getMatchResult().getTradeList().add(trade);
+        context.setLastPrice(trade.getPrice());
     }
 
     /**

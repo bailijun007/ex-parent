@@ -6,19 +6,19 @@ package com.hp.sh.expv3.match.match.core.match.task;
 
 import com.hp.sh.expv3.match.thread.def.BaseTask;
 import com.hp.sh.expv3.match.thread.def.ITask;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class PcOrderBaseTask extends BaseTask implements ITask {
 
-    final Logger logger = LoggerFactory.getLogger(getClass());
     private String asset;
     private String symbol;
     private String assetSymbol;
     private Long currentMsgOffset;
 
-    public Logger getLogger() {
-        return logger;
+    @Override
+    public boolean onError(Exception ex) {
+        LoggerFactory.getLogger(this.getClass()).error(ex.getMessage(), ex);
+        return false;
     }
 
     public String getAsset() {

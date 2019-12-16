@@ -4,10 +4,10 @@
  */
 package com.hp.sh.expv3.match.match.core.match.thread;
 
-
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.PcTradeBo;
 import com.hp.sh.expv3.match.constant.CommonConst;
+import com.hp.sh.expv3.match.match.core.match.vo.PcOrderMatchResultVo;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
 import com.hp.sh.expv3.match.thread.def.IThreadWorker;
 import com.hp.sh.expv3.match.util.PcUtil;
@@ -23,33 +23,19 @@ public class PcMatchHandlerContext {
 
     public IThreadWorker matchedThreadWorker;
 
-    // book list
-    private List<BookMsgDto.BookEntry> bookUpdateList;
+    private PcOrderMatchResultVo matchResult = new PcOrderMatchResultVo();
 
-    // order new
-    private PcOrder4MatchBo orderNew;
+    public PcOrderMatchResultVo getMatchResult() {
+        return matchResult;
+    }
 
-    // trade list
-    private List<PcTradeBo> tradeList;
 
     // last price
     private BigDecimal lastPrice;
-
-
-    private Boolean PendingNewIgnoreReasonAlreadyInQueue;
-    private Boolean PendingNewIgnoreReasonAlreadyCompleted;
-    private Boolean PendingCancelIgnoreReasonNotInQueue;
-
     private Long sentMqOffset;
-    private Long matchTxId;
-
-    public Long getMatchTxId() {
-        return matchTxId;
-    }
-
-    public void setMatchTxId(Long matchTxId) {
-        this.matchTxId = matchTxId;
-    }
+    private String assetSymbol;
+    private String asset;
+    private String symbol;
 
     public Long getSentMqOffset() {
         return sentMqOffset;
@@ -59,64 +45,12 @@ public class PcMatchHandlerContext {
         this.sentMqOffset = sentMqOffset;
     }
 
-    private String assetSymbol;
-    private String asset;
-    private String symbol;
-
-    public List<BookMsgDto.BookEntry> getBookUpdateList() {
-        return bookUpdateList;
-    }
-
-    public void setBookUpdateList(List<BookMsgDto.BookEntry> bookUpdateList) {
-        this.bookUpdateList = bookUpdateList;
-    }
-
-    public PcOrder4MatchBo getOrderNew() {
-        return orderNew;
-    }
-
-    public void setOrderNew(PcOrder4MatchBo orderNew) {
-        this.orderNew = orderNew;
-    }
-
-    public List<PcTradeBo> getTradeList() {
-        return tradeList;
-    }
-
-    public void setTradeList(List<PcTradeBo> tradeList) {
-        this.tradeList = tradeList;
-    }
-
     public BigDecimal getLastPrice() {
         return lastPrice;
     }
 
     public void setLastPrice(BigDecimal lastPrice) {
         this.lastPrice = lastPrice;
-    }
-
-    public Boolean getPendingNewIgnoreReasonAlreadyInQueue() {
-        return PendingNewIgnoreReasonAlreadyInQueue;
-    }
-
-    public void setPendingNewIgnoreReasonAlreadyInQueue(Boolean pendingNewIgnoreReasonAlreadyInQueue) {
-        PendingNewIgnoreReasonAlreadyInQueue = pendingNewIgnoreReasonAlreadyInQueue;
-    }
-
-    public Boolean getPendingNewIgnoreReasonAlreadyCompleted() {
-        return PendingNewIgnoreReasonAlreadyCompleted;
-    }
-
-    public void setPendingNewIgnoreReasonAlreadyCompleted(Boolean pendingNewIgnoreReasonAlreadyCompleted) {
-        PendingNewIgnoreReasonAlreadyCompleted = pendingNewIgnoreReasonAlreadyCompleted;
-    }
-
-    public Boolean getPendingCancelIgnoreReasonNotInQueue() {
-        return PendingCancelIgnoreReasonNotInQueue;
-    }
-
-    public void setPendingCancelIgnoreReasonNotInQueue(Boolean pendingCancelIgnoreReasonNotInQueue) {
-        PendingCancelIgnoreReasonNotInQueue = pendingCancelIgnoreReasonNotInQueue;
     }
 
     public String getAssetSymbol() {
@@ -195,17 +129,9 @@ public class PcMatchHandlerContext {
         }
     }
 
-
     public void clear() {
-        this.setBookUpdateList(null);
-        this.setOrderNew(null);
-        this.setTradeList(null);
-        this.setPendingCancelIgnoreReasonNotInQueue(null);
-        this.setPendingNewIgnoreReasonAlreadyCompleted(null);
-        this.setPendingNewIgnoreReasonAlreadyInQueue(null);
-        // 最新价格无需 重置
-//        context.lastPrice = null;
+        this.getMatchResult().setBookUpdateList(null);
+        this.getMatchResult().setTradeList(null);
     }
-
 
 }

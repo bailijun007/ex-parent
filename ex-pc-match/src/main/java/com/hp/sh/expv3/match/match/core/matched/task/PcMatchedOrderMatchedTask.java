@@ -5,9 +5,7 @@
 package com.hp.sh.expv3.match.match.core.matched.task;
 
 import com.google.common.collect.Lists;
-import com.hp.sh.expv3.match.bo.PcOrder2CancelBo;
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
-import com.hp.sh.expv3.match.bo.PcOrderNotMatchedBo;
 import com.hp.sh.expv3.match.bo.PcTradeBo;
 import com.hp.sh.expv3.match.component.notify.PcMatchMqNotify;
 import com.hp.sh.expv3.match.component.notify.PcNotify;
@@ -42,10 +40,8 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
 
     public List<PcTradeBo> tradeList;
 
-    public PcOrder4MatchBo takerOrder;
-    public PcOrderNotMatchedBo notMatchedTakerOrder;
     // 市价订单若没有匹配完成，则撤单
-    public PcOrder2CancelBo cancelTakerOrder;
+    public PcOrder4MatchBo takerOrder;
 
     public List<BookMsgDto.BookEntry> bookUpdateList;
 
@@ -65,14 +61,6 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
 
     public void setMatchTxId(Long matchTxId) {
         this.matchTxId = matchTxId;
-    }
-
-    public PcOrder2CancelBo getCancelTakerOrder() {
-        return cancelTakerOrder;
-    }
-
-    public void setCancelTakerOrder(PcOrder2CancelBo cancelTakerOrder) {
-        this.cancelTakerOrder = cancelTakerOrder;
     }
 
     @Autowired
@@ -98,14 +86,6 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
         this.bookUpdateList = bookUpdateList;
     }
 
-    public PcOrderNotMatchedBo getNotMatchedTakerOrder() {
-        return notMatchedTakerOrder;
-    }
-
-    public void setNotMatchedTakerOrder(PcOrderNotMatchedBo notMatchedTakerOrder) {
-        this.notMatchedTakerOrder = notMatchedTakerOrder;
-    }
-
     @Override
     public void onSucess() {
     }
@@ -122,46 +102,47 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
     }
 
     private void doLimit() {
-        if (null == notMatchedTakerOrder && (null == tradeList || tradeList.isEmpty())) {
-            throw new RuntimeException();
-        }
-        if (null != notMatchedTakerOrder) {
+        if (null == tradeList || tradeList.isEmpty()) {
             // 未匹配的委托
-            pcMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), notMatchedTakerOrder.getAccountId(), notMatchedTakerOrder.getOrderId());
+            pcMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId());
         } else {
-            if (null != tradeList && (!tradeList.isEmpty())) {
-                List<PcTradeBo> notSavedTrade = filterNotSavedTrade(this.tradeList);
-                if (null != notSavedTrade && !notSavedTrade.isEmpty()) {
-                    saveTradeList(notSavedTrade);
-                }
-                pcMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
+            List<PcTradeBo> notSavedTrade = filterNotSavedTrade(this.tradeList, this.takerOrder);
+            if (null != notSavedTrade && !notSavedTrade.isEmpty()) {
+                saveTradeList(notSavedTrade);
             }
+            pcMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
         }
-        sendBookMsg();
-        sendTradeMsg();
+        try {
+            sendBookMsg();
+            sendTradeMsg();
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+        }
     }
 
     private void doMarket() {
-        if (null == cancelTakerOrder && (null == tradeList || tradeList.isEmpty())) {
-            throw new RuntimeException();
-        }
 
         // 先发成交消息
         if (null != tradeList && (!tradeList.isEmpty())) {
-            List<PcTradeBo> notSavedTrade = filterNotSavedTrade(this.tradeList);
+            List<PcTradeBo> notSavedTrade = filterNotSavedTrade(this.tradeList, this.takerOrder);
             if (null != notSavedTrade && !notSavedTrade.isEmpty()) {
                 saveTradeList(notSavedTrade);
             }
             pcMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
         }
 
+        BigDecimal cancelNumber = takerOrder.getNumber().subtract(takerOrder.getFilledNumber());
         // 后发取消消息
-        if (null != cancelTakerOrder && cancelTakerOrder.getCancelNumber().compareTo(BigDecimal.ZERO) > 0) {
+        if (cancelNumber.compareTo(BigDecimal.ZERO) > 0) {
             // 未匹配的市价委托
-            pcMatchMqNotify.sendOrderMatchCancelled(this.getAsset(), this.getSymbol(), cancelTakerOrder.getAccountId(), cancelTakerOrder.getOrderId(), cancelTakerOrder.getCancelNumber());
+            pcMatchMqNotify.sendOrderMatchCancelled(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId(), cancelNumber);
         }
-        sendBookMsg();
-        sendTradeMsg();
+        try {
+            sendBookMsg();
+            sendTradeMsg();
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+        }
     }
 
     private TradeListMsgDto.TradeMsgDto buildTrade(PcTradeBo trade) {
@@ -186,14 +167,12 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
      * @param tradeList
      * @return
      */
-    private List<PcTradeBo> filterNotSavedTrade(List<PcTradeBo> tradeList) {
-        long takerAccountId = tradeList.get(0).getTkOrderId();
-        long takerOrderId = tradeList.get(0).getTkOrderId();
+    private List<PcTradeBo> filterNotSavedTrade(List<PcTradeBo> tradeList, PcOrder4MatchBo takerOrder) {
 
         List<PcTrade> existMatches = pcTradeDAO.queryList(new HashMap<String, Object>() {
             {
-                put("tkAccountId", takerAccountId);
-                put("tkOrderId", takerOrderId);
+                put("tkAccountId", takerOrder.getAccountId());
+                put("tkOrderId", takerOrder.getOrderId());
             }
         });
 

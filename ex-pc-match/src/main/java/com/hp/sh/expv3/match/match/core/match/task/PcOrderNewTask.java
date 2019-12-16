@@ -6,6 +6,7 @@ package com.hp.sh.expv3.match.match.core.match.task;
 
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.component.id.def.IdService;
+import com.hp.sh.expv3.match.enums.IdTypeEnum;
 import com.hp.sh.expv3.match.enums.PcOrderTypeEnum;
 import com.hp.sh.expv3.match.match.core.match.handler.PcLimitOrderHandler;
 import com.hp.sh.expv3.match.match.core.match.handler.PcMarketOrderHandler;
@@ -13,7 +14,6 @@ import com.hp.sh.expv3.match.match.core.match.handler.PcOrderHandler;
 import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.matched.task.def.PcMatchedTaskService;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
-import com.hp.sh.expv3.match.enums.IdTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -75,31 +75,25 @@ public class PcOrderNewTask extends PcOrderBaseTask implements ApplicationContex
         long now = System.currentTimeMillis();
         PcMatchHandlerContext context = PcMatchHandlerContext.getLocalContext();
 
-        long matchTxId = idService.getId(IdTypeEnum.MATCH);
-        context.setMatchTxId(matchTxId);
+        context.getMatchResult().setMatchTxId(idService.getId(IdTypeEnum.MATCH));
 
-        PcOrder4MatchBo todo = order;
         while (true) {
             PcOrderHandler handler = null;
-            if (PcOrderTypeEnum.LIMIT.getCode() == todo.getOrderType()) {
+            if (PcOrderTypeEnum.LIMIT.getCode() == order.getOrderType()) {
                 handler = pcLimitOrderHandler;
-            } else if (PcOrderTypeEnum.LIMIT.getCode() == todo.getOrderType()) {
+            } else if (PcOrderTypeEnum.LIMIT.getCode() == order.getOrderType()) {
                 handler = pcMarketOrderHandler;
             } else {
                 throw new RuntimeException();
             }
             if (null != handler) {
-                handler.process(context, todo);
+                handler.process(context, order);
             }
             break;
         }
 
-        if (null == context.getOrderNew() && (null == context.getTradeList() || context.getTradeList().isEmpty())) {
-            logger.warn("pending new task,no order,no trade,please check.offset:{},{}", this.getCurrentMsgOffset(), this.getAssetSymbol());
-        }
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
-            pcMatchedTaskService.addMatchedOrderMatchedTask(context, this.getCurrentMsgOffset(), todo);
-            context.setSentMqOffset(this.getCurrentMsgOffset());
+            pcMatchedTaskService.addMatchedOrderMatchedTask(context, this.getCurrentMsgOffset(), order);
         }
 
         context.clear();

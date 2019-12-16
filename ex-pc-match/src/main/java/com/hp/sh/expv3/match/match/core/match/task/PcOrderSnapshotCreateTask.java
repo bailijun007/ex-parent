@@ -46,18 +46,10 @@ public class PcOrderSnapshotCreateTask extends PcOrderBaseTask implements ITask 
     }
 
     @Override
-    public boolean onError(Exception ex) {
-        return false;
-    }
-
-    @Override
     public void run() {
         PcMatchHandlerContext context = PcMatchHandlerContext.getLocalContext();
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
-            pcMatchedTaskService.addOrderSnapshotTask(context, this.getCurrentMsgOffset());
-            context.setSentMqOffset(this.getCurrentMsgOffset());
+            pcMatchedTaskService.addOrderSnapshotTask(context, context.limitAskQueue, context.limitBidQueue, this.getCurrentMsgOffset());
         }
-        context.clear();
     }
-
 }

@@ -4,7 +4,6 @@
  */
 package com.hp.sh.expv3.match.component.notify;
 
-import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.PcTradeBo;
 import com.hp.sh.expv3.match.component.rocketmq.PcMatchProducer;
 import com.hp.sh.expv3.match.config.setting.PcmatchRocketMqSetting;
@@ -102,27 +101,20 @@ public class PcMatchMqNotify {
         return true;
     }
 
-    public boolean sendSameSideCloseOrderCancelled(String asset, String symbol, Collection<PcOrder4MatchBo> orders) {
+    public boolean sendSameSideCloseOrderCancelled(String asset, String symbol, Collection<PcOrderCancelMqMsgDto> msgs) {
         String topic = PcRocketMqUtil.buildPcAccountContractMqTopicName(pcmatchRocketMqSetting.getPcMatchTopicNamePattern(), asset, symbol);
 
-        if (null == orders || orders.isEmpty()) {
+        if (null == msgs || msgs.isEmpty()) {
         } else {
-            for (PcOrder4MatchBo order : orders) {
+            for (PcOrderCancelMqMsgDto msg : msgs) {
 
-                PcOrderCancelMqMsgDto msg = new PcOrderCancelMqMsgDto();
-                msg.setAccountId(order.getAccountId());
-                msg.setOrderId(order.getOrderId());
-                msg.setAsset(asset);
-                msg.setSymbol(symbol);
-                BigDecimal cancelDeltaAmt = order.getNumber().subtract(order.getFilledNumber());
-                msg.setCancelNumber(cancelDeltaAmt);
                 Message message = new Message(
                         topic,// topic
                         "" + RmqTagEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_CANCELLED.getConstant(),// tag
-                        "" + order.getOrderId(),
+                        "" + msg.getOrderId(),
                         JsonUtil.toJsonString(msg).getBytes()// body
                 );
-                safeSend2MatchTopic(message, order.getAccountId());
+                safeSend2MatchTopic(message, msg.getAccountId());
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));

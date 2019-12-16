@@ -36,6 +36,13 @@ public class PcOrderCancel4LiqTask extends PcOrderBaseTask implements Applicatio
         this.msg = msg;
     }
 
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
     @Override
     public void onSucess() {
     }
@@ -97,22 +104,10 @@ public class PcOrderCancel4LiqTask extends PcOrderBaseTask implements Applicatio
         }
 
         // book 信息懒处理，交由 matched 线程处理
-
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
             // 加入任务中
             pcMatchedTaskService.addMatchedOrderCancelByLiqTask(context, this.getCurrentMsgOffset(), id2OrderToCancel.values(), msg);
-            // 重置偏移量
-            context.setSentMqOffset(this.getCurrentMsgOffset());
         }
-
-        context.clear();
-    }
-
-    private ApplicationContext applicationContext;
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 
 }
