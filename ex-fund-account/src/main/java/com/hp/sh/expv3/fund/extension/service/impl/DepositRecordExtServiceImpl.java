@@ -31,7 +31,7 @@ public class DepositRecordExtServiceImpl implements DepositRecordExtService {
     @Override
     public List<DepositRecordHistoryVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         if(pageStatus==null){
-            pageStatus=0;
+            pageStatus=1;
         }
         List<DepositRecordHistoryVo> list=depositRecordExtMapper.queryHistory(userId,asset,queryId,pageSize,pageStatus);
         if (CollectionUtils.isEmpty(list)){

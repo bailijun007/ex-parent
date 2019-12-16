@@ -23,7 +23,7 @@ public interface DepositRecordExtApi {
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC"),
             @ApiImplicitParam(name = "queryId", value = "充币记录表主键编号", example = "1"),
-            @ApiImplicitParam(name = "pageStatus", value = "翻页状态：-1：上一页，0当前页（默认值），1：下一页", example = "1"),
+            @ApiImplicitParam(name = "pageStatus", value = "翻页状态：-1：上一页，1：下一页", example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
     @GetMapping(value = "/baseUrl/account/deposit/queryHistory")
