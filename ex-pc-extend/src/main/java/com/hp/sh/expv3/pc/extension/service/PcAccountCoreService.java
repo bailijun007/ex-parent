@@ -1,37 +1,15 @@
-/**
- * 
- */
 package com.hp.sh.expv3.pc.extension.service;
+
+import com.hp.sh.expv3.pc.extension.vo.PcAccountExtVo;
 
 import java.math.BigDecimal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.hp.sh.expv3.pc.extension.dao.PcAccountDAO;
-import com.hp.sh.expv3.pc.module.account.entity.PcAccount;
-
 /**
- * @author wangjg
+ * @author BaiLiJun  on 2019/12/16
  */
-@Service
-@Transactional(rollbackFor=Exception.class)
-public class PcAccountCoreService{
-	private static final Logger logger = LoggerFactory.getLogger(PcAccountCoreService.class);
+public interface PcAccountCoreService {
+    public BigDecimal getBalance(Long userId, String asset);
 
-	@Autowired
-	private PcAccountDAO pcAccountDAO;
+    public PcAccountExtVo findContractAccount(Long userId, String asset);
 
-	public BigDecimal getBalance(Long userId, String asset){
-		PcAccount fa = this.pcAccountDAO.get(userId, asset);
-		if(fa==null){
-			return null;
-		}
-		return fa.getBalance();
-	}
-	
 }
-

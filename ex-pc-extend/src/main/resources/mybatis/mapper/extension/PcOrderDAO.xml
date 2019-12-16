@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcOrderDAO">
+
+    <select id="getGrossMargin" resultType="java.math.BigDecimal">
+        select IFNULL(SUM(gross_margin),0) from pc_order
+        where active_flag=1
+        and user_id=#{userId}
+        and asset=#{asset}
+    </select>
+</mapper>
