@@ -34,7 +34,7 @@ import com.hp.sh.expv3.pc.strategy.aabb.AABBMetadataService;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.utils.IntBool;
-import com.hp.sh.expv3.utils.math.BigMathUtils;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
  * 委托
@@ -105,7 +105,7 @@ public class PcOrderService {
 		pcOrder.setLongFlag(longFlag);
 		pcOrder.setLeverage(pcSymbolService.getLeverage(userId, asset, symbol, longFlag));
 		pcOrder.setVolume(number);
-		pcOrder.setFaceValue(metadataService.getFaceValue(pcOrder.getSymbol()));
+		pcOrder.setFaceValue(metadataService.getFaceValue(symbol));
 		pcOrder.setPrice(price);
 		
 		pcOrder.setOrderType(PcOrderType.LIMIT);
@@ -225,7 +225,7 @@ public class PcOrderService {
 		if(order.getStatus() == OrderStatus.CANCELED){
 			throw new ExException(OrderError.CANCELED);
 		}
-		if(BigMathUtils.eq(order.getVolume(), order.getFilledVolume())){
+		if(BigUtils.eq(order.getVolume(), order.getFilledVolume())){
 			throw new ExException(OrderError.FILLED);
 		}
 		

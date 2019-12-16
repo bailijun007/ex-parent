@@ -7,9 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
-import com.hp.sh.expv3.pc.calc.PnlCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
-import com.hp.sh.expv3.pc.constant.BidFlag;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
@@ -21,7 +19,7 @@ import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.IntBool;
-import com.hp.sh.expv3.utils.math.BigMathUtils;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
  * 
@@ -57,7 +55,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 		tradeResult.setAmount(tradeRatioAmt.getAmount());
 		tradeResult.setBaseValue(CompFieldCalc.calcBaseValue(tradeResult.getAmount(), matchedVo.getPrice()));
 		tradeResult.setOrderMargin(tradeRatioAmt.getOrderMargin());//保证金
-		tradeResult.setOrderCompleted(BigMathUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
+		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN){
 			tradeResult.setFeeRatio(order.getOpenFeeRatio());
@@ -78,7 +76,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 			tradeResult.setNewMeanPrice(matchedVo.getPrice());
 		}
 
-		if(IntBool.isTrue(order.getCloseFlag()) && pcPosition!=null && BigMathUtils.gt(pcPosition.getMeanPrice(), BigDecimal.ZERO)){
+		if(IntBool.isTrue(order.getCloseFlag()) && pcPosition!=null && BigUtils.gt(pcPosition.getMeanPrice(), BigDecimal.ZERO)){
 			BigDecimal pnl = PnlCalc.calcPnl(order.getLongFlag(), tradeRatioAmt.getAmount(), pcPosition.getMeanPrice(), matchedVo.getPrice(), Precision.COMMON_PRECISION);
 			tradeResult.setPnl(pnl);	
 		}else{

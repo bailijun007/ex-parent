@@ -7,15 +7,10 @@ import java.math.BigDecimal;
  * @author wangjg
  *
  */
-public class BigMathUtils {
-
-	//是否正数
-	public static boolean isPositive(BigDecimal val){
-		return val.compareTo(BigDecimal.ZERO)>=0;
-	}
+public class BigUtils {
 
 	//是否负数
-	public static boolean isNegative(BigDecimal val){
+	public static boolean ltZero(BigDecimal val){
 		return val.compareTo(BigDecimal.ZERO)<0;
 	}
 
@@ -24,6 +19,11 @@ public class BigMathUtils {
 		return val.compareTo(BigDecimal.ZERO)>0;
 	}
 	
+	//是否正数
+	public static boolean geZero(BigDecimal val){
+		return val.compareTo(BigDecimal.ZERO)>=0;
+	}
+
 	public static boolean isZero(BigDecimal v1){
 		return v1.compareTo(BigDecimal.ZERO)==0;
 	}

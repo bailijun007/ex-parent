@@ -33,7 +33,7 @@ import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.IntBool;
-import com.hp.sh.expv3.utils.math.BigMathUtils;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
@@ -101,7 +101,7 @@ public class PcPositionService {
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
 			this.closeFeeToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult);
 		}else{
-			if(BigMathUtils.isNegative(tradeResult.getFeeReceivable())){
+			if(BigUtils.ltZero(tradeResult.getFeeReceivable())){
 				this.openFeeDiffToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult);
 			}
 		}
@@ -206,20 +206,27 @@ public class PcPositionService {
 		pcPosition.setLiqMarkTime(null);
 		pcPosition.setLiqStatus(LiqStatus.NO);
 		
+		pcPosition.setAccuVolume(BigDecimal.ZERO);
+		pcPosition.setAccuBaseValue(BigDecimal.ZERO);
+		
 		return pcPosition;
 	}
 
-	private void modOpenPos(PcPosition pcPosition, TradeResult tradeData) {
-		pcPosition.setVolume(pcPosition.getVolume().add(tradeData.getVolume()));
-		pcPosition.setBaseValue(pcPosition.getBaseValue().add(tradeData.getBaseValue()));
-		pcPosition.setPosMargin(pcPosition.getPosMargin().add(tradeData.getOrderMargin()));
-		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeData.getFeeReceivable()));
+	private void modOpenPos(PcPosition pcPosition, TradeResult tradeResult) {
+		pcPosition.setVolume(pcPosition.getVolume().add(tradeResult.getVolume()));
+		pcPosition.setBaseValue(pcPosition.getBaseValue().add(tradeResult.getBaseValue()));
+		pcPosition.setPosMargin(pcPosition.getPosMargin().add(tradeResult.getOrderMargin()));
+		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeResult.getFeeReceivable()));
 		
-		pcPosition.setMeanPrice(tradeData.getNewMeanPrice());
-		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeData.getOrderMargin()));
-		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeData.getFeeReceivable()));
+		pcPosition.setMeanPrice(tradeResult.getNewMeanPrice());
+		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeResult.getOrderMargin()));
+		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeResult.getFeeReceivable()));
 		
-		pcPosition.setLiqPrice(tradeData.getLiqPrice());
+		pcPosition.setLiqPrice(tradeResult.getLiqPrice());
+		
+		//
+		pcPosition.setAccuVolume(pcPosition.getAccuBaseValue().add(tradeResult.getVolume()));
+		pcPosition.setAccuBaseValue(pcPosition.getAccuBaseValue().add(tradeResult.getBaseValue()));
 		
 	}
 

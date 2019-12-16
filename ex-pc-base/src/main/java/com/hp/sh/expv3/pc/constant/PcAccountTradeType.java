@@ -18,9 +18,10 @@ public class PcAccountTradeType {
 	public static final int ORDER_CLOSE = 5;	//+平仓	//保证金+收益-手续费
 	
 	public static final int ADD_TO_MARGIN = 6;		//-追加保证金
+	public static final int REDUCE_MARGIN = 7;		//+减少保证金
 	
-	public static final int ADD_MARGIN2 = 7;	//-修改杠杆追加保证金
+	public static final int ADD_MARGIN2 = 8;	//-修改杠杆追加保证金
 	
-	public static final int RETURN_FEE_DIFF = 8;//+退回多收的手续费 taker fee - maker fee
+	public static final int RETURN_FEE_DIFF = 9;//+退回多收的手续费 taker fee - maker fee
 
 }

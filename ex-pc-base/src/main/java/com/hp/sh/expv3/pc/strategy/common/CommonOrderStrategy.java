@@ -11,7 +11,7 @@ import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
-import com.hp.sh.expv3.utils.math.BigMathUtils;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
  * 
@@ -104,12 +104,12 @@ public class CommonOrderStrategy implements OrderStrategy {
 		BigDecimal orderMargin;
 		BigDecimal grossMargin;
 
-		if(BigMathUtils.eq(number, BigDecimal.ZERO)){
+		if(BigUtils.eq(number, BigDecimal.ZERO)){
 			openFee = BigDecimal.ZERO;
 			closeFee = BigDecimal.ZERO;
 			orderMargin = BigDecimal.ZERO;
 			grossMargin = BigDecimal.ZERO;
-		}else if(BigMathUtils.eq(number, order.getVolume().subtract(order.getFilledVolume()))){
+		}else if(BigUtils.eq(number, order.getVolume().subtract(order.getFilledVolume()))){
 			openFee = order.getOpenFee();
 			closeFee = order.getCloseFee();
 			orderMargin = order.getOrderMargin();
