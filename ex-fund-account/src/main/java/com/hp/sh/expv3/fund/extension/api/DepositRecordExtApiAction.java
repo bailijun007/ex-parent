@@ -26,8 +26,7 @@ import java.util.List;
  */
 @RestController
 @Api(tags = "充值记录扩展Api")
-@RequestMapping("/baseUrl/account/deposit")
-public class DepositRecordExtApi {
+public class DepositRecordExtApiAction implements DepositRecordExtApi{
 
     @Autowired
     private DepositAddrExtService depositAddrExtService;
@@ -35,21 +34,15 @@ public class DepositRecordExtApi {
     @Autowired
     private DepositRecordExtService depositRecordExtService;
 
-    @ApiOperation("查询充币历史记录")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
-            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC"),
-            @ApiImplicitParam(name = "queryId", value = "充币记录表主键编号", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
-    })
-    @GetMapping(value = "/queryHistory")
+    @Override
     public List<DepositRecordHistoryVo> queryHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset", required = false) String asset,
-                                                     @RequestParam(value = "queryId", required = true) Long queryId, @RequestParam(value = "pageSize") Integer pageSize) {
+                                                     @RequestParam(value = "queryId", required = true) Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
+                                                     @RequestParam(value = "pageStatus") Integer pageStatus) {
 
         if (userId == null || pageSize == null || queryId == null) {
             throw new ExException(CapitalAccountErrorCode.PARAM_EMPTY);
         }
-        List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize);
+        List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize,pageStatus);
         String addr = depositAddrExtService.getAddressByUserIdAndAsset(userId, asset);
         for (DepositRecordHistoryVo historyVo : list) {
             historyVo.setAddress(addr);

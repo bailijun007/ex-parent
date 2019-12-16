@@ -11,5 +11,6 @@ import java.util.List;
 public interface DepositRecordExtMapper {
 
 
-    List<DepositRecordHistoryVo> queryHistory(@Param("userId") Long userId,@Param("asset") String asset,@Param("queryId") Long queryId, @Param("pageSize") Integer pageSize);
+    List<DepositRecordHistoryVo> queryHistory(@Param("userId") Long userId,@Param("asset") String asset,@Param("queryId") Long queryId,
+                                              @Param("pageSize") Integer pageSize,@Param("pageStatus") Integer pageStatus);
 }

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 /**
  * 资金账户相关请求
@@ -24,21 +23,19 @@ import java.util.Optional;
  * @author BaiLiJun  on 2019/12/13
  */
 @RestController
-@Api(tags ="资金账户扩展Api")
-@RequestMapping("/baseUrl/account/total")
-public class CapitalAccountExtApi {
+public class CapitalAccountExtApiAction implements CapitalAccountExtApi {
     @Autowired
     private FundAccountExtendServer fundAccountExtendServer;
 
     @Autowired
     private WithdrawalRecordExtServer withdrawalRecordExtServer;
 
+    @Override
     @ApiOperation("获取资金账户")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id",example = "1",required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型",example = "BTC")
     })
-    @GetMapping(value = "/query")
     public CapitalAccountVo getCapitalAccount(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset) {
         if (userId == null) {
             throw new ExException(CapitalAccountErrorCode.PARAM_EMPTY);

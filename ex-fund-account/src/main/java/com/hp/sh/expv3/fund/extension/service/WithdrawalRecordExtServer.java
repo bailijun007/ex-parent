@@ -13,13 +13,7 @@ import java.math.BigDecimal;
  *
  * @author BaiLiJun  on 2019/12/14
  */
-@Service
-@Transactional(rollbackFor = Exception.class)
-public class WithdrawalRecordExtServer {
-    @Autowired
-    private WithdrawalRecordExtMapper withdrawalRecordExtMapper;
+public interface WithdrawalRecordExtServer {
 
-    public BigDecimal getFrozenCapital(Long userId, String asset) {
-        return withdrawalRecordExtMapper.getFrozenCapital(userId,asset);
-    }
+    public BigDecimal getFrozenCapital(Long userId, String asset) ;
 }

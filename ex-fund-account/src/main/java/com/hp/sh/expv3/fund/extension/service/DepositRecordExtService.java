@@ -19,27 +19,8 @@ import java.util.Optional;
  *
  * @author BaiLiJun  on 2019/12/14
  */
-@Service
-@Transactional(rollbackFor = Exception.class)
-public class DepositRecordExtService {
-    @Autowired
-    private FundAccountExtendMapper fundAccountExtendMapper;
+public interface DepositRecordExtService {
 
-    @Autowired
-    private DepositRecordExtMapper depositRecordExtMapper;
 
-    public List<DepositRecordHistoryVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize) {
-
-        List<DepositRecordHistoryVo> list=depositRecordExtMapper.queryHistory(userId,asset,queryId,pageSize);
-        if (CollectionUtils.isEmpty(list)){
-            new ExException(CapitalAccountErrorCode.DATA_EMPTY);
-        }
-        for (DepositRecordHistoryVo historyVo : list) {
-            Optional<DepositRecordHistoryVo> vo=Optional.ofNullable(historyVo);
-            historyVo.setMtime( vo.map(d->d.getModified().getTime()).orElse(null));
-            historyVo.setMtime( vo.map(d->d.getPayTime().getTime()).orElse(null));
-        }
-
-        return list;
-    }
+    public List<DepositRecordHistoryVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize,Integer pageStatus) ;
 }
