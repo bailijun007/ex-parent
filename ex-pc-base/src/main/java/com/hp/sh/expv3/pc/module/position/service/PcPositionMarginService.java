@@ -147,8 +147,7 @@ public class PcPositionMarginService {
 		return true;
 	}
 	
-	private BigDecimal calcMarginWhenChangeLeverage(Integer longFlag, BigDecimal leverage, BigDecimal amount,
-			BigDecimal feeRatio, BigDecimal meanPrice, BigDecimal markPrice) {
+	private BigDecimal calcMarginWhenChangeLeverage(Integer longFlag, BigDecimal leverage, BigDecimal amount, BigDecimal feeRatio, BigDecimal meanPrice, BigDecimal markPrice) {
 		// TODO Auto-generated method stub
 		return null;
 	}

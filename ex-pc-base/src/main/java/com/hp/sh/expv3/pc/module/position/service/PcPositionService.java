@@ -99,7 +99,7 @@ public class PcPositionService {
 		
 		//pc account
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
-			this.closeFeeToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult);
+			this.closeFeeToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult, order.getLongFlag());
 		}else{
 			if(BigUtils.ltZero(tradeResult.getFeeReceivable())){
 				this.openFeeDiffToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult);
@@ -107,14 +107,14 @@ public class PcPositionService {
 		}
 	}
 	
-	private void closeFeeToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeData) {
+	private void closeFeeToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeResult, int longFlag) {
 		AddMoneyRequest request = new AddMoneyRequest();
-		request.setAmount(tradeData.getOrderMargin().add(tradeData.getPnl()).subtract(tradeData.getFeeReceivable()));
+		request.setAmount(tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFeeReceivable()));
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("平仓,保证金：%d,收益:%s,手续费：%d", tradeData.getOrderMargin(), tradeData.getPnl(), tradeData.getFeeReceivable()));
+		request.setRemark(String.format("平仓,保证金：%d,收益:%s,手续费：%d", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getFeeReceivable()));
 		request.setTradeNo("CLOSE-"+orderTradeId);
-		request.setTradeType(PcAccountTradeType.ORDER_CLOSE);
+		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_CLOSE_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setAssociatedId(orderTradeId);
 		this.pcAccountCoreService.add(request);
 	}

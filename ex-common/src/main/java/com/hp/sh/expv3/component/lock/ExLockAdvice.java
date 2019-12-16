@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.commons.lock.LockAdvice;
 
-@Order
+@Order(Integer.MAX_VALUE)
 @Aspect
 @Component
 public class ExLockAdvice extends LockAdvice {

@@ -132,7 +132,7 @@ public class PcOrderService {
 		pcOrderDAO.save(pcOrder);
 
 		//押金扣除
-		this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin());
+		this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin(), longFlag);
 		
 		return pcOrder;
 	}
@@ -168,13 +168,13 @@ public class PcOrderService {
 		pcOrder.setCancelVolume(BigDecimal.ZERO);
 	}
 	
-	private void cutBalance(Long userId, String asset, Long orderId, BigDecimal amount){
+	private void cutBalance(Long userId, String asset, Long orderId, BigDecimal amount, int longFlag){
 		CutMoneyRequest request = new CutMoneyRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
 		request.setRemark("开仓扣除");
 		request.setTradeNo("O"+orderId);
-		request.setTradeType(PcAccountTradeType.ORDER_OPEN);
+		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_OPEN_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
 		this.pcAccountCoreService.cut(request);
@@ -268,6 +268,12 @@ public class PcOrderService {
 			order.setCancelVolume(number);
 			order.setActiveFlag(PcOrder.NO);
 			order.setStatus(OrderStatus.CANCELED);
+			
+			//清空押金
+			order.setOrderMargin(BigDecimal.ZERO);
+			order.setOpenFee(BigDecimal.ZERO);
+			order.setCloseFee(BigDecimal.ZERO);
+			
 			this.pcOrderDAO.update(order);
 			
 			return;

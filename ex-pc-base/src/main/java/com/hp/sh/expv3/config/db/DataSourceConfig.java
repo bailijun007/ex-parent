@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@EnableTransactionManagement
+@EnableTransactionManagement(order=(Integer.MAX_VALUE-10))
 @PropertySource({ "db2.properties" })
 public class DataSourceConfig {
 
