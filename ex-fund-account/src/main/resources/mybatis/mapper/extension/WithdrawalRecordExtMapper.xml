@@ -15,5 +15,30 @@
         AND pay_status NOT IN (1,2);
     </select>
 
+    <select id="queryHistory" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
+        select id,asset symbol,  amount, pay_status  status,created,account
+        FROM withdrawal_record
+        <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+
+            <choose>
+                <when test="pageStatus==1 and pageSize!=null and queryId!=null">
+                    and id &gt; #{queryId}
+                    ORDER BY id asc
+                    LIMIT 0,${pageSize}
+                </when>
+                <otherwise>
+                    and id &lt; #{queryId}
+                    ORDER BY id desc
+                    LIMIT 0,${pageSize}
+                </otherwise>
+            </choose>
+        </where>
+    </select>
 
 </mapper>

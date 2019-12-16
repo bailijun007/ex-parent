@@ -2,16 +2,13 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.extension.constant.CapitalAccountErrorCode;
-import com.hp.sh.expv3.fund.extension.service.FundAccountExtendServer;
-import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtServer;
+import com.hp.sh.expv3.fund.extension.service.FundAccountExtendService;
+import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,10 +22,10 @@ import java.math.BigDecimal;
 @RestController
 public class CapitalAccountExtApiAction implements CapitalAccountExtApi {
     @Autowired
-    private FundAccountExtendServer fundAccountExtendServer;
+    private FundAccountExtendService fundAccountExtendServer;
 
     @Autowired
-    private WithdrawalRecordExtServer withdrawalRecordExtServer;
+    private WithdrawalRecordExtService withdrawalRecordExtServer;
 
     @Override
     @ApiOperation("获取资金账户")

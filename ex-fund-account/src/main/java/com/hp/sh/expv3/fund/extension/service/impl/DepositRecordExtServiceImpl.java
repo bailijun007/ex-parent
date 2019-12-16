@@ -35,7 +35,7 @@ public class DepositRecordExtServiceImpl implements DepositRecordExtService {
         }
         List<DepositRecordHistoryVo> list=depositRecordExtMapper.queryHistory(userId,asset,queryId,pageSize,pageStatus);
         if (CollectionUtils.isEmpty(list)){
-            new ExException(CapitalAccountErrorCode.DATA_EMPTY);
+            throw   new ExException(CapitalAccountErrorCode.DATA_EMPTY);
         }
         for (DepositRecordHistoryVo historyVo : list) {
             Optional<DepositRecordHistoryVo> vo=Optional.ofNullable(historyVo);

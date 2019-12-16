@@ -15,7 +15,7 @@ import java.util.List;
  * @author BaiLiJun  on 2019/12/16
  */
 @Api(tags = "充值记录扩展Api")
-@FeignClient(value = "ex-fund-account")
+@FeignClient(value = "ex-deposit-record")
 public interface DepositRecordExtApi {
 
     @ApiOperation("查询充币历史记录")

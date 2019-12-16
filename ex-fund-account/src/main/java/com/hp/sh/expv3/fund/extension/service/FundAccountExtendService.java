@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author BaiLiJun  on 2019/12/13
  */
-public interface FundAccountExtendServer {
+public interface FundAccountExtendService {
 
 
 

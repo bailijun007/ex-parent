@@ -26,9 +26,6 @@
                     LIMIT 0,${pageSize}
                 </otherwise>
             </choose>
-
-
-
         </where>
     </select>
 
