@@ -35,8 +35,9 @@ public class DepositRecordExtService {
             new ExException(CapitalAccountErrorCode.DATA_EMPTY);
         }
         for (DepositRecordHistoryVo historyVo : list) {
-            historyVo.setMtime(historyVo.getModified().getTime());
-            historyVo.setDepositTime(historyVo.getPayTime().getTime());
+            Optional<DepositRecordHistoryVo> vo=Optional.ofNullable(historyVo);
+            historyVo.setMtime( vo.map(d->d.getModified().getTime()).orElse(null));
+            historyVo.setMtime( vo.map(d->d.getPayTime().getTime()).orElse(null));
         }
 
         return list;

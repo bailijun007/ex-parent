@@ -50,8 +50,8 @@ public class DepositRecordExtApi {
             throw new ExException(CapitalAccountErrorCode.PARAM_EMPTY);
         }
         List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize);
+        String addr = depositAddrExtService.getAddressByUserIdAndAsset(userId, asset);
         for (DepositRecordHistoryVo historyVo : list) {
-            String addr = depositAddrExtService.getAddressByUserIdAndAsset(historyVo.getUserId(), historyVo.getAsset());
             historyVo.setAddress(addr);
         }
 
