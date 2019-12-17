@@ -38,6 +38,20 @@
 		        
 	</dependencies>
 
+	<distributionManagement>
+	  <repository>
+		<id>releases</id>
+		<name>User Project Release</name>
+		<url>http://192.168.0.46:8081/nexus/content/repositories/releases/</url>
+	  </repository>
+
+	  <snapshotRepository>
+		<id>snapshots</id>
+		<name>User Project SNAPSHOTS</name>
+		<url>http://192.168.0.46:8081/nexus/content/repositories/snapshots/</url>
+	  </snapshotRepository>
+	</distributionManagement>
+
 	<build>
 		<plugins>
 			<plugin>

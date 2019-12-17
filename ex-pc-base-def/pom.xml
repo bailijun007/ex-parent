@@ -6,7 +6,7 @@
 	<groupId>com.hp.sh</groupId>
 	<artifactId>ex-pc-base-def</artifactId>
 	<packaging>jar</packaging>
-	<version>3.0.0</version>
+	<version>3.0.0-SNAPSHOT</version>
     <description>永续合约基础服务接口定义</description>
     
 	<properties>
@@ -48,5 +48,19 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	
+	<distributionManagement>
+	  <repository>
+		<id>releases</id>
+		<name>User Project Release</name>
+		<url>http://192.168.0.46:8081/nexus/content/repositories/releases/</url>
+	  </repository>
+
+	  <snapshotRepository>
+		<id>snapshots</id>
+		<name>User Project SNAPSHOTS</name>
+		<url>http://192.168.0.46:8081/nexus/content/repositories/snapshots/</url>
+	  </snapshotRepository>
+	</distributionManagement>
 	
 </project>

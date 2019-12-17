@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
+import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
@@ -147,9 +148,14 @@ public class PcPositionMarginService {
 		return true;
 	}
 	
+	
+	//TODO 
 	private BigDecimal calcMarginWhenChangeLeverage(Integer longFlag, BigDecimal leverage, BigDecimal amount, BigDecimal feeRatio, BigDecimal meanPrice, BigDecimal markPrice) {
-		// TODO Auto-generated method stub
-		return null;
+        // ( 1 / leverage ) * volume = volume / leverage
+        BigDecimal pnl = PnlCalc.calcPnl(longFlag, amount, meanPrice, markPrice, Precision.COMMON_PRECISION);
+        BigDecimal initMarginRatio = feeRatioService.getInitedMarginRatio(leverage);
+        BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, meanPrice);
+        return baseValue.multiply(initMarginRatio).subtract(pnl.min(BigDecimal.ZERO)).stripTrailingZeros();
 	}
 
 	private void modifyAccountSymbol(PcAccountSymbol accountSymbol, Integer longFlag, BigDecimal leverage){
