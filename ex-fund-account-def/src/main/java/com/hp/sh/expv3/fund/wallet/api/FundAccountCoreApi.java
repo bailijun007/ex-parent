@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiOperation;
  * @author wangjg
  */
 @Api(tags = "资金账户接口")
-@FeignClient(value="ex-fund-account")
+@FeignClient(value = "ex-fund-account")
 public interface FundAccountCoreApi {
 
 	@ApiOperation(value = "加钱")

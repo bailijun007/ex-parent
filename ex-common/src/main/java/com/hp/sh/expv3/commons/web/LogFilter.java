@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.commons.web;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -11,47 +12,52 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.gitee.hupadev.commons.id.IdGenerator;
+import org.apache.commons.lang3.StringUtils;
 
 @WebFilter(filterName = "myLogFilter", urlPatterns = { "/api/**" })
 public class LogFilter implements Filter {
 	
-	@Autowired(required=false)
-	private IdGenerator idGenerator;
+	private static final String X_REQUEST_ID = "X-Request-Id";
 	
-	private String sequenceName = "LogFilter";;
+	private String serviceName;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		// TODO Auto-generated method stub
-		
+		this.serviceName = filterConfig.getInitParameter("serviceName");
 	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest httpReq = (HttpServletRequest)request;
 //		httpReq = new MyCachedServletRequest(httpReq);
-		System.out.println(httpReq.getServletPath());
-		System.out.println(httpReq.getHeader("X-Request-Id"));
-		RequestContext.setRequestId(this.getRequestId());
-		chain.doFilter(httpReq, response);
-		RequestContext.setRequestId(null);
+		
+		String requestId = this.getRequestId(httpReq);
+		if(StringUtils.isNotBlank(requestId)){
+			requestId = this.newRequestId();
+		}
+		RequestContext.setRequestId(requestId);
+		try{
+			chain.doFilter(httpReq, response);
+		}finally{
+			RequestContext.setRequestId(null);
+		}
 	}
 
 	@Override
 	public void destroy() {
-		// TODO Auto-generated method stub
 		
 	}
 	
-	private Long getRequestId(){
-		if(idGenerator!=null){
-			Long id = idGenerator.nextId(sequenceName);
-			return id;
+	private String getRequestId(HttpServletRequest httpReq){
+		String requestId = httpReq.getParameter(X_REQUEST_ID);
+		if(StringUtils.isBlank(requestId)){
+			requestId = httpReq.getHeader(X_REQUEST_ID);
 		}
-		return null;
+		return requestId;
+	}
+	
+	private String newRequestId(){
+		return this.serviceName + UUID.randomUUID().toString().replace("-", "");
 	}
 
 }

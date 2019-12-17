@@ -148,8 +148,17 @@ public class PcPositionMarginService {
 		return true;
 	}
 	
-	
-	//TODO 
+	/*
+	 * 用 均价 标记价格 为实现盈亏计算 保证金
+	 * @param longFlag
+	 * @param leverage
+	 * @param amount
+	 * @param feeRatio
+	 * @param meanPrice
+	 * @param markPrice
+	 * @return
+	 */
+	//TODO AABB
 	private BigDecimal calcMarginWhenChangeLeverage(Integer longFlag, BigDecimal leverage, BigDecimal amount, BigDecimal feeRatio, BigDecimal meanPrice, BigDecimal markPrice) {
         // ( 1 / leverage ) * volume = volume / leverage
         BigDecimal pnl = PnlCalc.calcPnl(longFlag, amount, meanPrice, markPrice, Precision.COMMON_PRECISION);

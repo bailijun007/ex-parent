@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.gitee.hupadev.commons.cache.Cache;
 import com.hp.sh.expv3.dev.Question;
 import com.hp.sh.expv3.pc.constant.Precision;
-import com.hp.sh.expv3.utils.IntBool;
 
 /**
  * 查询保证金费率，redis或db

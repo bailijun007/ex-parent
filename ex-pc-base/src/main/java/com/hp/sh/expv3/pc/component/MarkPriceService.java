@@ -11,6 +11,11 @@ import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.cache.Cache;
 
+/**
+ * 标记价格服务
+ * @author wangjg
+ *
+ */
 @Component
 public class MarkPriceService{
 
