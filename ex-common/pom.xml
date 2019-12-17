@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
 
-	<groupId>com.hp.sh</groupId>
+	<groupId>com.hp.sh.expv3</groupId>
 	<artifactId>ex-common3</artifactId>
 	<packaging>jar</packaging>
     <description>exchange-common</description>
-	<version>3.0.0</version>
+	<version>3.0.0-SNAPSHOT</version>
     
     <dependencies>
     
@@ -37,6 +37,20 @@
 		</dependency>
 		        
 	</dependencies>
+
+	<distributionManagement>
+	  <repository>
+		<id>releases</id>
+		<name>User Project Release</name>
+		<url>http://192.168.0.46:8081/nexus/content/repositories/releases/</url>
+	  </repository>
+
+	  <snapshotRepository>
+		<id>snapshots</id>
+		<name>User Project SNAPSHOTS</name>
+		<url>http://192.168.0.46:8081/nexus/content/repositories/snapshots/</url>
+	  </snapshotRepository>
+	</distributionManagement>
 
 	<build>
 		<plugins>

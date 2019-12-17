@@ -8,29 +8,29 @@
     <description>资金账户</description>
 
 	<parent>
-		<groupId>com.hp.sh</groupId>
+		<groupId>com.hp.sh.expv3</groupId>
 		<artifactId>ex-parent</artifactId>
-		<version>3.0.0</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 	
     <dependencies>
 		
 		<dependency>
-			<groupId>com.hp.sh</groupId>
+			<groupId>com.hp.sh.expv3</groupId>
 			<artifactId>ex-common3</artifactId>
-			<version>3.0.0</version>
+			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>com.hp.sh</groupId>
+			<groupId>com.hp.sh.expv3</groupId>
 			<artifactId>ex-fund-account-def</artifactId>
-			<version>3.0.0</version>
+			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>com.hp.sh</groupId>
+			<groupId>com.hp.sh.expv3</groupId>
 			<artifactId>ex-pc-base-def</artifactId>
-			<version>3.0.0</version>
+			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>

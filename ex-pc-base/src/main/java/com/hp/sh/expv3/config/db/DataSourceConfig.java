@@ -14,7 +14,6 @@ import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @EnableTransactionManagement(order=(Integer.MAX_VALUE-10))
-@PropertySource({ "db2.properties" })
 public class DataSourceConfig {
 
 	@Primary
