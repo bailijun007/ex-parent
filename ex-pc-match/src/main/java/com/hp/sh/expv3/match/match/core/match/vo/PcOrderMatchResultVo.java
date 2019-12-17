@@ -7,16 +7,35 @@ package com.hp.sh.expv3.match.match.core.match.vo;
 import com.hp.sh.expv3.match.bo.PcTradeBo;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class PcOrderMatchResultVo {
 
     // book list
-    private List<BookMsgDto.BookEntry> bookUpdateList = new ArrayList<>();
+    private List<BookMsgDto.BookEntry> bookUpdateList;
     // trade list
-    private List<PcTradeBo> tradeList = new ArrayList<>();
+    private List<PcTradeBo> tradeList;
     private Long matchTxId;
+
+    private boolean cancelFlag;
+    private BigDecimal cancelNumber;
+
+    public boolean isCancelFlag() {
+        return cancelFlag;
+    }
+
+    public void setCancelFlag(boolean cancelFlag) {
+        this.cancelFlag = cancelFlag;
+    }
+
+    public BigDecimal getCancelNumber() {
+        return cancelNumber;
+    }
+
+    public void setCancelNumber(BigDecimal cancelNumber) {
+        this.cancelNumber = cancelNumber;
+    }
 
     public List<BookMsgDto.BookEntry> getBookUpdateList() {
         return bookUpdateList;

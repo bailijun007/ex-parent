@@ -7,6 +7,7 @@ package com.hp.sh.expv3.match.match.core.match.handler;
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.PcTradeBo;
 import com.hp.sh.expv3.match.constant.CommonConst;
+import com.hp.sh.expv3.match.enums.PcOrderTimeInForceEnum;
 import com.hp.sh.expv3.match.enums.PcOrderTypeEnum;
 import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
@@ -56,8 +57,6 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
         } else { // 有对手单
             matchLimit(matchHandlerContext, makerLimitQueue, taker);
             if (isOrderComplete(taker)) {
-                // taker removed from allOrderMap here
-                // maker removed from allOrderMap in detail
                 completeOrder(matchHandlerContext, taker);
                 return;
             }
@@ -119,13 +118,37 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
 
     protected void handleTakerNotFinishedOrder(PcMatchHandlerContext context, PcOrder4MatchBo takerOrder, PriorityQueue<PcOrder4MatchBo> sameSideQueue) {
         if (PcOrderTypeEnum.LIMIT.getCode() == takerOrder.getOrderType()) {
-            sameSideQueue.offer(takerOrder);
-            BigDecimal bookNumber = PcUtil.calcBookNumber(takerOrder.getNumber(), takerOrder.getFilledNumber(), takerOrder.getDisplayNumber());
-            bookUpdate(context, takerOrder.getOrderId(), takerOrder.getBidFlag(), takerOrder.getPrice(), bookNumber);
+            if (PcOrderTimeInForceEnum.GOOD_TILL_CANCEL.getCode() == takerOrder.getTimeInForce()) {
+                continueMatch(context, takerOrder, sameSideQueue);
+            } else if (PcOrderTimeInForceEnum.MAKER_ONLY.getCode() == takerOrder.getTimeInForce()) {
+                if (context.getMatchResult().isCancelFlag()) {
+                    cancelAndComplete(context, takerOrder, sameSideQueue);
+                } else {
+                    continueMatch(context, takerOrder, sameSideQueue);
+                }
+            } else if (PcOrderTimeInForceEnum.IMMEDIATE_OR_CANCEL.getCode() == takerOrder.getTimeInForce()
+                    || PcOrderTimeInForceEnum.FILL_OR_KILL.getCode() == takerOrder.getTimeInForce()) {
+                // 这里一定是未全部成交
+                cancelAndComplete(context, takerOrder, sameSideQueue);
+            }
         } else if (PcOrderTypeEnum.MARKET.getCode() == takerOrder.getOrderType()) {
-            context.allOpenOrders.remove(takerOrder.getOrderId());
+            cancelAndComplete(context, takerOrder, sameSideQueue);
         }
 //        pcExDef.doOrderNew(context.asset, context.symbol, takerOrder.getAccountId(), takerOrder.getId());
+    }
+
+    private void continueMatch(PcMatchHandlerContext context, PcOrder4MatchBo takerOrder, PriorityQueue<PcOrder4MatchBo> sameSideQueue) {
+        BigDecimal unfilledNumber = PcUtil.calcUnfilledNumber(takerOrder.getNumber(), takerOrder.getFilledNumber());
+        // 这里一定是未全部成交
+        context.getMatchResult().setCancelNumber(unfilledNumber);
+        completeOrder(context, takerOrder);
+    }
+
+    private void cancelAndComplete(PcMatchHandlerContext context, PcOrder4MatchBo takerOrder, PriorityQueue<PcOrder4MatchBo> sameSideQueue) {
+        BigDecimal unfilledNumber = PcUtil.calcUnfilledNumber(takerOrder.getNumber(), takerOrder.getFilledNumber());
+        context.getMatchResult().setCancelFlag(true);
+        context.getMatchResult().setCancelNumber(unfilledNumber);
+        completeOrder(context, takerOrder);
     }
 
     protected void bookUpdate(PcMatchHandlerContext matchHandlerContext, long orderId, int bidFlag, BigDecimal price, BigDecimal bookNumber) {
@@ -148,8 +171,7 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
      */
     protected boolean isOrderComplete(PcOrder4MatchBo order) {
         // 不用考虑取消的情况，取消会直接在任务中取消
-
-        return DecimalUtil.toTrimLiteral(order.getNumber()).equals(DecimalUtil.toTrimLiteral(order.getFilledNumber()));
+        return PcUtil.calcUnfilledNumber(order.getNumber(), order.getFilledNumber()).compareTo(BigDecimal.ZERO) > 0;
     }
 
     /**

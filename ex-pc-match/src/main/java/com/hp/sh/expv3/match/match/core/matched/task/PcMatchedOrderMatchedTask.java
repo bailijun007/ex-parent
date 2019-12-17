@@ -11,6 +11,7 @@ import com.hp.sh.expv3.match.component.notify.PcMatchMqNotify;
 import com.hp.sh.expv3.match.component.notify.PcNotify;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.enums.EventEnum;
+import com.hp.sh.expv3.match.enums.PcOrderTimeInForceEnum;
 import com.hp.sh.expv3.match.enums.PcOrderTypeEnum;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
 import com.hp.sh.expv3.match.msg.TradeListMsgDto;
@@ -42,6 +43,25 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
 
     // 市价订单若没有匹配完成，则撤单
     public PcOrder4MatchBo takerOrder;
+
+    private boolean cancelFlag;
+    private BigDecimal cancelNumber;
+
+    public boolean isCancelFlag() {
+        return cancelFlag;
+    }
+
+    public void setCancelFlag(boolean cancelFlag) {
+        this.cancelFlag = cancelFlag;
+    }
+
+    public BigDecimal getCancelNumber() {
+        return cancelNumber;
+    }
+
+    public void setCancelNumber(BigDecimal cancelNumber) {
+        this.cancelNumber = cancelNumber;
+    }
 
     public List<BookMsgDto.BookEntry> bookUpdateList;
 
@@ -102,21 +122,42 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
     }
 
     private void doLimit() {
-        if (null == tradeList || tradeList.isEmpty()) {
-            // 未匹配的委托
-            pcMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId());
-        } else {
+        if (null != tradeList && (!tradeList.isEmpty())) {
             List<PcTradeBo> notSavedTrade = filterNotSavedTrade(this.tradeList, this.takerOrder);
             if (null != notSavedTrade && !notSavedTrade.isEmpty()) {
                 saveTradeList(notSavedTrade);
             }
             pcMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
         }
-        try {
-            sendBookMsg();
-            sendTradeMsg();
-        } catch (Exception e) {
-            logger.warn(e.getMessage());
+
+        if (PcOrderTimeInForceEnum.GOOD_TILL_CANCEL.getCode() == takerOrder.getOrderType()) {
+            // 发送未成交消息
+            pcMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId());
+        } else if (PcOrderTimeInForceEnum.IMMEDIATE_OR_CANCEL.getCode() == takerOrder.getOrderType()
+                || PcOrderTimeInForceEnum.FILL_OR_KILL.getCode() == takerOrder.getOrderType()) {
+            // 发送取消委托消息
+            if (isCancelFlag()) {
+                pcMatchMqNotify.sendOrderMatchCancelled(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId(), cancelNumber);
+            }
+        } else if (PcOrderTimeInForceEnum.MAKER_ONLY.getCode() == takerOrder.getOrderType()) {
+            if (isCancelFlag()) {
+                pcMatchMqNotify.sendOrderMatchCancelled(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId(), cancelNumber);
+            } else {
+                pcMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId());
+            }
+        }
+        sendNotifyMsg();
+    }
+
+    private void sendNotifyMsg() {
+
+        if (null != tradeList && (!tradeList.isEmpty())) {
+            try {
+                sendBookMsg();
+                sendTradeMsg();
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
+            }
         }
     }
 
@@ -131,18 +172,11 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
             pcMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
         }
 
-        BigDecimal cancelNumber = takerOrder.getNumber().subtract(takerOrder.getFilledNumber());
-        // 后发取消消息，市价委托若未成交，则取消剩余部分
-        if (cancelNumber.compareTo(BigDecimal.ZERO) > 0) {
-            // 未匹配的市价委托
+        if (isCancelFlag()) {
             pcMatchMqNotify.sendOrderMatchCancelled(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId(), cancelNumber);
         }
-        try {
-            sendBookMsg();
-            sendTradeMsg();
-        } catch (Exception e) {
-            logger.warn(e.getMessage());
-        }
+
+        sendNotifyMsg();
     }
 
     private TradeListMsgDto.TradeMsgDto buildTrade(PcTradeBo trade) {
