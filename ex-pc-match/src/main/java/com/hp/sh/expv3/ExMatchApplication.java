@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -44,6 +45,11 @@ public class ExMatchApplication extends Application implements ApplicationContex
     @Autowired
     private OrderInitializer orderInitializer;
 
+    @Value("${rmq.nameSpace}")
+    private String x;
+    @Value("${suffix}")
+    private String suffix;
+
     public static void main(String[] args) {
         Thread.currentThread().setName("PcMatchMain");
 
@@ -55,7 +61,12 @@ public class ExMatchApplication extends Application implements ApplicationContex
 //                    System.setProperty("logRootPath", context.getEnvironment().getProperty("ex.id.logRootPath"));
 //                })
                 .run(args);
-        ac.getBean(ExMatchApplication.class).run();
+        ExMatchApplication main = ac.getBean(ExMatchApplication.class);
+
+        System.out.println(main.x);
+        System.out.println(main.suffix);
+
+        main.run();
     }
 
     @Override

@@ -41,6 +41,8 @@ public class PcLimitOrderHandler extends PcOrderHandler {
             } else if (!isTakerBid && makerOrder.getPrice().compareTo(takerOrder.getPrice()) < 0) { // 本单欲卖,对手买价更低,不匹配
                 break;
             }
+
+
             // 价格交叉
             // 限价订单按照申报在先定成交价
             BigDecimal makerPrice = makerOrder.getPrice();

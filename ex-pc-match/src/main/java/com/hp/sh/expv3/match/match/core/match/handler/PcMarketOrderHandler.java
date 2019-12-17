@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.PriorityQueue;
 
 @Service
@@ -40,7 +41,7 @@ public class PcMarketOrderHandler extends PcOrderHandler {
             PcOrder4MatchBo makerOrder = makerLimitQueue.peek(); // 最优价订单
 
             // 市价订单判断价格是否匹配，如果价格有值的话
-            if (takerOrder.getPrice().compareTo(BigDecimal.ZERO) > 0) {
+            if (Optional.ofNullable(takerOrder.getPrice()).orElse(BigDecimal.ZERO).compareTo(BigDecimal.ZERO) > 0) {
                 if (isTakerBid && makerOrder.getPrice().compareTo(takerOrder.getPrice()) > 0) { // 本单欲买,对手卖价更高,不匹配
                     break;
                 } else if (!isTakerBid && makerOrder.getPrice().compareTo(takerOrder.getPrice()) < 0) { // 本单欲卖,对手买价更低,不匹配

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- if use spring,scan should be false see: https://docs.spring.io/spring-boot/docs/2.2.3.BUILD-SNAPSHOT/reference/html/spring-boot-features.html#boot-features-logback-extensions -->
+<configuration scan="false">
+
+    <springProperty scope="context" name="log.dir" source="log.dir" defaultValue="localhost.log"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="out2File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--日志文件输出的文件名-->
+        <file>${log.dir}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--归并日志文件输出的文件名-->
+            <fileNamePattern>${log.dir}-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <!--日志文件保留天数-->
+            <MaxHistory>30</MaxHistory>
+            <!--文件最大1G-->
+            <totalSizeCap>1GB</totalSizeCap>
+            <!--归并日志文件最大大小-->
+            <TimeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>100MB</MaxFileSize>
+            </TimeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} [%thread] %logger - %line - [%X] %msg%n</pattern>
+        </encoder>
+        <!--日志文件最大的大小-->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <logger name="springfox.documentation.spring" level="warn"></logger>
+
+    <!-- project default level -->
+    <logger name="cn.lee.jason" level="info"/>
+
+    <!-- 定义根日志级别 -->
+    <root level="info">
+        <appender-ref ref="out2File"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

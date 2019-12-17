@@ -132,7 +132,7 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
         }
 
         BigDecimal cancelNumber = takerOrder.getNumber().subtract(takerOrder.getFilledNumber());
-        // 后发取消消息
+        // 后发取消消息，市价委托若未成交，则取消剩余部分
         if (cancelNumber.compareTo(BigDecimal.ZERO) > 0) {
             // 未匹配的市价委托
             pcMatchMqNotify.sendOrderMatchCancelled(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId(), cancelNumber);

@@ -51,7 +51,6 @@ public class PcMatchedBookResetTask extends PcMatchedBaseTask {
     public void onSucess() {
     }
 
-
     @Override
     public void run() {
 
@@ -63,6 +62,7 @@ public class PcMatchedBookResetTask extends PcMatchedBaseTask {
         msg.setResetFlag(CommonConst.YES);
         msg.setMsgType(EventEnum.PC_BOOK.getCode());
         msg.setOrders(this.bookUpdateList);
+
         pcNotify.safeNotify(this.getAsset(), this.getSymbol(), msg);
 
         updateSentMqOffset();
