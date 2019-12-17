@@ -23,7 +23,7 @@ public class TimeInForce {
 	public static final int IMMEDIATE_OR_CANCEL = 0;
 	
 	/**
-	 * 全部成交或取消
+	 * 全部成交或全部取消
 	 */
 	public static final int FILL_OR_KILL = 0;
 	

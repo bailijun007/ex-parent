@@ -81,7 +81,7 @@ public class PcOrderNewTask extends PcOrderBaseTask implements ApplicationContex
             PcOrderHandler handler = null;
             if (PcOrderTypeEnum.LIMIT.getCode() == order.getOrderType()) {
                 handler = pcLimitOrderHandler;
-            } else if (PcOrderTypeEnum.LIMIT.getCode() == order.getOrderType()) {
+            } else if (PcOrderTypeEnum.MARKET.getCode() == order.getOrderType()) {
                 handler = pcMarketOrderHandler;
             } else {
                 throw new RuntimeException();
@@ -91,14 +91,10 @@ public class PcOrderNewTask extends PcOrderBaseTask implements ApplicationContex
             }
             break;
         }
-
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
             pcMatchedTaskService.addMatchedOrderMatchedTask(context, this.getCurrentMsgOffset(), order);
         }
-
         context.clear();
-//        logger.info("{} pending new over:{}", this.getAssetSymbol(), this.getCurrentMsgOffset());
-
     }
 
 }

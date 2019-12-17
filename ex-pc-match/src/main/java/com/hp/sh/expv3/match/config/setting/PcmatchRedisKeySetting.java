@@ -17,6 +17,11 @@ public class PcmatchRedisKeySetting {
     private String pcOrderSnapshotRedisKeyPattern;
     private String pcOrderSentMqOffsetRedisKeyPattern;
 
+    private String pcOrderMatchedQueueRedisKeyPattern;
+    private String pcOrderMatchedQueueHeadOffsetRedisKeyPattern;
+    private String pcOrderMatchedQueueEndOffsetRedisKeyPattern;
+    private String pcOrderMatchedQueueSizeRedisKeyPattern;
+
     public String getPcOrderSnapshotRedisKeyPattern() {
         return pcOrderSnapshotRedisKeyPattern;
     }
@@ -49,4 +54,35 @@ public class PcmatchRedisKeySetting {
         this.pcTradeChannelRedisKeyPattern = pcTradeChannelRedisKeyPattern;
     }
 
+    public String getPcOrderMatchedQueueRedisKeyPattern() {
+        return pcOrderMatchedQueueRedisKeyPattern;
+    }
+
+    public void setPcOrderMatchedQueueRedisKeyPattern(String pcOrderMatchedQueueRedisKeyPattern) {
+        this.pcOrderMatchedQueueRedisKeyPattern = pcOrderMatchedQueueRedisKeyPattern;
+    }
+
+    public String getPcOrderMatchedQueueHeadOffsetRedisKeyPattern() {
+        return pcOrderMatchedQueueHeadOffsetRedisKeyPattern;
+    }
+
+    public void setPcOrderMatchedQueueHeadOffsetRedisKeyPattern(String pcOrderMatchedQueueHeadOffsetRedisKeyPattern) {
+        this.pcOrderMatchedQueueHeadOffsetRedisKeyPattern = pcOrderMatchedQueueHeadOffsetRedisKeyPattern;
+    }
+
+    public String getPcOrderMatchedQueueEndOffsetRedisKeyPattern() {
+        return pcOrderMatchedQueueEndOffsetRedisKeyPattern;
+    }
+
+    public void setPcOrderMatchedQueueEndOffsetRedisKeyPattern(String pcOrderMatchedQueueEndOffsetRedisKeyPattern) {
+        this.pcOrderMatchedQueueEndOffsetRedisKeyPattern = pcOrderMatchedQueueEndOffsetRedisKeyPattern;
+    }
+
+    public String getPcOrderMatchedQueueSizeRedisKeyPattern() {
+        return pcOrderMatchedQueueSizeRedisKeyPattern;
+    }
+
+    public void setPcOrderMatchedQueueSizeRedisKeyPattern(String pcOrderMatchedQueueSizeRedisKeyPattern) {
+        this.pcOrderMatchedQueueSizeRedisKeyPattern = pcOrderMatchedQueueSizeRedisKeyPattern;
+    }
 }

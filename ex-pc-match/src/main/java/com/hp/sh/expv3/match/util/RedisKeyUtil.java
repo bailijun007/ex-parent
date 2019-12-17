@@ -52,6 +52,10 @@ public class RedisKeyUtil {
         return StringReplaceUtil.replace(pattern, ImmutableMap.of("asset", asset, "symbol", symbol));
     }
 
+    public static String buildPcOrderMatchedQueueRedisKey(String pattern, String asset, String symbol) {
+        return StringReplaceUtil.replace(pattern, ImmutableMap.of("asset", asset, "symbol", symbol));
+    }
+
     public static String buildPcOrderChannelRedisKey(String pattern, String asset, String symbol) {
         return StringReplaceUtil.replace(pattern, ImmutableMap.of("asset", asset, "symbol", symbol));
     }

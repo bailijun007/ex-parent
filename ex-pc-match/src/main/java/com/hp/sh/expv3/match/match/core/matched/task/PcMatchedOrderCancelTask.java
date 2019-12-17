@@ -87,7 +87,11 @@ public class PcMatchedOrderCancelTask extends PcMatchedBaseTask {
 
         pcOrderMqNotify.sendOrderMatchCancelled(this.getAsset(), this.getSymbol(), accountId, orderId, cancelDeltaAmt);
 
-        pcNotify.safeNotify(this.getAsset(), this.getSymbol(), bookMsgDto);
+        try {
+            pcNotify.safeNotify(this.getAsset(), this.getSymbol(), bookMsgDto);
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+        }
         updateSentMqOffset();
 
     }

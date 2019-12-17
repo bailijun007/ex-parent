@@ -5,6 +5,8 @@
 package com.hp.sh.expv3.match.match.core.matched.task.impl;
 
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
+import com.hp.sh.expv3.match.config.setting.PcmatchRedisKeySetting;
+import com.hp.sh.expv3.match.constant.PcmatchConst;
 import com.hp.sh.expv3.match.match.core.match.task.service.PcOrderBookEventService;
 import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.match.vo.PcOrderMatchResultVo;
@@ -14,19 +16,19 @@ import com.hp.sh.expv3.match.mqmsg.PcOrderCancelMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.PcPosLockedMqMsgDto;
 import com.hp.sh.expv3.match.msg.BookMsgDto.BookEntry;
 import com.hp.sh.expv3.match.util.PcOrder4MatchBoUtil;
+import com.hp.sh.expv3.match.util.RedisKeyUtil;
+import com.hp.sh.expv3.match.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 @Service
 public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, ApplicationContextAware {
@@ -77,6 +79,31 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
         context.matchedThreadWorker.addTask(task);
         context.setSentMqOffset(currentMsgOffset);
     }
+
+    public void logQueueSize(PcMatchHandlerContext context, PcMatchedBaseTask currentMatchedTask) {
+        Runnable headTask = context.matchedThreadWorker.getTasks().peek();
+        long headOffset = (null == headTask) ? currentMatchedTask.getCurrentMsgOffset() : ((PcMatchedBaseTask) headTask).getCurrentMsgOffset();
+        long endOffset = currentMatchedTask.getCurrentMsgOffset();
+        long queueSize = context.matchedThreadWorker.getTaskCount(); // 队列长度
+
+        String redisKey = RedisKeyUtil.buildPcOrderMatchedQueueRedisKey(pcmatchRedisKeySetting.getPcOrderMatchedQueueRedisKeyPattern(), context.getAsset(), context.getSymbol());
+        pcRedisUtil.hmset(redisKey, new HashMap<String, String>() {
+            {
+                put(pcmatchRedisKeySetting.getPcOrderMatchedQueueHeadOffsetRedisKeyPattern(), "" + headOffset);
+                put(pcmatchRedisKeySetting.getPcOrderMatchedQueueEndOffsetRedisKeyPattern(), "" + endOffset);
+                put(pcmatchRedisKeySetting.getPcOrderMatchedQueueSizeRedisKeyPattern(), "" + queueSize);
+            }
+        });
+
+    }
+
+
+    @Autowired
+    @Qualifier(PcmatchConst.MODULE_NAME + "RedisUtil")
+    private RedisUtil pcRedisUtil;
+
+    @Autowired
+    private PcmatchRedisKeySetting pcmatchRedisKeySetting;
 
     @Override
     public void addMatchedOrderCancelTask(PcMatchHandlerContext context, long currentMsgOffset, long accountId, long orderId, BigDecimal cancelDeltaAmt) {
