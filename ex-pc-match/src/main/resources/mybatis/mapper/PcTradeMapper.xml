@@ -19,10 +19,12 @@
 		<result column="price" property="price" />
 		<result column="number" property="number" />
 		<result column="trade_time" property="tradeTime" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,number,trade_time
+		id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,`number`,trade_time,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -37,6 +39,8 @@
 		<if test="mkOrderId!=null"> and mk_order_id=#{mkOrderId}</if>
 		<if test="mkCloseFlag!=null"> and mk_close_flag=#{mkCloseFlag}</if>
 		<if test="tradeTime!=null"> and trade_time=#{tradeTime}</if>
+		<if test="created!=null"> and created=#{created}</if>
+		<if test="modified!=null"> and modified=#{modified}</if>
 		</where>
 	</sql>
 
@@ -99,9 +103,9 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into pc_trade (
-			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,`number`,trade_time
+			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,`number`,trade_time,created,modified
 		)values(
-			#{id},#{matchTxId},#{symbol},#{asset},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{tkCloseFlag},#{mkAccountId},#{mkOrderId},#{mkCloseFlag},#{price},#{number},#{tradeTime}
+			#{id},#{matchTxId},#{symbol},#{asset},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{tkCloseFlag},#{mkAccountId},#{mkOrderId},#{mkCloseFlag},#{price},#{number},#{tradeTime},#{created},#{modified}
 		)
 	</insert>
 
@@ -110,14 +114,15 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into pc_trade (
-			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,`number`,trade_time
+			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,`number`,trade_time,trade_time,created,modified
 		) values
         <foreach collection="list" item="item" separator=",">
             (
             #{item.id},#{item.matchTxId},#{item.symbol},#{item.asset},#{item.tkBidFlag},
             #{item.tkAccountId},#{item.tkOrderId},#{item.tkCloseFlag},
             #{item.mkAccountId},#{item.mkOrderId},#{item.mkCloseFlag},
-            #{item.price},#{item.number},#{item.tradeTime}
+            #{item.price},#{item.number},#{item.tradeTime},
+			#{created},#{modified}
             )
         </foreach>
 	</insert>
@@ -126,7 +131,10 @@
 		update 
 			pc_trade
 		set 
-			id=#{id},match_tx_id=#{matchTxId},symbol=#{symbol},asset=#{asset},tk_bid_flag=#{tkBidFlag},tk_account_id=#{tkAccountId},tk_order_id=#{tkOrderId},tk_close_flag=#{tkCloseFlag},mk_account_id=#{mkAccountId},mk_order_id=#{mkOrderId},mk_close_flag=#{mkCloseFlag},price=#{price},number=#{number},trade_time=#{tradeTime}
+			id=#{id},match_tx_id=#{matchTxId},symbol=#{symbol},asset=#{asset},tk_bid_flag=#{tkBidFlag},
+			tk_account_id=#{tkAccountId},tk_order_id=#{tkOrderId},tk_close_flag=#{tkCloseFlag},
+			mk_account_id=#{mkAccountId},mk_order_id=#{mkOrderId},mk_close_flag=#{mkCloseFlag},
+			price=#{price},`number`=#{number},trade_time=#{tradeTime},created=#{created}
 		where 
 			id=#{id}
 	</update>
