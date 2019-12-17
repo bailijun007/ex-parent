@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
 
-	<groupId>com.hp.sh</groupId>
+	<groupId>com.hp.sh.expv3</groupId>
 	<artifactId>ex-common3</artifactId>
 	<packaging>jar</packaging>
     <description>exchange-common</description>
-	<version>3.0.0</version>
+	<version>3.0.0-SNAPSHOT</version>
     
     <dependencies>
     
