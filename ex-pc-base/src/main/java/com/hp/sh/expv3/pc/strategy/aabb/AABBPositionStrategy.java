@@ -71,7 +71,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 
 		//新的开仓均价
 		if(pcPosition!=null){
-			BigDecimal newMeanPrice = PcPriceCalc.calcEntryPrice(IntBool.isTrue(order.getLongFlag()), pcPosition.getBaseValue(), tradeResult.getAmount());
+			BigDecimal newMeanPrice = PcPriceCalc.calcEntryPrice(IntBool.isTrue(pcPosition.getLongFlag()), pcPosition.getBaseValue(), tradeResult.getAmount());
 			tradeResult.setNewMeanPrice(newMeanPrice);			
 		}else{
 			tradeResult.setNewMeanPrice(matchedVo.getPrice());

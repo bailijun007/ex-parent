@@ -299,4 +299,14 @@ public class PcPositionMarginService {
 		this.pcAccountCoreService.add(request);
 	}
 	
+	public boolean setAutoAddFlag(long userId, String asset, String symbol, int longFlag, int autoAddFlag){
+		//当前仓位
+		PcPosition pos = this.pcPositionDAO.getActivePos(userId, asset, symbol, longFlag);
+		if(pos==null){
+			throw new ExException(CommonError.OBJ_DONT_EXIST);
+		}
+		pos.setAutoAddFlag(autoAddFlag);
+		return true;
+	}
+	
 }

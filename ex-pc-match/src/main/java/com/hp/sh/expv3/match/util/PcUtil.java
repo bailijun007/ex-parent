@@ -18,8 +18,12 @@ import static com.hp.sh.expv3.match.constant.CommonConst.*;
  */
 public final class PcUtil {
 
+    public static final BigDecimal calcUnfilledNumber(BigDecimal number, BigDecimal filledNumber) {
+        return number.subtract(filledNumber);
+    }
+
     public static final BigDecimal calcBookNumber(BigDecimal number, BigDecimal filledNumber, BigDecimal displayNumber) {
-        BigDecimal unfilledNumber = number.subtract(filledNumber);
+        BigDecimal unfilledNumber = calcUnfilledNumber(number, filledNumber);
         return unfilledNumber.min(displayNumber).stripTrailingZeros();
     }
 

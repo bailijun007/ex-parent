@@ -184,6 +184,8 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
         task.setBookUpdateList(matchResult.getBookUpdateList());
         task.setTradeList(matchResult.getTradeList());
         task.setMatchTxId(matchResult.getMatchTxId());
+        task.setCancelFlag(matchResult.isCancelFlag());
+        task.setCancelNumber(matchResult.getCancelNumber());
 
         // 必须深复制
         PcOrder4MatchBo currentOrder = PcOrder4MatchBoUtil.deepClone(takerOrder);

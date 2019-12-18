@@ -66,7 +66,7 @@ public class PcOrderApiAction implements PcOrderApi {
 	@GetMapping(value = "/api/pc/order/cancel")
 	public void cancel(long userId, String asset, String symbol, Long orderId) throws Exception{
 
-		this.pcOrderService.setCancelStatus(userId, asset, symbol, orderId, OrderStatus.PENDING_CANCEL);
+		this.pcOrderService.setPendingCancel(userId, asset, symbol, orderId);
 
 		//发送消息
 		OrderPendingCancelMsg mqMsg = new OrderPendingCancelMsg(userId, asset, symbol, orderId);

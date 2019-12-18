@@ -105,7 +105,7 @@ public class PcPosition extends UserDataEntity {
 	private Integer liqStatus;
 	
 	//仓位已平空
-	private Integer closed;
+//	private Integer closed;
 
 	public PcPosition() {
 		super();
@@ -269,14 +269,6 @@ public class PcPosition extends UserDataEntity {
 
 	public void setCloseFee(BigDecimal closeFee) {
 		this.closeFee = closeFee;
-	}
-
-	public Integer getClosed() {
-		return closed;
-	}
-
-	public void setClosed(Integer closed) {
-		this.closed = closed;
 	}
 
 	public BigDecimal getAccuBaseValue() {

@@ -9,6 +9,8 @@ import com.hp.sh.expv3.match.enums.PcOrderTimeInForceEnum;
 import com.hp.sh.expv3.match.mqmsg.PcOrderMqMsgDto;
 import org.springframework.beans.BeanUtils;
 
+import java.math.BigDecimal;
+
 public class PcOrder4MatchBoUtil {
 
     public final static PcOrder4MatchBo deepClone(PcOrder4MatchBo bo) {
@@ -26,6 +28,24 @@ public class PcOrder4MatchBoUtil {
     public final static void extendSetter(PcOrder4MatchBo bo) {
         if (null == bo.getTimeInForce()) {
             bo.setTimeInForce(PcOrderTimeInForceEnum.GOOD_TILL_CANCEL.getCode());
+        }
+        if (null == bo.getFilledNumber()) {
+            bo.setFilledNumber(BigDecimal.ZERO);
+        }
+        if (null == bo.getDisplayNumber()) {
+            bo.setDisplayNumber(bo.getNumber());
+        }
+    }
+
+    public final static void extendSetter(PcOrderMqMsgDto dto) {
+        if (null == dto.getFilledNumber()) {
+            dto.setFilledNumber(BigDecimal.ZERO);
+        }
+        if (null == dto.getDisplayNumber()) {
+            dto.setDisplayNumber(dto.getNumber());
+        }
+        if (null == dto.getTimeInForce()) {
+            dto.setTimeInForce(PcOrderTimeInForceEnum.GOOD_TILL_CANCEL.getCode());
         }
     }
 
