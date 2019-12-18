@@ -2,12 +2,7 @@ package com.hp.sh.expv3.pc.component;
 
 import java.math.BigDecimal;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.gitee.hupadev.commons.cache.Cache;
 import com.hp.sh.expv3.dev.Question;
-import com.hp.sh.expv3.pc.constant.Precision;
 
 /**
  * 查询保证金费率，redis或db
@@ -16,11 +11,7 @@ import com.hp.sh.expv3.pc.constant.Precision;
  *
  */
 @Question(ask="是否随玩法不同", answer="NO")
-@Service
-public class FeeRatioService {
-
-	@Autowired
-	private Cache cache;
+public interface FeeRatioService {
 
 	/**
 	 * 获取初始化保证金率
@@ -28,9 +19,7 @@ public class FeeRatioService {
 	 * @param leverage
 	 * @return
 	 */
-	public BigDecimal getInitedMarginRatio(BigDecimal leverage) {
-		return BigDecimal.ONE.divide(leverage, Precision.PERCENT_PRECISION, Precision.LESS);
-	}
+	BigDecimal getInitedMarginRatio(BigDecimal leverage);
 
 	/**
 	 * 获取开仓手续费率
@@ -38,9 +27,7 @@ public class FeeRatioService {
 	 * @param userId
 	 * @return
 	 */
-	public BigDecimal getOpenFeeRatio(long userId) {
-		return getFeeRatio(userId, false);
-	}
+	BigDecimal getOpenFeeRatio(long userId);
 
 	/**
 	 * 平仓手续费率
@@ -48,32 +35,9 @@ public class FeeRatioService {
 	 * @param userId
 	 * @return
 	 */
-	public BigDecimal getCloseFeeRatio(long userId) {
-		return getFeeRatio(userId, false);
-	}
+	BigDecimal getCloseFeeRatio(long userId);
 
-	/**
-	 * 获取开仓手续费率
-	 * 
-	 * @param userId
-	 * @return
-	 */
-	private BigDecimal getFeeRatio(long userId, boolean isMaker) {
-		if (isMaker) {
-			// TODO get from cache
-			return new BigDecimal("0.0025");
-		} else {
-			return new BigDecimal("0.0075");
-		}
-	
-	}
-
-	public BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume) {
-		return new BigDecimal("0.005");
-	}
-	
-	int ___________;
-	
+	BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume);
 
 	/**
 	 * 获取maker开仓手续费率
@@ -81,9 +45,7 @@ public class FeeRatioService {
 	 * @param userId
 	 * @return
 	 */
-	public BigDecimal getMakerOpenFeeRatio(long userId) {
-		return getFeeRatio(userId, true);
-	}
+	BigDecimal getMakerOpenFeeRatio(long userId);
 
 	/**
 	 * 获取maker平仓手续费率
@@ -91,8 +53,6 @@ public class FeeRatioService {
 	 * @param userId
 	 * @return
 	 */
-	public BigDecimal getMakerCloseFeeRatio(long userId) {
-		return getFeeRatio(userId, true);
-	}
+	BigDecimal getMakerCloseFeeRatio(long userId);
 
 }
