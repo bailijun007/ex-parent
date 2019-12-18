@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.base.exceptions.CommonError;
+import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.component.PcDefaultSymbolSetting;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
@@ -33,6 +35,10 @@ public class PcAccountSymbolService{
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void create(Long userId, String asset, String symbol){
+		PcAccountSymbol as = this.get(userId, asset, symbol);
+		if(as!=null){
+			throw new ExException(CommonError.OBJ_DONT_EXIST);
+		}
 		Date now = new Date();
 		PcAccountSymbol entity = new PcAccountSymbol();
 		entity.setAsset(asset);
