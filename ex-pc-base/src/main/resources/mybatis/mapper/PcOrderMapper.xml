@@ -184,11 +184,12 @@
 			 and status != 4 and status != 6
 	</update>
 
-	<select id="getClosedPosVolume" resultType="java.math.BigDecimal">
+	<select id="getClosingVolume" resultType="java.math.BigDecimal">
 		select
-			sum(volume-cancel_volume)
+			sum(volume-cancel_volume-filled_volume)
 		from pc_order
 			where user_id=#{userId} and close_pos_id=#{posId}
+			and active_flag=1
 	</select>
 
 </mapper>

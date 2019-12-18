@@ -62,6 +62,7 @@
             <appender-ref ref="STDOUT" />
         </root>
         
+        <logger name="com.hp.sh.rocketmq" level="debug"></logger>
 		<logger name="com.hp.sh.expv3" level="debug"></logger>
 		<logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
         

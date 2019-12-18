@@ -90,7 +90,7 @@ public class PcOrderService {
 		
 		//check 检查可平仓位
 		if(closeFlag==OrderFlag.ACTION_CLOSE){
-			this.checkClosablePosition(pos);
+			this.checkClosablePosition(pos, number);
 		}
 		
 		Date now = new Date();
@@ -289,17 +289,23 @@ public class PcOrderService {
 		}
 	}
 
-	private void checkClosablePosition(PcPosition pos) {
+	/*
+	 * 检查可平仓位
+	 */
+	private void checkClosablePosition(PcPosition pos, BigDecimal number) {
 		if(pos==null){
 			throw new ExException(PositonError.POS_NOT_ENOUGH);
 		}
 		
-		BigDecimal cpv = this.pcOrderDAO.getClosedPosVolume(pos.getUserId(), pos.getId());
+		BigDecimal closablePos = pos.getVolume();
 		
-		BigDecimal availablePos = pos.getVolume().subtract(cpv);
+		BigDecimal cpv = this.pcOrderDAO.getClosingVolume(pos.getUserId(), pos.getId());
+		if(cpv!=null){
+			closablePos = closablePos.subtract(cpv);
+		}
 		
         //判断可平仓位是否足够
-        if (availablePos.compareTo(BigDecimal.ZERO)>0) {
+        if (BigUtils.gt(number, closablePos)) {
             throw new ExException(PositonError.POS_NOT_ENOUGH);
         }
 	}
