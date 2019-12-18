@@ -37,6 +37,6 @@ public interface PcOrderDAO extends BaseAccountDataMapper<PcOrder, Long> {
 			@Param("cancelStatus") Integer cancelStatus, 
 			@Param("modified") Date modified);
 
-	public BigDecimal getClosedPosVolume(@Param("userId") Long userId, @Param("posId") Long posId);
+	public BigDecimal getClosingVolume(@Param("userId") Long userId, @Param("posId") Long posId);
 
 }

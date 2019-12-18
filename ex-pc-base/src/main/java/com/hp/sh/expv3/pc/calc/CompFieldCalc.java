@@ -38,7 +38,8 @@ public class CompFieldCalc {
 	 * @param price 成交价格
 	 * @return
 	 */
-	public static BigDecimal calcBaseValue(BigDecimal volume, BigDecimal faceValue, BigDecimal price){
+	@SuppressWarnings("unused")
+	private static BigDecimal calcBaseValue(BigDecimal volume, BigDecimal faceValue, BigDecimal price){
 		return calcBaseValue(calcAmount(volume, faceValue), price);
 	}
 	

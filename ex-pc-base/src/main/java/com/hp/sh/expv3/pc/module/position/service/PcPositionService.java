@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -66,7 +67,10 @@ public class PcPositionService {
 	//处理成交订单
 	public void handleTradeOrder(PcTradeMsg matchedVo){
 		PcOrder order = this.pcOrderDAO.findById(matchedVo.getAccountId(), matchedVo.getOrderId());
-		this.chekOrderStatus(order, matchedVo);
+		boolean exist = this.chekOrderTrade(order, matchedVo);
+		if(exist){
+			return ;
+		}
 		
 		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
@@ -112,7 +116,7 @@ public class PcPositionService {
 		request.setAmount(tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFeeReceivable()));
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("平仓,保证金：%d,收益:%s,手续费：%d", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getFeeReceivable()));
+		request.setRemark(String.format("平仓。保证金：%s,收益:%s,手续费：-%s", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getFeeReceivable()));
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_CLOSE_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setAssociatedId(orderTradeId);
@@ -137,9 +141,9 @@ public class PcPositionService {
 	        order.setOpenFee(order.getOpenFee().subtract(tradeData.getFee()));
 		}
 		order.setFeeCost(order.getFeeCost().add(tradeData.getFeeReceivable()));
-        order.setStatus(tradeData.isOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
-        order.setActiveFlag(tradeData.isOrderCompleted()?PcOrder.NO:PcOrder.YES);
-		order.setFilledVolume(tradeData.getVolume());
+		order.setFilledVolume(order.getFilledVolume().add(tradeData.getVolume()));
+        order.setStatus(tradeData.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
+        order.setActiveFlag(tradeData.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setModified(new Date());
 		this.pcOrderDAO.update(order);
 	}
@@ -218,11 +222,11 @@ public class PcPositionService {
 		pcPosition.setPosMargin(pcPosition.getPosMargin().add(tradeResult.getOrderMargin()));
 		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeResult.getFeeReceivable()));
 		
-		pcPosition.setMeanPrice(tradeResult.getNewMeanPrice());
+		pcPosition.setMeanPrice(tradeResult.getNewPosMeanPrice());
 		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeResult.getOrderMargin()));
 		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeResult.getFeeReceivable()));
 		
-		pcPosition.setLiqPrice(tradeResult.getLiqPrice());
+		pcPosition.setLiqPrice(tradeResult.getNewPosliqPrice());
 		
 		//累计量
 		pcPosition.setAccuVolume(pcPosition.getAccuVolume().add(tradeResult.getVolume()));
@@ -236,7 +240,7 @@ public class PcPositionService {
 		pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(tradeResult.getOrderMargin()));
 		pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(tradeResult.getFeeReceivable()));
 		
-		pcPosition.setMeanPrice(tradeResult.getNewMeanPrice());
+		pcPosition.setMeanPrice(tradeResult.getNewPosMeanPrice());
 		pcPosition.setInitMargin(pcPosition.getInitMargin().subtract(tradeResult.getOrderMargin()));
 		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeResult.getFeeReceivable()));
 		
@@ -260,17 +264,20 @@ public class PcPositionService {
 	}
 
 	//检查订单状态
-	private void chekOrderStatus(PcOrder order, PcTradeMsg tradeMsg) {
+	private boolean chekOrderTrade(PcOrder order, PcTradeMsg tradeMsg) {
 		if(order==null){
 			throw new ExException(CommonError.OBJ_DONT_EXIST);
 		}
+		
+		//检查重复请求
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("userId", order.getUserId());
 		params.put("tradeSn", tradeMsg.uniqueKey());
 		Long count = this.pcOrderTradeDAO.queryCount(params);
 		if(count>0){
-			throw new ExException(CommonError.OBJ_EXIST);
+			return true;
 		}
+		return false;
 	}
 	
 	private void synchCollector(Long tradeOrderId, Long feeCollectorId, BigDecimal fee){

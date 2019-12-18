@@ -142,7 +142,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * @param amount 求值对象
 	 * @return
 	 */
-	private BigDecimal slope(BigDecimal number, BigDecimal volume, BigDecimal amount){
+	public static final BigDecimal slope(BigDecimal number, BigDecimal volume, BigDecimal amount){
 		return number.multiply(amount).divide(volume, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
 	}
 	
