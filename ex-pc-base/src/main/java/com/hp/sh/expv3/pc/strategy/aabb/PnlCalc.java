@@ -22,11 +22,11 @@ public class PnlCalc {
         return amt.divide(price, scale, Precision.LESS).stripTrailingZeros();
     }
 
-    public static BigDecimal calcPnl(int longFlag, BigDecimal amt, BigDecimal entryPrice, BigDecimal closePrice, int scale) {
-        return calcPnl(IntBool.isTrue(longFlag), amt, entryPrice, calcVolume(amt, closePrice, scale), scale);
+    public static BigDecimal calcPnl(int longFlag, BigDecimal amt, BigDecimal entryPrice, BigDecimal closePrice) {
+        return calcPnl(IntBool.isTrue(longFlag), amt, entryPrice, calcVolume(amt, closePrice, Precision.COMMON_PRECISION), Precision.COMMON_PRECISION);
     }
 
-    public static BigDecimal calcPnl(boolean isLong, BigDecimal amt, BigDecimal entryPrice, BigDecimal closeVolume, int scale) {
+    private static BigDecimal calcPnl(boolean isLong, BigDecimal amt, BigDecimal entryPrice, BigDecimal closeVolume, int scale) {
         BigDecimal pnl = closeVolume.subtract(calcVolume(amt, entryPrice, scale));
         if (isLong) {
             return pnl.negate();

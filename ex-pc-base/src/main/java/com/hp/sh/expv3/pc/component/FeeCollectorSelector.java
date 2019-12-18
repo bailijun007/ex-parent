@@ -1,12 +1,12 @@
 package com.hp.sh.expv3.pc.component;
 
-import org.springframework.stereotype.Component;
-
-@Component
-public class FeeCollectorSelector {
+/**
+ * 选择收费员
+ * @author wangjg
+ *
+ */
+public interface FeeCollectorSelector {
 	
-	public Long getFeeCollectorId(Long userId, String asset, String symbol){
-		return 1L;
-	}
+	public Long getFeeCollectorId(Long userId, String asset, String symbol);
 
 }

@@ -22,8 +22,8 @@ import com.gitee.hupadev.base.spring.plugin.HpLocaleResolver;
 @ServletComponentScan(basePackages = {"com.hp.sh.expv3"})
 @Configuration
 @ComponentScan
-public class MyMvcConfig implements WebMvcConfigurer {
-	private static final Logger logger = LoggerFactory.getLogger(MyMvcConfig.class);
+public class ExpMvcConfig implements WebMvcConfigurer {
+	private static final Logger logger = LoggerFactory.getLogger(ExpMvcConfig.class);
 	
 	@Autowired
 	public ObjectMapper objectMapper;

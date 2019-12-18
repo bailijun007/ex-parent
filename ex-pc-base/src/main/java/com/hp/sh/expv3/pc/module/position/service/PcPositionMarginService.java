@@ -111,11 +111,11 @@ public class PcPositionMarginService {
 
             //减少杠杆
             if (leverage.compareTo(pos.getLeverage()) < 0) {
-                BigDecimal feeRatio = feeRatioService.getCloseFeeRatio(userId);
+                BigDecimal feeRatio = feeRatioService.getCloseFeeRatio(userId, pos.getAsset(), pos.getSymbol());
 
                 /* 修改保证金 */
                 //标记价格
-                BigDecimal amount = pos.getVolume().multiply(metadataService.getFaceValue(symbol));
+                BigDecimal amount = pos.getVolume().multiply(metadataService.getFaceValue(asset, symbol));
                 BigDecimal markPrice = markPriceService.getCurrentMarkPrice(asset, symbol);
                 //新的仓位保证金
                 BigDecimal requestPosMargin = this.calcMarginWhenChangeLeverage(longFlag, leverage, amount, feeRatio, pos.getMeanPrice(), markPrice);
@@ -135,7 +135,7 @@ public class PcPositionMarginService {
             /* 修改强平价 */
     		
     		//重新计算强平价
-    		BigDecimal liqPrice = this.calcLiqPrice(pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldRatio(), pos.getPosMargin());
+    		BigDecimal liqPrice = this.calcLiqPrice(pos.getAsset(), pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldRatio(), pos.getPosMargin());
     		pos.setLiqPrice(liqPrice);
             
             //修改杠杆值
@@ -148,11 +148,20 @@ public class PcPositionMarginService {
 		return true;
 	}
 	
-	
-	//TODO 
+	/*
+	 * 用 均价 标记价格 为实现盈亏计算 保证金
+	 * @param longFlag
+	 * @param leverage
+	 * @param amount
+	 * @param feeRatio
+	 * @param meanPrice
+	 * @param markPrice
+	 * @return
+	 */
+	//TODO AABB
 	private BigDecimal calcMarginWhenChangeLeverage(Integer longFlag, BigDecimal leverage, BigDecimal amount, BigDecimal feeRatio, BigDecimal meanPrice, BigDecimal markPrice) {
         // ( 1 / leverage ) * volume = volume / leverage
-        BigDecimal pnl = PnlCalc.calcPnl(longFlag, amount, meanPrice, markPrice, Precision.COMMON_PRECISION);
+        BigDecimal pnl = PnlCalc.calcPnl(longFlag, amount, meanPrice, markPrice);
         BigDecimal initMarginRatio = feeRatioService.getInitedMarginRatio(leverage);
         BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, meanPrice);
         return baseValue.multiply(initMarginRatio).subtract(pnl.min(BigDecimal.ZERO)).stripTrailingZeros();
@@ -235,7 +244,7 @@ public class PcPositionMarginService {
 		}
 		
 		//重新计算强平价
-		BigDecimal liqPrice = this.calcLiqPrice(pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldRatio(), pos.getPosMargin());
+		BigDecimal liqPrice = this.calcLiqPrice(pos.getAsset(), pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldRatio(), pos.getPosMargin());
 		pos.setLiqPrice(liqPrice);
 		
 		//保存
@@ -248,7 +257,7 @@ public class PcPositionMarginService {
 	 */
 	public BigDecimal getMinMarginDiff(PcPosition pos){
 		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
-		BigDecimal pnl = PnlCalc.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(this.metadataService.getFaceValue(pos.getSymbol())), pos.getMeanPrice(), markPrice, Precision.COMMON_PRECISION);
+		BigDecimal pnl = PnlCalc.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(this.metadataService.getFaceValue(pos.getAsset(), pos.getSymbol())), pos.getMeanPrice(), markPrice);
 		BigDecimal posMargin = pos.getInitMargin();
 		if(BigUtils.ltZero(pnl)){
 			posMargin = posMargin.subtract(pnl);
@@ -261,8 +270,8 @@ public class PcPositionMarginService {
 		return posMargin.subtract(posMargin);
 	}
 	
-	private BigDecimal calcLiqPrice(String symbol, int longFlag, BigDecimal volume, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
-		BigDecimal liqPrice = this.positionStrategy.calcLiqPrice(symbol, longFlag, volume, openPrice, holdMarginRatio, posMargin);
+	private BigDecimal calcLiqPrice(String asset, String symbol, int longFlag, BigDecimal volume, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
+		BigDecimal liqPrice = this.positionStrategy.calcLiqPrice(asset, symbol, longFlag, volume, openPrice, holdMarginRatio, posMargin);
 		return liqPrice;
 	}
 	

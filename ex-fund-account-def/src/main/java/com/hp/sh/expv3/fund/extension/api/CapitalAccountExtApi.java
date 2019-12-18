@@ -1,19 +1,16 @@
 package com.hp.sh.expv3.fund.extension.api;
 
 
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.math.BigDecimal;
 
 /**
  * 资金账户相关请求
@@ -21,7 +18,7 @@ import java.math.BigDecimal;
  * @author BaiLiJun  on 2019/12/13
  */
 @Api(tags ="资金账户扩展Api")
-@FeignClient(value="ex-fund-account")
+@FeignClient(value = "ex-fund-account")
 public interface CapitalAccountExtApi {
 
     @ApiOperation("获取资金账户")

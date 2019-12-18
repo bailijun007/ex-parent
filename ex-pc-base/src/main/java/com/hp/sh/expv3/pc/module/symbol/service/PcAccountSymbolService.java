@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.base.exceptions.CommonError;
+import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.component.PcDefaultSymbolSetting;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
@@ -33,16 +35,19 @@ public class PcAccountSymbolService{
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void create(Long userId, String asset, String symbol){
+		PcAccountSymbol as = this.get(userId, asset, symbol);
+		if(as!=null){
+			throw new ExException(CommonError.OBJ_DONT_EXIST);
+		}
 		Date now = new Date();
 		PcAccountSymbol entity = new PcAccountSymbol();
 		entity.setAsset(asset);
 		entity.setMarginMode(pcDefaultSymbolSetting.getMarginMode());
-		entity.setLongMaxLeverage(pcDefaultSymbolSetting.getMaxLeverage());
-		entity.setShortMaxLeverage(pcDefaultSymbolSetting.getMaxLeverage());
-		entity.setCrossLeverage(pcDefaultSymbolSetting.getCrossLeverage());
-		entity.setLongLeverage(pcDefaultSymbolSetting.getLongLeverage());
-		entity.setShortLeverage(pcDefaultSymbolSetting.getShortLeverage());
-		entity.setHoldMarginRatio(pcDefaultSymbolSetting.getHoldMarginRatio());
+		entity.setLongMaxLeverage(pcDefaultSymbolSetting.getLongMaxLeverage(asset, symbol));
+		entity.setShortMaxLeverage(pcDefaultSymbolSetting.getShortMaxLeverage(asset, symbol));
+		entity.setCrossLeverage(pcDefaultSymbolSetting.getCrossLeverage(asset, symbol));
+		entity.setLongLeverage(pcDefaultSymbolSetting.getLongLeverage(asset, symbol));
+		entity.setShortLeverage(pcDefaultSymbolSetting.getShortLeverage(asset, symbol));
 		entity.setSymbol(symbol);
 		entity.setUserId(userId);
 		entity.setVersion(0L);

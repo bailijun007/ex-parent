@@ -87,11 +87,11 @@ public class PcPriceCalc {
      * @param amt
      * @return
      */
-    public static BigDecimal calcEntryPrice(boolean isLong, BigDecimal baseValue, BigDecimal amt, int scale) {
+    public static BigDecimal calcEntryPrice(boolean isLong, BigDecimal baseValue, BigDecimal amt) {
         if (isLong) {
-            return amt.divide(baseValue, scale, DecimalUtil.MORE).stripTrailingZeros();
+            return amt.divide(baseValue, Precision.COMMON_PRECISION, DecimalUtil.MORE).stripTrailingZeros();
         } else {
-            return amt.divide(baseValue, scale, DecimalUtil.LESS).stripTrailingZeros();
+            return amt.divide(baseValue, Precision.COMMON_PRECISION, DecimalUtil.LESS).stripTrailingZeros();
         }
     }
 

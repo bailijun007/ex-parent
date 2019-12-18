@@ -18,7 +18,6 @@
 		<result column="close_fee" property="closeFee" />
 		<result column="auto_add_flag" property="autoAddFlag" />
 		<result column="mean_price" property="meanPrice" />
-		<result column="avg_cost_price" property="avgCostPrice" />
 		<result column="init_margin" property="initMargin" />
 		<result column="hold_ratio" property="holdRatio" />
 		<result column="fee_cost" property="feeCost" />
@@ -33,7 +32,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,asset,symbol,long_flag,margin_mode,entry_leverage,volume,base_value,leverage,pos_margin,close_fee,auto_add_flag,mean_price,avg_cost_price,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
+		id,asset,symbol,long_flag,margin_mode,entry_leverage,volume,base_value,leverage,pos_margin,close_fee,auto_add_flag,mean_price,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -119,9 +118,9 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into pc_position (
-			id,asset,symbol,long_flag,margin_mode,entry_leverage,volume,base_value,leverage,pos_margin,close_fee,auto_add_flag,mean_price,avg_cost_price,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
+			id,asset,symbol,long_flag,margin_mode,entry_leverage,volume,base_value,leverage,pos_margin,close_fee,auto_add_flag,mean_price,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
 		)values(
-			#{id},#{asset},#{symbol},#{longFlag},#{marginMode},#{entryLeverage},#{volume},#{baseValue},#{leverage},#{posMargin},#{closeFee},#{autoAddFlag},#{meanPrice},#{avgCostPrice},#{initMargin},#{holdRatio},#{feeCost},#{realisedPnl},#{liqPrice},#{liqMarkPrice},#{liqMarkTime},#{liqStatus},#{userId},#{created},#{modified}
+			#{id},#{asset},#{symbol},#{longFlag},#{marginMode},#{entryLeverage},#{volume},#{baseValue},#{leverage},#{posMargin},#{closeFee},#{autoAddFlag},#{meanPrice},#{initMargin},#{holdRatio},#{feeCost},#{realisedPnl},#{liqPrice},#{liqMarkPrice},#{liqMarkTime},#{liqStatus},#{userId},#{created},#{modified}
 		)
 	</insert>
 	
@@ -129,7 +128,7 @@
 		update 
 			pc_position
 		set 
-			asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},volume=#{volume},base_value=#{baseValue},leverage=#{leverage},pos_margin=#{posMargin},close_fee=#{closeFee},auto_add_flag=#{autoAddFlag},mean_price=#{meanPrice},avg_cost_price=#{avgCostPrice},init_margin=#{initMargin},hold_ratio=#{holdRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},liq_status=#{liqStatus},user_id=#{userId},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},volume=#{volume},base_value=#{baseValue},leverage=#{leverage},pos_margin=#{posMargin},close_fee=#{closeFee},auto_add_flag=#{autoAddFlag},mean_price=#{meanPrice},init_margin=#{initMargin},hold_ratio=#{holdRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},liq_status=#{liqStatus},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>
