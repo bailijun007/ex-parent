@@ -37,6 +37,14 @@ public interface FeeRatioService {
 	 */
 	BigDecimal getCloseFeeRatio(long userId, String asset, String symbol);
 
+	/**
+	 * 维持保证金率
+	 * @param userId
+	 * @param asset
+	 * @param symbol
+	 * @param volume
+	 * @return
+	 */
 	BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume);
 
 	/**

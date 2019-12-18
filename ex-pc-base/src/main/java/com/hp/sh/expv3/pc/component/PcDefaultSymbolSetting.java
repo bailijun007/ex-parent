@@ -6,8 +6,12 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MarginMode;
 
-
-//TOOD 取缓存
+/**
+ * 获取默认值
+ * TOOD 取缓存
+ * @author wangjg
+ *
+ */
 @Component
 public class PcDefaultSymbolSetting {
 
