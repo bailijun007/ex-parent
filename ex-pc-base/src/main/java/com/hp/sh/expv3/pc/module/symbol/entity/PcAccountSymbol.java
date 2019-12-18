@@ -31,11 +31,6 @@ public class PcAccountSymbol extends UserDataEntity {
 	private Integer marginMode;
 
 	/**
-	 * 维持保证金比例(系统设置)
-	 */
-	private BigDecimal holdMarginRatio;
-
-	/**
      * 做空杠杆
      */
     private BigDecimal shortLeverage;
@@ -121,14 +116,6 @@ public class PcAccountSymbol extends UserDataEntity {
 
 	public void setCrossLeverage(BigDecimal crossLeverage) {
 		this.crossLeverage = crossLeverage;
-	}
-
-	public BigDecimal getHoldMarginRatio() {
-		return holdMarginRatio;
-	}
-
-	public void setHoldMarginRatio(BigDecimal holdMarginRatio) {
-		this.holdMarginRatio = holdMarginRatio;
 	}
 
 	public BigDecimal getLongMaxLeverage() {

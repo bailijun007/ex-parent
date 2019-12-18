@@ -62,7 +62,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 			tradeResult.setFeeRatio(order.getOpenFeeRatio());
 			tradeResult.setFee(tradeRatioAmt.getOpenFee());
 		}else{
-			BigDecimal closeFeeRatio = this.feeRatioService.getCloseFeeRatio(order.getUserId());
+			BigDecimal closeFeeRatio = this.feeRatioService.getCloseFeeRatio(order.getUserId(), order.getAsset(), order.getSymbol());
 			BigDecimal closeFee = MarginFeeCalc.calcFee(tradeResult.getBaseValue(), closeFeeRatio);
 
 			tradeResult.setFeeRatio(closeFeeRatio);
@@ -100,11 +100,11 @@ public class AABBPositionStrategy implements PositionStrategy {
 		
 		//maker fee
 		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN && matchedVo.getMakerFlag()==TradingRoles.MAKER){
-			BigDecimal makerFeeRatio = feeRatioService.getMakerOpenFeeRatio(order.getUserId());
+			BigDecimal makerFeeRatio = feeRatioService.getMakerOpenFeeRatio(order.getUserId(), order.getAsset(), order.getSymbol());
 			tradeResult.setMakerFeeRatio(makerFeeRatio);
 			tradeResult.setMakerFee(orderStrategy.calcFee(tradeResult.getBaseValue(), makerFeeRatio));
 		}else{
-			BigDecimal makerFeeRatio = feeRatioService.getMakerCloseFeeRatio(order.getUserId());
+			BigDecimal makerFeeRatio = feeRatioService.getMakerCloseFeeRatio(order.getUserId(), order.getAsset(), order.getSymbol());
 			tradeResult.setMakerFeeRatio(makerFeeRatio);
 			tradeResult.setMakerFee(orderStrategy.calcFee(tradeResult.getBaseValue(), makerFeeRatio));
 		}

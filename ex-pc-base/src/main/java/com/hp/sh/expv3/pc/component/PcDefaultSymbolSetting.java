@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MarginMode;
 
+
+//TOOD 取缓存
 @Component
 public class PcDefaultSymbolSetting {
 
@@ -13,25 +15,24 @@ public class PcDefaultSymbolSetting {
 		return MarginMode.FIXED;
 	};
 
-	public BigDecimal getCrossLeverage() {
+	public BigDecimal getCrossLeverage(String asset, String symbol) {
 		return new BigDecimal(5);
 	};
 
-	public BigDecimal getMaxLeverage() {
+	public BigDecimal getLongMaxLeverage(String asset, String symbol) {
 		return new BigDecimal(50);
 	};
 
-	public BigDecimal getLongLeverage() {
+	public BigDecimal getShortMaxLeverage(String asset, String symbol) {
+		return new BigDecimal(50);
+	};
+
+	public BigDecimal getLongLeverage(String asset, String symbol) {
 		return new BigDecimal(5);
 	};
 
-	public BigDecimal getShortLeverage() {
+	public BigDecimal getShortLeverage(String asset, String symbol) {
 		return new BigDecimal(5);
-	};
-
-	@Deprecated
-	public BigDecimal getHoldMarginRatio() {
-		return new BigDecimal("0.0005");
 	};
 
 }

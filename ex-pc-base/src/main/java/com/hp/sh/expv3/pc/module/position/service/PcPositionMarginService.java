@@ -111,7 +111,7 @@ public class PcPositionMarginService {
 
             //减少杠杆
             if (leverage.compareTo(pos.getLeverage()) < 0) {
-                BigDecimal feeRatio = feeRatioService.getCloseFeeRatio(userId);
+                BigDecimal feeRatio = feeRatioService.getCloseFeeRatio(userId, pos.getAsset(), pos.getSymbol());
 
                 /* 修改保证金 */
                 //标记价格

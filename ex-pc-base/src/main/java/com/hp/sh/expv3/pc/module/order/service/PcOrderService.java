@@ -207,8 +207,8 @@ public class PcOrderService {
 	//设置开仓订单的各种费率
 	private void setOpenOrderFee(PcOrder pcOrder) {
 		pcOrder.setMarginRatio(feeRatioService.getInitedMarginRatio(pcOrder.getLeverage()));
-		pcOrder.setOpenFeeRatio(feeRatioService.getOpenFeeRatio(pcOrder.getUserId()));
-		pcOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(pcOrder.getUserId()));
+		pcOrder.setOpenFeeRatio(feeRatioService.getOpenFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
+		pcOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
 		
 		OrderRatioData ratioData = orderStrategy.calcOrderAmt(pcOrder);
 		pcOrder.setOpenFee(ratioData.getOpenFee());

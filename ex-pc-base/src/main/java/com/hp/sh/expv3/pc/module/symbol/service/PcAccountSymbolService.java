@@ -37,12 +37,11 @@ public class PcAccountSymbolService{
 		PcAccountSymbol entity = new PcAccountSymbol();
 		entity.setAsset(asset);
 		entity.setMarginMode(pcDefaultSymbolSetting.getMarginMode());
-		entity.setLongMaxLeverage(pcDefaultSymbolSetting.getMaxLeverage());
-		entity.setShortMaxLeverage(pcDefaultSymbolSetting.getMaxLeverage());
-		entity.setCrossLeverage(pcDefaultSymbolSetting.getCrossLeverage());
-		entity.setLongLeverage(pcDefaultSymbolSetting.getLongLeverage());
-		entity.setShortLeverage(pcDefaultSymbolSetting.getShortLeverage());
-		entity.setHoldMarginRatio(pcDefaultSymbolSetting.getHoldMarginRatio());
+		entity.setLongMaxLeverage(pcDefaultSymbolSetting.getLongMaxLeverage(asset, symbol));
+		entity.setShortMaxLeverage(pcDefaultSymbolSetting.getShortMaxLeverage(asset, symbol));
+		entity.setCrossLeverage(pcDefaultSymbolSetting.getCrossLeverage(asset, symbol));
+		entity.setLongLeverage(pcDefaultSymbolSetting.getLongLeverage(asset, symbol));
+		entity.setShortLeverage(pcDefaultSymbolSetting.getShortLeverage(asset, symbol));
 		entity.setSymbol(symbol);
 		entity.setUserId(userId);
 		entity.setVersion(0L);
