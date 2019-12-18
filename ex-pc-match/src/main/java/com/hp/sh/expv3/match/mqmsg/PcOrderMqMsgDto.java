@@ -15,6 +15,7 @@ public class PcOrderMqMsgDto {
     private Long accountId;
     private Integer closeFlag;
     private Integer bidFlag;
+    private Integer timeInForce;
 
     private BigDecimal number;
     private BigDecimal displayNumber;
@@ -117,5 +118,13 @@ public class PcOrderMqMsgDto {
 
     public void setFilledNumber(BigDecimal filledNumber) {
         this.filledNumber = filledNumber;
+    }
+
+    public Integer getTimeInForce() {
+        return timeInForce;
+    }
+
+    public void setTimeInForce(Integer timeInForce) {
+        this.timeInForce = timeInForce;
     }
 }

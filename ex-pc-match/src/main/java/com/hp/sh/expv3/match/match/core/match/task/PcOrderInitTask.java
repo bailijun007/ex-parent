@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Service
 @Scope("prototype")
@@ -70,48 +72,20 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
     public void run() {
         Thread.currentThread().setName("PcMatWok-" + getAssetSymbol());
         PcMatchHandlerContext context = PcMatchHandlerContext.getLocalContext();
-        /**
-         * 作为下游的队列
-         */
+
         context.setAssetSymbol(this.getAssetSymbol());
         context.setAsset(this.getAsset());
         context.setSymbol(this.getSymbol());
+        /**
+         * 作为下游的队列
+         */
         context.matchedThreadWorker = this.matchedThreadWorker;
 
+        long sentMqOffset = getSentMqOffset();
+
         if (orders == null) {
-            loadData(context);
+            loadData(context, sentMqOffset);
         }
-
-        // booked add to queue
-        // 属于平衡状态，理论上 所有booked状态的订单，应该都是创建时间早的，应该排是前面的
-
-//        if (null != orders) {
-//            for (PcOrderBo order : orders) {
-//                if (pcOrderService.isPcOrderOk(order)) {
-//                    if (PcOrderStatusEnum.CANCELED.test(order.getStatus())
-//                            || PcOrderStatusEnum.FILLED.test(order.getStatus())
-//                            || PcOrderStatusEnum.FAILED.test(order.getStatus())
-//                            || PcOrderStatusEnum.EXPIRED.test(order.getStatus())
-//                            ) {
-//                        continue;
-//                    } else {
-//                        PcOrderStatusEnum displayStatus = PcOrderStatusEnum.getDisplayStatus(order.getStatus());
-//                        if (displayStatus.equals(PcOrderStatusEnum.PENDING_CANCEL)
-//                                || displayStatus.equals(PcOrderStatusEnum.PENDING_NEW)
-//                                ) {
-//                            logger.error("asset:{},symbol:{},accountId:{},orderId:{},pending status...", order.getAsset(), order.getSymbol(), order.getAccountId(), order.getId());
-//                            throw new BaseBizRuntimeException(CommonCode.IMPOSSIBLE_LOGIC_EXCEPTION);
-//                        }
-//                    }
-//                    PcOrder4MatchBo pcOrder4MatchBo = PcOrder4MatchBoUtil.buildOrder(order);
-//                    PriorityQueue<PcOrder4MatchBo> queue = context.getQueue(pcOrder4MatchBo);
-//                    queue.offer(pcOrder4MatchBo);
-//                    context.allOpenOrders.put(pcOrder4MatchBo.getId(), pcOrder4MatchBo);
-//                } else {
-//                    logger.warn("{} {} {} {} order not ok,please fix", order.getAccountId(), order.getId(), order.getAsset(), order.getSymbol());
-//                }
-//            }
-//        }
 
         IThreadWorker worker = threadManagerMatchImpl.getWorker(this.getAssetSymbol());
 
@@ -143,21 +117,24 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
         orderConsumer.setInitOffset(this.getCurrentMsgOffset());
         orderConsumer.setName("PcMatchConsumer_" + getAsset() + "__" + this.getSymbol());
         orderConsumer.start();
-        setSentMqOffset(context);
+        setSentMqOffset(context, sentMqOffset);
 
         pcOrderMqNotify.sendMatchStart(this.getAsset(), this.getSymbol());
 
     }
 
-    private void setSentMqOffset(PcMatchHandlerContext context) {
+    private void setSentMqOffset(PcMatchHandlerContext context, long matchedMqOffset) {
+        context.setSentMqOffset(matchedMqOffset);
+    }
+
+    private long getSentMqOffset() {
         String sentMqOffsetRedisKey = RedisKeyUtil.buildOrderSentMqOffsetRedisKeyPattern(pcmatchPcmatchRedisKeySetting.getPcOrderSentMqOffsetRedisKeyPattern(), this.getAsset(), this.getSymbol());
+        long matchedMqOffset = -1L;
         if (pcRedisUtil.exists(sentMqOffsetRedisKey)) {
             String s = pcRedisUtil.get(sentMqOffsetRedisKey);
-            long sentOffset = Long.valueOf(s);
-            context.setSentMqOffset(sentOffset);
-        } else {
-            context.setSentMqOffset(-1L);
+            matchedMqOffset = Long.valueOf(s);
         }
+        return matchedMqOffset;
     }
 
     @Autowired
@@ -169,13 +146,29 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
     @Qualifier(PcmatchConst.MODULE_NAME + "RedisUtil")
     private RedisUtil pcRedisUtil;
 
-    void loadData(PcMatchHandlerContext context) {
+    void loadData(PcMatchHandlerContext context, long sentMqOffset) {
 
         String snapshotRedisKey = RedisKeyUtil.buildPcOrderSnapshotRedisKey(pcmatchPcmatchRedisKeySetting.getPcOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
 
         boolean exists = pcRedisUtil.exists(snapshotRedisKey);
         if (exists) {
-            String s = pcRedisUtil.get(snapshotRedisKey);
+
+            Set<String> snapshotOffsetList = pcRedisUtil.hkeys(snapshotRedisKey);
+
+            TreeSet<Long> snapshotOffset = new TreeSet<>();
+            for (String offset : snapshotOffsetList) {
+                snapshotOffset.add(Long.valueOf(offset));
+            }
+
+            Long startSnapshotOffset = snapshotOffset.floor(sentMqOffset);
+
+            if (null == startSnapshotOffset) {
+                context.setLastPrice(null);
+                this.setCurrentMsgOffset(0L);
+                return;
+            }
+
+            String s = pcRedisUtil.hget(snapshotRedisKey, startSnapshotOffset + "");
             PcOrderSnapshotBo snapshot = JSON.parseObject(s, PcOrderSnapshotBo.class);
             context.setLastPrice(snapshot.getLastPrice());
             this.setCurrentMsgOffset(snapshot.getRmqNextOffset());

@@ -130,20 +130,21 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
             pcMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
         }
 
-        if (PcOrderTimeInForceEnum.GOOD_TILL_CANCEL.getCode() == takerOrder.getOrderType()) {
-            // 发送未成交消息
-            pcMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId());
-        } else if (PcOrderTimeInForceEnum.IMMEDIATE_OR_CANCEL.getCode() == takerOrder.getOrderType()
+        Long tkOrderId = takerOrder.getOrderId();
+        Long tkAccountId = takerOrder.getAccountId();
+        if (PcOrderTimeInForceEnum.GOOD_TILL_CANCEL.getCode() == takerOrder.getTimeInForce()) {
+            if (takerOrder.getFilledNumber().compareTo(BigDecimal.ZERO) == 0) {
+                pcMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), tkAccountId, tkOrderId);
+            }
+        } else if (PcOrderTimeInForceEnum.IMMEDIATE_OR_CANCEL.getCode() == takerOrder.getTimeInForce()
                 || PcOrderTimeInForceEnum.FILL_OR_KILL.getCode() == takerOrder.getOrderType()) {
             // 发送取消委托消息
             if (isCancelFlag()) {
-                pcMatchMqNotify.sendOrderMatchCancelled(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId(), cancelNumber);
+                pcMatchMqNotify.sendOrderMatchCancelled(this.getAsset(), this.getSymbol(), tkAccountId, tkOrderId, cancelNumber);
             }
-        } else if (PcOrderTimeInForceEnum.MAKER_ONLY.getCode() == takerOrder.getOrderType()) {
+        } else if (PcOrderTimeInForceEnum.MAKER_ONLY.getCode() == takerOrder.getTimeInForce()) {
             if (isCancelFlag()) {
-                pcMatchMqNotify.sendOrderMatchCancelled(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId(), cancelNumber);
-            } else {
-                pcMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), takerOrder.getAccountId(), takerOrder.getOrderId());
+                pcMatchMqNotify.sendOrderMatchCancelled(this.getAsset(), this.getSymbol(), tkAccountId, tkOrderId, cancelNumber);
             }
         }
         sendNotifyMsg();

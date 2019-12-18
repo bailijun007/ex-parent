@@ -138,10 +138,7 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
     }
 
     private void continueMatch(PcMatchHandlerContext context, PcOrder4MatchBo takerOrder, PriorityQueue<PcOrder4MatchBo> sameSideQueue) {
-        BigDecimal unfilledNumber = PcUtil.calcUnfilledNumber(takerOrder.getNumber(), takerOrder.getFilledNumber());
-        // 这里一定是未全部成交
-        context.getMatchResult().setCancelNumber(unfilledNumber);
-        completeOrder(context, takerOrder);
+        sameSideQueue.offer(takerOrder);
     }
 
     private void cancelAndComplete(PcMatchHandlerContext context, PcOrder4MatchBo takerOrder, PriorityQueue<PcOrder4MatchBo> sameSideQueue) {
@@ -171,7 +168,7 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
      */
     protected boolean isOrderComplete(PcOrder4MatchBo order) {
         // 不用考虑取消的情况，取消会直接在任务中取消
-        return PcUtil.calcUnfilledNumber(order.getNumber(), order.getFilledNumber()).compareTo(BigDecimal.ZERO) > 0;
+        return PcUtil.calcUnfilledNumber(order.getNumber(), order.getFilledNumber()).compareTo(BigDecimal.ZERO) == 0;
     }
 
     /**
