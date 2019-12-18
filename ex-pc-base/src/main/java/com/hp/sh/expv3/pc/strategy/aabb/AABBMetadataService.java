@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AABBMetadataService {
 	
-	public BigDecimal getFaceValue(String symbol){
+	public BigDecimal getFaceValue(String asset, String symbol){
 		
 		return BigDecimal.ONE;
 	}

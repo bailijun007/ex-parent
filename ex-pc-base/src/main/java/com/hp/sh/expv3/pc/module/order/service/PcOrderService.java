@@ -105,7 +105,7 @@ public class PcOrderService {
 		pcOrder.setLongFlag(longFlag);
 		pcOrder.setLeverage(pcSymbolService.getLeverage(userId, asset, symbol, longFlag));
 		pcOrder.setVolume(number);
-		pcOrder.setFaceValue(metadataService.getFaceValue(symbol));
+		pcOrder.setFaceValue(metadataService.getFaceValue(asset, symbol));
 		pcOrder.setPrice(price);
 		
 		pcOrder.setOrderType(PcOrderType.LIMIT);
