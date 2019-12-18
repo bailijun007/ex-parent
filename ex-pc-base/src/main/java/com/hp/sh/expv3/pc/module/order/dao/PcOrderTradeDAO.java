@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.hp.sh.expv3.base.mapper.BaseUserDataMapper;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 
@@ -20,4 +21,5 @@ public interface PcOrderTradeDAO extends BaseUserDataMapper<PcOrderTrade,Long> {
 
 	public Long queryCount(Map<String,Object> params);
 
+    Long getFeeCollectorId(@Param("userId") Long userId, @Param("asset") String asset,@Param("symbol") String symbol);
 }

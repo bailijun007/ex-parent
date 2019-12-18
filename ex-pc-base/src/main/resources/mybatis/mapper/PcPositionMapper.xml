@@ -4,127 +4,128 @@
 
 <mapper namespace="com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO">
 
-	<resultMap type="com.hp.sh.expv3.pc.module.position.entity.PcPosition" id="PcPosition">
-		<result column="id" property="id" />
-		<result column="asset" property="asset" />
-		<result column="symbol" property="symbol" />
-		<result column="long_flag" property="longFlag" />
-		<result column="margin_mode" property="marginMode" />
-		<result column="entry_leverage" property="entryLeverage" />
-		<result column="volume" property="volume" />
-		<result column="base_value" property="baseValue" />
-		<result column="leverage" property="leverage" />
-		<result column="pos_margin" property="posMargin" />
-		<result column="close_fee" property="closeFee" />
-		<result column="auto_add_flag" property="autoAddFlag" />
-		<result column="mean_price" property="meanPrice" />
-		<result column="init_margin" property="initMargin" />
-		<result column="hold_ratio" property="holdRatio" />
-		<result column="fee_cost" property="feeCost" />
-		<result column="realised_pnl" property="realisedPnl" />
-		<result column="liq_price" property="liqPrice" />
-		<result column="liq_mark_price" property="liqMarkPrice" />
-		<result column="liq_mark_time" property="liqMarkTime" />
-		<result column="liq_status" property="liqStatus" />
-		<result column="user_id" property="userId" />
-		<result column="created" property="created" />
-		<result column="modified" property="modified" />
-	</resultMap>
+    <resultMap type="com.hp.sh.expv3.pc.module.position.entity.PcPosition" id="PcPosition">
+        <result column="id" property="id"/>
+        <result column="asset" property="asset"/>
+        <result column="symbol" property="symbol"/>
+        <result column="long_flag" property="longFlag"/>
+        <result column="margin_mode" property="marginMode"/>
+        <result column="entry_leverage" property="entryLeverage"/>
+        <result column="volume" property="volume"/>
+        <result column="base_value" property="baseValue"/>
+        <result column="leverage" property="leverage"/>
+        <result column="pos_margin" property="posMargin"/>
+        <result column="close_fee" property="closeFee"/>
+        <result column="auto_add_flag" property="autoAddFlag"/>
+        <result column="mean_price" property="meanPrice"/>
+        <result column="init_margin" property="initMargin"/>
+        <result column="hold_ratio" property="holdRatio"/>
+        <result column="fee_cost" property="feeCost"/>
+        <result column="realised_pnl" property="realisedPnl"/>
+        <result column="liq_price" property="liqPrice"/>
+        <result column="liq_mark_price" property="liqMarkPrice"/>
+        <result column="liq_mark_time" property="liqMarkTime"/>
+        <result column="liq_status" property="liqStatus"/>
+        <result column="user_id" property="userId"/>
+        <result column="created" property="created"/>
+        <result column="modified" property="modified"/>
+    </resultMap>
 
-	<sql id="Base_Column_List" >
+    <sql id="Base_Column_List">
 		id,asset,symbol,long_flag,margin_mode,entry_leverage,volume,base_value,leverage,pos_margin,close_fee,auto_add_flag,mean_price,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
 	</sql>
 
-	<sql id="simple_where" >
-		<where>
-		<if test="idList!=null">
-		and id in
-		<foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
-		#{idList[${i}]}
-		</foreach>
-		</if>
-		<if test="userId!=null"> and user_id=#{userId}</if>
-		<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
-		<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
-		<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
-		<if test="marginMode!=null"> and margin_mode=#{marginMode}</if>
-		<if test="autoAddFlag!=null"> and auto_add_flag=#{autoAddFlag}</if>
-		<if test="liqMarkTime!=null"> and liq_mark_time=#{liqMarkTime}</if>
-		<if test="liqStatus!=null"> and liq_status=#{liqStatus}</if>
-		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
-		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
-		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
-		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
-		<if test="keyword!=null and keyword!=''"> and symbol like CONCAT('%',#{keyword},'%')</if>
-		</where>
-	</sql>
+    <sql id="simple_where">
+        <where>
+            <if test="idList!=null">
+                and id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="longFlag!=null">and long_flag=#{longFlag}</if>
+            <if test="marginMode!=null">and margin_mode=#{marginMode}</if>
+            <if test="autoAddFlag!=null">and auto_add_flag=#{autoAddFlag}</if>
+            <if test="liqMarkTime!=null">and liq_mark_time=#{liqMarkTime}</if>
+            <if test="liqStatus!=null">and liq_status=#{liqStatus}</if>
+            <if test="createdStart!=null">and created &gt;= #{createdStart}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedStart!=null">and modified &gt;= #{modifiedStart}</if>
+            <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
+            <if test="keyword!=null and keyword!=''">and symbol like CONCAT('%',#{keyword},'%')</if>
+        </where>
+    </sql>
 
-	<sql id="simple_query" >
-		select
-			<include refid="Base_Column_List" />
-		from pc_position
-			<include refid="simple_where" />
-		<if test="orderBy!=null and orderBy!=''">
-			order by ${orderBy} <if test="!asc">desc</if>
-		</if>
+    <sql id="simple_query">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_position
+        <include refid="simple_where"/>
+        <if test="orderBy!=null and orderBy!=''">
+            order by ${orderBy}
+            <if test="!asc">desc</if>
+        </if>
 
-	</sql>
+    </sql>
 
-	<select id="pageQuery" resultMap="PcPosition">
-		<include refid="simple_query" />
-	</select>
+    <select id="pageQuery" resultMap="PcPosition">
+        <include refid="simple_query"/>
+    </select>
 
-	<select id="queryList" resultMap="PcPosition">
-		<include refid="simple_query" />
-	</select>
+    <select id="queryList" resultMap="PcPosition">
+        <include refid="simple_query"/>
+    </select>
 
-	<select id="queryOne" resultMap="PcPosition">
-		<include refid="simple_query" />
-	</select>
+    <select id="queryOne" resultMap="PcPosition">
+        <include refid="simple_query"/>
+    </select>
 
-	<select id="queryCount" resultType="long">
-		select 
-		<choose>
-			<when test="SUM!=null">
-				sum(${SUM})
-			</when>
-			<otherwise>
-				count(1)
-			</otherwise>
-		</choose>
-		from pc_position
-		<include refid="simple_where" />
-	</select>
+    <select id="queryCount" resultType="long">
+        select
+        <choose>
+            <when test="SUM!=null">
+                sum(${SUM})
+            </when>
+            <otherwise>
+                count(1)
+            </otherwise>
+        </choose>
+        from pc_position
+        <include refid="simple_where"/>
+    </select>
 
-	<select id="findById" resultMap="PcPosition">
-		select
-			<include refid="Base_Column_List" />
-		from pc_position
-			where id=#{id} and user_id=#{userId}
-	</select>
+    <select id="findById" resultMap="PcPosition">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_position
+        where id=#{id} and user_id=#{userId}
+    </select>
 
-	<select id="exist" resultType="boolean">
-		select 
-			count(1)
-		from 
-			pc_position
-		<include refid="simple_where" />
-		limit 1
-	</select>
+    <select id="exist" resultType="boolean">
+        select
+        count(1)
+        from
+        pc_position
+        <include refid="simple_where"/>
+        limit 1
+    </select>
 
 
-	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
-		insert into pc_position (
-			id,asset,symbol,long_flag,margin_mode,entry_leverage,volume,base_value,leverage,pos_margin,close_fee,auto_add_flag,mean_price,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
-		)values(
-			#{id},#{asset},#{symbol},#{longFlag},#{marginMode},#{entryLeverage},#{volume},#{baseValue},#{leverage},#{posMargin},#{closeFee},#{autoAddFlag},#{meanPrice},#{initMargin},#{holdRatio},#{feeCost},#{realisedPnl},#{liqPrice},#{liqMarkPrice},#{liqMarkTime},#{liqStatus},#{userId},#{created},#{modified}
-		)
-	</insert>
-	
-	<update id="update">
+    <insert id="save">
+        <selectKey resultType="long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+        insert into pc_position (
+        id,asset,symbol,long_flag,margin_mode,entry_leverage,volume,base_value,leverage,pos_margin,close_fee,auto_add_flag,mean_price,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
+        )values(
+        #{id},#{asset},#{symbol},#{longFlag},#{marginMode},#{entryLeverage},#{volume},#{baseValue},#{leverage},#{posMargin},#{closeFee},#{autoAddFlag},#{meanPrice},#{initMargin},#{holdRatio},#{feeCost},#{realisedPnl},#{liqPrice},#{liqMarkPrice},#{liqMarkTime},#{liqStatus},#{userId},#{created},#{modified}
+        )
+    </insert>
+
+    <update id="update">
 		update 
 			pc_position
 		set 
@@ -133,30 +134,30 @@
 			id=#{id} and user_id=#{userId}
 	</update>
 
-	<!--  -->
-	
-	<select id="queryAmount" resultType="java.math.BigDecimal">
-		select 
-		<choose>
-			<when test="SUM!=null">
-				sum(${SUM})
-			</when>
-			<otherwise>
-				count(1)
-			</otherwise>
-		</choose>
-		from pc_position
-		<include refid="simple_where" />
-	</select>
+    <!--  -->
 
-	<select id="getActivePos" resultMap="PcPosition">
-		select
-			<include refid="Base_Column_List" />
-		from 
-			pc_position
-		where
-			user_id=#{userId} and asset=#{asset} and symbol=#{symbol} and long_flag=#{longFlag}
-		and volume &lt; 0;
-	</select>
+    <select id="queryAmount" resultType="java.math.BigDecimal">
+        select
+        <choose>
+            <when test="SUM!=null">
+                sum(${SUM})
+            </when>
+            <otherwise>
+                count(1)
+            </otherwise>
+        </choose>
+        from pc_position
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="getActivePos" resultMap="PcPosition">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        pc_position
+        where
+        user_id=#{userId} and asset=#{asset} and symbol=#{symbol} and long_flag=#{longFlag}
+        and volume &lt; 0;
+    </select>
 
 </mapper>
