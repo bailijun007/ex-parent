@@ -224,25 +224,26 @@ public class PcPositionService {
 		
 		pcPosition.setLiqPrice(tradeResult.getLiqPrice());
 		
-		//
-		pcPosition.setAccuVolume(pcPosition.getAccuBaseValue().add(tradeResult.getVolume()));
+		//累计量
+		pcPosition.setAccuVolume(pcPosition.getAccuVolume().add(tradeResult.getVolume()));
 		pcPosition.setAccuBaseValue(pcPosition.getAccuBaseValue().add(tradeResult.getBaseValue()));
 		
 	}
 
-	private void modClosePos(PcPosition pcPosition, TradeResult tradeData) {
-		pcPosition.setVolume(pcPosition.getVolume().subtract(tradeData.getVolume()));
-		pcPosition.setBaseValue(pcPosition.getBaseValue().subtract(tradeData.getBaseValue()));
-		pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(tradeData.getOrderMargin()));
-		pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(tradeData.getFeeReceivable()));
+	private void modClosePos(PcPosition pcPosition, TradeResult tradeResult) {
+		pcPosition.setVolume(pcPosition.getVolume().subtract(tradeResult.getVolume()));
+		pcPosition.setBaseValue(pcPosition.getBaseValue().subtract(tradeResult.getBaseValue()));
+		pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(tradeResult.getOrderMargin()));
+		pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(tradeResult.getFeeReceivable()));
 		
-		pcPosition.setMeanPrice(tradeData.getNewMeanPrice());
-		pcPosition.setInitMargin(pcPosition.getInitMargin().subtract(tradeData.getOrderMargin()));
-		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeData.getFeeReceivable()));
+		pcPosition.setMeanPrice(tradeResult.getNewMeanPrice());
+		pcPosition.setInitMargin(pcPosition.getInitMargin().subtract(tradeResult.getOrderMargin()));
+		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeResult.getFeeReceivable()));
 		
 //		pcPosition.setLiqPrice(tradeData.getLiqPrice());
 		
-		pcPosition.setRealisedPnl(pcPosition.getRealisedPnl().add(tradeData.getPnl()));
+		pcPosition.setRealisedPnl(pcPosition.getRealisedPnl().add(tradeResult.getPnl()));
+
 	}
 	
 	/**

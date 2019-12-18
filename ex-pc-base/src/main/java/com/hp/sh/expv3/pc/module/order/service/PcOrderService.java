@@ -89,7 +89,7 @@ public class PcOrderService {
 		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
 		
 		//check 检查可平仓位
-		if(closeFlag!=OrderFlag.ACTION_CLOSE){
+		if(closeFlag==OrderFlag.ACTION_CLOSE){
 			this.checkClosablePosition(pos);
 		}
 		
@@ -127,7 +127,7 @@ public class PcOrderService {
 		}
 		
 		////////其他字段，后面随状态修改////////
-		this.setOther(pcOrder, pos.getId());
+		this.setOther(pcOrder, pos);
 		
 		pcOrderDAO.save(pcOrder);
 
@@ -145,12 +145,12 @@ public class PcOrderService {
 		return count>0;
 	}
 
-	private void setOther(PcOrder pcOrder, Long posId){
+	private void setOther(PcOrder pcOrder, PcPosition pos){
 		pcOrder.setFeeCost(BigDecimal.ZERO);
 		pcOrder.setFilledVolume(BigDecimal.ZERO);
 		pcOrder.setCancelVolume(null);
 		if(pcOrder.getCloseFlag()==OrderFlag.ACTION_CLOSE){
-			pcOrder.setClosePosId(posId);
+			pcOrder.setClosePosId(pos.getId());
 		}
 		pcOrder.setTriggerFlag(IntBool.NO);
 		pcOrder.setCancelTime(null);
@@ -218,7 +218,7 @@ public class PcOrderService {
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void setCancelStatus(long userId, String asset, String symbol, long orderId, Integer cancelStatsus){
+	public void setPendingCancel(long userId, String asset, String symbol, long orderId){
 		Date now = new Date();
 		
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
@@ -229,7 +229,7 @@ public class PcOrderService {
 			throw new ExException(OrderError.FILLED);
 		}
 		
-		long count = this.pcOrderDAO.setCancelStatus(userId, orderId, cancelStatsus, now);
+		long count = this.pcOrderDAO.setCancelStatus(userId, orderId, OrderStatus.PENDING_CANCEL, now);
 		
 		if(count!=1){
 			throw new RuntimeException("更新失败，更新行数："+count);
@@ -246,43 +246,46 @@ public class PcOrderService {
 	 */
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void cancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
-			//返还余额
-	
-			PcOrder order = this.pcOrderDAO.findById(userId, orderId);
-			
-			OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, number);
-			
-			BigDecimal cancelledGrossFee = ratioData.getGrossMargin();
-			
-			int result = this.returnCancelAmt(userId, asset, orderId, cancelledGrossFee);
-			if(result==InvokeResult.NOCHANGE){
-				//利用合约账户的幂等性实现本方法的幂等性
-				logger.warn("已经执行过了");
-				return;
-			}
-	
-			//修改订单状态（撤销）
-			Date now = new Date();
-	//		this.setCancelStatus(userId, asset, orderId, PcOrder.CANCELED);
-			order.setCancelTime(now);
-			order.setCancelVolume(number);
-			order.setActiveFlag(PcOrder.NO);
-			order.setStatus(OrderStatus.CANCELED);
-			
-			//清空押金
-			order.setOrderMargin(BigDecimal.ZERO);
-			order.setOpenFee(BigDecimal.ZERO);
-			order.setCloseFee(BigDecimal.ZERO);
-			
-			this.pcOrderDAO.update(order);
-			
+		//返还余额
+
+		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		
+		if(BigUtils.ne(order.getVolume().subtract(order.getFilledVolume()), number)){
+			throw new ExException(OrderError.CANCELED_NUM_ERR);
+		}
+		
+		OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, number);
+		
+		BigDecimal cancelledGrossFee = ratioData.getGrossMargin();
+		
+		int result = this.returnCancelAmt(userId, asset, orderId, cancelledGrossFee);
+		if(result==InvokeResult.NOCHANGE){
+			//利用合约账户的幂等性实现本方法的幂等性
+			logger.warn("已经执行过了");
 			return;
 		}
 
-	public void changeStatus(Long userId, Long orderId, Integer newStatus, Integer desiredOldStatus){
+		//修改订单状态（撤销）
+		Date now = new Date();
+		order.setCancelTime(now);
+		order.setCancelVolume(number);
+		order.setActiveFlag(PcOrder.NO);
+		order.setStatus(OrderStatus.CANCELED);
+		
+		//清空押金
+		order.setOrderMargin(BigDecimal.ZERO);
+		order.setOpenFee(BigDecimal.ZERO);
+		order.setCloseFee(BigDecimal.ZERO);
+		
+		this.pcOrderDAO.update(order);
+		
+		return;
+	}
+
+	public void setNewStatus(Long userId, Long orderId, Integer newStatus, Integer desiredOldStatus){
 		long count = this.pcOrderDAO.changeStatus(userId, orderId, newStatus, desiredOldStatus, new Date());
 		if(count!=1){
-			throw new RuntimeException("更新失败，更新行数："+count);
+//			throw new RuntimeException("更新失败，更新行数："+count);
 		}
 	}
 

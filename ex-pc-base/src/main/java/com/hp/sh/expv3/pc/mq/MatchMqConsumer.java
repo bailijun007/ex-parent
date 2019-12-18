@@ -28,7 +28,7 @@ public class MatchMqConsumer {
 
 	@MQListener(tags=MqTopic.TAGS_NOT_MATCHED)
 	public void handleNotMatch(MatchNotMatchMsg msg){
-		this.pcOrderService.changeStatus(msg.getAccountId(), msg.getOrderId(), OrderStatus.NEW, OrderStatus.PENDING_NEW);
+		this.pcOrderService.setNewStatus(msg.getAccountId(), msg.getOrderId(), OrderStatus.NEW, OrderStatus.PENDING_NEW);
 		System.out.println(msg);
 	}
 	

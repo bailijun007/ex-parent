@@ -20,7 +20,7 @@ public class PcDefaultSymbolSetting {
 	};
 
 	public BigDecimal getCrossLeverage(String asset, String symbol) {
-		return new BigDecimal(5);
+		return new BigDecimal(10);
 	};
 
 	public BigDecimal getLongMaxLeverage(String asset, String symbol) {
@@ -32,11 +32,11 @@ public class PcDefaultSymbolSetting {
 	};
 
 	public BigDecimal getLongLeverage(String asset, String symbol) {
-		return new BigDecimal(5);
+		return new BigDecimal(10);
 	};
 
 	public BigDecimal getShortLeverage(String asset, String symbol) {
-		return new BigDecimal(5);
+		return new BigDecimal(10);
 	};
 
 }
