@@ -21,7 +21,7 @@ public class FundTransferExtApiAction implements FundTransferExtApi {
 
     @Override
     public List<FundTransferExtVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
-        if (userId == null || queryId == null || pageSize == null || pageStatus == null || StringUtils.isEmpty(asset)) {
+        if (userId == null ||  pageSize == null || pageStatus == null || StringUtils.isEmpty(asset)) {
             throw new ExException(FundTransferExtErrorCode.PARAM_EMPTY);
         }
 
