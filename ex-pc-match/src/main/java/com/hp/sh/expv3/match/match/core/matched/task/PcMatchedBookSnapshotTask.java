@@ -61,7 +61,7 @@ public class PcMatchedBookSnapshotTask extends PcMatchedBaseTask {
     }
 
     @Autowired
-    private PcmatchRedisKeySetting pcmatchPcmatchRedisKeySetting;
+    private PcmatchRedisKeySetting pcmatchRedisKeySetting;
 
     @Autowired
     @Qualifier(PcmatchConst.MODULE_NAME + "RedisUtil")
@@ -77,9 +77,9 @@ public class PcMatchedBookSnapshotTask extends PcMatchedBaseTask {
         long rmqNextOffset = this.getCurrentMsgOffset() + 1;
         snapshot.setRmqNextOffset(rmqNextOffset);
 
-        String snapshotRedisKey = RedisKeyUtil.buildPcOrderSnapshotRedisKey(pcmatchPcmatchRedisKeySetting.getPcOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
+        String snapshotRedisKey = RedisKeyUtil.buildPcOrderSnapshotRedisKey(pcmatchRedisKeySetting.getPcOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
 
-        pcRedisUtil.hset(snapshotRedisKey, "" + snapshotRedisKey, JsonUtil.toJsonString(snapshot));
+        pcRedisUtil.hset(snapshotRedisKey, "" + rmqNextOffset, JsonUtil.toJsonString(snapshot));
 
         logger.info("save snapshot at {}", System.currentTimeMillis());
 

@@ -88,6 +88,17 @@ public class PcMatchTaskServiceImpl implements PcMatchTaskService, ApplicationCo
         return task;
     }
 
+    @Override
+    public PcOrderRebaseTask buildOrderRebaseTask(String assetSymbol, String asset, String symbol, long currentOffset) {
+        PcOrderRebaseTask task = applicationContext.getBean(PcOrderRebaseTask.class);
+        task.setAssetSymbol(assetSymbol);
+        task.setAsset(asset);
+        task.setSymbol(symbol);
+        task.setPriority(MatchTaskConst.PRIORITY_ORDER_INIT);
+        task.setCurrentMsgOffset(currentOffset);
+        return task;
+    }
+
 
     private ApplicationContext applicationContext;
 

@@ -1,19 +1,23 @@
 package com.hp.sh.expv3.pc.component.impl;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.alibaba.fastjson.JSON;
+import com.hp.sh.expv3.pc.component.FeeRatioService;
+import com.hp.sh.expv3.pc.constant.Precision;
+import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
+import com.hp.sh.expv3.pc.strategy.vo.PosLevelVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.hp.sh.expv3.pc.component.FeeRatioService;
-import com.hp.sh.expv3.pc.constant.Precision;
-import com.hp.sh.expv3.pc.strategy.vo.PosLevelVo;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2019/12/18
@@ -21,7 +25,10 @@ import com.hp.sh.expv3.pc.strategy.vo.PosLevelVo;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class FeeRatioServiceImpl2 implements FeeRatioService {
-    private final String key ="pc_fee";
+    private final String key = "pc_fee";
+
+    @Autowired
+    private PcPositionDAO pcPositionDAO;
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
@@ -80,18 +87,16 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
     @Override
     public BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume) {
         HashOperations hashOperations = stringRedisTemplate.opsForHash();
-        List<Object> list = new ArrayList<>();
-        list.add(asset + "__" + symbol);
-        List<PosLevelVo> list1 = hashOperations.multiGet("pc_pos_level", list);
-        if (CollectionUtils.isEmpty(list1)) {
-            return BigDecimal.ZERO;
+        String hashKey = asset + "__" + symbol;
+        Object s = hashOperations.get("pc_pos_level", hashKey);
+        if (null != s) {
+            List<PosLevelVo> voList = JSON.parseArray(s.toString(), PosLevelVo.class);
+            List<BigDecimal> collect = voList.stream().filter(vo -> vo.getMinAmt().compareTo(volume) <= 0 && vo.getMaxAmt().compareTo(volume) >= 0)
+                    .map(PosLevelVo::getMinHoldMarginRatio).collect(Collectors.toList());
+            return collect.get(0);
         }
-        //   list1.stream().filter(vo -> vo.getMinAmt().compareTo(volume)<=0).filter(vo -> vo.getMaxAmt().compareTo(volume)>=0).map(PosLevelVo::getPosHoldMarginRatio).collect();
-        for (PosLevelVo vo : list1) {
-            if (vo.getMinAmt().compareTo(volume) <= 0 && vo.getMaxAmt().compareTo(volume) >= 0) {
-                return vo.getPosHoldMarginRatio();
-            }
-        }
+
+        
         return BigDecimal.ZERO;
     }
 
