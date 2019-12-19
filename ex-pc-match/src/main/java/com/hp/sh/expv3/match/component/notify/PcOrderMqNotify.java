@@ -7,6 +7,7 @@ package com.hp.sh.expv3.match.component.notify;
 import com.hp.sh.expv3.match.component.rocketmq.BasePcOrderProducer;
 import com.hp.sh.expv3.match.config.setting.PcmatchRocketMqSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
+import com.hp.sh.expv3.match.mqmsg.PcMatchOrderRebaseMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.PcMatchOrderSnapshotMqMsgDto;
 import com.hp.sh.expv3.match.util.JsonUtil;
 import com.hp.sh.expv3.match.util.PcRocketMqUtil;
@@ -62,7 +63,27 @@ public class PcOrderMqNotify {
         Message message = new Message(
                 topic,// topic
                 "" + RmqTagEnum.PC_MATCH_CONSUMER_START.getConstant(),// tag
-                "" + RmqTagEnum.PC_MATCH_CONSUMER_START.getConstant(),// tag
+                "" + RmqTagEnum.PC_MATCH_CONSUMER_START.getConstant(),// keys
+                JsonUtil.toJsonString(msg).getBytes()// body
+        );
+        safeSend2OrderTopic(message);
+        if (logger.isDebugEnabled()) {
+            logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+        }
+        return true;
+    }
+
+    public boolean sendPcOrderRebase(String asset, String symbol) {
+        String topic = PcRocketMqUtil.buildPcOrderTopicName(pcmatchRocketMqSetting.getPcOrderTopicNamePattern(), asset, symbol);
+
+        PcMatchOrderRebaseMqMsgDto msg = new PcMatchOrderRebaseMqMsgDto();
+        msg.setAsset(asset);
+        msg.setSymbol(symbol);
+
+        Message message = new Message(
+                topic,// topic
+                "" + RmqTagEnum.PC_ORDER_REBASE.getConstant(),// tag
+                "" + RmqTagEnum.PC_ORDER_REBASE.getConstant(),// keys
                 JsonUtil.toJsonString(msg).getBytes()// body
         );
         safeSend2OrderTopic(message);

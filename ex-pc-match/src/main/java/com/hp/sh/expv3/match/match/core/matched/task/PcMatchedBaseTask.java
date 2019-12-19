@@ -71,14 +71,14 @@ public abstract class PcMatchedBaseTask extends BaseTask {
     }
 
     @Autowired
-    private PcmatchRedisKeySetting pcmatchPcmatchRedisKeySetting;
+    private PcmatchRedisKeySetting pcmatchRedisKeySetting;
 
     @Autowired
     @Qualifier(PcmatchConst.MODULE_NAME + "RedisUtil")
     private RedisUtil pcRedisUtil;
 
     protected void updateSentMqOffset() {
-        String key = RedisKeyUtil.buildOrderSentMqOffsetRedisKeyPattern(pcmatchPcmatchRedisKeySetting.getPcOrderSentMqOffsetRedisKeyPattern(), this.getAsset(), this.getSymbol());
+        String key = RedisKeyUtil.buildOrderSentMqOffsetRedisKeyPattern(pcmatchRedisKeySetting.getPcOrderSentMqOffsetRedisKeyPattern(), this.getAsset(), this.getSymbol());
         pcRedisUtil.set(key, "" + this.getCurrentMsgOffset());
     }
 

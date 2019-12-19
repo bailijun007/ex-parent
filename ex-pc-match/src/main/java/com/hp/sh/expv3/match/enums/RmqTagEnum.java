@@ -36,6 +36,7 @@ public enum RmqTagEnum implements EnumDescribe {
     PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED(EventEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED.getCode(), EventEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED.getConstant()),
 
     PC_MATCH_CONSUMER_START(EventEnum.PC_MATCH_CONSUMER_START.getCode(), EventEnum.PC_MATCH_CONSUMER_START.getConstant()),
+    PC_ORDER_REBASE(-1, "PC_ORDER_REBASE"),
     //
     ;
 

@@ -24,4 +24,6 @@ public interface PcMatchTaskService {
 
     PcOrderSnapshotCreateTask buildOrderSnapshotTask(String assetSymbol, String asset, String symbol, long currentOffset);
 
+    PcOrderRebaseTask buildOrderRebaseTask(String assetSymbol, String asset, String symbol, long currentOffset);
+
 }
