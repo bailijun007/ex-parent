@@ -8,10 +8,12 @@
 		<result column="id" property="id" />
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
-		<result column="order_id" property="orderId" />
 		<result column="price" property="price" />
 		<result column="volume" property="volume" />
 		<result column="trade_sn" property="tradeSn" />
+		<result column="trade_id" property="tradeId" />
+		<result column="pos_id" property="posId" />
+		<result column="order_id" property="orderId" />
 		<result column="maker_flag" property="makerFlag" />
 		<result column="trade_time" property="tradeTime" />
 		<result column="fee_collector_id" property="feeCollectorId" />
@@ -24,7 +26,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,asset,symbol,order_id,price,volume,trade_sn,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,pnl,user_id,created,modified
+		id,asset,symbol,price,volume,trade_sn,trade_id,pos_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,pnl,user_id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -87,13 +89,6 @@
 		<include refid="simple_where" />
 	</select>
 
-    <select id="getFeeCollectorId" resultType="java.lang.Long">
-        SELECT fee_collector_id FROM pc_order_trade
-        WHERE user_id=#{userId}
-        and asset=#{asset}
-        and symbol=#{symbol}
-    </select>
-
 	<select id="findById" resultMap="PcOrderTrade">
 		select
 			<include refid="Base_Column_List" />
@@ -116,9 +111,9 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into pc_order_trade (
-			id,asset,symbol,order_id,price,volume,trade_sn,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,pnl,user_id,created,modified
+			id,asset,symbol,price,volume,trade_sn,trade_id,pos_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,pnl,user_id,created,modified
 		)values(
-			#{id},#{asset},#{symbol},#{orderId},#{price},#{volume},#{tradeSn},#{makerFlag},#{tradeTime},#{feeCollectorId},#{feeRatio},#{fee},#{pnl},#{userId},#{created},#{modified}
+			#{id},#{asset},#{symbol},#{price},#{volume},#{tradeSn},#{tradeId},#{posId},#{orderId},#{makerFlag},#{tradeTime},#{feeCollectorId},#{feeRatio},#{fee},#{pnl},#{userId},#{created},#{modified}
 		)
 	</insert>
 	
@@ -126,7 +121,7 @@
 		update 
 			pc_order_trade
 		set 
-			asset=#{asset},symbol=#{symbol},order_id=#{orderId},price=#{price},volume=#{volume},trade_sn=#{tradeSn},maker_flag=#{makerFlag},trade_time=#{tradeTime},fee_collector_id=#{feeCollectorId},fee_ratio=#{feeRatio},fee=#{fee},pnl=#{pnl},user_id=#{userId},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},price=#{price},volume=#{volume},trade_sn=#{tradeSn},trade_id=#{tradeId},pos_id=#{posId},order_id=#{orderId},maker_flag=#{makerFlag},trade_time=#{tradeTime},fee_collector_id=#{feeCollectorId},fee_ratio=#{feeRatio},fee=#{fee},pnl=#{pnl},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>

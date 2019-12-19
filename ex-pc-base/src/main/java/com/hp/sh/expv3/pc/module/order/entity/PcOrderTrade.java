@@ -23,9 +23,6 @@ public class PcOrderTrade extends UserDataEntity {
 	//合约交易品种
 	private String symbol;
 
-	//订单ID
-	private Long orderId;
-	
 	//成交价
 	private BigDecimal price;
 
@@ -34,6 +31,15 @@ public class PcOrderTrade extends UserDataEntity {
 
 	//交易序号
 	private String tradeSn;
+	
+	//交易ID
+	private Long tradeId;
+
+	//仓位ID
+	private Long posId;
+
+	//订单ID
+	private Long orderId;
 
 	// 1-marker， 0-taker
 	private Integer makerFlag;
@@ -154,6 +160,22 @@ public class PcOrderTrade extends UserDataEntity {
 
 	public void setPnl(BigDecimal pnl) {
 		this.pnl = pnl;
+	}
+
+	public Long getTradeId() {
+		return tradeId;
+	}
+
+	public void setTradeId(Long tradeId) {
+		this.tradeId = tradeId;
+	}
+
+	public Long getPosId() {
+		return posId;
+	}
+
+	public void setPosId(Long posId) {
+		this.posId = posId;
 	}
 
 	@Override

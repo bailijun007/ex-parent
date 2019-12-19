@@ -92,7 +92,9 @@ public class PcPosition extends UserDataEntity {
 
 	/**
 	 * 强平价，仓位为0时，表示最后一次仓位变动时的强平价
+	 * 可以实时算
 	 */
+    @Deprecated
 	private BigDecimal liqPrice;
 
 	// 触发强平的标记价格
