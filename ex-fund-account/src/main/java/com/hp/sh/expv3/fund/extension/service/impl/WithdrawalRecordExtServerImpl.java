@@ -35,7 +35,7 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
         List<WithdrawalRecordVo> list = withdrawalRecordExtMapper.queryHistory(userId, asset, queryId, pageSize, pageStatus);
 
         if (CollectionUtils.isEmpty(list)) {
-            throw new ExException(FundAccountExtErrorCode.DATA_EMPTY);
+           return list;
         }
         for (WithdrawalRecordVo historyVo : list) {
             Optional<WithdrawalRecordVo> vo = Optional.ofNullable(historyVo);
