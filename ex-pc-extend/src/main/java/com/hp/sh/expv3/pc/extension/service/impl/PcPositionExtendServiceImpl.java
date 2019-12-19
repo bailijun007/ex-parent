@@ -24,4 +24,16 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
         }
         return pcPositionDAO.getPosMargin(userId,asset);
     }
+
+	@Override
+	public BigDecimal getPl(Long userId, String asset, Long posId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BigDecimal getPlRatio(Long userId, String asset, Long posId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
