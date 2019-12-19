@@ -52,50 +52,25 @@ public class AABBPositionStrategy implements PositionStrategy {
 		TradeResult tradeResult = new TradeResult();
   
 		tradeResult.setVolume(matchedVo.getNumber());
+		tradeResult.setPrice(matchedVo.getPrice());
 		tradeResult.setAmount(tradeRatioAmt.getAmount());
-		tradeResult.setBaseValue(CompFieldCalc.calcBaseValue(tradeResult.getAmount(), matchedVo.getPrice()));
-		tradeResult.setOrderMargin(tradeRatioAmt.getOrderMargin());//保证金
+		tradeResult.setBaseValue(CompFieldCalc.calcBaseValue(tradeResult.getAmount(), tradeResult.getPrice()));
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		
 		//手续费&率
 		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN){
 			tradeResult.setFeeRatio(order.getOpenFeeRatio());
 			tradeResult.setFee(tradeRatioAmt.getOpenFee());
+			tradeResult.setOrderMargin(tradeRatioAmt.getOrderMargin());//保证金
 		}else{
 			BigDecimal closeFeeRatio = this.feeRatioService.getCloseFeeRatio(order.getUserId(), order.getAsset(), order.getSymbol());
 			BigDecimal closeFee = MarginFeeCalc.calcFee(tradeResult.getBaseValue(), closeFeeRatio);
 
 			tradeResult.setFeeRatio(closeFeeRatio);
 			tradeResult.setFee(closeFee);
-		}
-
-		//新的开仓均价
-		if(pcPosition!=null){
-			BigDecimal newMeanPrice = PcPriceCalc.calcEntryPrice(IntBool.isTrue(order.getLongFlag()), pcPosition.getBaseValue(), tradeResult.getAmount());
-			tradeResult.setNewMeanPrice(newMeanPrice);			
-		}else{
-			tradeResult.setNewMeanPrice(matchedVo.getPrice());
-		}
-
-		//收益
-		if(IntBool.isTrue(order.getCloseFlag()) && pcPosition!=null && BigUtils.gt(pcPosition.getMeanPrice(), BigDecimal.ZERO)){
-			BigDecimal pnl = PnlCalc.calcPnl(order.getLongFlag(), tradeRatioAmt.getAmount(), pcPosition.getMeanPrice(), matchedVo.getPrice());
-			tradeResult.setPnl(pnl);	
-		}else{
-			tradeResult.setPnl(BigDecimal.ZERO);
-		}
-		
-		//强平价
-		if(pcPosition!=null){
-			BigDecimal amount = pcPosition.getVolume().multiply(order.getFaceValue());
-			tradeResult.setLiqPrice(
-				this.calcLiqPrice(pcPosition.getLongFlag(), amount, tradeResult.getNewMeanPrice(), pcPosition.getHoldRatio(), pcPosition.getPosMargin())
-			);
-		}else{
-			BigDecimal holdRatio = feeRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), matchedVo.getNumber());
-			tradeResult.setLiqPrice(
-				this.calcLiqPrice(order.getLongFlag(), tradeResult.getAmount(), tradeResult.getNewMeanPrice(), holdRatio, tradeResult.getOrderMargin())
-			);
+			
+			BigDecimal orderMargin = CommonOrderStrategy.slope(tradeResult.getVolume(), pcPosition.getVolume(), pcPosition.getPosMargin());
+			tradeResult.setOrderMargin(orderMargin);
 		}
 		
 		//maker fee
@@ -107,6 +82,40 @@ public class AABBPositionStrategy implements PositionStrategy {
 			BigDecimal makerFeeRatio = feeRatioService.getMakerCloseFeeRatio(order.getUserId(), order.getAsset(), order.getSymbol());
 			tradeResult.setMakerFeeRatio(makerFeeRatio);
 			tradeResult.setMakerFee(orderStrategy.calcFee(tradeResult.getBaseValue(), makerFeeRatio));
+		}
+		
+		/* **************** 仓位累计数据 **************** */
+
+		//新的开仓均价
+		if(pcPosition!=null){
+			BigDecimal newPosBaseValue = pcPosition.getBaseValue().add(tradeResult.getBaseValue());
+			BigDecimal newPosVolume = pcPosition.getVolume().add(tradeResult.getVolume());
+			BigDecimal newPosAmount = CompFieldCalc.calcAmount(newPosVolume, this.metadataService.getFaceValue(pcPosition.getAsset(), pcPosition.getSymbol()));
+			BigDecimal newMeanPrice = PcPriceCalc.calcEntryPrice(IntBool.isTrue(pcPosition.getLongFlag()), newPosBaseValue, newPosAmount);
+			tradeResult.setNewPosMeanPrice(newMeanPrice);
+		}else{
+			tradeResult.setNewPosMeanPrice(tradeResult.getPrice());
+		}
+
+		//收益
+		if(IntBool.isTrue(order.getCloseFlag()) && pcPosition!=null && BigUtils.gt(pcPosition.getMeanPrice(), BigDecimal.ZERO)){
+			BigDecimal pnl = PnlCalc.calcPnl(order.getLongFlag(), tradeRatioAmt.getAmount(), pcPosition.getMeanPrice(), tradeResult.getPrice());
+			tradeResult.setPnl(pnl);	
+		}else{
+			tradeResult.setPnl(BigDecimal.ZERO);
+		}
+		
+		//强平价
+		if(pcPosition!=null){
+			BigDecimal amount = pcPosition.getVolume().multiply(order.getFaceValue());
+			tradeResult.setNewPosliqPrice(
+				this.calcLiqPrice(pcPosition.getLongFlag(), amount, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldRatio(), pcPosition.getPosMargin())
+			);
+		}else{
+			BigDecimal holdRatio = feeRatioService.getHoldRatio(order.getUserId(), order.getAsset(), order.getSymbol(), tradeResult.getVolume());
+			tradeResult.setNewPosliqPrice(
+				this.calcLiqPrice(order.getLongFlag(), tradeResult.getAmount(), tradeResult.getNewPosMeanPrice(), holdRatio, tradeResult.getOrderMargin())
+			);
 		}
 		
 		return tradeResult;

@@ -8,18 +8,18 @@ import java.math.BigDecimal;
  *
  */
 public class BigUtils {
-
+	
 	//是否负数
 	public static boolean ltZero(BigDecimal val){
 		return val.compareTo(BigDecimal.ZERO)<0;
 	}
 
-	//是否大于零
+	//大于零
 	public static boolean gtZero(BigDecimal val){
 		return val.compareTo(BigDecimal.ZERO)>0;
 	}
 	
-	//是否正数
+	//大于等于零
 	public static boolean geZero(BigDecimal val){
 		return val.compareTo(BigDecimal.ZERO)>=0;
 	}

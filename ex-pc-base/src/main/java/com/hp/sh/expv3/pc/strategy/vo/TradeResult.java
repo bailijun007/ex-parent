@@ -11,6 +11,8 @@ public class TradeResult {
 	
 	//此次成交的成交量
 	private BigDecimal volume;
+	//此次成交的成交价
+	private BigDecimal price;
 	//此次成交的成交金额
 	private BigDecimal amount;
 	//此次成交的成交合约价值
@@ -19,6 +21,10 @@ public class TradeResult {
 	private BigDecimal feeRatio ;
 	//此次成交的手续费
 	private BigDecimal fee;
+	//此次成交的maker手续费率
+	private BigDecimal makerFeeRatio;
+	//m此次成交的aker手续费
+	private BigDecimal makerFee;
 	//此次成交的保证金
 	private BigDecimal orderMargin;
 	//此次成交的盈亏（平仓才有）
@@ -27,17 +33,12 @@ public class TradeResult {
 	/* 以下为累计结果 */
 	
 	//新均价(此次成交后，仓位的均价)
-	private BigDecimal newMeanPrice;
+	private BigDecimal newPosMeanPrice;
 	//强平价(此次成交后，仓位的强平价)
-	private BigDecimal liqPrice;
+	private BigDecimal newPosliqPrice;
 	
 	//订单完成(此次成交后，对应订单已全部成交)
-	private boolean orderCompleted;
-	
-	//maker手续费率
-	private BigDecimal makerFeeRatio;
-	//maker手续费
-	private BigDecimal makerFee;
+	private boolean isOrderCompleted;
 	
 	public TradeResult() {
 		super();
@@ -57,6 +58,14 @@ public class TradeResult {
 			return makerFee;
 		}
 		return fee;
+	}
+
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
 	}
 
 	public BigDecimal getFeeRatio() {
@@ -115,28 +124,28 @@ public class TradeResult {
 		this.baseValue = baseValue;
 	}
 
-	public BigDecimal getNewMeanPrice() {
-		return newMeanPrice;
+	public BigDecimal getNewPosMeanPrice() {
+		return newPosMeanPrice;
 	}
 
-	public void setNewMeanPrice(BigDecimal newMeanPrice) {
-		this.newMeanPrice = newMeanPrice;
+	public void setNewPosMeanPrice(BigDecimal newMeanPrice) {
+		this.newPosMeanPrice = newMeanPrice;
 	}
 
-	public BigDecimal getLiqPrice() {
-		return liqPrice;
+	public BigDecimal getNewPosliqPrice() {
+		return newPosliqPrice;
 	}
 
-	public void setLiqPrice(BigDecimal liqPrice) {
-		this.liqPrice = liqPrice;
+	public void setNewPosliqPrice(BigDecimal liqPrice) {
+		this.newPosliqPrice = liqPrice;
 	}
 
-	public boolean isOrderCompleted() {
-		return orderCompleted;
+	public boolean getOrderCompleted() {
+		return isOrderCompleted;
 	}
 
 	public void setOrderCompleted(boolean completed) {
-		this.orderCompleted = completed;
+		this.isOrderCompleted = completed;
 	}
 
 	public BigDecimal getMakerFee() {
