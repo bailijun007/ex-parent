@@ -87,12 +87,6 @@
 		<include refid="simple_where" />
 	</select>
 
-    <select id="getFeeCollectorId" resultType="java.lang.Long">
-        SELECT fee_collector_id FROM pc_order_trade
-        WHERE user_id=#{userId}
-        and asset=#{asset}
-        and symbol=#{symbol}
-    </select>
 
 	<select id="findById" resultMap="PcOrderTrade">
 		select
