@@ -7,13 +7,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hp.sh.expv3.pc.extension.service.PcOrderCoreService;
-import com.hp.sh.expv3.pc.extension.service.PcPositionCoreService;
+import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
+import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountExtVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hp.sh.expv3.pc.extension.service.impl.PcAccountCoreServiceImpl;
+import com.hp.sh.expv3.pc.extension.service.impl.PcAccountExtendServiceImpl;
 
 /**
  * 永续合约账户核心接口
@@ -24,13 +24,13 @@ import com.hp.sh.expv3.pc.extension.service.impl.PcAccountCoreServiceImpl;
 public class PcAccountExtendApiAction implements PcAccountExtendApi {
 
     @Autowired
-    private PcAccountCoreServiceImpl pcAccountCoreService;
+    private PcAccountExtendServiceImpl pcAccountCoreService;
 
     @Autowired
-    private PcOrderCoreService pcOrderCoreService;
+    private PcOrderExtendService pcOrderCoreService;
 
     @Autowired
-    private PcPositionCoreService pcPositionCoreService;
+    private PcPositionExtendService pcPositionCoreService;
 
     @Override
     public BigDecimal getBalance(Long userId, String asset) {

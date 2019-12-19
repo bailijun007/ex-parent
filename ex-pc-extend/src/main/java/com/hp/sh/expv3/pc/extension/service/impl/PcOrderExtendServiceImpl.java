@@ -1,7 +1,7 @@
 package com.hp.sh.expv3.pc.extension.service.impl;
 
 import com.hp.sh.expv3.pc.extension.dao.PcOrderDAO;
-import com.hp.sh.expv3.pc.extension.service.PcOrderCoreService;
+import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  */
 @Service
 @Transactional(rollbackFor=Exception.class)
-public class PcOrderCoreServiceImpl implements PcOrderCoreService {
+public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     @Autowired
     private PcOrderDAO pcOrderDAO;
 

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 /**
  * @author BaiLiJun  on 2019/12/16
  */
-public interface PcAccountCoreService {
+public interface PcAccountExtendService {
     public BigDecimal getBalance(Long userId, String asset);
 
     public PcAccountExtVo findContractAccount(Long userId, String asset);

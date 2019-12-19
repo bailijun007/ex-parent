@@ -6,7 +6,7 @@ package com.hp.sh.expv3.pc.extension.service.impl;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import com.hp.sh.expv3.pc.extension.service.PcAccountCoreService;
+import com.hp.sh.expv3.pc.extension.service.PcAccountExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountExtVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +22,8 @@ import com.hp.sh.expv3.pc.module.account.entity.PcAccount;
  */
 @Service
 @Transactional(rollbackFor=Exception.class)
-public class PcAccountCoreServiceImpl implements PcAccountCoreService {
-	private static final Logger logger = LoggerFactory.getLogger(PcAccountCoreServiceImpl.class);
+public class PcAccountExtendServiceImpl implements PcAccountExtendService {
+	private static final Logger logger = LoggerFactory.getLogger(PcAccountExtendServiceImpl.class);
 
 	@Autowired
 	private PcAccountDAO pcAccountDAO;

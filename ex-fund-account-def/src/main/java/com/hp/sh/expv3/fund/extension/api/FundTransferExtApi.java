@@ -16,7 +16,7 @@ import java.util.List;
  * @author BaiLiJun  on 2019/12/16
  */
 @Api(tags = "资金划转扩展Api")
-@FeignClient(value = "ex-fund-transfer")
+@FeignClient(value = "ex-fund-account")
 public interface FundTransferExtApi {
 
     @ApiOperation("查询划转历史")

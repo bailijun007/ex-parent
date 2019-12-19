@@ -18,7 +18,7 @@ import java.util.List;
  * @author BaiLiJun  on 2019/12/16
  */
 @Api(tags = "提现记录扩展Api")
-@FeignClient(value = "ex-withdrawal-record")
+@FeignClient(value = "ex-fund-account")
 public interface WithdrawalRecordExtApi {
 
     @ApiOperation("获取充币历史")

@@ -96,6 +96,7 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
             return collect.get(0);
         }
 
+        
         return BigDecimal.ZERO;
     }
 
