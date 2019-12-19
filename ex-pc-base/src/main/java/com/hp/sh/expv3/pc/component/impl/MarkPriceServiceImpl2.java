@@ -5,6 +5,7 @@
 package com.hp.sh.expv3.pc.component.impl;
 
 import com.gitee.hupadev.commons.cache.Cache;
+import com.hp.sh.expv3.config.redis.RedisUtil;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -18,20 +19,22 @@ import java.math.BigDecimal;
 
 /**
  * 标记价格服务
- * @author wangjg
  *
+ * @author wangjg
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class MarkPriceServiceImpl2 implements MarkPriceService{
-
+public class MarkPriceServiceImpl2 implements MarkPriceService {
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisUtil redisUtil;
 
     @Override
     public BigDecimal getCurrentMarkPrice(String asset, String symbol) {
-
-        return null;
+        redisUtil.setDataBase(5);
+        StringRedisTemplate template = redisUtil.getRedisTemplate();
+        String key="markPrice:pc:current:";
+        String s = template.opsForValue().get(key+asset+":"+symbol);
+        return new BigDecimal(s);
     }
 
 }

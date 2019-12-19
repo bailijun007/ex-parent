@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.pc.component.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.hp.sh.expv3.config.redis.RedisUtil;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
@@ -28,10 +29,9 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
     private final String key = "pc_fee";
 
     @Autowired
-    private PcPositionDAO pcPositionDAO;
+    private RedisUtil redisUtil;
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+
 
     @Override
     public BigDecimal getInitedMarginRatio(BigDecimal leverage) {
@@ -50,8 +50,9 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
      */
     @Override
     public BigDecimal getOpenFeeRatio(long userId, String asset, String symbol) {
+        StringRedisTemplate template = getStringRedisTemplate();
         String prefix = "t_";
-        return findFeeRatio(userId, key, prefix);
+        return findFeeRatio(userId, key, prefix,template);
     }
 
     /**
@@ -66,8 +67,9 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
      */
     @Override
     public BigDecimal getCloseFeeRatio(long userId, String asset, String symbol) {
+        StringRedisTemplate template = getStringRedisTemplate();
         String prefix = "t_";
-        return findFeeRatio(userId, key, prefix);
+        return findFeeRatio(userId, key, prefix,template);
     }
 
 
@@ -86,7 +88,8 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
      */
     @Override
     public BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume) {
-        HashOperations hashOperations = stringRedisTemplate.opsForHash();
+        StringRedisTemplate template = getStringRedisTemplate();
+        HashOperations hashOperations = template.opsForHash();
         String hashKey = asset + "__" + symbol;
         Object s = hashOperations.get("pc_pos_level", hashKey);
         if (null != s) {
@@ -96,7 +99,7 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
             return collect.get(0);
         }
 
-        
+
         return BigDecimal.ZERO;
     }
 
@@ -112,8 +115,9 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
      */
     @Override
     public BigDecimal getMakerOpenFeeRatio(long userId, String asset, String symbol) {
+        StringRedisTemplate template = getStringRedisTemplate();
         String prefix = "m_";
-        return findFeeRatio(userId, key, prefix);
+        return findFeeRatio(userId, key, prefix,template);
     }
 
     /**
@@ -128,13 +132,19 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
      */
     @Override
     public BigDecimal getMakerCloseFeeRatio(long userId, String asset, String symbol) {
+        StringRedisTemplate template = getStringRedisTemplate();
         String prefix = "m_";
-        return findFeeRatio(userId, key, prefix);
+        return findFeeRatio(userId, key, prefix,template);
+    }
+
+    private StringRedisTemplate getStringRedisTemplate() {
+        redisUtil.setDataBase(0);
+        return redisUtil.getRedisTemplate();
     }
 
 
-    private BigDecimal findFeeRatio(long userId, String key, String prefix) {
-        HashOperations hashOperations = stringRedisTemplate.opsForHash();
+    private BigDecimal findFeeRatio(long userId, String key, String prefix,StringRedisTemplate template) {
+        HashOperations hashOperations = template.opsForHash();
         Object pcFee = hashOperations.get(key, prefix + userId);
         if (pcFee == null) {
             return BigDecimal.ZERO;
