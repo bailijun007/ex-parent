@@ -38,7 +38,9 @@ public class DbShardingAlgorithm implements PreciseShardingAlgorithm<Comparable<
 		if(value==null){
 			return 0;
 		}
-		int i = value.hashCode() % size;
+		int hc = value.hashCode();
+		hc = Math.abs(hc);
+		int i = hc % size;
 		return i;
 	}
 	
