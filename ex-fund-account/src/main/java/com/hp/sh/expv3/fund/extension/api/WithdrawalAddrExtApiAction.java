@@ -31,7 +31,7 @@ public class WithdrawalAddrExtApiAction implements  WithdrawalAddrExtApi{
 
         List<WithdrawalAddrVo> addrVoList = withdrawalAddrExtService.findWithdrawalAddr(param.getUserId(), param.getAsset());
         if(CollectionUtils.isEmpty(addrVoList)){
-            throw new ExException(WithdrawalAddressExtErrorCode.DATA_EMPTY);
+            return addrVoList;
         }
         //分页
         List<WithdrawalAddrVo> voList = addrVoList.stream().skip(param.getPageSize() * (param.getPageNo() - 1))
