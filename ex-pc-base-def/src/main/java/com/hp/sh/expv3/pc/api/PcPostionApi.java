@@ -19,10 +19,10 @@ public interface PcPostionApi {
 
 	@ApiOperation(value = "增加保证金")
 	@GetMapping(value = "/api/pc/position/margin/add")
-	void changeMargin(Long userId,String asset, String symbol, Integer longFlag, int optType, BigDecimal amount);
+	void changeMargin(Long userId,String asset, String symbol, Integer longFlag, Integer optType, BigDecimal amount);
 	
 	@ApiOperation(value = "修改杠杆")
 	@GetMapping(value = "/api/pc/position/leverage/change")
-	public boolean changeLeverage(long userId, String asset, String symbol, int marginMode, Integer longFlag, BigDecimal leverage);
+	public boolean changeLeverage(long userId, String asset, String symbol, Integer marginMode, Integer longFlag, BigDecimal leverage);
 	
 }
