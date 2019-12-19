@@ -1,22 +1,19 @@
 package com.hp.sh.expv3.pc.component.impl;
 
-import com.hp.sh.expv3.pc.component.FeeRatioService;
-import com.hp.sh.expv3.pc.constant.Precision;
-import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
-import com.hp.sh.expv3.pc.strategy.vo.PosLevelVo;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.hp.sh.expv3.pc.component.FeeRatioService;
+import com.hp.sh.expv3.pc.constant.Precision;
+import com.hp.sh.expv3.pc.strategy.vo.PosLevelVo;
 
 /**
  * @author BaiLiJun  on 2019/12/18
@@ -25,9 +22,6 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = Exception.class)
 public class FeeRatioServiceImpl2 implements FeeRatioService {
     private final String key ="pc_fee";
-
-    @Autowired
-    private PcPositionDAO pcPositionDAO;
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
