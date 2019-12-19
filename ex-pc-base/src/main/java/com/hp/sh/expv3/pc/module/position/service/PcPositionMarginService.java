@@ -134,9 +134,9 @@ public class PcPositionMarginService {
 
             /* 修改强平价 */
     		
-    		//重新计算强平价
-    		BigDecimal liqPrice = this.calcLiqPrice(pos.getAsset(), pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldRatio(), pos.getPosMargin());
-    		pos.setLiqPrice(liqPrice);
+//    		//重新计算强平价
+//    		BigDecimal liqPrice = this.calcLiqPrice(pos.getAsset(), pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldMarginRatio(), pos.getPosMargin());
+//    		pos.setLiqPrice(liqPrice);
             
             //修改杠杆值
             pos.setLeverage(leverage);
@@ -149,7 +149,7 @@ public class PcPositionMarginService {
 	}
 	
 	/*
-	 * 用 均价 标记价格 为实现盈亏计算 保证金
+	 * 用 均价 标记价格 未实现盈亏 计算 保证金
 	 * @param longFlag
 	 * @param leverage
 	 * @param amount
@@ -243,9 +243,9 @@ public class PcPositionMarginService {
 			pos.setPosMargin(pos.getPosMargin().subtract(amount));
 		}
 		
-		//重新计算强平价
-		BigDecimal liqPrice = this.calcLiqPrice(pos.getAsset(), pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldRatio(), pos.getPosMargin());
-		pos.setLiqPrice(liqPrice);
+//		//重新计算强平价
+//		BigDecimal liqPrice = this.calcLiqPrice(pos.getAsset(), pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldMarginRatio(), pos.getPosMargin());
+//		pos.setLiqPrice(liqPrice);
 		
 		//保存
 		this.pcPositionDAO.update(pos);

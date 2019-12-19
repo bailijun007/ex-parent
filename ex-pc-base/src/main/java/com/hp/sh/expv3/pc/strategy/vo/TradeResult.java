@@ -32,10 +32,13 @@ public class TradeResult {
 
 	/* 以下为累计结果 */
 	
+	//新仓位价值
+	private BigDecimal newPosBaseValue;
+	
 	//新均价(此次成交后，仓位的均价)
 	private BigDecimal newPosMeanPrice;
 	//强平价(此次成交后，仓位的强平价)
-	private BigDecimal newPosliqPrice;
+	private BigDecimal newPosLiqPrice;
 	
 	//订单完成(此次成交后，对应订单已全部成交)
 	private boolean isOrderCompleted;
@@ -108,14 +111,6 @@ public class TradeResult {
 		this.volume = volume;
 	}
 
-	public BigDecimal getAmount() {
-		return amount;
-	}
-
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
-	}
-
 	public BigDecimal getBaseValue() {
 		return baseValue;
 	}
@@ -132,12 +127,12 @@ public class TradeResult {
 		this.newPosMeanPrice = newMeanPrice;
 	}
 
-	public BigDecimal getNewPosliqPrice() {
-		return newPosliqPrice;
+	public BigDecimal getNewPosLiqPrice() {
+		return newPosLiqPrice;
 	}
 
-	public void setNewPosliqPrice(BigDecimal liqPrice) {
-		this.newPosliqPrice = liqPrice;
+	public void setNewPosLiqPrice(BigDecimal liqPrice) {
+		this.newPosLiqPrice = liqPrice;
 	}
 
 	public boolean getOrderCompleted() {
@@ -162,6 +157,22 @@ public class TradeResult {
 
 	public void setMakerFeeRatio(BigDecimal makerFeeRatio) {
 		this.makerFeeRatio = makerFeeRatio;
+	}
+
+	public BigDecimal getNewPosBaseValue() {
+		return newPosBaseValue;
+	}
+
+	public void setNewPosBaseValue(BigDecimal newPosBaseValue) {
+		this.newPosBaseValue = newPosBaseValue;
+	}
+
+	public BigDecimal getAmount() {
+		return amount;
+	}
+
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
 	}
 
 }

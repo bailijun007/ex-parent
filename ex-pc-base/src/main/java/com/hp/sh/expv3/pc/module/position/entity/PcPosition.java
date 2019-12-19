@@ -44,8 +44,11 @@ public class PcPosition extends UserDataEntity {
 	 */
 	private BigDecimal volume;
 	
+	// 面值(单位：报价货币)
+	private BigDecimal faceValue;
+	
 	/*
-	 * 仓位 基础货币 总价值
+	 * 仓位 基础货币 总价值（含义不明，不是用当前价格计算的）
 	 * posBaseValue  
 	 */
 	private BigDecimal baseValue;
@@ -78,9 +81,9 @@ public class PcPosition extends UserDataEntity {
 //  int _____________________________________________________;
 
 	/**
-     * 维持保证金比率
+     * 维持保证金率
      */
-    private BigDecimal holdRatio;
+    private BigDecimal holdMarginRatio;
     
     // 已扣手续费
     private BigDecimal feeCost;
@@ -89,13 +92,6 @@ public class PcPosition extends UserDataEntity {
     private BigDecimal realisedPnl;
 	
 	/****************** 强平 ****************/
-
-	/**
-	 * 强平价，仓位为0时，表示最后一次仓位变动时的强平价
-	 * 可以实时算
-	 */
-    @Deprecated
-	private BigDecimal liqPrice;
 
 	// 触发强平的标记价格
 	private BigDecimal liqMarkPrice;
@@ -217,20 +213,12 @@ public class PcPosition extends UserDataEntity {
 		this.posMargin = posMargin;
 	}
 
-	public BigDecimal getLiqPrice() {
-		return liqPrice;
+	public BigDecimal getHoldMarginRatio() {
+		return holdMarginRatio;
 	}
 
-	public void setLiqPrice(BigDecimal liqPrice) {
-		this.liqPrice = liqPrice;
-	}
-
-	public BigDecimal getHoldRatio() {
-		return holdRatio;
-	}
-
-	public void setHoldRatio(BigDecimal holdRatio) {
-		this.holdRatio = holdRatio;
+	public void setHoldMarginRatio(BigDecimal holdRatio) {
+		this.holdMarginRatio = holdRatio;
 	}
 
 	public BigDecimal getInitMargin() {
@@ -287,6 +275,14 @@ public class PcPosition extends UserDataEntity {
 
 	public void setAccuVolume(BigDecimal accuVolume) {
 		this.accuVolume = accuVolume;
+	}
+
+	public BigDecimal getFaceValue() {
+		return faceValue;
+	}
+
+	public void setFaceValue(BigDecimal faceValue) {
+		this.faceValue = faceValue;
 	}
 
 }

@@ -193,7 +193,7 @@ public class PcPositionService {
 		pcPosition.setEntryLeverage(entryLeverage);
 		pcPosition.setLeverage(entryLeverage);
 		pcPosition.setAutoAddFlag(IntBool.NO);
-		pcPosition.setHoldRatio(feeRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
+		pcPosition.setHoldMarginRatio(feeRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
 		Date now = new Date();
 		pcPosition.setCreated(now );
 		pcPosition.setModified(now);
@@ -207,8 +207,6 @@ public class PcPositionService {
 		pcPosition.setFeeCost(BigDecimal.ZERO);
 		
 		pcPosition.setRealisedPnl(BigDecimal.ZERO);
-		
-		pcPosition.setLiqPrice(BigDecimal.ZERO);
 		
 		pcPosition.setLiqMarkPrice(null);
 		pcPosition.setLiqMarkTime(null);
@@ -229,8 +227,6 @@ public class PcPositionService {
 		pcPosition.setMeanPrice(tradeResult.getNewPosMeanPrice());
 		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeResult.getOrderMargin()));
 		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeResult.getFeeReceivable()));
-		
-		pcPosition.setLiqPrice(tradeResult.getNewPosliqPrice());
 		
 		//累计量
 		pcPosition.setAccuVolume(pcPosition.getAccuVolume().add(tradeResult.getVolume()));
