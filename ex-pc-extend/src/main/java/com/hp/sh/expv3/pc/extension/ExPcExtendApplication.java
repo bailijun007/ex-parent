@@ -16,7 +16,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableFeignClients({"com.hp.sh.expv3"})
 @ComponentScan("com.hp.sh.expv3")
 @SpringBootApplication
-@EnableSwagger2
 public class ExPcExtendApplication {
 	private static final Logger logger = LoggerFactory.getLogger(ExPcExtendApplication.class);
 
