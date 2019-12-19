@@ -12,18 +12,18 @@ public class PosMarinJob {
     private static final Logger logger = LoggerFactory.getLogger(PosMarinJob.class);
     
 	/**
-	 * 处理已付款，未同步余额的记录
+	 * 
 	 */
 	@Scheduled(cron = "0 0/10 * * * ?")
-	public void handlePendingSynch() {
+	public void autoAddMargin() {
 		
 	}
 
 	/**
-	 * 处理已付款，未同步余额的记录
+	 * 自动增加保证金金
 	 */
     @MQListener(group="group1", topic = "topic1")
-	public void handleOnePendingSynch(Object msg) {
+	public void autoAddMargin(Object msg) {
 		
 	}
 
