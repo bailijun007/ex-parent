@@ -110,6 +110,9 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
             }
         }
 
+        // 先发消息，所以一定会有topic，那么在topic消失的时候，一定是rebase的
+        pcOrderMqNotify.sendMatchStart(this.getAsset(), this.getSymbol());
+
         PcmatchOrderRmqConsumerThread orderConsumer = this.applicationContext.getBean(PcmatchOrderRmqConsumerThread.class);
         orderConsumer.setAsset(this.getAsset());
         orderConsumer.setSymbol(this.getSymbol());
@@ -118,9 +121,6 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
         orderConsumer.setName("PcMatchConsumer_" + getAsset() + "__" + this.getSymbol());
         orderConsumer.start();
         setSentMqOffset(context, sentMqOffset);
-
-        pcOrderMqNotify.sendMatchStart(this.getAsset(), this.getSymbol());
-
     }
 
     private void setSentMqOffset(PcMatchHandlerContext context, long matchedMqOffset) {
@@ -128,7 +128,7 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
     }
 
     private long getSentMqOffset() {
-        String sentMqOffsetRedisKey = RedisKeyUtil.buildOrderSentMqOffsetRedisKeyPattern(pcmatchPcmatchRedisKeySetting.getPcOrderSentMqOffsetRedisKeyPattern(), this.getAsset(), this.getSymbol());
+        String sentMqOffsetRedisKey = RedisKeyUtil.buildOrderSentMqOffsetRedisKeyPattern(pcmatchRedisKeySetting.getPcOrderSentMqOffsetRedisKeyPattern(), this.getAsset(), this.getSymbol());
         long matchedMqOffset = -1L;
         if (pcRedisUtil.exists(sentMqOffsetRedisKey)) {
             String s = pcRedisUtil.get(sentMqOffsetRedisKey);
@@ -138,7 +138,7 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
     }
 
     @Autowired
-    private PcmatchRedisKeySetting pcmatchPcmatchRedisKeySetting;
+    private PcmatchRedisKeySetting pcmatchRedisKeySetting;
     @Autowired
     private PcOrderMqNotify pcOrderMqNotify;
 
@@ -148,7 +148,7 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
 
     void loadData(PcMatchHandlerContext context, long sentMqOffset) {
 
-        String snapshotRedisKey = RedisKeyUtil.buildPcOrderSnapshotRedisKey(pcmatchPcmatchRedisKeySetting.getPcOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
+        String snapshotRedisKey = RedisKeyUtil.buildPcOrderSnapshotRedisKey(pcmatchRedisKeySetting.getPcOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
 
         boolean exists = pcRedisUtil.exists(snapshotRedisKey);
         if (exists) {

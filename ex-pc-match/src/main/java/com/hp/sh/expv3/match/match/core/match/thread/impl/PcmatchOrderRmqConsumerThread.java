@@ -6,6 +6,7 @@ package com.hp.sh.expv3.match.match.core.match.thread.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
+import com.hp.sh.expv3.match.component.notify.PcOrderMqNotify;
 import com.hp.sh.expv3.match.config.setting.PcmatchRocketMqSetting;
 import com.hp.sh.expv3.match.config.setting.RocketMqSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
@@ -25,6 +26,7 @@ import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.message.MessageQueue;
+import org.apache.rocketmq.common.protocol.ResponseCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,7 +139,6 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
 
         try {
 
-            Set<MessageQueue> mqs = new HashSet<>();
 
             Map<String, String> topic2AssetSymbol = new HashMap<>();
 
@@ -145,30 +146,7 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
             Tuple2<String, String> assetSymbolTuple = PcUtil.splitAssetAndSymbol(assetSymbol);
             String topicName = PcRocketMqUtil.buildPcOrderTopicName(pcmatchRocketMqSetting.getPcOrderTopicNamePattern(), assetSymbolTuple.first, assetSymbolTuple.second);
 
-            while (true) {
-                try {
-                    Set<MessageQueue> qs = consumer.fetchSubscribeMessageQueues(topicName);
-                    if (qs.size() > 1) {
-                        logger.error("rmq topic " + topicName + " config more than 1 queue");
-                        System.exit(-1);
-                    } else {
-                        mqs.addAll(qs);
-                        break;
-                    }
-                } catch (MQClientException e) {
-
-                    if (e.getCause() instanceof MQClientException) {
-                        MQClientException o = (MQClientException) e.getCause();
-                        if (o.getResponseCode() == 17) {
-                            logger.warn("wait topic {} created at namespace:{} for {} {}.", topicName, rocketMqSetting.getNameSpace(), consumerGroup, instanceName);
-                            Thread.sleep(5000L);
-                            continue;
-                        }
-                    }
-                    logger.error(e.getErrorMessage(), e);
-                    System.exit(-1);
-                }
-            }
+            Set<MessageQueue> mqs = getMqs(consumer, topicName);
             topic2Offset.put(topicName, initOffset);
             topic2AssetSymbol.put(topicName, assetSymbol);
 
@@ -190,7 +168,8 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                                         RmqTagEnum.PC_ORDER_PENDING_CANCEL.getConstant(),
                                         RmqTagEnum.PC_MATCH_ORDER_SNAPSHOT_CREATE.getConstant(),
                                         RmqTagEnum.PC_ORDER_PENDING_NEW.getConstant(),
-                                        RmqTagEnum.PC_POS_LIQ_LOCKED.getConstant()
+                                        RmqTagEnum.PC_POS_LIQ_LOCKED.getConstant(),
+                                        RmqTagEnum.PC_ORDER_REBASE.getConstant()
                                 ),
                                 topic2Offset.get(topicName),
                                 1024);
@@ -201,7 +180,7 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                             topic2Offset.put(topicName, pullResult.getNextBeginOffset());
                             try {
                                 Thread.sleep(10L);
-                            } catch (InterruptedException e) {
+                            } catch (InterruptedException e) {// catched ?
                                 e.printStackTrace();
                             }
                         } else {
@@ -234,16 +213,17 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                                     task.setCurrentMsgOffset(m.getQueueOffset());
                                     matchWorker.addTask(task);
                                 } else if (RmqTagEnum.PC_BOOK_RESET.getConstant().equals(m.getTags())) {
-//                                    BookResetMqMsgDto dto = JSON.parseObject(body, BookResetMqMsgDto.class);
                                     task = pcMatchTaskService.buildPcOrderBookReset(assetSymbol, asset, symbol, queueOffset);
                                     matchWorker.addTask(task);
                                 } else if (RmqTagEnum.PC_MATCH_ORDER_SNAPSHOT_CREATE.getConstant().equals(m.getTags())) {
-//                                    PcOrderSnapshotCreateDto dto = JSON.parseObject(body, PcOrderSnapshotCreateDto.class);
                                     task = pcMatchTaskService.buildOrderSnapshotTask(assetSymbol, asset, symbol, queueOffset);
                                     matchWorker.addTask(task);
                                 } else if (RmqTagEnum.PC_POS_LIQ_LOCKED.getConstant().equals(m.getTags())) {
                                     PcPosLockedMqMsgDto dto = JSON.parseObject(body, PcPosLockedMqMsgDto.class);
                                     task = pcMatchTaskService.buildPcOrderCancelByLiqTask(assetSymbol, asset, symbol, queueOffset, dto);
+                                    matchWorker.addTask(task);
+                                } else if (RmqTagEnum.PC_ORDER_REBASE.getConstant().equals(m.getTags())) {
+                                    task = pcMatchTaskService.buildOrderRebaseTask(assetSymbol, asset, symbol, queueOffset);
                                     matchWorker.addTask(task);
                                 } else {
                                     logger.error("get tags {} not define,go to exit -1", m.getTags());
@@ -257,8 +237,14 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                             }
                         }
                     } catch (MQBrokerException e) {
-                        logger.error(e.getErrorMessage());
-                        Thread.sleep(1000L);
+                        if (e.getResponseCode() == ResponseCode.TOPIC_NOT_EXIST) {
+                            logger.warn("{} deleted.rebase ", assetSymbolTuple);
+                            pcOrderMqNotify.sendPcOrderRebase(asset, symbol);
+                            mqs = getMqs(consumer, topicName);
+                        } else {
+                            logger.error(e.getErrorMessage());
+                            Thread.sleep(1000L);
+                        }
                     }
                 }
             }
@@ -269,5 +255,38 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
         isStart.set(false);
     }
 
+    @Autowired
+    private PcOrderMqNotify pcOrderMqNotify;
+
+    protected Set<MessageQueue> getMqs(DefaultMQPullConsumer consumer, String topicName) {
+
+        Set<MessageQueue> mqs = new HashSet<>();
+        while (true) {
+            try {
+                Set<MessageQueue> qs = consumer.fetchSubscribeMessageQueues(topicName);
+                if (qs.size() > 1) {
+                    logger.error("rmq topic " + topicName + " config more than 1 queue");
+                    System.exit(-1);
+                } else {
+                    mqs.addAll(qs);
+                    break;
+                }
+            } catch (MQClientException e) {
+                if (e.getCause() instanceof MQClientException) {
+                    MQClientException o = (MQClientException) e.getCause();
+                    if (o.getResponseCode() == ResponseCode.TOPIC_NOT_EXIST) {
+                        try {
+                            Thread.sleep(1000L);
+                        } catch (InterruptedException e1) {
+                        }
+                        continue;
+                    }
+                }
+                logger.error(e.getErrorMessage(), e);
+                System.exit(-1);
+            }
+        }
+        return mqs;
+    }
 
 }
