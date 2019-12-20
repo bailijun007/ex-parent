@@ -23,6 +23,16 @@ public class FundAccountCoreApiAction implements FundAccountCoreApi{
 	private FundAccountCoreService fundAccountCoreService;
 
 	@Override
+	public Boolean accountExist(Long userId, String asset) {
+		return fundAccountCoreService.accountExist(userId, asset);
+	}
+
+	@Override
+	public int createAccount(Long userId, String asset) {
+		return fundAccountCoreService.createAccount(userId, asset);
+	}
+
+	@Override
 	public void add(FundAddRequest request) {
 		fundAccountCoreService.add(request);
 	}
@@ -35,11 +45,6 @@ public class FundAccountCoreApiAction implements FundAccountCoreApi{
 	@Override
 	public Boolean checkTradNo(Long userId, String tradeNo) {
 		return fundAccountCoreService.checkTradNo(userId, tradeNo);
-	}
-
-	@Override
-	public int createAccount(Long userId, String asset) {
-		return fundAccountCoreService.createAccount(userId, asset);
 	}
 
 	@Override

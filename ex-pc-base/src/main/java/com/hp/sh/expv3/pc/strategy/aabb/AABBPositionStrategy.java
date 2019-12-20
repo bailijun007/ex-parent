@@ -92,8 +92,8 @@ public class AABBPositionStrategy implements PositionStrategy {
 			BigDecimal newPosBaseValue = (order.getCloseFlag() == OrderFlag.ACTION_OPEN)
 					? pcPosition.getBaseValue().add(tradeResult.getBaseValue())
 					: pcPosition.getBaseValue().subtract(tradeResult.getBaseValue());
-			BigDecimal newPosVolume = pcPosition.getVolume().add(tradeResult.getVolume());
-			BigDecimal newPosAmount = CompFieldCalc.calcAmount(newPosVolume, this.metadataService.getFaceValue(pcPosition.getAsset(), pcPosition.getSymbol()));
+			BigDecimal _newPosVolume = pcPosition.getVolume().add(tradeResult.getVolume());//当前张数
+			BigDecimal newPosAmount = CompFieldCalc.calcAmount(_newPosVolume, faceValue); //当前金额
 			BigDecimal newMeanPrice = PcPriceCalc.calcEntryPrice(IntBool.isTrue(pcPosition.getLongFlag()), newPosBaseValue, newPosAmount);
 			tradeResult.setNewPosMeanPrice(newMeanPrice);
 		}else{
