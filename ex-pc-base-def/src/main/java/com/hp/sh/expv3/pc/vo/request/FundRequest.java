@@ -32,6 +32,9 @@ public class FundRequest {
 	
 	@ApiModelProperty(value = "关联对象ID")
 	private Long associatedId;
+	
+	@ApiModelProperty(value = "不如余额不足，扣全部", hidden=true)
+	private boolean whole;
 		
 	public FundRequest() {
 	}

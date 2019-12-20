@@ -22,7 +22,7 @@ import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
- * 
+ * 成交计算策略
  * @author wangjg
  *
  */
@@ -108,7 +108,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 			tradeResult.setNewPosMeanPrice(tradeResult.getPrice());
 		}
 
-		//收益
+		//此笔成交收益
 		if(IntBool.isTrue(closeFlag) && pcPosition!=null && BigUtils.gt(pcPosition.getMeanPrice(), BigDecimal.ZERO)){
 			BigDecimal pnl = PnlCalc.calcPnl(longFlag, tradeRatioAmt.getAmount(), pcPosition.getMeanPrice(), tradeResult.getPrice());
 			tradeResult.setPnl(pnl);	
