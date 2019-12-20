@@ -31,13 +31,29 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
             throw new ExException(WithdrawalRecordExtErrorCode.PARAM_EMPTY);
         }
 
+        List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, queryId, pageSize, pageStatus);
+
+        return voList;
+    }
+
+    @Override
+    public List<WithdrawalRecordVo> queryAllUserHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
+        if (userId == null || pageSize == null ) {
+            throw new ExException(WithdrawalRecordExtErrorCode.PARAM_EMPTY);
+        }
+
+        List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, queryId, pageSize, pageStatus);
+
+        return voList;
+    }
+
+    private List<WithdrawalRecordVo> getWithdrawalRecordVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         List<WithdrawalRecordVo> voList = withdrawalRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
 
         String addr = withdrawalAddrExtService.getAddressByUserIdAndAsset(userId, asset);
         for (WithdrawalRecordVo vo : voList) {
             vo.setTargetAddress(addr);
         }
-
         return voList;
     }
 }

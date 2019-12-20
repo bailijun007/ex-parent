@@ -33,15 +33,27 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi{
                                                      @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
                                                      @RequestParam(value = "pageStatus") Integer pageStatus) {
 
-        if (userId == null || pageSize == null ) {
+        List<DepositRecordHistoryVo> list = getDepositRecordHistoryVos(userId, asset, queryId, pageSize, pageStatus);
+
+        return list;
+    }
+
+    @Override
+    public List<DepositRecordHistoryVo> queryAllUserHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
+        List<DepositRecordHistoryVo> list = getDepositRecordHistoryVos(userId, asset, queryId, pageSize, pageStatus);
+
+        return list;
+    }
+
+    private List<DepositRecordHistoryVo> getDepositRecordHistoryVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
+        if (userId == null || pageSize == null) {
             throw new ExException(DepositRecordExtErrorCode.PARAM_EMPTY);
         }
-        List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize,pageStatus);
+        List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
         String addr = depositAddrExtService.getAddressByUserIdAndAsset(userId, asset);
         for (DepositRecordHistoryVo historyVo : list) {
             historyVo.setAddress(addr);
         }
-
         return list;
     }
 

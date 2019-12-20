@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.Precision;
+import com.hp.sh.expv3.pc.constant.RedisKey;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.strategy.vo.PosLevelVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class FeeRatioServiceImpl2 implements FeeRatioService {
-    private final String key = "pc_fee";
 
     @Autowired
     private RedisUtil redisUtil;
@@ -51,8 +51,7 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
     @Override
     public BigDecimal getOpenFeeRatio(long userId, String asset, String symbol) {
         StringRedisTemplate template = getStringRedisTemplate();
-        String prefix = "t_";
-        return findFeeRatio(userId, key, prefix,template);
+        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.PREFIX_T,template);
     }
 
     /**
@@ -68,8 +67,7 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
     @Override
     public BigDecimal getCloseFeeRatio(long userId, String asset, String symbol) {
         StringRedisTemplate template = getStringRedisTemplate();
-        String prefix = "t_";
-        return findFeeRatio(userId, key, prefix,template);
+        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.PREFIX_T,template);
     }
 
 
@@ -91,7 +89,7 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
         StringRedisTemplate template = getStringRedisTemplate();
         HashOperations hashOperations = template.opsForHash();
         String hashKey = asset + "__" + symbol;
-        Object s = hashOperations.get("pc_pos_level", hashKey);
+        Object s = hashOperations.get(RedisKey.PC_POS_LEVEL, hashKey);
         if (null != s) {
             List<PosLevelVo> voList = JSON.parseArray(s.toString(), PosLevelVo.class);
             List<BigDecimal> collect = voList.stream().filter(vo -> vo.getMinAmt().compareTo(volume) <= 0 && vo.getMaxAmt().compareTo(volume) >= 0)
@@ -116,8 +114,7 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
     @Override
     public BigDecimal getMakerOpenFeeRatio(long userId, String asset, String symbol) {
         StringRedisTemplate template = getStringRedisTemplate();
-        String prefix = "m_";
-        return findFeeRatio(userId, key, prefix,template);
+        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.PREFIX_M,template);
     }
 
     /**
@@ -133,8 +130,7 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
     @Override
     public BigDecimal getMakerCloseFeeRatio(long userId, String asset, String symbol) {
         StringRedisTemplate template = getStringRedisTemplate();
-        String prefix = "m_";
-        return findFeeRatio(userId, key, prefix,template);
+        return findFeeRatio(userId, RedisKey.PC_FEE,  RedisKey.PREFIX_M,template);
     }
 
     private StringRedisTemplate getStringRedisTemplate() {
