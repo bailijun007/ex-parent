@@ -23,16 +23,17 @@ public class WithdrawalAddrExtServiceImpl implements WithdrawalAddrExtService {
     private WithdrawalAddrExtMapper withdrawalAddrExtMapper;
 
     @Override
-    public String getAddressByUserIdAndAsset(Long userId, String asset) {
+    public List<WithdrawalAddrVo> getAddressByUserIdAndAsset(Long userId, String asset) {
+        List<WithdrawalAddrVo> voList = withdrawalAddrExtMapper.getAddressByUserIdAndAsset(userId, asset);
+        return voList;
 
-        return withdrawalAddrExtMapper.getAddressByUserIdAndAsset(userId, asset);
     }
 
     @Override
     public List<WithdrawalAddrVo> findWithdrawalAddr(Long userId, String asset) {
         Map<String, Object> map = new HashMap<>();
-        map.put("userId",userId);
-        map.put("asset",asset);
+        map.put("userId", userId);
+        map.put("asset", asset);
         List<WithdrawalAddrVo> voList = withdrawalAddrExtMapper.findWithdrawalAddr(map);
         return voList;
     }

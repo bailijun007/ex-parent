@@ -13,7 +13,7 @@ import java.util.Map;
 public interface WithdrawalAddrExtMapper {
 
 
-    String getAddressByUserIdAndAsset(@Param("userId") Long userId, @Param("asset")String asset);
+    List<WithdrawalAddrVo> getAddressByUserIdAndAsset(@Param("userId") Long userId, @Param("asset")String asset);
 
     List<WithdrawalAddrVo> findWithdrawalAddr( Map<String, Object> map);
 }

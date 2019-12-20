@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author BaiLiJun  on 2019/12/16
@@ -21,6 +22,51 @@ public class WithdrawalAddrVo implements Serializable {
 
     @ApiModelProperty("备注")
     private String remark;
+
+
+    private Integer enabled;
+
+
+    private Long userId;
+
+
+    private Date created;
+
+
+    private Date modified;
+
+
+    public Integer getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Integer enabled) {
+        this.enabled = enabled;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public Date getModified() {
+        return modified;
+    }
+
+    public void setModified(Date modified) {
+        this.modified = modified;
+    }
 
     public Long getId() {
         return id;
