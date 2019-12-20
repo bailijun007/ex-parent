@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO">
+
+    <select id="getPl" resultType="java.math.BigDecimal">
+      select IFNULL(sum(pnl),0)  from pc_order_trade
+      where pos_id = #{posId}
+      and asset = #{asset}
+      and user_id = #{userId}
+    </select>
+
+</mapper>
