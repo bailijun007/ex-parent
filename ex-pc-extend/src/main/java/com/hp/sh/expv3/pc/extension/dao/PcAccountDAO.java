@@ -1,6 +1,7 @@
 
 package com.hp.sh.expv3.pc.extension.dao;
 
+import com.hp.sh.expv3.pc.extension.vo.PcAccountVo;
 import org.apache.ibatis.annotations.Param;
 
 import com.hp.sh.expv3.pc.module.account.entity.PcAccount;
@@ -15,11 +16,11 @@ import java.util.Map;
  */
 public interface PcAccountDAO {
 	
-	public PcAccount get(@Param("userId") Long userId, @Param("asset") String asset);
+	public PcAccountVo get(@Param("userId") Long userId, @Param("asset") String asset);
 
-    public List<PcAccount> queryList(Map<String,Object> params);
+    public List<PcAccountVo> queryList(Map<String,Object> params);
 
-    public PcAccount queryOne(Map<String,Object> params);
+    public PcAccountVo queryOne(Map<String,Object> params);
 
 
 }

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import com.hp.sh.expv3.pc.extension.service.PcAccountExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountExtVo;
+import com.hp.sh.expv3.pc.extension.vo.PcAccountVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,8 @@ public class PcAccountExtendServiceImpl implements PcAccountExtendService {
 
 	@Override
     public BigDecimal getBalance(Long userId, String asset){
-		PcAccount fa = this.pcAccountDAO.get(userId, asset);
-		if(fa==null){
+        PcAccountVo fa = this.pcAccountDAO.get(userId, asset);
+        if(fa==null){
 			return null;
 		}
 		return fa.getBalance();
@@ -40,8 +41,8 @@ public class PcAccountExtendServiceImpl implements PcAccountExtendService {
     @Override
     public PcAccountExtVo findContractAccount(Long userId, String asset) {
         PcAccountExtVo vo=new PcAccountExtVo();
-        PcAccount pcAccount = pcAccountDAO.get(userId, asset);
-        Optional<PcAccount> optional = Optional.ofNullable(pcAccount);
+        PcAccountVo pcAccount = pcAccountDAO.get(userId, asset);
+        Optional<PcAccountVo> optional = Optional.ofNullable(pcAccount);
         vo.setAccountId(optional.map(u->u.getUserId()).orElse(null));
         vo.setAsset(optional.map(a->a.getAsset()).orElse(null));
         vo.setAvailable(optional.map(a->a.getBalance()).orElse(BigDecimal.ZERO));

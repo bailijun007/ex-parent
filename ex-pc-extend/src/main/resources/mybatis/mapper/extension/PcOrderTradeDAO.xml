@@ -3,11 +3,91 @@
 
 <mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO">
 
+    <resultMap type="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo" id="PcOrderTradeVo">
+        <result column="id" property="id" />
+        <result column="asset" property="asset" />
+        <result column="symbol" property="symbol" />
+        <result column="order_id" property="orderId" />
+        <result column="price" property="price" />
+        <result column="volume" property="volume" />
+        <result column="trade_sn" property="tradeSn" />
+        <result column="trade_id" property="tradeId" />
+        <result column="pos_id" property="posId" />
+        <result column="maker_flag" property="makerFlag" />
+        <result column="trade_time" property="tradeTime" />
+        <result column="fee_collector_id" property="feeCollectorId" />
+        <result column="fee_ratio" property="feeRatio" />
+        <result column="fee" property="fee" />
+        <result column="pnl" property="pnl" />
+        <result column="user_id" property="userId" />
+        <result column="created" property="created" />
+        <result column="modified" property="modified" />
+    </resultMap>
+
+    <sql id="simple_where">
+        where 1=1
+        <if test="idList!=null">and id in
+            <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                #{idList[${i}]}
+            </foreach>
+        </if>
+        <if test="userIdList!=null">and user_id in
+            <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                #{userIdList[${i}]}
+            </foreach>
+        </if>
+        <if test="assetList!=null">and asset in
+            <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                #{assetList[${i}]}
+            </foreach>
+        </if>
+        <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+        <if test="orderId!=null">and order_id=#{orderId}</if>
+        <if test="price!=null">and price=#{price}</if>
+        <if test="volume!=null">and volume=#{volume}</if>
+        <if test="tradeSn!=null and tradeSn!=''">and trade_sn=#{tradeSn}</if>
+        <if test="tradeId!=null">and trade_id=#{tradeId}</if>
+        <if test="posId!=null">and pos_id=#{posId}</if>
+        <if test="makerFlag!=null">and maker_flag=#{makerFlag}</if>
+        <if test="tradeTime!=null">and trade_time=#{tradeTime}</if>
+        <if test="feeCollectorId!=null">and fee_collector_id=#{feeCollectorId}</if>
+        <if test="feeRatio!=null">and fee_ratio=#{feeRatio}</if>
+        <if test="fee!=null">and fee=#{fee}</if>
+        <if test="pnl!=null">and pnl=#{pnl}</if>
+        <if test="userId!=null">and user_id=#{userId}</if>
+        <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
+        <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
+        <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
+        <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>if>
+    </sql>
+
+    <sql id="Base_Column_List" >
+		id,asset,symbol,order_id,price,volume,trade_sn,trade_id,pos_id,maker_flag,trade_time,fee_collector_id,
+		fee_ratio,fee,pnl,user_id,created,modified
+	</sql>
+
+
     <select id="getPl" resultType="java.math.BigDecimal">
       select IFNULL(sum(pnl),0)  from pc_order_trade
       where pos_id = #{posId}
       and asset = #{asset}
       and user_id = #{userId}
     </select>
+
+
+    <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+      select
+      <include refid="Base_Column_List"/>
+        from pc_order_trade
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order_trade
+        <include refid="simple_where"/>
+    </select>
+
 
 </mapper>

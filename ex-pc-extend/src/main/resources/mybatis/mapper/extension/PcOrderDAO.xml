@@ -3,7 +3,7 @@
 
 <mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcOrderDAO">
 
-    <resultMap type="com.hp.sh.expv3.pc.module.order.entity.PcOrder" id="PcOrder">
+    <resultMap type="com.hp.sh.expv3.pc.extension.vo.PcOrderVo" id="PcOrderVo">
         <result column="id" property="id" />
         <result column="asset" property="asset" />
         <result column="symbol" property="symbol" />
@@ -90,8 +90,14 @@
         <if test="closePosId!=null">and close_pos_id=#{closePosId}</if>
         <if test="timeInForce!=null">and time_in_force=#{timeInForce}</if>
         <if test="triggerFlag!=null">and trigger_flag=#{triggerFlag}</if>
-
-
+        <if test="cancelTime!=null">and cancel_time=#{cancelTime}</if>
+        <if test="visibleFlag!=null">and visible_flag=#{visibleFlag}</if>
+        <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
+        <if test="createOperator!=null and createOperator！=''">and create_operator=#{createOperator}</if>
+        <if test="cancelOperator!=null and cancelOperator！=''">and cancel_operator=#{cancelOperator}</if>
+        <if test="remark!=null and remark！=''">and remark=#{remark}</if>
+        <if test="clientOrderId!=null and clientOrderId！=''">and client_order_id=#{clientOrderId}</if>
+        <if test="userId!=null">and user_id=#{userId}</if>
         <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
         <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
         <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
@@ -113,7 +119,13 @@
         and asset=#{asset}
     </select>
 
-    <select id="queryOne" resultType="PcOrder">
+    <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
+        select <include refid="Base_Column_List"/>
+        from pc_order
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
         select <include refid="Base_Column_List"/>
         from pc_order
         <include refid="simple_where"/>

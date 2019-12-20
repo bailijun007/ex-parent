@@ -1,9 +1,11 @@
 package com.hp.sh.expv3.pc.extension.dao;
 
+import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,6 +15,8 @@ public interface PcOrderDAO {
 
     BigDecimal getGrossMargin(@Param("userId") Long userId,@Param("asset") String asset);
 
-    PcOrder queryOne( Map<String,Object> map);
+    PcOrderVo queryOne(Map<String,Object> map);
+
+    List<PcOrderVo> queryList(Map<String,Object> map);
 
 }

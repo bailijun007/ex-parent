@@ -3,7 +3,7 @@
 
 <mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcAccountDAO">
 
-	<resultMap type="com.hp.sh.expv3.pc.module.account.entity.PcAccount" id="PcAccount">
+	<resultMap type="com.hp.sh.expv3.pc.extension.vo.PcAccountVo" id="PcAccountVo">
 		<result column="asset" property="asset" />
 		<result column="balance" property="balance" />
 		<result column="version" property="version" />
@@ -36,21 +36,21 @@
 		asset,balance,version,user_id,created,modified
 	</sql>
 
-	<select id="get" resultMap="PcAccount">
+	<select id="get" resultMap="PcAccountVo">
 		select
 			<include refid="Base_Column_List" />
 		from pc_account
 			where user_id=#{userId} and asset=#{asset}
 	</select>
 
-    <select id="queryList" resultMap="PcAccount">
+    <select id="queryList" resultMap="PcAccountVo">
         select
         <include refid="Base_Column_List" />
         from pc_account
         <include refid="simple_where"/>
     </select>
 
-    <select id="queryOne" resultMap="PcAccount">
+    <select id="queryOne" resultMap="PcAccountVo">
         select
         <include refid="Base_Column_List" />
         from pc_account
