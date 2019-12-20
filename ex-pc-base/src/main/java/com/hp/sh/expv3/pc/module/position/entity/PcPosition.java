@@ -48,7 +48,7 @@ public class PcPosition extends UserDataEntity {
 	private BigDecimal faceValue;
 	
 	/*
-	 * 仓位 基础货币 总价值（含义不明，不是           用当前价格计算的）
+	 * 仓位 基础货币 总价值（含义不明，不是 用当前价格计算的）（按均价计算的仓位价值）
 	 * posBaseValue  
 	 */
 	private BigDecimal baseValue;

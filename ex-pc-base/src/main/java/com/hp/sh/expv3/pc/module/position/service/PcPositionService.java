@@ -75,7 +75,7 @@ public class PcPositionService {
 		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
-		TradeResult tradeResult = this.positionStrategy.getTradeResult(order, matchedVo, pcPosition);
+		TradeResult tradeResult = this.positionStrategy.getTradeResult(matchedVo, order, pcPosition);
 		
 		//如果仓位不存在则创建新仓位
 		boolean isNewPos = false;

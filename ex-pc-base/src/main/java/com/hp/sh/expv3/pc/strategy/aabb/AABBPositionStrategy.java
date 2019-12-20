@@ -46,7 +46,10 @@ public class AABBPositionStrategy implements PositionStrategy {
 	 * @param pcPosition
 	 * @return
 	 */
-	public TradeResult getTradeResult(PcOrder order, PcTradeMsg matchedVo, PcPosition pcPosition){
+	public TradeResult getTradeResult(PcTradeMsg matchedVo, PcOrder order, PcPosition pcPosition){
+		String asset = pcPosition.getAsset();
+		String symbol = pcPosition.getSymbol();
+		
 		OrderRatioData tradeRatioAmt = orderStrategy.calcRaitoAmt(order, matchedVo.getNumber());
 		
 		BigDecimal faceValue = this.metadataService.getFaceValue(order.getAsset(), order.getSymbol());
@@ -87,15 +90,17 @@ public class AABBPositionStrategy implements PositionStrategy {
 		
 		/* **************** 仓位累计数据 **************** */
 
-		//新的开仓均价
+		//仓位均价
 		if(pcPosition!=null){
-			BigDecimal newPosBaseValue = (order.getCloseFlag() == OrderFlag.ACTION_OPEN)
-					? pcPosition.getBaseValue().add(tradeResult.getBaseValue())
-					: pcPosition.getBaseValue().subtract(tradeResult.getBaseValue());
-			BigDecimal _newPosVolume = pcPosition.getVolume().add(tradeResult.getVolume());//当前张数
-			BigDecimal newPosAmount = CompFieldCalc.calcAmount(_newPosVolume, faceValue); //当前金额
-			BigDecimal newMeanPrice = PcPriceCalc.calcEntryPrice(IntBool.isTrue(pcPosition.getLongFlag()), newPosBaseValue, newPosAmount);
-			tradeResult.setNewPosMeanPrice(newMeanPrice);
+			if((order.getCloseFlag() == OrderFlag.ACTION_OPEN)){
+				BigDecimal _newBaseValue = pcPosition.getBaseValue().add(tradeResult.getBaseValue());//一共几个基础货币
+				BigDecimal _newVolume = pcPosition.getVolume().add(tradeResult.getVolume());//当前张数
+				BigDecimal _newAmount = CompFieldCalc.calcAmount(_newVolume, faceValue); //当前金额
+				BigDecimal newMeanPrice = PcPriceCalc.calcEntryPrice(IntBool.isTrue(pcPosition.getLongFlag()), _newBaseValue, _newAmount);
+				tradeResult.setNewPosMeanPrice(newMeanPrice);
+			}else{
+				tradeResult.setNewPosMeanPrice(pcPosition.getMeanPrice());
+			}
 		}else{
 			tradeResult.setNewPosMeanPrice(tradeResult.getPrice());
 		}
