@@ -30,10 +30,10 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi{
 
     @Override
     public List<DepositRecordHistoryVo> queryHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset", required = false) String asset,
-                                                     @RequestParam(value = "queryId", required = true) Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
+                                                     @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
                                                      @RequestParam(value = "pageStatus") Integer pageStatus) {
 
-        if (userId == null || pageSize == null || queryId == null) {
+        if (userId == null || pageSize == null ) {
             throw new ExException(DepositRecordExtErrorCode.PARAM_EMPTY);
         }
         List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize,pageStatus);

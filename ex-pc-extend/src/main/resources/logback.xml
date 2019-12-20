@@ -51,10 +51,14 @@
     </springProfile>
     
     <springProfile name="dev">
-        <root level="debug">
+        <root level="info">
             <appender-ref ref="STDOUT" />
             <appender-ref ref="out2File" />
         </root>
+        
+		<logger name="com.hp.sh.expv3" level="debug"></logger>
+		<logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
+        
     </springProfile>
     
     <springProfile name="local">

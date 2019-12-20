@@ -76,7 +76,6 @@ public class PcPositionService {
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
 		TradeResult tradeResult = this.positionStrategy.getTradeResult(order, matchedVo, pcPosition);
-		PcOrderTrade pcOrderTrade = this.saveOrderTrade(matchedVo, order, tradeResult);
 		
 		//如果仓位不存在则创建新仓位
 		boolean isNewPos = false;
@@ -97,6 +96,8 @@ public class PcPositionService {
 		}else{
 			this.pcPositionDAO.update(pcPosition);
 		}
+		
+		PcOrderTrade pcOrderTrade = this.saveOrderTrade(matchedVo, order, tradeResult, pcPosition.getId());
 		
 		//修改订单状态
 		this.updateOrder(order, tradeResult);
@@ -148,7 +149,7 @@ public class PcPositionService {
 		this.pcOrderDAO.update(order);
 	}
 
-	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeData) {
+	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeData, Long posId) {
 		Date now = new Date();
 		
 		PcOrderTrade orderTrade = new PcOrderTrade();
@@ -156,21 +157,24 @@ public class PcPositionService {
 		orderTrade.setId(null);
 		orderTrade.setAsset(tradeMsg.getAsset());
 		orderTrade.setSymbol(tradeMsg.getSymbol());
-		orderTrade.setPrice(tradeMsg.getPrice());
 		orderTrade.setVolume(tradeMsg.getNumber());
+		orderTrade.setPrice(tradeMsg.getPrice());
 		orderTrade.setMakerFlag(tradeMsg.getMakerFlag());
 
 		orderTrade.setFee(tradeData.getFeeReceivable());
 		orderTrade.setFeeRatio(tradeData.getFeeRatio());
 		orderTrade.setPnl(tradeData.getPnl());
 		
-		orderTrade.setOrderId(order.getId());
-		
-		orderTrade.setTradeSn(tradeMsg.uniqueKey());
-		orderTrade.setTradeTime(tradeMsg.getTradeTime());
 		orderTrade.setUserId(order.getUserId());
 		orderTrade.setCreated(now);
 		orderTrade.setModified(now);
+
+		orderTrade.setTradeSn(tradeMsg.uniqueKey());
+		orderTrade.setTradeId(tradeMsg.getTradeId());
+		orderTrade.setTradeTime(tradeMsg.getTradeTime());
+		
+		orderTrade.setPosId(posId);
+		orderTrade.setOrderId(order.getId());
 		
 		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
 		
@@ -189,7 +193,7 @@ public class PcPositionService {
 		pcPosition.setEntryLeverage(entryLeverage);
 		pcPosition.setLeverage(entryLeverage);
 		pcPosition.setAutoAddFlag(IntBool.NO);
-		pcPosition.setHoldRatio(feeRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
+		pcPosition.setHoldMarginRatio(feeRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
 		Date now = new Date();
 		pcPosition.setCreated(now );
 		pcPosition.setModified(now);
@@ -203,8 +207,6 @@ public class PcPositionService {
 		pcPosition.setFeeCost(BigDecimal.ZERO);
 		
 		pcPosition.setRealisedPnl(BigDecimal.ZERO);
-		
-		pcPosition.setLiqPrice(BigDecimal.ZERO);
 		
 		pcPosition.setLiqMarkPrice(null);
 		pcPosition.setLiqMarkTime(null);
@@ -225,8 +227,6 @@ public class PcPositionService {
 		pcPosition.setMeanPrice(tradeResult.getNewPosMeanPrice());
 		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeResult.getOrderMargin()));
 		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeResult.getFeeReceivable()));
-		
-		pcPosition.setLiqPrice(tradeResult.getNewPosliqPrice());
 		
 		//累计量
 		pcPosition.setAccuVolume(pcPosition.getAccuVolume().add(tradeResult.getVolume()));

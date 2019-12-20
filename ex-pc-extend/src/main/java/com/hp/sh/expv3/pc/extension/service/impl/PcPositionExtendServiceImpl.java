@@ -1,7 +1,7 @@
 package com.hp.sh.expv3.pc.extension.service.impl;
 
 import com.hp.sh.expv3.pc.extension.dao.PcPositionDAO;
-import com.hp.sh.expv3.pc.extension.service.PcPositionCoreService;
+import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class PcPositionCoreServiceImpl implements PcPositionCoreService {
+public class PcPositionExtendServiceImpl implements PcPositionExtendService {
     @Autowired
     private PcPositionDAO pcPositionDAO;
 
@@ -24,4 +24,16 @@ public class PcPositionCoreServiceImpl implements PcPositionCoreService {
         }
         return pcPositionDAO.getPosMargin(userId,asset);
     }
+
+	@Override
+	public BigDecimal getPl(Long userId, String asset, Long posId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BigDecimal getPlRatio(Long userId, String asset, Long posId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

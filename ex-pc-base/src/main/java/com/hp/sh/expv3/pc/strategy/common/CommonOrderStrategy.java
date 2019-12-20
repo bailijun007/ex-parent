@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
-import com.hp.sh.expv3.pc.calc.MarginFeeCalc;
+import com.hp.sh.expv3.pc.calc.OrderFeeCalc;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
@@ -39,10 +39,10 @@ public class CommonOrderStrategy implements OrderStrategy {
 		BigDecimal closeFee = this.calcFee(baseValue, pcOrder.getCloseFeeRatio());
 		
 		//保证金
-		BigDecimal orderMargin = MarginFeeCalc.calMargin(baseValue, pcOrder.getMarginRatio());
+		BigDecimal orderMargin = OrderFeeCalc.calMargin(baseValue, pcOrder.getMarginRatio());
 		
 		//总押金
-		BigDecimal grossMargin = MarginFeeCalc.sum(closeFee, openFee, orderMargin);
+		BigDecimal grossMargin = OrderFeeCalc.calcGrossMargin(closeFee, openFee, orderMargin);
 
 		OrderRatioData orderAmount = new OrderRatioData();
 		orderAmount.setAmount(amount);
@@ -58,7 +58,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 	}
 	
 	public BigDecimal calcFee(BigDecimal baseValue, BigDecimal feeRatio){
-		BigDecimal fee = MarginFeeCalc.calcFee(baseValue, feeRatio);
+		BigDecimal fee = OrderFeeCalc.calcFee(baseValue, feeRatio);
 		return fee;
 	}
 	
@@ -118,7 +118,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 			openFee = slope(number, order.getVolume(), order.getOpenFee());
 			closeFee = slope(number, order.getVolume(), order.getCloseFee());
 			orderMargin = slope(number, order.getVolume(), order.getOrderMargin());
-			grossMargin = MarginFeeCalc.sum(openFee, closeFee, orderMargin);
+			grossMargin = OrderFeeCalc.calcGrossMargin(openFee, closeFee, orderMargin);
 		}
 		
 		orderAmount.setOrderMargin(orderMargin);

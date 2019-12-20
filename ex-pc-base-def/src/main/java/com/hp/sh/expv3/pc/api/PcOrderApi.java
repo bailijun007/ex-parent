@@ -27,11 +27,11 @@ public interface PcOrderApi {
 	 * @throws Exception 
 	 */
 	@ApiOperation(value = "创建订单")
-	void create(long userId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce,
+	void create(Long userId, String asset, String symbol, Integer closeFlag, Integer longFlag, Integer timeInForce,
 			BigDecimal price, BigDecimal number, String cliOrderId) throws Exception;
 
 	@ApiOperation(value = "取消订单")
-	void cancel(long userId, String asset, String symbol, Long orderId) throws Exception;
+	void cancel(Long userId, String asset, String symbol, Long orderId) throws Exception;
 
 	@GetMapping(value = "/api/pc/order/bookReset")
 	void bookReset(String asset, String symbol) throws Exception;

@@ -27,7 +27,7 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
 
         List<FundTransferExtVo> voList = fundTransferExtMapper.queryHistory(userId, asset, queryId, pageSize, pageStatus);
         if (CollectionUtils.isEmpty(voList)) {
-            throw new ExException(FundTransferExtErrorCode.DATA_EMPTY);
+            return voList;
         }
         for (FundTransferExtVo transferExtVo : voList) {
             Optional<FundTransferExtVo> vo = Optional.ofNullable(transferExtVo);

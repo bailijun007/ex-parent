@@ -19,7 +19,7 @@ import java.util.List;
  * @author BaiLiJun  on 2019/12/16
  */
 @Api(tags ="提币地址扩展Api")
-@FeignClient(value="ex-withdrawal-addr")
+@FeignClient(value="ex-fund-account")
 public interface WithdrawalAddrExtApi {
 
     @ApiOperation("查询提币地址")

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
@@ -41,7 +40,7 @@ public class PcOrderApiAction implements PcOrderApi {
 	 */
 	@Override
 	@GetMapping(value = "/api/pc/order/create")
-	public void create(long userId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, String cliOrderId) throws Exception{
+	public void create(Long userId, String asset, String symbol, Integer closeFlag, Integer longFlag, Integer timeInForce, BigDecimal price, BigDecimal number, String cliOrderId) throws Exception{
 		
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
 
@@ -64,7 +63,7 @@ public class PcOrderApiAction implements PcOrderApi {
 	
 	@Override
 	@GetMapping(value = "/api/pc/order/cancel")
-	public void cancel(long userId, String asset, String symbol, Long orderId) throws Exception{
+	public void cancel(Long userId, String asset, String symbol, Long orderId) throws Exception{
 
 		this.pcOrderService.setPendingCancel(userId, asset, symbol, orderId);
 

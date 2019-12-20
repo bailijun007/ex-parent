@@ -8,7 +8,6 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
 public class WithdrawalRecordExtErrorCode extends ErrorCode {
     public static final WithdrawalRecordExtErrorCode PARAM_EMPTY = new WithdrawalRecordExtErrorCode(8200, "缺少必填参数!");
 
-    public static final WithdrawalRecordExtErrorCode DATA_EMPTY = new WithdrawalRecordExtErrorCode(8201, "没有查询到数据!");
 
 
 

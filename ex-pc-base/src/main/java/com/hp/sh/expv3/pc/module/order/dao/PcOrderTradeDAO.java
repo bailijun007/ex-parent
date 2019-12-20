@@ -21,5 +21,5 @@ public interface PcOrderTradeDAO extends BaseUserDataMapper<PcOrderTrade,Long> {
 
 	public Long queryCount(Map<String,Object> params);
 
-    Long getFeeCollectorId(@Param("userId") Long userId, @Param("asset") String asset,@Param("symbol") String symbol);
+
 }
