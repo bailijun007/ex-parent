@@ -19,5 +19,7 @@ public interface PcAccountDAO {
 
     public List<PcAccount> queryList(Map<String,Object> params);
 
+    public PcAccount queryOne(Map<String,Object> params);
+
 
 }
