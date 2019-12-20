@@ -40,6 +40,11 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     }
 
     @Override
+    public WithdrawalRecordVo queryLastHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
+        return null;
+    }
+
+    @Override
     public PageResult<WithdrawalRecordVo> queryAllUserHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
         PageResult<WithdrawalRecordVo> result = new PageResult<WithdrawalRecordVo>();
         if (pageNo == null || pageSize == null) {

@@ -84,7 +84,7 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean
+    @Bean(name = "TeamplateDB0")
     @ConditionalOnMissingBean(StringRedisTemplate.class)
     public StringRedisTemplate stringRedisTemplate(
             RedisConnectionFactory redisConnectionFactory) {
