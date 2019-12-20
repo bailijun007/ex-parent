@@ -6,9 +6,11 @@ import com.hp.sh.expv3.fund.extension.constant.DepositRecordExtErrorCode;
 import com.hp.sh.expv3.fund.extension.constant.WithdrawalRecordExtErrorCode;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalAddrExtService;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
+import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,8 +42,9 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     }
 
     @Override
-    public WithdrawalRecordVo queryLastHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
-        return null;
+    public WithdrawalRecordVo queryLastHistory(Long userId, String asset) {
+        WithdrawalRecordVo vo = withdrawalRecordExtService.queryLastHistory(userId, asset);
+        return vo;
     }
 
     @Override
@@ -68,11 +71,23 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
 
     private List<WithdrawalRecordVo> getWithdrawalRecordVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         List<WithdrawalRecordVo> voList = withdrawalRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
-
-        String addr = withdrawalAddrExtService.getAddressByUserIdAndAsset(userId, asset);
-        for (WithdrawalRecordVo vo : voList) {
-            vo.setTargetAddress(addr);
+        List<WithdrawalAddrVo> withdrawalAddrVos = withdrawalAddrExtService.getAddressByUserIdAndAsset(userId, asset);
+        if (!CollectionUtils.isEmpty(voList) && !CollectionUtils.isEmpty(withdrawalAddrVos)) {
+            for (int i = 0; i < voList.size(); i++) {
+                for (int j = 0; j < withdrawalAddrVos.size(); j++) {
+                    if (isExsit(voList, withdrawalAddrVos, i, j)) {
+                        voList.get(i).setTargetAddress(withdrawalAddrVos.get(j).getAddress());
+                    }
+                }
+            }
         }
+
         return voList;
     }
+
+    private boolean isExsit(List<WithdrawalRecordVo> voList, List<WithdrawalAddrVo> withdrawalAddrVos, int i, int j) {
+        return voList.get(i).getUserId().equals(withdrawalAddrVos.get(j).getUserId())&&voList.get(i).getAsset().equals(withdrawalAddrVos.get(j).getAsset());
+    }
+
+
 }

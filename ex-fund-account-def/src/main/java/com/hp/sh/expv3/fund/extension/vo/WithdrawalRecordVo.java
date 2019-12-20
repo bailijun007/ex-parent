@@ -16,6 +16,11 @@ public class WithdrawalRecordVo {
     @ApiModelProperty("id")
     private Long id;
 
+
+    private String asset;
+
+    private Long userId;
+
     @ApiModelProperty("币种")
     private String symbol;
 
@@ -109,6 +114,22 @@ public class WithdrawalRecordVo {
 
     public void setTargetAddress(String targetAddress) {
         this.targetAddress = targetAddress;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getAsset() {
+        return asset;
+    }
+
+    public void setAsset(String asset) {
+        this.asset = asset;
     }
 
     public WithdrawalRecordVo() {

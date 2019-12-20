@@ -3,8 +3,22 @@
 
 <mapper namespace="com.hp.sh.expv3.fund.extension.dao.WithdrawalAddrExtMapper">
 
-    <select id="getAddressByUserIdAndAsset" resultType="java.lang.String">
-        SELECT address FROM withdrawal_addr
+    <resultMap type="com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo" id="WithdrawalAddrVo">
+        <result column="id" property="id" />
+        <result column="asset" property="asset" />
+        <result column="address" property="address" />
+        <result column="remark" property="remark" />
+        <result column="enabled" property="enabled" />
+        <result column="user_id" property="userId" />
+        <result column="created" property="created" />
+        <result column="modified" property="modified" />
+    </resultMap>
+
+
+    <select id="getAddressByUserIdAndAsset" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo">
+        SELECT
+        id,asset,address,remark,user_id userId
+        FROM withdrawal_addr
         <where>
             enabled=1
             <if test="userId!=null">
