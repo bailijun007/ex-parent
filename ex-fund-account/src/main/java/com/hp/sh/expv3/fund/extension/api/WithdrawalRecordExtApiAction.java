@@ -40,8 +40,9 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     }
 
     @Override
-    public WithdrawalRecordVo queryLastHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
-        return null;
+    public WithdrawalRecordVo queryLastHistory(Long userId, String asset) {
+        WithdrawalRecordVo vo = withdrawalRecordExtService.queryLastHistory(userId, asset);
+        return vo;
     }
 
     @Override

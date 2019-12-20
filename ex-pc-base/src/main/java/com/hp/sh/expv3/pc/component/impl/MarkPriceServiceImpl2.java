@@ -5,7 +5,6 @@
 package com.hp.sh.expv3.pc.component.impl;
 
 import com.gitee.hupadev.commons.cache.Cache;
-import com.hp.sh.expv3.config.redis.RedisUtil;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 
 /**
@@ -25,15 +25,16 @@ import java.math.BigDecimal;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class MarkPriceServiceImpl2 implements MarkPriceService {
-    @Autowired
-    private RedisUtil redisUtil;
+    @Resource(name = "templateDB0")
+    private StringRedisTemplate templateDB0;
+
+    @Resource(name = "templateDB5")
+    private StringRedisTemplate templateDB5;
 
     @Override
     public BigDecimal getCurrentMarkPrice(String asset, String symbol) {
-        redisUtil.setDataBase(5);
-        StringRedisTemplate template = redisUtil.getRedisTemplate();
         String key="markPrice:pc:current:";
-        String s = template.opsForValue().get(key+asset+":"+symbol);
+        String s = templateDB5.opsForValue().get(key+asset+":"+symbol);
         return new BigDecimal(s);
     }
 

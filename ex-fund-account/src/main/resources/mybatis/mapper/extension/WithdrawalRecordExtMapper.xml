@@ -42,4 +42,19 @@
         </where>
     </select>
 
+    <select id="queryLastHistory" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
+        select id,asset symbol,  amount, pay_status  status,created,account
+        FROM withdrawal_record
+        <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+        </where>
+        ORDER BY id desc
+        LIMIT 1
+    </select>
+
 </mapper>
