@@ -6,7 +6,9 @@ package com.hp.sh.expv3.match.match.core.matched.task;
 
 import com.hp.sh.expv3.match.config.setting.PcmatchRedisKeySetting;
 import com.hp.sh.expv3.match.constant.PcmatchConst;
+import com.hp.sh.expv3.match.match.core.matched.task.def.PcMatchedTaskService;
 import com.hp.sh.expv3.match.thread.def.BaseTask;
+import com.hp.sh.expv3.match.thread.def.IThreadWorker;
 import com.hp.sh.expv3.match.util.RedisKeyUtil;
 import com.hp.sh.expv3.match.util.RedisUtil;
 import org.slf4j.LoggerFactory;
@@ -21,8 +23,17 @@ public abstract class PcMatchedBaseTask extends BaseTask {
     private String asset;
     private String symbol;
     private Long currentMsgOffset;
-
     private BigDecimal lastPrice;
+
+    private IThreadWorker matchedThreadWorker;
+
+    public IThreadWorker getMatchedThreadWorker() {
+        return matchedThreadWorker;
+    }
+
+    public void setMatchedThreadWorker(IThreadWorker matchedThreadWorker) {
+        this.matchedThreadWorker = matchedThreadWorker;
+    }
 
     @Override
     public boolean onError(Exception ex) {
@@ -72,6 +83,8 @@ public abstract class PcMatchedBaseTask extends BaseTask {
 
     @Autowired
     private PcmatchRedisKeySetting pcmatchRedisKeySetting;
+    @Autowired
+    private PcMatchedTaskService pcMatchedTaskService;
 
     @Autowired
     @Qualifier(PcmatchConst.MODULE_NAME + "RedisUtil")
@@ -80,6 +93,7 @@ public abstract class PcMatchedBaseTask extends BaseTask {
     protected void updateSentMqOffset() {
         String key = RedisKeyUtil.buildOrderSentMqOffsetRedisKeyPattern(pcmatchRedisKeySetting.getPcOrderSentMqOffsetRedisKeyPattern(), this.getAsset(), this.getSymbol());
         pcRedisUtil.set(key, "" + this.getCurrentMsgOffset());
+        pcMatchedTaskService.logQueueSize(asset, symbol, matchedThreadWorker, this);
     }
 
 }

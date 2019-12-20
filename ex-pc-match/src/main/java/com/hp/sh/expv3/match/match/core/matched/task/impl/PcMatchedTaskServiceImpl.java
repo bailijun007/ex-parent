@@ -15,6 +15,7 @@ import com.hp.sh.expv3.match.match.core.matched.task.def.PcMatchedTaskService;
 import com.hp.sh.expv3.match.mqmsg.PcOrderCancelMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.PcPosLockedMqMsgDto;
 import com.hp.sh.expv3.match.msg.BookMsgDto.BookEntry;
+import com.hp.sh.expv3.match.thread.def.IThreadWorker;
 import com.hp.sh.expv3.match.util.PcOrder4MatchBoUtil;
 import com.hp.sh.expv3.match.util.RedisKeyUtil;
 import com.hp.sh.expv3.match.util.RedisUtil;
@@ -42,7 +43,6 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-
     @Autowired
     private PcOrderBookEventService pcOrderBookEventService;
 
@@ -63,30 +63,32 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
         return task;
     }
 
-    private void baseSet(PcMatchedBaseTask task, String asset, String symbol, String assetSymbol, long currentMsqOffset) {
+    private void baseSet(PcMatchedBaseTask task, String asset, String symbol, String assetSymbol, long currentMsqOffset, IThreadWorker matchedThreadWorker) {
         task.setAsset(asset);
         task.setSymbol(symbol);
         task.setAssetSymbol(assetSymbol);
         task.setCurrentMsgOffset(currentMsqOffset);
+        task.setMatchedThreadWorker(matchedThreadWorker);
     }
 
     @Override
     public void addMatchedBookResetTask(PcMatchHandlerContext context, List<BookEntry> entries, BigDecimal lastPrice, long currentMsgOffset) {
         PcMatchedBookResetTask task = applicationContext.getBean(PcMatchedBookResetTask.class);
-        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset);
+        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, context.matchedThreadWorker);
         task.setBookUpdateList(entries);
         task.setLastPrice(lastPrice);
         context.matchedThreadWorker.addTask(task);
         context.setSentMqOffset(currentMsgOffset);
     }
 
-    public void logQueueSize(PcMatchHandlerContext context, PcMatchedBaseTask currentMatchedTask) {
-        Runnable headTask = context.matchedThreadWorker.getTasks().peek();
+    @Override
+    public void logQueueSize(String asset, String symbol, IThreadWorker matchedThreadWorker, PcMatchedBaseTask currentMatchedTask) {
+        Runnable headTask = matchedThreadWorker.getTasks().peek();
         long headOffset = (null == headTask) ? currentMatchedTask.getCurrentMsgOffset() : ((PcMatchedBaseTask) headTask).getCurrentMsgOffset();
         long endOffset = currentMatchedTask.getCurrentMsgOffset();
-        long queueSize = context.matchedThreadWorker.getTaskCount(); // 队列长度
+        long queueSize = matchedThreadWorker.getTaskCount(); // 队列长度
 
-        String redisKey = RedisKeyUtil.buildPcOrderMatchedQueueRedisKey(pcmatchRedisKeySetting.getPcOrderMatchedQueueRedisKeyPattern(), context.getAsset(), context.getSymbol());
+        String redisKey = RedisKeyUtil.buildPcOrderMatchedQueueRedisKey(pcmatchRedisKeySetting.getPcOrderMatchedQueueRedisKeyPattern(), asset, symbol);
         pcRedisUtil.hmset(redisKey, new HashMap<String, String>() {
             {
                 put(pcmatchRedisKeySetting.getPcOrderMatchedQueueHeadOffsetRedisKeyPattern(), "" + headOffset);
@@ -109,7 +111,7 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
     public void addMatchedOrderCancelTask(PcMatchHandlerContext context, long currentMsgOffset, long accountId, long orderId, BigDecimal cancelDeltaAmt) {
         // send book,and Rmq Order Canceled
         PcMatchedOrderCancelTask task = applicationContext.getBean(PcMatchedOrderCancelTask.class);
-        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset);
+        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, context.matchedThreadWorker);
         task.setAccountId(accountId);
         task.setOrderId(orderId);
         task.setCancelDeltaAmt(cancelDeltaAmt);
@@ -120,7 +122,7 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
     @Override
     public void addOrderSnapshotTask(PcMatchHandlerContext context, PriorityQueue<PcOrder4MatchBo> limitBidQueue, PriorityQueue<PcOrder4MatchBo> limitAskQueue, long currentMsgOffset) {
         PcMatchedBookSnapshotTask task = applicationContext.getBean(PcMatchedBookSnapshotTask.class);
-        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset);
+        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, context.matchedThreadWorker);
         task.setLastPrice(context.getLastPrice());
 
         task.setLimitAskOrders(deepClone(limitAskQueue));
@@ -146,7 +148,7 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
         PcMatchedOrderCancelByLiqTask task = applicationContext.getBean(PcMatchedOrderCancelByLiqTask.class);
         String asset = context.getAsset();
         String symbol = context.getSymbol();
-        baseSet(task, asset, symbol, context.getAssetSymbol(), currentMsgOffset);
+        baseSet(task, asset, symbol, context.getAssetSymbol(), currentMsgOffset, context.matchedThreadWorker);
 
         List<PcOrderCancelMqMsgDto> cancelMqMsgs = new ArrayList<>(8);
         if (null == order2CancelByLiq || order2CancelByLiq.isEmpty()) {
@@ -175,7 +177,7 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
     @Override
     public void addMatchedOrderMatchedTask(PcMatchHandlerContext context, long currentMsgOffset, PcOrder4MatchBo takerOrder) {
         PcMatchedOrderMatchedTask task = applicationContext.getBean(PcMatchedOrderMatchedTask.class);
-        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset);
+        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, context.matchedThreadWorker);
 
         task.setLastPrice(context.getLastPrice());
 
