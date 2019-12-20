@@ -24,6 +24,16 @@ public class PcAccountCoreApiAction implements PcAccountCoreApi {
 	private PcAccountCoreService pcAccountCoreService;
 	
 	@Override
+	public int createAccount(Long userId, String asset) {
+		return pcAccountCoreService.createAccount(userId, asset);
+	}
+
+	@Override
+	public boolean accountExist(Long userId, String asset) {
+		return pcAccountCoreService.exist(userId, asset);
+	}
+
+	@Override
 	public Integer add(PcAddRequest request) {
 		return pcAccountCoreService.add(request);
 	}
@@ -36,11 +46,6 @@ public class PcAccountCoreApiAction implements PcAccountCoreApi {
 	@Override
 	public Boolean checkTradNo(Long userId, String tradeNo) {
 		return pcAccountCoreService.checkTradNo(userId, tradeNo);
-	}
-
-	@Override
-	public int createAccount(Long userId, String asset) {
-		return pcAccountCoreService.createAccount(userId, asset);
 	}
 
 	@Override
