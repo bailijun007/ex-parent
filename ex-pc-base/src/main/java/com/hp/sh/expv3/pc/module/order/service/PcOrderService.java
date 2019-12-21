@@ -66,6 +66,9 @@ public class PcOrderService {
 	
 	@Autowired
 	private PcPositionService pcPositionService;
+	
+	@Autowired
+	private PcOrderService self;
 
 	/**
 	 * 创建订单
@@ -79,8 +82,12 @@ public class PcOrderService {
 	 * @param price 委托价格
 	 * @param amt 委托金额
 	 */
-	@LockIt(key="${userId}-${asset}-${symbol}")
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
+		return self.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number, IntBool.YES);
+	}
+	
+	@LockIt(key="${userId}-${asset}-${symbol}")
+	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, Integer visibleFlag){
 		
 //		if(this.existClientOrderId(userId, cliOrderId)){
 //			throw new ExException(OrderError.CREATED);
@@ -129,10 +136,14 @@ public class PcOrderService {
 		////////其他字段，后面随状态修改////////
 		this.setOther(pcOrder, pos);
 		
+		pcOrder.setVisibleFlag(visibleFlag);
+		
 		pcOrderDAO.save(pcOrder);
 
-		//押金扣除
-		this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin(), longFlag);
+		//开仓押金扣除
+		if(closeFlag==OrderFlag.ACTION_OPEN){
+			this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin(), longFlag);
+		}
 		
 		return pcOrder;
 	}
@@ -155,10 +166,6 @@ public class PcOrderService {
 		pcOrder.setTriggerFlag(IntBool.NO);
 		pcOrder.setCancelTime(null);
 
-		////////////强平////////////
-		
-		pcOrder.setVisibleFlag(IntBool.YES);
-		
 		////////////log////////////
 		pcOrder.setCreateOperator(null);
 		pcOrder.setCancelOperator(null);
@@ -246,25 +253,26 @@ public class PcOrderService {
 	 */
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void cancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
-		//返还余额
-
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
 		
-		if(BigUtils.ne(order.getVolume().subtract(order.getFilledVolume()), number)){
-			throw new ExException(OrderError.CANCELED_NUM_ERR);
+		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN){
+			//返还余额
+			if(BigUtils.ne(order.getVolume().subtract(order.getFilledVolume()), number)){
+				throw new ExException(OrderError.CANCELED_NUM_ERR);
+			}
+			
+			OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, number);
+			
+			BigDecimal cancelledGrossFee = ratioData.getGrossMargin();
+			
+			int result = this.returnCancelAmt(userId, asset, orderId, cancelledGrossFee);
+			if(result==InvokeResult.NOCHANGE){
+				//利用合约账户的幂等性实现本方法的幂等性
+				logger.warn("已经执行过了");
+				return;
+			}
 		}
 		
-		OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, number);
-		
-		BigDecimal cancelledGrossFee = ratioData.getGrossMargin();
-		
-		int result = this.returnCancelAmt(userId, asset, orderId, cancelledGrossFee);
-		if(result==InvokeResult.NOCHANGE){
-			//利用合约账户的幂等性实现本方法的幂等性
-			logger.warn("已经执行过了");
-			return;
-		}
-
 		//修改订单状态（撤销）
 		Date now = new Date();
 		order.setCancelTime(now);

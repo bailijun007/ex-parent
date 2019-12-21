@@ -91,4 +91,16 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
         return baseValue.multiply(initMarginRatio).subtract(pnl.min(BigDecimal.ZERO)).stripTrailingZeros();
 	}
 	
+	/**
+	 * 计算破产价
+	 * @param isLong
+	 * @param openPrice
+	 * @param amt
+	 * @param margin
+	 * @return
+	 */
+	public BigDecimal calcBankruptPrice(Integer longFlag, BigDecimal openPrice, BigDecimal amt, BigDecimal margin) {
+		return PcPriceCalc.calcBankruptPrice(IntBool.isTrue(longFlag), openPrice, amt, margin, Precision.COMMON_PRECISION );
+	}
+	
 }

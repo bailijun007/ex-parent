@@ -1,4 +1,6 @@
-package com.hp.sh.expv3.pc.mq.msg;
+package com.hp.sh.expv3.pc.mq.match.msg;
+
+import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
 
 /**
  * 未匹配

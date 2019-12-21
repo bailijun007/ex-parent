@@ -1,6 +1,6 @@
 package com.hp.sh.expv3.pc.constant;
 
-public class MqTopic {
+public class MqTags {
 	
 	//send
 	public static final String TAGS_PC_ORDER_PENDING_NEW = "PC_ORDER_PENDING_NEW";
@@ -9,13 +9,7 @@ public class MqTopic {
 
 	public static final String TAGS_PC_BOOK_RESET = "PC_BOOK_RESET";
 	
-	public static final String getOrderTopic(String asset, String symbol){
-		return "pcOrder_"+asset+"__"+symbol;
-	}
-	
 	//consumer
-	public static final String TOPIC_PCMATCH_BTC__BTC_USD = "pcMatch_BTC__BTC_USD";
-	
 	public static final String TAGS_CANCELLED = "PC_MATCH_ORDER_CANCELLED";
 
 	public static final String TAGS_NOT_MATCHED = "PC_MATCH_ORDER_NOT_MATCHED";
@@ -23,6 +17,10 @@ public class MqTopic {
 	public static final String TAGS_MATCHED = "PC_MATCH_ORDER_MATCHED";
 	
 	public static final String TAGS_PC_TRADE = "PC_TRADE";
+	
+	public static final String TAGS_PC_POS_LIQ_LOCKED = "PC_POS_LIQ_LOCKED";
+	
+	public static final String TAGS_ORDER_ALL_CANCEL = "PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCEL";
 
 	
 }
