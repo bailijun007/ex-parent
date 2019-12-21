@@ -45,4 +45,12 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
 
         return list;
     }
+
+    @Override
+    public WithdrawalRecordVo queryLastHistory(Long userId, String asset) {
+        WithdrawalRecordVo vo= withdrawalRecordExtMapper.queryLastHistory(userId, asset);
+
+        return vo;
+    }
+
 }

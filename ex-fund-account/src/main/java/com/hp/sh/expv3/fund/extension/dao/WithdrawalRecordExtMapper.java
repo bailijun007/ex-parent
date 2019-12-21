@@ -16,4 +16,6 @@ public interface WithdrawalRecordExtMapper {
 
     List<WithdrawalRecordVo> queryHistory(@Param("userId") Long userId,@Param("asset") String asset, @Param("queryId") Long queryId,
                                           @Param("pageSize") Integer pageSize,  @Param("pageStatus")  Integer pageStatus);
+
+    WithdrawalRecordVo queryLastHistory(@Param("userId") Long userId,@Param("asset") String asset);
 }

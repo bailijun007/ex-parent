@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.base.mapper.BaseUserDataMapper;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 
@@ -30,5 +31,11 @@ public interface PcPositionDAO extends BaseUserDataMapper<PcPosition,Long> {
 			@Param("asset") String asset,
 			@Param("symbol") String symbol, 
 			@Param("longFlag") int longFlag);
+
+	public List<PcPosition> queryActivePosList(
+			Page page,
+			@Param("userId") long userId, 
+			@Param("asset") String asset,
+			@Param("symbol") String symbol);
 
 }

@@ -24,6 +24,10 @@ import io.swagger.annotations.ApiOperation;
 @FeignClient(value="ex-pc-base")
 public interface PcAccountCoreApi {
 
+	@ApiOperation(value = "账户是否存在")
+	@GetMapping(value = "/api/pc/pc_account/account/exist")	
+	boolean accountExist(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
+
 	@ApiOperation(value = "创建资金账户")
 	@GetMapping(value = "/api/pc/pc_account/account/create")
 	public int createAccount(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
@@ -41,7 +45,7 @@ public interface PcAccountCoreApi {
 	BigDecimal getBalance(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
 	@ApiOperation(value = "查询资金记录是否存在")
-	@GetMapping(value = "/api/pc/pc_account/record/check_exist")
+	@GetMapping(value = "/api/pc/pc_account/record/exist")
 	public Boolean checkTradNo(@RequestParam("userId") Long userId, @RequestParam("tradeNo") String tradeNo);
 
 }

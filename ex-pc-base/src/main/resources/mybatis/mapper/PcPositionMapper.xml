@@ -156,10 +156,22 @@
         select
         <include refid="Base_Column_List"/>
         from
-        pc_position
+        	pc_position
         where
-        user_id=#{userId} and asset=#{asset} and symbol=#{symbol} and long_flag=#{longFlag}
-        and volume &lt; 0;
+        	user_id=#{userId} and asset=#{asset} and symbol=#{symbol} and long_flag=#{longFlag}
+        and volume &lt; 0
+    </select>
+
+    <select id="queryActivePosList" resultMap="PcPosition">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        	pc_position
+        where
+        	volume &lt; 0
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
     </select>
 
 </mapper>

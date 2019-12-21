@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.fund.extension.api;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -30,6 +31,19 @@ public interface DepositRecordExtApi {
     public List<DepositRecordHistoryVo> queryHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset", required = false) String asset,
                                                      @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
                                                      @RequestParam(value = "pageStatus") Integer pageStatus);
+
+
+
+    @ApiOperation("查询所有用户充币历史记录 后台admin专用")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
+            @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
+    })
+    @GetMapping(value = "/api/extension/account/deposit/queryAllUserHistory")
+    public PageResult<DepositRecordHistoryVo> queryAllUserHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset", required = false) String asset,
+                                                                  @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize") Integer pageSize);
 
 
 }

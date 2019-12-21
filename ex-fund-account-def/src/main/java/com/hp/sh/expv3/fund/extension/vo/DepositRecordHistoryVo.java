@@ -33,7 +33,7 @@ public class DepositRecordHistoryVo implements Serializable {
     private String address;
 
     @ApiModelProperty("充币地址(0:已创建，3：已到账)")
-    private String status;
+    private Integer status;
 
     @ApiModelProperty("更新时间")
     private Long mtime;
@@ -85,11 +85,11 @@ public class DepositRecordHistoryVo implements Serializable {
         this.address = address;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

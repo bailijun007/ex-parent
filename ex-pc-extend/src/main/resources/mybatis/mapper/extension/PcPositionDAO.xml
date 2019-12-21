@@ -9,4 +9,12 @@
         and user_id=#{userId}
         and asset=#{asset}
     </select>
+
+    <select id="getInitMargin" resultType="java.math.BigDecimal">
+        select init_margin from pc_position
+        where user_id=#{userId}
+        and asset=#{asset}
+        and id=#{posId}
+    </select>
+
 </mapper>

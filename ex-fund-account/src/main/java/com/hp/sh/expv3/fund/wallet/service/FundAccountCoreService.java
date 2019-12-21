@@ -41,6 +41,11 @@ public class FundAccountCoreService{
 	@Autowired
 	private FundAccountRecordDAO fundAccountRecordDAO;
 
+	public boolean accountExist(Long userId, String asset){
+		FundAccount fa = this.fundAccountDAO.get(userId, asset);
+		return fa!=null;
+	}
+
 	public int createAccount(Long userId, String asset){
 		FundAccount fa = this.fundAccountDAO.get(userId, asset);
 		if(fa!=null){

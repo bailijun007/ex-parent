@@ -24,6 +24,14 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags = "资金账户接口")
 @FeignClient(value = "ex-fund-account")
 public interface FundAccountCoreApi {
+	
+	@ApiOperation(value = "账户是否存在")
+	@GetMapping(value = "/api/fund_account/account/exist")
+	Boolean accountExist(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
+
+	@ApiOperation(value = "创建资金账户")
+	@GetMapping(value = "/api/fund_account/account/create")
+	public int createAccount(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
 	@ApiOperation(value = "加钱")
 	@PostMapping(value = "/api/fund_account/money/add")
@@ -36,10 +44,6 @@ public interface FundAccountCoreApi {
 	@ApiOperation(value = "查询资金记录是否存在")
 	@GetMapping(value = "/api/fund_account/record/check_exist")
 	public Boolean checkTradNo(@RequestParam("userId") Long userId, @RequestParam("tradeNo") String tradeNo);
-
-	@ApiOperation(value = "创建资金账户")
-	@GetMapping(value = "/api/fund_account/account/create")
-	public int createAccount(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
 	@ApiOperation(value = "获取账户余额")
 	@GetMapping(value = "/api/fund_account/account/balance")

@@ -3,19 +3,23 @@ package com.hp.sh.expv3.pc.module.position.service;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
+import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
+import com.hp.sh.expv3.pc.constant.ChangeMarginOptType;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.MarginMode;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
@@ -29,6 +33,8 @@ import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
+import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.strategy.aabb.AABBHoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBMetadataService;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
 import com.hp.sh.expv3.pc.strategy.aabb.PnlCalc;
@@ -75,6 +81,10 @@ public class PcPositionMarginService {
 	private MarkPriceService markPriceService;
 	@Autowired
 	private AABBMetadataService metadataService;
+	@Autowired
+	private AABBHoldPosStrategy holdPosStrategy;
+    @Autowired
+    private PositionStrategyContext positionStrategyContext;
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public boolean changeLeverage(long userId, String asset, String symbol, int marginMode, Integer longFlag, BigDecimal leverage){
@@ -113,18 +123,18 @@ public class PcPositionMarginService {
             if (leverage.compareTo(pos.getLeverage()) < 0) {
                 BigDecimal feeRatio = feeRatioService.getCloseFeeRatio(userId, pos.getAsset(), pos.getSymbol());
 
-                /* 修改保证金 */
-                //标记价格
+                /* **** 修改保证金 **** */
                 BigDecimal amount = pos.getVolume().multiply(metadataService.getFaceValue(asset, symbol));
                 BigDecimal markPrice = markPriceService.getCurrentMarkPrice(asset, symbol);
                 //新的仓位保证金
-                BigDecimal requestPosMargin = this.calcMarginWhenChangeLeverage(longFlag, leverage, amount, feeRatio, pos.getMeanPrice(), markPrice);
+                BigDecimal initMarginRatio = feeRatioService.getInitedMarginRatio(leverage); 
+                BigDecimal requestPosMargin = this.holdPosStrategy.calcMarginWhenChangeLeverage(longFlag, initMarginRatio, amount, feeRatio, pos.getMeanPrice(), markPrice);
 
                 //超过了现有保证金,增加
-                if (requestPosMargin.compareTo(pos.getPosMargin()) > 0) {
+                if (BigUtils.gt(requestPosMargin, pos.getPosMargin())) {
                 	//扣余额
                 	BigDecimal delta = requestPosMargin.subtract(pos.getPosMargin());
-                	this.cutPcAccount(userId, asset, pos.getId(), delta);
+                	this.cutLeverageMargin(userId, asset, pos.getId(), delta);
 
                 	//增加保证金
                 	pos.setPosMargin(requestPosMargin);
@@ -222,7 +232,7 @@ public class PcPositionMarginService {
 		}
 		
 		//检查可减少的保证金
-		if(optType==1){
+		if(optType==ChangeMarginOptType.CUT){
 			BigDecimal diff = this.getMinMarginDiff(pos);
 			if(BigUtils.ltZero(diff)){
 				throw new ExException(PositonError.NO_MORE_MARGIN);
@@ -230,16 +240,12 @@ public class PcPositionMarginService {
 		}
 		
 		//修改pc_account余额
-		if(optType==0){
-			this.cutPcAccount(userId, asset, pos.getId(), amount);
-		}else{
-			this.addPcAccount(userId, asset, pos.getId(), amount);
-		}
-		
 		//增加仓位保证金
-		if(optType==0){
+		if(optType==ChangeMarginOptType.ADD){
+			this.cutManualMargin(userId, asset, pos.getId(), amount);
 			pos.setPosMargin(pos.getPosMargin().add(amount));
 		}else{
+			this.returnManualMargin(userId, asset, pos.getId(), amount);
 			pos.setPosMargin(pos.getPosMargin().subtract(amount));
 		}
 		
@@ -248,6 +254,7 @@ public class PcPositionMarginService {
 //		pos.setLiqPrice(liqPrice);
 		
 		//保存
+		pos.setModified(DbDateUtils.now());
 		this.pcPositionDAO.update(pos);
 	}
 	
@@ -255,7 +262,7 @@ public class PcPositionMarginService {
 	 * 可减少的保证金
 	 * @return
 	 */
-	public BigDecimal getMinMarginDiff(PcPosition pos){
+	protected BigDecimal getMinMarginDiff(PcPosition pos){
 		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
 		BigDecimal pnl = PnlCalc.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(this.metadataService.getFaceValue(pos.getAsset(), pos.getSymbol())), pos.getMeanPrice(), markPrice);
 		BigDecimal posMargin = pos.getInitMargin();
@@ -275,19 +282,31 @@ public class PcPositionMarginService {
 		return liqPrice;
 	}
 	
-	private void cutPcAccount(Long userId, String asset, Long posId, BigDecimal amount) {
+	private void cutLeverageMargin(Long userId, String asset, Long posId, BigDecimal amount) {
 		PcCutRequest request = new PcCutRequest();
 		request.setAmount(request.getAmount());
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark("仓位追加保证金");
+		request.setRemark("调低杠杆追加保证金");
+		request.setTradeNo("ADD_TO_MARGIN-"+System.currentTimeMillis());
+		request.setTradeType(PcAccountTradeType.LEVERAGE_ADD_MARGIN);
+		request.setAssociatedId(posId);
+		this.pcAccountCoreService.cut(request);
+	}
+	
+	private void cutManualMargin(Long userId, String asset, Long posId, BigDecimal amount) {
+		PcCutRequest request = new PcCutRequest();
+		request.setAmount(request.getAmount());
+		request.setUserId(userId);
+		request.setAsset(asset);
+		request.setRemark("手动追加保证金");
 		request.setTradeNo("ADD_TO_MARGIN-"+System.currentTimeMillis());
 		request.setTradeType(PcAccountTradeType.ADD_TO_MARGIN);
 		request.setAssociatedId(posId);
 		this.pcAccountCoreService.cut(request);
 	}
 	
-	private void addPcAccount(Long userId, String asset, Long posId, BigDecimal amount) {
+	private void returnManualMargin(Long userId, String asset, Long posId, BigDecimal amount) {
 		PcAddRequest request = new PcAddRequest();
 		request.setAmount(request.getAmount());
 		request.setUserId(userId);
@@ -308,5 +327,40 @@ public class PcPositionMarginService {
 		pos.setAutoAddFlag(autoAddFlag);
 		return true;
 	}
+
+	public List<PcPosition> queryActivePosList(Page page, Long userId, String asset, String symbol) {
+		List<PcPosition> list = this.pcPositionDAO.queryActivePosList(page, userId, asset, symbol);
+		return list;
+	}
 	
+	public void autoAddMargin(PcPosition pos){
+		BigDecimal requestPosMargin = positionStrategyContext.calcInitMargin(pos);
+        //超过了现有保证金,增加
+        if (BigUtils.gt(requestPosMargin, pos.getPosMargin())) {
+        	//扣余额
+        	BigDecimal delta = requestPosMargin.subtract(pos.getPosMargin());
+        	BigDecimal balance = this.getBalance(pos.getUserId(), pos.getAsset());
+        	delta = delta.min(balance);
+    		this.cutAutoMargin(pos.getUserId(), pos.getAsset(), pos.getId(), delta);
+    		pos.setPosMargin(pos.getPosMargin().add(delta));
+    		pos.setModified(DbDateUtils.now());
+    		this.pcPositionDAO.update(pos);
+        }
+	}
+	
+	private void cutAutoMargin(Long userId, String asset, Long posId, BigDecimal amount) {
+		PcCutRequest request = new PcCutRequest();
+		request.setAmount(request.getAmount());
+		request.setUserId(userId);
+		request.setAsset(asset);
+		request.setRemark("自动追加保证金");
+		request.setTradeNo("ADD_TO_MARGIN-"+System.currentTimeMillis());
+		request.setTradeType(PcAccountTradeType.AUTO_ADD_MARGIN);
+		request.setAssociatedId(posId);
+		this.pcAccountCoreService.cut(request);
+	}
+	
+	private BigDecimal getBalance(Long userId, String asset){
+		return this.pcAccountCoreService.getBalance(userId, asset);
+	}
 }

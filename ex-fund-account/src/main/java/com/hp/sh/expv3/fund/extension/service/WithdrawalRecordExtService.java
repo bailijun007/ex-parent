@@ -20,4 +20,8 @@ public interface WithdrawalRecordExtService {
     public BigDecimal getFrozenCapital(Long userId, String asset) ;
 
     List<WithdrawalRecordVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus);
+
+    WithdrawalRecordVo queryLastHistory(Long userId, String asset);
+
+
 }

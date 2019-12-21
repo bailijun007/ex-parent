@@ -40,6 +40,11 @@ public class PcAccountCoreService{
 
 	@Autowired
 	private PcAccountRecordDAO fundAccountRecordDAO;
+	
+	public Boolean exist(Long userId, String asset){
+		PcAccount fa = this.pcAccountDAO.get(userId, asset);
+		return fa!=null;
+	}
 
 	public int createAccount(Long userId, String asset){
 		PcAccount fa = this.pcAccountDAO.get(userId, asset);

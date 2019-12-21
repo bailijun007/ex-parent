@@ -9,4 +9,6 @@ import java.math.BigDecimal;
  */
 public interface PcPositionDAO {
     BigDecimal getPosMargin(@Param("userId") Long userId, @Param("asset") String asset);
+
+    BigDecimal getInitMargin(@Param("userId") Long userId, @Param("asset") String asset,@Param("posId")  Long posId);
 }

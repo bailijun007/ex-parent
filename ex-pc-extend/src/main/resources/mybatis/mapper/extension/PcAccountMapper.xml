@@ -3,7 +3,7 @@
 
 <mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcAccountDAO">
 
-	<resultMap type="com.hp.sh.expv3.pc.module.account.entity.PcAccount" id="PcAccount">
+	<resultMap type="com.hp.sh.expv3.pc.extension.vo.PcAccountVo" id="PcAccountVo">
 		<result column="asset" property="asset" />
 		<result column="balance" property="balance" />
 		<result column="version" property="version" />
@@ -12,15 +12,49 @@
 		<result column="modified" property="modified" />
 	</resultMap>
 
+    <sql id="simple_where">
+        where 1=1
+        <if test="userIdList!=null">and id in
+            <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                #{userIdList[${i}]}
+            </foreach>
+        </if>
+        <if test="assetList!=null">and id in
+            <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                #{assetList[${i}]}
+            </foreach>
+        </if>
+        <if test="balance!=null and balance!=''">and balance=#{balance}</if>
+        <if test="version!=null">and version=#{version}</if>
+        <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
+        <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
+        <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
+        <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>if>
+    </sql>
+
 	<sql id="Base_Column_List" >
 		asset,balance,version,user_id,created,modified
 	</sql>
 
-	<select id="get" resultMap="PcAccount">
+	<select id="get" resultMap="PcAccountVo">
 		select
 			<include refid="Base_Column_List" />
 		from pc_account
 			where user_id=#{userId} and asset=#{asset}
 	</select>
-	
+
+    <select id="queryList" resultMap="PcAccountVo">
+        select
+        <include refid="Base_Column_List" />
+        from pc_account
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryOne" resultMap="PcAccountVo">
+        select
+        <include refid="Base_Column_List" />
+        from pc_account
+        <include refid="simple_where"/>
+    </select>
+
 </mapper>

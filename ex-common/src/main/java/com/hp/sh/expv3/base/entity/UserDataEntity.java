@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.base.entity;
 
 import javax.persistence.MappedSuperclass;
+import java.math.BigDecimal;
 
 /**
  * 典型的用户数据Entity 
@@ -24,5 +25,6 @@ public abstract class UserDataEntity extends BaseBizEntity implements UserData{
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
-	
+
+
 }
