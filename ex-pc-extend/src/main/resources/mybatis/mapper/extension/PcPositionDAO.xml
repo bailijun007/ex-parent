@@ -3,6 +3,88 @@
 
 <mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcPositionDAO">
 
+    <resultMap type="com.hp.sh.expv3.pc.extension.vo.PcPositionVo" id="PcPositionVo">
+        <result column="id" property="id" />
+        <result column="asset" property="asset" />
+        <result column="symbol" property="symbol" />
+        <result column="long_flag" property="longFlag" />
+        <result column="margin_mode" property="marginMode" />
+        <result column="entry_leverage" property="entryLeverage" />
+        <result column="volume" property="volume" />
+        <result column="base_value" property="baseValue" />
+        <result column="leverage" property="leverage" />
+        <result column="pos_margin" property="posMargin" />
+        <result column="close_fee" property="closeFee" />
+        <result column="auto_add_flag" property="autoAddFlag" />
+        <result column="mean_price" property="meanPrice" />
+        <result column="accu_base_value" property="accuBaseValue" />
+        <result column="accu_volume" property="accuVolume" />
+        <result column="init_margin" property="initMargin" />
+        <result column="hold_ratio" property="holdRatio" />
+        <result column="fee_cost" property="feeCost" />
+        <result column="realised_pnl" property="realisedPnl" />
+        <result column="liq_price" property="liqPrice" />
+        <result column="liq_mark_price" property="liqMarkPrice" />
+        <result column="liq_mark_time" property="liqMarkTime" />
+        <result column="liq_status" property="liqStatus" />
+        <result column="user_id" property="userId" />
+        <result column="created" property="created" />
+        <result column="modified" property="modified" />
+    </resultMap>
+
+    <sql id="simple_where">
+        where 1=1
+        <if test="idList!=null">and id in
+            <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                #{idList[${i}]}
+            </foreach>
+        </if>
+        <if test="userIdList!=null">and user_id in
+            <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                #{userIdList[${i}]}
+            </foreach>
+        </if>
+        <if test="assetList!=null">and asset in
+            <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                #{assetList[${i}]}
+            </foreach>
+        </if>
+        <if test="id!=null">and id=#{id}</if>
+        <if test="userId!=null and userId!=''">and user_id=#{userId}</if>
+        <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+        <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+        <if test="longFlag!=null">and long_flag=#{longFlag}</if>
+        <if test="marginMode!=null and marginMode!=''">and margin_mode=#{marginMode}</if>
+        <if test="entryLeverage!=null">and entry_leverage=#{entryLeverage}</if>
+        <if test="volume!=null">and volume=#{volume}</if>
+        <if test="baseValue!=null">and base_value=#{baseValue}</if>
+        <if test="leverage!=null">and leverage=#{leverage}</if>
+        <if test="posMargin!=null">and pos_margin=#{posMargin}</if>
+        <if test="closeFee!=null">and close_fee=#{closeFee}</if>
+        <if test="autoAddFlag!=null">and auto_add_flag=#{autoAddFlag}</if>
+        <if test="meanPrice!=null">and mean_price=#{meanPrice}</if>
+        <if test="accuBaseValue!=null">and accu_base_value=#{accuBaseValue}</if>
+        <if test="accuVolume!=null">and accu_volume=#{accuVolume}</if>
+        <if test="initMargin!=null">and init_margin=#{initMargin}</if>
+        <if test="holdRatio!=null">and hold_ratio=#{holdRatio}</if>
+        <if test="feeCost!=null">and fee_cost=#{feeCost}</if>
+        <if test="realisedPnl!=null">and realised_pnl=#{realisedPnl}</if>
+        <if test="liqPrice!=null">and liq_price=#{liqPrice}</if>
+        <if test="liqMarkPrice!=null">and liq_mark_price=#{liqMarkPrice}</if>
+        <if test="liqMarkTime!=null">and liq_mark_time=#{liqMarkTime}</if>
+        <if test="liqStatus!=null">and liq_status=#{liqStatus}</if>
+        <if test="userId!=null">and user_id=#{userId}</if>
+        <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
+        <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
+        <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
+        <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>if>
+    </sql>
+
+    <sql id="Base_Column_List" >
+		id,asset,symbol,long_flag,margin_mode,entry_leverage,volume,base_value,leverage,pos_margin,close_fee,auto_add_flag,mean_price,accu_base_value,
+		accu_volume,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
+	</sql>
+
     <select id="getPosMargin" resultType="java.math.BigDecimal">
         select  IFNULL(SUM(pos_margin),0)from pc_position
         where volume &gt;  0
@@ -15,6 +97,20 @@
         where user_id=#{userId}
         and asset=#{asset}
         and id=#{posId}
+    </select>
+
+    <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_position
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryList" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_position
+        <include refid="simple_where"/>
     </select>
 
 </mapper>

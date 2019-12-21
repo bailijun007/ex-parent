@@ -155,10 +155,10 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
         } else {
             for (PcOrder4MatchBo order : order2CancelByLiq) {
                 PcOrderCancelMqMsgDto cancelMqMsgDto = new PcOrderCancelMqMsgDto();
-                cancelMqMsgDto.setAccountId(order.getAccountId());
+//                cancelMqMsgDto.setAccountId(order.getAccountId());
                 cancelMqMsgDto.setOrderId(order.getOrderId());
-                cancelMqMsgDto.setAsset(asset);
-                cancelMqMsgDto.setSymbol(symbol);
+//                cancelMqMsgDto.setAsset(asset);
+//                cancelMqMsgDto.setSymbol(symbol);
                 BigDecimal cancelDeltaAmt = order.getNumber().subtract(order.getFilledNumber());
                 cancelMqMsgDto.setCancelNumber(cancelDeltaAmt);
                 cancelMqMsgs.add(cancelMqMsgDto);

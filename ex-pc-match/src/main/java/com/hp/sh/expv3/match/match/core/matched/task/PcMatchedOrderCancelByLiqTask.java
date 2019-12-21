@@ -68,9 +68,15 @@ public class PcMatchedOrderCancelByLiqTask extends PcMatchedBaseTask {
     @Override
     public void run() {
 
-        if (null == cancelMqMsgs || cancelMqMsgs.isEmpty()) {
-        } else {
+        // 先发MQ消息
+        if (null != cancelMqMsgs && cancelMqMsgs.isEmpty()) {
+            msg.setCancelOrders(cancelMqMsgs);
+        }
+        // 不管是否有委托被取消，都要发送此消息，以便后续执行强平操作
+        pcOrderMqNotify.sendSameSideCloseOrderAllCancelled(this.getAsset(), this.getSymbol(), msg);
 
+        // 后发redis消息
+        if (null != bookEntries && bookEntries.isEmpty()) {
             // send book
             BookMsgDto bookMsgDto = new BookMsgDto();
             bookMsgDto.setLastPrice(this.getLastPrice());
@@ -78,21 +84,13 @@ public class PcMatchedOrderCancelByLiqTask extends PcMatchedBaseTask {
             bookMsgDto.setSymbol(this.getSymbol());
             bookMsgDto.setResetFlag(CommonConst.NO);
             bookMsgDto.setMsgType(EventEnum.PC_BOOK.getCode());
-
             bookMsgDto.setOrders(bookEntries);
-            // prepared book end
-            pcOrderMqNotify.sendSameSideCloseOrderCancelled(this.getAsset(), this.getSymbol(), cancelMqMsgs);
-
             try {
                 pcNotify.safeNotify(this.getAsset(), this.getSymbol(), bookMsgDto);
             } catch (Exception e) {
                 logger.warn(e.getMessage());
             }
-
         }
-
-        // 不管是否有委托被取消，都要发送此消息，以便后续执行强平操作
-        pcOrderMqNotify.sendSameSideCloseOrderAllCancelled(this.getAsset(), this.getSymbol(), msg);
 
         updateSentMqOffset();
 
