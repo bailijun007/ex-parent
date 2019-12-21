@@ -41,6 +41,10 @@
                 #{assetList[${i}]}
             </foreach>
         </if>
+
+        <if test="id!=null">and id=#{id}</if>
+        <if test="userId!=null">and user_id=#{userId}</if>
+        <if test="asset!=null and asset!=''">and asset=#{asset}</if>
         <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
         <if test="orderId!=null">and order_id=#{orderId}</if>
         <if test="price!=null">and price=#{price}</if>
