@@ -20,9 +20,6 @@ import com.hp.sh.expv3.pc.constant.Precision;
 @Component
 public class FeeRatioServiceImpl implements FeeRatioService {
 
-	@Autowired
-	private Cache cache;
-
 	@Override
 	public BigDecimal getInitedMarginRatio(BigDecimal leverage) {
 		return BigDecimal.ONE.divide(leverage, Precision.PERCENT_PRECISION, Precision.LESS);
