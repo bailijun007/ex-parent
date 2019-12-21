@@ -8,11 +8,11 @@ import java.math.BigDecimal;
 
 public class PcOrderCancelMqMsgDto {
 
+    private Long accountId;
     private String asset;
     private String symbol;
 
     private Long orderId;
-    private Long accountId;
     private BigDecimal cancelNumber;
 
     public String getAsset() {

@@ -5,6 +5,7 @@
 package com.hp.sh.expv3.match.mqmsg;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class PcPosLockedMqMsgDto {
 
@@ -36,10 +37,16 @@ public class PcPosLockedMqMsgDto {
      * 破产价
      */
     private BigDecimal bankruptPrice;
-    /**
-     * 需要平仓的数量
-     */
-    private BigDecimal amt;
+
+    private List<PcOrderCancelMqMsgDto> cancelOrders;
+
+    public List<PcOrderCancelMqMsgDto> getCancelOrders() {
+        return cancelOrders;
+    }
+
+    public void setCancelOrders(List<PcOrderCancelMqMsgDto> cancelOrders) {
+        this.cancelOrders = cancelOrders;
+    }
 
     public Long getId() {
         return id;
@@ -111,13 +118,5 @@ public class PcPosLockedMqMsgDto {
 
     public void setBankruptPrice(BigDecimal bankruptPrice) {
         this.bankruptPrice = bankruptPrice;
-    }
-
-    public BigDecimal getAmt() {
-        return amt;
-    }
-
-    public void setAmt(BigDecimal amt) {
-        this.amt = amt;
     }
 }
