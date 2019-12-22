@@ -14,6 +14,8 @@ public class PcPosLockedMqMsgDto {
     private Long accountId;
     private String symbol;
     private String asset;
+    private Long posId;
+
 
     /**
      * 触发强平的标记价格
@@ -118,5 +120,13 @@ public class PcPosLockedMqMsgDto {
 
     public void setBankruptPrice(BigDecimal bankruptPrice) {
         this.bankruptPrice = bankruptPrice;
+    }
+
+    public Long getPosId() {
+        return posId;
+    }
+
+    public void setPosId(Long posId) {
+        this.posId = posId;
     }
 }
