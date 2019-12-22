@@ -69,6 +69,11 @@
             </foreach>
         </if>
 
+        <if test="id!=null">and id=#{id}</if>
+        <if test="userId!=null">and user_id=#{userId}</if>
+        <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+        <if test="status!=null">and status=#{status}</if>
+        <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
         <if test="closeFlag!=null">and close_flag=#{closeFlag}</if>
         <if test="longFlag!=null">and long_flag=#{longFlag}</if>
         <if test="marginMode!=null">and margin_mode=#{marginMode}</if>

@@ -1,6 +1,8 @@
-package com.hp.sh.expv3.pc.mq.msg;
+package com.hp.sh.expv3.pc.mq.match.msg;
 
 import java.math.BigDecimal;
+
+import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
 
 /**
  * 成交

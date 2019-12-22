@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcAccountSymbolDAO">
+
+    <resultMap type="com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVo" id="PcAccountSymbolVo">
+        <result column="id" property="id" />
+        <result column="asset" property="asset" />
+        <result column="symbol" property="symbol" />
+        <result column="margin_mode" property="marginMode" />
+        <result column="hold_margin_ratio" property="holdMarginRatio" />
+        <result column="short_leverage" property="shortLeverage" />
+        <result column="long_leverage" property="longLeverage" />
+        <result column="long_max_leverage" property="longMaxLeverage" />
+        <result column="short_max_leverage" property="shortMaxLeverage" />
+        <result column="cross_leverage" property="crossLeverage" />
+        <result column="version" property="version" />
+        <result column="user_id" property="userId" />
+        <result column="created" property="created" />
+        <result column="modified" property="modified" />
+    </resultMap>
+
+    <sql id="simple_where">
+        where 1=1
+        <if test="idList!=null">and id in
+            <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                #{idList[${i}]}
+            </foreach>
+        </if>
+        <if test="userIdList!=null">and user_id in
+            <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                #{userIdList[${i}]}
+            </foreach>
+        </if>
+        <if test="assetList!=null">and asset in
+            <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                #{assetList[${i}]}
+            </foreach>
+        </if>
+        <if test="id!=null">and id=#{id}</if>
+        <if test="userId!=null">and user_id=#{userId}</if>
+        <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+        <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+        <if test="marginMode!=null">and margin_mode=#{marginMode}</if>
+        <if test="holdMarginRatio!=null">and hold_margin_ratio=#{holdMarginRatio}</if>
+        <if test="shortLeverage!=null">and short_leverage=#{shortLeverage}</if>
+        <if test="longLeverage!=null">and long_leverage=#{longLeverage}</if>
+        <if test="longMaxLeverage!=null">and long_max_leverage=#{longMaxLeverage}</if>
+        <if test="shortMaxLeverage!=null">and short_max_leverage=#{shortMaxLeverage}</if>
+        <if test="crossLeverage!=null">and cross_leverage=#{crossLeverage}</if>
+        <if test="version!=null">and version=#{version}</if>
+        <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
+        <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
+        <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
+        <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>if>
+    </sql>
+
+    <sql id="Base_Column_List" >
+	id,asset,symbol,margin_mode,hold_margin_ratio,short_leverage,long_leverage,long_max_leverage,short_max_leverage,cross_leverage,
+	version,user_id,created,modified
+    </sql>
+
+
+    <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVo">
+        select <include refid="Base_Column_List"/>
+        from pc_account_symbol
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryList" resultType="com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVo">
+        select <include refid="Base_Column_List"/>
+        from pc_account_symbol
+        <include refid="simple_where"/>
+    </select>
+
+</mapper>

@@ -4,20 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.constant.RedisKey;
-import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.strategy.vo.PosLevelVo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,7 +47,7 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
      */
     @Override
     public BigDecimal getOpenFeeRatio(long userId, String asset, String symbol) {
-        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.PREFIX_T,templateDB0);
+        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.KEY_PREFIX_TAKER,templateDB0);
     }
 
     /**
@@ -68,7 +62,7 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
      */
     @Override
     public BigDecimal getCloseFeeRatio(long userId, String asset, String symbol) {
-        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.PREFIX_T,templateDB0);
+        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.KEY_PREFIX_TAKER,templateDB0);
     }
 
 
@@ -113,7 +107,7 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
      */
     @Override
     public BigDecimal getMakerOpenFeeRatio(long userId, String asset, String symbol) {
-        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.PREFIX_M,templateDB0);
+        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.KEY_PREFIX_MAKER,templateDB0);
     }
 
     /**
@@ -128,7 +122,7 @@ public class FeeRatioServiceImpl2 implements FeeRatioService {
      */
     @Override
     public BigDecimal getMakerCloseFeeRatio(long userId, String asset, String symbol) {
-        return findFeeRatio(userId, RedisKey.PC_FEE,  RedisKey.PREFIX_M,templateDB0);
+        return findFeeRatio(userId, RedisKey.PC_FEE,  RedisKey.KEY_PREFIX_MAKER,templateDB0);
     }
 
 

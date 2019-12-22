@@ -16,11 +16,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableFeignClients({"com.hp.sh.expv3"})
 @ComponentScan("com.hp.sh.expv3")
 @SpringBootApplication
-public class ExPcApplication {
-	private static final Logger logger = LoggerFactory.getLogger(ExPcApplication.class);
+public class ExPcBaseApplication {
+	private static final Logger logger = LoggerFactory.getLogger(ExPcBaseApplication.class);
 
 	public static void main(String[] args) throws Exception {
-		SpringApplication.run(ExPcApplication.class, args);
+		SpringApplication.run(ExPcBaseApplication.class, args);
 	}
 	
 	@Value("${spring.profiles.active:}")

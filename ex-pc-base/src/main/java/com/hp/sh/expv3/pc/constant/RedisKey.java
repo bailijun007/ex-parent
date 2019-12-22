@@ -11,9 +11,11 @@ public class RedisKey {
 
     public static final String PC_POS_LEVEL = "pc_pos_level";
 
-    public static final String PREFIX_M = "m_";
+    public static final String KEY_PREFIX_MAKER = "m_";
 
-    public static final String PREFIX_T = "t_";
+    public static final String KEY_PREFIX_TAKER = "t_";
+
+    public static final String KEY_PREFIX_MARKPRICE_LAST_HISTORY = "markPrice:pc:history:";
 
 
 }

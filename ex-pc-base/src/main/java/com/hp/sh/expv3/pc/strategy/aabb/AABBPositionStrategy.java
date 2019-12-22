@@ -13,7 +13,7 @@ import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
-import com.hp.sh.expv3.pc.mq.msg.PcTradeMsg;
+import com.hp.sh.expv3.pc.mq.match.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.PositionStrategy;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;

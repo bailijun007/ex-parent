@@ -14,16 +14,18 @@
 
     <sql id="simple_where">
         where 1=1
-        <if test="userIdList!=null">and id in
+        <if test="userIdList!=null">and user_id in
             <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
                 #{userIdList[${i}]}
             </foreach>
         </if>
-        <if test="assetList!=null">and id in
+        <if test="assetList!=null">and asset in
             <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
                 #{assetList[${i}]}
             </foreach>
         </if>
+        <if test="userId!=null">and user_id=#{userId}</if>
+        <if test="asset!=null and asset!=''">and asset=#{asset}</if>
         <if test="balance!=null and balance!=''">and balance=#{balance}</if>
         <if test="version!=null">and version=#{version}</if>
         <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
