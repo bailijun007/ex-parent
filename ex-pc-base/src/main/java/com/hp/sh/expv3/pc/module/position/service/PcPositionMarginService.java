@@ -144,9 +144,9 @@ public class PcPositionMarginService {
 
             /* 修改强平价 */
     		
-//    		//重新计算强平价
-//    		BigDecimal liqPrice = this.calcLiqPrice(pos.getAsset(), pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldMarginRatio(), pos.getPosMargin());
-//    		pos.setLiqPrice(liqPrice);
+    		//重新计算强平价
+    		BigDecimal liqPrice = this.calcLiqPrice(pos.getAsset(), pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldMarginRatio(), pos.getPosMargin());
+    		pos.setLiqPrice(liqPrice);
             
             //修改杠杆值
             pos.setLeverage(leverage);
@@ -210,6 +210,7 @@ public class PcPositionMarginService {
 		params.put("symbol", symbol);
 		params.put("longFlag", longFlag);
 		params.put("activeFlag", IntBool.YES);
+		params.put("liqFlag", IntBool.NO);
 		Long count = this.pcOrderDAO.queryCount(params);
 		return count>0;
 	}

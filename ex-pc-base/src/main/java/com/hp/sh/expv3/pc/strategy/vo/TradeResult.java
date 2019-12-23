@@ -37,7 +37,7 @@ public class TradeResult {
 	
 	//新均价(此次成交后，仓位的均价)
 	private BigDecimal newPosMeanPrice;
-	//强平价(此次成交后，仓位的强平价)
+	//新预估强平价(此次成交后，仓位的强平价)
 	private BigDecimal newPosLiqPrice;
 	
 	//订单完成(此次成交后，对应订单已全部成交)

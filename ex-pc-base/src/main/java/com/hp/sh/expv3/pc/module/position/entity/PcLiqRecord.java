@@ -35,6 +35,11 @@ public class PcLiqRecord extends UserDataEntity {
 	
 	//破产价
 	private BigDecimal bankruptPrice;
+	
+    /**
+	 * 已成交量
+	 */
+	private BigDecimal filledVolume;
 
 	public PcLiqRecord() {
 	}
@@ -93,6 +98,14 @@ public class PcLiqRecord extends UserDataEntity {
 
 	public void setPosMargin(BigDecimal posMargin) {
 		this.posMargin = posMargin;
+	}
+
+	public BigDecimal getFilledVolume() {
+		return filledVolume;
+	}
+
+	public void setFilledVolume(BigDecimal filledVolume) {
+		this.filledVolume = filledVolume;
 	}
 
 }
