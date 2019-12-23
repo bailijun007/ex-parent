@@ -69,11 +69,8 @@ public class PcMatchedOrderCancelByLiqTask extends PcMatchedBaseTask {
     public void run() {
 
         // 先发MQ消息
-        if (null != cancelMqMsgs && cancelMqMsgs.isEmpty()) {
-            msg.setCancelOrders(cancelMqMsgs);
-        }
         // 不管是否有委托被取消，都要发送此消息，以便后续执行强平操作
-        pcOrderMqNotify.sendSameSideCloseOrderAllCancelled(this.getAsset(), this.getSymbol(), msg);
+        pcOrderMqNotify.sendSameSideCloseOrderAllCancelled(this.getAsset(), this.getSymbol(), msg, cancelMqMsgs);
 
         // 后发redis消息
         if (null != bookEntries && bookEntries.isEmpty()) {

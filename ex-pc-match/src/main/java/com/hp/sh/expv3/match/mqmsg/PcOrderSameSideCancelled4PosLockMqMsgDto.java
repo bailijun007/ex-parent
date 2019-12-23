@@ -5,16 +5,15 @@
 package com.hp.sh.expv3.match.mqmsg;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-public class PcPosLockedMqMsgDto {
+public class PcOrderSameSideCancelled4PosLockMqMsgDto {
 
-    // pos id
     private Long id;
     private Long accountId;
     private String symbol;
     private String asset;
     private Long posId;
-
 
     /**
      * 触发强平的标记价格
@@ -38,6 +37,29 @@ public class PcPosLockedMqMsgDto {
      * 破产价
      */
     private BigDecimal bankruptPrice;
+
+    /**
+     * 是否最后一条消息，取消同向平仓委托可能会分批发送消息，最后一条时为1
+     */
+    private Integer lastFlag;
+
+    public Integer getLastFlag() {
+        return lastFlag;
+    }
+
+    public void setLastFlag(Integer lastFlag) {
+        this.lastFlag = lastFlag;
+    }
+
+    private List<PcOrderCancelMqMsgDto> cancelOrders;
+
+    public List<PcOrderCancelMqMsgDto> getCancelOrders() {
+        return cancelOrders;
+    }
+
+    public void setCancelOrders(List<PcOrderCancelMqMsgDto> cancelOrders) {
+        this.cancelOrders = cancelOrders;
+    }
 
     public Long getId() {
         return id;
