@@ -19,6 +19,6 @@ public class PcOrderTradeServiceImpl implements PcOrderTradeService {
 
     @Override
     public BigDecimal getRealisedPnlByPosIdAndUserId(Long posId, Long userId) {
-        return pcOrderTradeDAO.getRealisedPnlByPosIdAndUserId(posId,userId);
+        return pcOrderTradeDAO.getRealisedPnlByPosIdAndUserId(posId,userId,null);
     }
 }

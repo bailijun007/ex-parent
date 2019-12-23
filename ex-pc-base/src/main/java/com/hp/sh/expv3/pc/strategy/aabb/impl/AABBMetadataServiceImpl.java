@@ -52,20 +52,20 @@ public class AABBMetadataServiceImpl extends AABBMetadataService {
 
 
 //获取最新一期面值
-//    public LastFaceValue getLastFaceValue(String asset, String symbol) {
-//        String prefix=RedisKey.KEY_PREFIX_MARKPRICE_LAST_HISTORY;
-//        String key=prefix+asset+":"+symbol;
-//        LastFaceValue lastFaceValue=new LastFaceValue();
-//        Set<String> set = templateDB5.boundZSetOps(key).reverseRange(0, 0);
-//        if(!CollectionUtils.isEmpty(set)){
-//            ArrayList<String> list = new ArrayList<>(set);
-//            String s = list.get(0);
-//            String[] split = s.split("#");
-//            lastFaceValue.setFaceValue(new BigDecimal(split[0]));
-//            lastFaceValue.setTime(Long.parseLong(split[1]));
-//        }
-//        return lastFaceValue;
-//    }
+    public LastFaceValue getLastFaceValue(String asset, String symbol) {
+        String prefix=RedisKey.KEY_PREFIX_MARKPRICE_LAST_HISTORY;
+        String key=prefix+asset+":"+symbol;
+        LastFaceValue lastFaceValue=new LastFaceValue();
+        Set<String> set = templateDB5.boundZSetOps(key).reverseRange(0, 0);
+        if(!CollectionUtils.isEmpty(set)){
+            ArrayList<String> list = new ArrayList<>(set);
+            String s = list.get(0);
+            String[] split = s.split("#");
+            lastFaceValue.setFaceValue(new BigDecimal(split[0]));
+            lastFaceValue.setTime(Long.parseLong(split[1]));
+        }
+        return lastFaceValue;
+    }
 
 
 

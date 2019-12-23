@@ -93,11 +93,19 @@
         <include refid="simple_where"/>
     </select>
 
-    <select id="getRealisedPnlByPosIdAndUserId">
+    <select id="getRealisedPnlByPosIdAndUserId" resultType="java.math.BigDecimal">
         select IFNULL(SUM(pnl),0)
         from pc_order_trade
-        where pos_id =#{posId}
-        and user_id = #{userId}
+        <where>
+            <if test="posId!=null">
+             and  pos_id =#{posId}
+            </if>
+            <if test="orderId!=null">
+                and order_id=#{orderId}
+            </if>
+            and user_id = #{userId}
+        </where>
+
     </select>
 
 </mapper>

@@ -3,12 +3,13 @@ package com.hp.sh.expv3.pc.extension.vo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * @author BaiLiJun  on 2019/12/23
  */
-public class CurrentPositionVo {
+public class CurrentPositionVo implements Serializable {
     @ApiModelProperty("仓位id")
     private Long id;
     @ApiModelProperty("资产")
