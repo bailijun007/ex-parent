@@ -77,16 +77,10 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
 
     private List<DepositRecordHistoryVo> getAllUserDepositRecordHistoryVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
-        List<AddressVo> addressVos = depositAddrExtService.getAddresses(userId, asset);
-       if(!CollectionUtils.isEmpty(list)&&!CollectionUtils.isEmpty(addressVos)){
-           for (DepositRecordHistoryVo historyVo : list) {
-               for (AddressVo addressVo : addressVos) {
-                   if(historyVo.getUserId().equals(addressVo.getUserId())){
-                       historyVo.setAddress(addressVo.getAddress());
-                   }
-               }
-           }
-       }
+        for (DepositRecordHistoryVo depositRecordHistoryVo : list) {
+            AddressVo addressVos = depositAddrExtService.getAddresses(depositRecordHistoryVo.getUserId(), depositRecordHistoryVo.getAsset());
+            depositRecordHistoryVo.setAddress(addressVos.getAddress());
+        }
 
         return list;
     }

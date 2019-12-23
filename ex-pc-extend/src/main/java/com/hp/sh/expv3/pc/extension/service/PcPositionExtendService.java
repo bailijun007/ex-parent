@@ -1,6 +1,9 @@
 package com.hp.sh.expv3.pc.extension.service;
 
+import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author BaiLiJun  on 2019/12/16
@@ -34,4 +37,6 @@ public interface PcPositionExtendService {
 	 * @return
 	 */
     BigDecimal getPlRatio(Long userId, String asset, Long posId);
+
+    List<PcPositionVo> findCurrentPosition(Long userId, String asset, String symbol);
 }

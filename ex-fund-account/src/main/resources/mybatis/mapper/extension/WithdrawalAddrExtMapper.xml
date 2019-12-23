@@ -4,14 +4,14 @@
 <mapper namespace="com.hp.sh.expv3.fund.extension.dao.WithdrawalAddrExtMapper">
 
     <resultMap type="com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo" id="WithdrawalAddrVo">
-        <result column="id" property="id" />
-        <result column="asset" property="asset" />
-        <result column="address" property="address" />
-        <result column="remark" property="remark" />
-        <result column="enabled" property="enabled" />
-        <result column="user_id" property="userId" />
-        <result column="created" property="created" />
-        <result column="modified" property="modified" />
+        <result column="id" property="id"/>
+        <result column="asset" property="asset"/>
+        <result column="address" property="address"/>
+        <result column="remark" property="remark"/>
+        <result column="enabled" property="enabled"/>
+        <result column="user_id" property="userId"/>
+        <result column="created" property="created"/>
+        <result column="modified" property="modified"/>
     </resultMap>
 
 
@@ -19,29 +19,24 @@
         SELECT
         id,asset,address,remark,user_id userId
         FROM withdrawal_addr
+         where   enabled=1
+       and user_id=#{userId}
+         AND asset=#{asset}
+
+    </select>
+
+    <select id="findWithdrawalAddr" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo">
+        SELECT id,asset,address,remark FROM withdrawal_addr
         <where>
             enabled=1
             <if test="userId!=null">
                 and user_id=#{userId}
             </if>
             <if test="asset!=null and asset!=''">
-                AND asset=#{asset}
+                and asset=#{asset}
             </if>
+
         </where>
-    </select>
-
-    <select id="findWithdrawalAddr" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo">
-      SELECT id,asset,address,remark FROM withdrawal_addr
-      <where>
-          enabled=1
-          <if test="userId!=null">
-              and user_id=#{userId}
-          </if>
-          <if test="asset!=null and asset!=''">
-              and asset=#{asset}
-          </if>
-
-      </where>
     </select>
 
 </mapper>

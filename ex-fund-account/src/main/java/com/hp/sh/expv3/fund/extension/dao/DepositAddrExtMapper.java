@@ -13,5 +13,5 @@ public interface DepositAddrExtMapper {
 
     String getAddressByUserIdAndAsset(@Param("userId") Long userId,@Param("asset") String asset);
 
-    List<AddressVo> getAddresses(@Param("userId") Long userId,@Param("asset") String asset);
+    AddressVo getAddresses(@Param("userId") Long userId,@Param("asset") String asset);
 }

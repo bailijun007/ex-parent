@@ -19,4 +19,5 @@ public interface PcOrderTradeDAO {
 
     List<PcOrderTradeVo> queryList(Map<String,Object> map);
 
+    BigDecimal getRealisedPnlByPosIdAndUserId(@Param("posId") Long posId, @Param("userId") Long userId);
 }

@@ -4,24 +4,24 @@
 <mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO">
 
     <resultMap type="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo" id="PcOrderTradeVo">
-        <result column="id" property="id" />
-        <result column="asset" property="asset" />
-        <result column="symbol" property="symbol" />
-        <result column="order_id" property="orderId" />
-        <result column="price" property="price" />
-        <result column="volume" property="volume" />
-        <result column="trade_sn" property="tradeSn" />
-        <result column="trade_id" property="tradeId" />
-        <result column="pos_id" property="posId" />
-        <result column="maker_flag" property="makerFlag" />
-        <result column="trade_time" property="tradeTime" />
-        <result column="fee_collector_id" property="feeCollectorId" />
-        <result column="fee_ratio" property="feeRatio" />
-        <result column="fee" property="fee" />
-        <result column="pnl" property="pnl" />
-        <result column="user_id" property="userId" />
-        <result column="created" property="created" />
-        <result column="modified" property="modified" />
+        <result column="id" property="id"/>
+        <result column="asset" property="asset"/>
+        <result column="symbol" property="symbol"/>
+        <result column="order_id" property="orderId"/>
+        <result column="price" property="price"/>
+        <result column="volume" property="volume"/>
+        <result column="trade_sn" property="tradeSn"/>
+        <result column="trade_id" property="tradeId"/>
+        <result column="pos_id" property="posId"/>
+        <result column="maker_flag" property="makerFlag"/>
+        <result column="trade_time" property="tradeTime"/>
+        <result column="fee_collector_id" property="feeCollectorId"/>
+        <result column="fee_ratio" property="feeRatio"/>
+        <result column="fee" property="fee"/>
+        <result column="pnl" property="pnl"/>
+        <result column="user_id" property="userId"/>
+        <result column="created" property="created"/>
+        <result column="modified" property="modified"/>
     </resultMap>
 
     <sql id="simple_where">
@@ -65,7 +65,7 @@
         <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>if>
     </sql>
 
-    <sql id="Base_Column_List" >
+    <sql id="Base_Column_List">
 		id,asset,symbol,order_id,price,volume,trade_sn,trade_id,pos_id,maker_flag,trade_time,fee_collector_id,
 		fee_ratio,fee,pnl,user_id,created,modified
 	</sql>
@@ -80,8 +80,8 @@
 
 
     <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
-      select
-      <include refid="Base_Column_List"/>
+        select
+        <include refid="Base_Column_List"/>
         from pc_order_trade
         <include refid="simple_where"/>
     </select>
@@ -93,5 +93,11 @@
         <include refid="simple_where"/>
     </select>
 
+    <select id="getRealisedPnlByPosIdAndUserId">
+        select IFNULL(SUM(pnl),0)
+        from pc_order_trade
+        where pos_id =#{posId}
+        and user_id = #{userId}
+    </select>
 
 </mapper>

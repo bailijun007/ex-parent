@@ -63,7 +63,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
         result.setList(pageList);
         Integer rowTotal = voList.size();
         result.setPageNo(pageNo);
-        result.setRowTotal(new Long(rowTotal+ ""));
+        result.setRowTotal(new Long(rowTotal + ""));
         result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
 
         return result;
@@ -71,22 +71,15 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
 
     private List<WithdrawalRecordVo> getWithdrawalRecordVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         List<WithdrawalRecordVo> voList = withdrawalRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
-        List<WithdrawalAddrVo> withdrawalAddrVos = withdrawalAddrExtService.getAddressByUserIdAndAsset(userId, asset);
-        if (!CollectionUtils.isEmpty(voList) && !CollectionUtils.isEmpty(withdrawalAddrVos)) {
-            for (int i = 0; i < voList.size(); i++) {
-                for (int j = 0; j < withdrawalAddrVos.size(); j++) {
-                    if (isExsit(voList, withdrawalAddrVos, i, j)) {
-                        voList.get(i).setTargetAddress(withdrawalAddrVos.get(j).getAddress());
-                    }
-                }
-            }
+        for (WithdrawalRecordVo vo : voList) {
+            WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
+            vo.setTargetAddress(withdrawalAddrVo.getAddress());
         }
-
         return voList;
     }
 
     private boolean isExsit(List<WithdrawalRecordVo> voList, List<WithdrawalAddrVo> withdrawalAddrVos, int i, int j) {
-        return voList.get(i).getUserId().equals(withdrawalAddrVos.get(j).getUserId())&&voList.get(i).getAsset().equals(withdrawalAddrVos.get(j).getAsset());
+        return voList.get(i).getUserId().equals(withdrawalAddrVos.get(j).getUserId()) && voList.get(i).getAsset().equals(withdrawalAddrVos.get(j).getAsset());
     }
 
 
