@@ -22,9 +22,10 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 	 * 计算仓位的开仓均价
 	 * @return
 	 */
-	public BigDecimal calPosMeanPrice(){
-		
-		return null;
+	public BigDecimal calcLiqPrice(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
+		return PcPriceCalc.calcLiqPrice(
+			holdMarginRatio, IntBool.isTrue(longFlag), openPrice, amount, posMargin, Precision.COMMON_PRECISION
+		);
 	}
 
 	/**
@@ -84,7 +85,7 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 	 * @param markPrice
 	 * @return
 	 */
-	public BigDecimal calcMarginWhenChangeLeverage(Integer longFlag, BigDecimal initMarginRatio, BigDecimal amount, BigDecimal feeRatio, BigDecimal meanPrice, BigDecimal markPrice) {
+	public BigDecimal calcInitMargin(Integer longFlag, BigDecimal initMarginRatio, BigDecimal amount, BigDecimal feeRatio, BigDecimal meanPrice, BigDecimal markPrice) {
         // ( 1 / leverage ) * volume = volume / leverage
         BigDecimal pnl = PnlCalc.calcPnl(longFlag, amount, meanPrice, markPrice);
         BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, meanPrice);

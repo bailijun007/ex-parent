@@ -10,7 +10,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import com.hp.sh.expv3.pc.vo.response.markPriceVo;
+import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +40,9 @@ public class MarkPriceServiceImpl2 implements MarkPriceService {
     }
 
     //查询最新标记价格
-    public markPriceVo getLastMarkPrice(String asset, String symbol) {
-        markPriceVo vo = new markPriceVo();
+    @Override
+    public MarkPriceVo getLastMarkPrice(String asset, String symbol) {
+        MarkPriceVo vo = new MarkPriceVo();
         String key = "markPrice:pc:history:";
         Set<String> set = templateDB5.boundZSetOps(key + asset + ":" + symbol).reverseRange(0, 0);
        if(!CollectionUtils.isEmpty(set)){

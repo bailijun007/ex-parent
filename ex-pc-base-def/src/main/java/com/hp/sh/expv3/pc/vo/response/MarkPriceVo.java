@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  *
  * @author BaiLiJun  on 2019/12/23
  */
-public class markPriceVo {
+public class MarkPriceVo {
     @ApiModelProperty("标记价格")
     private BigDecimal markPrice;
     @ApiModelProperty("时间戳")

@@ -25,6 +25,7 @@ import com.hp.sh.expv3.pc.mq.liq.LiqMqSender;
 import com.hp.sh.expv3.pc.mq.liq.msg.CancelOrder;
 import com.hp.sh.expv3.pc.mq.liq.msg.LiqLockMsg;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBHoldPosStrategy;
+import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 
@@ -64,9 +65,9 @@ public class PcLiqService {
     private LiqMqSender liqMqSender;
 
 	public void handleLiq(PcPosition pos) {
-		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getAsset());
+		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getAsset());
 		//检查触发强平
-		if(!this.checkLiq(pos, markPrice)){
+		if(!this.checkLiq(pos, markPriceVo.getMarkPrice())){
 			return;
 		}
 		
@@ -76,7 +77,7 @@ public class PcLiqService {
 		}
 		
 		//检查触发强平
-		if(!this.checkLiq(pos, markPrice)){
+		if(!this.checkLiq(pos, markPriceVo.getMarkPrice())){
 			return;
 		}
 		
@@ -87,8 +88,8 @@ public class PcLiqService {
 		LiqLockMsg lockMsg = new LiqLockMsg();
 		lockMsg.setAccountId(pos.getUserId());
 		lockMsg.setAsset(pos.getAsset());
-		lockMsg.setLiqMarkPrice(markPrice);
-		lockMsg.setLiqMarkTime(DbDateUtils.now().getTime());
+		lockMsg.setLiqMarkPrice(markPriceVo.getMarkPrice());
+		lockMsg.setLiqMarkTime(markPriceVo.getTime());
 		lockMsg.setLiqPrice(null);
 		lockMsg.setLongFlag(pos.getLongFlag());
 		lockMsg.setPosId(pos.getId());

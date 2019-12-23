@@ -19,6 +19,7 @@ import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
+import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.constant.ChangeMarginOptType;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.MarginMode;
@@ -35,7 +36,6 @@ import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBHoldPosStrategy;
-import com.hp.sh.expv3.pc.strategy.aabb.AABBMetadataService;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
 import com.hp.sh.expv3.pc.strategy.aabb.PnlCalc;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
@@ -80,7 +80,7 @@ public class PcPositionMarginService {
 	@Autowired
 	private MarkPriceService markPriceService;
 	@Autowired
-	private AABBMetadataService metadataService;
+	private MetadataService metadataService;
 	@Autowired
 	private AABBHoldPosStrategy holdPosStrategy;
     @Autowired
@@ -128,7 +128,7 @@ public class PcPositionMarginService {
                 BigDecimal markPrice = markPriceService.getCurrentMarkPrice(asset, symbol);
                 //新的仓位保证金
                 BigDecimal initMarginRatio = feeRatioService.getInitedMarginRatio(leverage); 
-                BigDecimal requestPosMargin = this.holdPosStrategy.calcMarginWhenChangeLeverage(longFlag, initMarginRatio, amount, feeRatio, pos.getMeanPrice(), markPrice);
+                BigDecimal requestPosMargin = this.holdPosStrategy.calcInitMargin(longFlag, initMarginRatio, amount, feeRatio, pos.getMeanPrice(), markPrice);
 
                 //超过了现有保证金,增加
                 if (BigUtils.gt(requestPosMargin, pos.getPosMargin())) {
