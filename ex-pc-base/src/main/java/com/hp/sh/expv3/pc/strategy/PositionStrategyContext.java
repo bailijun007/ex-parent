@@ -40,7 +40,7 @@ public class PositionStrategyContext {
 	@Autowired
 	private AABBHoldPosStrategy holdPosStrategy;
 
-	@Autowired
+
 	private List<StrategyBundle> list;
 	private Map<String,StrategyBundle> map;
 	
