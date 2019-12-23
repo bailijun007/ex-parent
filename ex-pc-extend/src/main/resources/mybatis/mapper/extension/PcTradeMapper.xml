@@ -44,12 +44,17 @@
         <if test="userId!=null">and user_id=#{userId}</if>
         <if test="asset!=null and asset!=''">and asset=#{asset}</if>
         <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
-        <if test="matchTxId!=null and matchTxId!=''">and match_tx_id=#{matchTxId}</if>
-
-
+        <if test="matchTxId!=null">and match_tx_id=#{matchTxId}</if>
+        <if test="tkBidFlag!=null">and tk_bid_flag=#{tkBidFlag}</if>
+        <if test="tkAccountId!=null">and tk_account_id=#{tkAccountId}</if>
+        <if test="tkOrderId!=null">and tk_order_id=#{tkOrderId}</if>
+        <if test="tkCloseFlag!=null">and tk_close_flag=#{tkCloseFlag}</if>
+        <if test="mkAccountId!=null">and mk_account_id=#{mkAccountId}</if>
+        <if test="mkOrderId!=null">and mk_order_id=#{mkOrderId}</if>
+        <if test="mkCloseFlag!=null">and mk_close_flag=#{mkCloseFlag}</if>
         <if test="price!=null">and price=#{price}</if>
-
-
+        <if test="number!=null">and number=#{number}</if>
+        <if test="tradeTime!=null">and trade_time=#{tradeTime}</if>
         <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
         <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
         <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
@@ -57,30 +62,24 @@
     </sql>
 
     <sql id="Base_Column_List" >
-		id,asset,symbol,order_id,price,volume,trade_sn,trade_id,pos_id,maker_flag,trade_time,fee_collector_id,
-		fee_ratio,fee,pnl,user_id,created,modified
+		id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,
+		mk_order_id,mk_close_flag,price,`number`,trade_time,created,modified
 	</sql>
 
 
-    <select id="getPl" resultType="java.math.BigDecimal">
-      select IFNULL(sum(pnl),0)  from pc_order_trade
-      where pos_id = #{posId}
-      and asset = #{asset}
-      and user_id = #{userId}
-    </select>
 
 
-    <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+    <select id="queryOne" resultMap="PcTradeVo">
         select
         <include refid="Base_Column_List"/>
-        from pc_order_trade
+        from pc_trade
         <include refid="simple_where"/>
     </select>
 
-    <select id="queryList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+    <select id="queryList" resultMap="PcTradeVo">
         select
         <include refid="Base_Column_List"/>
-        from pc_order_trade
+        from pc_trade
         <include refid="simple_where"/>
     </select>
 

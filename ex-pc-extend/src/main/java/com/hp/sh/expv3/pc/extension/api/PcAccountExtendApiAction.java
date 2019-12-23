@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hp.sh.expv3.pc.extension.service.impl.PcAccountExtendServiceImpl;
 
 /**
- * 永续合约账户核心接口
+ * 永续合约账户扩展接口
  *
  * @author wangjg
  */
