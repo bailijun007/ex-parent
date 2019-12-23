@@ -163,6 +163,9 @@ public class PcOrder extends UserDataEntity{
      * 可见性，强平委托，自动减仓委托 都不可见
      */
     private Integer visibleFlag;
+    
+    //是否强平委托
+	private Integer liqFlag;
 
 //    int ________log__________;
 
@@ -421,5 +424,12 @@ public class PcOrder extends UserDataEntity{
 		this.cancelVolume = cancelVolume;
 	}
 
+	public Integer getLiqFlag() {
+		return liqFlag;
+	}
+
+	public void setLiqFlag(Integer liqFlag) {
+		this.liqFlag = liqFlag;
+	}
 
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.calc.OrderFeeCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
+import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
@@ -36,7 +37,7 @@ public class AABBPositionStrategy implements PositionStrategy {
 	private CommonOrderStrategy orderStrategy;
 	
 	@Autowired
-	private AABBMetadataService metadataService;
+	private MetadataService metadataService;
 	
 	
 	/**
@@ -117,22 +118,22 @@ public class AABBPositionStrategy implements PositionStrategy {
 		}
 		
 		//强平价
-//		if(pcPosition!=null){
-//			BigDecimal amount = pcPosition.getVolume().multiply(order.getFaceValue());
-//			tradeResult.setNewPosLiqPrice(
-//				this.calcLiqPrice(longFlag, amount, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), pcPosition.getPosMargin())
-//			);
-//		}else{
-//			BigDecimal holdRatio = feeRatioService.getHoldRatio(userId, asset, symbol, tradeResult.getVolume());
-//			tradeResult.setNewPosLiqPrice(
-//				this.calcLiqPrice(longFlag, tradeResult.getAmount(), tradeResult.getNewPosMeanPrice(), holdRatio, tradeResult.getOrderMargin())
-//			);
-//		}
+		if(pcPosition!=null){
+			BigDecimal amount = pcPosition.getVolume().multiply(order.getFaceValue());
+			tradeResult.setNewPosLiqPrice(
+				this.calcLiqPrice(longFlag, amount, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), pcPosition.getPosMargin())
+			);
+		}else{
+			BigDecimal holdRatio = feeRatioService.getHoldRatio(userId, asset, symbol, tradeResult.getVolume());
+			tradeResult.setNewPosLiqPrice(
+				this.calcLiqPrice(longFlag, tradeResult.getAmount(), tradeResult.getNewPosMeanPrice(), holdRatio, tradeResult.getOrderMargin())
+			);
+		}
 		
 		return tradeResult;
 	}
 	
-	public BigDecimal calcLiqPrice(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
+	private BigDecimal calcLiqPrice(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
 		return PcPriceCalc.calcLiqPrice( holdMarginRatio, IntBool.isTrue(longFlag), openPrice, amount, posMargin, Precision.COMMON_PRECISION );
 	}
 	

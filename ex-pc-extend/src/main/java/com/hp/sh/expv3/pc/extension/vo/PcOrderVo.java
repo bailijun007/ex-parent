@@ -31,7 +31,7 @@ public class PcOrderVo extends UserDataEntity{
     /**
      * 是否:1-平仓,0-开
      */
-    private Integer closeFlag;
+    private BigDecimal closeFlag;
     /**
      * 是否：1-多仓，0-空仓
      */
@@ -189,11 +189,11 @@ public class PcOrderVo extends UserDataEntity{
 		this.symbol = symbol;
 	}
 
-	public Integer getCloseFlag() {
+	public BigDecimal getCloseFlag() {
 		return closeFlag;
 	}
 
-	public void setCloseFlag(Integer closeFlag) {
+	public void setCloseFlag(BigDecimal closeFlag) {
 		this.closeFlag = closeFlag;
 	}
 

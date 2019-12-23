@@ -17,4 +17,11 @@
     </select>
 
 
+    <select id="getAddresses" resultType="com.hp.sh.expv3.fund.extension.vo.AddressVo">
+        SELECT address,user_id userId FROM deposit_addr
+         where   enabled=1
+          and user_id=#{userId}
+          AND asset=#{asset}
+    </select>
+
 </mapper>

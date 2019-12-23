@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.component.MarkPriceService;
+import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 
 /**
  * 标记价格服务
@@ -23,5 +24,13 @@ public class MarkPriceServiceImpl implements MarkPriceService{
     public BigDecimal getCurrentMarkPrice(String asset, String symbol) {
         return BigDecimal.ONE;
     }
+
+	@Override
+	public MarkPriceVo getLastMarkPrice(String asset, String symbol) {
+		MarkPriceVo mp = new MarkPriceVo();
+		mp.setMarkPrice(BigDecimal.ONE);
+		mp.setTime(System.currentTimeMillis());
+		return mp;
+	}
 
 }

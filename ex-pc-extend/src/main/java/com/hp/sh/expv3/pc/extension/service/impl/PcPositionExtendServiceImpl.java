@@ -5,12 +5,16 @@ import com.hp.sh.expv3.pc.extension.constant.PcPositionErrorCode;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
+import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author BaiLiJun  on 2019/12/16
@@ -47,5 +51,15 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
             throw new ExException(PcPositionErrorCode.INIT_MARGIN_NOT_EQUAL_ZERO);
         }
         return pl.divide(initMargin);
+    }
+
+    @Override
+    public List<PcPositionVo> findCurrentPosition(Long userId, String asset, String symbol) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("userId",userId);
+        map.put("asset",asset);
+        map.put("symbol",symbol);
+        List<PcPositionVo> pcPositionVos = pcPositionDAO.queryList(map);
+        return pcPositionVos;
     }
 }

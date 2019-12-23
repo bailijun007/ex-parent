@@ -92,6 +92,8 @@ public class PcPosition extends UserDataEntity {
     private BigDecimal realisedPnl;
 	
 	/****************** 强平 ****************/
+    
+    private BigDecimal liqPrice;
 
 	// 触发强平的标记价格
 	private BigDecimal liqMarkPrice;
@@ -283,6 +285,14 @@ public class PcPosition extends UserDataEntity {
 
 	public void setFaceValue(BigDecimal faceValue) {
 		this.faceValue = faceValue;
+	}
+
+	public BigDecimal getLiqPrice() {
+		return liqPrice;
+	}
+
+	public void setLiqPrice(BigDecimal liqPrice) {
+		this.liqPrice = liqPrice;
 	}
 
 }

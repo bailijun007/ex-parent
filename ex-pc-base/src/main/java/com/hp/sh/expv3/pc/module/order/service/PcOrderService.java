@@ -15,6 +15,8 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
+import com.hp.sh.expv3.pc.component.MetadataService;
+import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.MarginMode;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
@@ -28,7 +30,6 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
-import com.hp.sh.expv3.pc.strategy.aabb.AABBMetadataService;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
@@ -59,7 +60,7 @@ public class PcOrderService {
 	private PcAccountCoreService pcAccountCoreService;
 	
 	@Autowired
-	private AABBMetadataService metadataService;
+	private MetadataService metadataService;
 	
 	@Autowired
 	private CommonOrderStrategy orderStrategy;	
@@ -83,17 +84,16 @@ public class PcOrderService {
 	 * @param amt 委托金额
 	 */
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
-		return self.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number, IntBool.YES);
+		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+		return self.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number, pos, IntBool.YES);
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, Integer visibleFlag){
+	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag){
 		
 //		if(this.existClientOrderId(userId, cliOrderId)){
 //			throw new ExException(OrderError.CREATED);
 //		}
-		
-		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
 		
 		//check 检查可平仓位
 		if(closeFlag==OrderFlag.ACTION_CLOSE){
@@ -245,7 +245,7 @@ public class PcOrderService {
 	}
 	
 	/**
-	 * 
+	 * 撤销委托
 	 * @param userId
 	 * @param asset
 	 * @param orderId 订单ID
@@ -302,6 +302,9 @@ public class PcOrderService {
 	 */
 	private void checkClosablePosition(PcPosition pos, BigDecimal number) {
 		if(pos==null){
+			throw new ExException(PositonError.POS_NOT_ENOUGH);
+		}
+		if(pos.getLiqStatus()==LiqStatus.YES){
 			throw new ExException(PositonError.POS_NOT_ENOUGH);
 		}
 		

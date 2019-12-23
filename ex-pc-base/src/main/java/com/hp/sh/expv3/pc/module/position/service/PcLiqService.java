@@ -14,6 +14,8 @@ import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.TimeInForce;
+import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
+import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcLiqRecordDAO;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
@@ -23,6 +25,7 @@ import com.hp.sh.expv3.pc.mq.liq.LiqMqSender;
 import com.hp.sh.expv3.pc.mq.liq.msg.CancelOrder;
 import com.hp.sh.expv3.pc.mq.liq.msg.LiqLockMsg;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBHoldPosStrategy;
+import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 
@@ -32,6 +35,7 @@ import com.hp.sh.expv3.utils.IntBool;
  *
  */
 @Service
+@Transactional(rollbackFor=Exception.class)
 public class PcLiqService {
 
     @Autowired
@@ -54,14 +58,16 @@ public class PcLiqService {
     
     @Autowired
     private PcPositionDAO pcPositionDAO;
+	@Autowired
+	private PcOrderDAO pcOrderDAO;
     
     @Autowired
     private LiqMqSender liqMqSender;
 
 	public void handleLiq(PcPosition pos) {
-		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getAsset());
+		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getAsset());
 		//检查触发强平
-		if(!this.checkLiq(pos, markPrice)){
+		if(!this.checkLiq(pos, markPriceVo.getMarkPrice())){
 			return;
 		}
 		
@@ -71,7 +77,7 @@ public class PcLiqService {
 		}
 		
 		//检查触发强平
-		if(!this.checkLiq(pos, markPrice)){
+		if(!this.checkLiq(pos, markPriceVo.getMarkPrice())){
 			return;
 		}
 		
@@ -82,8 +88,8 @@ public class PcLiqService {
 		LiqLockMsg lockMsg = new LiqLockMsg();
 		lockMsg.setAccountId(pos.getUserId());
 		lockMsg.setAsset(pos.getAsset());
-		lockMsg.setLiqMarkPrice(markPrice);
-		lockMsg.setLiqMarkTime(DbDateUtils.now().getTime());
+		lockMsg.setLiqMarkPrice(markPriceVo.getMarkPrice());
+		lockMsg.setLiqMarkTime(markPriceVo.getTime());
 		lockMsg.setLiqPrice(null);
 		lockMsg.setLongFlag(pos.getLongFlag());
 		lockMsg.setPosId(pos.getId());
@@ -115,7 +121,6 @@ public class PcLiqService {
 		this.pcPositionService.lockLiq(pos);
 	}
 
-	@Transactional(rollbackFor=Exception.class)
 	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list) {
 		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(!pos.getId().equals(posId)){
@@ -133,9 +138,12 @@ public class PcLiqService {
 	}
 	
 	void doLiq(PcPosition pos){
+		//保存强平记录
 		PcLiqRecord record = this.saveLiqRecord(pos);
+		//清空仓位
 		this.clearLiqPos(pos);
-		this.liqOrder(record);
+		//创建强平委托
+		this.createLiqOrder(record);
 	}
 	
 	private void clearLiqPos(PcPosition pos){
@@ -156,8 +164,8 @@ public class PcLiqService {
 		record.setLongFlag(pos.getLongFlag());
 		record.setVolume(pos.getVolume());
 		record.setPosMargin(pos.getPosMargin());
-		BigDecimal amt = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal bankruptPrice = this.holdPosStrategy.calcBankruptPrice(pos.getLongFlag(), pos.getMeanPrice(), amt, pos.getPosMargin());
+		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
+		BigDecimal bankruptPrice = this.holdPosStrategy.calcBankruptPrice(pos.getLongFlag(), pos.getMeanPrice(), _amount, pos.getPosMargin());
 		record.setBankruptPrice(bankruptPrice);
 		record.setCreated(now);
 		record.setModified(now);
@@ -165,16 +173,22 @@ public class PcLiqService {
 		return record;
 	}
 	
-	//TODO order.closePosId
-	private void liqOrder(PcLiqRecord record){
-		this.pcOrderService.create(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), OrderFlag.ACTION_CLOSE, record.getLongFlag(), TimeInForce.IMMEDIATE_OR_CANCEL, record.getBankruptPrice(), record.getVolume(), IntBool.NO);
+	private void createLiqOrder(PcLiqRecord record){
+		PcPosition pos = this.pcPositionDAO.findById(record.getUserId(), record.getPosId());
+		this.pcOrderService.create(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), OrderFlag.ACTION_CLOSE, record.getLongFlag(), TimeInForce.IMMEDIATE_OR_CANCEL, record.getBankruptPrice(), record.getVolume(), pos, IntBool.NO);
+	}
+	
+	public void handleLiqTrade(Long userId, Long recordId){
+		PcLiqRecord record = this.pcLiqRecordDAO.findById(userId, recordId);
+		
 	}
 
 	private void cancelLiqOrder(Long userId, Long posId) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("userId", userId);
-		params.put("posId", posId);
-		PcLiqRecord record = this.pcLiqRecordDAO.queryOne(params);
+		params.put("closePosId", posId);
+		PcOrder liqOrder = this.pcOrderDAO.queryOne(params);
+		this.pcOrderService.cancel(userId, liqOrder.getAsset(), liqOrder.getSymbol(), liqOrder.getId(), liqOrder.getVolume().subtract(liqOrder.getFilledVolume()));
 	}
 
 }

@@ -42,8 +42,8 @@ public interface DepositRecordExtApi {
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
     @GetMapping(value = "/api/extension/account/deposit/queryAllUserHistory")
-    public PageResult<DepositRecordHistoryVo> queryAllUserHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset", required = false) String asset,
-                                                                  @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize") Integer pageSize);
+    public PageResult<DepositRecordHistoryVo> queryAllUserHistory(@RequestParam(value = "userId",required = false) Long userId, @RequestParam(value = "asset", required = false) String asset,
+                                                                  @RequestParam(value = "pageNo") Integer pageNo, @RequestParam(value = "pageSize") Integer pageSize);
 
 
 }

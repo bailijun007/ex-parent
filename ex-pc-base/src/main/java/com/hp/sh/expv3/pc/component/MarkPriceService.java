@@ -6,6 +6,8 @@ package com.hp.sh.expv3.pc.component;
 
 import java.math.BigDecimal;
 
+import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
+
 /**
  * 标记价格服务
  * @author wangjg
@@ -14,5 +16,7 @@ import java.math.BigDecimal;
 public interface MarkPriceService{
 
     public BigDecimal getCurrentMarkPrice(String asset, String symbol);
+
+    public MarkPriceVo getLastMarkPrice(String asset, String symbol);
 
 }

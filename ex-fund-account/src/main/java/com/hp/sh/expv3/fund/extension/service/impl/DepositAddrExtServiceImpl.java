@@ -2,9 +2,12 @@ package com.hp.sh.expv3.fund.extension.service.impl;
 
 import com.hp.sh.expv3.fund.extension.dao.DepositAddrExtMapper;
 import com.hp.sh.expv3.fund.extension.service.DepositAddrExtService;
+import com.hp.sh.expv3.fund.extension.vo.AddressVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 充币地址扩展服务
@@ -20,5 +23,10 @@ public class DepositAddrExtServiceImpl implements DepositAddrExtService {
     @Override
     public String getAddressByUserIdAndAsset(Long userId, String asset) {
         return depositAddrExtMapper.getAddressByUserIdAndAsset(userId,asset);
+    }
+
+    @Override
+    public AddressVo getAddresses(Long userId, String asset) {
+        return depositAddrExtMapper.getAddresses(userId,asset);
     }
 }
