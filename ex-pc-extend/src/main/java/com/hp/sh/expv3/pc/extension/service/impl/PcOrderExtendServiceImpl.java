@@ -39,5 +39,48 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         return pcOrderVos;
     }
 
+    @Override
+    public List<PcOrderVo> findCurrentUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("userId",userId);
+        map.put("asset",asset);
+        map.put("symbol",symbol);
+        map.put("orderType",orderType);
+        map.put("longFlag",longFlag);
+        map.put("closeFlag",closeFlag);
+        List<PcOrderVo> pcOrderVos = pcOrderDAO.queryList(map);
+        return pcOrderVos;
+    }
+
+    @Override
+    public List<PcOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("userId",userId);
+        map.put("asset",asset);
+        map.put("symbol",symbol);
+        map.put("orderType",orderType);
+        map.put("longFlag",longFlag);
+        map.put("closeFlag",closeFlag);
+        map.put("lastOrderId",lastOrderId);
+        map.put("currentPage",currentPage);
+        map.put("pageSize",pageSize);
+        map.put("nextPage",nextPage);
+        List<PcOrderVo> pcOrderVos = pcOrderDAO.queryHistory(map);
+        return pcOrderVos;
+    }
+
+    @Override
+    public List<PcOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("userId",userId);
+        map.put("asset",asset);
+        map.put("symbol",symbol);
+        map.put("orderType",status);
+        map.put("longFlag",longFlag);
+        map.put("closeFlag",closeFlag);
+        List<PcOrderVo> pcOrderVos = pcOrderDAO.queryList(map);
+        return pcOrderVos;
+    }
+
 
 }
