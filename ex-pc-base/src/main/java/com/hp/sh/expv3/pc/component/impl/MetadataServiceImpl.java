@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.pc.component.MetadataService;
+import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 import com.hp.sh.expv3.pc.constant.RedisKey;
-import com.hp.sh.expv3.pc.strategy.vo.PcContractVO;
 
 /**
  * @author BaiLiJun  on 2019/12/18

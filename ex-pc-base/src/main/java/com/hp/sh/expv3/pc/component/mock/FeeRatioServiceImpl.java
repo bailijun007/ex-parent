@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.cache.Cache;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
-import com.hp.sh.expv3.pc.constant.Precision;
+import com.hp.sh.expv3.utils.math.Precision;
 
 /**
  * 查询保证金费率，redis或db

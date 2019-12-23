@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +15,6 @@ import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
-import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.component.MetadataService;
@@ -25,19 +23,15 @@ import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.MarginMode;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
-import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.error.PositonError;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
-import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
+import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
-import com.hp.sh.expv3.pc.strategy.aabb.AABBHoldPosStrategy;
-import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
-import com.hp.sh.expv3.pc.strategy.aabb.PnlCalc;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -57,9 +51,6 @@ public class PcPositionMarginService {
 	private PcPositionDAO pcPositionDAO;
 	
 	@Autowired
-	private PcOrderTradeDAO pcOrderTradeDAO;
-	
-	@Autowired
 	private PcOrderDAO pcOrderDAO;
 	
 	@Autowired
@@ -72,17 +63,11 @@ public class PcPositionMarginService {
 	private PcAccountCoreService pcAccountCoreService;
 	
 	@Autowired
-	private FeeCollectorSelector feeCollectorSelector;
-	
-	@Autowired
-	private AABBPositionStrategy positionStrategy;
-	
-	@Autowired
 	private MarkPriceService markPriceService;
 	@Autowired
 	private MetadataService metadataService;
 	@Autowired
-	private AABBHoldPosStrategy holdPosStrategy;
+	private HoldPosStrategy holdPosStrategy;
     @Autowired
     private PositionStrategyContext positionStrategyContext;
 	
@@ -121,7 +106,7 @@ public class PcPositionMarginService {
 
             //减少杠杆
             if (leverage.compareTo(pos.getLeverage()) < 0) {
-                BigDecimal feeRatio = feeRatioService.getCloseFeeRatio(userId, pos.getAsset(), pos.getSymbol());
+                BigDecimal feeRatio = feeRatioService.getCloseFeeRatio(userId, asset, symbol);
 
                 /* **** 修改保证金 **** */
                 BigDecimal amount = pos.getVolume().multiply(metadataService.getFaceValue(asset, symbol));
@@ -145,7 +130,8 @@ public class PcPositionMarginService {
             /* 修改强平价 */
     		
     		//重新计算强平价
-    		BigDecimal liqPrice = this.calcLiqPrice(pos.getAsset(), pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldMarginRatio(), pos.getPosMargin());
+    		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), this.metadataService.getFaceValue(asset, symbol));
+    		BigDecimal liqPrice = holdPosStrategy.calcLiqPrice(longFlag, _amount, pos.getMeanPrice(), pos.getHoldMarginRatio(), pos.getPosMargin());
     		pos.setLiqPrice(liqPrice);
             
             //修改杠杆值
@@ -156,25 +142,6 @@ public class PcPositionMarginService {
         }
         
 		return true;
-	}
-	
-	/*
-	 * 用 均价 标记价格 未实现盈亏 计算 保证金
-	 * @param longFlag
-	 * @param leverage
-	 * @param amount
-	 * @param feeRatio
-	 * @param meanPrice
-	 * @param markPrice
-	 * @return
-	 */
-	//TODO AABB
-	private BigDecimal calcMarginWhenChangeLeverage(Integer longFlag, BigDecimal leverage, BigDecimal amount, BigDecimal feeRatio, BigDecimal meanPrice, BigDecimal markPrice) {
-        // ( 1 / leverage ) * volume = volume / leverage
-        BigDecimal pnl = PnlCalc.calcPnl(longFlag, amount, meanPrice, markPrice);
-        BigDecimal initMarginRatio = feeRatioService.getInitedMarginRatio(leverage);
-        BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, meanPrice);
-        return baseValue.multiply(initMarginRatio).subtract(pnl.min(BigDecimal.ZERO)).stripTrailingZeros();
 	}
 
 	private void modifyAccountSymbol(PcAccountSymbol accountSymbol, Integer longFlag, BigDecimal leverage){
@@ -265,7 +232,7 @@ public class PcPositionMarginService {
 	 */
 	protected BigDecimal getMinMarginDiff(PcPosition pos){
 		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
-		BigDecimal pnl = PnlCalc.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(this.metadataService.getFaceValue(pos.getAsset(), pos.getSymbol())), pos.getMeanPrice(), markPrice);
+		BigDecimal pnl = holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(this.metadataService.getFaceValue(pos.getAsset(), pos.getSymbol())), pos.getMeanPrice(), markPrice);
 		BigDecimal posMargin = pos.getInitMargin();
 		if(BigUtils.ltZero(pnl)){
 			posMargin = posMargin.subtract(pnl);
@@ -277,12 +244,7 @@ public class PcPositionMarginService {
 		}
 		return posMargin.subtract(posMargin);
 	}
-	
-	private BigDecimal calcLiqPrice(String asset, String symbol, int longFlag, BigDecimal volume, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
-		BigDecimal liqPrice = this.positionStrategy.calcLiqPrice(asset, symbol, longFlag, volume, openPrice, holdMarginRatio, posMargin);
-		return liqPrice;
-	}
-	
+
 	private void cutLeverageMargin(Long userId, String asset, Long posId, BigDecimal amount) {
 		PcCutRequest request = new PcCutRequest();
 		request.setAmount(request.getAmount());

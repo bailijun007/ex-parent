@@ -2,8 +2,8 @@ package com.hp.sh.expv3.pc.strategy.aabb;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.utils.math.DecimalUtil;
+import com.hp.sh.expv3.utils.math.Precision;
 
 /**
  * AABB价格计算器

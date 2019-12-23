@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.calc.OrderFeeCalc;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
-import com.hp.sh.expv3.pc.constant.Precision;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.utils.math.BigUtils;
+import com.hp.sh.expv3.utils.math.Precision;
 
 /**
  * 

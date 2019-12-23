@@ -2,7 +2,7 @@ package com.hp.sh.expv3.pc.calc;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.constant.Precision;
+import com.hp.sh.expv3.utils.math.Precision;
 
 /**
  * 计算合成字段

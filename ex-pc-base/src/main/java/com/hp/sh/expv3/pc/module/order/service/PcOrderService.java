@@ -85,11 +85,11 @@ public class PcOrderService {
 	 */
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
-		return self.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number, pos, IntBool.YES);
+		return self.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number, pos, IntBool.YES, IntBool.NO);
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag){
+	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag, int liqFlag){
 		
 //		if(this.existClientOrderId(userId, cliOrderId)){
 //			throw new ExException(OrderError.CREATED);
@@ -122,8 +122,9 @@ public class PcOrderService {
 		pcOrder.setCreated(now);
 		pcOrder.setModified(now);
 		pcOrder.setStatus(OrderStatus.PENDING_NEW);
-		pcOrder.setActiveFlag(IntBool.YES);
 		pcOrder.setClientOrderId(cliOrderId);
+		pcOrder.setActiveFlag(IntBool.YES);
+		pcOrder.setLiqFlag(liqFlag);
 		
 		/////////押金数据/////////
 		

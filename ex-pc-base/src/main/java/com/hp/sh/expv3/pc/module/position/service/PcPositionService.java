@@ -29,7 +29,7 @@ import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.mq.match.msg.PcTradeMsg;
-import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
+import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -62,7 +62,7 @@ public class PcPositionService {
 	private FeeCollectorSelector feeCollectorSelector;
 	
 	@Autowired
-	private AABBPositionStrategy positionStrategy;
+	private PositionStrategyContext positionStrategy;
 	
 	//处理成交订单
 	public void handleTradeOrder(PcTradeMsg matchedVo){
@@ -75,7 +75,7 @@ public class PcPositionService {
 		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
-		TradeResult tradeResult = this.positionStrategy.getTradeResult(matchedVo, order, pcPosition);
+		TradeResult tradeResult = this.positionStrategy.calcTradeResult(matchedVo, order, pcPosition);
 		
 		////////// 仓位 ///////////
 		//如果仓位不存在则创建新仓位

@@ -2,9 +2,10 @@ package com.hp.sh.expv3.pc.component.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
-import com.hp.sh.expv3.pc.constant.Precision;
+import com.hp.sh.expv3.pc.component.vo.PosLevelVo;
 import com.hp.sh.expv3.pc.constant.RedisKey;
-import com.hp.sh.expv3.pc.strategy.vo.PosLevelVo;
+import com.hp.sh.expv3.utils.math.Precision;
+
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;

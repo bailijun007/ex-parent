@@ -24,7 +24,7 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.mq.liq.LiqMqSender;
 import com.hp.sh.expv3.pc.mq.liq.msg.CancelOrder;
 import com.hp.sh.expv3.pc.mq.liq.msg.LiqLockMsg;
-import com.hp.sh.expv3.pc.strategy.aabb.AABBHoldPosStrategy;
+import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
@@ -48,7 +48,7 @@ public class PcLiqService {
     private PcPositionMarginService pcPositionMarginService;
     
     @Autowired
-    private AABBHoldPosStrategy holdPosStrategy;
+    private HoldPosStrategy holdPosStrategy;
     
     @Autowired
     private MarkPriceService markPriceService;
@@ -99,14 +99,14 @@ public class PcLiqService {
 	}
 
 	/*
-	 * checkAndResetLiqStatus
+	 * TODO checkAndResetLiqStatus
 	 * 是否触发强平
 	 * @param pos
 	 * @return
 	 */
 	private boolean checkLiq(PcPosition pos, BigDecimal markPrice) {
-		BigDecimal amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal posPnl = holdPosStrategy.calcPosPnl(pos.getLongFlag(), amount, pos.getMeanPrice(), markPrice);
+		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
+		BigDecimal posPnl = holdPosStrategy.calcPosPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
 		BigDecimal posMarginRatio = holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), posPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
 		BigDecimal holdMarginRatio = pos.getHoldMarginRatio();
 		
@@ -175,7 +175,7 @@ public class PcLiqService {
 	
 	private void createLiqOrder(PcLiqRecord record){
 		PcPosition pos = this.pcPositionDAO.findById(record.getUserId(), record.getPosId());
-		this.pcOrderService.create(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), OrderFlag.ACTION_CLOSE, record.getLongFlag(), TimeInForce.IMMEDIATE_OR_CANCEL, record.getBankruptPrice(), record.getVolume(), pos, IntBool.NO);
+		this.pcOrderService.create(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), OrderFlag.ACTION_CLOSE, record.getLongFlag(), TimeInForce.IMMEDIATE_OR_CANCEL, record.getBankruptPrice(), record.getVolume(), pos, IntBool.NO, IntBool.YES);
 	}
 	
 	public void handleLiqTrade(Long userId, Long recordId){

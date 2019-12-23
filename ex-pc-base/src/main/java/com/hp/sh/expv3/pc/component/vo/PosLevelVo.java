@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.strategy.vo;
+package com.hp.sh.expv3.pc.component.vo;
 
 import java.math.BigDecimal;
 
