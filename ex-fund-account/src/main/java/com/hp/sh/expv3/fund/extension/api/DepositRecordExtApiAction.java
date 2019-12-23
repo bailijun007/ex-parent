@@ -6,9 +6,11 @@ import com.hp.sh.expv3.fund.extension.constant.DepositRecordExtErrorCode;
 import com.hp.sh.expv3.fund.extension.constant.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.service.DepositAddrExtService;
 import com.hp.sh.expv3.fund.extension.service.DepositRecordExtService;
+import com.hp.sh.expv3.fund.extension.vo.AddressVo;
 import com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,7 +50,7 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
             throw new ExException(DepositRecordExtErrorCode.PARAM_EMPTY);
         }
         PageResult<DepositRecordHistoryVo> result = new PageResult<DepositRecordHistoryVo>();
-        List<DepositRecordHistoryVo> list = getDepositRecordHistoryVos(userId, asset, null, null, null);
+        List<DepositRecordHistoryVo> list = getAllUserDepositRecordHistoryVos(userId, asset, null, null, null);
 
         List<DepositRecordHistoryVo> pageList = list.stream().skip(pageSize * (pageNo - 1))
                 .limit(pageSize)
@@ -72,5 +74,21 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
         return list;
     }
 
+
+    private List<DepositRecordHistoryVo> getAllUserDepositRecordHistoryVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
+        List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
+        List<AddressVo> addressVos = depositAddrExtService.getAddresses(userId, asset);
+       if(!CollectionUtils.isEmpty(list)&&!CollectionUtils.isEmpty(addressVos)){
+           for (DepositRecordHistoryVo historyVo : list) {
+               for (AddressVo addressVo : addressVos) {
+                   if(historyVo.getUserId().equals(addressVo.getUserId())){
+                       historyVo.setAddress(addressVo.getAddress());
+                   }
+               }
+           }
+       }
+
+        return list;
+    }
 
 }

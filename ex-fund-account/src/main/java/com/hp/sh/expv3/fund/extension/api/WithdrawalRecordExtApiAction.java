@@ -63,7 +63,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
         result.setList(pageList);
         Integer rowTotal = voList.size();
         result.setPageNo(pageNo);
-        result.setRowTotal(new Long(pageSize + ""));
+        result.setRowTotal(new Long(rowTotal+ ""));
         result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
 
         return result;

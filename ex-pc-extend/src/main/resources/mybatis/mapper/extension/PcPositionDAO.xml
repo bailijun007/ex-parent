@@ -73,7 +73,6 @@
         <if test="liqMarkPrice!=null">and liq_mark_price=#{liqMarkPrice}</if>
         <if test="liqMarkTime!=null">and liq_mark_time=#{liqMarkTime}</if>
         <if test="liqStatus!=null">and liq_status=#{liqStatus}</if>
-        <if test="userId!=null">and user_id=#{userId}</if>
         <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
         <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
         <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>

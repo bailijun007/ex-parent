@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcTradeDAO">
+
+    <resultMap type="com.hp.sh.expv3.pc.extension.vo.PcTradeVo" id="PcTradeVo">
+        <result column="id" property="id" />
+        <result column="asset" property="asset" />
+        <result column="symbol" property="symbol" />
+        <result column="match_tx_id" property="matchTxId" />
+        <result column="tk_bid_flag" property="tkBidFlag" />
+        <result column="tk_account_id" property="tkAccountId" />
+        <result column="tk_order_id" property="tkOrderId" />
+        <result column="tk_close_flag" property="tkCloseFlag" />
+        <result column="mk_account_id" property="mkAccountId" />
+        <result column="mk_order_id" property="mkOrderId" />
+        <result column="mk_close_flag" property="mkCloseFlag" />
+        <result column="price" property="price" />
+        <result column="number" property="number" />
+        <result column="trade_time" property="tradeTime" />
+        <result column="created" property="created" />
+        <result column="modified" property="modified" />
+    </resultMap>
+
+    <sql id="simple_where">
+        where 1=1
+        <if test="idList!=null">and id in
+            <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                #{idList[${i}]}
+            </foreach>
+        </if>
+        <if test="userIdList!=null">and user_id in
+            <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                #{userIdList[${i}]}
+            </foreach>
+        </if>
+        <if test="assetList!=null">and asset in
+            <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                #{assetList[${i}]}
+            </foreach>
+        </if>
+
+        <if test="id!=null">and id=#{id}</if>
+        <if test="userId!=null">and user_id=#{userId}</if>
+        <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+        <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+        <if test="matchTxId!=null and matchTxId!=''">and match_tx_id=#{matchTxId}</if>
+
+
+        <if test="price!=null">and price=#{price}</if>
+
+
+        <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
+        <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
+        <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
+        <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>if>
+    </sql>
+
+    <sql id="Base_Column_List" >
+		id,asset,symbol,order_id,price,volume,trade_sn,trade_id,pos_id,maker_flag,trade_time,fee_collector_id,
+		fee_ratio,fee,pnl,user_id,created,modified
+	</sql>
+
+
+    <select id="getPl" resultType="java.math.BigDecimal">
+      select IFNULL(sum(pnl),0)  from pc_order_trade
+      where pos_id = #{posId}
+      and asset = #{asset}
+      and user_id = #{userId}
+    </select>
+
+
+    <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order_trade
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order_trade
+        <include refid="simple_where"/>
+    </select>
+
+
+</mapper>
