@@ -24,17 +24,17 @@ import com.hp.sh.expv3.pc.extension.service.impl.PcAccountExtendServiceImpl;
 public class PcAccountExtendApiAction implements PcAccountExtendApi {
 
     @Autowired
-    private PcAccountExtendServiceImpl pcAccountCoreService;
+    private PcAccountExtendServiceImpl pcAccountExtendService;
 
     @Autowired
-    private PcOrderExtendService pcOrderCoreService;
+    private PcOrderExtendService pcOrderExtendService;
 
     @Autowired
-    private PcPositionExtendService pcPositionCoreService;
+    private PcPositionExtendService pcPositionExtendService;
 
     @Override
     public BigDecimal getBalance(Long userId, String asset) {
-        return pcAccountCoreService.getBalance(userId, asset);
+        return pcAccountExtendService.getBalance(userId, asset);
     }
 
     @Override
@@ -42,10 +42,10 @@ public class PcAccountExtendApiAction implements PcAccountExtendApi {
         List<PcAccountExtVo> list = new ArrayList<>();
         String[] split = userIds.split(",");
         for (int i = 0; i < split.length; i++) {
-            PcAccountExtVo vo = pcAccountCoreService.findContractAccount(Long.parseLong(split[i]), asset);
-            BigDecimal orderMargin = pcOrderCoreService.getGrossMargin(Long.parseLong(split[i]), asset);
+            PcAccountExtVo vo = pcAccountExtendService.findContractAccount(Long.parseLong(split[i]), asset);
+            BigDecimal orderMargin = pcOrderExtendService.getGrossMargin(Long.parseLong(split[i]), asset);
             vo.setOrderMargin(orderMargin);
-            BigDecimal posMargin = pcPositionCoreService.getPosMargin(Long.parseLong(split[i]), asset);
+            BigDecimal posMargin = pcPositionExtendService.getPosMargin(Long.parseLong(split[i]), asset);
             vo.setPoserMargin(posMargin);
 
             vo.setTotal(vo.getAvailable().add(orderMargin).add(posMargin));

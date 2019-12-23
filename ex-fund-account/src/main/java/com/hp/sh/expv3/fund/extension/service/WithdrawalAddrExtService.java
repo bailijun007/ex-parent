@@ -10,7 +10,8 @@ import java.util.List;
  * @author BaiLiJun  on 2019/12/16
  */
 public interface WithdrawalAddrExtService {
-    List<WithdrawalAddrVo> getAddressByUserIdAndAsset(Long userId, String asset);
+
+    WithdrawalAddrVo getAddressByUserIdAndAsset(Long userId, String asset);
 
     List<WithdrawalAddrVo> findWithdrawalAddr(Long userId, String asset);
 }

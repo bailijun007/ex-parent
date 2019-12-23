@@ -17,7 +17,7 @@ public interface DepositAddrExtService {
 
     public String getAddressByUserIdAndAsset(Long userId, String asset);
 
-    List<AddressVo> getAddresses(Long userId, String asset);
+    AddressVo getAddresses(Long userId, String asset);
 
 
 }

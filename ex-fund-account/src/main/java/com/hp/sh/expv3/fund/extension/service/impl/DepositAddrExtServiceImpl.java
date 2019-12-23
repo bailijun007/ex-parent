@@ -26,7 +26,7 @@ public class DepositAddrExtServiceImpl implements DepositAddrExtService {
     }
 
     @Override
-    public List<AddressVo> getAddresses(Long userId, String asset) {
+    public AddressVo getAddresses(Long userId, String asset) {
         return depositAddrExtMapper.getAddresses(userId,asset);
     }
 }

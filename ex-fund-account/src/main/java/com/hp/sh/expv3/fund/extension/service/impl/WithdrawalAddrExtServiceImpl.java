@@ -23,10 +23,8 @@ public class WithdrawalAddrExtServiceImpl implements WithdrawalAddrExtService {
     private WithdrawalAddrExtMapper withdrawalAddrExtMapper;
 
     @Override
-    public List<WithdrawalAddrVo> getAddressByUserIdAndAsset(Long userId, String asset) {
-        List<WithdrawalAddrVo> voList = withdrawalAddrExtMapper.getAddressByUserIdAndAsset(userId, asset);
-        return voList;
-
+    public WithdrawalAddrVo getAddressByUserIdAndAsset(Long userId, String asset) {
+        return    withdrawalAddrExtMapper.getAddressByUserIdAndAsset(userId, asset);
     }
 
     @Override
