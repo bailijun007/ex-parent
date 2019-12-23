@@ -6,5 +6,5 @@ import java.math.BigDecimal;
  * @author BaiLiJun  on 2019/12/23
  */
 public interface PcOrderTradeService {
-    BigDecimal getRealisedPnlByPosIdAndUserId(Long posId, Long userId);
+    BigDecimal getRealisedPnl(Long posId, Long userId);
 }

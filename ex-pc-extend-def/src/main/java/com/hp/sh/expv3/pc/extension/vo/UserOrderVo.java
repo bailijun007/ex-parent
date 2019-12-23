@@ -12,6 +12,9 @@ public class UserOrderVo implements Serializable {
     @ApiModelProperty("id")
     private Long id;
 
+    @ApiModelProperty("用户id")
+    private Long userId;
+
     @ApiModelProperty("委托状态")
     private Integer status;
 
@@ -57,6 +60,24 @@ public class UserOrderVo implements Serializable {
     @ApiModelProperty("委托类型")
     private Integer orderType;
 
+    @ApiModelProperty("收益")
+    private BigDecimal realisedPnl;
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public BigDecimal getRealisedPnl() {
+        return realisedPnl;
+    }
+
+    public void setRealisedPnl(BigDecimal realisedPnl) {
+        this.realisedPnl = realisedPnl;
+    }
 
     public Long getId() {
         return id;

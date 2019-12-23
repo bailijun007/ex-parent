@@ -93,7 +93,7 @@
         <include refid="simple_where"/>
     </select>
 
-    <select id="getRealisedPnlByPosIdAndUserId" resultType="java.math.BigDecimal">
+    <select id="getRealisedPnl" resultType="java.math.BigDecimal">
         select IFNULL(SUM(pnl),0)
         from pc_order_trade
         <where>
