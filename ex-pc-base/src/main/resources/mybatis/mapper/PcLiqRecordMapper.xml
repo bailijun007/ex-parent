@@ -83,7 +83,7 @@
 		select
 			<include refid="Base_Column_List" />
 		from pc_liq_record
-			where id=#{id}
+			where id=#{id} and user_id=#{userId}
 	</select>
 
 	<select id="exist" resultType="boolean">
@@ -113,11 +113,11 @@
 		set 
 			asset=#{asset},symbol=#{symbol},pos_id=#{posId},long_flag=#{longFlag},volume=#{volume},pos_margin=#{posMargin},bankrupt_price=#{bankruptPrice},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
-			id=#{id}
+			id=#{id} and user_id=#{userId}
 	</update>
 
 	<delete id="delete">
-        delete from pc_liq_record where id=#{id}
+        delete from pc_liq_record where id=#{id} and user_id=#{userId}
     </delete>
 
     <delete id="condDelete">

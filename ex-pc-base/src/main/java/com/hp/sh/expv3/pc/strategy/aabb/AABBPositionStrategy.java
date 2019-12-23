@@ -117,17 +117,17 @@ public class AABBPositionStrategy implements PositionStrategy {
 		}
 		
 		//强平价
-//		if(pcPosition!=null){
-//			BigDecimal amount = pcPosition.getVolume().multiply(order.getFaceValue());
-//			tradeResult.setNewPosLiqPrice(
-//				this.calcLiqPrice(longFlag, amount, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), pcPosition.getPosMargin())
-//			);
-//		}else{
-//			BigDecimal holdRatio = feeRatioService.getHoldRatio(userId, asset, symbol, tradeResult.getVolume());
-//			tradeResult.setNewPosLiqPrice(
-//				this.calcLiqPrice(longFlag, tradeResult.getAmount(), tradeResult.getNewPosMeanPrice(), holdRatio, tradeResult.getOrderMargin())
-//			);
-//		}
+		if(pcPosition!=null){
+			BigDecimal amount = pcPosition.getVolume().multiply(order.getFaceValue());
+			tradeResult.setNewPosLiqPrice(
+				this.calcLiqPrice(longFlag, amount, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), pcPosition.getPosMargin())
+			);
+		}else{
+			BigDecimal holdRatio = feeRatioService.getHoldRatio(userId, asset, symbol, tradeResult.getVolume());
+			tradeResult.setNewPosLiqPrice(
+				this.calcLiqPrice(longFlag, tradeResult.getAmount(), tradeResult.getNewPosMeanPrice(), holdRatio, tradeResult.getOrderMargin())
+			);
+		}
 		
 		return tradeResult;
 	}
