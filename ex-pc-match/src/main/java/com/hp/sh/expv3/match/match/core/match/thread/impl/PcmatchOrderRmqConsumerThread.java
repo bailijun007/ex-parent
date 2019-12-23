@@ -27,6 +27,8 @@ import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.apache.rocketmq.common.protocol.ResponseCode;
+import org.apache.rocketmq.remoting.exception.RemotingException;
+import org.apache.rocketmq.remoting.exception.RemotingTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,122 +139,115 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
             logger.error(e.getErrorMessage(), e);
         }
 
-        try {
+//        try {
 
+        Map<String, String> topic2AssetSymbol = new HashMap<>();
 
-            Map<String, String> topic2AssetSymbol = new HashMap<>();
+        Map<String, Long> topic2Offset = new HashMap<>();
+        Tuple2<String, String> assetSymbolTuple = PcUtil.splitAssetAndSymbol(assetSymbol);
+        String topicName = PcRocketMqUtil.buildPcOrderTopicName(pcmatchRocketMqSetting.getPcOrderTopicNamePattern(), assetSymbolTuple.first, assetSymbolTuple.second);
 
-            Map<String, Long> topic2Offset = new HashMap<>();
-            Tuple2<String, String> assetSymbolTuple = PcUtil.splitAssetAndSymbol(assetSymbol);
-            String topicName = PcRocketMqUtil.buildPcOrderTopicName(pcmatchRocketMqSetting.getPcOrderTopicNamePattern(), assetSymbolTuple.first, assetSymbolTuple.second);
+        Set<MessageQueue> mqs = getMqs(consumer, topicName);
+        topic2Offset.put(topicName, initOffset);
+        topic2AssetSymbol.put(topicName, assetSymbol);
 
-            Set<MessageQueue> mqs = getMqs(consumer, topicName);
-            topic2Offset.put(topicName, initOffset);
-            topic2AssetSymbol.put(topicName, assetSymbol);
+        while (true) {
 
-            while (true) {
-
-                for (MessageQueue mq : mqs) {
+            for (MessageQueue mq : mqs) {
 //                	long offset = consumer.fetchConsumeOffset(mq, true);
 //                	PullResultExt pullResult =(PullResultExt)consumer.pull(mq, null, getMessageQueueOffset(mq), 32);
-                    //消息未到达默认是阻塞10秒，private long consumerPullTimeoutMillis = 1000 * 10;
+                //消息未到达默认是阻塞10秒，private long consumerPullTimeoutMillis = 1000 * 10;
 //                    logger.info("{}:{}", mq.getTopic(), topic2Offset.get(mq.getTopic()));
-                    try {
-                        String assetSymbol = topic2AssetSymbol.get(topicName);
-                        String asset = assetSymbolTuple.first;
-                        String symbol = assetSymbolTuple.second;
+                try {
+                    String assetSymbol = topic2AssetSymbol.get(topicName);
+                    String asset = assetSymbolTuple.first;
+                    String symbol = assetSymbolTuple.second;
 
-                        PullResult pullResult = consumer.pull(mq,
-                                String.join("||",
-                                        RmqTagEnum.PC_BOOK_RESET.getConstant(),
-                                        RmqTagEnum.PC_ORDER_PENDING_CANCEL.getConstant(),
-                                        RmqTagEnum.PC_MATCH_ORDER_SNAPSHOT_CREATE.getConstant(),
-                                        RmqTagEnum.PC_ORDER_PENDING_NEW.getConstant(),
-                                        RmqTagEnum.PC_POS_LIQ_LOCKED.getConstant(),
-                                        RmqTagEnum.PC_ORDER_REBASE.getConstant()
-                                ),
-                                topic2Offset.get(topicName),
-                                1024);
+                    Long offset = topic2Offset.get(topicName);
+                    PullResult pullResult = pull(consumer, mq, offset);
 
-                        List<MessageExt> msgFoundList = pullResult.getMsgFoundList();
-                        if (null == msgFoundList || msgFoundList.isEmpty()) {
-                            // 本批没有取到任何数据，期待下一次
-                            topic2Offset.put(topicName, pullResult.getNextBeginOffset());
-                            try {
-                                Thread.sleep(10L);
-                            } catch (InterruptedException e) {// catched ?
-                                e.printStackTrace();
-                            }
-                        } else {
+                    List<MessageExt> msgFoundList = pullResult.getMsgFoundList();
+                    if (null == msgFoundList || msgFoundList.isEmpty()) {
+                        // 本批没有取到任何数据，期待下一次
+                        topic2Offset.put(topicName, pullResult.getNextBeginOffset());
+                        try {
+                            Thread.sleep(10L);
+                        } catch (InterruptedException e) {// catched ?
+                            e.printStackTrace();
+                        }
+                    } else {
 
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("{}:size:{} {}-》{},last {}", topicName, msgFoundList.size(), topic2Offset.get(topicName), pullResult.getNextBeginOffset(), msgFoundList.get(msgFoundList.size() - 1).getQueueOffset());
-                            }
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("{}:size:{} {}-》{},last {}", topicName, msgFoundList.size(), offset, pullResult.getNextBeginOffset(), msgFoundList.get(msgFoundList.size() - 1).getQueueOffset());
+                        }
 
-                            for (int i = 0; i < msgFoundList.size(); i++) {
-                                MessageExt m = msgFoundList.get(i);
-                                topic2Offset.put(topicName, m.getQueueOffset() + 1);
-                                String body = new String(m.getBody());
+                        for (int i = 0; i < msgFoundList.size(); i++) {
+                            MessageExt m = msgFoundList.get(i);
+                            topic2Offset.put(topicName, m.getQueueOffset() + 1);
+                            String body = new String(m.getBody());
 
-                                IThreadWorker matchWorker = threadManagerPcMatchImpl.getWorker(assetSymbol);
+                            IThreadWorker matchWorker = threadManagerPcMatchImpl.getWorker(assetSymbol);
 
-                                PcOrderBaseTask task = null;
-                                long queueOffset = m.getQueueOffset();
-                                // 按出现频率多少，排 if 的顺序
-                                if (RmqTagEnum.PC_ORDER_PENDING_NEW.getConstant().equals(m.getTags())) {
-                                    PcOrderMqMsgDto dto = JSON.parseObject(body, PcOrderMqMsgDto.class);
-                                    if (null == dto.getFilledNumber()) {
-                                        dto.setFilledNumber(BigDecimal.ZERO);
-                                    }
-                                    PcOrder4MatchBo pcOrder4Match = PcOrder4MatchBoUtil.convert(dto);
-                                    task = pcMatchTaskService.buildPcOrderNewTask(assetSymbol, asset, symbol, queueOffset, pcOrder4Match);
-                                    matchWorker.addTask(task);
-                                } else if (RmqTagEnum.PC_ORDER_PENDING_CANCEL.getConstant().equals(m.getTags())) {
-                                    PcOrderMqMsgDto dto = JSON.parseObject(body, PcOrderMqMsgDto.class);
-                                    task = pcMatchTaskService.buildPcOrderCancelTask(assetSymbol, asset, symbol, queueOffset, dto.getAccountId(), dto.getOrderId());
-                                    task.setCurrentMsgOffset(m.getQueueOffset());
-                                    matchWorker.addTask(task);
-                                } else if (RmqTagEnum.PC_BOOK_RESET.getConstant().equals(m.getTags())) {
-                                    task = pcMatchTaskService.buildPcOrderBookReset(assetSymbol, asset, symbol, queueOffset);
-                                    matchWorker.addTask(task);
-                                } else if (RmqTagEnum.PC_MATCH_ORDER_SNAPSHOT_CREATE.getConstant().equals(m.getTags())) {
-                                    task = pcMatchTaskService.buildOrderSnapshotTask(assetSymbol, asset, symbol, queueOffset);
-                                    matchWorker.addTask(task);
-                                } else if (RmqTagEnum.PC_POS_LIQ_LOCKED.getConstant().equals(m.getTags())) {
-                                    PcPosLockedMqMsgDto dto = JSON.parseObject(body, PcPosLockedMqMsgDto.class);
-                                    task = pcMatchTaskService.buildPcOrderCancelByLiqTask(assetSymbol, asset, symbol, queueOffset, dto);
-                                    matchWorker.addTask(task);
-                                } else if (RmqTagEnum.PC_ORDER_REBASE.getConstant().equals(m.getTags())) {
-                                    task = pcMatchTaskService.buildOrderRebaseTask(assetSymbol, asset, symbol, queueOffset);
-                                    matchWorker.addTask(task);
-                                } else {
-                                    logger.error("get tags {} not define,go to exit -1", m.getTags());
-                                    System.exit(-1);
+                            PcOrderBaseTask task = null;
+                            long queueOffset = m.getQueueOffset();
+                            // 按出现频率多少，排 if 的顺序
+                            if (RmqTagEnum.PC_ORDER_PENDING_NEW.getConstant().equals(m.getTags())) {
+                                PcOrderMqMsgDto dto = JSON.parseObject(body, PcOrderMqMsgDto.class);
+                                if (null == dto.getFilledNumber()) {
+                                    dto.setFilledNumber(BigDecimal.ZERO);
                                 }
-                            }
-                            try {
-                                Thread.sleep(2L);
-                            } catch (InterruptedException e) {
-                                logger.error(e.getMessage(), e);
+                                PcOrder4MatchBo pcOrder4Match = PcOrder4MatchBoUtil.convert(dto);
+                                task = pcMatchTaskService.buildPcOrderNewTask(assetSymbol, asset, symbol, queueOffset, pcOrder4Match);
+                                matchWorker.addTask(task);
+                            } else if (RmqTagEnum.PC_ORDER_PENDING_CANCEL.getConstant().equals(m.getTags())) {
+                                PcOrderMqMsgDto dto = JSON.parseObject(body, PcOrderMqMsgDto.class);
+                                task = pcMatchTaskService.buildPcOrderCancelTask(assetSymbol, asset, symbol, queueOffset, dto.getAccountId(), dto.getOrderId());
+                                task.setCurrentMsgOffset(m.getQueueOffset());
+                                matchWorker.addTask(task);
+                            } else if (RmqTagEnum.PC_BOOK_RESET.getConstant().equals(m.getTags())) {
+                                task = pcMatchTaskService.buildPcOrderBookReset(assetSymbol, asset, symbol, queueOffset);
+                                matchWorker.addTask(task);
+                            } else if (RmqTagEnum.PC_MATCH_ORDER_SNAPSHOT_CREATE.getConstant().equals(m.getTags())) {
+                                task = pcMatchTaskService.buildOrderSnapshotTask(assetSymbol, asset, symbol, queueOffset);
+                                matchWorker.addTask(task);
+                            } else if (RmqTagEnum.PC_POS_LIQ_LOCKED.getConstant().equals(m.getTags())) {
+                                PcPosLockedMqMsgDto dto = JSON.parseObject(body, PcPosLockedMqMsgDto.class);
+                                task = pcMatchTaskService.buildPcOrderCancelByLiqTask(assetSymbol, asset, symbol, queueOffset, dto);
+                                matchWorker.addTask(task);
+                            } else if (RmqTagEnum.PC_ORDER_REBASE.getConstant().equals(m.getTags())) {
+                                task = pcMatchTaskService.buildOrderRebaseTask(assetSymbol, asset, symbol, queueOffset);
+                                matchWorker.addTask(task);
+                            } else {
+                                logger.error("get tags {} not define,go to exit -1", m.getTags());
+                                System.exit(-1);
                             }
                         }
-                    } catch (MQBrokerException e) {
-                        if (e.getResponseCode() == ResponseCode.TOPIC_NOT_EXIST) {
-                            logger.warn("{} deleted.rebase ", assetSymbolTuple);
-                            pcOrderMqNotify.sendPcOrderRebase(asset, symbol);
-                            mqs = getMqs(consumer, topicName);
-                        } else {
-                            logger.error(e.getErrorMessage());
-                            Thread.sleep(1000L);
+                        try {
+                            Thread.sleep(2L);
+                        } catch (InterruptedException e) {
+                            logger.error(e.getMessage(), e);
                         }
                     }
+                } catch (MQBrokerException e) {
+                    if (e.getResponseCode() == ResponseCode.TOPIC_NOT_EXIST) {
+                        logger.warn("{} deleted.rebase ", assetSymbolTuple);
+                        pcOrderMqNotify.sendPcOrderRebase(asset, symbol);
+                        mqs = getMqs(consumer, topicName);
+                    } else {
+                        logger.error(e.getErrorMessage());
+                        try {
+                            Thread.sleep(1000L);
+                        } catch (InterruptedException e1) {
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error(this.getName() + " stop:" + e.getMessage(), e);
+                    isStart.set(false);
                 }
             }
-        } catch (Exception e) {
-            logger.error(this.getName() + " stop:" + e.getMessage(), e);
-            isStart.set(false);
         }
-        isStart.set(false);
+//        }
+//        isStart.set(false);
     }
 
     @Autowired
@@ -287,6 +282,26 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
             }
         }
         return mqs;
+    }
+
+    private PullResult pull(DefaultMQPullConsumer consumer, MessageQueue mq, long offset) throws MQBrokerException, RemotingException, MQClientException, InterruptedException {
+        while (true) {
+            try {
+                return consumer.pull(mq,
+                        String.join("||",
+                                RmqTagEnum.PC_BOOK_RESET.getConstant(),
+                                RmqTagEnum.PC_ORDER_PENDING_CANCEL.getConstant(),
+                                RmqTagEnum.PC_MATCH_ORDER_SNAPSHOT_CREATE.getConstant(),
+                                RmqTagEnum.PC_ORDER_PENDING_NEW.getConstant(),
+                                RmqTagEnum.PC_POS_LIQ_LOCKED.getConstant(),
+                                RmqTagEnum.PC_ORDER_REBASE.getConstant()
+                        ),
+                        offset,
+                        1024);
+            } catch (RemotingTimeoutException e) {
+                logger.warn("retry,pull timeout:{}", e.getMessage());
+            }
+        }
     }
 
 }

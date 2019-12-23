@@ -1,7 +1,9 @@
 package com.hp.sh.expv3;
 
-import java.util.concurrent.Executor;
-
+import com.hp.sh.expv3.match.match.core.match.thread.impl.PcOrderSnapshotCreateTriggerThread;
+import com.hp.sh.expv3.match.match.core.order.OrderInitializer;
+import com.hp.sh.expv3.match.thread.def.IThreadManager;
+import com.hp.sh.expv3.match.util.Application;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +21,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import com.hp.sh.expv3.match.match.core.match.thread.impl.PcOrderSnapshotCreateTriggerThread;
-import com.hp.sh.expv3.match.match.core.order.OrderInitializer;
-import com.hp.sh.expv3.match.thread.def.IThreadManager;
-import com.hp.sh.expv3.match.util.Application;
+import java.util.concurrent.Executor;
 
 //@EnableDiscoveryClient
 //@EnableFeignClients({"com.hp.sh.expv3"})

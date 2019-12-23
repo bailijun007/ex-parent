@@ -4,15 +4,14 @@
  */
 package com.hp.sh.expv3.match.component.notify;
 
+import com.google.common.collect.Lists;
 import com.hp.sh.expv3.match.bo.PcTradeBo;
 import com.hp.sh.expv3.match.component.rocketmq.PcMatchProducer;
 import com.hp.sh.expv3.match.config.setting.PcmatchRocketMqSetting;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
-import com.hp.sh.expv3.match.mqmsg.PcOrderCancelMqMsgDto;
-import com.hp.sh.expv3.match.mqmsg.PcOrderMqMsgDto;
-import com.hp.sh.expv3.match.mqmsg.PcOrderTradeMqMsgDto;
-import com.hp.sh.expv3.match.mqmsg.PcPosLockedMqMsgDto;
+import com.hp.sh.expv3.match.mqmsg.*;
+import com.hp.sh.expv3.match.util.BeanCopyUtil;
 import com.hp.sh.expv3.match.util.JsonUtil;
 import com.hp.sh.expv3.match.util.PcRocketMqUtil;
 import org.apache.rocketmq.common.message.Message;
@@ -22,8 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PcMatchMqNotify {
@@ -180,19 +181,30 @@ public class PcMatchMqNotify {
         return true;
     }
 
-    public boolean sendSameSideCloseOrderAllCancelled(String asset, String symbol, PcPosLockedMqMsgDto msg) {
+    public boolean sendSameSideCloseOrderAllCancelled(String asset, String symbol, PcPosLockedMqMsgDto msg, List<PcOrderCancelMqMsgDto> cancelMqMsgs) {
         String topic = PcRocketMqUtil.buildPcAccountContractMqTopicName(pcmatchRocketMqSetting.getPcMatchTopicNamePattern(), asset, symbol);
 
-        Message message = new Message(
-                topic,// topic
-                "" + RmqTagEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED.getConstant(),// tag
-                "" + msg.getId(), // pos id
-                JsonUtil.toJsonString(msg).getBytes()// body
-        );
-        safeSend2MatchTopic(message, msg.getAccountId());
+        PcOrderSameSideCancelled4PosLockMqMsgDto dto = BeanCopyUtil.copy(msg);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+        List<List<PcOrderCancelMqMsgDto>> partitions = Lists.partition(Optional.ofNullable(cancelMqMsgs).orElse(new ArrayList<>()), 10);
+
+        for (int i = 0; i < partitions.size(); i++) {
+            if (i == partitions.size() - 1) {
+                dto.setLastFlag(CommonConst.YES);
+            } else {
+                dto.setLastFlag(CommonConst.NO);
+            }
+            dto.setCancelOrders(partitions.get(i));
+            Message message = new Message(
+                    topic,// topic
+                    "" + RmqTagEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED.getConstant(),// tag
+                    "" + dto.getPosId(), // pos id
+                    JsonUtil.toJsonString(dto).getBytes()// body
+            );
+            safeSend2MatchTopic(message, dto.getAccountId());
+            if (logger.isDebugEnabled()) {
+                logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+            }
         }
         return true;
     }
