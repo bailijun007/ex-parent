@@ -136,5 +136,45 @@
         <include refid="simple_where"/>
     </select>
 
+    <select id="queryHistory" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
+        select <include refid="Base_Column_List"/>
+        from pc_order
+      <where>
+          <if test="userId!=null">
+              user_id=#{userId}
+          </if>
+          <if test="asset!=null and asset!=''">
+              and asset=#{asset}
+          </if>
+          <if test="symbol!=null and symbol!=''">
+              and symbol=#{symbol}
+          </if>
+          <if test="orderType!=null">
+              and order_type=#{orderType}
+          </if>
+          <if test="longFlag!=null">
+              and long_flag=#{longFlag}
+          </if>
+          <if test="closeFlag!=null">
+              and close_flag=#{closeFlag}
+          </if>
+          <choose>
+              <when test="nextPage==1 and pageSize!=null and lastOrderId!=null">
+                  and id &gt; #{lastOrderId}
+                  ORDER BY id asc
+                  LIMIT 0,${pageSize}
+              </when>
+              <when test="nextPage==-1 and pageSize!=null and lastOrderId!=null">
+                  and id &lt; #{lastOrderId}
+                  ORDER BY id desc
+                  LIMIT 0,${pageSize}
+              </when>
+              <otherwise>
+                  ORDER BY id desc
+                  LIMIT 0,${pageSize}
+              </otherwise>
+          </choose>
+      </where>
+    </select>
 
 </mapper>
