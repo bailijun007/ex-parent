@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.fund.extension.api;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.fund.extension.vo.FundTransferExtVo;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo;
 import io.swagger.annotations.Api;
@@ -22,16 +23,27 @@ public interface FundTransferExtApi {
     @ApiOperation("查询划转历史")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
-            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC",required = false),
-            @ApiImplicitParam(name = "queryId", value = "充币记录表主键编号", example = "1",required = false),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "queryId", value = "充币记录表主键编号", example = "1", required = false),
             @ApiImplicitParam(name = "pageStatus", value = "翻页状态：-1：上一页，1：下一页", example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
     @GetMapping(value = "/api/extension/account/transfer/queryHistory")
-    public List<FundTransferExtVo> queryHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset",required = false) String asset,
-                                                @RequestParam(value = "queryId",required = false) Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
+    public List<FundTransferExtVo> queryHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset", required = false) String asset,
+                                                @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
                                                 @RequestParam(value = "pageStatus") Integer pageStatus);
 
+
+    @ApiOperation("查询所有用户划转历史记录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
+            @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
+    })
+    @GetMapping(value = "/api/extension/account/transfer/queryAllUserHistory")
+    public PageResult<FundTransferExtVo> queryAllUserHistory(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "asset", required = false) String asset,
+                                                             @RequestParam(value = "pageSize") Integer pageSize, @RequestParam(value = "pageNo") Integer pageNo);
 
 
 }

@@ -29,4 +29,20 @@
         </where>
     </select>
 
+    <select id="queryList" resultType="com.hp.sh.expv3.fund.extension.vo.FundTransferExtVo">
+         SELECT id transferId,asset,  amount qty,created,status,src_account_type  fromAccount,target_account_type toAccount
+         FROM fund_transfer
+        <where>
+
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
+
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+        </where>
+
+    </select>
+
 </mapper>

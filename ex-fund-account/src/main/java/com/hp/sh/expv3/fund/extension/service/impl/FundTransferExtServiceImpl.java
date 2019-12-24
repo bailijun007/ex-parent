@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.fund.extension.service.impl;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.extension.dao.FundTransferExtMapper;
 import com.hp.sh.expv3.fund.extension.error.FundTransferExtErrorCode;
@@ -10,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -33,10 +36,33 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
             Optional<FundTransferExtVo> vo = Optional.ofNullable(transferExtVo);
             transferExtVo.setCtime(vo.map(t -> t.getCreated().getTime()).orElse(null));
             int status = vo.filter(t -> t.getStatus() == 8).map(t -> t.getStatus()).orElse(2);
-            if(status==2){
+            if (status == 2) {
                 transferExtVo.setStatus(status);
-            }else {
+            } else {
                 transferExtVo.setStatus(1);
+            }
+        }
+
+        return voList;
+    }
+
+    @Override
+    public List<FundTransferExtVo> queryAllUserHistory(Long userId, String asset) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("userId",userId);
+        map.put("asset",asset);
+        List<FundTransferExtVo> voList = fundTransferExtMapper.queryList(map);
+
+        if (!CollectionUtils.isEmpty(voList)) {
+            for (FundTransferExtVo transferExtVo : voList) {
+                Optional<FundTransferExtVo> vo = Optional.ofNullable(transferExtVo);
+                transferExtVo.setCtime(vo.map(t -> t.getCreated().getTime()).orElse(null));
+                int status = vo.filter(t -> t.getStatus() == 8).map(t -> t.getStatus()).orElse(2);
+                if (status == 2) {
+                    transferExtVo.setStatus(status);
+                } else {
+                    transferExtVo.setStatus(1);
+                }
             }
         }
 

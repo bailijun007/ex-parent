@@ -3,15 +3,34 @@
 
 <mapper namespace="com.hp.sh.expv3.fund.extension.dao.FundAccountExtendMapper">
 
+    <sql id="simple_where">
+        <where>
+            <if test="idList!=null">
+                and user_id in
+                <foreach item="item" index="i" collection="userIdList" open="("
+                         separator="," close=")">
+                    #{userIdList[${i}]}
+                </foreach>
+            </if>
+            <if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+            <if test="version!=null"> and version=#{version}</if>
+            <if test="userId!=null"> and user_id=#{userId}</if>
+            <if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+            <if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+            <if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
+            <if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+
+        </where>
+    </sql>
+
     <select id="getCapitalAccount" resultType="com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo">
-       SELECT user_id as accountId ,asset ,balance as available from fund_account
-       where 1=1
-       <if test="userId!=null">
-           and user_id=#{userId}
-       </if>
-        <if test="asset!=null and asset!=''">
-            and asset=#{asset}
-        </if>
+        SELECT user_id as accountId ,asset ,balance as available from fund_account
+        where user_id=#{userId}  and asset=#{asset}
+    </select>
+
+    <select id="queryList" resultType="com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo">
+        SELECT user_id as accountId ,asset ,balance as available from fund_account
+        <include refid="simple_where"/>
     </select>
 
 </mapper>
