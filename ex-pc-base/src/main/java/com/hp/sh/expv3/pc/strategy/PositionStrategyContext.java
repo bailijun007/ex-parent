@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.pc.strategy;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class PositionStrategyContext {
 	@Autowired
 	private HoldPosStrategy _holdPosStrategy;
 
-	private Map<Integer, StrategyBundle> map;
+	private Map<Integer, StrategyBundle> strategyBundleMap = new HashMap<Integer, StrategyBundle>();
 	
 	/**
 	 * 仓位所需初始保证金
@@ -161,7 +162,7 @@ public class PositionStrategyContext {
 	
 	public HoldPosStrategy getHoldPosStrategy(String asset, String symbol){
 		Integer strategyId = this.genStrategyId(asset, symbol);
-		StrategyBundle sb = map.get(strategyId);
+		StrategyBundle sb = strategyBundleMap.get(strategyId);
 		return sb.getHoldPosStrategy();
 	}
 	
@@ -173,7 +174,7 @@ public class PositionStrategyContext {
 	@Autowired(required=false)
 	public void setBundleList(List<StrategyBundle> bundleList){
 		for(StrategyBundle sb : bundleList){
-			this.map.put(sb.strategyId(), sb);
+			this.strategyBundleMap.put(sb.strategyId(), sb);
 		}
 	}
 	

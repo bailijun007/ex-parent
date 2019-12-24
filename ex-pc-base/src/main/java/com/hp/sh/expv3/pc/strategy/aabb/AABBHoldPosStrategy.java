@@ -2,8 +2,6 @@ package com.hp.sh.expv3.pc.strategy.aabb;
 
 import java.math.BigDecimal;
 
-import org.springframework.stereotype.Component;
-
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.utils.IntBool;
@@ -15,7 +13,6 @@ import com.hp.sh.expv3.utils.math.Precision;
  * @author wangjg
  *
  */
-@Component
 public class AABBHoldPosStrategy implements HoldPosStrategy{
 	
 	/**
