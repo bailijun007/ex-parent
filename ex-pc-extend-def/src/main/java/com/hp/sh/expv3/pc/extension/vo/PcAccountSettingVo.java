@@ -2,12 +2,13 @@ package com.hp.sh.expv3.pc.extension.vo;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * @author BaiLiJun  on 2019/12/24
  */
-public class PcAccountSymbolVO {
+public class PcAccountSettingVo implements Serializable {
 
     @ApiModelProperty("资产")
     private String asset;
@@ -36,7 +37,7 @@ public class PcAccountSymbolVO {
     @ApiModelProperty("1全仓 2逐仓")
     private Integer marginMode;
 
-    public PcAccountSymbolVO() {
+    public PcAccountSettingVo() {
     }
 
     public String getAsset() {

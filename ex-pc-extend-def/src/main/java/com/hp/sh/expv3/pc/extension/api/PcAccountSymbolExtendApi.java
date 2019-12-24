@@ -1,6 +1,6 @@
 package com.hp.sh.expv3.pc.extension.api;
 
-import com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVO;
+import com.hp.sh.expv3.pc.extension.vo.PcAccountSettingVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -23,8 +23,8 @@ public interface PcAccountSymbolExtendApi {
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true)
     })
-    PcAccountSymbolVO query(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
-                            @RequestParam("symbol") String symbol);
+    PcAccountSettingVo query(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
+                             @RequestParam("symbol") String symbol);
 
 
 }
