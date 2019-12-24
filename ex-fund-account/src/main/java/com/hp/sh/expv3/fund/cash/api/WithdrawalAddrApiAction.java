@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalAddr;
 import com.hp.sh.expv3.fund.cash.service.WithdrawAddrService;
 
-import io.swagger.annotations.Api;
-
 /**
  * 提币地址接口
  * @author wangjg
