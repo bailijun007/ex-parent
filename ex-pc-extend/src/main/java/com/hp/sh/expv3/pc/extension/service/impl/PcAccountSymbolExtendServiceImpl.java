@@ -2,7 +2,6 @@ package com.hp.sh.expv3.pc.extension.service.impl;
 
 import com.hp.sh.expv3.pc.extension.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.extension.service.PcAccountSymbolExtendService;
-import com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVO;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

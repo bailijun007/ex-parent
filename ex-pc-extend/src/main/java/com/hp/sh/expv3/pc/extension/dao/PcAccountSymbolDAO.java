@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.pc.extension.dao;
 
-import com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVO;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVo;
 
 import java.util.List;
