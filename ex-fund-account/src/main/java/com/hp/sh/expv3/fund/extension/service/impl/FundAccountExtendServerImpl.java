@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author BaiLiJun  on 2019/12/13
  */
@@ -20,5 +24,14 @@ public class FundAccountExtendServerImpl implements FundAccountExtendService {
     @Override
     public CapitalAccountVo getCapitalAccount(Long userId, String asset) {
         return fundAccountExtendMapper.getCapitalAccount(userId,asset);
+    }
+
+    @Override
+    public List<CapitalAccountVo> fundAccountList(Long userId, String asset) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("userId",userId);
+        map.put("asset",asset);
+        List<CapitalAccountVo> voList = fundAccountExtendMapper.queryList(map);
+        return voList;
     }
 }

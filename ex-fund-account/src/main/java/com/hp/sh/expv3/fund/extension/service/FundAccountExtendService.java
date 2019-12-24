@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author BaiLiJun  on 2019/12/13
  */
@@ -14,4 +16,6 @@ public interface FundAccountExtendService {
 
 
     public CapitalAccountVo getCapitalAccount(Long userId, String asset) ;
+
+    List<CapitalAccountVo> fundAccountList(Long userId, String asset);
 }
