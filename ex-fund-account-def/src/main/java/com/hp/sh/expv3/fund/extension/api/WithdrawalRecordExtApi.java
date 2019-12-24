@@ -35,6 +35,17 @@ public interface WithdrawalRecordExtApi {
                                                  @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
                                                  @RequestParam(value = "pageStatus") Integer pageStatus);
 
+    @ApiOperation("通过时间戳获取用户提币记录（不含提币失败的）")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "2", required = true),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "ETH", required = true),
+            @ApiImplicitParam(name = "timestamp", value = "时间戳", required = true)
+    })
+    @GetMapping(value = "/api/extension/account/withdrawal/queryHistoryByTime")
+    public List<WithdrawalRecordVo> queryHistoryByTime(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset") String asset,
+                                                       @RequestParam(value = "timestamp") Long timestamp);
+
+
     @ApiOperation("获取最新提币历史")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "2", required = true),

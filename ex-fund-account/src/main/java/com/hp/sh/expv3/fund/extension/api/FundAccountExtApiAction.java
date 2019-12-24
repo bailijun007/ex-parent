@@ -68,16 +68,14 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
                 vo.setLock(frozenCapital);
                 vo.setTotalAssets(frozenCapital.add(vo.getAvailable()));
             }
-        }
-        List<CapitalAccountVo> list = voList.stream()
-                .skip(pageSize * (pageNo - 1))
-                .limit(pageSize)
-                .collect(Collectors.toList());
 
-        Integer rowTotal = list.size();
-        result.setList(list);
+            List<CapitalAccountVo> list = voList.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
+            result.setList(list);
+        }
+
+        Integer rowTotal = voList.size();
         result.setPageNo(pageNo);
-        result.setRowTotal(Long.valueOf(rowTotal+""));
+        result.setRowTotal(Long.valueOf(rowTotal + ""));
         result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
         return result;
     }

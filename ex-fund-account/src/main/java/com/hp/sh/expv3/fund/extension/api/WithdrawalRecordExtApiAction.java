@@ -15,6 +15,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +44,20 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     }
 
     @Override
+    public List<WithdrawalRecordVo> queryHistoryByTime(Long userId, String asset, Long timestamp) {
+        if (userId == null || timestamp == null || StringUtils.isEmpty(asset)) {
+            throw new ExException(WithdrawalRecordExtErrorCode.PARAM_EMPTY);
+        }
+        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(timestamp));
+        List<WithdrawalRecordVo> voList = withdrawalRecordExtService.findWithdrawalRecordList(userId, asset, time);
+        for (WithdrawalRecordVo vo : voList) {
+            WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
+            vo.setTargetAddress(withdrawalAddrVo.getAddress());
+        }
+        return voList;
+    }
+
+    @Override
     public WithdrawalRecordVo queryLastHistory(Long userId, String asset) {
         WithdrawalRecordVo vo = withdrawalRecordExtService.queryLastHistory(userId, asset);
         return vo;
@@ -55,12 +71,13 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
         }
 
         List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, null, null, null);
+        if (!CollectionUtils.isEmpty(voList)) {
+            List<WithdrawalRecordVo> pageList = voList.stream().skip(pageSize * (pageNo - 1))
+                    .limit(pageSize)
+                    .collect(Collectors.toList());
+            result.setList(pageList);
+        }
 
-        List<WithdrawalRecordVo> pageList = voList.stream().skip(pageSize * (pageNo - 1))
-                .limit(pageSize)
-                .collect(Collectors.toList());
-
-        result.setList(pageList);
         Integer rowTotal = voList.size();
         result.setPageNo(pageNo);
         result.setRowTotal(new Long(rowTotal + ""));

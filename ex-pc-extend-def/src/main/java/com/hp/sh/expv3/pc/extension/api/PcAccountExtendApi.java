@@ -6,6 +6,7 @@ package com.hp.sh.expv3.pc.extension.api;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountExtVo;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -34,6 +35,19 @@ public interface PcAccountExtendApi {
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true)
     })
     List<PcAccountExtVo> findContractAccount(@RequestParam("userIds") String userIds, @RequestParam("asset") String asset);
+
+
+    @ApiOperation(value = "获取合约账户列表")
+    @GetMapping(value = "/api/extension/account/pc/findContractAccountList")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
+            @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true),
+
+    })
+    PageResult<PcAccountExtVo> findContractAccountList(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "asset", required = false) String asset,
+                                                       @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize", required = true) Integer pageSize);
 
 
 }
