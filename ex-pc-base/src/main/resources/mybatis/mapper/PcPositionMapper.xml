@@ -159,7 +159,7 @@
         	pc_position
         where
         	user_id=#{userId} and asset=#{asset} and symbol=#{symbol} and long_flag=#{longFlag}
-        and volume &lt; 0
+        and volume &gt; 0
     </select>
 
     <select id="queryActivePosList" resultMap="PcPosition">
