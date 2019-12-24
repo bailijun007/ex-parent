@@ -6,7 +6,6 @@ package com.hp.sh.expv3.pc.component.mock;
 
 import java.math.BigDecimal;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.component.MarkPriceService;
@@ -17,9 +16,8 @@ import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
  * @author wangjg
  *
  */
-@Primary
 @Component
-public class MarkPriceServiceImpl implements MarkPriceService{
+public class MarkPriceServiceMock implements MarkPriceService{
 
     public BigDecimal getCurrentMarkPrice(String asset, String symbol) {
         return BigDecimal.ONE;

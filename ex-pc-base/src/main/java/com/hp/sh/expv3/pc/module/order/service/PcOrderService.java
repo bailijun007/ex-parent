@@ -3,6 +3,7 @@ package com.hp.sh.expv3.pc.module.order.service;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -11,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
+import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -236,6 +239,9 @@ public class PcOrderService {
 		if(BigUtils.eq(order.getVolume(), order.getFilledVolume())){
 			throw new ExException(OrderError.FILLED);
 		}
+		if(IntBool.isFlase(order.getActiveFlag())){
+			throw new ExException(OrderError.NOT_ACTIVE);
+		}
 		
 		long count = this.pcOrderDAO.setCancelStatus(userId, orderId, OrderStatus.PENDING_CANCEL, now);
 		
@@ -320,6 +326,16 @@ public class PcOrderService {
         if (BigUtils.gt(number, closablePos)) {
             throw new ExException(PositonError.POS_NOT_ENOUGH);
         }
+	}
+	
+	@CrossDB
+	public List<PcOrder> pageQuery(Page page, Integer status, Date modified){
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("page", page);
+		params.put("status", status);
+		params.put("modifiedEnd", modified);
+		List<PcOrder> list = this.pcOrderDAO.queryList(params);
+		return list;
 	}
 	
 }

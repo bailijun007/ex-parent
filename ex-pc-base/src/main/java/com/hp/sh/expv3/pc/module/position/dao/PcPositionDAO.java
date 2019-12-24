@@ -34,7 +34,7 @@ public interface PcPositionDAO extends BaseUserDataMapper<PcPosition,Long> {
 
 	public List<PcPosition> queryActivePosList(
 			Page page,
-			@Param("userId") long userId, 
+			@Param("userId") Long userId, 
 			@Param("asset") String asset,
 			@Param("symbol") String symbol);
 

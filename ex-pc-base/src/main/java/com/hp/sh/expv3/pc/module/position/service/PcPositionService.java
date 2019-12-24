@@ -81,7 +81,7 @@ public class PcPositionService {
 		//如果仓位不存在则创建新仓位
 		boolean isNewPos = false;
 		if(pcPosition==null){
-			pcPosition = this.newEmptyPostion(as.getUserId(), as.getAsset(), as.getSymbol(), order.getLongFlag(), order.getLeverage(), as.getMarginMode());
+			pcPosition = this.newEmptyPostion(as.getUserId(), as.getAsset(), as.getSymbol(), order.getLongFlag(), order.getLeverage(), as.getMarginMode(), order.getFaceValue());
 			isNewPos = true;
 		}
 		
@@ -191,7 +191,7 @@ public class PcPositionService {
 		return orderTrade;
 	}
 	
-	private PcPosition newEmptyPostion(long userId, String asset, String symbol, int longFlag, BigDecimal entryLeverage, int marginMode) {
+	private PcPosition newEmptyPostion(long userId, String asset, String symbol, int longFlag, BigDecimal entryLeverage, int marginMode, BigDecimal faceValue) {
 		PcPosition pcPosition = new PcPosition();
 		pcPosition.setUserId(userId);
 		pcPosition.setAsset(asset);
@@ -222,6 +222,8 @@ public class PcPositionService {
 		
 		pcPosition.setAccuVolume(BigDecimal.ZERO);
 		pcPosition.setAccuBaseValue(BigDecimal.ZERO);
+		
+		pcPosition.setFaceValue(faceValue);
 		
 		return pcPosition;
 	}

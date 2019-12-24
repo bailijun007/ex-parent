@@ -42,14 +42,14 @@ public interface PcOrderApi {
     })
 	@GetMapping(value = "/api/pc/order/create")
 	void create(Long userId, String asset, String symbol, Integer closeFlag, Integer longFlag, Integer timeInForce,
-			BigDecimal price, BigDecimal number, String cliOrderId) throws Exception;
+			BigDecimal price, BigDecimal number, String cliOrderId);
 
 	@ApiOperation(value = "取消订单")
 	@GetMapping(value = "/api/pc/order/cancel")
-	void cancel(Long userId, String asset, String symbol, Long orderId) throws Exception;
+	void cancel(Long userId, String asset, String symbol, Long orderId);
 
 	@ApiOperation(value = "重置深度1")
 	@GetMapping(value = "/api/pc/order/bookReset")
-	void bookReset(String asset, String symbol) throws Exception;
+	void bookReset(String asset, String symbol);
 
 }

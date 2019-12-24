@@ -1,27 +1,28 @@
 package com.hp.sh.expv3.pc.component.impl;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
+
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.vo.PosLevelVo;
 import com.hp.sh.expv3.pc.constant.RedisKey;
 import com.hp.sh.expv3.utils.math.Precision;
 
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * @author BaiLiJun  on 2019/12/18
  */
-@Service
-@Transactional(rollbackFor = Exception.class)
-public class FeeRatioServiceImpl2 implements FeeRatioService {
+@Primary
+@Component
+public class FeeRatioServiceImpl implements FeeRatioService {
 
     @Resource(name = "templateDB0")
     private StringRedisTemplate templateDB0;

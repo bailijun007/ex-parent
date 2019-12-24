@@ -66,7 +66,7 @@ public class PcLiqService {
     private LiqMqSender liqMqSender;
 
 	public void handleLiq(PcPosition pos) {
-		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getAsset());
+		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getSymbol());
 		//检查触发强平
 		if(!this.checkAndResetLiqStatus(pos, markPriceVo.getMarkPrice())){
 			return;
@@ -113,8 +113,10 @@ public class PcLiqService {
 		if(posMarginRatio.compareTo(holdMarginRatio)<=0){//强平
 			return true;
 		}else{//不强平
-			pos.setLiqStatus(LiqStatus.NO);
-			this.pcPositionDAO.update(pos);
+			if(pos.getLiqStatus()!=LiqStatus.NO){
+				pos.setLiqStatus(LiqStatus.NO);
+				this.pcPositionDAO.update(pos);
+			}
 			return false;
 		}
 	}

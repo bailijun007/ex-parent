@@ -2,11 +2,8 @@ package com.hp.sh.expv3.pc.component.mock;
 
 import java.math.BigDecimal;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-import com.gitee.hupadev.commons.cache.Cache;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.utils.math.Precision;
 
@@ -16,9 +13,8 @@ import com.hp.sh.expv3.utils.math.Precision;
  * @author lw
  *
  */
-@Primary
 @Component
-public class FeeRatioServiceImpl implements FeeRatioService {
+public class FeeRatioServiceMock implements FeeRatioService {
 
 	@Override
 	public BigDecimal getInitedMarginRatio(BigDecimal leverage) {

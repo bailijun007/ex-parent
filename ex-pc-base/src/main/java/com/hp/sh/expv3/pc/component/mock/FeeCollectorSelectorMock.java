@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.pc.component.mock;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
@@ -10,9 +9,8 @@ import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
  * @author wangjg
  *
  */
-@Primary
 @Component
-public class FeeCollectorSelectorImpl implements FeeCollectorSelector{
+public class FeeCollectorSelectorMock implements FeeCollectorSelector{
 	
 	public Long getFeeCollectorId(Long userId, String asset, String symbol){
 		return 1L;

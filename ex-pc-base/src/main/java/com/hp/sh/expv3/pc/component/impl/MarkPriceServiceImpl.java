@@ -10,22 +10,22 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import com.hp.sh.expv3.pc.component.MarkPriceService;
-import org.springframework.util.CollectionUtils;
+import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 
 /**
  * 标记价格服务
  *
  * @author wangjg
  */
-@Service
-@Transactional(rollbackFor = Exception.class)
-public class MarkPriceServiceImpl2 implements MarkPriceService {
+@Primary
+@Component
+public class MarkPriceServiceImpl implements MarkPriceService {
     @Resource(name = "templateDB0")
     private StringRedisTemplate templateDB0;
 

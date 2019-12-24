@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import com.hp.sh.expv3.pc.constant.RedisKey;
 /**
  * @author BaiLiJun  on 2019/12/18
  */
+@Primary
 @Component
 public class MetadataServiceImpl implements MetadataService {
 

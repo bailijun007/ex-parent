@@ -19,6 +19,8 @@ public class OrderError extends ErrorCode {
 
 	public static final OrderError FILLED = new OrderError(020103, "订单已成交!");
 	
+	public static final OrderError NOT_ACTIVE = new OrderError(020104, "订单已经已结束!");
+	
 	private OrderError(int code, String message) {
 		super(code, message);
 	}

@@ -36,7 +36,7 @@ public class PcOrderApiAction implements PcOrderApi {
 	 * @throws Exception 
 	 */
 	@Override
-	public void create(Long userId, String asset, String symbol, Integer closeFlag, Integer longFlag, Integer timeInForce, BigDecimal price, BigDecimal number, String cliOrderId) throws Exception{
+	public void create(Long userId, String asset, String symbol, Integer closeFlag, Integer longFlag, Integer timeInForce, BigDecimal price, BigDecimal number, String cliOrderId){
 		
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
 
@@ -58,7 +58,7 @@ public class PcOrderApiAction implements PcOrderApi {
 	}
 	
 	@Override
-	public void cancel(Long userId, String asset, String symbol, Long orderId) throws Exception{
+	public void cancel(Long userId, String asset, String symbol, Long orderId) {
 
 		this.pcOrderService.setPendingCancel(userId, asset, symbol, orderId);
 
@@ -75,7 +75,7 @@ public class PcOrderApiAction implements PcOrderApi {
 	}
 	
 	@Override
-	public void bookReset (String asset, String symbol) throws Exception{
+	public void bookReset (String asset, String symbol){
 		//发送消息
 		BookResetMsg msg = new BookResetMsg(asset, symbol);
 		msg.setAsset(asset);
