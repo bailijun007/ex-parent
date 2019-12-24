@@ -21,7 +21,7 @@ public class FundRequest {
 	@ApiModelProperty(value = "本笔金额")
 	private BigDecimal amount;
 	
-	@ApiModelProperty(value = "订单类型：1-充值，2-消费，3-后台充值，4-后台扣款 5-撤单  6-下注 7-下级返点 8-彩票中奖")
+	@ApiModelProperty(value = "订单类型：@see TradeType#*")
 	private Integer tradeType;
 
 	@ApiModelProperty(value = "备注")

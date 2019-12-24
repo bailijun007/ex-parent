@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.fund.cash.constant;
+package com.hp.sh.expv3.fund.cash.error;
 
 import com.gitee.hupadev.base.exceptions.ErrorCode;
 

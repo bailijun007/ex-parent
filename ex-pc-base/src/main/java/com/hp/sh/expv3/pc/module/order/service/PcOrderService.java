@@ -180,7 +180,7 @@ public class PcOrderService {
 		PcCutRequest request = new PcCutRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
-		request.setRemark("开仓扣除");
+		request.setRemark("开仓");
 		request.setTradeNo("O"+orderId);
 		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_OPEN_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setUserId(userId);

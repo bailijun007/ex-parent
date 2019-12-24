@@ -2,8 +2,8 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.constant.DepositRecordExtErrorCode;
-import com.hp.sh.expv3.fund.extension.constant.FundAccountExtErrorCode;
+import com.hp.sh.expv3.fund.extension.error.DepositRecordExtErrorCode;
+import com.hp.sh.expv3.fund.extension.error.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.service.DepositAddrExtService;
 import com.hp.sh.expv3.fund.extension.service.DepositRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.AddressVo;

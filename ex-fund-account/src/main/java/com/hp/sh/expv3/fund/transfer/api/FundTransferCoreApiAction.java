@@ -40,7 +40,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	private MqSender mqSender;
 
 	@Override
-	public void transfer(Long userId, String asset, Integer srcAccountType, Integer targetAccountType, BigDecimal amount) throws Exception{
+	public void transfer(Long userId, String asset, Integer srcAccountType, Integer targetAccountType, BigDecimal amount){
 		if(srcAccountType.equals(targetAccountType)){
 			throw new ExException(TransferError.ACCOUNT_TYPE);
 		}

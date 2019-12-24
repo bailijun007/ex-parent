@@ -13,6 +13,8 @@ public class LiqCancelledMsg extends BaseOrderMsg{
     //多空
     private Integer longFlag;
     
+    private Integer lastFlag;
+    
     private List<CancelOrder> cancelOrders;
     
 	public LiqCancelledMsg() {
@@ -49,6 +51,14 @@ public class LiqCancelledMsg extends BaseOrderMsg{
 
 	public void setLongFlag(Integer longFlag) {
 		this.longFlag = longFlag;
+	}
+
+	public Integer getLastFlag() {
+		return lastFlag;
+	}
+
+	public void setLastFlag(Integer lastFlag) {
+		this.lastFlag = lastFlag;
 	}
 
 }

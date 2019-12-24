@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.fund.wallet.constant;
+package com.hp.sh.expv3.fund.wallet.error;
 
 import com.gitee.hupadev.base.exceptions.ErrorCode;
 

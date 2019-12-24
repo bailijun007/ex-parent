@@ -43,7 +43,6 @@ public class FeeRatioServiceImpl implements FeeRatioService {
 	 */
 	private BigDecimal getFeeRatio(long userId, boolean isMaker) {
 		if (isMaker) {
-			// TODO get from cache
 			return new BigDecimal("0.0025");
 		} else {
 			return new BigDecimal("0.0075");

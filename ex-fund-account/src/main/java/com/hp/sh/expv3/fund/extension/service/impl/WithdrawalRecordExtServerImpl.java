@@ -1,8 +1,8 @@
 package com.hp.sh.expv3.fund.extension.service.impl;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.constant.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.dao.WithdrawalRecordExtMapper;
+import com.hp.sh.expv3.fund.extension.error.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -50,7 +50,8 @@ public class MetadataServiceImpl implements MetadataService {
         HashOperations hashOperations = templateDB0.opsForHash();
         String hashKey = asset+"__"+symbol;
         Object o = hashOperations.get(RedisKey.PC_CONTRACT, hashKey);
-        PcContractVO vo = JSON.parseObject(o.toString(), PcContractVO.class);
+        String json = o.toString();
+        PcContractVO vo = JSON.parseObject(json, PcContractVO.class);
         return vo;
     }
 

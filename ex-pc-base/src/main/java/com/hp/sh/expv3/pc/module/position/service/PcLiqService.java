@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
+import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.TimeInForce;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
@@ -67,7 +68,7 @@ public class PcLiqService {
 	public void handleLiq(PcPosition pos) {
 		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getAsset());
 		//检查触发强平
-		if(!this.checkLiq(pos, markPriceVo.getMarkPrice())){
+		if(!this.checkAndResetLiqStatus(pos, markPriceVo.getMarkPrice())){
 			return;
 		}
 		
@@ -77,7 +78,7 @@ public class PcLiqService {
 		}
 		
 		//检查触发强平
-		if(!this.checkLiq(pos, markPriceVo.getMarkPrice())){
+		if(!this.checkAndResetLiqStatus(pos, markPriceVo.getMarkPrice())){
 			return;
 		}
 		
@@ -99,20 +100,21 @@ public class PcLiqService {
 	}
 
 	/*
-	 * TODO checkAndResetLiqStatus
 	 * 是否触发强平
 	 * @param pos
-	 * @return
+	 * @return 是否触发强平
 	 */
-	private boolean checkLiq(PcPosition pos, BigDecimal markPrice) {
+	private boolean checkAndResetLiqStatus(PcPosition pos, BigDecimal markPrice) {
 		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
 		BigDecimal posPnl = holdPosStrategy.calcPosPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
 		BigDecimal posMarginRatio = holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), posPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
 		BigDecimal holdMarginRatio = pos.getHoldMarginRatio();
 		
-		if(posMarginRatio.compareTo(holdMarginRatio)<=0){
+		if(posMarginRatio.compareTo(holdMarginRatio)<=0){//强平
 			return true;
-		}else{
+		}else{//不强平
+			pos.setLiqStatus(LiqStatus.NO);
+			this.pcPositionDAO.update(pos);
 			return false;
 		}
 	}
@@ -121,20 +123,27 @@ public class PcLiqService {
 		this.pcPositionService.lockLiq(pos);
 	}
 
-	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list) {
+	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list, Integer lastFlag) {
 		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(!pos.getId().equals(posId)){
 			throw new RuntimeException("平仓，仓位ID与当前仓位ID不一致");
 		}
 		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getAsset());
 		
-		this.checkLiq(pos, markPrice);
+		//检查触发强平
+		if(!this.checkAndResetLiqStatus(pos, markPrice)){
+			return;
+		}
 		
+		//取消订单
 		for(CancelOrder co : list){
 			this.pcOrderService.cancel(userId, asset, symbol, co.getOrderId(), co.getCancelNumber());
 		}
 		
-		this.doLiq(pos);
+		//强平
+		if(IntBool.isTrue(lastFlag)){
+			this.doLiq(pos);
+		}
 	}
 	
 	void doLiq(PcPosition pos){

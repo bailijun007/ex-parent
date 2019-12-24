@@ -15,7 +15,7 @@ import com.hp.sh.expv3.fund.cash.constant.PayChannel;
 import com.hp.sh.expv3.fund.cash.service.complex.DepositService;
 import com.hp.sh.expv3.fund.cash.service.complex.WithdrawalService;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
-import com.hp.sh.expv3.fund.wallet.constant.WalletError;
+import com.hp.sh.expv3.fund.wallet.error.WalletError;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

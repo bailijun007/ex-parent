@@ -89,6 +89,7 @@ public class PositionStrategyContext {
   
 		tradeResult.setVolume(matchedVo.getNumber());
 		tradeResult.setPrice(matchedVo.getPrice());
+		tradeResult.setAmount(CompFieldCalc.calcAmount(tradeResult.getVolume(), faceValue));
 		tradeResult.setBaseValue(CompFieldCalc.calcBaseValue(tradeResult.getVolume(), faceValue, tradeResult.getPrice()));
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		

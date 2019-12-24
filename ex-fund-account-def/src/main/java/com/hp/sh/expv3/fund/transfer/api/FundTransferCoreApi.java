@@ -20,7 +20,7 @@ public interface FundTransferCoreApi {
 			@RequestParam("asset") String asset,
 			@RequestParam("srcAccountType") Integer srcAccountType, 
 			@RequestParam("targetAccountType") Integer targetAccountType,
-			@RequestParam("amount") BigDecimal amount) throws Exception;
+			@RequestParam("amount") BigDecimal amount);
 
 	@ApiOperation(value = "处理划转")
 	@GetMapping(value = "/api/fund/transfer/handlePending")

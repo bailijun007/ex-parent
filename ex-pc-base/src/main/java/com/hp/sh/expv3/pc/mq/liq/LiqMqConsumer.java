@@ -29,7 +29,7 @@ public class LiqMqConsumer {
 
 	@MQListener(tags = MqTags.TAGS_ORDER_ALL_CANCEL)
 	public void handleCancelled(LiqCancelledMsg msg){
-		pcLiqService.cancelCloseOrder(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getLongFlag(), msg.getPosId(), msg.getCancelOrders());
+		pcLiqService.cancelCloseOrder(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getLongFlag(), msg.getPosId(), msg.getCancelOrders(), msg.getLastFlag());
 	}
     
 }
