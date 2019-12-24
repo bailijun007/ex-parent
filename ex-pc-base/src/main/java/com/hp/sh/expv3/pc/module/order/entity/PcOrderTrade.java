@@ -28,6 +28,9 @@ public class PcOrderTrade extends UserDataEntity {
 
 	//成交量（张数）
 	private BigDecimal volume;
+	
+	//未成交（张数）
+	private BigDecimal remainingVolume; 
 
 	//交易序号
 	private String tradeSn;

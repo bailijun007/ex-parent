@@ -39,6 +39,10 @@ public class PcAccountEvent {
 	public PcAccountEvent() {
 	}
 	
+	public String tags(){
+		return this.getType()+"";
+	}
+	
 	public Integer getType() {
 		return type;
 	}
