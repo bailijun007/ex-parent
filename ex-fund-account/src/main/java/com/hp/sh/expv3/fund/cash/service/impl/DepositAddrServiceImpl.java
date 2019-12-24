@@ -43,4 +43,9 @@ public class DepositAddrServiceImpl implements DepositAddrService{
 		this.depositAddrDAO.update(depositAddr);
 	}
 
+	@Override
+	public DepositAddr findById(long userId, long id) {
+		return this.depositAddrDAO.findById(userId, id);
+	}
+
 }

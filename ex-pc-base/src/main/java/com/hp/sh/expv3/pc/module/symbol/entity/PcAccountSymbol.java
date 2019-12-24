@@ -55,6 +55,11 @@ public class PcAccountSymbol extends UserDataEntity {
 	 */
 	private BigDecimal crossLeverage;
 
+	/**
+	 * 最大全仓杠杆
+	 */
+	private BigDecimal crossMaxLeverage;
+
 	//版本
 	@Version
 	private Long version;
@@ -124,6 +129,14 @@ public class PcAccountSymbol extends UserDataEntity {
 
 	public void setLongMaxLeverage(BigDecimal maxLeverage) {
 		this.longMaxLeverage = maxLeverage;
+	}
+
+	public BigDecimal getCrossMaxLeverage() {
+		return crossMaxLeverage;
+	}
+
+	public void setCrossMaxLeverage(BigDecimal crossMaxLeverage) {
+		this.crossMaxLeverage = crossMaxLeverage;
 	}
 
 	public Long getVersion() {

@@ -30,7 +30,7 @@ public class LiquidationJob {
 	/**
 	 * 
 	 */
-	@Scheduled(cron = "0 0/10 * * * ?")
+	@Scheduled(cron = "5 * * * * ?")
 	public void handle() {
 		Page page = new Page(1, 100, 1000L);
 		while(true){

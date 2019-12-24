@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.fund.wallet.api.constant;
+package com.hp.sh.expv3.fund.wallet.constant;
 
 /**
  * 交易类型

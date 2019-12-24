@@ -15,7 +15,7 @@ import com.hp.sh.expv3.fund.transfer.mq.MqSender;
 import com.hp.sh.expv3.fund.transfer.mq.msg.NewTransfer;
 import com.hp.sh.expv3.fund.transfer.service.FundTransferCoreService;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
-import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
+import com.hp.sh.expv3.fund.wallet.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 import com.hp.sh.expv3.pc.api.PcAccountCoreApi;
