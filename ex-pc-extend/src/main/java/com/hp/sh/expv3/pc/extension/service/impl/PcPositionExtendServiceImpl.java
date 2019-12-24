@@ -1,12 +1,11 @@
 package com.hp.sh.expv3.pc.extension.service.impl;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.extension.constant.PcPositionErrorCode;
+import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +47,7 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
         BigDecimal initMargin = pcPositionDAO.getInitMargin(userId, asset, posId);
         if(initMargin.compareTo(new BigDecimal(0))==0){
             //初始保证金不能为0
-            throw new ExException(PcPositionErrorCode.INIT_MARGIN_NOT_EQUAL_ZERO);
+            throw new ExException(PcCommonErrorCode.INIT_MARGIN_NOT_EQUAL_ZERO);
         }
         return pl.divide(initMargin);
     }

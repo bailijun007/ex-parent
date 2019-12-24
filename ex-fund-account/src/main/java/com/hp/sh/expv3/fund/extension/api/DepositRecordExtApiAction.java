@@ -52,11 +52,11 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
         PageResult<DepositRecordHistoryVo> result = new PageResult<DepositRecordHistoryVo>();
         List<DepositRecordHistoryVo> list = getAllUserDepositRecordHistoryVos(userId, asset, null, null, null);
 
-        List<DepositRecordHistoryVo> pageList = list.stream().skip(pageSize * (pageNo - 1))
-                .limit(pageSize)
-                .collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(list)) {
+            List<DepositRecordHistoryVo> pageList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
+            result.setList(pageList);
+        }
 
-        result.setList(pageList);
         Integer rowTotal = list.size();
         result.setPageNo(pageNo);
         result.setRowTotal(new Long(rowTotal + ""));

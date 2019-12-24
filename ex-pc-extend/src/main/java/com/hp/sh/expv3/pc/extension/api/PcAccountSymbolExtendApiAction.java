@@ -1,7 +1,7 @@
 package com.hp.sh.expv3.pc.extension.api;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.extension.constant.PcPositionErrorCode;
+import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcAccountSymbolExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVO;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVo;
@@ -21,7 +21,7 @@ public class PcAccountSymbolExtendApiAction implements PcAccountSymbolExtendApi 
     @Override
     public PcAccountSymbolVO query(Long userId, String asset, String symbol) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId) {
-            throw new ExException(PcPositionErrorCode.PARAM_EMPTY);
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         PcAccountSymbolVO result = new PcAccountSymbolVO();
 

@@ -1,11 +1,10 @@
 package com.hp.sh.expv3.pc.extension.api;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.extension.constant.PcPositionErrorCode;
+import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeService;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeDetailVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
-import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
     @Override
     public List<PcOrderTradeDetailVo> query(Long userId, String asset, String symbol, String orderId) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || StringUtils.isEmpty(orderId)) {
-            throw new ExException(PcPositionErrorCode.PARAM_EMPTY);
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         List<PcOrderTradeDetailVo> result=new ArrayList<>();
         List<PcOrderTradeVo> voList = pcOrderTradeService.queryOrderTrade(userId, asset, symbol, orderId);
