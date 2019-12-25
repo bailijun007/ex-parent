@@ -3,7 +3,7 @@
 
 <mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcAccountSymbolDAO">
 
-    <resultMap type="com.hp.sh.expv3.pc.extension.vo.PcAccountSettingVo" id="PcAccountSymbolVo">
+    <resultMap type="com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVo" id="PcAccountSymbolVo">
         <result column="id" property="id" />
         <result column="asset" property="asset" />
         <result column="symbol" property="symbol" />

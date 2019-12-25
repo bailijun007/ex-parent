@@ -11,6 +11,9 @@ public class PcCommonErrorCode extends ErrorCode {
 
     public static final PcCommonErrorCode INIT_MARGIN_NOT_EQUAL_ZERO = new PcCommonErrorCode(8601, "初始保证金不能为0");
 
+    public static final PcCommonErrorCode SAVE_PC_ACCOUNT_LOG_FAIL= new PcCommonErrorCode(8602, "保存账户日志失败");
+
+
 
     protected PcCommonErrorCode(int code, String message) {
         super(code, message);
