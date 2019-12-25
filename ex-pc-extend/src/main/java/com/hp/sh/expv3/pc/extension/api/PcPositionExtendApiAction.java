@@ -54,6 +54,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
                 BigDecimal volume = pcOrderVos.stream().map(PcOrderVo::getVolume).reduce(BigDecimal.ZERO, BigDecimal::add);
                 CurrentPositionVo currentPositionVo = new CurrentPositionVo();
                 BeanUtils.copyProperties(positionVo, currentPositionVo);
+                currentPositionVo.setUserId(positionVo.getUserId());
                 currentPositionVo.setRealisedPnl(realisedPnl);
                 //可平数量=this.volume -volume
                 currentPositionVo.setAvailQty(positionVo.getVolume().subtract(volume));
