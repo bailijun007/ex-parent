@@ -36,7 +36,7 @@ public class PcOrderApiAction implements PcOrderApi {
 	 * @throws Exception 
 	 */
 	@Override
-	public void create(Long userId, String asset, String symbol, Integer closeFlag, Integer longFlag, Integer timeInForce, BigDecimal price, BigDecimal number, String cliOrderId){
+	public Long create(Long userId, String asset, String symbol, Integer closeFlag, Integer longFlag, Integer timeInForce, BigDecimal price, BigDecimal number, String cliOrderId){
 		
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
 
@@ -55,6 +55,8 @@ public class PcOrderApiAction implements PcOrderApi {
 		msg.setOrderTime(order.getCreated().getTime());
 		msg.setTimeInForce(order.getTimeInForce());
 		matchMqSender.sendPendingNew(msg);
+		
+		return order.getId();
 	}
 	
 	@Override

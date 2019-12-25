@@ -22,10 +22,12 @@ public interface FundTransferCoreApi {
 			@RequestParam("targetAccountType") Integer targetAccountType,
 			@RequestParam("amount") BigDecimal amount);
 
-	@ApiOperation(value = "处理划转")
+	@ApiOperation(value = "处理待划转", hidden=true)
 	@GetMapping(value = "/api/fund/transfer/handlePending")
 	void handlePending();
 
+	@ApiOperation(value = "处理一条划转记录", hidden=true)
+	@GetMapping(value = "/api/fund/transfer/#handleOne")
 	void handleOne(@RequestParam("userId") Long userId, @RequestParam("id") Long id);
 
 }
