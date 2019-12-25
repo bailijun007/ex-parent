@@ -12,6 +12,12 @@ public class PcOrderTradeDetailVo implements Serializable {
     @ApiModelProperty("id")
     private Long id;
 
+    @ApiModelProperty("资产")
+    private String asset;
+
+    @ApiModelProperty("交易对")
+    private String symbol;
+
     @ApiModelProperty("成交时间")
     private Long tradeTime;
 
@@ -28,6 +34,22 @@ public class PcOrderTradeDetailVo implements Serializable {
     private BigDecimal fee;
 
     public PcOrderTradeDetailVo() {
+    }
+
+    public String getAsset() {
+        return asset;
+    }
+
+    public void setAsset(String asset) {
+        this.asset = asset;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 
     public Long getId() {
