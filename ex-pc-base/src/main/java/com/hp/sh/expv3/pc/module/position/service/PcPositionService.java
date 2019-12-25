@@ -144,15 +144,15 @@ public class PcPositionService {
 		this.pcAccountCoreService.add(request);
 	}
 
-	private void updateOrderStatus4Trade(PcOrder order, TradeResult tradeData){
+	private void updateOrderStatus4Trade(PcOrder order, TradeResult tradeResult){
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
-	        order.setOrderMargin(order.getOrderMargin().subtract(tradeData.getOrderMargin()));
-	        order.setOpenFee(order.getOpenFee().subtract(tradeData.getFee()));
+	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
+	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getFee()));
 		}
-		order.setFeeCost(order.getFeeCost().add(tradeData.getFeeReceivable()));
-		order.setFilledVolume(order.getFilledVolume().add(tradeData.getVolume()));
-        order.setStatus(tradeData.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
-        order.setActiveFlag(tradeData.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
+		order.setFeeCost(order.getFeeCost().add(tradeResult.getFeeReceivable()));
+		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getVolume()));
+        order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
+        order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setModified(new Date());
 		this.pcOrderDAO.update(order);
 	}
@@ -185,6 +185,8 @@ public class PcPositionService {
 		orderTrade.setOrderId(order.getId());
 		
 		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
+		
+		orderTrade.setRemainVolume(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeResult.getVolume()));
 		
 		this.pcOrderTradeDAO.save(orderTrade);
 		
