@@ -4,15 +4,10 @@
  */
 package com.hp.sh.expv3.match.match.core.match.thread.impl;
 
-import com.hp.sh.expv3.match.component.notify.PcOrderMqNotify;
 import com.hp.sh.expv3.match.match.core.order.OrderInitializer;
-import com.hp.sh.expv3.match.thread.def.IThreadManager;
-import com.hp.sh.expv3.match.util.PcUtil;
-import com.hp.sh.expv3.match.util.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

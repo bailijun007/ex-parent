@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Service
 @Scope("prototype")
@@ -158,10 +159,7 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
 
             Set<String> snapshotOffsetList = pcRedisUtil.hkeys(snapshotRedisKey);
 
-            TreeSet<Long> snapshotOffset = new TreeSet<>();
-            for (String offset : snapshotOffsetList) {
-                snapshotOffset.add(Long.valueOf(offset));
-            }
+            TreeSet<Long> snapshotOffset = snapshotOffsetList.stream().map(Long::valueOf).collect(Collectors.toCollection(TreeSet::new));
 
             Long startSnapshotOffset = snapshotOffset.floor(sentMqOffset);
 
@@ -202,6 +200,15 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
                     }
                 }
             }
+
+            /**
+             * 删除大于此offset的快照信息
+             */
+            Set<String> ignoreSnapshotOffset = snapshotOffset.stream().filter(offset -> offset > startSnapshotOffset).map(String::valueOf).collect(Collectors.toSet());
+            if (ignoreSnapshotOffset.size() > 0) {
+                pcRedisUtil.hdel(snapshotRedisKey, ignoreSnapshotOffset);
+            }
+
         } else {
             context.setLastPrice(null);
             this.setCurrentMsgOffset(0L);
