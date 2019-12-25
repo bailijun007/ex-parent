@@ -31,7 +31,6 @@ import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.mq.match.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.msg.LogType;
-import com.hp.sh.expv3.pc.msg.PcAccountEvent;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
@@ -71,11 +70,11 @@ public class PcPositionService {
     private ApplicationEventPublisher publisher;
 	
 	//处理成交订单
-	public PcAccountEvent handleTradeOrder(PcTradeMsg matchedVo){
+	public void handleTradeOrder(PcTradeMsg matchedVo){
 		PcOrder order = this.pcOrderDAO.findById(matchedVo.getAccountId(), matchedVo.getOrderId());
 		boolean exist = this.chekOrderTrade(order, matchedVo);
 		if(exist){
-			return null;
+			return;
 		}
 		
 		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
@@ -112,11 +111,9 @@ public class PcPositionService {
 		//修改订单状态
 		this.updateOrderStatus4Trade(order, tradeResult);
 		
-		PcAccountEvent accountLog = getAccountLog(pcOrderTrade, order);
-
 		//////////pc_account ///////////
 		if(order.getLiqFlag()==IntBool.YES){//强平委托
-			return accountLog;
+			return ;
 		}
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
@@ -126,18 +123,7 @@ public class PcPositionService {
 				this.openFeeDiffToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult);
 			}
 		}
-		return accountLog;
-	}
-	
-	private PcAccountEvent getAccountLog(PcOrderTrade pcOrderTrade, PcOrder order){
-		PcAccountEvent eventMsg = new PcAccountEvent();
-		eventMsg.setUserId(pcOrderTrade.getUserId());
-		eventMsg.setAsset(pcOrderTrade.getAsset());
-		eventMsg.setSymbol(pcOrderTrade.getSymbol());
-		eventMsg.setTime(pcOrderTrade.getCreated().getTime());
-		eventMsg.setType(getLogType(order.getCloseFlag(), order.getLongFlag()));
-		eventMsg.setRefId(pcOrderTrade.getId());
-		return eventMsg;
+		
 	}
 	
 	private int getLogType(int closeFlag, int longFlag){
@@ -217,6 +203,8 @@ public class PcPositionService {
 		orderTrade.setRemainVolume(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeResult.getVolume()));
 		
 		this.pcOrderTradeDAO.save(orderTrade);
+		
+		orderTrade.setTradType(this.getLogType(order.getCloseFlag(), order.getLongFlag()));
 		
 		publisher.publishEvent(orderTrade);
 		

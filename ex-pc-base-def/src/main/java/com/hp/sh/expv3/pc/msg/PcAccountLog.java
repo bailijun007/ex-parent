@@ -8,7 +8,7 @@ import javax.persistence.Table;
  *
  */
 @Table(name="pc_account_log")
-public class PcAccountEvent {
+public class PcAccountLog {
 
 	public static final int TYPE_TRAD_OPEN_LONG = 1;		//成交开多
 	public static final int TYPE_TRAD_OPEN_SHORT = 2;		//成交开空
@@ -27,7 +27,7 @@ public class PcAccountEvent {
 	public static final int TYPE_LIQ_SHORT = 12;			//强平平空
 	
 	/**
-	 * 事件类型
+	 * 日志类型
 	 */
 	private Integer type;
 
@@ -43,7 +43,7 @@ public class PcAccountEvent {
 	//时间
 	private Long time;
 	
-	public PcAccountEvent() {
+	public PcAccountLog() {
 	}
 	
 	public String tags(){

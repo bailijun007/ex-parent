@@ -10,12 +10,10 @@ import com.hp.sh.expv3.pc.constant.MqTopic;
 import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
-import com.hp.sh.expv3.pc.mq.extend.EventSender;
 import com.hp.sh.expv3.pc.mq.match.msg.MatchNotMatchMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.MatchedMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.MatchedOrderCancelledMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.PcTradeMsg;
-import com.hp.sh.expv3.pc.msg.PcAccountEvent;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
@@ -29,9 +27,6 @@ public class MatchMqConsumer {
 	@Autowired
 	private PcPositionService pcPositionService;
 	
-	@Autowired
-	private EventSender eventSender;
-
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(MatchNotMatchMsg msg){
 		this.pcOrderService.setNewStatus(msg.getAccountId(), msg.getOrderId(), OrderStatus.NEW, OrderStatus.PENDING_NEW);
@@ -48,10 +43,7 @@ public class MatchMqConsumer {
 	@MQListener(tags=MqTags.TAGS_PC_TRADE)
 	public void handleTradeMsg(PcTradeMsg msg){
 		logger.info("收到消息:{}", msg);
-		PcAccountEvent logMsg = pcPositionService.handleTradeOrder(msg);
-		if(logMsg!=null){
-			eventSender.sendEventMsg(logMsg);
-		}
+		pcPositionService.handleTradeOrder(msg);
 	}
 	
 	//撮合成功

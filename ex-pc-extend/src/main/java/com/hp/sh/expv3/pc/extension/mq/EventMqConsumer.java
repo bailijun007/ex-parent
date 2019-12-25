@@ -1,21 +1,20 @@
 package com.hp.sh.expv3.pc.extension.mq;
 
-import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
-import com.hp.sh.expv3.pc.extension.dao.PcAccountLogDAO;
-import com.hp.sh.expv3.pc.extension.vo.PcAccountLogVo;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
+import com.hp.sh.expv3.pc.extension.dao.PcAccountLogDAO;
+import com.hp.sh.expv3.pc.extension.vo.PcAccountLogVo;
 import com.hp.sh.expv3.pc.msg.MsgConstant;
-import com.hp.sh.expv3.pc.msg.PcAccountEvent;
+import com.hp.sh.expv3.pc.msg.PcAccountLog;
 import com.hp.sh.rocketmq.annotation.MQListener;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component
 @MQListener(topic = MsgConstant.EVENT_TOPIC, orderly = MQListener.ORDERLY_YES)
@@ -24,7 +23,7 @@ public class EventMqConsumer {
     @Autowired
     private PcAccountLogDAO pcAccountLogDAO;
 
-    public void handleMsg(PcAccountEvent msg) {
+    public void handleMsg(PcAccountLog msg) {
         logger.info("收到消息:{}", msg);
         Map<String, Object> map = new HashMap<>();
         map.put("type", msg.getType());
