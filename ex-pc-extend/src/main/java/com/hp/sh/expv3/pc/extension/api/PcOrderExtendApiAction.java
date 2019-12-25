@@ -38,7 +38,12 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     private PcOrderTradeExtendService pcOrderTradeService;
 
     @Override
-    public List<UserOrderVo> query(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize) {
+    public List<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count,String status) {
+        return null;
+    }
+
+    @Override
+    public List<UserOrderVo> queryUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || currentPage == null || pageSize == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
