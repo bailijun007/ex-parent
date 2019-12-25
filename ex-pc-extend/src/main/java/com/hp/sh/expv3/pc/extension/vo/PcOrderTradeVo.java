@@ -54,6 +54,9 @@ public class PcOrderTradeVo extends UserDataEntity {
 	//手续费
 	private BigDecimal fee;
 
+	//未成交数量
+    private BigDecimal remainVolume;
+
 	//盈亏(此次成交的盈亏)
 	@Question(ask="没有用到，老项目里也没这个字段", answer="老杜用")
 	private BigDecimal pnl;
@@ -172,5 +175,13 @@ public class PcOrderTradeVo extends UserDataEntity {
 
     public void setPosId(Long posId) {
         this.posId = posId;
+    }
+
+    public BigDecimal getRemainVolume() {
+        return remainVolume;
+    }
+
+    public void setRemainVolume(BigDecimal remainVolume) {
+        this.remainVolume = remainVolume;
     }
 }

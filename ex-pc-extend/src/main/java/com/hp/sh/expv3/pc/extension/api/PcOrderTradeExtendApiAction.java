@@ -2,7 +2,7 @@ package com.hp.sh.expv3.pc.extension.api;
 
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
-import com.hp.sh.expv3.pc.extension.service.PcOrderTradeService;
+import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeDetailVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
     @Autowired
-    private PcOrderTradeService pcOrderTradeService;
+    private PcOrderTradeExtendService pcOrderTradeService;
 
 
     @Override

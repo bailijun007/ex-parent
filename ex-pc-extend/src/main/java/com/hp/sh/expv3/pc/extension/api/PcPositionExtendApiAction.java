@@ -2,7 +2,7 @@ package com.hp.sh.expv3.pc.extension.api;
 
 import com.hp.sh.expv3.pc.extension.service.PcAccountExtendService;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
-import com.hp.sh.expv3.pc.extension.service.PcOrderTradeService;
+import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
 import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
 import com.hp.sh.expv3.pc.extension.vo.CurrentPositionVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
@@ -34,7 +34,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
     private PcPositionExtendService pcPositionExtendService;
 
     @Autowired
-    private PcOrderTradeService pcOrderTradeService;
+    private PcOrderTradeExtendService pcOrderTradeService;
 
     /*
      * @param userId
