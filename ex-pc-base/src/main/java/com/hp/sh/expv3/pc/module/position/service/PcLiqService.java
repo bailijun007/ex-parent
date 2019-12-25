@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
+import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
@@ -59,11 +61,18 @@ public class PcLiqService {
     
     @Autowired
     private PcPositionDAO pcPositionDAO;
+    
 	@Autowired
 	private PcOrderDAO pcOrderDAO;
+	
+	@Autowired
+	private FeeRatioService feeRatioService;
     
     @Autowired
     private LiqMqSender liqMqSender;
+    
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
 	public void handleLiq(PcPosition pos) {
 		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getSymbol());
@@ -149,11 +158,11 @@ public class PcLiqService {
 	}
 	
 	void doLiq(PcPosition pos){
-		//保存强平记录
+		//1、保存强平记录
 		PcLiqRecord record = this.saveLiqRecord(pos);
-		//清空仓位
+		//2、清空仓位
 		this.clearLiqPos(pos);
-		//创建强平委托
+		//3、创建强平委托
 		this.createLiqOrder(record);
 	}
 	
@@ -180,7 +189,15 @@ public class PcLiqService {
 		record.setBankruptPrice(bankruptPrice);
 		record.setCreated(now);
 		record.setModified(now);
+		
+		//log
+		record.setLiqPrice(pos.getLiqPrice());
+		record.setFee(pos.getCloseFee());
+		record.setFeeRatio(feeRatioService.getCloseFeeRatio(pos.getUserId(), pos.getAsset(), pos.getSymbol()));
+		
+		//save
 		pcLiqRecordDAO.save(record);
+		publisher.publishEvent(record);
 		return record;
 	}
 	

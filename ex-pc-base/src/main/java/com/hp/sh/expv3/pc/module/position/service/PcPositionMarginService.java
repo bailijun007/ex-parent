@@ -129,7 +129,7 @@ public class PcPositionMarginService {
 
             /* 修改强平价 */
     		
-    		//重新计算强平价
+    		//重新计算预估强平价
     		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), this.metadataService.getFaceValue(asset, symbol));
     		BigDecimal liqPrice = holdPosStrategy.calcLiqPrice(longFlag, _amount, pos.getMeanPrice(), pos.getHoldMarginRatio(), pos.getPosMargin());
     		pos.setLiqPrice(liqPrice);

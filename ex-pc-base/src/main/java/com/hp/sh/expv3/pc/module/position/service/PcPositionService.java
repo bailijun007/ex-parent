@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +66,9 @@ public class PcPositionService {
 	
 	@Autowired
 	private PositionStrategyContext positionStrategy;
+    
+    @Autowired
+    private ApplicationEventPublisher publisher;
 	
 	//处理成交订单
 	public PcAccountEvent handleTradeOrder(PcTradeMsg matchedVo){
@@ -104,6 +108,7 @@ public class PcPositionService {
 		PcOrderTrade pcOrderTrade = this.saveOrderTrade(matchedVo, order, tradeResult, pcPosition.getId());
 		
 		////////// 订单 ///////////
+		
 		//修改订单状态
 		this.updateOrderStatus4Trade(order, tradeResult);
 		
@@ -212,6 +217,8 @@ public class PcPositionService {
 		orderTrade.setRemainVolume(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeResult.getVolume()));
 		
 		this.pcOrderTradeDAO.save(orderTrade);
+		
+		publisher.publishEvent(orderTrade);
 		
 		return orderTrade;
 	}

@@ -36,10 +36,17 @@ public class PcLiqRecord extends UserDataEntity {
 	//破产价
 	private BigDecimal bankruptPrice;
 	
-    /**
-	 * 已成交量
-	 */
+	 // 已成交量
 	private BigDecimal filledVolume;
+	
+	//强平价
+	private BigDecimal liqPrice;
+	
+	//手续费
+	private BigDecimal fee;
+	
+	//手续费率
+	private BigDecimal feeRatio;
 
 	public PcLiqRecord() {
 	}
@@ -106,6 +113,30 @@ public class PcLiqRecord extends UserDataEntity {
 
 	public void setFilledVolume(BigDecimal filledVolume) {
 		this.filledVolume = filledVolume;
+	}
+
+	public BigDecimal getLiqPrice() {
+		return liqPrice;
+	}
+
+	public void setLiqPrice(BigDecimal liqPrice) {
+		this.liqPrice = liqPrice;
+	}
+
+	public BigDecimal getFee() {
+		return fee;
+	}
+
+	public void setFee(BigDecimal fee) {
+		this.fee = fee;
+	}
+
+	public BigDecimal getFeeRatio() {
+		return feeRatio;
+	}
+
+	public void setFeeRatio(BigDecimal feeRatio) {
+		this.feeRatio = feeRatio;
 	}
 
 }
