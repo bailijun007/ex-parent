@@ -7,10 +7,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -23,11 +19,10 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
+import com.gitee.hupadev.commons.cache.JsonCacheSerializer;
 import com.gitee.hupadev.commons.cache.RedisCache;
 import com.gitee.hupadev.commons.cache.RedisPool;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import com.gitee.hupadev.commons.cache.RedisPublisher;
 
 @EnableCaching
 @Configuration
@@ -62,6 +57,14 @@ public class RedisConfig {
 				.initialCacheNames(cacheNames).withInitialCacheConfigurations(configMap).build();
 
 		return cacheManager;
+	}
+	
+	@Bean
+	public RedisPublisher redisPublisher(RedisPool redisPool){
+		JsonCacheSerializer jsonCs = new JsonCacheSerializer();
+		RedisPublisher rp = new RedisPublisher(redisPool);
+		rp.setCacheSerializer(jsonCs);
+		return rp;
 	}
 	
     @Bean("myKeyGenerator")
