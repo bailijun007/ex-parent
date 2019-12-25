@@ -4,6 +4,7 @@
  */
 package com.hp.sh.expv3.match.config;
 
+import com.hp.sh.expv3.match.config.setting.MetadataRedisSetting;
 import com.hp.sh.expv3.match.config.setting.PcmatchRedisSetting;
 import com.hp.sh.expv3.match.constant.PcmatchConst;
 import com.hp.sh.expv3.match.util.RedisUtil;
@@ -18,22 +19,47 @@ import redis.clients.jedis.JedisPoolConfig;
 public class PcmatchRedisBeans {
 
     @Autowired
-    private PcmatchRedisSetting redisSetting;
+    private PcmatchRedisSetting pcmatchRedisSetting;
+    @Autowired
+    private MetadataRedisSetting metadataRedisSetting;
 
     @Bean(name = PcmatchConst.MODULE_NAME + "RedisUtil")
     public RedisUtil getRedisUtil() {
         JedisPoolConfig config = new JedisPoolConfig();
-        config.setMaxTotal(redisSetting.getMaxTotal());
-        config.setMaxIdle(redisSetting.getMaxIdle());
-        config.setMinIdle(redisSetting.getMinIdle());
-        config.setMaxWaitMillis(redisSetting.getMaxWaitMillis());
-        config.setTestOnBorrow(redisSetting.isTestOnBorrow());
-        config.setTestOnReturn(redisSetting.isTestOnReturn());
-        config.setTestWhileIdle(redisSetting.isTestWhileIdle());
+        config.setMaxTotal(pcmatchRedisSetting.getMaxTotal());
+        config.setMaxIdle(pcmatchRedisSetting.getMaxIdle());
+        config.setMinIdle(pcmatchRedisSetting.getMinIdle());
+        config.setMaxWaitMillis(pcmatchRedisSetting.getMaxWaitMillis());
+        config.setTestOnBorrow(pcmatchRedisSetting.isTestOnBorrow());
+        config.setTestOnReturn(pcmatchRedisSetting.isTestOnReturn());
+        config.setTestWhileIdle(pcmatchRedisSetting.isTestWhileIdle());
 
-        JedisPool jedisPool = new JedisPool(config, redisSetting.getHostName(), redisSetting.getPort(), redisSetting.getTimeout(),
-                StringUtils.isEmpty(redisSetting.getPassword()) ? null : redisSetting.getPassword(),
-                redisSetting.getDatabase());
+        JedisPool jedisPool = new JedisPool(config,
+                pcmatchRedisSetting.getHostName(),
+                pcmatchRedisSetting.getPort(),
+                pcmatchRedisSetting.getTimeout(),
+                StringUtils.isEmpty(pcmatchRedisSetting.getPassword()) ? null : pcmatchRedisSetting.getPassword(),
+                pcmatchRedisSetting.getDatabase());
+        return new RedisUtil(jedisPool);
+    }
+
+    @Bean(name = "metadataRedisUtil")
+    public RedisUtil getMetadataRedisUtil() {
+        JedisPoolConfig config = new JedisPoolConfig();
+        config.setMaxTotal(metadataRedisSetting.getMaxTotal());
+        config.setMaxIdle(metadataRedisSetting.getMaxIdle());
+        config.setMinIdle(metadataRedisSetting.getMinIdle());
+        config.setMaxWaitMillis(metadataRedisSetting.getMaxWaitMillis());
+        config.setTestOnBorrow(metadataRedisSetting.isTestOnBorrow());
+        config.setTestOnReturn(metadataRedisSetting.isTestOnReturn());
+        config.setTestWhileIdle(metadataRedisSetting.isTestWhileIdle());
+
+        JedisPool jedisPool = new JedisPool(config,
+                metadataRedisSetting.getHostName(),
+                metadataRedisSetting.getPort(),
+                metadataRedisSetting.getTimeout(),
+                StringUtils.isEmpty(metadataRedisSetting.getPassword()) ? null : metadataRedisSetting.getPassword(),
+                metadataRedisSetting.getDatabase());
         return new RedisUtil(jedisPool);
     }
 

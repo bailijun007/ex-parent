@@ -70,7 +70,7 @@ public class ExMatchApplication extends Application implements ApplicationContex
 
     @Override
     protected void onStart() {
-        orderInitializer.start();
+        orderInitializer.start(true);
         threadManagerPcMatchedImpl.waitAllReady();
         threadManagerPcMatchImpl.waitAllReady();
         // 等到所有的 matchedHandler都启动

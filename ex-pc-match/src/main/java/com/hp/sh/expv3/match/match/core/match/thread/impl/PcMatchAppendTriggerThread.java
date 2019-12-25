@@ -4,8 +4,8 @@
  */
 package com.hp.sh.expv3.match.match.core.match.thread.impl;
 
-import com.hp.sh.expv3.match.component.MatchSupportContractService;
 import com.hp.sh.expv3.match.component.notify.PcOrderMqNotify;
+import com.hp.sh.expv3.match.match.core.order.OrderInitializer;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
 import com.hp.sh.expv3.match.util.PcUtil;
 import com.hp.sh.expv3.match.util.Tuple2;
@@ -17,29 +17,20 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PcOrderSnapshotCreateTriggerThread {
+public class PcMatchAppendTriggerThread {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private PcOrderMqNotify pcOrderMqNotify;
+    private OrderInitializer orderInitializer;
 
-    @Autowired
-    @Qualifier("threadManagerPcMatchImpl")
-    private IThreadManager iThreadManager;
-
-    @Scheduled(initialDelay = 5000, fixedDelay = 3600000)
+    @Scheduled(initialDelay = 60000, fixedDelay = 60000)
     private void process() {
         trigger();
     }
 
     public void trigger() {
-        if (null != iThreadManager.getWorkerKeys() && iThreadManager.getWorkerKeys().size() > 0) {
-            for (String assetSymbol : iThreadManager.getWorkerKeys()) {
-                Tuple2<String, String> assetSymbolTuple = PcUtil.splitAssetAndSymbol(assetSymbol);
-                pcOrderMqNotify.sendOrderSnapshotTrigger(assetSymbolTuple.first, assetSymbolTuple.second);
-            }
-        }
+        orderInitializer.start(false);
     }
 
 }

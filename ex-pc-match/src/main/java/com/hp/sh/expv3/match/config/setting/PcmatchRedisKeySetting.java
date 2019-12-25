@@ -22,6 +22,8 @@ public class PcmatchRedisKeySetting {
     private String pcOrderMatchedQueueEndOffsetRedisKeyPattern;
     private String pcOrderMatchedQueueSizeRedisKeyPattern;
 
+    private String pcContractPattern;
+
     public String getPcOrderSnapshotRedisKeyPattern() {
         return pcOrderSnapshotRedisKeyPattern;
     }
@@ -84,5 +86,13 @@ public class PcmatchRedisKeySetting {
 
     public void setPcOrderMatchedQueueSizeRedisKeyPattern(String pcOrderMatchedQueueSizeRedisKeyPattern) {
         this.pcOrderMatchedQueueSizeRedisKeyPattern = pcOrderMatchedQueueSizeRedisKeyPattern;
+    }
+
+    public String getPcContractPattern() {
+        return pcContractPattern;
+    }
+
+    public void setPcContractPattern(String pcContractPattern) {
+        this.pcContractPattern = pcContractPattern;
     }
 }

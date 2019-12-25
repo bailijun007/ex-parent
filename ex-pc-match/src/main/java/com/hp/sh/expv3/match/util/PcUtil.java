@@ -86,23 +86,23 @@ public final class PcUtil {
 
     public static final String concatAssetAndSymbol(String pattern, String asset, String symbol) {
         if (StringUtils.isEmpty(pattern)) {
-            pattern = "${asset}__${symbol}";
+            pattern = "${asset}" + CommonConst.ASSET_SYMBOL_CONNECTOR + "${symbol}";
         }
         return StringReplaceUtil.replace(pattern, ImmutableMap.of("asset", asset, "symbol", symbol));
     }
 
     public static final Tuple2<String, String> splitAssetAndSymbol(String assetSymbol) {
-        return splitAssetAndSymbol(assetSymbol, "__");
+        return splitAssetAndSymbol(assetSymbol, CommonConst.ASSET_SYMBOL_CONNECTOR);
     }
 
     public static final Tuple2<String, String> splitAssetAndSymbol(String assetSymbol, String spliter) {
-        String[] assetSymbols = assetSymbol.split("__");
+        String[] assetSymbols = assetSymbol.split(CommonConst.ASSET_SYMBOL_CONNECTOR);
         return new Tuple2<>(assetSymbols[0], assetSymbols[1]);
     }
 
     public static final String concatAccountIdAndAssetAndSymbol(String pattern, long accountId, String asset, String symbol) {
         if (StringUtils.isEmpty(pattern)) {
-            pattern = "${accountId}_${asset}__${symbol}";
+            pattern = "${accountId}_${asset}" + CommonConst.ASSET_SYMBOL_CONNECTOR + "${symbol}";
         }
         return StringReplaceUtil.replace(pattern, ImmutableMap.of("accountId", "" + accountId, "asset", asset, "symbol", symbol));
     }

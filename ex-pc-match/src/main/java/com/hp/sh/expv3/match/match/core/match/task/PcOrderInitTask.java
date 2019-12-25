@@ -16,6 +16,7 @@ import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.match.thread.impl.PcmatchOrderRmqConsumerThread;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
 import com.hp.sh.expv3.match.thread.def.IThreadWorker;
+import com.hp.sh.expv3.match.util.DecimalUtil;
 import com.hp.sh.expv3.match.util.PcOrder4MatchBoUtil;
 import com.hp.sh.expv3.match.util.RedisKeyUtil;
 import com.hp.sh.expv3.match.util.RedisUtil;
@@ -103,8 +104,8 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
                 BigDecimal askMinPrice = askOrder.getPrice();
 
                 if (bidMaxPrice.compareTo(askMinPrice) >= 0) {
-                    logger.error("asset:{},symbol:{},accountId:{},orderId:{},bid order price >= top ask order.", bidOrder.getAsset(), bidOrder.getSymbol(), bidOrder.getAccountId(), bidOrder.getOrderId());
-                    logger.error("asset:{},symbol:{},accountId:{},orderId:{},ask order price <= top bid order.", askOrder.getAsset(), askOrder.getSymbol(), askOrder.getAccountId(), askOrder.getOrderId());
+                    logger.error("bid asset:{},symbol:{},accountId:{},orderId:{},bid order price >= top ask order.{}", bidOrder.getAsset(), bidOrder.getSymbol(), bidOrder.getAccountId(), bidOrder.getOrderId(), DecimalUtil.toTrimLiteral(bidOrder.getPrice()));
+                    logger.error("ask asset:{},symbol:{},accountId:{},orderId:{},ask order price <= top bid order.{}", askOrder.getAsset(), askOrder.getSymbol(), askOrder.getAccountId(), askOrder.getOrderId(), DecimalUtil.toTrimLiteral(askOrder.getPrice()));
                     throw new RuntimeException();
                 }
             }
@@ -121,6 +122,8 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
         orderConsumer.setName("PcMatchConsumer_" + getAsset() + "__" + this.getSymbol());
         orderConsumer.start();
         setSentMqOffset(context, sentMqOffset);
+
+        logger.info("{} {} match start.", this.getAsset(), this.getSymbol());
     }
 
     private void setSentMqOffset(PcMatchHandlerContext context, long matchedMqOffset) {
