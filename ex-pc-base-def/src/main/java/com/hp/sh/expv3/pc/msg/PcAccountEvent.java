@@ -1,10 +1,13 @@
 package com.hp.sh.expv3.pc.msg;
 
+import javax.persistence.Table;
+
 /**
- * 
+ * 账户日志
  * @author wangjg
  *
  */
+@Table(name="pc_account_log")
 public class PcAccountEvent {
 
 	public static final int TYPE_TRAD_OPEN_LONG = 1;		//成交开多
@@ -28,12 +31,16 @@ public class PcAccountEvent {
 	 */
 	private Integer type;
 
+	//用户Id
 	private Long userId;
 
+	//资产
 	private String asset;
+	//交易品种
 	private String symbol;
-	
+	//引用对象Id
 	private Long refId;
+	//时间
 	private Long time;
 	
 	public PcAccountEvent() {

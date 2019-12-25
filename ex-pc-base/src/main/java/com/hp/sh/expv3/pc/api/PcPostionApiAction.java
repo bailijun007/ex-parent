@@ -18,7 +18,7 @@ public class PcPostionApiAction implements PcPostionApi {
 		pcPositionService.changeMargin(userId, asset, symbol, longFlag, optType, amount);
 	}
 	
-	public boolean changeLeverage(long userId, String asset, String symbol, Integer marginMode, Integer longFlag, BigDecimal leverage){
+	public boolean changeLeverage(Long userId, String asset, String symbol, Integer marginMode, Integer longFlag, BigDecimal leverage){
 		return pcPositionService.changeLeverage(userId, asset, symbol, marginMode, longFlag, leverage);
 	}
 	

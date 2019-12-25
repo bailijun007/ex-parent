@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -41,15 +42,15 @@ public interface PcOrderApi {
         @ApiImplicitParam(name = "cliOrderId", value = "客户端订单ID", example = "12345", required = true)
     })
 	@GetMapping(value = "/api/pc/order/create")
-	void create(Long userId, String asset, String symbol, Integer closeFlag, Integer longFlag, Integer timeInForce,
-			BigDecimal price, BigDecimal number, String cliOrderId);
+	void create(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol, @RequestParam("closeFlag") Integer closeFlag, @RequestParam("longFlag") Integer longFlag, @RequestParam("timeInForce") Integer timeInForce,
+			@RequestParam("price") BigDecimal price, @RequestParam("number") BigDecimal number, @RequestParam("cliOrderId") String cliOrderId);
 
 	@ApiOperation(value = "取消订单")
 	@GetMapping(value = "/api/pc/order/cancel")
-	void cancel(Long userId, String asset, String symbol, Long orderId);
+	void cancel(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol, @RequestParam("orderId") Long orderId);
 
 	@ApiOperation(value = "重置深度1")
 	@GetMapping(value = "/api/pc/order/bookReset")
-	void bookReset(String asset, String symbol);
+	void bookReset(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
 
 }

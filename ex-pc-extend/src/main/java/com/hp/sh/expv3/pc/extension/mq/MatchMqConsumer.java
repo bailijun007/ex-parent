@@ -9,7 +9,7 @@ import com.hp.sh.expv3.pc.msg.PcAccountEvent;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
-@MQListener(topic = MsgConstant.EVENT_TOPIC, orderly=MQListener.ORDERLY_NO)
+@MQListener(topic = MsgConstant.EVENT_TOPIC, orderly=MQListener.ORDERLY_YES)
 public class MatchMqConsumer {
 	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer.class);
 
@@ -18,5 +18,4 @@ public class MatchMqConsumer {
 		
 	}
 	
-    
 }
