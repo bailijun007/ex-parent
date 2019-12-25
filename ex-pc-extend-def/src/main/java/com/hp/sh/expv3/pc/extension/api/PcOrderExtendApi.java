@@ -19,8 +19,25 @@ import java.util.List;
 public interface PcOrderExtendApi {
 
 
+    @ApiOperation(value = "查询委托")
+    @GetMapping(value = "/api/extension/pc/order/queryOrderList")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
+            @ApiImplicitParam(name = "asset", value = "资产类型，多个以逗号分割", example = "BTC,ETH", required = false),
+            @ApiImplicitParam(name = "symbol", value = "交易对，多个以逗号分割", example = "BTC_USDT,BTC_ETH", required = false),
+            @ApiImplicitParam(name = "status", value = "委托状态，多个以逗号分割"),
+            @ApiImplicitParam(name = "gtOrderId ", value = "order_id,请求大于order_id的数据,gt和lt都填,以gt为准", example = "10", required = false),
+            @ApiImplicitParam(name = "ltOrderId ", value = "order_id,请求小于order_id的数据", example = "10", required = false),
+            @ApiImplicitParam(name = "count", value = "返回条数最大100条", example = "10", required = true)
+    })
+    List<UserOrderVo> queryOrderList(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset", required = false) String asset,
+                                     @RequestParam(value = "symbol", required = false) String symbol, @RequestParam(value = "gtOrderId", required = false) Long gtOrderId,
+                                     @RequestParam(value = "ltOrderId", required = false) Long ltOrderId, @RequestParam("count") Integer count,
+                                     @RequestParam("status") String status);
+
+
     @ApiOperation(value = "获取当前用户活动委托")
-    @GetMapping(value = "/api/extension/pc/order/query")
+    @GetMapping(value = "/api/extension/pc/order/queryUserOrder")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
@@ -31,10 +48,10 @@ public interface PcOrderExtendApi {
             @ApiImplicitParam(name = "currentPage ", value = "当前页数", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "10", required = true)
     })
-    List<UserOrderVo> query(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
-                            @RequestParam("symbol") String symbol, @RequestParam(value = "orderType", required = false) Integer orderType,
-                            @RequestParam(value = "longFlag", required = false) Integer longFlag, @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
-                            @RequestParam("currentPage") Integer currentPage, @RequestParam("pageSize") Integer pageSize);
+    List<UserOrderVo> queryUserOrder(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
+                                     @RequestParam("symbol") String symbol, @RequestParam(value = "orderType", required = false) Integer orderType,
+                                     @RequestParam(value = "longFlag", required = false) Integer longFlag, @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
+                                     @RequestParam("currentPage") Integer currentPage, @RequestParam("pageSize") Integer pageSize);
 
 
     @ApiOperation(value = "获取当前用户活动委托")
@@ -52,10 +69,10 @@ public interface PcOrderExtendApi {
             @ApiImplicitParam(name = "nextPage ", value = " 翻页标记,-1 上一页,1.下一页 ", example = "1", required = true),
     })
     List<UserOrderVo> queryHistory(@RequestParam("userId") Long userId, @RequestParam(value = "asset") String asset,
-                                          @RequestParam("symbol") String symbol, @RequestParam(value = "orderType", required = false) Integer orderType,
-                                          @RequestParam(value = "longFlag", required = false) Integer longFlag, @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
-                                          @RequestParam("currentPage") Integer currentPage, @RequestParam("pageSize") Integer pageSize,
-                                          @RequestParam(value = "lastOrderId", required = false) Long lastOrderId, @RequestParam("nextPage") Integer nextPage);
+                                   @RequestParam("symbol") String symbol, @RequestParam(value = "orderType", required = false) Integer orderType,
+                                   @RequestParam(value = "longFlag", required = false) Integer longFlag, @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
+                                   @RequestParam("currentPage") Integer currentPage, @RequestParam("pageSize") Integer pageSize,
+                                   @RequestParam(value = "lastOrderId", required = false) Long lastOrderId, @RequestParam("nextPage") Integer nextPage);
 
 
     @ApiOperation(value = "获取当前用户活动委托")
@@ -71,11 +88,9 @@ public interface PcOrderExtendApi {
             @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "10", required = true)
     })
     List<UserOrderVo> queryAll(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
-                            @RequestParam("symbol") String symbol, @RequestParam(value = "status", required = false) Integer status,
-                            @RequestParam(value = "longFlag", required = false) Integer longFlag, @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
-                            @RequestParam("currentPage") Integer currentPage, @RequestParam("pageSize") Integer pageSize);
-
-
+                               @RequestParam("symbol") String symbol, @RequestParam(value = "status", required = false) Integer status,
+                               @RequestParam(value = "longFlag", required = false) Integer longFlag, @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
+                               @RequestParam("currentPage") Integer currentPage, @RequestParam("pageSize") Integer pageSize);
 
 
 }

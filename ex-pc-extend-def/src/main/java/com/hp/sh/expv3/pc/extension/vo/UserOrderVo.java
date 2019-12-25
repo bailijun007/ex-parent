@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * @author BaiLiJun  on 2019/12/23
  */
 public class UserOrderVo implements Serializable {
-    @ApiModelProperty("id")
+    @ApiModelProperty("委托id")
     private Long id;
 
     @ApiModelProperty("用户id")
@@ -62,6 +62,9 @@ public class UserOrderVo implements Serializable {
 
     @ApiModelProperty("收益")
     private BigDecimal realisedPnl;
+
+    @ApiModelProperty("客户端id")
+    private String clientOid;
 
     public Long getUserId() {
         return userId;
