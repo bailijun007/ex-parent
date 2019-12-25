@@ -4,6 +4,7 @@
  */
 package com.hp.sh.expv3.match.match.core.order;
 
+import com.hp.sh.expv3.match.component.MatchSupportContractService;
 import com.hp.sh.expv3.match.config.setting.PcmatchSetting;
 import com.hp.sh.expv3.match.match.core.match.task.PcOrderInitTask;
 import com.hp.sh.expv3.match.match.core.match.task.def.PcMatchTaskService;
@@ -23,6 +24,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Set;
 
 @Service
 public class OrderInitializer implements ApplicationContextAware {
@@ -52,28 +54,42 @@ public class OrderInitializer implements ApplicationContextAware {
     @Autowired
     private PcMatchedTaskService pcMatchedTaskService;
 
+    @Autowired
+    private MatchSupportContractService matchSupportContractService;
+    @Autowired
+    @Qualifier("threadManagerPcMatchImpl")
+    private IThreadManager iThreadManager;
+
     @PostConstruct
     private void init() {
     }
 
-    public boolean start() {
+    public synchronized boolean start(boolean initFlag) {
 
-        if (null == pcmatchSetting.getSupportAssetSymbol() || pcmatchSetting.getSupportAssetSymbol().isEmpty()) {
-            logger.error("support assetSymbol empty.pls check!");
-            return false;
-        }
+        Set<String> supportAssetSymbol = matchSupportContractService.getSupportAssetSymbol(false);
+        if (null == supportAssetSymbol || supportAssetSymbol.isEmpty()) {
+            if (initFlag) {
+                logger.warn("support assetSymbol empty.pls check!");
+            }
+        } else {
 
-        for (String assetSymbol : pcmatchSetting.getSupportAssetSymbol()) {
-            // build init task
-            Tuple2<String, String> assetSymbolTuple = PcUtil.splitAssetAndSymbol(assetSymbol);
-            String asset = assetSymbolTuple.first;
-            String symbol = assetSymbolTuple.second;
-            PcMatchedInitTask matchedInitTask = pcMatchedTaskService.buildMatchedInitTask(assetSymbol, asset, symbol);
-            IThreadWorker matchedThreadWorker = threadManagerPcMatchedImpl.addWorker(assetSymbol, matchedInitTask);
+            for (String assetSymbol : supportAssetSymbol) {
 
-            PcOrderInitTask task = pcMatchTaskService.buildPcOrderInitTask(assetSymbol, asset, symbol, matchedThreadWorker);
-            threadManagerPcMatchImpl.addWorker(assetSymbol, task);
+                if (iThreadManager.getWorkerKeys().contains(assetSymbol)) {
+                    // 已启动的，忽略
+                    continue;
+                }
 
+                // build init task
+                Tuple2<String, String> assetSymbolTuple = PcUtil.splitAssetAndSymbol(assetSymbol);
+                String asset = assetSymbolTuple.first;
+                String symbol = assetSymbolTuple.second;
+                PcMatchedInitTask matchedInitTask = pcMatchedTaskService.buildMatchedInitTask(assetSymbol, asset, symbol);
+                IThreadWorker matchedThreadWorker = threadManagerPcMatchedImpl.addWorker(assetSymbol, matchedInitTask);
+
+                PcOrderInitTask task = pcMatchTaskService.buildPcOrderInitTask(assetSymbol, asset, symbol, matchedThreadWorker);
+                threadManagerPcMatchImpl.addWorker(assetSymbol, task);
+            }
         }
         return true;
     }

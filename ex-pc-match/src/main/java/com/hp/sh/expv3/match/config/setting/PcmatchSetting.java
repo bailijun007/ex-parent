@@ -8,20 +8,19 @@ import com.hp.sh.expv3.match.constant.PcmatchConst;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Set;
-
 @Configuration
 @ConfigurationProperties(prefix = PcmatchConst.MODULE_NAME)
 public class PcmatchSetting {
 
-    private Set<String> supportAssetSymbol;
+    private Integer matchGroupId;
 
-    public Set<String> getSupportAssetSymbol() {
-        return supportAssetSymbol;
+    public Integer getMatchGroupId() {
+        return matchGroupId;
     }
 
-    public void setSupportAssetSymbol(Set<String> supportAssetSymbol) {
-        this.supportAssetSymbol = supportAssetSymbol;
+    public void setMatchGroupId(Integer matchGroupId) {
+        this.matchGroupId = matchGroupId;
     }
+
 
 }

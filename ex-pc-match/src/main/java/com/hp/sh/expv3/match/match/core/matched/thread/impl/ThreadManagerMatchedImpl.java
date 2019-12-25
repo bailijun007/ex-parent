@@ -4,6 +4,7 @@
  */
 package com.hp.sh.expv3.match.match.core.matched.thread.impl;
 
+import com.google.common.collect.ImmutableSet;
 import com.hp.sh.expv3.match.thread.def.ITask;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
 import com.hp.sh.expv3.match.thread.def.IThreadWorker;
@@ -13,6 +14,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service("threadManagerPcMatchedImpl")
@@ -78,4 +80,8 @@ public class ThreadManagerMatchedImpl implements IThreadManager, ApplicationCont
         return workerMap.get(assetSymbol);
     }
 
+    @Override
+    public Set<String> getWorkerKeys() {
+        return ImmutableSet.copyOf(this.workerMap.keySet());
+    }
 }

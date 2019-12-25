@@ -14,6 +14,8 @@ public final class CommonConst {
     public static final int NO = 0;
     public static final int YES = 1;
 
+    public static final String ASSET_SYMBOL_CONNECTOR = "__";
+
     public static final long INVALID_ID = -1L;
     public static final int COMMON_PRECISION = 18;
     public static final BigDecimal ERROR_THRESHOLD = BigDecimal.ONE.subtract(BigDecimal.TEN.pow(COMMON_PRECISION));

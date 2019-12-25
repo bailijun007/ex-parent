@@ -89,13 +89,14 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
         long queueSize = matchedThreadWorker.getTaskCount(); // 队列长度
 
         String redisKey = RedisKeyUtil.buildPcOrderMatchedQueueRedisKey(pcmatchRedisKeySetting.getPcOrderMatchedQueueRedisKeyPattern(), asset, symbol);
-        pcRedisUtil.hmset(redisKey, new HashMap<String, String>() {
-            {
-                put(pcmatchRedisKeySetting.getPcOrderMatchedQueueHeadOffsetRedisKeyPattern(), "" + headOffset);
-                put(pcmatchRedisKeySetting.getPcOrderMatchedQueueEndOffsetRedisKeyPattern(), "" + endOffset);
-                put(pcmatchRedisKeySetting.getPcOrderMatchedQueueSizeRedisKeyPattern(), "" + queueSize);
-            }
-        });
+        pcRedisUtil.hmset(new HashMap<String, String>() {
+                              {
+                                  put(pcmatchRedisKeySetting.getPcOrderMatchedQueueHeadOffsetRedisKeyPattern(), "" + headOffset);
+                                  put(pcmatchRedisKeySetting.getPcOrderMatchedQueueEndOffsetRedisKeyPattern(), "" + endOffset);
+                                  put(pcmatchRedisKeySetting.getPcOrderMatchedQueueSizeRedisKeyPattern(), "" + queueSize);
+                              }
+                          },
+                redisKey);
 
     }
 
