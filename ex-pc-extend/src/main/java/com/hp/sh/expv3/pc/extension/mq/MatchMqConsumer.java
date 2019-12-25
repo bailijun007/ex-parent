@@ -15,8 +15,8 @@ public class MatchMqConsumer {
 
 	public void handleMatch(PcAccountEvent msg){
 		logger.info("收到消息:{}", msg);
-		
+
 	}
-	
-    
+
+
 }
