@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 /**
  * @author BaiLiJun  on 2019/12/24
  */
-public class PcAccountRecordExtVo implements Serializable {
-    @ApiModelProperty("")
+public class PcAccountRecordLogVo implements Serializable {
+    @ApiModelProperty("金额")
     private BigDecimal volume;
 
     @ApiModelProperty("已付费用")
@@ -45,7 +45,29 @@ public class PcAccountRecordExtVo implements Serializable {
     @ApiModelProperty("委托id")
     private Long orderId;
 
-    public PcAccountRecordExtVo() {
+    @ApiModelProperty("时间")
+    private Long time;
+
+    @ApiModelProperty("引用对象Id")
+    private Long refId;
+
+    public PcAccountRecordLogVo() {
+    }
+
+    public Long getTime() {
+        return time;
+    }
+
+    public Long getRefId() {
+        return refId;
+    }
+
+    public void setRefId(Long refId) {
+        this.refId = refId;
+    }
+
+    public void setTime(Long time) {
+        this.time = time;
     }
 
     public BigDecimal getVolume() {

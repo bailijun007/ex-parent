@@ -29,6 +29,15 @@ public class PcAccountLogVo implements Serializable {
     public PcAccountLogVo() {
     }
 
+    public PcAccountLogVo(Integer type, Long userId, String asset, String symbol, Long refId, Long time) {
+        this.type = type;
+        this.userId = userId;
+        this.asset = asset;
+        this.symbol = symbol;
+        this.refId = refId;
+        this.time = time;
+    }
+
     public Integer getType() {
         return type;
     }
