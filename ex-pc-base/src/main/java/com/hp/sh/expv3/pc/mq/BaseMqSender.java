@@ -11,16 +11,16 @@ import com.hp.sh.rocketmq.codec.MsgCodec;
 public class BaseMqSender {
 	
 	@Autowired
-    private MQProducer producer;
+	protected MQProducer producer;
 	
 	@Autowired
-	private MsgCodec msgCodec;
+	protected MsgCodec msgCodec;
     
 	public BaseMqSender() {
 	}
 	
 	protected void sendOrderMsg(BaseOrderMsg msg, String tags, String keys){
-		String topic = this.getOrderTopic(msg.getAsset(), msg.getSymbol());
+		String topic = this.getTopic(msg);
 		byte[] msgBuff = (byte[]) msgCodec.encode(msg);
 		Message mqMsg = new Message(topic, tags, msgBuff);
 		mqMsg.setKeys(keys);
@@ -36,7 +36,9 @@ public class BaseMqSender {
 		}
 	}
 
-	protected String getOrderTopic(String asset, String symbol){
+	protected String getTopic(BaseOrderMsg msg){
+		String asset = msg.getAsset();
+		String symbol = msg.getSymbol();
 		return "pcOrder_"+asset+"__"+symbol;
 	}
     

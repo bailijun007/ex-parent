@@ -6,6 +6,8 @@ package com.hp.sh.expv3.pc.module.order.entity;
 
 import java.math.BigDecimal;
 
+import javax.persistence.Transient;
+
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.dev.Question;
 
@@ -64,6 +66,9 @@ public class PcOrderTrade extends UserDataEntity {
 	
 	//未成交（张数）
 	private BigDecimal remainVolume;
+	
+	@Transient
+	private Integer tradType;
 
 	public PcOrderTrade() {
 		super();
@@ -195,6 +200,14 @@ public class PcOrderTrade extends UserDataEntity {
 				+ ", volume=" + volume + ", tradeSn=" + tradeSn + ", makerFlag=" + makerFlag + ", tradeTime="
 				+ tradeTime + ", feeCollectorId=" + feeCollectorId + ", feeRatio=" + feeRatio + ", fee=" + fee
 				+ ", pnl=" + pnl + "]";
+	}
+
+	public Integer getTradType() {
+		return tradType;
+	}
+
+	public void setTradType(Integer tradType) {
+		this.tradType = tradType;
 	}
 
 }

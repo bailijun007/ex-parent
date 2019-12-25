@@ -29,6 +29,8 @@ import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.mq.match.msg.PcTradeMsg;
+import com.hp.sh.expv3.pc.msg.LogType;
+import com.hp.sh.expv3.pc.msg.PcAccountEvent;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
@@ -65,11 +67,11 @@ public class PcPositionService {
 	private PositionStrategyContext positionStrategy;
 	
 	//处理成交订单
-	public void handleTradeOrder(PcTradeMsg matchedVo){
+	public PcAccountEvent handleTradeOrder(PcTradeMsg matchedVo){
 		PcOrder order = this.pcOrderDAO.findById(matchedVo.getAccountId(), matchedVo.getOrderId());
 		boolean exist = this.chekOrderTrade(order, matchedVo);
 		if(exist){
-			return ;
+			return null;
 		}
 		
 		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
@@ -104,10 +106,12 @@ public class PcPositionService {
 		////////// 订单 ///////////
 		//修改订单状态
 		this.updateOrderStatus4Trade(order, tradeResult);
+		
+		PcAccountEvent accountLog = getAccountLog(pcOrderTrade, order);
 
 		//////////pc_account ///////////
 		if(order.getLiqFlag()==IntBool.YES){//强平委托
-			return;
+			return accountLog;
 		}
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
@@ -117,7 +121,26 @@ public class PcPositionService {
 				this.openFeeDiffToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult);
 			}
 		}
-		
+		return accountLog;
+	}
+	
+	private PcAccountEvent getAccountLog(PcOrderTrade pcOrderTrade, PcOrder order){
+		PcAccountEvent eventMsg = new PcAccountEvent();
+		eventMsg.setUserId(pcOrderTrade.getUserId());
+		eventMsg.setAsset(pcOrderTrade.getAsset());
+		eventMsg.setSymbol(pcOrderTrade.getSymbol());
+		eventMsg.setTime(pcOrderTrade.getCreated().getTime());
+		eventMsg.setType(getLogType(order.getCloseFlag(), order.getLongFlag()));
+		eventMsg.setRefId(pcOrderTrade.getId());
+		return eventMsg;
+	}
+	
+	private int getLogType(int closeFlag, int longFlag){
+		if(IntBool.isFalse(closeFlag)){
+			return IntBool.isTrue(longFlag)?LogType.TYPE_TRAD_OPEN_LONG:LogType.TYPE_TRAD_CLOSE_SHORT;
+		}else{
+			return IntBool.isTrue(longFlag)?LogType.TYPE_TRAD_CLOSE_LONG:LogType.TYPE_TRAD_CLOSE_SHORT;
+		}
 	}
 	
 	private void closeFeeToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeResult, int longFlag) {
@@ -301,7 +324,7 @@ public class PcPositionService {
 	/**
 	 * 处理成交
 	 */
-	public void handleMatchedResult(PcMatchedResult pcMatchedResult){
+	void handleMatchedResult(PcMatchedResult pcMatchedResult){
 		//taker
 		PcTradeMsg takerTradeVo = new PcTradeMsg();
 		takerTradeVo.setMakerFlag(TradingRoles.TAKER);

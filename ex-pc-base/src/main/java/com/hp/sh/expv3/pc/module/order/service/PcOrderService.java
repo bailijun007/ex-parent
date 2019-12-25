@@ -239,7 +239,7 @@ public class PcOrderService {
 		if(BigUtils.eq(order.getVolume(), order.getFilledVolume())){
 			throw new ExException(OrderError.FILLED);
 		}
-		if(IntBool.isFlase(order.getActiveFlag())){
+		if(IntBool.isFalse(order.getActiveFlag())){
 			throw new ExException(OrderError.NOT_ACTIVE);
 		}
 		

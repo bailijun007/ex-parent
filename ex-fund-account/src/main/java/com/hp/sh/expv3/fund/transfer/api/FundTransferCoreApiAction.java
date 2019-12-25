@@ -21,9 +21,6 @@ import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 import com.hp.sh.expv3.pc.api.PcAccountCoreApi;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 
-import io.swagger.annotations.Api;
-
-@Api(tags="资金划转接口")
 @RestController
 public class FundTransferCoreApiAction implements FundTransferCoreApi {
 
