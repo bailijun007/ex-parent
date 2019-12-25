@@ -9,14 +9,13 @@ import com.hp.sh.expv3.pc.msg.PcAccountEvent;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
-@MQListener(topic = MsgConstant.EVENT_TOPIC, orderly=MQListener.ORDERLY_NO)
-public class MatchMqConsumer {
-	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer.class);
+@MQListener(topic = MsgConstant.EVENT_TOPIC, orderly=MQListener.ORDERLY_YES)
+public class EventMqConsumer {
+	private static final Logger logger = LoggerFactory.getLogger(EventMqConsumer.class);
 
-	public void handleMatch(PcAccountEvent msg){
+	public void handleMsg(PcAccountEvent msg){
 		logger.info("收到消息:{}", msg);
-
+		
 	}
-
-
+	
 }

@@ -29,9 +29,6 @@ public class PcOrderTrade extends UserDataEntity {
 	//成交量（张数）
 	private BigDecimal volume;
 	
-	//未成交（张数）
-	private BigDecimal remainingVolume; 
-
 	//交易序号
 	private String tradeSn;
 	
@@ -64,6 +61,9 @@ public class PcOrderTrade extends UserDataEntity {
 	//盈亏(此次成交的盈亏)
 	@Question(ask="没有用到，老项目里也没这个字段", answer="老杜用")
 	private BigDecimal pnl;
+	
+	//未成交（张数）
+	private BigDecimal remainVolume;
 
 	public PcOrderTrade() {
 		super();
@@ -179,6 +179,14 @@ public class PcOrderTrade extends UserDataEntity {
 
 	public void setPosId(Long posId) {
 		this.posId = posId;
+	}
+
+	public BigDecimal getRemainVolume() {
+		return remainVolume;
+	}
+
+	public void setRemainVolume(BigDecimal remainVolume) {
+		this.remainVolume = remainVolume;
 	}
 
 	@Override
