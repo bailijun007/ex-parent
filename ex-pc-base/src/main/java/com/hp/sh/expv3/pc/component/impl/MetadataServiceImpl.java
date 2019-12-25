@@ -5,18 +5,20 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.pc.component.MetadataService;
+import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 import com.hp.sh.expv3.pc.constant.RedisKey;
-import com.hp.sh.expv3.pc.strategy.vo.PcContractVO;
 
 /**
  * @author BaiLiJun  on 2019/12/18
  */
+@Primary
 @Component
 public class MetadataServiceImpl implements MetadataService {
 
@@ -50,7 +52,8 @@ public class MetadataServiceImpl implements MetadataService {
         HashOperations hashOperations = templateDB0.opsForHash();
         String hashKey = asset+"__"+symbol;
         Object o = hashOperations.get(RedisKey.PC_CONTRACT, hashKey);
-        PcContractVO vo = JSON.parseObject(o.toString(), PcContractVO.class);
+        String json = o.toString();
+        PcContractVO vo = JSON.parseObject(json, PcContractVO.class);
         return vo;
     }
 

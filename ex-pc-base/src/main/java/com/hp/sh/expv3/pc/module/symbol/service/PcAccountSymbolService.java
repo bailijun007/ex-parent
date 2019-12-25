@@ -48,6 +48,7 @@ public class PcAccountSymbolService{
 		entity.setCrossLeverage(pcDefaultSymbolSetting.getCrossLeverage(asset, symbol));
 		entity.setLongLeverage(pcDefaultSymbolSetting.getLongLeverage(asset, symbol));
 		entity.setShortLeverage(pcDefaultSymbolSetting.getShortLeverage(asset, symbol));
+		entity.setCrossMaxLeverage(pcDefaultSymbolSetting.getCrossMaxLeverage(asset, symbol));
 		entity.setSymbol(symbol);
 		entity.setUserId(userId);
 		entity.setVersion(0L);

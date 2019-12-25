@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcLiqRecordDAO">
+
+    <resultMap type="com.hp.sh.expv3.pc.extension.vo.PcLiqRecordVo" id="PcLiqRecordVo">
+        <result column="id" property="id"/>
+        <result column="asset" property="asset"/>
+        <result column="symbol" property="symbol"/>
+        <result column="pos_id" property="posId"/>
+        <result column="long_flag" property="longFlag"/>
+        <result column="volume" property="volume"/>
+        <result column="pos_margin" property="posMargin"/>
+        <result column="bankrupt_price" property="bankruptPrice"/>
+        <result column="user_id" property="userId"/>
+        <result column="created" property="created"/>
+        <result column="modified" property="modified"/>
+        <result column="liq_price" property="liqPrice"/>
+        <result column="fee" property="fee"/>
+        <result column="fee_ratio" property="feeRatio"/>
+    </resultMap>
+
+    <sql id="simple_where">
+        <where>
+            <if test="idList!=null">and id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+            <if test="userIdList!=null">and user_id in
+                <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                    #{userIdList[${i}]}
+                </foreach>
+            </if>
+            <if test="assetList!=null">and asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="posId!=null">and pos_id=#{posId}</if>
+            <if test="longFlag!=null">and long_flag=#{longFlag}</if>
+            <if test="volume!=null">and volume=#{volume}</if>
+            <if test="posMrgin!=null">and pos_margin=#{posMrgin}</if>
+            <if test="bankruptPrice!=null">and bankrupt_price=#{bankruptPrice}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="liqPrice!=null">and liq_price=#{liqPrice}</if>
+            <if test="fee!=null">and fee=#{fee}</if>
+            <if test="feeRatio!=null">and fee_ratio=#{feeRatio}</if>
+            <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>if>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+	id,asset,symbol,pos_id,long_flag,volume,pos_margin,bankrupt_price,user_id,
+	liq_price,created,modified,fee,fee_ratio
+    </sql>
+
+
+    <select id="queryOne" resultMap="PcLiqRecordVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_liq_record
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryList" resultMap="PcLiqRecordVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_liq_record
+        <include refid="simple_where"/>
+    </select>
+
+
+</mapper>

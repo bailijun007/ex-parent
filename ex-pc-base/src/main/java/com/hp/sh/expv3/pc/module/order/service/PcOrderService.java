@@ -3,6 +3,7 @@ package com.hp.sh.expv3.pc.module.order.service;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -11,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
+import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -85,11 +88,11 @@ public class PcOrderService {
 	 */
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
-		return self.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number, pos, IntBool.YES);
+		return self.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number, pos, IntBool.YES, IntBool.NO);
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag){
+	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag, int liqFlag){
 		
 //		if(this.existClientOrderId(userId, cliOrderId)){
 //			throw new ExException(OrderError.CREATED);
@@ -122,8 +125,9 @@ public class PcOrderService {
 		pcOrder.setCreated(now);
 		pcOrder.setModified(now);
 		pcOrder.setStatus(OrderStatus.PENDING_NEW);
-		pcOrder.setActiveFlag(IntBool.YES);
 		pcOrder.setClientOrderId(cliOrderId);
+		pcOrder.setActiveFlag(IntBool.YES);
+		pcOrder.setLiqFlag(liqFlag);
 		
 		/////////押金数据/////////
 		
@@ -179,7 +183,7 @@ public class PcOrderService {
 		PcCutRequest request = new PcCutRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
-		request.setRemark("开仓扣除");
+		request.setRemark("开仓");
 		request.setTradeNo("O"+orderId);
 		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_OPEN_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setUserId(userId);
@@ -234,6 +238,9 @@ public class PcOrderService {
 		}
 		if(BigUtils.eq(order.getVolume(), order.getFilledVolume())){
 			throw new ExException(OrderError.FILLED);
+		}
+		if(IntBool.isFalse(order.getActiveFlag())){
+			throw new ExException(OrderError.NOT_ACTIVE);
 		}
 		
 		long count = this.pcOrderDAO.setCancelStatus(userId, orderId, OrderStatus.PENDING_CANCEL, now);
@@ -319,6 +326,16 @@ public class PcOrderService {
         if (BigUtils.gt(number, closablePos)) {
             throw new ExException(PositonError.POS_NOT_ENOUGH);
         }
+	}
+	
+	@CrossDB
+	public List<PcOrder> pageQuery(Page page, Integer status, Date modified){
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("page", page);
+		params.put("status", status);
+		params.put("modifiedEnd", modified);
+		List<PcOrder> list = this.pcOrderDAO.queryList(params);
+		return list;
 	}
 	
 }

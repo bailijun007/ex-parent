@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 public class CurrentPositionVo implements Serializable {
     @ApiModelProperty("仓位id")
     private Long id;
+    @ApiModelProperty("用户id")
+    private Long userId;
     @ApiModelProperty("资产")
     private String asset;
     @ApiModelProperty("交易对")
@@ -60,6 +62,14 @@ public class CurrentPositionVo implements Serializable {
 
     @ApiModelProperty("开仓时间")
     private Long ctime;
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public Long getId() {
         return id;

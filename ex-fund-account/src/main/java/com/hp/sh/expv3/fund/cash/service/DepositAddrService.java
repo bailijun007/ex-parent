@@ -14,4 +14,6 @@ public interface DepositAddrService {
 
 	public void update(DepositAddr depositAddr);
 
+	public DepositAddr findById(long userId, long depositAddrId);
+
 }

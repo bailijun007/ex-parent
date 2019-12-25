@@ -3,16 +3,50 @@
 
 <mapper namespace="com.hp.sh.expv3.fund.extension.dao.WithdrawalRecordExtMapper">
 
+    <sql id="simple_where">
+        <where>
+            <if test="idList!=null">
+                and id in
+                <foreach item="item" index="i" collection="idList" open="("
+                         separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+            <if test="payStatusList!=null">
+                and pay_status in
+                <foreach item="item" index="i" collection="payStatusList" open="("
+                         separator="," close=")">
+                    #{payStatusList[${i}]}
+                </foreach>
+            </if>
+            <if test="userIdList!=null">
+                and user_id in
+                <foreach item="item" index="i" collection="userIdList" open="("
+                         separator="," close=")">
+                    #{userIdList[${i}]}
+                </foreach>
+            </if>
+            <if test="userId!=null"> and user_id=#{userId}</if>
+            <if test="payStatus!=null"> and pay_status=#{payStatus}</if>
+            <if test="createdBegin!=null and createdBegin!=''"> and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null and createdEnd!=''"> and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null and modifiedBegin!=''"> and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null and modifiedEnd!=''"> and modified &lt;= #{modifiedEnd}</if>
+
+        </where>
+    </sql>
+
     <select id="getFrozenCapital" resultType="java.math.BigDecimal">
       SELECT IFNULL(SUM(amount),0) from withdrawal_record
-        WHERE 1=1
+        <where>
         <if test="userId!=null">
-            and  user_id=#{userId}
+              user_id=#{userId}
         </if>
         <if test="asset!=null and asset!=''">
             AND asset=#{asset}
         </if>
         AND pay_status NOT IN (1,2);
+        </where>
     </select>
 
     <select id="queryHistory" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
@@ -39,6 +73,25 @@
                 </when>
 
             </choose>
+        </where>
+    </select>
+
+    <select id="queryHistoryByTime" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
+      select id,asset symbol,  amount, pay_status  status,created,account,user_id userId,asset
+        FROM withdrawal_record
+        <where>
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+            <if test="payStatus!=null">  AND pay_status&lt;&gt; #{payStatus}</if>
+            <if test="createdBegin!=null and createdBegin!=''"> and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null and createdEnd!=''"> and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null and modifiedBegin!=''"> and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null and modifiedEnd!=''"> and modified &lt;= #{modifiedEnd}</if>
+
         </where>
     </select>
 

@@ -6,6 +6,8 @@ package com.hp.sh.expv3.pc.module.order.entity;
 
 import java.math.BigDecimal;
 
+import javax.persistence.Transient;
+
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.dev.Question;
 
@@ -28,7 +30,7 @@ public class PcOrderTrade extends UserDataEntity {
 
 	//成交量（张数）
 	private BigDecimal volume;
-
+	
 	//交易序号
 	private String tradeSn;
 	
@@ -61,6 +63,12 @@ public class PcOrderTrade extends UserDataEntity {
 	//盈亏(此次成交的盈亏)
 	@Question(ask="没有用到，老项目里也没这个字段", answer="老杜用")
 	private BigDecimal pnl;
+	
+	//未成交（张数）
+	private BigDecimal remainVolume;
+	
+	@Transient
+	private Integer tradType;
 
 	public PcOrderTrade() {
 		super();
@@ -178,12 +186,28 @@ public class PcOrderTrade extends UserDataEntity {
 		this.posId = posId;
 	}
 
+	public BigDecimal getRemainVolume() {
+		return remainVolume;
+	}
+
+	public void setRemainVolume(BigDecimal remainVolume) {
+		this.remainVolume = remainVolume;
+	}
+
 	@Override
 	public String toString() {
 		return "PcOrderTrade [asset=" + asset + ", symbol=" + symbol + ", orderId=" + orderId + ", price=" + price
 				+ ", volume=" + volume + ", tradeSn=" + tradeSn + ", makerFlag=" + makerFlag + ", tradeTime="
 				+ tradeTime + ", feeCollectorId=" + feeCollectorId + ", feeRatio=" + feeRatio + ", fee=" + fee
 				+ ", pnl=" + pnl + "]";
+	}
+
+	public Integer getTradType() {
+		return tradType;
+	}
+
+	public void setTradType(Integer tradType) {
+		this.tradType = tradType;
 	}
 
 }

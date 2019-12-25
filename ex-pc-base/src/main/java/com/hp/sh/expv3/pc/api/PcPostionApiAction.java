@@ -13,12 +13,12 @@ public class PcPostionApiAction implements PcPostionApi {
 	@Autowired
 	private PcPositionMarginService pcPositionService;
 	
-	//调整保证金 TODO 加&减
+	//调整保证金 加&减
 	public void changeMargin(Long userId, String asset, String symbol, Integer longFlag, Integer optType, BigDecimal amount){
 		pcPositionService.changeMargin(userId, asset, symbol, longFlag, optType, amount);
 	}
 	
-	public boolean changeLeverage(long userId, String asset, String symbol, Integer marginMode, Integer longFlag, BigDecimal leverage){
+	public boolean changeLeverage(Long userId, String asset, String symbol, Integer marginMode, Integer longFlag, BigDecimal leverage){
 		return pcPositionService.changeLeverage(userId, asset, symbol, marginMode, longFlag, leverage);
 	}
 	

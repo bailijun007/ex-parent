@@ -1,9 +1,9 @@
 package com.hp.sh.expv3.pc.extension.api;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.extension.constant.PcPositionErrorCode;
+import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
-import com.hp.sh.expv3.pc.extension.service.PcOrderTradeService;
+import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
 import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
 import com.hp.sh.expv3.pc.extension.service.impl.PcAccountExtendServiceImpl;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
@@ -35,12 +35,12 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     private PcPositionExtendService pcPositionExtendService;
 
     @Autowired
-    private PcOrderTradeService pcOrderTradeService;
+    private PcOrderTradeExtendService pcOrderTradeService;
 
     @Override
     public List<UserOrderVo> query(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || currentPage == null || pageSize == null) {
-            throw new ExException(PcPositionErrorCode.PARAM_EMPTY);
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         List<UserOrderVo> result = new ArrayList<>();
         List<PcOrderVo> list = pcOrderExtendService.findCurrentUserOrder(userId, asset, symbol, orderType, longFlag, closeFlag);
@@ -72,7 +72,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     @Override
     public List<UserOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || currentPage == null || pageSize == null || nextPage == null) {
-            throw new ExException(PcPositionErrorCode.PARAM_EMPTY);
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         List<UserOrderVo> result = new ArrayList<>();
         List<PcOrderVo> list = pcOrderExtendService.queryHistory(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage);
@@ -87,7 +87,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     @Override
     public List<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || currentPage == null || pageSize == null) {
-            throw new ExException(PcPositionErrorCode.PARAM_EMPTY);
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         List<UserOrderVo> result = new ArrayList<>();
         List<PcOrderVo> list = pcOrderExtendService.queryAll(userId, asset, symbol, status, longFlag, closeFlag);

@@ -10,7 +10,7 @@ import com.hp.sh.expv3.base.BaseApiAction;
 import com.hp.sh.expv3.fund.cash.api.ChainCasehApiAction;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApiAction;
-import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
+import com.hp.sh.expv3.fund.wallet.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.utils.SnUtils;
 

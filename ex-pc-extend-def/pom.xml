@@ -10,6 +10,8 @@
     <description>永续合约扩展服务接口定义</description>
     
 	<properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<springboot.version>2.0.3.RELEASE</springboot.version>
 		<springcloud.version>2.0.0.RELEASE</springcloud.version>

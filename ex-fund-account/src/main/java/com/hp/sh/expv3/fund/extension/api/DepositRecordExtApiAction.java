@@ -2,8 +2,8 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.constant.DepositRecordExtErrorCode;
-import com.hp.sh.expv3.fund.extension.constant.FundAccountExtErrorCode;
+import com.hp.sh.expv3.fund.extension.error.DepositRecordExtErrorCode;
+import com.hp.sh.expv3.fund.extension.error.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.service.DepositAddrExtService;
 import com.hp.sh.expv3.fund.extension.service.DepositRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.AddressVo;
@@ -52,11 +52,11 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
         PageResult<DepositRecordHistoryVo> result = new PageResult<DepositRecordHistoryVo>();
         List<DepositRecordHistoryVo> list = getAllUserDepositRecordHistoryVos(userId, asset, null, null, null);
 
-        List<DepositRecordHistoryVo> pageList = list.stream().skip(pageSize * (pageNo - 1))
-                .limit(pageSize)
-                .collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(list)) {
+            List<DepositRecordHistoryVo> pageList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
+            result.setList(pageList);
+        }
 
-        result.setList(pageList);
         Integer rowTotal = list.size();
         result.setPageNo(pageNo);
         result.setRowTotal(new Long(rowTotal + ""));

@@ -21,4 +21,6 @@ public interface PcOrderExtendService {
     List<PcOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage);
 
     List<PcOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag);
+
+    PcOrderVo getPcOrder(Long orderId, String asset, String symbol, Long userId);
 }

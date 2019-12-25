@@ -15,15 +15,12 @@ import com.hp.sh.expv3.fund.transfer.mq.MqSender;
 import com.hp.sh.expv3.fund.transfer.mq.msg.NewTransfer;
 import com.hp.sh.expv3.fund.transfer.service.FundTransferCoreService;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
-import com.hp.sh.expv3.fund.wallet.api.constant.TradeType;
+import com.hp.sh.expv3.fund.wallet.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 import com.hp.sh.expv3.pc.api.PcAccountCoreApi;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 
-import io.swagger.annotations.Api;
-
-@Api(tags="资金划转接口")
 @RestController
 public class FundTransferCoreApiAction implements FundTransferCoreApi {
 
@@ -40,7 +37,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	private MqSender mqSender;
 
 	@Override
-	public void transfer(Long userId, String asset, Integer srcAccountType, Integer targetAccountType, BigDecimal amount) throws Exception{
+	public void transfer(Long userId, String asset, Integer srcAccountType, Integer targetAccountType, BigDecimal amount){
 		if(srcAccountType.equals(targetAccountType)){
 			throw new ExException(TransferError.ACCOUNT_TYPE);
 		}

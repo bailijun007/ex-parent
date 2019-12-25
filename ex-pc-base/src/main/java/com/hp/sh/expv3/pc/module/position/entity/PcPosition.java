@@ -93,7 +93,11 @@ public class PcPosition extends UserDataEntity {
 	
 	/****************** 强平 ****************/
     
+    //预估强评价
     private BigDecimal liqPrice;
+
+	// 仓位强平状态，0：未触发平仓，1：仓位被冻结，
+	private Integer liqStatus;
 
 	// 触发强平的标记价格
 	private BigDecimal liqMarkPrice;
@@ -101,8 +105,7 @@ public class PcPosition extends UserDataEntity {
 	// 触发强平的标记时间
 	private Long liqMarkTime;
 
-	// 仓位强平状态，0：未触发平仓，1：仓位被冻结，
-	private Integer liqStatus;
+	
 	
 	//仓位已平空
 //	private Integer closed;

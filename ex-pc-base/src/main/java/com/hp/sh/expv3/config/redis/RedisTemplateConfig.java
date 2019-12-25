@@ -21,36 +21,34 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 public class RedisTemplateConfig {
 
-	@Value("${spring.redis.host}")
+	@Value("${meta.redis.host}")
 	private String hostName;
-	@Value("${spring.redis.port}")
+	@Value("${meta.redis.port}")
 	private Integer port;
-	@Value("${spring.redis.password}")
+	@Value("${meta.redis.password}")
 	private String password;
-	
-	@Bean
-	RedisStandaloneConfiguration redisStandaloneConfiguration(){
-        RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
-        conf.setHostName(hostName);
-        conf.setPort(port);
-        conf.setPassword(RedisPassword.of(password));
-        return conf;
-	}
 
     @Primary
     @Bean("cf0")
-    public RedisConnectionFactory redisConnectionFactory0(RedisStandaloneConfiguration conf) {
-        LettuceConnectionFactory cf = new LettuceConnectionFactory(conf);
-        cf.setDatabase(0);
+    public RedisConnectionFactory redisConnectionFactory0() {
+        LettuceConnectionFactory cf = new LettuceConnectionFactory(standaloneConfiguration(0));
         return cf;
     }
 
     @Bean("cf5")
-    public RedisConnectionFactory redisConnectionFactory5(RedisStandaloneConfiguration conf) {
-        LettuceConnectionFactory cf = new LettuceConnectionFactory(conf);
-        cf.setDatabase(5);
+    public RedisConnectionFactory redisConnectionFactory5() {
+        LettuceConnectionFactory cf = new LettuceConnectionFactory(standaloneConfiguration(5));
         return cf;
     }
+
+	private RedisStandaloneConfiguration standaloneConfiguration(int dataBase){
+        RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
+        conf.setHostName(hostName);
+        conf.setPort(port);
+        conf.setPassword(RedisPassword.of(password));
+        conf.setDatabase(dataBase);
+        return conf;
+	}
 
     @Bean(name = "templateDB0")
     public StringRedisTemplate template0(@Qualifier("cf0") RedisConnectionFactory redisConnectionFactory) {

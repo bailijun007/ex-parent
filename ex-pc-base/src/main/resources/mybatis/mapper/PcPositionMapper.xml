@@ -14,6 +14,7 @@
 		<result column="auto_add_flag" property="autoAddFlag" />
 		<result column="leverage" property="leverage" />
 		<result column="volume" property="volume" />
+		<result column="face_value" property="faceValue" />
 		<result column="base_value" property="baseValue" />
 		<result column="pos_margin" property="posMargin" />
 		<result column="close_fee" property="closeFee" />
@@ -34,7 +35,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,asset,symbol,long_flag,margin_mode,entry_leverage,auto_add_flag,leverage,volume,base_value,pos_margin,close_fee,mean_price,accu_base_value,accu_volume,init_margin,hold_margin_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
+		id,asset,symbol,long_flag,margin_mode,entry_leverage,auto_add_flag,leverage,volume,face_value,base_value,pos_margin,close_fee,mean_price,accu_base_value,accu_volume,init_margin,hold_margin_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
 	</sql>
 
     <sql id="simple_where">
@@ -115,15 +116,14 @@
         limit 1
     </select>
 
-
 	<insert id="save">
 		<selectKey resultType="long" order="AFTER" keyProperty="id">
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into pc_position (
-			id,asset,symbol,long_flag,margin_mode,entry_leverage,auto_add_flag,leverage,volume,base_value,pos_margin,close_fee,mean_price,accu_base_value,accu_volume,init_margin,hold_margin_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
+			id,asset,symbol,long_flag,margin_mode,entry_leverage,auto_add_flag,leverage,volume,face_value,base_value,pos_margin,close_fee,mean_price,accu_base_value,accu_volume,init_margin,hold_margin_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
 		)values(
-			#{id},#{asset},#{symbol},#{longFlag},#{marginMode},#{entryLeverage},#{autoAddFlag},#{leverage},#{volume},#{baseValue},#{posMargin},#{closeFee},#{meanPrice},#{accuBaseValue},#{accuVolume},#{initMargin},#{holdMarginRatio},#{feeCost},#{realisedPnl},#{liqPrice},#{liqMarkPrice},#{liqMarkTime},#{liqStatus},#{userId},#{created},#{modified}
+			#{id},#{asset},#{symbol},#{longFlag},#{marginMode},#{entryLeverage},#{autoAddFlag},#{leverage},#{volume},#{faceValue},#{baseValue},#{posMargin},#{closeFee},#{meanPrice},#{accuBaseValue},#{accuVolume},#{initMargin},#{holdMarginRatio},#{feeCost},#{realisedPnl},#{liqPrice},#{liqMarkPrice},#{liqMarkTime},#{liqStatus},#{userId},#{created},#{modified}
 		)
 	</insert>
 	
@@ -131,7 +131,7 @@
 		update 
 			pc_position
 		set 
-			asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},auto_add_flag=#{autoAddFlag},leverage=#{leverage},volume=#{volume},base_value=#{baseValue},pos_margin=#{posMargin},close_fee=#{closeFee},mean_price=#{meanPrice},accu_base_value=#{accuBaseValue},accu_volume=#{accuVolume},init_margin=#{initMargin},hold_margin_ratio=#{holdMarginRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},liq_status=#{liqStatus},user_id=#{userId},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},auto_add_flag=#{autoAddFlag},leverage=#{leverage},volume=#{volume},face_value=#{faceValue},base_value=#{baseValue},pos_margin=#{posMargin},close_fee=#{closeFee},mean_price=#{meanPrice},accu_base_value=#{accuBaseValue},accu_volume=#{accuVolume},init_margin=#{initMargin},hold_margin_ratio=#{holdMarginRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},liq_status=#{liqStatus},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>
@@ -159,7 +159,7 @@
         	pc_position
         where
         	user_id=#{userId} and asset=#{asset} and symbol=#{symbol} and long_flag=#{longFlag}
-        and volume &lt; 0
+        and volume &gt; 0
     </select>
 
     <select id="queryActivePosList" resultMap="PcPosition">
@@ -168,8 +168,20 @@
         from
         	pc_position
         where
-        	volume &lt; 0
+        	volume &gt; 0
             <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+    </select>
+    
+
+    <select id="queryActivePosUserIdList" resultType="long">
+        select
+        	DISTINCT user_id 
+        from
+        	pc_position
+        where
+        	volume &gt; 0
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
     </select>

@@ -6,6 +6,12 @@ package com.hp.sh.expv3.fund.api4v2;
 
 import java.math.BigDecimal;
 
+/**
+ * 冲值
+ * @author wangjg
+ *
+ */
+@Deprecated
 public interface FundAccount4ChainServerDef {
 
     /**

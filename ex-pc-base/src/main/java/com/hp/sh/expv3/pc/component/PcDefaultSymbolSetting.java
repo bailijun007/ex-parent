@@ -39,4 +39,8 @@ public class PcDefaultSymbolSetting {
 		return new BigDecimal(10);
 	};
 
+	public BigDecimal getCrossMaxLeverage(String asset, String symbol) {
+		return new BigDecimal(20);
+	};
+
 }

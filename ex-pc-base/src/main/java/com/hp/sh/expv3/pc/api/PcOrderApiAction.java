@@ -3,7 +3,6 @@ package com.hp.sh.expv3.pc.api;
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
@@ -13,8 +12,6 @@ import com.hp.sh.expv3.pc.mq.match.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.utils.BidUtils;
-
-import io.swagger.annotations.ApiOperation;
 
 @RestController
 public class PcOrderApiAction implements PcOrderApi {
@@ -39,8 +36,7 @@ public class PcOrderApiAction implements PcOrderApi {
 	 * @throws Exception 
 	 */
 	@Override
-	@GetMapping(value = "/api/pc/order/create")
-	public void create(Long userId, String asset, String symbol, Integer closeFlag, Integer longFlag, Integer timeInForce, BigDecimal price, BigDecimal number, String cliOrderId) throws Exception{
+	public Long create(Long userId, String asset, String symbol, Integer closeFlag, Integer longFlag, Integer timeInForce, BigDecimal price, BigDecimal number, String cliOrderId){
 		
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
 
@@ -59,11 +55,12 @@ public class PcOrderApiAction implements PcOrderApi {
 		msg.setOrderTime(order.getCreated().getTime());
 		msg.setTimeInForce(order.getTimeInForce());
 		matchMqSender.sendPendingNew(msg);
+		
+		return order.getId();
 	}
 	
 	@Override
-	@GetMapping(value = "/api/pc/order/cancel")
-	public void cancel(Long userId, String asset, String symbol, Long orderId) throws Exception{
+	public void cancel(Long userId, String asset, String symbol, Long orderId) {
 
 		this.pcOrderService.setPendingCancel(userId, asset, symbol, orderId);
 
@@ -80,9 +77,7 @@ public class PcOrderApiAction implements PcOrderApi {
 	}
 	
 	@Override
-	@ApiOperation(value = "重置深度1")
-	@GetMapping(value = "/api/pc/order/bookReset")
-	public void bookReset (String asset, String symbol) throws Exception{
+	public void bookReset (String asset, String symbol){
 		//发送消息
 		BookResetMsg msg = new BookResetMsg(asset, symbol);
 		msg.setAsset(asset);

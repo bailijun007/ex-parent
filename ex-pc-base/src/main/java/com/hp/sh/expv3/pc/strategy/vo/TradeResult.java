@@ -23,7 +23,7 @@ public class TradeResult {
 	private BigDecimal fee;
 	//此次成交的maker手续费率
 	private BigDecimal makerFeeRatio;
-	//m此次成交的aker手续费
+	//此次成交的taker手续费
 	private BigDecimal makerFee;
 	//此次成交的保证金
 	private BigDecimal orderMargin;

@@ -1,10 +1,10 @@
 package com.hp.sh.expv3.fund.extension.service.impl;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.constant.DepositRecordExtErrorCode;
-import com.hp.sh.expv3.fund.extension.constant.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.dao.DepositRecordExtMapper;
 import com.hp.sh.expv3.fund.extension.dao.FundAccountExtendMapper;
+import com.hp.sh.expv3.fund.extension.error.DepositRecordExtErrorCode;
+import com.hp.sh.expv3.fund.extension.error.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.service.DepositRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo;
 import org.springframework.beans.factory.annotation.Autowired;

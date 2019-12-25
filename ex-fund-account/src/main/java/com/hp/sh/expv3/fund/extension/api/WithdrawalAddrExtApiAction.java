@@ -1,8 +1,8 @@
 package com.hp.sh.expv3.fund.extension.api;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.constant.DepositRecordExtErrorCode;
-import com.hp.sh.expv3.fund.extension.constant.WithdrawalAddressExtErrorCode;
+import com.hp.sh.expv3.fund.extension.error.DepositRecordExtErrorCode;
+import com.hp.sh.expv3.fund.extension.error.WithdrawalAddressExtErrorCode;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalAddrExtService;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrParam;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo;

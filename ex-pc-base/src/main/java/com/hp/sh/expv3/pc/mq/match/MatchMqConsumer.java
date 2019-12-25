@@ -26,7 +26,7 @@ public class MatchMqConsumer {
 	
 	@Autowired
 	private PcPositionService pcPositionService;
-
+	
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(MatchNotMatchMsg msg){
 		this.pcOrderService.setNewStatus(msg.getAccountId(), msg.getOrderId(), OrderStatus.NEW, OrderStatus.PENDING_NEW);
@@ -47,7 +47,7 @@ public class MatchMqConsumer {
 	}
 	
 	//撮合成功
-	@MQListener(tags=MqTags.TAGS_MATCHED)
+	@MQListener(tags=MqTags.TAGS_MATCHED)  
 	public void handleMatch(MatchedMsg msg){
 		logger.info("收到消息:{}", msg);
 		

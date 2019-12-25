@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,8 @@ import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.mq.match.msg.PcTradeMsg;
-import com.hp.sh.expv3.pc.strategy.aabb.AABBPositionStrategy;
+import com.hp.sh.expv3.pc.msg.LogType;
+import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -62,26 +64,29 @@ public class PcPositionService {
 	private FeeCollectorSelector feeCollectorSelector;
 	
 	@Autowired
-	private AABBPositionStrategy positionStrategy;
+	private PositionStrategyContext positionStrategy;
+    
+    @Autowired
+    private ApplicationEventPublisher publisher;
 	
 	//处理成交订单
 	public void handleTradeOrder(PcTradeMsg matchedVo){
 		PcOrder order = this.pcOrderDAO.findById(matchedVo.getAccountId(), matchedVo.getOrderId());
 		boolean exist = this.chekOrderTrade(order, matchedVo);
 		if(exist){
-			return ;
+			return;
 		}
 		
 		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
-		TradeResult tradeResult = this.positionStrategy.getTradeResult(matchedVo, order, pcPosition);
+		TradeResult tradeResult = this.positionStrategy.calcTradeResult(matchedVo, order, pcPosition);
 		
 		////////// 仓位 ///////////
 		//如果仓位不存在则创建新仓位
 		boolean isNewPos = false;
 		if(pcPosition==null){
-			pcPosition = this.newEmptyPostion(as.getUserId(), as.getAsset(), as.getSymbol(), order.getLongFlag(), order.getLeverage(), as.getMarginMode());
+			pcPosition = this.newEmptyPostion(as.getUserId(), as.getAsset(), as.getSymbol(), order.getLongFlag(), order.getLeverage(), as.getMarginMode(), order.getFaceValue());
 			isNewPos = true;
 		}
 		
@@ -102,12 +107,13 @@ public class PcPositionService {
 		PcOrderTrade pcOrderTrade = this.saveOrderTrade(matchedVo, order, tradeResult, pcPosition.getId());
 		
 		////////// 订单 ///////////
+		
 		//修改订单状态
 		this.updateOrderStatus4Trade(order, tradeResult);
-
+		
 		//////////pc_account ///////////
 		if(order.getLiqFlag()==IntBool.YES){//强平委托
-			return;
+			return ;
 		}
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
@@ -118,6 +124,14 @@ public class PcPositionService {
 			}
 		}
 		
+	}
+	
+	private int getLogType(int closeFlag, int longFlag){
+		if(IntBool.isFalse(closeFlag)){
+			return IntBool.isTrue(longFlag)?LogType.TYPE_TRAD_OPEN_LONG:LogType.TYPE_TRAD_CLOSE_SHORT;
+		}else{
+			return IntBool.isTrue(longFlag)?LogType.TYPE_TRAD_CLOSE_LONG:LogType.TYPE_TRAD_CLOSE_SHORT;
+		}
 	}
 	
 	private void closeFeeToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeResult, int longFlag) {
@@ -144,15 +158,15 @@ public class PcPositionService {
 		this.pcAccountCoreService.add(request);
 	}
 
-	private void updateOrderStatus4Trade(PcOrder order, TradeResult tradeData){
+	private void updateOrderStatus4Trade(PcOrder order, TradeResult tradeResult){
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
-	        order.setOrderMargin(order.getOrderMargin().subtract(tradeData.getOrderMargin()));
-	        order.setOpenFee(order.getOpenFee().subtract(tradeData.getFee()));
+	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
+	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getFee()));
 		}
-		order.setFeeCost(order.getFeeCost().add(tradeData.getFeeReceivable()));
-		order.setFilledVolume(order.getFilledVolume().add(tradeData.getVolume()));
-        order.setStatus(tradeData.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
-        order.setActiveFlag(tradeData.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
+		order.setFeeCost(order.getFeeCost().add(tradeResult.getFeeReceivable()));
+		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getVolume()));
+        order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
+        order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setModified(new Date());
 		this.pcOrderDAO.update(order);
 	}
@@ -186,12 +200,18 @@ public class PcPositionService {
 		
 		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
 		
+		orderTrade.setRemainVolume(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeResult.getVolume()));
+		
 		this.pcOrderTradeDAO.save(orderTrade);
+		
+		orderTrade.setTradType(this.getLogType(order.getCloseFlag(), order.getLongFlag()));
+		
+		publisher.publishEvent(orderTrade);
 		
 		return orderTrade;
 	}
 	
-	private PcPosition newEmptyPostion(long userId, String asset, String symbol, int longFlag, BigDecimal entryLeverage, int marginMode) {
+	private PcPosition newEmptyPostion(long userId, String asset, String symbol, int longFlag, BigDecimal entryLeverage, int marginMode, BigDecimal faceValue) {
 		PcPosition pcPosition = new PcPosition();
 		pcPosition.setUserId(userId);
 		pcPosition.setAsset(asset);
@@ -222,6 +242,8 @@ public class PcPositionService {
 		
 		pcPosition.setAccuVolume(BigDecimal.ZERO);
 		pcPosition.setAccuBaseValue(BigDecimal.ZERO);
+		
+		pcPosition.setFaceValue(faceValue);
 		
 		return pcPosition;
 	}
@@ -297,7 +319,7 @@ public class PcPositionService {
 	/**
 	 * 处理成交
 	 */
-	public void handleMatchedResult(PcMatchedResult pcMatchedResult){
+	void handleMatchedResult(PcMatchedResult pcMatchedResult){
 		//taker
 		PcTradeMsg takerTradeVo = new PcTradeMsg();
 		takerTradeVo.setMakerFlag(TradingRoles.TAKER);

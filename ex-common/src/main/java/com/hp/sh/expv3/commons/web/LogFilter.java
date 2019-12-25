@@ -14,16 +14,24 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
-@WebFilter(filterName = "myLogFilter", urlPatterns = { "/api/**" })
+//@WebFilter(filterName = "myLogFilter", urlPatterns = { "/api/**" })
 public class LogFilter implements Filter {
 	
 	private static final String X_REQUEST_ID = "X-Request-Id";
 	
-	private String serviceName;
+	private String serverName;
+
+	public LogFilter() {
+		super();
+	}
+
+	public LogFilter(String serverName) {
+		this.serverName = serverName;
+	}
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		this.serviceName = filterConfig.getInitParameter("serviceName");
+		this.serverName = filterConfig.getInitParameter("serverName");
 	}
 
 	@Override
@@ -40,6 +48,7 @@ public class LogFilter implements Filter {
 			chain.doFilter(httpReq, response);
 		}finally{
 			RequestContext.setRequestId(null);
+			RequestContext.setOperator(null);
 		}
 	}
 
@@ -57,7 +66,7 @@ public class LogFilter implements Filter {
 	}
 	
 	private String newRequestId(){
-		return this.serviceName + UUID.randomUUID().toString().replace("-", "");
+		return this.serverName + UUID.randomUUID().toString().replace("-", "");
 	}
 
 }

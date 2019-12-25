@@ -2,7 +2,7 @@ package com.hp.sh.expv3.pc.component;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.strategy.vo.PcContractVO;
+import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 
 /**
  * 面值查询

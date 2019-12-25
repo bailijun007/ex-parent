@@ -2,16 +2,15 @@ package com.hp.sh.expv3.pc.extension.service.impl;
 
 import com.hp.sh.expv3.pc.extension.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
+import com.hp.sh.expv3.pc.extension.vo.PcLiqRecordVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author BaiLiJun  on 2019/12/16
@@ -80,6 +79,17 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("closeFlag",closeFlag);
         List<PcOrderVo> pcOrderVos = pcOrderDAO.queryList(map);
         return pcOrderVos;
+    }
+
+    @Override
+    public PcOrderVo getPcOrder(Long orderId, String asset, String symbol, Long userId) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("id",orderId);
+        map.put("asset",asset);
+        map.put("symbol",symbol);
+        map.put("userId",userId);
+        PcOrderVo pcOrderVo = pcOrderDAO.queryOne(map);
+        return pcOrderVo;
     }
 
 

@@ -61,13 +61,13 @@
     </sql>
 
 
-    <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVo">
+    <select id="queryOne" resultMap="PcAccountSymbolVo">
         select <include refid="Base_Column_List"/>
         from pc_account_symbol
         <include refid="simple_where"/>
     </select>
 
-    <select id="queryList" resultType="com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVo">
+    <select id="queryList" resultMap="PcAccountSymbolVo">
         select <include refid="Base_Column_List"/>
         from pc_account_symbol
         <include refid="simple_where"/>

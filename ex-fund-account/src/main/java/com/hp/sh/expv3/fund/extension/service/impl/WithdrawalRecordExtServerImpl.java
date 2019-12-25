@@ -1,8 +1,8 @@
 package com.hp.sh.expv3.fund.extension.service.impl;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.constant.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.dao.WithdrawalRecordExtMapper;
+import com.hp.sh.expv3.fund.extension.error.FundAccountExtErrorCode;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -51,6 +53,17 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
         WithdrawalRecordVo vo= withdrawalRecordExtMapper.queryLastHistory(userId, asset);
 
         return vo;
+    }
+
+    @Override
+    public List<WithdrawalRecordVo> findWithdrawalRecordList(Long userId, String asset, String time) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("userId",userId);
+        map.put("asset",asset);
+        map.put("payStatus",2);
+        map.put("createdBegin",time);
+        List<WithdrawalRecordVo> recordVos = withdrawalRecordExtMapper.queryHistoryByTime(map);
+        return recordVos;
     }
 
 }

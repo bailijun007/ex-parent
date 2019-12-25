@@ -16,7 +16,7 @@ public class IntBool {
 		return value == YES;
 	}
 	
-	public static final boolean isFlase(int value){
+	public static final boolean isFalse(int value){
 		check(value);
 		return value != YES;
 	} 

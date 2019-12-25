@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
+import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
+import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.TimeInForce;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
@@ -24,7 +27,7 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.mq.liq.LiqMqSender;
 import com.hp.sh.expv3.pc.mq.liq.msg.CancelOrder;
 import com.hp.sh.expv3.pc.mq.liq.msg.LiqLockMsg;
-import com.hp.sh.expv3.pc.strategy.aabb.AABBHoldPosStrategy;
+import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
@@ -48,7 +51,7 @@ public class PcLiqService {
     private PcPositionMarginService pcPositionMarginService;
     
     @Autowired
-    private AABBHoldPosStrategy holdPosStrategy;
+    private HoldPosStrategy holdPosStrategy;
     
     @Autowired
     private MarkPriceService markPriceService;
@@ -58,16 +61,23 @@ public class PcLiqService {
     
     @Autowired
     private PcPositionDAO pcPositionDAO;
+    
 	@Autowired
 	private PcOrderDAO pcOrderDAO;
+	
+	@Autowired
+	private FeeRatioService feeRatioService;
     
     @Autowired
     private LiqMqSender liqMqSender;
+    
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
 	public void handleLiq(PcPosition pos) {
-		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getAsset());
+		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getSymbol());
 		//检查触发强平
-		if(!this.checkLiq(pos, markPriceVo.getMarkPrice())){
+		if(!this.checkAndResetLiqStatus(pos, markPriceVo.getMarkPrice())){
 			return;
 		}
 		
@@ -77,7 +87,7 @@ public class PcLiqService {
 		}
 		
 		//检查触发强平
-		if(!this.checkLiq(pos, markPriceVo.getMarkPrice())){
+		if(!this.checkAndResetLiqStatus(pos, markPriceVo.getMarkPrice())){
 			return;
 		}
 		
@@ -99,20 +109,23 @@ public class PcLiqService {
 	}
 
 	/*
-	 * checkAndResetLiqStatus
 	 * 是否触发强平
 	 * @param pos
-	 * @return
+	 * @return 是否触发强平
 	 */
-	private boolean checkLiq(PcPosition pos, BigDecimal markPrice) {
-		BigDecimal amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal posPnl = holdPosStrategy.calcPosPnl(pos.getLongFlag(), amount, pos.getMeanPrice(), markPrice);
+	private boolean checkAndResetLiqStatus(PcPosition pos, BigDecimal markPrice) {
+		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
+		BigDecimal posPnl = holdPosStrategy.calcPosPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
 		BigDecimal posMarginRatio = holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), posPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
 		BigDecimal holdMarginRatio = pos.getHoldMarginRatio();
 		
-		if(posMarginRatio.compareTo(holdMarginRatio)<=0){
+		if(posMarginRatio.compareTo(holdMarginRatio)<=0){//强平
 			return true;
-		}else{
+		}else{//不强平
+			if(pos.getLiqStatus()!=LiqStatus.NO){
+				pos.setLiqStatus(LiqStatus.NO);
+				this.pcPositionDAO.update(pos);
+			}
 			return false;
 		}
 	}
@@ -121,28 +134,35 @@ public class PcLiqService {
 		this.pcPositionService.lockLiq(pos);
 	}
 
-	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list) {
+	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list, Integer lastFlag) {
 		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(!pos.getId().equals(posId)){
 			throw new RuntimeException("平仓，仓位ID与当前仓位ID不一致");
 		}
 		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getAsset());
 		
-		this.checkLiq(pos, markPrice);
+		//检查触发强平
+		if(!this.checkAndResetLiqStatus(pos, markPrice)){
+			return;
+		}
 		
+		//取消订单
 		for(CancelOrder co : list){
 			this.pcOrderService.cancel(userId, asset, symbol, co.getOrderId(), co.getCancelNumber());
 		}
 		
-		this.doLiq(pos);
+		//强平
+		if(IntBool.isTrue(lastFlag)){
+			this.doLiq(pos);
+		}
 	}
 	
 	void doLiq(PcPosition pos){
-		//保存强平记录
+		//1、保存强平记录
 		PcLiqRecord record = this.saveLiqRecord(pos);
-		//清空仓位
+		//2、清空仓位
 		this.clearLiqPos(pos);
-		//创建强平委托
+		//3、创建强平委托
 		this.createLiqOrder(record);
 	}
 	
@@ -169,13 +189,21 @@ public class PcLiqService {
 		record.setBankruptPrice(bankruptPrice);
 		record.setCreated(now);
 		record.setModified(now);
+		
+		//log
+		record.setLiqPrice(pos.getLiqPrice());
+		record.setFee(pos.getCloseFee());
+		record.setFeeRatio(feeRatioService.getCloseFeeRatio(pos.getUserId(), pos.getAsset(), pos.getSymbol()));
+		
+		//save
 		pcLiqRecordDAO.save(record);
+		publisher.publishEvent(record);
 		return record;
 	}
 	
 	private void createLiqOrder(PcLiqRecord record){
 		PcPosition pos = this.pcPositionDAO.findById(record.getUserId(), record.getPosId());
-		this.pcOrderService.create(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), OrderFlag.ACTION_CLOSE, record.getLongFlag(), TimeInForce.IMMEDIATE_OR_CANCEL, record.getBankruptPrice(), record.getVolume(), pos, IntBool.NO);
+		this.pcOrderService.create(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), OrderFlag.ACTION_CLOSE, record.getLongFlag(), TimeInForce.IMMEDIATE_OR_CANCEL, record.getBankruptPrice(), record.getVolume(), pos, IntBool.NO, IntBool.YES);
 	}
 	
 	public void handleLiqTrade(Long userId, Long recordId){

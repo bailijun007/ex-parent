@@ -8,7 +8,13 @@ import java.math.BigDecimal;
 
 import javax.security.auth.login.AccountException;
 
+/**
+ * 地址
+ * @author wangjg
+ *
+ */
 //@Remote
+@Deprecated
 public interface FundAccount4ServerDef {
 
     /**
