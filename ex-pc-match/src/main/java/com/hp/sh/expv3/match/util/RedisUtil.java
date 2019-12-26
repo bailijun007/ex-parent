@@ -58,7 +58,7 @@ public class RedisUtil {
 
     public <T> Map<String, T> hgetAll(String key, Class<T> cls) {
         JedisCommands jedis = getJedis();
-        Map<String, String> values = new HashMap<>();
+        Map<String, String> values ;
         try {
             values = jedis.hgetAll(key);
         } finally {
@@ -183,7 +183,7 @@ public class RedisUtil {
 
     public Set<String> hkeys(String key) {
         JedisCommands jedis = getJedis();
-        Set<String> keys = new HashSet<>();
+        Set<String> keys ;
         try {
             keys = jedis.hkeys(key);
         } finally {
@@ -313,7 +313,7 @@ public class RedisUtil {
 
     public List<String> hvals(String key) {
         JedisCommands jedis = getJedis();
-        List<String> values = new ArrayList<>();
+        List<String> values ;
         try {
             values = jedis.hvals(key);
         } finally {
@@ -397,7 +397,7 @@ public class RedisUtil {
         Map<String, String> rs = hget(key, fs);
         Map<Long, T> map = new HashMap<>(rs.size());
         for (Entry<String, String> kv : rs.entrySet()) {
-            map.put(new Long(kv.getKey()), JSON.parseObject(kv.getValue(), cls));
+            map.put(Long.parseLong(kv.getKey()), JSON.parseObject(kv.getValue(), cls));
         }
         return map;
     }
@@ -555,7 +555,7 @@ public class RedisUtil {
 
     public Set<Tuple> zrevrangeWithScores(String key, long start, long end) {
         JedisCommands jedis = getJedis();
-        Set<Tuple> tuples = new HashSet<>();
+        Set<Tuple> tuples ;
         try {
             tuples = jedis.zrevrangeWithScores(key, start, end);
         } finally {
@@ -566,13 +566,11 @@ public class RedisUtil {
 
     public Set<String> zrevrange(String key, long start, long end) {
         JedisCommands jedis = getJedis();
-        Set<String> tuples = new HashSet<>();
         try {
-            tuples = jedis.zrevrange(key, start, end);
+            return jedis.zrevrange(key, start, end);
         } finally {
             returnJedis(jedis);
         }
-        return tuples;
     }
 
     /**
@@ -586,7 +584,7 @@ public class RedisUtil {
     @Deprecated
     public Set<Tuple> zrangeWithScores(String key, long start, long end) {
         JedisCommands jedis = getJedis();
-        Set<Tuple> tuples = new HashSet<>();
+        Set<Tuple> tuples ;
         try {
             tuples = jedis.zrangeWithScores(key, start, end);
         } finally {
@@ -661,24 +659,20 @@ public class RedisUtil {
      */
     public Set<String> zrangeByScore(String key, String min, String max, Integer offset, Integer count) {
         JedisCommands jedis = getJedis();
-        Set<String> eles = new HashSet<>();
         try {
-            eles = (null == count) ? jedis.zrangeByScore(key, min, max) : jedis.zrangeByScore(key, min, max, offset.intValue(), count.intValue());
+            return (null == count) ? jedis.zrangeByScore(key, min, max) : jedis.zrangeByScore(key, min, max, offset.intValue(), count.intValue());
         } finally {
             returnJedis(jedis);
         }
-        return eles;
     }
 
     public Set<String> zrange(String key, long start, long end) {
-        Set<String> zrange = new HashSet<>();
         JedisCommands jedis = getJedis();
         try {
-            zrange = jedis.zrange(key, start, end);
+            return jedis.zrange(key, start, end);
         } finally {
             returnJedis(jedis);
         }
-        return zrange;
     }
 
     public void rename(String key, String newKey) {

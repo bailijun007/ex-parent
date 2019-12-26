@@ -21,4 +21,6 @@ public interface PcOrderDAO {
 
 
     List<PcOrderVo> queryHistory(Map<String, Object> map);
+
+    List<PcOrderVo> queryOrderList(Map<String, Object> map);
 }

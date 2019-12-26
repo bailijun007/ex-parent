@@ -68,6 +68,12 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
     }
 
     public void checkOrder(PcMatchHandlerContext matchHandlerContext, PcOrder4MatchBo order) {
+        if (null == matchHandlerContext.limitBidQueue || matchHandlerContext.limitBidQueue.isEmpty()) {
+            return;
+        }
+        if (null == matchHandlerContext.limitAskQueue || matchHandlerContext.limitAskQueue.isEmpty()) {
+            return;
+        }
 
         if (matchHandlerContext.limitAskQueue.size() + matchHandlerContext.limitBidQueue.size() != matchHandlerContext.allOpenOrders.size()) {
             logger.error("bug=======================bid:{}+ask:{} !={},oid:{} {},u:{},{}@{},exchanged:{} after matcher"
@@ -90,30 +96,28 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
 
             Set<Long> bidOrderId = new HashSet<>();
             logger.error("=======limit bid queue:====================");
-            if (null != matchHandlerContext.limitBidQueue && !matchHandlerContext.limitBidQueue.isEmpty()) {
-                for (PcOrder4MatchBo orderBo : matchHandlerContext.limitBidQueue) {
-                    logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BidUtil.getPcBidCloseDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
-                    if (!matchHandlerContext.allOpenOrders.containsKey(orderBo.getOrderId())) {
-                        logger.error("bid oid:{} not in map", orderBo.getOrderId());
-                    }
-                    bidOrderId.add(orderBo.getOrderId());
+
+            for (PcOrder4MatchBo orderBo : matchHandlerContext.limitBidQueue) {
+                logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BidUtil.getPcBidCloseDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
+                if (!matchHandlerContext.allOpenOrders.containsKey(orderBo.getOrderId())) {
+                    logger.error("bid oid:{} not in map", orderBo.getOrderId());
                 }
+                bidOrderId.add(orderBo.getOrderId());
             }
 
             logger.error("=======all orders in map:====================");
-            if (null != matchHandlerContext.allOpenOrders && !matchHandlerContext.allOpenOrders.isEmpty()) {
-                for (PcOrder4MatchBo orderBo : matchHandlerContext.allOpenOrders.values()) {
-                    logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BidUtil.getPcBidCloseDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
-                    if (orderBo.getBidFlag() == CommonConst.BID && !bidOrderId.contains(orderBo.getOrderId())) {
-                        logger.error("bid oid:{} not in queue. check!!!", orderBo.getOrderId());
-                    }
-                    if (orderBo.getBidFlag() == CommonConst.ASK && !askOrderId.contains(orderBo.getOrderId())) {
-                        logger.error("ask oid:{} not in queue. check!!!", orderBo.getOrderId());
-                    }
+            for (PcOrder4MatchBo orderBo : matchHandlerContext.allOpenOrders.values()) {
+                logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BidUtil.getPcBidCloseDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
+                if (orderBo.getBidFlag() == CommonConst.BID && !bidOrderId.contains(orderBo.getOrderId())) {
+                    logger.error("bid oid:{} not in queue. check!!!", orderBo.getOrderId());
+                }
+                if (orderBo.getBidFlag() == CommonConst.ASK && !askOrderId.contains(orderBo.getOrderId())) {
+                    logger.error("ask oid:{} not in queue. check!!!", orderBo.getOrderId());
                 }
             }
             logger.error("=======end====================");
         }
+
     }
 
     protected void handleTakerNotFinishedOrder(PcMatchHandlerContext context, PcOrder4MatchBo takerOrder, PriorityQueue<PcOrder4MatchBo> sameSideQueue) {

@@ -52,7 +52,7 @@ public class PcDeprecatedSnapshotDeleteTriggerThread {
         long matchedMqOffset = -1L;
         if (pcRedisUtil.exists(sentMqOffsetRedisKey)) {
             String s = pcRedisUtil.get(sentMqOffsetRedisKey);
-            matchedMqOffset = Long.valueOf(s);
+            matchedMqOffset = Long.parseLong(s);
         }
         return matchedMqOffset;
     }

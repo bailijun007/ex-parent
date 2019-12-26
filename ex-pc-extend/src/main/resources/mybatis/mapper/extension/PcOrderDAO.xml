@@ -4,112 +4,113 @@
 <mapper namespace="com.hp.sh.expv3.pc.extension.dao.PcOrderDAO">
 
     <resultMap type="com.hp.sh.expv3.pc.extension.vo.PcOrderVo" id="PcOrderVo">
-        <result column="id" property="id" />
-        <result column="asset" property="asset" />
-        <result column="symbol" property="symbol" />
-        <result column="close_flag" property="closeFlag" />
-        <result column="long_flag" property="longFlag" />
-        <result column="margin_mode" property="marginMode" />
-        <result column="leverage" property="leverage" />
-        <result column="price" property="price" />
-        <result column="order_type" property="orderType" />
-        <result column="volume" property="volume" />
-        <result column="face_value" property="faceValue" />
-        <result column="status" property="status" />
-        <result column="margin_ratio" property="marginRatio" />
-        <result column="open_fee_ratio" property="openFeeRatio" />
-        <result column="close_fee_ratio" property="closeFeeRatio" />
-        <result column="fee_cost" property="feeCost" />
-        <result column="gross_margin" property="grossMargin" />
-        <result column="order_margin" property="orderMargin" />
-        <result column="open_fee" property="openFee" />
-        <result column="close_fee" property="closeFee" />
-        <result column="filled_volume" property="filledVolume" />
-        <result column="cancel_volume" property="cancelVolume" />
-        <result column="close_pos_id" property="closePosId" />
-        <result column="time_in_force" property="timeInForce" />
-        <result column="trigger_flag" property="triggerFlag" />
-        <result column="cancel_time" property="cancelTime" />
-        <result column="visible_flag" property="visibleFlag" />
-        <result column="active_flag" property="activeFlag" />
-        <result column="create_operator" property="createOperator" />
-        <result column="cancel_operator" property="cancelOperator" />
-        <result column="remark" property="remark" />
-        <result column="client_order_id" property="clientOrderId" />
-        <result column="user_id" property="userId" />
-        <result column="created" property="created" />
-        <result column="modified" property="modified" />
+        <result column="id" property="id"/>
+        <result column="asset" property="asset"/>
+        <result column="symbol" property="symbol"/>
+        <result column="close_flag" property="closeFlag"/>
+        <result column="long_flag" property="longFlag"/>
+        <result column="margin_mode" property="marginMode"/>
+        <result column="leverage" property="leverage"/>
+        <result column="price" property="price"/>
+        <result column="order_type" property="orderType"/>
+        <result column="volume" property="volume"/>
+        <result column="face_value" property="faceValue"/>
+        <result column="status" property="status"/>
+        <result column="margin_ratio" property="marginRatio"/>
+        <result column="open_fee_ratio" property="openFeeRatio"/>
+        <result column="close_fee_ratio" property="closeFeeRatio"/>
+        <result column="fee_cost" property="feeCost"/>
+        <result column="gross_margin" property="grossMargin"/>
+        <result column="order_margin" property="orderMargin"/>
+        <result column="open_fee" property="openFee"/>
+        <result column="close_fee" property="closeFee"/>
+        <result column="filled_volume" property="filledVolume"/>
+        <result column="cancel_volume" property="cancelVolume"/>
+        <result column="close_pos_id" property="closePosId"/>
+        <result column="time_in_force" property="timeInForce"/>
+        <result column="trigger_flag" property="triggerFlag"/>
+        <result column="cancel_time" property="cancelTime"/>
+        <result column="visible_flag" property="visibleFlag"/>
+        <result column="active_flag" property="activeFlag"/>
+        <result column="create_operator" property="createOperator"/>
+        <result column="cancel_operator" property="cancelOperator"/>
+        <result column="remark" property="remark"/>
+        <result column="client_order_id" property="clientOrderId"/>
+        <result column="user_id" property="userId"/>
+        <result column="created" property="created"/>
+        <result column="modified" property="modified"/>
     </resultMap>
 
     <sql id="simple_where">
-        where 1=1
-        <if test="idList!=null">and id in
-            <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
-                #{idList[${i}]}
-            </foreach>
-        </if>
-        <if test="userIdList!=null">and user_id in
-            <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
-                #{userIdList[${i}]}
-            </foreach>
-        </if>
-        <if test="assetList!=null">and asset in
-            <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
-                #{assetList[${i}]}
-            </foreach>
-        </if>
-        <if test="statusList!=null">and status in
-            <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
-                #{statusList[${i}]}
-            </foreach>
-        </if>
-        <if test="symbolList!=null">and symbol in
-            <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
-                #{symbolList[${i}]}
-            </foreach>
-        </if>
+        <where>
+            <if test="idList!=null">and id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+            <if test="userIdList!=null">and user_id in
+                <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                    #{userIdList[${i}]}
+                </foreach>
+            </if>
+            <if test="assetList!=null">and asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+            <if test="statusList!=null">and status in
+                <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
+                    #{statusList[${i}]}
+                </foreach>
+            </if>
+            <if test="symbolList!=null">and symbol in
+                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
+                    #{symbolList[${i}]}
+                </foreach>
+            </if>
 
-        <if test="id!=null">and id=#{id}</if>
-        <if test="userId!=null">and user_id=#{userId}</if>
-        <if test="asset!=null and asset!=''">and asset=#{asset}</if>
-        <if test="status!=null">and status=#{status}</if>
-        <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
-        <if test="closeFlag!=null">and close_flag=#{closeFlag}</if>
-        <if test="longFlag!=null">and long_flag=#{longFlag}</if>
-        <if test="marginMode!=null">and margin_mode=#{marginMode}</if>
-        <if test="leverage!=null">and leverage=#{leverage}</if>
-        <if test="price!=null">and price=#{price}</if>
-        <if test="orderType!=null">and order_type=#{orderType}</if>
-        <if test="volume!=null">and volume=#{volume}</if>
-        <if test="faceValue!=null">and face_value=#{faceValue}</if>
-        <if test="marginRatio!=null">and margin_ratio=#{marginRatio}</if>
-        <if test="openFeeRatio!=null">and open_fee_ratio=#{openFeeRatio}</if>
-        <if test="close_fee_ratio!=null">and close_fee_ratio=#{closeFeeRatio}</if>
-        <if test="feeCost!=null">and fee_cost=#{feeCost}</if>
-        <if test="grossMargin!=null">and gross_margin=#{grossMargin}</if>
-        <if test="orderMargin!=null">and order_margin=#{orderMargin}</if>
-        <if test="openFee!=null">and open_fee=#{openFee}</if>
-        <if test="closeFee!=null">and close_fee=#{closeFee}</if>
-        <if test="filledVolume!=null">and filled_volume=#{filledVolume}</if>
-        <if test="cancelVolume!=null">and cancel_volume=#{cancelVolume}</if>
-        <if test="closePosId!=null">and close_pos_id=#{closePosId}</if>
-        <if test="timeInForce!=null">and time_in_force=#{timeInForce}</if>
-        <if test="triggerFlag!=null">and trigger_flag=#{triggerFlag}</if>
-        <if test="cancelTime!=null">and cancel_time=#{cancelTime}</if>
-        <if test="visibleFlag!=null">and visible_flag=#{visibleFlag}</if>
-        <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
-        <if test="createOperator!=null and createOperator！=''">and create_operator=#{createOperator}</if>
-        <if test="cancelOperator!=null and cancelOperator！=''">and cancel_operator=#{cancelOperator}</if>
-        <if test="remark!=null and remark！=''">and remark=#{remark}</if>
-        <if test="clientOrderId!=null and clientOrderId！=''">and client_order_id=#{clientOrderId}</if>
-        <if test="userId!=null">and user_id=#{userId}</if>
-        <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
-        <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
-        <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
-        <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>if>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="status!=null">and status=#{status}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="closeFlag!=null">and close_flag=#{closeFlag}</if>
+            <if test="longFlag!=null">and long_flag=#{longFlag}</if>
+            <if test="marginMode!=null">and margin_mode=#{marginMode}</if>
+            <if test="leverage!=null">and leverage=#{leverage}</if>
+            <if test="price!=null">and price=#{price}</if>
+            <if test="orderType!=null">and order_type=#{orderType}</if>
+            <if test="volume!=null">and volume=#{volume}</if>
+            <if test="faceValue!=null">and face_value=#{faceValue}</if>
+            <if test="marginRatio!=null">and margin_ratio=#{marginRatio}</if>
+            <if test="openFeeRatio!=null">and open_fee_ratio=#{openFeeRatio}</if>
+            <if test="close_fee_ratio!=null">and close_fee_ratio=#{closeFeeRatio}</if>
+            <if test="feeCost!=null">and fee_cost=#{feeCost}</if>
+            <if test="grossMargin!=null">and gross_margin=#{grossMargin}</if>
+            <if test="orderMargin!=null">and order_margin=#{orderMargin}</if>
+            <if test="openFee!=null">and open_fee=#{openFee}</if>
+            <if test="closeFee!=null">and close_fee=#{closeFee}</if>
+            <if test="filledVolume!=null">and filled_volume=#{filledVolume}</if>
+            <if test="cancelVolume!=null">and cancel_volume=#{cancelVolume}</if>
+            <if test="closePosId!=null">and close_pos_id=#{closePosId}</if>
+            <if test="timeInForce!=null">and time_in_force=#{timeInForce}</if>
+            <if test="triggerFlag!=null">and trigger_flag=#{triggerFlag}</if>
+            <if test="cancelTime!=null">and cancel_time=#{cancelTime}</if>
+            <if test="visibleFlag!=null">and visible_flag=#{visibleFlag}</if>
+            <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
+            <if test="createOperator!=null and createOperator！=''">and create_operator=#{createOperator}</if>
+            <if test="cancelOperator!=null and cancelOperator！=''">and cancel_operator=#{cancelOperator}</if>
+            <if test="remark!=null and remark！=''">and remark=#{remark}</if>
+            <if test="clientOrderId!=null and clientOrderId！=''">and client_order_id=#{clientOrderId}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>if>
+        </where>
     </sql>
 
-    <sql id="Base_Column_List" >
+    <sql id="Base_Column_List">
 		id,asset,symbol,close_flag,long_flag,margin_mode,leverage,price,order_type,volume,face_value,status,
 		margin_ratio,open_fee_ratio,close_fee_ratio,fee_cost,gross_margin,order_margin,open_fee,close_fee,filled_volume,
 		cancel_volume,close_pos_id,time_in_force,trigger_flag,cancel_time,visible_flag,active_flag,create_operator,cancel_operator,
@@ -125,56 +126,95 @@
     </select>
 
     <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
-        select <include refid="Base_Column_List"/>
+        select
+        <include refid="Base_Column_List"/>
         from pc_order
         <include refid="simple_where"/>
     </select>
 
     <select id="queryList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
-        select <include refid="Base_Column_List"/>
+        select
+        <include refid="Base_Column_List"/>
         from pc_order
         <include refid="simple_where"/>
     </select>
 
-    <select id="queryHistory" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
-        select <include refid="Base_Column_List"/>
+
+    <select id="queryOrderList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
+        select
+        <include refid="Base_Column_List"/>
         from pc_order
-      <where>
-          <if test="userId!=null">
-              user_id=#{userId}
-          </if>
-          <if test="asset!=null and asset!=''">
-              and asset=#{asset}
-          </if>
-          <if test="symbol!=null and symbol!=''">
-              and symbol=#{symbol}
-          </if>
-          <if test="orderType!=null">
-              and order_type=#{orderType}
-          </if>
-          <if test="longFlag!=null">
-              and long_flag=#{longFlag}
-          </if>
-          <if test="closeFlag!=null">
-              and close_flag=#{closeFlag}
-          </if>
-          <choose>
-              <when test="nextPage==1 and pageSize!=null and lastOrderId!=null">
-                  and id &gt; #{lastOrderId}
-                  ORDER BY id asc
-                  LIMIT 0,${pageSize}
-              </when>
-              <when test="nextPage==-1 and pageSize!=null and lastOrderId!=null">
-                  and id &lt; #{lastOrderId}
-                  ORDER BY id desc
-                  LIMIT 0,${pageSize}
-              </when>
-              <otherwise>
-                  ORDER BY id desc
-                  LIMIT 0,${pageSize}
-              </otherwise>
-          </choose>
-      </where>
+        <where>
+            <if test="assetList!=null">and asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+            <if test="statusList!=null">and status in
+                <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
+                    #{statusList[${i}]}
+                </foreach>
+            </if>
+            <if test="symbolList!=null">and symbol in
+                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
+                    #{symbolList[${i}]}
+                </foreach>
+            </if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+
+            <if test="gtOrderId!=null">
+                and id &gt;#{gtOrderId}
+                ORDER BY id asc
+            </if>
+
+            <if test="ltOrderId!=null">
+                and id &lt;#{ltOrderId}
+                ORDER BY id desc
+            </if>
+        </where>
+        LIMIT 0,${limit}
+    </select>
+
+    <select id="queryHistory" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order
+        <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+            <if test="symbol!=null and symbol!=''">
+                and symbol=#{symbol}
+            </if>
+            <if test="orderType!=null">
+                and order_type=#{orderType}
+            </if>
+            <if test="longFlag!=null">
+                and long_flag=#{longFlag}
+            </if>
+            <if test="closeFlag!=null">
+                and close_flag=#{closeFlag}
+            </if>
+            <choose>
+                <when test="nextPage==1 and pageSize!=null and lastOrderId!=null">
+                    and id &gt; #{lastOrderId}
+                    ORDER BY id asc
+                    LIMIT 0,${pageSize}
+                </when>
+                <when test="nextPage==-1 and pageSize!=null and lastOrderId!=null">
+                    and id &lt; #{lastOrderId}
+                    ORDER BY id desc
+                    LIMIT 0,${pageSize}
+                </when>
+                <otherwise>
+                    ORDER BY id desc
+                    LIMIT 0,${pageSize}
+                </otherwise>
+            </choose>
+        </where>
     </select>
 
 </mapper>

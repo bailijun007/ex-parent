@@ -92,5 +92,19 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         return pcOrderVo;
     }
 
+    @Override
+    public List<PcOrderVo> queryOrderList(Long userId, List<String> assetList, List<String> symbolList, Long gtOrderId, Long ltOrderId, Integer count, List<Integer> statusList) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("userId",userId);
+        map.put("assetList",assetList);
+        map.put("symbolList",symbolList);
+        map.put("statusList",statusList);
+        map.put("gtOrderId",gtOrderId);
+        map.put("ltOrderId",ltOrderId);
+        map.put("limit",count);
+        List<PcOrderVo> list = pcOrderDAO.queryOrderList(map);
+        return list;
+    }
+
 
 }
