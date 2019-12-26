@@ -24,9 +24,6 @@ public class LiquidationJob {
     @Autowired
     private PcLiqService pcLiqService;
     
-    @Autowired
-    private LiqMqSender liqMqSender;
-    
 	/**
 	 * 
 	 */

@@ -11,9 +11,9 @@ import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.mq.match.msg.MatchNotMatchMsg;
-import com.hp.sh.expv3.pc.mq.match.msg.MatchedMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.MatchedOrderCancelledMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.PcTradeMsg;
+import com.hp.sh.expv3.pc.msg.MatchedMsg;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component

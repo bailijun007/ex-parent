@@ -18,9 +18,11 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import com.gitee.hupadev.commons.cache.JsonCacheSerializer;
+import com.gitee.hupadev.commons.cache.MsgListener;
 import com.gitee.hupadev.commons.cache.RedisCache;
 import com.gitee.hupadev.commons.cache.RedisPool;
 import com.gitee.hupadev.commons.cache.RedisPublisher;
+import com.gitee.hupadev.commons.cache.RedisSubscriber;
 
 @EnableCaching
 @Configuration
@@ -65,10 +67,29 @@ public class RedisConfig {
 		return rp;
 	}
 	
-	@Bean
-	public Object test1(RedisCache redisCache) {
-		redisCache.put("test", "111");
-		return null;
+	@Bean 
+	public RedisSubscriber testRs(RedisPool redisPool){
+		final RedisSubscriber rs = new RedisSubscriber(redisPool);
+		rs.setCacheSerializer(new JsonCacheSerializer());
+		rs.setMsgListener(new MsgListener(){
+
+			@Override
+			public void onMessage(Object message) {
+				System.out.println("RedisSubscriber:" + message);
+			}
+			
+		});
+		rs.setChannel("pc:account:BTC");
+		new Thread(){
+			public void run(){
+				try{
+					rs.subscribe();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}.start();
+		return rs;
 	}
 	
 }

@@ -28,7 +28,7 @@ public interface PcAccountCoreApi {
 	@GetMapping(value = "/api/pc/pc_account/account/exist")	
 	boolean accountExist(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
-	@ApiOperation(value = "创建资金账户")
+	@ApiOperation(value = "创建永续合约账户")
 	@GetMapping(value = "/api/pc/pc_account/account/create")
 	public int createAccount(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 

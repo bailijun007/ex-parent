@@ -77,6 +77,8 @@ public class PcPositionService {
 			return;
 		}
 		
+		Date now  = DbDateUtils.now();
+		
 		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
@@ -98,18 +100,21 @@ public class PcPositionService {
 		}
 		//保存
 		if(isNewPos){
+			pcPosition.setCreated(now);
+			pcPosition.setModified(now);
 			this.pcPositionDAO.save(pcPosition);
 		}else{
+			pcPosition.setModified(now);
 			this.pcPositionDAO.update(pcPosition);
 		}
 		
 		////////// 成交记录  ///////////
-		PcOrderTrade pcOrderTrade = this.saveOrderTrade(matchedVo, order, tradeResult, pcPosition.getId());
+		PcOrderTrade pcOrderTrade = this.saveOrderTrade(matchedVo, order, tradeResult, pcPosition.getId(), now);
 		
 		////////// 订单 ///////////
 		
 		//修改订单状态
-		this.updateOrderStatus4Trade(order, tradeResult);
+		this.updateOrderStatus4Trade(order, tradeResult, now);
 		
 		//////////pc_account ///////////
 		if(order.getLiqFlag()==IntBool.YES){//强平委托
@@ -158,7 +163,7 @@ public class PcPositionService {
 		this.pcAccountCoreService.add(request);
 	}
 
-	private void updateOrderStatus4Trade(PcOrder order, TradeResult tradeResult){
+	private void updateOrderStatus4Trade(PcOrder order, TradeResult tradeResult, Date now){
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getFee()));
@@ -167,13 +172,11 @@ public class PcPositionService {
 		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getVolume()));
         order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
-		order.setModified(new Date());
+		order.setModified(now);
 		this.pcOrderDAO.update(order);
 	}
 
-	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeResult, Long posId) {
-		Date now = new Date();
-		
+	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeResult, Long posId, Date now) {
 		PcOrderTrade orderTrade = new PcOrderTrade();
 
 		orderTrade.setId(null);
@@ -222,9 +225,10 @@ public class PcPositionService {
 		pcPosition.setLeverage(entryLeverage);
 		pcPosition.setAutoAddFlag(IntBool.NO);
 		pcPosition.setHoldMarginRatio(feeRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
-		Date now = new Date();
-		pcPosition.setCreated(now );
-		pcPosition.setModified(now);
+
+//		Date now = new Date();
+//		pcPosition.setCreated(now );
+//		pcPosition.setModified(now);
 		//
 		pcPosition.setVolume(BigDecimal.ZERO);
 		pcPosition.setBaseValue(BigDecimal.ZERO);

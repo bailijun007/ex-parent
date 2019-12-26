@@ -22,7 +22,8 @@ public class PcPostionApiAction implements PcPostionApi {
 		return pcPositionService.changeLeverage(userId, asset, symbol, marginMode, longFlag, leverage);
 	}
 	
-	//开关自动追加保证金接口
+	//开关自动追加保证金
+	@Override
 	public boolean setAutoAddFlag(long userId, String asset, String symbol, Integer longFlag, Integer autoAddFlag){
 		return pcPositionService.setAutoAddFlag(userId, asset, symbol, longFlag, autoAddFlag);
 	}

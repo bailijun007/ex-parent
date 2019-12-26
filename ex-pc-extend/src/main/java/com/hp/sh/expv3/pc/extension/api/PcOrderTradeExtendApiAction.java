@@ -40,8 +40,8 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
     }
 
     @Override
-    public List<PcOrderTradeDetailVo> queryTradeRecord(Long userId,String asset, String symbol, Long gtTradeId, Long ltTradeId, Integer count) {
-        if (StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)|| count == null|| userId == null) {
+    public List<PcOrderTradeDetailVo> queryTradeRecord(String asset, String symbol, Long gtTradeId, Long ltTradeId, Integer count) {
+        if (StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)|| count == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         //如果同时传了gtTradeId和ltTradeId 则以gtOrderId为查询条件，同时不传，则查全部
@@ -51,7 +51,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         List<PcOrderTradeDetailVo> result=new ArrayList<>();
         List<String> assetList = Arrays.asList(asset.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
         List<String> symbolList = Arrays.asList(symbol.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
-        List<PcOrderTradeVo> voList = pcOrderTradeService.queryTradeRecords(userId,assetList,symbolList,gtTradeId,ltTradeId,count);
+        List<PcOrderTradeVo> voList = pcOrderTradeService.queryTradeRecords(assetList,symbolList,gtTradeId,ltTradeId,count);
       //封装结果集
         this.toResult(result, voList);
 

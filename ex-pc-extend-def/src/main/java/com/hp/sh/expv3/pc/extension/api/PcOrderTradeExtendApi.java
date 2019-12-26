@@ -34,7 +34,6 @@ public interface PcOrderTradeExtendApi {
     @ApiOperation(value = "查询成交记录")
     @GetMapping(value = "/api/extension/pc/trade/queryTradeRecord")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型，多个以逗号分割", example = "BTC,ETH", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对，多个以逗号分割", example = "BTC_USDT,BTC_ETH", required = true),
             @ApiImplicitParam(name = "gtTradeId ", value = "成交记录id,请求大于trade_id的数据,gt和lt都填,以gt为准", example = "10", required = false),
@@ -42,7 +41,6 @@ public interface PcOrderTradeExtendApi {
             @ApiImplicitParam(name = "count ", value = "返回条数,最大100条", example = "10", required = false)
     })
     List<PcOrderTradeDetailVo> queryTradeRecord(
-            @RequestParam(value = "userId") Long userId,
             @RequestParam(value = "asset") String asset,
             @RequestParam(value = "symbol", required = true) String symbol,
             @RequestParam(value = "gtTradeId", required = false) Long gtTradeId,

@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.pc.extension.api;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
@@ -56,7 +57,6 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         if (!CollectionUtils.isEmpty(list)) {
             for (PcOrderVo orderVo : list) {
                 UserOrderVo vo = getUserOrderVo(orderVo);
-                vo.setClientOid(orderVo.getClientOrderId());
                 result.add(vo);
             }
         }
@@ -67,14 +67,20 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
 
 
     @Override
-    public List<UserOrderVo> queryUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize) {
+    public PageResult<UserOrderVo> queryUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Integer isTotalNumber) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || currentPage == null || pageSize == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        List<UserOrderVo> result = new ArrayList<>();
-        List<PcOrderVo> list = pcOrderExtendService.findCurrentUserOrder(userId, asset, symbol, orderType, longFlag, closeFlag);
-        if (!CollectionUtils.isEmpty(list)) {
-            getOrderList(currentPage, pageSize, result, list);
+        PageResult<UserOrderVo> result=new PageResult<>();
+        List<UserOrderVo> list = new ArrayList<>();
+        List<PcOrderVo> voList = pcOrderExtendService.findCurrentUserOrder(userId, asset, symbol, orderType, longFlag, closeFlag);
+        if (!CollectionUtils.isEmpty(voList)) {
+            getOrderList(currentPage, pageSize, list, voList);
+        }
+
+        result.setList(list);
+        if(isTotalNumber==1){
+            result.setRowTotal(Long.parseLong(list.size()+""));
         }
         return result;
     }
@@ -89,7 +95,8 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         List<PcOrderVo> list = pcOrderExtendService.queryHistory(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage);
         if (!CollectionUtils.isEmpty(list)) {
             for (PcOrderVo orderVo : list) {
-                getOrderVo(result, orderVo);
+                UserOrderVo vo = getUserOrderVo(orderVo);
+                result.add(vo);
             }
         }
         return result;
@@ -113,18 +120,14 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         return result;
     }
 
-    private void getOrderVo(List<UserOrderVo> result, PcOrderVo orderVo) {
-        UserOrderVo vo = getUserOrderVo(orderVo);
-        result.add(vo);
-    }
-
     private void getOrderList(Integer currentPage, Integer pageSize, List<UserOrderVo> result, List<PcOrderVo> list) {
         List<PcOrderVo> orderVos = list.stream().skip(pageSize * (currentPage - 1))
                 .limit(pageSize)
                 .collect(Collectors.toList());
 
         for (PcOrderVo orderVo : orderVos) {
-            getOrderVo(result, orderVo);
+            UserOrderVo vo = getUserOrderVo(orderVo);
+            result.add(vo);
         }
     }
 
@@ -144,6 +147,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         vo.setCloseFlag(orderVo.getCloseFlag());
         vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume()));
         vo.setOrderType(orderVo.getOrderType());
+        vo.setClientOid(orderVo.getClientOrderId());
         return vo;
     }
 
