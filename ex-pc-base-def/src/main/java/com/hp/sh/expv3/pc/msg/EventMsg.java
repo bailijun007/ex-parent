@@ -74,5 +74,11 @@ public class EventMsg {
 	public void setTime(Long time) {
 		this.time = time;
 	}
+
+	@Override
+	public String toString() {
+		return "EventMsg [type=" + type + ", userId=" + userId + ", asset=" + asset + ", symbol=" + symbol + ", refId="
+				+ refId + ", time=" + time + "]";
+	}
 	
 }

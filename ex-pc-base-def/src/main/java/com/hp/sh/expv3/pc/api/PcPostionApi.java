@@ -18,12 +18,16 @@ import io.swagger.annotations.ApiOperation;
 @FeignClient(value="ex-pc-base")
 public interface PcPostionApi {
 
-	@ApiOperation(value = "增加保证金")
+	@ApiOperation(value = "修改保证金")
 	@GetMapping(value = "/api/pc/position/margin/add")
 	void changeMargin(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol, @RequestParam("longFlag") Integer longFlag, @RequestParam("optType") Integer optType, @RequestParam("amount") BigDecimal amount);
 	
 	@ApiOperation(value = "修改杠杆")
 	@GetMapping(value = "/api/pc/position/leverage/change")
 	public boolean changeLeverage(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol, @RequestParam("marginMode") Integer marginMode, @RequestParam("longFlag") Integer longFlag, @RequestParam("leverage") BigDecimal leverage);
+
+	@ApiOperation(value = "开关自动追加保证金")
+	@GetMapping(value = "/api/pc/position/setAutoAddFlag")
+	boolean setAutoAddFlag(long userId, String asset, String symbol, Integer longFlag, Integer autoAddFlag);
 	
 }
