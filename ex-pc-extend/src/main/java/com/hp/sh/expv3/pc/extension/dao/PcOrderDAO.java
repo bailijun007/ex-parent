@@ -20,7 +20,7 @@ public interface PcOrderDAO {
     List<PcOrderVo> queryList(Map<String,Object> map);
 
 
-    List<PcOrderVo> queryHistory(Map<String, Object> map);
+    List<PcOrderVo> queryOrders(Map<String, Object> map);
 
     List<PcOrderVo> queryOrderList(Map<String, Object> map);
 }

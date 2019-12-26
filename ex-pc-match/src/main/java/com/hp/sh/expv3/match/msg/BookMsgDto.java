@@ -92,6 +92,7 @@ public class BookMsgDto extends BaseMessageDto {
     private String symbol;
     private String asset;
     private BigDecimal lastPrice;
+    private List<BookEntry> orders;
 
     public BigDecimal getLastPrice() {
         return lastPrice;
@@ -101,7 +102,6 @@ public class BookMsgDto extends BaseMessageDto {
         this.lastPrice = lastPrice;
     }
 
-    private List<BookEntry> orders;
 
     public Integer getResetFlag() {
         return resetFlag;

@@ -26,6 +26,31 @@ public class IdServiceImpl implements IdService, ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
+    @Override
+    public int getDataCenter(long id) {
+        return idType2IdWorker.get(IdTypeEnum.COMMON).getDataCenter(id);
+    }
+
+    @Override
+    public int getServer(long id) {
+        return idType2IdWorker.get(IdTypeEnum.COMMON).getServer(id);
+    }
+
+    @Override
+    public int getIdType(long id) {
+        return idType2IdWorker.get(IdTypeEnum.COMMON).getIdType(id);
+    }
+
+    @Override
+    public long getTimeInMs(long id) {
+        return idType2IdWorker.get(IdTypeEnum.COMMON).getTime(id);
+    }
+
+    @Override
+    public int getSequence(long id) {
+        return idType2IdWorker.get(IdTypeEnum.COMMON).getServer(id);
+    }
+
     Map<Integer, SnowflakeIdWorker> idType2IdWorker = new HashMap<>(32);
 
     @PostConstruct

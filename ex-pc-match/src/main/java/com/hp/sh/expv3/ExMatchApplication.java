@@ -53,13 +53,9 @@ public class ExMatchApplication extends Application implements ApplicationContex
         Thread.currentThread().setName("PcMatchMain");
 
         ConfigurableApplicationContext ac = new SpringApplicationBuilder(ExMatchApplication.class)
-//                .web(WebApplicationType.NONE)
                 .web(WebApplicationType.NONE)
-//                .initializers((ConfigurableApplicationContext context) -> {
-//                    System.setProperty("serverId", context.getEnvironment().getProperty("ex.id.serverId"));
-//                    System.setProperty("logRootPath", context.getEnvironment().getProperty("ex.id.logRootPath"));
-//                })
                 .run(args);
+
         ExMatchApplication main = ac.getBean(ExMatchApplication.class);
 
         System.out.println(main.x);

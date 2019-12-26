@@ -5,7 +5,3 @@
 定时检查撮合是否存活，是否冲突，通过group的概念
 
 启动时要验证数据库可用
-
-重启之后，要将在matchedOffset之后的snapshot数据删除
-
-新增一个定时器，找出小于matchedOffset的最大的snapshotOffset，将小于此最大的snapshotOffset的 hash的key都删除
