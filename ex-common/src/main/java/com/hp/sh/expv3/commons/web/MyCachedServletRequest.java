@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.commons.web;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -23,9 +22,7 @@ public class MyCachedServletRequest extends HttpServletRequestWrapper{
 	public ServletInputStream getInputStream() throws IOException{
 		if(newServletInputStream==null){
 			InputStream input = super.getInputStream();
-			ByteArrayOutputStream output = new ByteArrayOutputStream(this.getContentLength());
-			IOUtils.copy(input, output);
-			byte[] buf = output.toByteArray();
+			byte[] buf = IOUtils.toByteArray(input);
 			ByteArrayInputStream newInputStream = new ByteArrayInputStream(buf);
 			this.newServletInputStream = new MyServletInputStream(newInputStream);
 		}
