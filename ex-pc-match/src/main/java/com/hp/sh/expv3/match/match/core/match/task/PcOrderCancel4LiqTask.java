@@ -66,7 +66,7 @@ public class PcOrderCancel4LiqTask extends PcOrderBaseTask implements Applicatio
 
         if (null != context.limitAskQueue && (!context.limitAskQueue.isEmpty())) {
             for (PcOrder4MatchBo order : context.limitAskQueue) {
-                if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag()) && PcUtil.isClose(order.getCloseFlag())) {
+                if (msg.getAccountId().compareTo(order.getAccountId()) == 0 && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag()) && PcUtil.isClose(order.getCloseFlag())) {
                     id2OrderToCancel.put(order.getOrderId(), order);
                 }
             }
@@ -80,7 +80,7 @@ public class PcOrderCancel4LiqTask extends PcOrderBaseTask implements Applicatio
         }
 
         for (PcOrder4MatchBo order : context.allOpenOrders.values()) {
-            if (msg.getAccountId() == order.getAccountId() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag()) && PcUtil.isClose(order.getCloseFlag())) {
+            if (msg.getAccountId().longValue() == order.getAccountId().longValue() && longFlag == PcUtil.getLongFlag(order.getCloseFlag(), order.getBidFlag()) && PcUtil.isClose(order.getCloseFlag())) {
                 if (!id2OrderToCancel.containsKey(order.getOrderId())) {
                     logger.warn("order {} in all order,but not in priority queue", order.getOrderId());
                     id2OrderToCancel.put(order.getOrderId(), order);

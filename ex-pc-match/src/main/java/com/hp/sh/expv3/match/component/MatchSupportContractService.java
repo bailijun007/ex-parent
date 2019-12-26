@@ -47,7 +47,7 @@ public class MatchSupportContractService {
                 String value = kv.getValue();
                 if (null != value) {
                     PcContractBo pcContractBo = JSON.parseObject(value, PcContractBo.class);
-                    if (pcmatchSetting.getMatchGroupId() == pcContractBo.getContractGroup()) {
+                    if (pcmatchSetting.getMatchGroupId().intValue() == pcContractBo.getContractGroup().intValue()) {
                         supportAssetSymbol.add(PcUtil.concatAssetAndSymbol(null, pcContractBo.getAsset(), pcContractBo.getSymbol()));
                     }
                 }

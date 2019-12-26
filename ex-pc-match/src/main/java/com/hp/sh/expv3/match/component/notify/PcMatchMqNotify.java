@@ -15,11 +15,13 @@ import com.hp.sh.expv3.match.util.BeanCopyUtil;
 import com.hp.sh.expv3.match.util.JsonUtil;
 import com.hp.sh.expv3.match.util.PcRocketMqUtil;
 import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.remoting.common.RemotingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,11 +44,11 @@ public class PcMatchMqNotify {
         String topic = PcRocketMqUtil.buildPcAccountContractMqTopicName(pcmatchRocketMqSetting.getPcMatchTopicNamePattern(), asset, symbol);
         if (null != tradeList && !tradeList.isEmpty()) {
 
-            Message message = new Message(
+            Message message = buildMessage(
                     topic,// topic
                     "" + RmqTagEnum.PC_MATCH_ORDER_MATCHED.getConstant(),// tag
                     "" + tradeList.get(0).getTkOrderId(),
-                    JsonUtil.toJsonString(tradeList).getBytes()// body
+                    tradeList// body
             );
             safeSend2MatchTopic(message, tradeList.get(0).getTkAccountId());
 
@@ -65,11 +67,11 @@ public class PcMatchMqNotify {
         msg.setAsset(asset);
         msg.setSymbol(symbol);
 
-        Message message = new Message(
+        Message message = buildMessage(
                 topic,// topic
                 "" + RmqTagEnum.PC_MATCH_ORDER_NOT_MATCHED.getConstant(),// tag
                 "" + orderId,
-                JsonUtil.toJsonString(msg).getBytes()// body
+                msg// body
         );
 //        SendResult send =
         safeSend2MatchTopic(message, accountId);
@@ -88,11 +90,11 @@ public class PcMatchMqNotify {
         msg.setAsset(asset);
         msg.setSymbol(symbol);
         msg.setCancelNumber(cancelDeltaAmt);
-        Message message = new Message(
+        Message message = buildMessage(
                 topic,// topic
                 "" + RmqTagEnum.PC_MATCH_ORDER_CANCELLED.getConstant(),// tag
                 "" + orderId,
-                JsonUtil.toJsonString(msg).getBytes()// body
+                msg // body
         );
         safeSend2MatchTopic(message, accountId);
 
@@ -109,11 +111,11 @@ public class PcMatchMqNotify {
         } else {
             for (PcOrderCancelMqMsgDto msg : msgs) {
 
-                Message message = new Message(
+                Message message = buildMessage(
                         topic,// topic
                         "" + RmqTagEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_CANCELLED.getConstant(),// tag
                         "" + msg.getOrderId(),
-                        JsonUtil.toJsonString(msg).getBytes()// body
+                        msg// body
                 );
                 safeSend2MatchTopic(message, msg.getAccountId());
 
@@ -143,11 +145,11 @@ public class PcMatchMqNotify {
             maker.setTradeTime(trade.getTradeTime());
             maker.setOpponentOrderId(trade.getTkOrderId()); // 对手委托ID
             maker.setTradeId(trade.getId());
-            Message makerMsg = new Message(
+            Message makerMsg = buildMessage(
                     topic,// topic
                     "" + RmqTagEnum.PC_TRADE.getConstant(),// tag
                     "" + maker.getOrderId(),
-                    JsonUtil.toJsonString(maker).getBytes()// body
+                    maker// body
             );
             safeSend2MatchTopic(makerMsg, maker.getAccountId());
 
@@ -167,11 +169,11 @@ public class PcMatchMqNotify {
             taker.setTradeTime(trade.getTradeTime());
             taker.setOpponentOrderId(trade.getMkOrderId()); // 对手委托ID
             taker.setTradeId(trade.getId());
-            Message takerMsg = new Message(
+            Message takerMsg = buildMessage(
                     topic,// topic
                     "" + RmqTagEnum.PC_TRADE.getConstant(),// tag
                     "" + taker.getOrderId(),
-                    JsonUtil.toJsonString(taker).getBytes()                    // body
+                    taker                // body
             );
             safeSend2MatchTopic(takerMsg, taker.getAccountId());
             if (logger.isDebugEnabled()) {
@@ -195,11 +197,11 @@ public class PcMatchMqNotify {
                 dto.setLastFlag(CommonConst.NO);
             }
             dto.setCancelOrders(partitions.get(i));
-            Message message = new Message(
+            Message message = buildMessage(
                     topic,// topic
                     "" + RmqTagEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED.getConstant(),// tag
                     "" + dto.getPosId(), // pos id
-                    JsonUtil.toJsonString(dto).getBytes()// body
+                    dto// body
             );
             safeSend2MatchTopic(message, dto.getAccountId());
             if (logger.isDebugEnabled()) {
@@ -207,6 +209,19 @@ public class PcMatchMqNotify {
             }
         }
         return true;
+    }
+
+    private Message buildMessage(String topic, String tags, String keys, Object o) {
+        try {
+            return new Message(
+                    topic,// topic
+                    tags,// tag
+                    keys, // pos id
+                    JsonUtil.toJsonString(o).getBytes(RemotingHelper.DEFAULT_CHARSET)// body
+            );
+        } catch (UnsupportedEncodingException e) {
+        }
+        return null;
     }
 
     private boolean safeSend2MatchTopic(Message message, long accountId) {
