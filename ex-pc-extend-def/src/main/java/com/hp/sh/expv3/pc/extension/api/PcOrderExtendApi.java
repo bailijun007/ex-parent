@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.pc.extension.api;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -45,16 +46,17 @@ public interface PcOrderExtendApi {
             @ApiImplicitParam(name = "orderType ", value = "委托类型,1:限价,非必填 ,不填为全部类型"),
             @ApiImplicitParam(name = "longFlag", value = "是否：1-多仓，0-空仓", example = "1"),
             @ApiImplicitParam(name = "closeFlag", value = "是否:1-平仓,0-开", example = "1"),
+            @ApiImplicitParam(name = "isTotalNumber", value = "是否需要总条数:1-需要,0-不需要", example = "1"),
             @ApiImplicitParam(name = "currentPage ", value = "当前页数", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "10", required = true)
     })
-    List<UserOrderVo> queryUserOrder(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
+    PageResult<UserOrderVo> queryUserOrder(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
                                      @RequestParam("symbol") String symbol, @RequestParam(value = "orderType", required = false) Integer orderType,
                                      @RequestParam(value = "longFlag", required = false) Integer longFlag, @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
-                                     @RequestParam("currentPage") Integer currentPage, @RequestParam("pageSize") Integer pageSize);
+                                     @RequestParam("currentPage") Integer currentPage, @RequestParam("pageSize") Integer pageSize, @RequestParam("isTotalNumber") Integer isTotalNumber);
 
 
-    @ApiOperation(value = "获取当前用户活动委托")
+    @ApiOperation(value = "获取当前用户历史委托")
     @GetMapping(value = "/api/extension/pc/order/queryHistory")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
@@ -75,7 +77,7 @@ public interface PcOrderExtendApi {
                                    @RequestParam(value = "lastOrderId", required = false) Long lastOrderId, @RequestParam("nextPage") Integer nextPage);
 
 
-    @ApiOperation(value = "获取当前用户活动委托")
+    @ApiOperation(value = "获取当前用户所有委托,条件查询")
     @GetMapping(value = "/api/extension/pc/order/queryAll")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
