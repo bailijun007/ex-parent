@@ -5,11 +5,6 @@ package com.hp.sh.expv3.pc.msg;
  * @author wangjg
  */
 public class EventMsg {
-
-	public static final int TYPE_PC_ACCOUNT = 1;
-	public static final int TYPE_ORDER = 2;
-	public static final int TYPE_POS = 3;
-	
 	/**
 	 * 事件类型
 	 */
