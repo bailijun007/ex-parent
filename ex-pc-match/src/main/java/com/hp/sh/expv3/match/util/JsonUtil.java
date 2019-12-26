@@ -17,7 +17,7 @@ public final class JsonUtil {
         return JSON.toJSONString(o, COMMON_FORMATTER, SerializerFeature.WriteBigDecimalAsPlain);
     }
 
-    public static SerializeFilter COMMON_FORMATTER = new BigDecimalValueFilter();
+    public final static SerializeFilter COMMON_FORMATTER = new BigDecimalValueFilter();
 
     public static class BigDecimalValueFilter implements ValueFilter {
 

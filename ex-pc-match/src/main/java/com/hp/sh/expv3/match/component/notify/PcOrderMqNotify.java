@@ -14,11 +14,13 @@ import com.hp.sh.expv3.match.util.PcRocketMqUtil;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageQueue;
+import org.apache.rocketmq.remoting.common.RemotingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @Service
@@ -39,11 +41,11 @@ public class PcOrderMqNotify {
         msg.setAsset(asset);
         msg.setSymbol(symbol);
 
-        Message message = new Message(
+        Message message = buildMessage(
                 topic,// topic
                 "" + RmqTagEnum.PC_MATCH_ORDER_SNAPSHOT_CREATE.getConstant(),// tag
                 "" + RmqTagEnum.PC_MATCH_ORDER_SNAPSHOT_CREATE.getConstant(),// tag
-                JsonUtil.toJsonString(msg).getBytes()// body
+                msg// body
         );
         safeSend2OrderTopic(message);
 
@@ -60,11 +62,11 @@ public class PcOrderMqNotify {
         msg.setAsset(asset);
         msg.setSymbol(symbol);
 
-        Message message = new Message(
+        Message message = buildMessage(
                 topic,// topic
                 "" + RmqTagEnum.PC_MATCH_CONSUMER_START.getConstant(),// tag
                 "" + RmqTagEnum.PC_MATCH_CONSUMER_START.getConstant(),// keys
-                JsonUtil.toJsonString(msg).getBytes()// body
+                msg// body
         );
         safeSend2OrderTopic(message);
         if (logger.isDebugEnabled()) {
@@ -80,17 +82,30 @@ public class PcOrderMqNotify {
         msg.setAsset(asset);
         msg.setSymbol(symbol);
 
-        Message message = new Message(
+        Message message = buildMessage(
                 topic,// topic
                 "" + RmqTagEnum.PC_ORDER_REBASE.getConstant(),// tag
                 "" + RmqTagEnum.PC_ORDER_REBASE.getConstant(),// keys
-                JsonUtil.toJsonString(msg).getBytes()// body
+                msg// body
         );
         safeSend2OrderTopic(message);
         if (logger.isDebugEnabled()) {
             logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
         }
         return true;
+    }
+
+    private Message buildMessage(String topic, String tags, String keys, Object o) {
+        try {
+            return new Message(
+                    topic,// topic
+                    tags,// tag
+                    keys, // pos id
+                    JsonUtil.toJsonString(o).getBytes(RemotingHelper.DEFAULT_CHARSET)// body
+            );
+        } catch (UnsupportedEncodingException e) {
+        }
+        return null;
     }
 
     private boolean safeSend2OrderTopic(Message message) {

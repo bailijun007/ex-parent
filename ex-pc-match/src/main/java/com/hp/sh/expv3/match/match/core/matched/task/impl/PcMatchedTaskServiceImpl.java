@@ -168,6 +168,7 @@ public class PcMatchedTaskServiceImpl implements PcMatchedTaskService, Applicati
             List<BookEntry> bookEntries = pcOrderBookEventService.buildBookEntry4CancelByLiq(order2CancelByLiq);
             task.setBookEntries(bookEntries);
         }
+        task.setCancelMqMsgs(cancelMqMsgs);
 
         task.setMsg(msg);
         context.matchedThreadWorker.addTask(task);
