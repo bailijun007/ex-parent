@@ -1,15 +1,20 @@
-package com.hp.sh.expv3.pc.mq.match.msg;
+package com.hp.sh.expv3.pc.msg;
 
 import java.math.BigDecimal;
-
-import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
 
 /**
  * 成交
  * @author wangjg
  *
  */
-public class MatchedMsg extends BaseOrderMsg{
+public class MatchedMsg {
+
+	//资产
+	protected String asset;
+	
+	//交易对（合约品种）
+	protected String symbol;
+	
 	private Long id;
 	private Long matchTxId;
 	private Long mkAccountId;
@@ -106,6 +111,22 @@ public class MatchedMsg extends BaseOrderMsg{
 				+ ", tkAccountId=" + tkAccountId + ", tkBidFlag=" + tkBidFlag + ", tkCloseFlag=" + tkCloseFlag
 				+ ", tkOrderId=" + tkOrderId + ", tradeTime=" + tradeTime + ", asset=" + asset + ", symbol=" + symbol
 				+ "]";
+	}
+
+	public String getAsset() {
+		return asset;
+	}
+
+	public void setAsset(String asset) {
+		this.asset = asset;
+	}
+
+	public String getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
 	}
 	
 }

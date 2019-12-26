@@ -298,6 +298,8 @@ public class PcOrderService {
 		
 		this.pcOrderDAO.update(order);
 		
+		publisher.publishEvent(order);
+		
 		return;
 	}
 
