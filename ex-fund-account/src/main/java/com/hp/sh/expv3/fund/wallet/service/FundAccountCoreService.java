@@ -9,7 +9,6 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,9 +41,6 @@ public class FundAccountCoreService{
 	@Autowired
 	private FundAccountRecordDAO fundAccountRecordDAO;
 	
-    @Autowired
-    private ApplicationEventPublisher publisher;
-
 	public boolean accountExist(Long userId, String asset){
 		FundAccount fa = this.fundAccountDAO.get(userId, asset);
 		return fa!=null;
@@ -144,8 +140,6 @@ public class FundAccountCoreService{
 		record.setModified(now);
 		this.fundAccountRecordDAO.save(record);
 		
-		publisher.publishEvent(record);
-	
 		return InvokeResult.SUCCESS;
 	}
 	
