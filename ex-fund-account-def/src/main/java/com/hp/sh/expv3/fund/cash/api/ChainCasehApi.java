@@ -19,10 +19,14 @@ import io.swagger.annotations.ApiOperation;
 @FeignClient(value = "ex-fund-account")
 public interface ChainCasehApi {
 
-	@GetMapping(value = "/api/cash/bys/getAddress")
-	public String getBysAddress(@RequestParam("userId") Long userId, String asset);
+	@GetMapping(value = "/api/cash/bys/getDepositAddress")
+	public String getDepositAddress(@RequestParam("userId") Long userId, String asset);
 
-	@ApiOperation("创建充值记录")
+	@ApiOperation(value = "2、验证地址")
+	@GetMapping(value = "/api/cash/bys/verifyAddress")
+	boolean verifyAddress(String asset, String address);
+
+	@ApiOperation("创建充币记录")
 	@GetMapping(value = "/api/cash/bys/createDeposit")
 	public String createDeposit(
 			@RequestParam("userId") Long userId,
@@ -34,7 +38,7 @@ public interface ChainCasehApi {
 
 	@ApiOperation("创建提现记录")
 	@GetMapping(value = "/api/cash/bys/createBysDraw")
-	public void createDraw(
+	public void createWithdrawal(
 			@RequestParam("userId") Long userId,
 			@RequestParam("asset") String asset, 
 			@RequestParam("address") String address, 
@@ -47,5 +51,13 @@ public interface ChainCasehApi {
 	@ApiOperation("充值失败回掉")
 	@GetMapping(value = "/api/cash/bys/depositFail")
 	void depositFail(@RequestParam("userId") Long userId, @RequestParam("sn") String sn);
+
+	@ApiOperation(value = "2、批准提现")
+	@GetMapping(value = "/api/cash/bys/draw/approve")
+	void approve(Long userId, Long id);
+	
+	@ApiOperation(value = "3、拒绝提现")
+	@GetMapping(value = "/api/cash/bys/draw/reject")
+	void reject(Long userId, Long id, String remark);
 
 }

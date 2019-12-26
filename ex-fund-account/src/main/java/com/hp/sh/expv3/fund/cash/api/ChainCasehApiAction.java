@@ -46,21 +46,22 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	
 	int _____充值______;
 	
-	@ApiOperation(value = "1、获取BYS充值地址")
-	public String getBysAddress(Long userId, String asset){
+	@ApiOperation(value = "1、获取充币地址")
+	public String getDepositAddress(Long userId, String asset){
 		Integer symbolId = asset2Symbol.getSymbol(asset);
 		String address = chainService.getAddress(userId, symbolId);
 		return address;
 	}
 	
-	@ApiOperation(value = "2、验证BYS充值地址")
+	@Override
+	@ApiOperation(value = "2、验证地址")
 	public boolean verifyAddress(String asset, String address){
 		Integer symbol = asset2Symbol.getSymbol(asset);
 		return chainService.checkAddress(symbol);
 	}
 
 	//bys callback
-	@ApiOperation(value = "3、创建Bys充值记录")
+	@ApiOperation(value = "3、创建充值记录")
 	public String createDeposit(Long userId, String chainOrderId, String asset, String account, BigDecimal amount, String txHash) {
 		String sn = this.depositService.deposit(userId, asset, account, amount, chainOrderId, PayChannel.BYS, txHash);
 		return sn;
@@ -79,8 +80,8 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	
 	int _____提现______;
 	
-	@ApiOperation(value = "1、创建Bys提款记录")
-	public void createDraw(Long userId, String asset, String address, BigDecimal amount) {
+	@ApiOperation(value = "1、创建提款记录")
+	public void createWithdrawal(Long userId, String asset, String address, BigDecimal amount) {
 		BigDecimal balance = fundAccountCoreApi.getBalance(userId, asset);
 		if(balance==null || balance.compareTo(amount)<0){
 			throw new ExException(WalletError.NOT_ENOUGH);
@@ -88,12 +89,14 @@ public class ChainCasehApiAction implements ChainCasehApi{
 		this.withdrawalService.createWithdrawal(userId, asset, address, amount, null, PayChannel.BYS);
 	}
 	
+	@Override
 	@ApiOperation(value = "2、批准提现")
 	public void approve(Long userId, Long id){
 		//修改状态
 		withdrawalService.approveWithdrawal(userId, id);
 	}
 	
+	@Override
 	@ApiOperation(value = "3、拒绝提现")
 	public void reject(Long userId, Long id, String remark){
 		withdrawalService.rejectWithdrawal(userId, id);

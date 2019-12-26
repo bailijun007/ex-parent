@@ -7,14 +7,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.base.BaseApiAction;
-import com.hp.sh.expv3.fund.cash.api.ChainCasehApiAction;
+import com.hp.sh.expv3.fund.cash.api.ChainCasehApi;
 
 @RestController
 @RequestMapping("/inner/api/msg/send1")
 public class FundAccount4ChainServer extends BaseApiAction implements FundAccount4ChainServerDef{
 
 	@Autowired
-	private ChainCasehApiAction chainCasehApiAction;
+	private ChainCasehApi chainCasehApiAction;
 	
 	@Override
 	public long createDepositOrder(String operator, long accountId, String asset, String chainServerOrderId,
