@@ -16,5 +16,5 @@ public interface PcOrderTradeExtendService {
     PcOrderTradeVo getPcOrderTrade(Long refId, String asset, String symbol, Long userId, Long time);
 
 
-    List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count);
+    List<PcOrderTradeVo> queryTradeRecords(Long userId,List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count);
 }

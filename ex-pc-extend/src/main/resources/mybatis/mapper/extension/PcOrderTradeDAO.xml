@@ -113,6 +113,8 @@
                 </foreach>
             </if>
 
+            <if test="userId!=null">and user_id=#{userId}</if>
+
             <if test="gtTradeId!=null">
                 and id &gt;#{gtTradeId}
                 ORDER BY id asc
