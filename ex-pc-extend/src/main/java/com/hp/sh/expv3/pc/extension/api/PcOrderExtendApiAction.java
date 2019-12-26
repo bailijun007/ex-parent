@@ -56,7 +56,6 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         if (!CollectionUtils.isEmpty(list)) {
             for (PcOrderVo orderVo : list) {
                 UserOrderVo vo = getUserOrderVo(orderVo);
-                vo.setClientOid(orderVo.getClientOrderId());
                 result.add(vo);
             }
         }
@@ -89,7 +88,8 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         List<PcOrderVo> list = pcOrderExtendService.queryHistory(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage);
         if (!CollectionUtils.isEmpty(list)) {
             for (PcOrderVo orderVo : list) {
-                getOrderVo(result, orderVo);
+                UserOrderVo vo = getUserOrderVo(orderVo);
+                result.add(vo);
             }
         }
         return result;
@@ -113,18 +113,14 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         return result;
     }
 
-    private void getOrderVo(List<UserOrderVo> result, PcOrderVo orderVo) {
-        UserOrderVo vo = getUserOrderVo(orderVo);
-        result.add(vo);
-    }
-
     private void getOrderList(Integer currentPage, Integer pageSize, List<UserOrderVo> result, List<PcOrderVo> list) {
         List<PcOrderVo> orderVos = list.stream().skip(pageSize * (currentPage - 1))
                 .limit(pageSize)
                 .collect(Collectors.toList());
 
         for (PcOrderVo orderVo : orderVos) {
-            getOrderVo(result, orderVo);
+            UserOrderVo vo = getUserOrderVo(orderVo);
+            result.add(vo);
         }
     }
 
@@ -144,6 +140,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         vo.setCloseFlag(orderVo.getCloseFlag());
         vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume()));
         vo.setOrderType(orderVo.getOrderType());
+        vo.setClientOid(orderVo.getClientOrderId());
         return vo;
     }
 
