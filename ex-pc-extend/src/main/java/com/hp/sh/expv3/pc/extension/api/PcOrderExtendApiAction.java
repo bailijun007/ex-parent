@@ -9,6 +9,7 @@ import com.hp.sh.expv3.pc.extension.service.impl.PcAccountExtendServiceImpl;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.Integers;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,9 +40,31 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     private PcOrderTradeExtendService pcOrderTradeService;
 
     @Override
-    public List<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count,String status) {
-        return null;
+    public List<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status) {
+        if (null == userId || count == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        //如果同时传了gtOrderId和gtOrderId 则以gtOrderId为查询条件，同时不传，则查全部
+        if (gtOrderId != null && ltOrderId != null) {
+            ltOrderId = null;
+        }
+        List<UserOrderVo> result=new ArrayList<>();
+        List<String> assetList = Arrays.asList(asset.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
+        List<String> symbolList = Arrays.asList(symbol.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
+        List<Integer> statusList = Arrays.asList(status.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
+        List<PcOrderVo> list = pcOrderExtendService.queryOrderList(userId, assetList, symbolList, gtOrderId, ltOrderId, count, statusList);
+        if (!CollectionUtils.isEmpty(list)) {
+            for (PcOrderVo orderVo : list) {
+                UserOrderVo vo = getUserOrderVo(orderVo);
+                vo.setClientOid(orderVo.getClientOrderId());
+                result.add(vo);
+            }
+        }
+
+        return result;
     }
+
+
 
     @Override
     public List<UserOrderVo> queryUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize) {
@@ -55,24 +79,6 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         return result;
     }
 
-    private void getOrderVo(List<UserOrderVo> result, PcOrderVo orderVo) {
-        UserOrderVo vo = new UserOrderVo();
-        BeanUtils.copyProperties(orderVo, vo);
-        vo.setFee(orderVo.getFeeCost());
-        vo.setQty(orderVo.getVolume());
-        vo.setLongFlag(orderVo.getLongFlag());
-        Date created = orderVo.getCreated();
-        if (null != created) {
-            vo.setCtime(created.getTime());
-        }
-        //平均价 暂时写死，后期掉老王接口
-        vo.setAvgPrice(BigDecimal.ZERO);
-        vo.setFilledQty(orderVo.getFilledVolume());
-        vo.setCloseFlag(orderVo.getCloseFlag());
-        vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume()));
-        vo.setOrderType(orderVo.getOrderType());
-        result.add(vo);
-    }
 
     @Override
     public List<UserOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
@@ -107,6 +113,11 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         return result;
     }
 
+    private void getOrderVo(List<UserOrderVo> result, PcOrderVo orderVo) {
+        UserOrderVo vo = getUserOrderVo(orderVo);
+        result.add(vo);
+    }
+
     private void getOrderList(Integer currentPage, Integer pageSize, List<UserOrderVo> result, List<PcOrderVo> list) {
         List<PcOrderVo> orderVos = list.stream().skip(pageSize * (currentPage - 1))
                 .limit(pageSize)
@@ -116,4 +127,24 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
             getOrderVo(result, orderVo);
         }
     }
+
+    private UserOrderVo getUserOrderVo(PcOrderVo orderVo) {
+        UserOrderVo vo = new UserOrderVo();
+        BeanUtils.copyProperties(orderVo, vo);
+        vo.setFee(orderVo.getFeeCost());
+        vo.setQty(orderVo.getVolume());
+        vo.setLongFlag(orderVo.getLongFlag());
+        Date created = orderVo.getCreated();
+        if (null != created) {
+            vo.setCtime(created.getTime());
+        }
+        //平均价 暂时写死，后期掉老王接口
+        vo.setAvgPrice(BigDecimal.ZERO);
+        vo.setFilledQty(orderVo.getFilledVolume());
+        vo.setCloseFlag(orderVo.getCloseFlag());
+        vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume()));
+        vo.setOrderType(orderVo.getOrderType());
+        return vo;
+    }
+
 }

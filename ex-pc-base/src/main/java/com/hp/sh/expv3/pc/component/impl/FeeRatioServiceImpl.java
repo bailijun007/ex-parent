@@ -2,6 +2,7 @@ package com.hp.sh.expv3.pc.component.impl;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -88,9 +89,9 @@ public class FeeRatioServiceImpl implements FeeRatioService {
         Object s = hashOperations.get(RedisKey.PC_POS_LEVEL, hashKey);
         if (null != s) {
             List<PosLevelVo> voList = JSON.parseArray(s.toString(), PosLevelVo.class);
-            List<BigDecimal> collect = voList.stream().filter(vo -> vo.getMinAmt().compareTo(volume) <= 0 && vo.getMaxAmt().compareTo(volume) >= 0)
-                    .map(PosLevelVo::getMinHoldMarginRatio).collect(Collectors.toList());
-            return collect.get(0);
+            Optional<BigDecimal> first = voList.stream().filter(vo -> vo.getMinAmt().compareTo(volume) <= 0 && vo.getMaxAmt().compareTo(volume) >= 0)
+                    .map(PosLevelVo::getMinHoldMarginRatio).findFirst();
+            return first.orElse(BigDecimal.ZERO);
         }
 
 

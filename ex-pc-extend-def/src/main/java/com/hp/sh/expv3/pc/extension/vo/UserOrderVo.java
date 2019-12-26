@@ -209,4 +209,12 @@ public class UserOrderVo implements Serializable {
     public void setOrderType(Integer orderType) {
         this.orderType = orderType;
     }
+
+    public String getClientOid() {
+        return clientOid;
+    }
+
+    public void setClientOid(String clientOid) {
+        this.clientOid = clientOid;
+    }
 }
