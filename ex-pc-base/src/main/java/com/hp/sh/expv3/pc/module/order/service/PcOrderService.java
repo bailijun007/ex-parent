@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +74,9 @@ public class PcOrderService {
 	
 	@Autowired
 	private PcOrderService self;
+    
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
 	/**
 	 * 创建订单
@@ -243,7 +247,7 @@ public class PcOrderService {
 			throw new ExException(OrderError.NOT_ACTIVE);
 		}
 		
-		long count = this.pcOrderDAO.setCancelStatus(userId, orderId, OrderStatus.PENDING_CANCEL, now);
+		long count = this.pcOrderDAO.updateCancelStatus(userId, orderId, OrderStatus.PENDING_CANCEL, now);
 		
 		if(count!=1){
 			throw new RuntimeException("更新失败，更新行数："+count);
@@ -298,7 +302,7 @@ public class PcOrderService {
 	}
 
 	public void setNewStatus(Long userId, Long orderId, Integer newStatus, Integer desiredOldStatus){
-		long count = this.pcOrderDAO.changeStatus(userId, orderId, newStatus, desiredOldStatus, new Date());
+		long count = this.pcOrderDAO.updateStatus(userId, orderId, newStatus, desiredOldStatus, new Date());
 		if(count!=1){
 //			throw new RuntimeException("更新失败，更新行数："+count);
 		}

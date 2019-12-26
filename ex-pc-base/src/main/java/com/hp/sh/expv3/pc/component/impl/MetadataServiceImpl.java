@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.pc.component.impl;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Resource;
@@ -57,6 +58,10 @@ public class MetadataServiceImpl implements MetadataService {
         return vo;
     }
 
+    public List<PcContractVO> getAllPcContract(){
+    	//TODO
+    	return null;
+    }
 
 
 }

@@ -65,10 +65,4 @@ public class RedisConfig {
 		return rp;
 	}
 	
-	@Bean
-	public Object test1(RedisCache redisCache) {
-		redisCache.put("test", "111");
-		return null;
-	}
-	
 }

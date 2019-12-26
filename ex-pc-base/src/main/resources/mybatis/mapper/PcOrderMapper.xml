@@ -165,7 +165,7 @@
 
 	<!--  -->
 	
-	<update id="changeStatus">
+	<update id="updateStatus">
 		update 
 			pc_order
 		set 
@@ -174,7 +174,7 @@
 			id=#{orderId} and user_id=#{userId} and status=#{oldStatus}
 	</update>
 
-	<update id="setCancelStatus">
+	<update id="updateCancelStatus">
 		update 
 			pc_order
 		set 
