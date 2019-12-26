@@ -10,4 +10,14 @@ public interface IdService {
 
     long getId(IdTypeEnum idType);
 
+    int getDataCenter(long id);
+
+    int getServer(long id);
+
+    int getIdType(long id);
+
+    long getTimeInMs(long id);
+
+    int getSequence(long id);
+
 }

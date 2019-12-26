@@ -38,7 +38,7 @@ public class PcmatchRmqBeans {
         producer.setRetryTimesWhenSendAsyncFailed(3);
         producer.setRetryTimesWhenSendFailed(3);
         producer.start();
-        logger.info(PcmatchConst.MODULE_NAME + "OrderProducer defaultProducer Started.");
+        logger.info("{}OrderProducer {} {} Started.", PcmatchConst.MODULE_NAME, pcmatchRocketMqSetting.getPcOrderProducerGroupName(),pcmatchRocketMqSetting.getPcOrderProducerInstanceName());
         return producer;
     }
 
@@ -54,7 +54,7 @@ public class PcmatchRmqBeans {
         producer.setRetryTimesWhenSendAsyncFailed(3);
         producer.setRetryTimesWhenSendFailed(3);
         producer.start();
-        logger.info(PcmatchConst.MODULE_NAME + "AccountContractProducer defaultProducer Started.");
+        logger.info("{}AccountContractProducer {} {} Started.", PcmatchConst.MODULE_NAME, pcmatchRocketMqSetting.getPcOrderProducerGroupName(),pcmatchRocketMqSetting.getPcOrderProducerInstanceName());
         return producer;
     }
 
