@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.pc.extension.api;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
@@ -66,14 +67,20 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
 
 
     @Override
-    public List<UserOrderVo> queryUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize) {
+    public PageResult<UserOrderVo> queryUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Integer isTotalNumber) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || currentPage == null || pageSize == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        List<UserOrderVo> result = new ArrayList<>();
-        List<PcOrderVo> list = pcOrderExtendService.findCurrentUserOrder(userId, asset, symbol, orderType, longFlag, closeFlag);
-        if (!CollectionUtils.isEmpty(list)) {
-            getOrderList(currentPage, pageSize, result, list);
+        PageResult<UserOrderVo> result=new PageResult<>();
+        List<UserOrderVo> list = new ArrayList<>();
+        List<PcOrderVo> voList = pcOrderExtendService.findCurrentUserOrder(userId, asset, symbol, orderType, longFlag, closeFlag);
+        if (!CollectionUtils.isEmpty(voList)) {
+            getOrderList(currentPage, pageSize, list, voList);
+        }
+
+        result.setList(list);
+        if(isTotalNumber==1){
+            result.setRowTotal(Long.parseLong(list.size()+""));
         }
         return result;
     }
