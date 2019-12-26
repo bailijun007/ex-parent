@@ -56,7 +56,7 @@ public interface PcOrderExtendApi {
                                      @RequestParam("currentPage") Integer currentPage, @RequestParam("pageSize") Integer pageSize, @RequestParam("isTotalNumber") Integer isTotalNumber);
 
 
-    @ApiOperation(value = "获取当前用户活动委托")
+    @ApiOperation(value = "获取当前用户历史委托")
     @GetMapping(value = "/api/extension/pc/order/queryHistory")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
@@ -77,7 +77,7 @@ public interface PcOrderExtendApi {
                                    @RequestParam(value = "lastOrderId", required = false) Long lastOrderId, @RequestParam("nextPage") Integer nextPage);
 
 
-    @ApiOperation(value = "获取当前用户活动委托")
+    @ApiOperation(value = "获取当前用户所有委托,条件查询")
     @GetMapping(value = "/api/extension/pc/order/queryAll")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
