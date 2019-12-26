@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.biz.msg;
+package com.hp.sh.expv3.pc.msg;
 
 /**
  * 事件消息
@@ -6,10 +6,9 @@ package com.hp.sh.expv3.biz.msg;
  */
 public class EventMsg {
 
-	public static final int TYPE_FUND_ACCOUNT = 1;
-	public static final int TYPE_PC_ACCOUNT = 2;
-	public static final int TYPE_ORDER = 3;
-	public static final int TYPE_POS = 4;
+	public static final int TYPE_PC_ACCOUNT = 1;
+	public static final int TYPE_ORDER = 2;
+	public static final int TYPE_POS = 3;
 	
 	/**
 	 * 事件类型
