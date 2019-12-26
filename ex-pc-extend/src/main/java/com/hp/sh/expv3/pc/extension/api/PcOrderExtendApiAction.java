@@ -44,7 +44,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         if (null == userId || count == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        //如果同时传了gtOrderId和gtOrderId 则以gtOrderId为查询条件，同时不传，则查全部
+        //如果同时传了gtOrderId和ltOrderId 则以gtOrderId为查询条件，同时不传，则查全部
         if (gtOrderId != null && ltOrderId != null) {
             ltOrderId = null;
         }
