@@ -237,8 +237,23 @@ public class PcOrderService {
 		Date now = new Date();
 		
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		
+		this.checkCancelStatus(order);
+
+		long count = this.pcOrderDAO.updateCancelStatus(userId, orderId, OrderStatus.PENDING_CANCEL, now);
+		
+		if(count!=1){
+			throw new RuntimeException("更新失败，更新行数："+count);
+		}
+        
+	}
+	
+	private void checkCancelStatus(PcOrder order){
 		if(order.getStatus() == OrderStatus.CANCELED){
 			throw new ExException(OrderError.CANCELED);
+		}
+		if(order.getStatus() == OrderStatus.FAILED){
+			throw new ExException(OrderError.FILLED);
 		}
 		if(BigUtils.eq(order.getVolume(), order.getFilledVolume())){
 			throw new ExException(OrderError.FILLED);
@@ -246,13 +261,6 @@ public class PcOrderService {
 		if(IntBool.isFalse(order.getActiveFlag())){
 			throw new ExException(OrderError.NOT_ACTIVE);
 		}
-		
-		long count = this.pcOrderDAO.updateCancelStatus(userId, orderId, OrderStatus.PENDING_CANCEL, now);
-		
-		if(count!=1){
-			throw new RuntimeException("更新失败，更新行数："+count);
-		}
-        
 	}
 	
 	/**
@@ -265,6 +273,8 @@ public class PcOrderService {
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void cancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		
+		this.checkCancelStatus(order);
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN){
 			//返还余额
@@ -317,7 +327,7 @@ public class PcOrderService {
 		if(pos==null){
 			throw new ExException(PositonError.POS_NOT_ENOUGH);
 		}
-		if(pos.getLiqStatus()==LiqStatus.YES){
+		if(pos.getLiqStatus()==LiqStatus.FROZEN){
 			throw new ExException(PositonError.POS_NOT_ENOUGH);
 		}
 		

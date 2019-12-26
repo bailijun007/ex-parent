@@ -17,7 +17,7 @@ import com.hp.sh.expv3.utils.IntBool;
  * 发送事件消息
  * 
  * @author wangjg
- *
+ * 
  */
 @Component
 public class LogEventListener {

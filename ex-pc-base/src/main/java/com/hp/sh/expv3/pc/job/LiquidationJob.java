@@ -13,6 +13,8 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcLiqService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
 import com.hp.sh.expv3.pc.mq.liq.LiqMqSender;
+import com.hp.sh.expv3.pc.mq.liq.msg.LiqLockMsg;
+import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 
 @Component
 public class LiquidationJob {
@@ -23,6 +25,9 @@ public class LiquidationJob {
     
     @Autowired
     private PcLiqService pcLiqService;
+
+    @Autowired
+    private LiqMqSender liqMqSender;
     
 	/**
 	 * 
@@ -38,14 +43,30 @@ public class LiquidationJob {
 			}
 			
 			for(PcPosition pos : list){
-				pcLiqService.handleLiq(pos);
+				LiqHandleResult liqResult = pcLiqService.handleLiq(pos);
+				if(liqResult.isTrigger()){
+					this.sendLiqMsg(pos, liqResult);
+				}
 			}
 			
 			page.setPageNo(page.getPageNo()+1);
 		}
 	}
-
-
+	
+	private void sendLiqMsg(PcPosition pos, LiqHandleResult liqResut){
+		MarkPriceVo markPriceVo = liqResut.getMarkPriceVo();
+		//发送强平消息
+		LiqLockMsg lockMsg = new LiqLockMsg();
+		lockMsg.setAccountId(pos.getUserId());
+		lockMsg.setAsset(pos.getAsset());
+		lockMsg.setLiqMarkPrice(markPriceVo.getMarkPrice());
+		lockMsg.setLiqMarkTime(markPriceVo.getTime());
+		lockMsg.setLiqPrice(liqResut.getLiqPrice());
+		lockMsg.setLongFlag(pos.getLongFlag());
+		lockMsg.setPosId(pos.getId());
+		lockMsg.setSymbol(pos.getSymbol());
+		this.liqMqSender.sendLiqLockMsg(lockMsg);
+	}
 
 
 }

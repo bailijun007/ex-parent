@@ -242,7 +242,7 @@ public class PcPositionService {
 		
 		pcPosition.setLiqMarkPrice(null);
 		pcPosition.setLiqMarkTime(null);
-		pcPosition.setLiqStatus(LiqStatus.NO);
+		pcPosition.setLiqStatus(LiqStatus.NON);
 		
 		pcPosition.setAccuVolume(BigDecimal.ZERO);
 		pcPosition.setAccuBaseValue(BigDecimal.ZERO);
@@ -360,9 +360,4 @@ public class PcPositionService {
 		
 	}
 	
-	public void lockLiq(PcPosition pos) {
-		pos.setLiqStatus(LiqStatus.YES);
-		pos.setModified(DbDateUtils.now());
-		this.pcPositionDAO.update(pos);
-	}
 }

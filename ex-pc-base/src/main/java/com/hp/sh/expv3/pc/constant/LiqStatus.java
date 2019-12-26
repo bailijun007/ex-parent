@@ -7,8 +7,10 @@ package com.hp.sh.expv3.pc.constant;
  */
 public class LiqStatus {
 	
-	public static final int NO = 0;
+	public static final int NON = 0;
 
-	public static final int YES = 1;
+	public static final int FROZEN = 1;
+
+	public static final int FORCE_CLOSE = 2;
 	
 }
