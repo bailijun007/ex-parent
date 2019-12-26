@@ -95,6 +95,39 @@
         <include refid="simple_where"/>
     </select>
 
+
+    <select id="queryTradeRecords" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order_trade
+        <where>
+            <if test="assetList!=null">and asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+
+            <if test="symbolList!=null">and symbol in
+                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
+                    #{symbolList[${i}]}
+                </foreach>
+            </if>
+
+            <if test="userId!=null">and user_id=#{userId}</if>
+
+            <if test="gtTradeId!=null">
+                and id &gt;#{gtTradeId}
+                ORDER BY id asc
+            </if>
+
+            <if test="ltTradeId!=null">
+                and id &lt;#{ltTradeId}
+                ORDER BY id desc
+            </if>
+        </where>
+        LIMIT 0,${limit}
+    </select>
+
     <select id="getRealisedPnl" resultType="java.math.BigDecimal">
         select IFNULL(SUM(pnl),0)
         from pc_order_trade

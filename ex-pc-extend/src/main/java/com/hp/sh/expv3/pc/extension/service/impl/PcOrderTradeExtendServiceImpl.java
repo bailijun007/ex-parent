@@ -52,4 +52,20 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         PcOrderTradeVo pcOrderTradeVo = pcOrderTradeDAO.queryOne(map);
         return pcOrderTradeVo;
     }
+
+    @Override
+    public List<PcOrderTradeVo> queryTradeRecords(Long userId,List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("assetList", assetList);
+        map.put("symbolList", symbolList);
+        map.put("gtTradeId", gtTradeId);
+        map.put("ltTradeId", ltTradeId);
+        map.put("limit", count);
+        List<PcOrderTradeVo> voList = pcOrderTradeDAO.queryTradeRecords(map);
+
+        return voList;
+    }
+
+
 }
