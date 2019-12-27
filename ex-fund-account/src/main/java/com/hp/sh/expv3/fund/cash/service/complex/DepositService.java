@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.fund.cash.service.complex;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,12 +19,12 @@ import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.cash.dao.DepositRecordDAO;
 import com.hp.sh.expv3.fund.cash.entity.DepositRecord;
 import com.hp.sh.expv3.fund.cash.error.CashError;
-import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -43,7 +42,7 @@ public class DepositService {
 	
 	public String deposit(Long userId, String asset, String account, BigDecimal amount, String chainOrderId, Integer channelId, String txHash) {
 		this.checkExist(userId, asset, chainOrderId, channelId);
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		DepositRecord rr = new DepositRecord();
 
 		rr.setSn(SnUtils.genDepositSn());

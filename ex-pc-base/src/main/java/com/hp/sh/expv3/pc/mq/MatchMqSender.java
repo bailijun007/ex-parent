@@ -36,7 +36,7 @@ public class MatchMqSender extends BaseMqSender{
 		msg.setPrice(order.getPrice());
 		msg.setSymbol(order.getSymbol());
 		msg.setOrderType(order.getOrderType());
-		msg.setOrderTime(order.getCreated().getTime());
+		msg.setOrderTime(order.getCreated());
 		msg.setTimeInForce(order.getTimeInForce());
 		this.sendPendingNew(msg);
 	}

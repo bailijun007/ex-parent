@@ -42,10 +42,10 @@ public abstract class PaymentRecord extends UserDataEntity {
 	protected String payStatusDesc;
 	
 	//支付时间
-	protected Date payTime;
+	protected Long payTime;
 	
 	//支付完成时间
-	protected Date payFinishTime;
+	protected Long payFinishTime;
 	
 	//同步状态
 	protected Integer synchStatus;
@@ -116,19 +116,19 @@ public abstract class PaymentRecord extends UserDataEntity {
 		this.payStatusDesc = payStatusDesc;
 	}
 
-	public Date getPayTime() {
+	public Long getPayTime() {
 		return payTime;
 	}
 
-	public void setPayTime(Date payTime) {
+	public void setPayTime(Long payTime) {
 		this.payTime = payTime;
 	}
 
-	public Date getPayFinishTime() {
+	public Long getPayFinishTime() {
 		return payFinishTime;
 	}
 
-	public void setPayFinishTime(Date payFinishTime) {
+	public void setPayFinishTime(Long payFinishTime) {
 		this.payFinishTime = payFinishTime;
 	}
 

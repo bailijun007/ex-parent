@@ -35,7 +35,7 @@ public class LogEventListener {
 		logMsg.setUserId(pcAccountRecord.getUserId());
 		logMsg.setAsset(pcAccountRecord.getAsset());
 		logMsg.setSymbol(null);
-		logMsg.setTime(pcAccountRecord.getCreated().getTime());
+		logMsg.setTime(pcAccountRecord.getCreated());
 		logMsg.setType(type);
 		logMsg.setRefId(pcAccountRecord.getId());
 		
@@ -48,7 +48,7 @@ public class LogEventListener {
 		logMsg.setUserId(orderTrade.getUserId());
 		logMsg.setAsset(orderTrade.getAsset());
 		logMsg.setSymbol(orderTrade.getSymbol());
-		logMsg.setTime(orderTrade.getCreated().getTime());
+		logMsg.setTime(orderTrade.getCreated());
 		logMsg.setType(orderTrade.getTradType());
 		logMsg.setRefId(orderTrade.getId());
 		
@@ -61,7 +61,7 @@ public class LogEventListener {
 		logMsg.setUserId(liqRecord.getUserId());
 		logMsg.setAsset(liqRecord.getAsset());
 		logMsg.setSymbol(liqRecord.getSymbol());
-		logMsg.setTime(liqRecord.getCreated().getTime());
+		logMsg.setTime(liqRecord.getCreated());
 		logMsg.setType(IntBool.isTrue(liqRecord.getLongFlag())?LogType.TYPE_LIQ_LONG:LogType.TYPE_LIQ_SHORT);
 		logMsg.setRefId(liqRecord.getId());
 		
