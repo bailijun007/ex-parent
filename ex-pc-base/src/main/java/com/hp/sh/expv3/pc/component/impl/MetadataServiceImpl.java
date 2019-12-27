@@ -1,13 +1,17 @@
 package com.hp.sh.expv3.pc.component.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Resource;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -59,8 +63,19 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     public List<PcContractVO> getAllPcContract(){
-    	//TODO
-    	return null;
+        HashOperations opsForHash = templateDB0.opsForHash();
+        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(RedisKey.PC_CONTRACT, ScanOptions.NONE);
+
+        List<PcContractVO> list = new ArrayList<>();
+        while (curosr.hasNext()) {
+            Map.Entry<String, Object> entry = curosr.next();
+            Object o = entry.getValue();
+            PcContractVO pcContractVO = JSON.parseObject(o.toString(), PcContractVO.class);
+            list.add(pcContractVO);
+        }
+
+
+        return list;
     }
 
 
