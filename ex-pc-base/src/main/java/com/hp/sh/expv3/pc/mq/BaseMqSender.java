@@ -5,6 +5,7 @@ import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.hp.sh.expv3.pc.constant.MqTopic;
 import com.hp.sh.expv3.pc.mq.utils.OrderMessageQueueSelector;
 import com.hp.sh.rocketmq.codec.MsgCodec;
 
@@ -39,7 +40,7 @@ public class BaseMqSender {
 	protected String getTopic(BaseOrderMsg msg){
 		String asset = msg.getAsset();
 		String symbol = msg.getSymbol();
-		return "pcOrder_"+asset+"__"+symbol;
+		return MqTopic.getOrderTopic(asset, symbol);
 	}
     
 }

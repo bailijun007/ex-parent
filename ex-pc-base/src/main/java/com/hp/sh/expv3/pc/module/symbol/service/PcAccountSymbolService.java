@@ -75,4 +75,12 @@ public class PcAccountSymbolService{
 		}
 	}
 
+	public void changeMarginMode(Long userId, String asset, String symbol, Integer marginMode) {
+		PcAccountSymbol as = this.get(userId, asset, symbol);
+		if(!as.getMarginMode().equals(marginMode)){
+			as.setMarginMode(marginMode);
+			this.pcAccountSymbolDAO.update(as);
+		}
+	}
+
 }
