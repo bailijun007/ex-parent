@@ -90,7 +90,7 @@ public class WithdrawalService {
 	}
 
 	public void onDrawSuccess(Long userId, Long id, String txHash){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		WithdrawalRecord rr = this.withdrawalRecordDAO.findById(userId, id);
 		rr.setTxHash(txHash);
 		rr.setPayTime(now);
@@ -101,7 +101,7 @@ public class WithdrawalService {
 	}
 
 	public void onDrawFail(Long userId, Long id){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		WithdrawalRecord rr = this.withdrawalRecordDAO.findById(userId, id);
 		rr.setPayTime(now);
 		rr.setPayFinishTime(now);
