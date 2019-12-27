@@ -20,11 +20,11 @@ import io.swagger.annotations.ApiOperation;
 public interface ChainCasehApi {
 
 	@GetMapping(value = "/api/cash/bys/getDepositAddress")
-	public String getDepositAddress(@RequestParam("userId") Long userId, String asset);
+	public String getDepositAddress(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
 	@ApiOperation(value = "2、验证地址")
 	@GetMapping(value = "/api/cash/bys/verifyAddress")
-	boolean verifyAddress(String asset, String address);
+	boolean verifyAddress(@RequestParam("asset") String asset, @RequestParam("address") String address);
 
 	@ApiOperation("创建充币记录")
 	@GetMapping(value = "/api/cash/bys/createDeposit")
@@ -54,10 +54,10 @@ public interface ChainCasehApi {
 
 	@ApiOperation(value = "2、批准提现")
 	@GetMapping(value = "/api/cash/bys/draw/approve")
-	void approve(Long userId, Long id);
+	void approve(@RequestParam("userId") Long userId, @RequestParam("id") Long id);
 	
 	@ApiOperation(value = "3、拒绝提现")
 	@GetMapping(value = "/api/cash/bys/draw/reject")
-	void reject(Long userId, Long id, String remark);
+	void reject(@RequestParam("userId") Long userId, @RequestParam("id") Long id, @RequestParam("remark") String remark);
 
 }
