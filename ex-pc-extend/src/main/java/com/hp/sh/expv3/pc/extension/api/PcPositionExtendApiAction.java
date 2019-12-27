@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.pc.extension.api;
 
+import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.extension.service.PcAccountExtendService;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
@@ -7,6 +8,8 @@ import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
 import com.hp.sh.expv3.pc.extension.vo.CurrentPositionVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
+import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
+import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -35,6 +38,12 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
 
     @Autowired
     private PcOrderTradeExtendService pcOrderTradeService;
+
+    @Autowired
+    private PositionStrategyContext positionStrategyContext;
+
+    @Autowired
+    private MarkPriceService markPriceService;
 
     /*
      * @param userId
@@ -71,9 +80,14 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
                     currentPositionVo.setCtime(created.getTime());
                 }
 
-                //保证金率 表示5% (${pos_margin} - ${未实现盈亏} ) / ( faceValue * ${this.volume} / ${当前标记价格})
-
+                HoldPosStrategy ps = positionStrategyContext.getHoldPosStrategy(positionVo.getAsset(), positionVo.getSymbol());
+                BigDecimal markPrice = markPriceService.getCurrentMarkPrice(positionVo.getAsset(), positionVo.getSymbol());
                 //未实现盈亏 掉老王接口
+                BigDecimal pnl = ps.calcPnl(positionVo.getLongFlag(), positionVo.getVolume().multiply(positionVo.getFaceValue()), positionVo.getMeanPrice(), markPrice);
+                currentPositionVo.setPnl(pnl);
+
+                BigDecimal posMarginRatio = ps.calPosMarginRatio(positionVo.getPosMargin(), pnl, positionVo.getFaceValue(), positionVo.getVolume(), markPrice);
+                currentPositionVo.setPosMarginRatio(posMarginRatio);
 
                 result.add(currentPositionVo);
             }

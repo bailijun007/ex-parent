@@ -30,6 +30,7 @@
         <result column="user_id" property="userId" />
         <result column="created" property="created" />
         <result column="modified" property="modified" />
+        <result column="face_value" property="faceValue" />
     </resultMap>
 
     <sql id="simple_where">
@@ -73,6 +74,7 @@
         <if test="liqMarkPrice!=null">and liq_mark_price=#{liqMarkPrice}</if>
         <if test="liqMarkTime!=null">and liq_mark_time=#{liqMarkTime}</if>
         <if test="liqStatus!=null">and liq_status=#{liqStatus}</if>
+        <if test="faceValue!=null">and face_value=#{faceValue}</if>
         <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
         <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
         <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
@@ -81,7 +83,7 @@
 
     <sql id="Base_Column_List" >
 		id,asset,symbol,long_flag,margin_mode,entry_leverage,volume,base_value,leverage,pos_margin,close_fee,auto_add_flag,mean_price,accu_base_value,
-		accu_volume,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
+		accu_volume,init_margin,hold_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified,face_value
 	</sql>
 
     <select id="getPosMargin" resultType="java.math.BigDecimal">

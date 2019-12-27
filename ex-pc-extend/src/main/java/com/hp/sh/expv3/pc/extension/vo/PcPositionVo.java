@@ -104,10 +104,21 @@ public class PcPositionVo extends UserDataEntity {
 	// 仓位强平状态，0：未触发平仓，1：仓位被冻结，
 	private Integer liqStatus;
 
+	//面值
+	private BigDecimal faceValue;
+
 	//仓位已平空
 	private Integer closed;
 
-	public PcPositionVo() {
+    public BigDecimal getFaceValue() {
+        return faceValue;
+    }
+
+    public void setFaceValue(BigDecimal faceValue) {
+        this.faceValue = faceValue;
+    }
+
+    public PcPositionVo() {
 		super();
 	}
 
