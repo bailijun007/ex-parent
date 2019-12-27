@@ -153,6 +153,8 @@ public class PcOrderService {
 			this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin(), longFlag);
 		}
 		
+		publisher.publishEvent(pcOrder);
+		
 		return pcOrder;
 	}
 	
@@ -240,12 +242,13 @@ public class PcOrderService {
 		
 		this.checkCancelStatus(order);
 
-		long count = this.pcOrderDAO.updateCancelStatus(userId, orderId, OrderStatus.PENDING_CANCEL, now);
+		long count = this.pcOrderDAO.updateCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now);
 		
 		if(count!=1){
 			throw new RuntimeException("更新失败，更新行数："+count);
 		}
         
+		publisher.publishEvent(order);
 	}
 	
 	private void checkCancelStatus(PcOrder order){
@@ -314,7 +317,7 @@ public class PcOrderService {
 	}
 
 	public void setNewStatus(Long userId, Long orderId, Integer newStatus, Integer desiredOldStatus){
-		long count = this.pcOrderDAO.updateStatus(userId, orderId, newStatus, desiredOldStatus, new Date());
+		long count = this.pcOrderDAO.updateStatus(orderId, userId, newStatus, desiredOldStatus, new Date());
 		if(count!=1){
 //			throw new RuntimeException("更新失败，更新行数："+count);
 		}
