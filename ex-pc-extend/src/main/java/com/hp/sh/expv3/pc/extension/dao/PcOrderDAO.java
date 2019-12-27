@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.pc.extension.dao;
 
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;

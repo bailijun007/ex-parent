@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.pc.extension.dao.PcAccountDAO;
-import com.hp.sh.expv3.pc.module.account.entity.PcAccount;
 import org.springframework.util.CollectionUtils;
 
 /**
