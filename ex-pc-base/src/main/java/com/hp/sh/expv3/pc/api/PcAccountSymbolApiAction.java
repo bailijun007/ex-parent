@@ -16,5 +16,11 @@ public class PcAccountSymbolApiAction implements PcAccountSymbolApi {
 		pcAccountSymbolService.create(userId, asset, symbol);
 		return true;
 	}
+	
+	@Override
+	public boolean changeMarginMode(Long userId, String asset, String symbol, Integer marginMode){
+		pcAccountSymbolService.changeMarginMode(userId, asset, symbol, marginMode);
+		return true;
+	}
 
 }

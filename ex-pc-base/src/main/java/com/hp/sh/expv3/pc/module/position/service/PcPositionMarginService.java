@@ -98,7 +98,7 @@ public class PcPositionMarginService {
         
         if (pos != null && leverage.compareTo(pos.getLeverage()) != 0) {
 
-            if (pos.getLiqStatus()==LiqStatus.YES) {
+            if (pos.getLiqStatus()==LiqStatus.FROZEN) {
                 throw new ExException(PositonError.LIQING);
             }
 

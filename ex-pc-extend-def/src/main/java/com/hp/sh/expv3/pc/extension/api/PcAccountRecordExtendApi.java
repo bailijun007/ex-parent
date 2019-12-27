@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 /**
  * @author BaiLiJun  on 2019/12/24
  */
-@Api(tags = "合约账户扩展接口")
+@Api(tags = "合约账户明细扩展接口")
 @FeignClient(value = "ex-pc-extend")
 public interface PcAccountRecordExtendApi {
 

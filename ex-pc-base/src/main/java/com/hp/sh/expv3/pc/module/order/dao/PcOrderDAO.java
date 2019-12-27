@@ -23,17 +23,19 @@ public interface PcOrderDAO extends BaseAccountDataMapper<PcOrder, Long> {
 	public PcOrder queryOne(Map<String, Object> params);
 
 	public Long queryCount(Map<String, Object> params);
+	
+	int update(PcOrder entity);
 
 	public long updateStatus(
-			@Param("userId") Long userId, 
 			@Param("orderId") Long orderId,
+			@Param("userId") Long userId, 
 			@Param("newStatus") Integer newStatus, 
 			@Param("oldStatus") Integer oldStatus,
 			@Param("modified") Date modified);
 
 	public long updateCancelStatus(
-			@Param("userId") Long userId, 
 			@Param("orderId") Long orderId,
+			@Param("userId") Long userId, 
 			@Param("cancelStatus") Integer cancelStatus, 
 			@Param("modified") Date modified);
 

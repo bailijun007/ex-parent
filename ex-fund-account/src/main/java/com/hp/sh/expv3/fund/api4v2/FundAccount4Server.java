@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.base.BaseApiAction;
-import com.hp.sh.expv3.fund.cash.api.ChainCasehApiAction;
+import com.hp.sh.expv3.fund.cash.api.ChainCasehApi;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalAddr;
 import com.hp.sh.expv3.fund.cash.service.DepositAddrService;
 import com.hp.sh.expv3.fund.cash.service.WithdrawAddrService;
@@ -18,7 +18,7 @@ import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApiAction;
 public class FundAccount4Server extends BaseApiAction implements FundAccount4ServerDef{
 	
 	@Autowired
-	private ChainCasehApiAction chainCasehApiAction;
+	private ChainCasehApi chainCasehApiAction;
 	
 	@Autowired
 	private FundAccountCoreApiAction fundAccountCoreApi;
@@ -42,7 +42,7 @@ public class FundAccount4Server extends BaseApiAction implements FundAccount4Ser
 
 	@Override
 	public String getDepositAddress(String operator, long accountId, String asset, String token) {
-		String addr = chainCasehApiAction.getBysAddress(accountId, asset);
+		String addr = chainCasehApiAction.getDepositAddress(accountId, asset);
 		return addr;
 	}
 
@@ -74,7 +74,7 @@ public class FundAccount4Server extends BaseApiAction implements FundAccount4Ser
 
 	@Override
 	public long withdraw(String operator, long accountId, String asset, String withdrawAddr, BigDecimal volume, String token) {
-		this.chainCasehApiAction.createDraw(accountId, asset, withdrawAddr, volume);
+		this.chainCasehApiAction.createWithdrawal(accountId, asset, withdrawAddr, volume);
 		return -1;
 	}
 

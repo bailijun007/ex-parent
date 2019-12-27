@@ -1,8 +1,8 @@
 package com.hp.sh.expv3.pc.mq.match.msg;
 
-import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
+import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 
-public class BookResetMsg extends BaseOrderMsg{
+public class BookResetMsg extends BaseSymbolMsg{
 
 	public BookResetMsg(String asset, String symbol) {
 		this.asset = asset;

@@ -67,7 +67,7 @@ public class RedisConfig {
 		return rp;
 	}
 	
-	@Bean 
+	@Bean
 	public RedisSubscriber testRs(RedisPool redisPool){
 		final RedisSubscriber rs = new RedisSubscriber(redisPool);
 		rs.setCacheSerializer(new JsonCacheSerializer());
@@ -77,11 +77,12 @@ public class RedisConfig {
 			public void onMessage(Object message) {
 				System.out.println("RedisSubscriber:" + message);
 			}
-			
+
 		});
 		rs.setChannel("pc:account:BTC");
 		new Thread(){
-			public void run(){
+			@Override
+            public void run(){
 				try{
 					rs.subscribe();
 				}catch(Exception e){

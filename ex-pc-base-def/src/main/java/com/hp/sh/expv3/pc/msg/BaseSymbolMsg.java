@@ -1,6 +1,6 @@
-package com.hp.sh.expv3.pc.mq;
+package com.hp.sh.expv3.pc.msg;
 
-public class BaseOrderMsg {
+public class BaseSymbolMsg {
 
 	//资产
 	protected String asset;
@@ -8,7 +8,7 @@ public class BaseOrderMsg {
 	//交易对（合约品种）
 	protected String symbol;
 	
-	public BaseOrderMsg() {
+	public BaseSymbolMsg() {
 	}
 
 	public String getAsset() {

@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.pc.extension.dao;
 
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -20,7 +19,7 @@ public interface PcOrderDAO {
     List<PcOrderVo> queryList(Map<String,Object> map);
 
 
-    List<PcOrderVo> queryHistory(Map<String, Object> map);
+    List<PcOrderVo> queryOrders(Map<String, Object> map);
 
     List<PcOrderVo> queryOrderList(Map<String, Object> map);
 }

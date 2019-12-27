@@ -2,9 +2,9 @@ package com.hp.sh.expv3.pc.mq.liq.msg;
 
 import java.util.List;
 
-import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
+import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 
-public class LiqCancelledMsg extends BaseOrderMsg{
+public class LiqCancelledMsg extends BaseSymbolMsg{
 
 	//用户ID
     private Long accountId;    

@@ -28,6 +28,6 @@ public interface PcPostionApi {
 
 	@ApiOperation(value = "开关自动追加保证金")
 	@GetMapping(value = "/api/pc/position/setAutoAddFlag")
-	boolean setAutoAddFlag(long userId, String asset, String symbol, Integer longFlag, Integer autoAddFlag);
+	boolean setAutoAddFlag(@RequestParam("userId") long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol, @RequestParam("longFlag") Integer longFlag, @RequestParam("autoAddFlag") Integer autoAddFlag);
 	
 }
