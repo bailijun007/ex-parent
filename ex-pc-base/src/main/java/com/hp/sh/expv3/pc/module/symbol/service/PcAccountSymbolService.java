@@ -16,6 +16,7 @@ import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.component.PcDefaultSymbolSetting;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 
 /**
@@ -39,7 +40,7 @@ public class PcAccountSymbolService{
 		if(as!=null){
 			throw new ExException(CommonError.OBJ_DONT_EXIST);
 		}
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		PcAccountSymbol entity = new PcAccountSymbol();
 		entity.setAsset(asset);
 		entity.setMarginMode(pcDefaultSymbolSetting.getMarginMode());

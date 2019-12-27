@@ -77,7 +77,7 @@ public class PcPositionService {
 			return;
 		}
 		
-		Date now  = DbDateUtils.now();
+		Long now  = DbDateUtils.now();
 		
 		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
@@ -163,7 +163,7 @@ public class PcPositionService {
 		this.pcAccountCoreService.add(request);
 	}
 
-	private void updateOrderStatus4Trade(PcOrder order, TradeResult tradeResult, Date now){
+	private void updateOrderStatus4Trade(PcOrder order, TradeResult tradeResult, Long now){
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getFee()));
@@ -176,7 +176,7 @@ public class PcPositionService {
 		this.pcOrderDAO.update(order);
 	}
 
-	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeResult, Long posId, Date now) {
+	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeResult, Long posId, Long now) {
 		PcOrderTrade orderTrade = new PcOrderTrade();
 
 		orderTrade.setId(null);
@@ -226,7 +226,6 @@ public class PcPositionService {
 		pcPosition.setAutoAddFlag(IntBool.NO);
 		pcPosition.setHoldMarginRatio(feeRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
 
-//		Date now = new Date();
 //		pcPosition.setCreated(now );
 //		pcPosition.setModified(now);
 		//

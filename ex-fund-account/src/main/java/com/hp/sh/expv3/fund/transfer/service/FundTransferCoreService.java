@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.fund.transfer.dao.FundTransferDAO;
 import com.hp.sh.expv3.fund.transfer.entity.FundTransfer;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -33,7 +34,7 @@ public class FundTransferCoreService {
 	 * @param amount
 	 */
 	public FundTransfer transfer(Long userId, String asset, Integer srcAccountType, Integer targetAccountType, BigDecimal amount) {
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		
 		FundTransfer transfer = new FundTransfer();
 		transfer.setSn(SnUtils.genTransferSn());

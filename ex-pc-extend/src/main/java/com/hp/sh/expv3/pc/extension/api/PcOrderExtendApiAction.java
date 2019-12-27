@@ -1,5 +1,17 @@
 package com.hp.sh.expv3.pc.extension.api;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
@@ -7,21 +19,8 @@ import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
 import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
 import com.hp.sh.expv3.pc.extension.service.impl.PcAccountExtendServiceImpl;
-import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
-import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.Integers;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 
 /**
  * @author BaiLiJun  on 2019/12/23
@@ -83,10 +82,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                 vo.setFee(orderVo.getFeeCost());
                 vo.setQty(orderVo.getVolume());
                 vo.setLongFlag(orderVo.getLongFlag());
-                Date created = orderVo.getCreated();
-                if (null != created) {
-                    vo.setCtime(created.getTime());
-                }
+                vo.setCtime(orderVo.getCreated());
                 //平均价 暂时写死，后期掉老王接口
                 vo.setAvgPrice(BigDecimal.ZERO);
                 vo.setFilledQty(orderVo.getFilledVolume());
