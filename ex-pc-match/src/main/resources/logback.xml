@@ -8,7 +8,7 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- 对日志进行格式化 -->
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger -%msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{10} -%msg%n</pattern>
         </encoder>
     </appender>
 
@@ -42,7 +42,7 @@
         </triggeringPolicy>   -->
 
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{10} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -62,7 +62,7 @@
             <maxHistory>${maxHistory}</maxHistory>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{10} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -83,7 +83,7 @@
             <maxHistory>${maxHistory}</maxHistory>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{10} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -103,7 +103,7 @@
             <maxHistory>${maxHistory}</maxHistory>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{10} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -123,7 +123,7 @@
             <maxHistory>${maxHistory}</maxHistory>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{10} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -143,7 +143,7 @@
             <maxHistory>${maxHistory}</maxHistory>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{10} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -151,15 +151,7 @@
     <logger name="org.springframework" value="INFO" additivity="false"/>
     <logger name="org.hibernate" value="INFO" additivity="false"/>
     <logger name="org.mybatis.spring" value="INFO" additivity="false"/>
-
-<!--
-    <logger name="java.sql.PreparedStatement" value="DEBUG"/>
-    <logger name="java.sql.Connection" value="DEBUG"/>
-    <logger name="java.sql.Statement" value="DEBUG"/>
-    <logger name="com.ibatis" value="DEBUG"/>
-    <logger name="com.ibatis.common.jdbc.SimpleDataSource" value="DEBUG"/>
-    <logger name="com.ibatis.common.jdbc.ScriptRunner" level="DEBUG"/>
-    <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" value="DEBUG"/>-->
+    <logger name="org.apache.skywalking" value="INFO" additivity="false"/>
 
     <logger name="com.hp.sh.expv3.match.component.notify.PcNotify"  level="DEBUG" additivity="false" >
         <appender-ref ref="pcNotify"/>
