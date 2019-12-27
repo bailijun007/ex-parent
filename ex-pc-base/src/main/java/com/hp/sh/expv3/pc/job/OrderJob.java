@@ -12,7 +12,7 @@ import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
-import com.hp.sh.expv3.pc.mq.match.MatchMqSender;
+import com.hp.sh.expv3.pc.mq.MatchMqSender;
 
 //@Component
 public class OrderJob {
