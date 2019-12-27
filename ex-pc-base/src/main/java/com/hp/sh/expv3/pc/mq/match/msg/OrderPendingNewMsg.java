@@ -2,14 +2,14 @@ package com.hp.sh.expv3.pc.mq.match.msg;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
+import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 
 /**
  * 新订单消息
  * @author lw
  *
  */
-public class OrderPendingNewMsg extends BaseOrderMsg{
+public class OrderPendingNewMsg extends BaseSymbolMsg{
 
 	private Long orderId;
 	private Long accountId;

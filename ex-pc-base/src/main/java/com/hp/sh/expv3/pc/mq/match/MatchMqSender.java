@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MqTags;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
-import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.pc.mq.utils.OrderMessageQueueSelector;
+import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 import com.hp.sh.expv3.utils.BidUtils;
 import com.hp.sh.rocketmq.codec.MsgCodec;
 
@@ -76,7 +76,7 @@ public class MatchMqSender {
 	    this.send(mqMsg);
 	}
 	
-	void sendOrderMsg(BaseOrderMsg msg, String tags, String keys){
+	void sendOrderMsg(BaseSymbolMsg msg, String tags, String keys){
 		String topic = this.getOrderTopic(msg.getAsset(), msg.getSymbol());
 		byte[] msgBuff = (byte[]) msgCodec.encode(msg);
 		Message mqMsg = new Message(topic, tags, msgBuff);

@@ -2,9 +2,9 @@ package com.hp.sh.expv3.pc.mq.liq.msg;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
+import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 
-public class LiqCancelMsg extends BaseOrderMsg{
+public class LiqCancelMsg extends BaseSymbolMsg{
 
     private Long orderId;
     private Long accountId;

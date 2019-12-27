@@ -1,15 +1,13 @@
-package com.hp.sh.expv3.pc.mq.match.msg;
+package com.hp.sh.expv3.pc.msg;
 
 import java.math.BigDecimal;
-
-import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
 
 /**
  * 撮合成功消息
  * @author wangjg
  *
  */
-public class PcTradeMsg extends BaseOrderMsg {
+public class PcTradeMsg extends BaseSymbolMsg {
 	
 	//用户ID
 	private Long accountId;

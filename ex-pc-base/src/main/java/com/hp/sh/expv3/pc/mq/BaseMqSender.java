@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hp.sh.expv3.pc.constant.MqTopic;
 import com.hp.sh.expv3.pc.mq.utils.OrderMessageQueueSelector;
+import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 import com.hp.sh.rocketmq.codec.MsgCodec;
 
 public class BaseMqSender {
@@ -20,7 +21,7 @@ public class BaseMqSender {
 	public BaseMqSender() {
 	}
 	
-	protected void sendOrderMsg(BaseOrderMsg msg, String tags, String keys){
+	protected void sendOrderMsg(BaseSymbolMsg msg, String tags, String keys){
 		String topic = this.getTopic(msg);
 		byte[] msgBuff = (byte[]) msgCodec.encode(msg);
 		Message mqMsg = new Message(topic, tags, msgBuff);
@@ -37,7 +38,7 @@ public class BaseMqSender {
 		}
 	}
 
-	protected String getTopic(BaseOrderMsg msg){
+	protected String getTopic(BaseSymbolMsg msg){
 		String asset = msg.getAsset();
 		String symbol = msg.getSymbol();
 		return MqTopic.getOrderTopic(asset, symbol);

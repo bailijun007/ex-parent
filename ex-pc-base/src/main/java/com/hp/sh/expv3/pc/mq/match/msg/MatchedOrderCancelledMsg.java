@@ -2,14 +2,14 @@ package com.hp.sh.expv3.pc.mq.match.msg;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
+import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 
 /**
  * 取消订单
  * @author lw
  *
  */
-public class MatchedOrderCancelledMsg extends BaseOrderMsg{
+public class MatchedOrderCancelledMsg extends BaseSymbolMsg{
 	private Long accountId;
 	private Long orderId;
 	private BigDecimal cancelNumber;

@@ -2,9 +2,7 @@ package com.hp.sh.expv3.pc.module.position.service;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -19,7 +17,6 @@ import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.TimeInForce;
 import com.hp.sh.expv3.pc.job.LiqHandleResult;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcLiqRecordDAO;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
@@ -202,19 +199,6 @@ public class PcLiqService {
 	private void createLiqOrder(PcLiqRecord record){
 		PcPosition pos = this.pcPositionDAO.findById(record.getUserId(), record.getPosId());
 		this.pcOrderService.create(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), OrderFlag.ACTION_CLOSE, record.getLongFlag(), TimeInForce.IMMEDIATE_OR_CANCEL, record.getBankruptPrice(), record.getVolume(), pos, IntBool.NO, IntBool.YES);
-	}
-	
-	public void handleLiqTrade(Long userId, Long recordId){
-		PcLiqRecord record = this.pcLiqRecordDAO.findById(userId, recordId);
-		
-	}
-
-	private void cancelLiqOrder(Long userId, Long posId) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", userId);
-		params.put("closePosId", posId);
-		PcOrder liqOrder = this.pcOrderDAO.queryOne(params);
-		this.pcOrderService.cancel(userId, liqOrder.getAsset(), liqOrder.getSymbol(), liqOrder.getId(), liqOrder.getVolume().subtract(liqOrder.getFilledVolume()));
 	}
 
 }

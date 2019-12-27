@@ -1,13 +1,13 @@
 package com.hp.sh.expv3.pc.mq.match.msg;
 
-import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
+import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 
 /**
  * 未匹配
  * @author lw
  *
  */
-public class MatchNotMatchMsg extends BaseOrderMsg{
+public class MatchNotMatchMsg extends BaseSymbolMsg{
 
 	private Long accountId;
 	private Long orderId;

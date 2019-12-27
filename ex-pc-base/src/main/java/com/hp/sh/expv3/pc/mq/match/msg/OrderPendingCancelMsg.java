@@ -1,13 +1,13 @@
 package com.hp.sh.expv3.pc.mq.match.msg;
 
-import com.hp.sh.expv3.pc.mq.BaseOrderMsg;
+import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 
 /**
  * 订单待取消
  * @author lw
  *
  */
-public class OrderPendingCancelMsg extends BaseOrderMsg{
+public class OrderPendingCancelMsg extends BaseSymbolMsg{
 
 	private Long accountId;
 	private Long orderId;
