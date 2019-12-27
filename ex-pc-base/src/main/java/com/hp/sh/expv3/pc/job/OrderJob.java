@@ -13,6 +13,7 @@ import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
+import com.hp.sh.expv3.utils.DbDateUtils;
 
 //@Component
 public class OrderJob {
@@ -26,9 +27,10 @@ public class OrderJob {
 	
 //	@Scheduled(cron = "0/10 * * * * ?")
 	public void handle() {
+		Long now = DbDateUtils.now();
 		Page page = new Page(1, 100, 1000L);
 		while(true){
-			List<PcOrder> list = this.orderService.pageQuery(page, OrderStatus.PENDING_NEW, new Date(System.currentTimeMillis()-1000*30));
+			List<PcOrder> list = this.orderService.pageQuery(page, OrderStatus.PENDING_NEW, System.currentTimeMillis()-1000*30);
 			
 			if(list==null || list.isEmpty()){
 				break;

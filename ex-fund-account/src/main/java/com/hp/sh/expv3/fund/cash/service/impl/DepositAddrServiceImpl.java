@@ -1,8 +1,6 @@
 
 package com.hp.sh.expv3.fund.cash.service.impl;
 
-import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hp.sh.expv3.fund.cash.dao.DepositAddrDAO;
 import com.hp.sh.expv3.fund.cash.entity.DepositAddr;
 import com.hp.sh.expv3.fund.cash.service.DepositAddrService;
+import com.hp.sh.expv3.utils.DbDateUtils;
 
 /**
  * 
@@ -25,7 +24,7 @@ public class DepositAddrServiceImpl implements DepositAddrService{
 
 	@Override
 	public void save(DepositAddr depositAddr){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		if(depositAddr.getId()==null){
 			depositAddr.setCreated(now);
 			depositAddr.setModified(now);
@@ -38,7 +37,7 @@ public class DepositAddrServiceImpl implements DepositAddrService{
 
 	@Override
 	public void update(DepositAddr depositAddr){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		depositAddr.setModified(now);
 		this.depositAddrDAO.update(depositAddr);
 	}

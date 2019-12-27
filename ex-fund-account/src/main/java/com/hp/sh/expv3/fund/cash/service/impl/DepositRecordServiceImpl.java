@@ -16,6 +16,7 @@ import com.hp.sh.expv3.fund.cash.dao.DepositRecordDAO;
 import com.hp.sh.expv3.fund.cash.entity.DepositRecord;
 import com.hp.sh.expv3.fund.cash.service.DepositRecordService;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
+import com.hp.sh.expv3.utils.DbDateUtils;
 
 /**
  * 
@@ -32,7 +33,7 @@ public class DepositRecordServiceImpl implements DepositRecordService{
 
 	@Override
 	public void save(DepositRecord depositRecord){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		if(depositRecord.getId()==null){
 			depositRecord.setCreated(now);
 			depositRecord.setModified(now);
@@ -45,7 +46,7 @@ public class DepositRecordServiceImpl implements DepositRecordService{
 
 	@Override
 	public void update(DepositRecord depositRecord){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		depositRecord.setModified(now);
 		this.depositRecordDAO.update(depositRecord);
 	}

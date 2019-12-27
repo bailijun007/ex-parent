@@ -24,8 +24,8 @@ CREATE TABLE `pc_account` (
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产类型' ,
 `balance`  decimal(50,30) NOT NULL COMMENT '余额' ,
 `version`  bigint(20) NOT NULL COMMENT '版本' ,
-`modified`  datetime NOT NULL COMMENT '创建时间' ,
-`created`  datetime NOT NULL COMMENT '创建时间' ,
+`modified`  bigint NOT NULL COMMENT '创建时间' ,
+`created`  bigint NOT NULL COMMENT '创建时间' ,
 PRIMARY KEY (`user_id`, `asset`),
 UNIQUE INDEX `un_user_asset` (`user_id`, `asset`) USING BTREE 
 )
@@ -74,8 +74,8 @@ CREATE TABLE `pc_account_record` (
 `serial_no`  bigint(20) NOT NULL COMMENT '序号:' ,
 `associated_id`  bigint(20) NULL DEFAULT NULL COMMENT '关联对象的ID' ,
 `request_id`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '请求ID' ,
-`created`  datetime NOT NULL COMMENT '创建时间' ,
-`modified`  datetime NOT NULL COMMENT '修改时间' ,
+`created`  bigint NOT NULL COMMENT '创建时间' ,
+`modified`  bigint NOT NULL COMMENT '修改时间' ,
 PRIMARY KEY (`id`),
 UNIQUE INDEX `un_sn` (`sn`) USING BTREE 
 )
@@ -102,8 +102,8 @@ CREATE TABLE `pc_account_symbol` (
 `cross_leverage`  decimal(10,0) NOT NULL COMMENT '全仓杠杆' ,
 `version`  bigint(20) NOT NULL COMMENT '版本' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`created`  datetime NOT NULL COMMENT '创建时间' ,
-`modified`  datetime NOT NULL COMMENT '修改时间' ,
+`created`  bigint NOT NULL COMMENT '创建时间' ,
+`modified`  bigint NOT NULL COMMENT '修改时间' ,
 PRIMARY KEY (`id`),
 UNIQUE INDEX `user_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE 
 )
@@ -132,8 +132,8 @@ CREATE TABLE `pc_liq_record` (
 `fee`  decimal(50,30) NOT NULL COMMENT '手续费' ,
 `fee_ratio`  decimal(10,4) NOT NULL COMMENT '手续费率' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`created`  datetime NOT NULL COMMENT '创建时间' ,
-`modified`  datetime NOT NULL COMMENT '修改时间' ,
+`created`  bigint NOT NULL COMMENT '创建时间' ,
+`modified`  bigint NOT NULL COMMENT '修改时间' ,
 PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB
@@ -174,7 +174,7 @@ CREATE TABLE `pc_order` (
 `close_pos_id`  bigint(20) NULL DEFAULT NULL COMMENT '平仓委托对应的仓位Id' ,
 `time_in_force`  int(11) NULL DEFAULT NULL COMMENT '委托有效时间' ,
 `trigger_flag`  int(11) NULL DEFAULT NULL COMMENT '是否已触发，用于止盈止损等触发式委托' ,
-`cancel_time`  datetime NULL DEFAULT NULL COMMENT '取消时间' ,
+`cancel_time`  bigint NULL DEFAULT NULL COMMENT '取消时间' ,
 `visible_flag`  int(11) NULL DEFAULT NULL COMMENT '可见性，强平委托，自动减仓委托 都不可见' ,
 `liq_flag`  int(11) NOT NULL COMMENT '是否强平委托' ,
 `active_flag`  int(11) NOT NULL COMMENT '是否活动委托' ,
@@ -182,8 +182,8 @@ CREATE TABLE `pc_order` (
 `cancel_operator`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `remark`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注' ,
 `client_order_id`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '客户自定义委托ID，用于与客户系统关联 （open api）' ,
-`created`  datetime NOT NULL COMMENT '创建时间' ,
-`modified`  datetime NOT NULL COMMENT '修改时间' ,
+`created`  bigint NOT NULL COMMENT '创建时间' ,
+`modified`  bigint NOT NULL COMMENT '修改时间' ,
 PRIMARY KEY (`id`),
 INDEX `idx_userid_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE ,
 INDEX `idx_created` (`created`) USING BTREE 
@@ -216,8 +216,8 @@ CREATE TABLE `pc_order_trade` (
 `fee`  decimal(50,30) NOT NULL COMMENT '手续费' ,
 `pnl`  decimal(50,30) NOT NULL COMMENT '盈亏(此次成交的盈亏)' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`created`  datetime NOT NULL COMMENT '创建时间' ,
-`modified`  datetime NOT NULL COMMENT '修改时间' ,
+`created`  bigint NOT NULL COMMENT '创建时间' ,
+`modified`  bigint NOT NULL COMMENT '修改时间' ,
 `remain_volume`  decimal(10,0) NULL DEFAULT NULL COMMENT '未成交量' ,
 PRIMARY KEY (`id`)
 )
@@ -258,8 +258,8 @@ CREATE TABLE `pc_position` (
 `liq_mark_price`  decimal(50,30) NULL DEFAULT NULL COMMENT '强平' ,
 `liq_mark_time`  bigint(20) NULL DEFAULT NULL COMMENT '触发强平的标记时间' ,
 `liq_status`  int(11) NULL DEFAULT NULL COMMENT '仓位强平状态，0：未触发平仓，1：仓位被冻结，' ,
-`created`  datetime NOT NULL COMMENT '创建时间' ,
-`modified`  datetime NOT NULL COMMENT '修改时间' ,
+`created`  bigint NOT NULL COMMENT '创建时间' ,
+`modified`  bigint NOT NULL COMMENT '修改时间' ,
 PRIMARY KEY (`id`),
 INDEX `idx_userid_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE ,
 INDEX `idx_volume` (`volume`) USING BTREE 

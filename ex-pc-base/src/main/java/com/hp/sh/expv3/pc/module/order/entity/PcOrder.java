@@ -128,7 +128,7 @@ public class PcOrder extends UserDataEntity{
 	/**
 	 * 取消时间
 	 */
-	private Date cancelTime;
+	private Long cancelTime;
 
 	/**
 	 * @deprecated
@@ -360,11 +360,11 @@ public class PcOrder extends UserDataEntity{
 		this.triggerFlag = triggerFlag;
 	}
 
-	public Date getCancelTime() {
+	public Long getCancelTime() {
 		return cancelTime;
 	}
 
-	public void setCancelTime(Date cancelTime) {
+	public void setCancelTime(Long cancelTime) {
 		this.cancelTime = cancelTime;
 	}
 

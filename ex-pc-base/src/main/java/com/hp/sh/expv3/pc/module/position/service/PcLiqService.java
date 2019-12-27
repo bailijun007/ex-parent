@@ -152,7 +152,7 @@ public class PcLiqService {
 	}
 	
 	void doLiq(PcPosition pos){
-		Date now = DbDateUtils.now();
+		Long now = DbDateUtils.now();
 		//1、保存强平记录
 		PcLiqRecord record = this.saveLiqRecord(pos, now);
 		//2、清空仓位
@@ -161,7 +161,7 @@ public class PcLiqService {
 		this.createLiqOrder(record);
 	}
 	
-	private void clearLiqPos(PcPosition pos, Date now){
+	private void clearLiqPos(PcPosition pos, Long now){
 		pos.setVolume(BigDecimal.ZERO);
 		pos.setCloseFee(BigDecimal.ZERO);
 		pos.setPosMargin(BigDecimal.ZERO);
@@ -170,7 +170,7 @@ public class PcLiqService {
 		pcPositionDAO.update(pos);
 	}
 	
-	private PcLiqRecord saveLiqRecord(PcPosition pos, Date now){
+	private PcLiqRecord saveLiqRecord(PcPosition pos, Long now){
 		PcLiqRecord record = new PcLiqRecord();
 		record.setUserId(pos.getUserId());
 		record.setAsset(pos.getAsset());

@@ -102,7 +102,7 @@ public class PcPositionMarginService {
                 throw new ExException(PositonError.LIQING);
             }
 
-            Date now = DbDateUtils.now();
+            Long now = DbDateUtils.now();
 
             //减少杠杆
             if (leverage.compareTo(pos.getLeverage()) < 0) {
@@ -156,7 +156,7 @@ public class PcPositionMarginService {
         	}
         	accountSymbol.setShortLeverage(leverage);
         }
-        Date now = DbDateUtils.now();
+        Long now = DbDateUtils.now();
 		accountSymbol.setModified(now);
         this.pcAccountSymbolDAO.update(accountSymbol);
 	}

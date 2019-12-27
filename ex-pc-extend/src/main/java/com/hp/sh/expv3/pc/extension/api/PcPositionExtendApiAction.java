@@ -1,5 +1,14 @@
 package com.hp.sh.expv3.pc.extension.api;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.extension.service.PcAccountExtendService;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
@@ -10,15 +19,6 @@ import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * 永续合约_仓位 扩展接口
@@ -75,10 +75,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
                 currentPositionVo.setBidFlag(positionVo.getLongFlag());
                 currentPositionVo.setAutoIncreaseFlag(positionVo.getAutoAddFlag());
                 currentPositionVo.setPosPnlRatio(realisedPnl.divide(positionVo.getInitMargin()));
-                Date created = positionVo.getCreated();
-                if (created != null) {
-                    currentPositionVo.setCtime(created.getTime());
-                }
+                currentPositionVo.setCtime(positionVo.getCreated());
 
                 HoldPosStrategy ps = positionStrategyContext.getHoldPosStrategy(positionVo.getAsset(), positionVo.getSymbol());
                 BigDecimal markPrice = markPriceService.getCurrentMarkPrice(positionVo.getAsset(), positionVo.getSymbol());

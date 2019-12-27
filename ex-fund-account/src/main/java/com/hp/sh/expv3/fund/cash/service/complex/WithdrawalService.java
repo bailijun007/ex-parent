@@ -18,13 +18,13 @@ import com.hp.sh.expv3.fund.cash.constant.PayChannel;
 import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.cash.dao.WithdrawalRecordDAO;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
-import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -42,7 +42,7 @@ public class WithdrawalService {
 
 	public void createWithdrawal(Long userId, String asset, String account, BigDecimal amount, String transactionId, Integer channelId) {
 		
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		WithdrawalRecord rr = new WithdrawalRecord();
 		rr.setSn(SnUtils.genDepositSn());
 		rr.setUserId(userId);
@@ -72,7 +72,7 @@ public class WithdrawalService {
 		WithdrawalRecord record = this.withdrawalRecordDAO.findById(userId, id);
 		record.setApprovalStatus(ApprovalStatus.APPROVED);
 		record.setSynchStatus(SynchStatus.SYNCH); // 下面同事务执行口扣款，所以这里直接设置为已同步
-		record.setModified(new Date());
+		record.setModified(DbDateUtils.now());
 		this.withdrawalRecordDAO.update(record);
 		this.cutBalance(record);
 		return record;

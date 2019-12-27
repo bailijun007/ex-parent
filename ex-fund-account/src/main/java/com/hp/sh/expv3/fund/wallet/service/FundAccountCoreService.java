@@ -25,6 +25,7 @@ import com.hp.sh.expv3.fund.wallet.error.WalletError;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundRequest;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -47,11 +48,12 @@ public class FundAccountCoreService{
 	}
 
 	public int createAccount(Long userId, String asset){
+		Long now = DbDateUtils.now();
 		FundAccount fa = this.fundAccountDAO.get(userId, asset);
 		if(fa!=null){
 			return InvokeResult.NOCHANGE;
 		}
-		this.createFundAccount(userId, asset, BigDecimal.ZERO, new Date());
+		this.createFundAccount(userId, asset, BigDecimal.ZERO, now);
 		
 		return InvokeResult.SUCCESS;
 	}
@@ -105,7 +107,7 @@ public class FundAccountCoreService{
 	}
 
 	protected int newRecord(FundAccountRecord record){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		
 		//金额必须是正数
 		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
@@ -159,7 +161,7 @@ public class FundAccountCoreService{
 		}
 	}
 	
-	private FundAccount createFundAccount(Long userId, String asset, BigDecimal balance, Date now){
+	private FundAccount createFundAccount(Long userId, String asset, BigDecimal balance, Long now){
 		FundAccount account = new FundAccount();
 		account.setAsset(asset);
 		account.setBalance(balance);

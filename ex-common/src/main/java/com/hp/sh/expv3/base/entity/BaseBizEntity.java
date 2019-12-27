@@ -3,7 +3,6 @@ package com.hp.sh.expv3.base.entity;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -25,9 +24,9 @@ public class BaseBizEntity implements Serializable {
 	protected Long id;
 
 	// 创建时间
-	private Date created;
+	private Long created;
 	// 修改时间
-	private Date modified;
+	private Long modified;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -39,19 +38,19 @@ public class BaseBizEntity implements Serializable {
 		this.id = id;
 	}
 
-	public Date getCreated() {
+	public Long getCreated() {
 		return created;
 	}
 
-	public void setCreated(Date created) {
+	public void setCreated(Long created) {
 		this.created = created;
 	}
 
-	public Date getModified() {
+	public Long getModified() {
 		return modified;
 	}
 
-	public void setModified(Date modified) {
+	public void setModified(Long modified) {
 		this.modified = modified;
 	}
 

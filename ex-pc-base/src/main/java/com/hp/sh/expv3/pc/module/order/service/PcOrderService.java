@@ -38,6 +38,7 @@ import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
@@ -107,7 +108,7 @@ public class PcOrderService {
 			this.checkClosablePosition(pos, number);
 		}
 		
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		
 		
 		//订单基本数据
@@ -236,7 +237,7 @@ public class PcOrderService {
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void setPendingCancel(long userId, String asset, String symbol, long orderId){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
 		
@@ -298,7 +299,7 @@ public class PcOrderService {
 		}
 		
 		//修改订单状态（撤销）
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		order.setCancelTime(now);
 		order.setCancelVolume(number);
 		order.setActiveFlag(PcOrder.NO);
@@ -317,7 +318,7 @@ public class PcOrderService {
 	}
 
 	public void setNewStatus(Long userId, Long orderId, Integer newStatus, Integer desiredOldStatus){
-		long count = this.pcOrderDAO.updateStatus(orderId, userId, newStatus, desiredOldStatus, new Date());
+		long count = this.pcOrderDAO.updateStatus(orderId, userId, newStatus, desiredOldStatus, DbDateUtils.now());
 		if(count!=1){
 //			throw new RuntimeException("更新失败，更新行数："+count);
 		}
@@ -348,7 +349,7 @@ public class PcOrderService {
 	}
 	
 	@CrossDB
-	public List<PcOrder> pageQuery(Page page, Integer status, Date modified){
+	public List<PcOrder> pageQuery(Page page, Integer status, Long modified){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", page);
 		params.put("status", status);
