@@ -12,7 +12,7 @@ import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcLiqService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
-import com.hp.sh.expv3.pc.mq.liq.LiqMqSender;
+import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.liq.msg.LiqLockMsg;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 
@@ -27,7 +27,7 @@ public class LiquidationJob {
     private PcLiqService pcLiqService;
 
     @Autowired
-    private LiqMqSender liqMqSender;
+    private MatchMqSender liqMqSender;
     
 	/**
 	 * 
