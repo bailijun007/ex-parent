@@ -27,7 +27,6 @@ import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.apache.rocketmq.common.protocol.ResponseCode;
-import org.apache.rocketmq.remoting.common.RemotingHelper;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.apache.rocketmq.remoting.exception.RemotingTimeoutException;
 import org.slf4j.Logger;
@@ -185,7 +184,7 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                         for (int i = 0; i < msgFoundList.size(); i++) {
                             MessageExt m = msgFoundList.get(i);
                             topic2Offset.put(topicName, m.getQueueOffset() + 1);
-                            String body = new String(m.getBody(), RemotingHelper.DEFAULT_CHARSET);
+                            String body = new String(m.getBody());
 
                             IThreadWorker matchWorker = threadManagerPcMatchImpl.getWorker(assetSymbol);
 
