@@ -20,7 +20,7 @@ import io.swagger.annotations.ApiOperation;
 /**
  * @author wangjg
  */
-@Api(tags = "合约账户扩展接口")
+@Api(tags = "用户资金账户扩展接口")
 @FeignClient(value = "ex-pc-extend")
 public interface PcAccountExtendApi {
 

@@ -2,7 +2,9 @@ package com.hp.sh.expv3.pc.extension.mq;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import com.hp.sh.expv3.pc.extension.service.PcAccountLogExtendService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,24 +23,21 @@ import com.hp.sh.rocketmq.annotation.MQListener;
 public class EventMqConsumer {
     private static final Logger logger = LoggerFactory.getLogger(EventMqConsumer.class);
     @Autowired
-    private PcAccountLogDAO pcAccountLogDAO;
+    private PcAccountLogExtendService pcAccountLogExtendService;
 
     public void handleMsg(PcAccountLog msg) {
         logger.info("收到消息:{}", msg);
-        Map<String, Object> map = new HashMap<>();
-        map.put("type", msg.getType());
-        map.put("refId", msg.getRefId());
-        map.put("userId", msg.getUserId());
-        map.put("asset", msg.getAsset());
-        map.put("symbol", msg.getSymbol());
-        PcAccountLogVo pcAccountLogVo = pcAccountLogDAO.queryOne(map);
-        if(pcAccountLogVo==null){
-            PcAccountLogVo vo=new PcAccountLogVo(msg.getType(),msg.getUserId(),msg.getAsset(),msg.getSymbol(),msg.getRefId(),msg.getTime());
-            int count = pcAccountLogDAO.save(vo);
-            if(count!=1){
-               throw new  ExException(PcCommonErrorCode.SAVE_PC_ACCOUNT_LOG_FAIL);
-            }
-        }else {
+        Optional<PcAccountLog> optional = Optional.ofNullable(msg);
+        PcAccountLogVo vo = new PcAccountLogVo(optional.map(PcAccountLog::getType).orElse(null),
+                optional.map(PcAccountLog::getUserId).orElse(null),
+                optional.map(PcAccountLog::getAsset).orElse(null),
+                optional.map(PcAccountLog::getSymbol).orElse(null),
+                optional.map(PcAccountLog::getRefId).orElse(null),
+                optional.map(PcAccountLog::getTime).orElse(null));
+        PcAccountLogVo pcAccountLogVo = pcAccountLogExtendService.getPcAccountLog(vo);
+        if (pcAccountLogVo == null) {
+            pcAccountLogExtendService.save(vo);
+        } else {
             logger.info("收到重复消息:{}", msg);
         }
 

@@ -1,5 +1,7 @@
 package com.hp.sh.expv3.pc.extension.service.impl;
 
+import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.dao.PcAccountLogDAO;
 import com.hp.sh.expv3.pc.extension.service.PcAccountLogExtendService;
 import com.hp.sh.expv3.pc.extension.util.DateUtil;
@@ -50,5 +52,26 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
 
         List<PcAccountLogVo> list = pcAccountLogDAO.queryList(map);
         return list;
+    }
+
+    @Override
+    public void save(PcAccountLogVo pcAccountLogVo) {
+        int count = pcAccountLogDAO.save(pcAccountLogVo);
+        if(count!=1){
+            throw new ExException(PcCommonErrorCode.SAVE_PC_ACCOUNT_LOG_FAIL);
+        }
+
+    }
+
+    @Override
+    public PcAccountLogVo getPcAccountLog(PcAccountLogVo pcAccountLogVo) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("type", pcAccountLogVo.getType());
+        map.put("refId", pcAccountLogVo.getRefId());
+        map.put("userId", pcAccountLogVo.getUserId());
+        map.put("asset", pcAccountLogVo.getAsset());
+        map.put("symbol", pcAccountLogVo.getSymbol());
+        PcAccountLogVo vo = pcAccountLogDAO.queryOne(map);
+        return vo;
     }
 }
