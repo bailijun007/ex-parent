@@ -62,6 +62,7 @@ public class MetadataServiceImpl implements MetadataService {
         return vo;
     }
 
+    @Override
     public List<PcContractVO> getAllPcContract(){
         HashOperations opsForHash = templateDB0.opsForHash();
         Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(RedisKey.PC_CONTRACT, ScanOptions.NONE);
