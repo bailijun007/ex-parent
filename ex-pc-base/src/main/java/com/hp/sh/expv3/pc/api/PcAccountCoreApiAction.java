@@ -6,9 +6,9 @@ package com.hp.sh.expv3.pc.api;
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hp.sh.expv3.pc.api.PcAccountCoreApi;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
@@ -34,12 +34,12 @@ public class PcAccountCoreApiAction implements PcAccountCoreApi {
 	}
 
 	@Override
-	public Integer add(PcAddRequest request) {
+	public Integer add(@RequestBody PcAddRequest request) {
 		return pcAccountCoreService.add(request);
 	}
 
 	@Override
-	public Integer cut(PcCutRequest request) {
+	public Integer cut(@RequestBody PcCutRequest request) {
 		return pcAccountCoreService.cut(request);
 	}
 

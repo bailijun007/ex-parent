@@ -85,7 +85,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			}else if(record.getTargetAccountType()==AccountType.PC){
 				this.addPcFund(record);
 			}
-//			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SUCCESS);
+//			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_TARGET_COMPLETE);
 		case FundTransfer.STATUS_TARGET_COMPLETE:
 			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SUCCESS);
 		}
