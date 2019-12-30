@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.constant.RedisKey;
-import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
+import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.*;
 import com.hp.sh.expv3.pc.extension.vo.*;
 import org.apache.commons.lang3.StringUtils;

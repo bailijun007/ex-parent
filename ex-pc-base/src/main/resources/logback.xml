@@ -37,6 +37,34 @@
             <MaxFileSize>10MB</MaxFileSize>
         </triggeringPolicy>
     </appender>
+    
+	<appender name="errorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.dir}-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.dir}-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <MaxHistory>30</MaxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+            <TimeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>100MB</MaxFileSize>
+            </TimeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} [%thread] %logger - %line - [%X] %msg%n</pattern>
+        </encoder>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+        
+        <!-- 过滤器 -->
+        <!-- 只打印错误日志 -->
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
+			<level>ERROR</level>  
+			<onMatch>ACCEPT</onMatch>  
+			<onMismatch>DENY</onMismatch>  
+		</filter>  
+        
+    </appender>
 
 	<root level="info">
 		<appender-ref ref="STDOUT" />
@@ -54,6 +82,7 @@
         <root level="info">
             <appender-ref ref="STDOUT" />
             <appender-ref ref="out2File" />
+            <appender-ref ref="errorFile" />
         </root>
         
 		<logger name="com.hp.sh.expv3" level="debug"></logger>
