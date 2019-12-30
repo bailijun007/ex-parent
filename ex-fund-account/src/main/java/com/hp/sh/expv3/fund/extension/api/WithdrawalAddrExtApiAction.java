@@ -3,6 +3,7 @@ package com.hp.sh.expv3.fund.extension.api;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.extension.error.DepositExtError;
 import com.hp.sh.expv3.fund.extension.error.AddressExtError;
+import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalAddrExtService;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrParam;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo;
@@ -26,7 +27,7 @@ public class WithdrawalAddrExtApiAction implements  WithdrawalAddrExtApi{
     @Override
     public List<WithdrawalAddrVo> findWithdrawalAddr(@RequestBody WithdrawalAddrParam param) {
         if (param.getUserId()==null || param.getPageNo() == null || param.getPageSize() == null|| StringUtils.isEmpty(param.getAsset())) {
-            throw new ExException(AddressExtError.PARAM_EMPTY);
+            throw new ExException(FundCommonError.PARAM_EMPTY);
         }
 
         List<WithdrawalAddrVo> addrVoList = withdrawalAddrExtService.findWithdrawalAddr(param.getUserId(), param.getAsset());

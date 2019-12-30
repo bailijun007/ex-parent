@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.pc.extension.service;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
+import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -24,5 +26,5 @@ public interface PcOrderExtendService {
 
     List<PcOrderVo> queryOrderList(Long userId, List<String> assetList, List<String> symbolList, Long gtOrderId, Long ltOrderId, Integer count, List<Integer> statusList);
 
-    List<PcOrderVo> queryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag);
+    PageResult<UserOrderVo> pageQueryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag, Long orderId, Integer pageNo, Integer pageSize);
 }

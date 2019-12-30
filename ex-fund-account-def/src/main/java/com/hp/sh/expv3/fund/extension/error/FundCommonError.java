@@ -7,7 +7,8 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
  * @author BaiLiJun  on 2019/12/16
  */
 public class FundCommonError extends ErrorCode {
-    public static final FundCommonError PARAM_EMPTY = new FundCommonError(8400, "缺少必填参数!");
+    public static final FundCommonError PARAM_EMPTY = new FundCommonError(010500, "缺少必填参数!");
+    public static final DepositExtError ACCOUNT_NOT_FIND = new DepositExtError(010501, "账户不存在！");
 
 
 

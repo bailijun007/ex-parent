@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.pc.extension.api;
 
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeDetailVo;
@@ -67,6 +68,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
      * @param statTime 成交时间
      * @return
      */
+    @CrossDB
     @Override
     public PcOrderTradeDetailVo selectLessTimeTrade(String asset, String symbol, Long statTime) {
         PcOrderTradeVo vo = pcOrderTradeService.selectLessTimeTrade(asset, symbol, statTime);
@@ -100,6 +102,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         return result;
     }
 
+    @CrossDB
     @Override
     public List<PcOrderTradeDetailVo> selectTradeListByTimeInterval(String asset, String symbol, Long statTime, Long endTime) {
         List<PcOrderTradeDetailVo> result = new ArrayList<>();
@@ -108,6 +111,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         return result;
     }
 
+    @CrossDB
     @Override
     public List<PcOrderTradeDetailVo> selectTradeListByUser(String asset, String symbol, Long userId, Long statTime, Long endTime) {
         if (userId == null) {

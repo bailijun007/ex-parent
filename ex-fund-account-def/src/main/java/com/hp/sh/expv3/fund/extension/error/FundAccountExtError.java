@@ -10,8 +10,6 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
  */
 public class FundAccountExtError extends ErrorCode {
 
-    public static final FundAccountExtError PARAM_EMPTY = new FundAccountExtError(8100, "缺少必填参数!");
-
 
 
 

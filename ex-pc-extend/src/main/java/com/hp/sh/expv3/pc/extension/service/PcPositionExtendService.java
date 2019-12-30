@@ -38,5 +38,5 @@ public interface PcPositionExtendService {
 	 */
     BigDecimal getPlRatio(Long userId, String asset, Long posId);
 
-    List<PcPositionVo> findCurrentPosition(Long userId, String asset, String symbol);
+    List<PcPositionVo> findPositionList(Long userId, String asset, String symbol,Long posId,Integer liqStatus);
 }

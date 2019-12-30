@@ -53,11 +53,13 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
     }
 
     @Override
-    public List<PcPositionVo> findCurrentPosition(Long userId, String asset, String symbol) {
+    public List<PcPositionVo> findPositionList(Long userId, String asset, String symbol,Long posId,Integer liqStatus) {
         Map<String, Object> map=new HashMap<>();
         map.put("userId",userId);
         map.put("asset",asset);
         map.put("symbol",symbol);
+        map.put("id",posId);
+        map.put("liqStatus",liqStatus);
         List<PcPositionVo> pcPositionVos = pcPositionDAO.queryList(map);
         return pcPositionVos;
     }

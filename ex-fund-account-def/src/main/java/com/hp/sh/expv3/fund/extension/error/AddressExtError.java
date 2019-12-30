@@ -7,7 +7,6 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
  * @author BaiLiJun  on 2019/12/16
  */
 public class AddressExtError extends ErrorCode {
-    public static final AddressExtError PARAM_EMPTY = new AddressExtError(8400, "缺少必填参数!");
 
 
 

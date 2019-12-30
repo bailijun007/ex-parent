@@ -8,8 +8,6 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
  */
 public class FundTransferExtError extends ErrorCode {
 
-    public static final AddressExtError PARAM_EMPTY = new AddressExtError(8500, "缺少必填参数!");
-
 
 
 

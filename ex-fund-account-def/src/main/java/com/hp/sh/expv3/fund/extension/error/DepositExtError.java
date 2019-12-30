@@ -8,9 +8,6 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
  */
 public class DepositExtError extends ErrorCode {
 
-    public static final DepositExtError PARAM_EMPTY = new DepositExtError(8300, "缺少必填参数!");
-
-    public static final DepositExtError ACCOUNT_NOT_FIND = new DepositExtError(8301, "账户不存在！");
 
 
     protected DepositExtError(int code, String message) {
