@@ -4,7 +4,7 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
 
 /**
  * 资金账户错误码
- * 01-08-??
+ * 1-08-??
  *
  * @author BaiLiJun  on 2019/12/14
  */

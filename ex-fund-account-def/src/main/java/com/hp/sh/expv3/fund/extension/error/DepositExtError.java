@@ -3,7 +3,7 @@ package com.hp.sh.expv3.fund.extension.error;
 import com.gitee.hupadev.base.exceptions.ErrorCode;
 
 /**
- * 01-07-??
+ * 1-07-??
  * @author BaiLiJun  on 2019/12/16
  */
 public class DepositExtError extends ErrorCode {
