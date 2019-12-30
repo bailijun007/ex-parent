@@ -32,7 +32,7 @@ public class BaseBizEntity implements Serializable {
 	}
 
 	public void setId(Long id) {
-		if(id==0 && this.id!=null){
+		if(id!=null && id==0 && this.id!=null){
 			return;
 		}
 		this.id = id;

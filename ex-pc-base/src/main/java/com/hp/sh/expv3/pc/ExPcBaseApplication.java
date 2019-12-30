@@ -12,7 +12,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@EnableScheduling
+//@EnableScheduling
 @EnableDiscoveryClient
 @EnableFeignClients({"com.hp.sh.expv3"})
 @ComponentScan("com.hp.sh.expv3")
