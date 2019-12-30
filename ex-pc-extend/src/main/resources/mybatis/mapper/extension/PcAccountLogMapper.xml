@@ -30,7 +30,7 @@
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
             <if test="refId!=null">and ref_id=#{refId}</if>
             <if test="timeBegin!=null">and `time` &gt;= #{timeBegin}</if>
-            <if test="timeEnd!=null">and `time` &lt;= #{timeEnd}</if>if>
+            <if test="timeEnd!=null">and `time` &lt;= #{timeEnd}</if>
         </where>
     </sql>
 
