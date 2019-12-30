@@ -1,7 +1,6 @@
 
 package com.hp.sh.expv3.fund.transfer.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -26,7 +25,7 @@ public interface FundTransferDAO extends BaseAccountDataMapper<FundTransfer, Lon
 		@Param("id") Long id,
 		@Param("newStatus") Integer newStatus, 
 		@Param("oldStatus") Integer oldStatus,
-		@Param("modified") Date modified
+		@Param("modified") Long modified
 	);
 
 }

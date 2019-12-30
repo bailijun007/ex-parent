@@ -37,7 +37,7 @@ public class PcAccountSymbolService{
 	public void create(Long userId, String asset, String symbol){
 		PcAccountSymbol as = this.get(userId, asset, symbol);
 		if(as!=null){
-			throw new ExException(CommonError.OBJ_DONT_EXIST);
+			return;
 		}
 		Long now = DbDateUtils.now();
 		PcAccountSymbol entity = new PcAccountSymbol();

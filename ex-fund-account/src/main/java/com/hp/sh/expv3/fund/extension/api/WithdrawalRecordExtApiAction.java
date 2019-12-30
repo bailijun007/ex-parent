@@ -2,8 +2,8 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.error.DepositRecordExtErrorCode;
-import com.hp.sh.expv3.fund.extension.error.WithdrawalRecordExtErrorCode;
+import com.hp.sh.expv3.fund.extension.error.DepositExtError;
+import com.hp.sh.expv3.fund.extension.error.WithdrawalExtError;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalAddrExtService;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo;
@@ -35,7 +35,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     @Override
     public List<WithdrawalRecordVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         if (userId == null || pageSize == null || StringUtils.isEmpty(asset)) {
-            throw new ExException(WithdrawalRecordExtErrorCode.PARAM_EMPTY);
+            throw new ExException(WithdrawalExtError.PARAM_EMPTY);
         }
 
         List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, queryId, pageSize, pageStatus);
@@ -46,7 +46,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     @Override
     public List<WithdrawalRecordVo> queryHistoryByTime(Long userId, String asset, Long timestamp) {
         if (userId == null || timestamp == null || StringUtils.isEmpty(asset)) {
-            throw new ExException(WithdrawalRecordExtErrorCode.PARAM_EMPTY);
+            throw new ExException(WithdrawalExtError.PARAM_EMPTY);
         }
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(timestamp));
         List<WithdrawalRecordVo> voList = withdrawalRecordExtService.findWithdrawalRecordList(userId, asset, time);
@@ -67,7 +67,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     public PageResult<WithdrawalRecordVo> queryAllUserHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
         PageResult<WithdrawalRecordVo> result = new PageResult<WithdrawalRecordVo>();
         if (pageNo == null || pageSize == null) {
-            throw new ExException(WithdrawalRecordExtErrorCode.PARAM_EMPTY);
+            throw new ExException(WithdrawalExtError.PARAM_EMPTY);
         }
 
         List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, null, null, null);

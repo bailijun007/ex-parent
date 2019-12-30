@@ -1,7 +1,7 @@
 package com.hp.sh.expv3.pc.extension.api;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
+import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcAccountSymbolExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountSettingVo;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountSymbolVo;

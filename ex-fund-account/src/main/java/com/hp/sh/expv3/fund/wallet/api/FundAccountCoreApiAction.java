@@ -6,6 +6,7 @@ package com.hp.sh.expv3.fund.wallet.api;
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
@@ -33,12 +34,12 @@ public class FundAccountCoreApiAction implements FundAccountCoreApi{
 	}
 
 	@Override
-	public void add(FundAddRequest request) {
+	public void add(@RequestBody FundAddRequest request) {
 		fundAccountCoreService.add(request);
 	}
 
 	@Override
-	public void cut(FundCutRequest request) {
+	public void cut(@RequestBody FundCutRequest request) {
 		fundAccountCoreService.cut(request);
 	}
 

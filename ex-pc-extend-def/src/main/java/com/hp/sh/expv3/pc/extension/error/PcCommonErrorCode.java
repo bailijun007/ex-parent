@@ -1,8 +1,9 @@
-package com.hp.sh.expv3.pc.extension.constant;
+package com.hp.sh.expv3.pc.extension.error;
 
 import com.gitee.hupadev.base.exceptions.ErrorCode;
 
 /**
+ * 03-00-??
  * @author BaiLiJun  on 2019/12/20
  */
 public class PcCommonErrorCode extends ErrorCode {

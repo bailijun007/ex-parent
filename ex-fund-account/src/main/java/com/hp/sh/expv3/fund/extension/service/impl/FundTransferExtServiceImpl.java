@@ -3,7 +3,7 @@ package com.hp.sh.expv3.fund.extension.service.impl;
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.extension.dao.FundTransferExtMapper;
-import com.hp.sh.expv3.fund.extension.error.FundTransferExtErrorCode;
+import com.hp.sh.expv3.fund.extension.error.FundTransferExtError;
 import com.hp.sh.expv3.fund.extension.service.FundTransferExtService;
 import com.hp.sh.expv3.fund.extension.vo.FundTransferExtVo;
 import org.springframework.beans.factory.annotation.Autowired;

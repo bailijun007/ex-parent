@@ -2,8 +2,8 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.error.DepositRecordExtErrorCode;
-import com.hp.sh.expv3.fund.extension.error.FundAccountExtErrorCode;
+import com.hp.sh.expv3.fund.extension.error.DepositExtError;
+import com.hp.sh.expv3.fund.extension.error.FundAccountExtError;
 import com.hp.sh.expv3.fund.extension.service.DepositAddrExtService;
 import com.hp.sh.expv3.fund.extension.service.DepositRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.AddressVo;
@@ -37,7 +37,7 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
                                                      @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
                                                      @RequestParam(value = "pageStatus") Integer pageStatus) {
         if (userId == null || pageSize == null) {
-            throw new ExException(DepositRecordExtErrorCode.PARAM_EMPTY);
+            throw new ExException(DepositExtError.PARAM_EMPTY);
         }
         List<DepositRecordHistoryVo> list = getDepositRecordHistoryVos(userId, asset, queryId, pageSize, pageStatus);
 
@@ -47,7 +47,7 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
     @Override
     public PageResult<DepositRecordHistoryVo> queryAllUserHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageSize == null) {
-            throw new ExException(DepositRecordExtErrorCode.PARAM_EMPTY);
+            throw new ExException(DepositExtError.PARAM_EMPTY);
         }
         PageResult<DepositRecordHistoryVo> result = new PageResult<DepositRecordHistoryVo>();
         List<DepositRecordHistoryVo> list = getAllUserDepositRecordHistoryVos(userId, asset, null, null, null);
