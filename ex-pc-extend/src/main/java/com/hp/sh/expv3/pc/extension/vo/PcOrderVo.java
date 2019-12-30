@@ -8,7 +8,6 @@ package com.hp.sh.expv3.pc.extension.vo;
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 永续合约_订单（委托）
@@ -128,7 +127,7 @@ public class PcOrderVo extends UserDataEntity{
 	/**
 	 * 取消时间
 	 */
-	private Date cancelTime;
+	private Long cancelTime;
 
 	/**
 	 * @deprecated
@@ -357,11 +356,11 @@ public class PcOrderVo extends UserDataEntity{
 		this.triggerFlag = triggerFlag;
 	}
 
-	public Date getCancelTime() {
+	public Long getCancelTime() {
 		return cancelTime;
 	}
 
-	public void setCancelTime(Date cancelTime) {
+	public void setCancelTime(Long cancelTime) {
 		this.cancelTime = cancelTime;
 	}
 

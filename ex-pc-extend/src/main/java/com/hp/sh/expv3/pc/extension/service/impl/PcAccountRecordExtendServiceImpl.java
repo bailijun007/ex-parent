@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +28,7 @@ public class PcAccountRecordExtendServiceImpl implements PcAccountRecordExtendSe
         map.put("id",refId);
         map.put("asset",asset);
         map.put("userId",userId);
-        String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(time));
-        map.put("createdBegin",start);
+        map.put("createdBegin",time);
         PcAccountRecordVo pcAccountRecordVo = pcAccountRecordDAO.queryOne(map);
 
         return pcAccountRecordVo;

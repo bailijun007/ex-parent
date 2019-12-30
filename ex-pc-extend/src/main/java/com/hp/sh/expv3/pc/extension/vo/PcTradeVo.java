@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * @author BaiLiJun  on 2019/12/23
@@ -53,10 +52,10 @@ public class PcTradeVo implements Serializable {
     private Long  tradeTime;
 
     @ApiModelProperty("创建时间")
-    private Date created;
+    private Long created;
 
     @ApiModelProperty("修改时间")
-    private Date modified;
+    private Long modified;
 
     public PcTradeVo() {
     }
@@ -165,19 +164,19 @@ public class PcTradeVo implements Serializable {
         this.tradeTime = tradeTime;
     }
 
-    public Date getCreated() {
+    public Long getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Long created) {
         this.created = created;
     }
 
-    public Date getModified() {
+    public Long getModified() {
         return modified;
     }
 
-    public void setModified(Date modified) {
+    public void setModified(Long modified) {
         this.modified = modified;
     }
 

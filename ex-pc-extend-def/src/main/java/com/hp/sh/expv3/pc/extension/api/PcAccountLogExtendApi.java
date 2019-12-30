@@ -32,7 +32,7 @@ public interface PcAccountLogExtendApi {
     })
     PageResult<PcAccountRecordLogVo> findContractAccountList(@RequestParam(value = "userId", required = true) Long userId, @RequestParam(value = "asset", required = true) String asset,
                                                              @RequestParam(value = "tradeType", required = true) Integer tradeType, @RequestParam(value = "historyType", required = true) Integer historyType,
-                                                             @RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate,
+                                                             @RequestParam(value = "startDate", required = false) Long startDate, @RequestParam(value = "endDate", required = false) Long endDate,
                                                              @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize", required = true) Integer pageSize,
                                                              @RequestParam(value = "symbol", required = true) String symbol);
 

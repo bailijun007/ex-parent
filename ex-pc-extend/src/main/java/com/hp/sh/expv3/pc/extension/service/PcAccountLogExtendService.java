@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public interface PcAccountLogExtendService {
 
-    List<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, String startDate, String endDate, String symbol);
+    List<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol);
     void save(PcAccountLogVo pcAccountLogVo);
 
     PcAccountLogVo getPcAccountLog(PcAccountLogVo pcAccountLogVo);
