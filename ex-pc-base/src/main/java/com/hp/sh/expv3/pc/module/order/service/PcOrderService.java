@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.base.exceptions.CommonError;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
@@ -281,6 +282,9 @@ public class PcOrderService {
 	}
 	
 	private void checkCancelStatus(PcOrder order){
+		if(order==null){
+			throw new ExException(CommonError.OBJ_DONT_EXIST);
+		}
 		if(order.getStatus() == OrderStatus.CANCELED){
 			throw new ExException(OrderError.CANCELED);
 		}

@@ -37,7 +37,7 @@ public interface PcOrderApi {
         @ApiImplicitParam(name = "closeFlag", value = "开/平", example = "0", required = true),
         @ApiImplicitParam(name = "longFlag", value = "是否：1-多仓，0-空仓", example = "1", required = true),
         @ApiImplicitParam(name = "timeInForce", value = "成交有效时间", example = "0", required = true),
-        @ApiImplicitParam(name = "price", value = "价格", example = "5000", required = true),
+        @ApiImplicitParam(name = "price", value = "价格", example = "5500", required = true),
         @ApiImplicitParam(name = "number", value = "数量（张）", example = "10", required = true),
         @ApiImplicitParam(name = "cliOrderId", value = "客户端订单ID", example = "12345", required = true)
     })
