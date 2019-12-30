@@ -5,12 +5,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
+import com.hp.sh.expv3.commons.daoevent.DaoAdvice;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
@@ -41,6 +44,7 @@ import com.hp.sh.expv3.utils.math.BigUtils;
 @Service
 @Transactional(rollbackFor=Exception.class)
 public class PcPositionService {
+	private static final Logger logger = LoggerFactory.getLogger(DaoAdvice.class);
 
 	@Autowired
 	private PcPositionDAO pcPositionDAO;
@@ -141,7 +145,15 @@ public class PcPositionService {
 	
 	private void closeFeeToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeResult, int longFlag) {
 		PcAddRequest request = new PcAddRequest();
-		request.setAmount(tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFeeReceivable()));
+		BigDecimal amount = tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFeeReceivable());
+		if(BigUtils.isZero(amount)){
+			return;
+		}
+		if(BigUtils.ltZero(amount)){
+			logger.error("穿仓。。。。");
+			return;
+		}
+		request.setAmount(amount);
 		request.setUserId(userId);
 		request.setAsset(asset);
 		request.setRemark(String.format("平仓。保证金：%s,收益:%s,手续费：-%s", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getFeeReceivable()));

@@ -4,7 +4,7 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
 
 /**
  * 错误码
- * 
+ * 01-00-??
  * @author wangjg
  *
  */

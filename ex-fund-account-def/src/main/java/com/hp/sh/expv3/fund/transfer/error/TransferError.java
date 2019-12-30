@@ -1,10 +1,10 @@
-package com.hp.sh.expv3.fund.transfer.constant;
+package com.hp.sh.expv3.fund.transfer.error;
 
 import com.gitee.hupadev.base.exceptions.ErrorCode;
 
 /**
  * 现金充提错误码
- * 
+ * 01-02-??
  * @author wangjg
  *
  */
