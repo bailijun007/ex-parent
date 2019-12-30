@@ -55,7 +55,7 @@ public class WorkerConfigBuilder {
 		workerConfig.setDataCenterId(dataCenterId);
 		workerConfig.setServerId(serverId);
 		workerConfig.setSequencConfigs(new ArrayList<SequencConfig>());
-		workerConfig.setSeqIdPairs(new ArrayList<Pair<String, Integer>>());
+		workerConfig.setEntitySeqPairs(new ArrayList<Pair<String, Integer>>());
 		this.set(workerConfig);
 		return workerConfig;
 	}
@@ -73,7 +73,7 @@ public class WorkerConfigBuilder {
 	
 	private void set(WorkerConfig workerConfig, int seqId, String tableUUID){
 		workerConfig.getSequencConfigs().add(new SequencConfig(seqId));
-		workerConfig.getSeqIdPairs().add(Pair.of(tableUUID, seqId));
+		workerConfig.getEntitySeqPairs().add(Pair.of(tableUUID, seqId));
 	}
 	
 }

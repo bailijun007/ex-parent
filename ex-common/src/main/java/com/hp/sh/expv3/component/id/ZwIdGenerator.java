@@ -17,25 +17,25 @@ public class ZwIdGenerator implements IdGenerator{
 	
 	private final Map<Integer, SnowflakeIdWorker> idWorkerMap = new HashMap<Integer, SnowflakeIdWorker>();
 	
-	private final Map<String, Integer> sequenceNameMap = new HashMap<String, Integer>();
+	private final Map<String, Integer> entitySequenceMap = new HashMap<String, Integer>();
 
 	public ZwIdGenerator(WorkerConfig workerConfig) {
-		this(workerConfig.getDataCenterId(), workerConfig.getServerId(), workerConfig.getSequencConfigs(), workerConfig.getSeqIdPairs());
+		this(workerConfig.getDataCenterId(), workerConfig.getServerId(), workerConfig.getSequencConfigs(), workerConfig.getEntitySeqPairs());
 	}
 
-	public ZwIdGenerator(int dataCenterId, int serverId, List<SequencConfig> idSettings, List<Pair<String,Integer>> seqIdPairs) {
+	public ZwIdGenerator(int dataCenterId, int serverId, List<SequencConfig> idSettings, List<Pair<String,Integer>> entityPairs) {
 		for(SequencConfig sequencConfig : idSettings){
 			SnowflakeIdWorker idworker = IdUtil.newIdWorker(sequencConfig.getDataCenterBits(), sequencConfig.getServerBits(), sequencConfig.getIdTypeBits(), sequencConfig.getSequenceBits(), dataCenterId, serverId, 0);
 			idWorkerMap.put(sequencConfig.getSequencId(), idworker);
 		}
-		for(Pair<String,Integer> nameIdPair: seqIdPairs){
-			sequenceNameMap.put(nameIdPair.getKey(), nameIdPair.getValue());
+		for(Pair<String,Integer> nameIdPair: entityPairs){
+			entitySequenceMap.put(nameIdPair.getKey(), nameIdPair.getValue());
 		}
 	}
 
 	@Override
-	public Long nextId(String tableUUID) {
-		Integer seqId = this.sequenceNameMap.get(tableUUID);
+	public Long nextId(String entityId) {
+		Integer seqId = this.entitySequenceMap.get(entityId);
 		SnowflakeIdWorker idworker = idWorkerMap.get(seqId);
 		return idworker.nextId();
 	}

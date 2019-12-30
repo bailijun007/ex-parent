@@ -11,7 +11,7 @@ public class WorkerConfig {
 	
 	private List<SequencConfig> sequencConfigs;
 	
-	private List<Pair<String, Integer>> seqIdPairs;
+	private List<Pair<String, Integer>> entitySeqPairs;
 
 	public int getDataCenterId() {
 		return dataCenterId;
@@ -37,12 +37,12 @@ public class WorkerConfig {
 		this.sequencConfigs = sequencConfigs;
 	}
 
-	public List<Pair<String, Integer>> getSeqIdPairs() {
-		return seqIdPairs;
+	public List<Pair<String, Integer>> getEntitySeqPairs() {
+		return entitySeqPairs;
 	}
 
-	public void setSeqIdPairs(List<Pair<String, Integer>> seqIdPairs) {
-		this.seqIdPairs = seqIdPairs;
+	public void setEntitySeqPairs(List<Pair<String, Integer>> seqIdPairs) {
+		this.entitySeqPairs = seqIdPairs;
 	}
 
 }
