@@ -70,7 +70,7 @@ public interface PcOrderExtendApi {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
-            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
             @ApiImplicitParam(name = "orderType ", value = "委托类型,1:限价,非必填 ,不填为全部类型"),
             @ApiImplicitParam(name = "longFlag", value = "是否：1-多仓，0-空仓", example = "1"),
             @ApiImplicitParam(name = "closeFlag", value = "是否:1-平仓,0-开", example = "1"),
@@ -81,7 +81,7 @@ public interface PcOrderExtendApi {
     })
     List<UserOrderVo> queryHistory(@RequestParam("userId") Long userId,
                                    @RequestParam(value = "asset") String asset,
-                                   @RequestParam("symbol") String symbol,
+                                   @RequestParam(value = "symbol", required = false) String symbol,
                                    @RequestParam(value = "orderType", required = false) Integer orderType,
                                    @RequestParam(value = "longFlag", required = false) Integer longFlag,
                                    @RequestParam(value = "closeFlag", required = false) Integer closeFlag,

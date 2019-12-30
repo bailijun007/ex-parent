@@ -115,7 +115,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     }
 
     private void checkParam(Long userId, String asset, String symbol, Integer currentPage, Integer pageSize, Integer nextPage) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || currentPage == null || pageSize == null || nextPage == null) {
+        if (StringUtils.isEmpty(asset) || null == userId || currentPage == null || pageSize == null || nextPage == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
     }
