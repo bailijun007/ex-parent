@@ -110,6 +110,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 		request.setTradeNo(record.getSn());
 		request.setTradeType(PcAccountTradeType.FUND_TO_PC);
 		request.setUserId(record.getUserId());
+		request.setAssociatedId(record.getId());
 		pcAccountCoreApi.add(request);
 	}
 
