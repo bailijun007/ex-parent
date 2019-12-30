@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.pc.module.position.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
-import com.hp.sh.expv3.commons.daoevent.DaoAdvice;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
@@ -44,7 +42,7 @@ import com.hp.sh.expv3.utils.math.BigUtils;
 @Service
 @Transactional(rollbackFor=Exception.class)
 public class PcPositionService {
-	private static final Logger logger = LoggerFactory.getLogger(DaoAdvice.class);
+	private static final Logger logger = LoggerFactory.getLogger(PcPositionService.class);
 
 	@Autowired
 	private PcPositionDAO pcPositionDAO;
