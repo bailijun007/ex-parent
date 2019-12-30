@@ -48,4 +48,67 @@ public interface PcOrderTradeExtendApi {
             @RequestParam(value = "count", required = true) Integer count);
 
 
+    @ApiOperation(value = "查小于某个时间点的最大的一条记录")
+    @GetMapping(value = "/api/extension/pc/trade/selectLessTimeTrade")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
+            @ApiImplicitParam(name = "statTime ", value = "时间戳", required = false)
+    })
+    PcOrderTradeDetailVo selectLessTimeTrade(
+            @RequestParam(value = "asset", required = false) String asset,
+            @RequestParam(value = "symbol", required = false) String symbol,
+            @RequestParam(value = "statTime", required = false) Long statTime
+    );
+
+
+
+    @ApiOperation(value = "查某个用户的所有成交记录")
+    @GetMapping(value = "/api/extension/pc/trade/selectAllTradeListByUser")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
+            @ApiImplicitParam(name = "userId ", value = "用户id", required = true)
+    })
+    List<PcOrderTradeDetailVo> selectAllTradeListByUser(
+            @RequestParam(value = "asset", required = false) String asset,
+            @RequestParam(value = "symbol", required = false) String symbol,
+            @RequestParam(value = "userId", required = true) Long userId
+    );
+
+
+    @ApiOperation(value = "通过一个时间区间获取数据")
+    @GetMapping(value = "/api/extension/pc/trade/selectTradeListByTimeInterval")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
+            @ApiImplicitParam(name = "statTime ", value = "开始时间", required = false),
+            @ApiImplicitParam(name = "endTime ", value = "结束时间", required = false)
+    })
+    List<PcOrderTradeDetailVo> selectTradeListByTimeInterval(
+            @RequestParam(value = "asset", required = false) String asset,
+            @RequestParam(value = "symbol", required = false) String symbol,
+            @RequestParam(value = "statTime", required = false) Long statTime,
+            @RequestParam(value = "endTime", required = false) Long endTime
+    );
+
+
+
+//    @ApiOperation(value = "查某个时间区间某个用户的成交记录")
+//    @GetMapping(value = "/api/extension/pc/trade/selectTradeListByUser")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+//            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
+//            @ApiImplicitParam(name = "statTime ", value = "开始时间", required = false),
+//            @ApiImplicitParam(name = "endTime ", value = "结束时间", required = false)
+//    })
+//    List<PcOrderTradeDetailVo> selectTradeListByUser(
+//            @RequestParam(value = "asset", required = false) String asset,
+//            @RequestParam(value = "symbol", required = false) String symbol,
+//            @RequestParam(value = "statTime", required = false) Long statTime,
+//            @RequestParam(value = "endTime", required = false) Long endTime
+//    );
+
+
+
 }
