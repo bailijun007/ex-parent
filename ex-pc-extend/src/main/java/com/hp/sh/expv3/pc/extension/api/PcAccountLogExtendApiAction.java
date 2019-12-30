@@ -49,7 +49,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
     private PcOrderExtendService pcOrderExtendService;
 
     @Override
-    public PageResult<PcAccountRecordLogVo> findContractAccountList(Long userId, String asset, Integer tradeType, Integer historyType, String startDate, String endDate, Integer pageNo, Integer pageSize, String symbol) {
+    public PageResult<PcAccountRecordLogVo> findContractAccountList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || tradeType == null || null == userId || historyType == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }

@@ -70,7 +70,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
                 currentPositionVo.setMarginMode(positionVo.getMarginMode());
                 currentPositionVo.setEntryPrice(positionVo.getMeanPrice());
                 currentPositionVo.setLiquidationPrice(positionVo.getLiqPrice());
-                currentPositionVo.setMaintMarginRatio(positionVo.getHoldRatio());
+                currentPositionVo.setMaintMarginRatio(positionVo.getHoldMarginRatio());
                 currentPositionVo.setQty(positionVo.getVolume());
                 currentPositionVo.setBidFlag(positionVo.getLongFlag());
                 currentPositionVo.setAutoIncreaseFlag(positionVo.getAutoAddFlag());

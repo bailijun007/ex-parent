@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +27,7 @@ public class PcLiqRecordExtendServiceImpl implements PcLiqRecordExtendService {
         map.put("asset",asset);
         map.put("symbol",symbol);
         map.put("userId",userId);
-        String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(time));
-        map.put("createdBegin",start);
+        map.put("createdBegin",time);
         PcLiqRecordVo pcLiqRecordVo = pcLiqRecordDAO.queryOne(map);
         return pcLiqRecordVo;
     }

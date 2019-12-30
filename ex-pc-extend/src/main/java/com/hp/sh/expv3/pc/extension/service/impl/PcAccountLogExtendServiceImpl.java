@@ -28,7 +28,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
 
 
     @Override
-    public List<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, String startDate, String endDate, String symbol) {
+    public List<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType,  Long startDate, Long endDate, String symbol) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
@@ -41,10 +41,8 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
                 Date begin = dateFormat.parse(beginDate);
                 map.put("timeBegin", begin.getTime());
             } else if (historyType == 2) {
-                Date begin = dateFormat.parse(startDate);
-                Date end = dateFormat.parse(endDate);
-                map.put("timeBegin", begin.getTime());
-                map.put("timeEnd", end.getTime());
+                map.put("timeBegin", startDate);
+                map.put("timeEnd", endDate);
             }
         } catch (ParseException e) {
             e.printStackTrace();
