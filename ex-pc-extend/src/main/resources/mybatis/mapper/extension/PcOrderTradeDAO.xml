@@ -138,6 +138,9 @@
         <include refid="Base_Column_List"/>
         from pc_order_trade
         <where>
+            <if test="userId!=null">
+                and user_id = #{userId}
+            </if>
             <if test="asset!=null and asset!=''">
                 and asset=#{asset}
             </if>

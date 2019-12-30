@@ -53,7 +53,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         List<String> symbolList = Arrays.asList(symbol.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
         List<Integer> statusList = Arrays.asList(status.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
         List<PcOrderVo> list = pcOrderExtendService.queryOrderList(userId, assetList, symbolList, gtOrderId, ltOrderId, count, statusList);
-        getOrderList(result, list);
+        convertOrderList(result, list);
 
         return result;
     }
@@ -65,7 +65,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         PageResult<UserOrderVo> result = new PageResult<>();
         List<UserOrderVo> list = new ArrayList<>();
         List<PcOrderVo> voList = pcOrderExtendService.queryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage);
-        getOrderList(list, voList);
+        convertOrderList(list, voList);
 
         result.setList(list);
         if (isTotalNumber == 1) {
@@ -74,7 +74,12 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         return result;
     }
 
-    private void getOrderList(List<UserOrderVo> list, List<PcOrderVo> voList) {
+    /**
+     * 转换成结果集返回
+     * @param list 最终返回的结果集
+     * @param voList 需要转换的list集合
+     */
+    private void convertOrderList(List<UserOrderVo> list, List<PcOrderVo> voList) {
         if (!CollectionUtils.isEmpty(voList)) {
             for (PcOrderVo orderVo : voList) {
                 UserOrderVo vo = new UserOrderVo();
@@ -101,7 +106,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
         List<PcOrderVo> list = pcOrderExtendService.queryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage);
-        getOrderList(result, list);
+        convertOrderList(result, list);
         return result;
     }
 
@@ -110,7 +115,17 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
         List<PcOrderVo> list = pcOrderExtendService.queryOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage);
-        getOrderList(result, list);
+        convertOrderList(result, list);
+        return result;
+    }
+
+    @Override
+    public PageResult<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag, Integer pageNo, Integer pageSize) {
+        PageResult<UserOrderVo> result=new PageResult();
+        List<UserOrderVo> list = new ArrayList<>();
+        List<PcOrderVo> voList = pcOrderExtendService.queryOrderList(userId,asset,symbol,status,closeFlag);
+        convertOrderList(list, voList);
+
         return result;
     }
 
