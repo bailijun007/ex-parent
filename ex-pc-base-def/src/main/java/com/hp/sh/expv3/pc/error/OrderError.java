@@ -21,6 +21,12 @@ public class OrderError extends ErrorCode {
 	
 	public static final OrderError NOT_ACTIVE = new OrderError(020104, "订单已经已结束!");
 	
+	public static final OrderError BANKRUPT_PRICE = new OrderError(020105, "平仓委托价格不能低于破产价!");
+
+	public static final OrderError POS_LIQ = new OrderError(020106, "仓位强平中!");
+	
+	public static final OrderError POS_LIQED = new OrderError(020106, "仓位已强平!");
+	
 	private OrderError(int code, String message) {
 		super(code, message);
 	}

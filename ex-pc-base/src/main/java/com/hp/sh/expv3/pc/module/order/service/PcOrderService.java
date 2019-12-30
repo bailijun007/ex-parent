@@ -17,6 +17,7 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.dev.CrossDB;
+import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -33,6 +34,7 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
+import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
@@ -72,6 +74,9 @@ public class PcOrderService {
 	@Autowired
 	private PcPositionService pcPositionService;
 	
+    @Autowired
+    private HoldPosStrategy holdPosStrategy;
+	
 	@Autowired
 	private PcOrderService self;
     
@@ -102,9 +107,12 @@ public class PcOrderService {
 //			throw new ExException(OrderError.CREATED);
 //		}
 		
-		//check 检查可平仓位
 		if(closeFlag==OrderFlag.ACTION_CLOSE){
+			this.checkLiqStatus(pos);
+			// 检查可平仓位
 			this.checkClosablePosition(pos, number);
+			// 检查价格
+			this.checkPrice(pos, price);
 		}
 		
 		Long now = DbDateUtils.now();
@@ -158,6 +166,23 @@ public class PcOrderService {
 		return pcOrder;
 	}
 	
+	private void checkLiqStatus(PcPosition pos) {
+		if(pos.getLiqStatus() == LiqStatus.FROZEN){
+			throw new ExException(OrderError.POS_LIQ);
+		}
+		if(pos.getLiqStatus() == LiqStatus.FORCE_CLOSE){
+			throw new ExException(OrderError.POS_LIQED);
+		}
+	}
+
+	private void checkPrice(PcPosition pos, BigDecimal price) {
+		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
+		BigDecimal bankruptPrice = this.holdPosStrategy.calcBankruptPrice(pos.getLongFlag(), pos.getMeanPrice(), _amount, pos.getPosMargin());
+		if(BigUtils.lt(price, bankruptPrice)){
+			throw new ExException(OrderError.BANKRUPT_PRICE);
+		}
+	}
+
 	private boolean existClientOrderId(long userId, String clientOrderId) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("userId", userId);
@@ -241,6 +266,10 @@ public class PcOrderService {
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
 		
 		this.checkCancelStatus(order);
+		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
+			PcPosition pos = this.pcPositionService.getPosition(userId, asset, symbol, order.getClosePosId());
+			this.checkLiqStatus(pos);	
+		}
 
 		long count = this.pcOrderDAO.updateCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now);
 		

@@ -368,5 +368,9 @@ public class PcPositionService {
 		this.handleTradeOrder(makerTradeVo);
 		
 	}
+
+	public PcPosition getPosition(long userId, String asset, String symbol, Long id) {
+		return this.pcPositionDAO.findById(userId, id);
+	}
 	
 }

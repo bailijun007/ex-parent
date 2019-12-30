@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.pc.module.position.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.TimeInForce;
 import com.hp.sh.expv3.pc.job.LiqHandleResult;
-import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcLiqRecordDAO;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
@@ -58,9 +56,6 @@ public class PcLiqService {
     @Autowired
     private PcPositionDAO pcPositionDAO;
     
-	@Autowired
-	private PcOrderDAO pcOrderDAO;
-	
 	@Autowired
 	private FeeRatioService feeRatioService;
     
