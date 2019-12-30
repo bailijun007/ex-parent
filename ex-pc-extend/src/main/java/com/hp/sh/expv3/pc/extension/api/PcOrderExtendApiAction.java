@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.hp.sh.expv3.dev.CrossDB;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +77,8 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
 
     /**
      * 转换成结果集返回
-     * @param list 最终返回的结果集
+     *
+     * @param list   最终返回的结果集
      * @param voList 需要转换的list集合
      */
     private void convertOrderList(List<UserOrderVo> list, List<PcOrderVo> voList) {
@@ -120,12 +122,9 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     }
 
     @Override
-    public PageResult<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag, Integer pageNo, Integer pageSize) {
-        PageResult<UserOrderVo> result=new PageResult();
-        List<UserOrderVo> list = new ArrayList<>();
-        List<PcOrderVo> voList = pcOrderExtendService.queryOrderList(userId,asset,symbol,status,closeFlag);
-        convertOrderList(list, voList);
-
+    @CrossDB
+    public PageResult<UserOrderVo> pageQueryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag, Long orderId, Integer pageNo, Integer pageSize) {
+        PageResult<UserOrderVo> result = pcOrderExtendService.pageQueryOrderList(userId, asset, symbol, status, closeFlag, orderId, pageNo, pageSize);
         return result;
     }
 

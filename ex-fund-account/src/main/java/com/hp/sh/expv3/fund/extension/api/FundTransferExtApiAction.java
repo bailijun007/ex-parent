@@ -2,6 +2,7 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import com.hp.sh.expv3.fund.extension.error.FundTransferExtError;
 import com.hp.sh.expv3.fund.extension.error.AddressExtError;
 import com.hp.sh.expv3.fund.extension.service.FundTransferExtService;
@@ -26,7 +27,7 @@ public class FundTransferExtApiAction implements FundTransferExtApi {
     @Override
     public List<FundTransferExtVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         if (userId == null || pageSize == null || pageStatus == null) {
-            throw new ExException(FundTransferExtError.PARAM_EMPTY);
+            throw new ExException(FundCommonError.PARAM_EMPTY);
         }
 
         return fundTransferExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
@@ -35,7 +36,7 @@ public class FundTransferExtApiAction implements FundTransferExtApi {
     @Override
     public PageResult<FundTransferExtVo> queryAllUserHistory(Long userId, String asset, Integer pageSize, Integer pageNo) {
         if (pageSize == null || pageNo == null) {
-            throw new ExException(FundTransferExtError.PARAM_EMPTY);
+            throw new ExException(FundCommonError.PARAM_EMPTY);
         }
         PageResult<FundTransferExtVo> result = new PageResult();
         List<FundTransferExtVo> list = fundTransferExtService.queryAllUserHistory(userId, asset);

@@ -7,7 +7,6 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
  * @author BaiLiJun  on 2019/12/16
  */
 public class WithdrawalExtError extends ErrorCode {
-    public static final WithdrawalExtError PARAM_EMPTY = new WithdrawalExtError(8200, "缺少必填参数!");
 
 
 
