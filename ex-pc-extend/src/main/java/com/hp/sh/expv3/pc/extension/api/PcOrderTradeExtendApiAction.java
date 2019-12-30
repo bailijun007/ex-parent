@@ -103,7 +103,18 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
     @Override
     public List<PcOrderTradeDetailVo> selectTradeListByTimeInterval(String asset, String symbol, Long statTime, Long endTime) {
         List<PcOrderTradeDetailVo> result = new ArrayList<>();
-        List<PcOrderTradeVo> voList = pcOrderTradeService.selectTradeListByTimeInterval(asset, symbol, statTime,endTime);
+        List<PcOrderTradeVo> voList = pcOrderTradeService.selectTradeListByTimeInterval(asset, symbol, statTime,endTime,null);
+        this.toResult(result,voList);
+        return result;
+    }
+
+    @Override
+    public List<PcOrderTradeDetailVo> selectTradeListByUser(String asset, String symbol, Long userId, Long statTime, Long endTime) {
+        if (userId == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        List<PcOrderTradeDetailVo> result = new ArrayList<>();
+        List<PcOrderTradeVo> voList = pcOrderTradeService.selectTradeListByTimeInterval(asset, symbol, statTime,endTime,userId);
         this.toResult(result,voList);
         return result;
     }

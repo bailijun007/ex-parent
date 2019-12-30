@@ -22,5 +22,5 @@ public interface PcOrderTradeExtendService {
 
     List<PcOrderTradeVo> selectAllTradeListByUser(String asset, String symbol, Long userId);
 
-    List<PcOrderTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long statTime, Long endTime);
+    List<PcOrderTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long statTime, Long endTime,Long userId);
 }

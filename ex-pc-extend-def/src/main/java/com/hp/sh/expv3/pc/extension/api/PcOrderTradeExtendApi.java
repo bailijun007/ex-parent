@@ -94,20 +94,22 @@ public interface PcOrderTradeExtendApi {
 
 
 
-//    @ApiOperation(value = "查某个时间区间某个用户的成交记录")
-//    @GetMapping(value = "/api/extension/pc/trade/selectTradeListByUser")
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
-//            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
-//            @ApiImplicitParam(name = "statTime ", value = "开始时间", required = false),
-//            @ApiImplicitParam(name = "endTime ", value = "结束时间", required = false)
-//    })
-//    List<PcOrderTradeDetailVo> selectTradeListByUser(
-//            @RequestParam(value = "asset", required = false) String asset,
-//            @RequestParam(value = "symbol", required = false) String symbol,
-//            @RequestParam(value = "statTime", required = false) Long statTime,
-//            @RequestParam(value = "endTime", required = false) Long endTime
-//    );
+    @ApiOperation(value = "查某个时间区间某个用户的成交记录")
+    @GetMapping(value = "/api/extension/pc/trade/selectTradeListByUser")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
+            @ApiImplicitParam(name = "userId ", value = "用户id", required = true),
+            @ApiImplicitParam(name = "statTime ", value = "开始时间", required = false),
+            @ApiImplicitParam(name = "endTime ", value = "结束时间", required = false)
+    })
+    List<PcOrderTradeDetailVo> selectTradeListByUser(
+            @RequestParam(value = "asset", required = false) String asset,
+            @RequestParam(value = "symbol", required = false) String symbol,
+            @RequestParam(value = "userId", required = false) Long userId,
+            @RequestParam(value = "statTime", required = false) Long statTime,
+            @RequestParam(value = "endTime", required = false) Long endTime
+    );
 
 
 

@@ -160,8 +160,9 @@
                     #{symbolList[${i}]}
                 </foreach>
             </if>
-            <if test="userId!=null">and user_id=#{userId}</if>
-
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
             <if test="gtOrderId!=null">
                 and id &gt;#{gtOrderId}
                 ORDER BY id asc
