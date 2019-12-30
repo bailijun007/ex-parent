@@ -50,7 +50,7 @@ public class MatchMqSender extends BaseMqSender{
 	}
 
 	public void sendBookResetMsg(BookResetMsg msg) {
-	    this.sendOrderMsg(msg, MqTags.TAGS_PC_BOOK_RESET, null);
+	    this.sendOrderMsg(msg, MqTags.TAGS_PC_BOOK_RESET, MqTags.TAGS_PC_BOOK_RESET);
 	}
 
 }
