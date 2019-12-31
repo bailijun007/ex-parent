@@ -1,5 +1,7 @@
 package com.hp.sh.expv3;
 
+import com.hp.sh.expv3.match.config.setting.PcmatchIdSetting;
+import com.hp.sh.expv3.match.config.setting.PcmatchSetting;
 import com.hp.sh.expv3.match.match.core.match.thread.impl.PcOrderSnapshotCreateTriggerThread;
 import com.hp.sh.expv3.match.match.core.order.OrderInitializer;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
@@ -32,6 +34,7 @@ import java.util.concurrent.Executor;
 @SpringBootApplication
 @EnableScheduling
 public class ExMatchApplication extends Application implements ApplicationContextAware {
+
     private static final Logger logger = LoggerFactory.getLogger(ExMatchApplication.class);
 
     @Autowired
@@ -45,9 +48,13 @@ public class ExMatchApplication extends Application implements ApplicationContex
     private OrderInitializer orderInitializer;
 
     @Value("${rmq.nameSpace}")
-    private String x;
+    private String nameSpace;
     @Value("${suffix}")
     private String suffix;
+    @Autowired
+    private PcmatchIdSetting pcmatchIdSetting;
+    @Autowired
+    private PcmatchSetting pcmatchSetting;
 
     public static void main(String[] args) {
         Thread.currentThread().setName("PcMatchMain");
@@ -58,14 +65,14 @@ public class ExMatchApplication extends Application implements ApplicationContex
 
         ExMatchApplication main = ac.getBean(ExMatchApplication.class);
 
-        System.out.println(main.x);
-        System.out.println(main.suffix);
-
         main.run();
     }
 
     @Override
     protected void onStart() {
+
+        logger.info("nameSpace:{},suffix:{},matchGroupId:{},serverId:{}", nameSpace, suffix, pcmatchSetting.getMatchGroupId(), pcmatchIdSetting.getServerId());
+
         orderInitializer.start(true);
         threadManagerPcMatchedImpl.waitAllReady();
         threadManagerPcMatchImpl.waitAllReady();
