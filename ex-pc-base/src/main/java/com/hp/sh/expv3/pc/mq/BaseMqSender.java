@@ -35,8 +35,7 @@ public class BaseMqSender {
 	protected void send(Message mqMsg) {
 		try {
 	        SendResult sendResult = producer.send(mqMsg, new OrderMessageQueueSelector(), 0);
-	        System.out.printf("%s%n", sendResult);
-	        logger.info("send msg:{}-{}", mqMsg.getTags(),sendResult.toString());
+	        logger.info("send msg:{}-{}-{}", mqMsg.getTags(), mqMsg.getKeys(),sendResult.toString());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

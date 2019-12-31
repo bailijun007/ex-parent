@@ -168,6 +168,9 @@ public class PcOrderService {
 	}
 	
 	private void checkLiqStatus(PcPosition pos) {
+		if(pos==null){
+			return;
+		}
 		if(pos.getLiqStatus() == LiqStatus.FROZEN){
 			throw new ExException(OrderError.POS_LIQ);
 		}

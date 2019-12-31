@@ -4,6 +4,7 @@
 package com.hp.sh.expv3.fund.cash.component;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +17,11 @@ import com.hp.sh.chainserver.client.AddressResponse;
 import com.hp.sh.chainserver.client.ChainClient;
 import com.hp.sh.chainserver.client.CheckAddressRequest;
 import com.hp.sh.chainserver.client.CheckAddressResponse;
+import com.hp.sh.chainserver.client.NotifyCreateParams;
+import com.hp.sh.chainserver.client.NotifyResultParams;
 import com.hp.sh.chainserver.client.WithDrawRequest;
 import com.hp.sh.chainserver.client.WithDrawResponse;
+import com.hp.sh.chainserver.utils.ChainUtil;
 
 /**
  * @author wangjg
@@ -31,6 +35,9 @@ public class ExChainService{
 	
 	@Value("${bys.client.merchantId}")
 	private String merchantId;
+	
+	@Value("${bys.client.secret}")
+	private String secret;
 	
 	private ChainClient chainClient;
 	
@@ -72,7 +79,18 @@ public class ExChainService{
 		if(this.chainClient==null){
 			this.chainClient = new ChainClient();
 			this.chainClient.setApiServer(apiHost);
+			this.chainClient.setSecret(secret);
 		}
 		return chainClient;
+	}
+	
+	public NotifyCreateParams getCreateParams(Map map){
+		NotifyCreateParams cp = ChainUtil.getCreateParams(map, secret);
+		return cp;
+	}
+	
+	public NotifyResultParams getNotifyParams(Map map){
+		NotifyResultParams np = ChainUtil.getNotifyParams(map, secret);
+		return np;
 	}
 }
