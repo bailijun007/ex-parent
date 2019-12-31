@@ -75,7 +75,7 @@ public class LiqLockMsg extends BaseSymbolMsg{
 	}
 
 	public String keys() {
-		return "[accountId=" + accountId + ", asset=" + asset + ", symbol=" + symbol + "]";
+		return ""+this.posId;
 	}
 
 	@Override

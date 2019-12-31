@@ -140,7 +140,7 @@ public class DepositService {
 		addRequest.setAsset(rr.getAsset());
 		addRequest.setAmount(rr.getAmount());
 		addRequest.setRemark("充值:"+ PayChannel.getName(rr.getChannelId()));
-		addRequest.setTradeNo(rr.getSn());
+		addRequest.setTradeNo(SnUtils.genSynchAddSn(rr.getSn()));
 		addRequest.setTradeType(TradeType.DEPOSIT);
 		addRequest.setUserId(rr.getUserId());
 		fundAccountCoreApi.add(addRequest);
