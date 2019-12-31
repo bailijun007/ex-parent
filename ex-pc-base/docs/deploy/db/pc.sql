@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50599
 File Encoding         : 65001
 
-Date: 2019-12-27 19:41:23
+Date: 2020-01-01 00:02:31
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -24,10 +24,9 @@ CREATE TABLE `pc_account` (
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产类型' ,
 `balance`  decimal(50,30) NOT NULL COMMENT '余额' ,
 `version`  bigint(20) NOT NULL COMMENT '版本' ,
-`modified`  bigint NOT NULL COMMENT '创建时间' ,
-`created`  bigint NOT NULL COMMENT '创建时间' ,
-PRIMARY KEY (`user_id`, `asset`),
-UNIQUE INDEX `un_user_asset` (`user_id`, `asset`) USING BTREE 
+`modified`  bigint(20) NOT NULL COMMENT '创建时间' ,
+`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
+PRIMARY KEY (`user_id`, `asset`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
@@ -40,7 +39,7 @@ COMMENT='用户资金账户'
 -- ----------------------------
 DROP TABLE IF EXISTS `pc_account_log`;
 CREATE TABLE `pc_account_log` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT ,
+`id`  bigint(20) NOT NULL ,
 `type`  int(11) NOT NULL COMMENT '事件类型' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户Id' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
@@ -53,7 +52,6 @@ ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='账户日志'
 
-
 ;
 
 -- ----------------------------
@@ -61,7 +59,7 @@ COMMENT='账户日志'
 -- ----------------------------
 DROP TABLE IF EXISTS `pc_account_record`;
 CREATE TABLE `pc_account_record` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint(20) NOT NULL COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `sn`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '流水号' ,
@@ -74,15 +72,13 @@ CREATE TABLE `pc_account_record` (
 `serial_no`  bigint(20) NOT NULL COMMENT '序号:' ,
 `associated_id`  bigint(20) NULL DEFAULT NULL COMMENT '关联对象的ID' ,
 `request_id`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '请求ID' ,
-`created`  bigint NOT NULL COMMENT '创建时间' ,
-`modified`  bigint NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`),
-UNIQUE INDEX `un_sn` (`sn`) USING BTREE 
+`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
+`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
+PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_账户明细'
-
 
 ;
 
@@ -91,7 +87,7 @@ COMMENT='永续合约_账户明细'
 -- ----------------------------
 DROP TABLE IF EXISTS `pc_account_symbol`;
 CREATE TABLE `pc_account_symbol` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint(20) NOT NULL COMMENT '主键' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
 `margin_mode`  int(11) NOT NULL COMMENT '保证金模式,' ,
@@ -102,15 +98,13 @@ CREATE TABLE `pc_account_symbol` (
 `cross_leverage`  decimal(10,0) NOT NULL COMMENT '全仓杠杆' ,
 `version`  bigint(20) NOT NULL COMMENT '版本' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`created`  bigint NOT NULL COMMENT '创建时间' ,
-`modified`  bigint NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`),
-UNIQUE INDEX `user_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE 
+`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
+`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
+PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_账户设置'
-
 
 ;
 
@@ -119,7 +113,7 @@ COMMENT='永续合约_账户设置'
 -- ----------------------------
 DROP TABLE IF EXISTS `pc_liq_record`;
 CREATE TABLE `pc_liq_record` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint(20) NOT NULL COMMENT '主键' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
 `pos_id`  bigint(20) NOT NULL COMMENT '仓位ID' ,
@@ -132,14 +126,13 @@ CREATE TABLE `pc_liq_record` (
 `fee`  decimal(50,30) NOT NULL COMMENT '手续费' ,
 `fee_ratio`  decimal(10,4) NOT NULL COMMENT '手续费率' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`created`  bigint NOT NULL COMMENT '创建时间' ,
-`modified`  bigint NOT NULL COMMENT '修改时间' ,
+`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
+`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
 PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_仓位'
-
 
 ;
 
@@ -148,7 +141,7 @@ COMMENT='永续合约_仓位'
 -- ----------------------------
 DROP TABLE IF EXISTS `pc_order`;
 CREATE TABLE `pc_order` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint(20) NOT NULL COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
@@ -174,24 +167,21 @@ CREATE TABLE `pc_order` (
 `close_pos_id`  bigint(20) NULL DEFAULT NULL COMMENT '平仓委托对应的仓位Id' ,
 `time_in_force`  int(11) NULL DEFAULT NULL COMMENT '委托有效时间' ,
 `trigger_flag`  int(11) NULL DEFAULT NULL COMMENT '是否已触发，用于止盈止损等触发式委托' ,
-`cancel_time`  bigint NULL DEFAULT NULL COMMENT '取消时间' ,
+`cancel_time`  bigint(20) NULL DEFAULT NULL COMMENT '取消时间' ,
 `visible_flag`  int(11) NULL DEFAULT NULL COMMENT '可见性，强平委托，自动减仓委托 都不可见' ,
 `liq_flag`  int(11) NOT NULL COMMENT '是否强平委托' ,
 `active_flag`  int(11) NOT NULL COMMENT '是否活动委托' ,
 `create_operator`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `cancel_operator`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `remark`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注' ,
-`client_order_id`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '客户自定义委托ID，用于与客户系统关联 （open api）' ,
-`created`  bigint NOT NULL COMMENT '创建时间' ,
-`modified`  bigint NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`),
-INDEX `idx_userid_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE ,
-INDEX `idx_created` (`created`) USING BTREE 
+`client_order_id`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户自定义委托ID，用于与客户系统关联 （open api）' ,
+`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
+`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
+PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_订单（委托）'
-
 
 ;
 
@@ -200,7 +190,7 @@ COMMENT='永续合约_订单（委托）'
 -- ----------------------------
 DROP TABLE IF EXISTS `pc_order_trade`;
 CREATE TABLE `pc_order_trade` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint(20) NOT NULL COMMENT '主键' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
 `order_id`  bigint(20) NOT NULL COMMENT '订单ID' ,
@@ -216,15 +206,14 @@ CREATE TABLE `pc_order_trade` (
 `fee`  decimal(50,30) NOT NULL COMMENT '手续费' ,
 `pnl`  decimal(50,30) NOT NULL COMMENT '盈亏(此次成交的盈亏)' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`created`  bigint NOT NULL COMMENT '创建时间' ,
-`modified`  bigint NOT NULL COMMENT '修改时间' ,
+`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
+`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
 `remain_volume`  decimal(10,0) NULL DEFAULT NULL COMMENT '未成交量' ,
 PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_用户订单成交记录'
-
 
 ;
 
@@ -233,7 +222,7 @@ COMMENT='永续合约_用户订单成交记录'
 -- ----------------------------
 DROP TABLE IF EXISTS `pc_position`;
 CREATE TABLE `pc_position` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint(20) NOT NULL COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
@@ -258,16 +247,13 @@ CREATE TABLE `pc_position` (
 `liq_mark_price`  decimal(50,30) NULL DEFAULT NULL COMMENT '强平' ,
 `liq_mark_time`  bigint(20) NULL DEFAULT NULL COMMENT '触发强平的标记时间' ,
 `liq_status`  int(11) NULL DEFAULT NULL COMMENT '仓位强平状态，0：未触发平仓，1：仓位被冻结，' ,
-`created`  bigint NOT NULL COMMENT '创建时间' ,
-`modified`  bigint NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`),
-INDEX `idx_userid_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE ,
-INDEX `idx_volume` (`volume`) USING BTREE 
+`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
+`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
+PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_仓位'
-
 
 ;
 
@@ -299,3 +285,30 @@ DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_成交(撮合结果)'
 
 ;
+
+-- ----------------------------
+-- Indexes structure for table pc_account
+-- ----------------------------
+CREATE UNIQUE INDEX `un_user_asset` ON `pc_account`(`user_id`, `asset`) USING BTREE ;
+
+-- ----------------------------
+-- Indexes structure for table pc_account_record
+-- ----------------------------
+CREATE UNIQUE INDEX `un_sn` ON `pc_account_record`(`sn`) USING BTREE ;
+
+-- ----------------------------
+-- Indexes structure for table pc_account_symbol
+-- ----------------------------
+CREATE UNIQUE INDEX `user_asset_symbol` ON `pc_account_symbol`(`user_id`, `asset`, `symbol`) USING BTREE ;
+
+-- ----------------------------
+-- Indexes structure for table pc_order
+-- ----------------------------
+CREATE INDEX `idx_userid_asset_symbol` ON `pc_order`(`user_id`, `asset`, `symbol`) USING BTREE ;
+CREATE INDEX `idx_created` ON `pc_order`(`created`) USING BTREE ;
+
+-- ----------------------------
+-- Indexes structure for table pc_position
+-- ----------------------------
+CREATE INDEX `idx_userid_asset_symbol` ON `pc_position`(`user_id`, `asset`, `symbol`) USING BTREE ;
+CREATE INDEX `idx_volume` ON `pc_position`(`volume`) USING BTREE ;
