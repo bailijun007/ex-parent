@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.pc.mq;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -43,10 +42,8 @@ public class OrderlyConsumer {
 	@Value("${pc.mq.consumer.contractGroup}")
 	private Integer contractGroup;
 	
-	DefaultMQPushConsumer consumer;
-	
 	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
-        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup());
+        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic);
         
         consumer.setNamesrvAddr(setting.getNamesrvAddr());
         consumer.setNamespace(setting.getNamespace());
@@ -91,7 +88,6 @@ public class OrderlyConsumer {
 		for(PcContractVO pc : pcList){
 			if(contractGroup.equals(pc.getContractGroup())){
 				this.buildConsumer(MqTopic.getMatchTopic(pc.getAsset(), pc.getSymbol()));
-		        break;
 			}
 	        logger.info("Consumer Started. asset={}, symbol={}", pc.getAsset(), pc.getSymbol());
 		}

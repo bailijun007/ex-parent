@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.fund.transfer.mq;
+package com.hp.sh.expv3.fund.cash.mq;
 
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -14,8 +14,8 @@ import com.gitee.hupadev.commons.json.JsonUtils;
 import com.hp.sh.expv3.fund.transfer.constant.MQConstant;
 
 @Component
-public class MqSender {
-	private static final Logger logger = LoggerFactory.getLogger(MqSender.class);
+public class WithDrawalSender {
+	private static final Logger logger = LoggerFactory.getLogger(WithDrawalSender.class);
 	
 	@Value("${hp.rocketmq.namesrvAddr}")
 	private String namesrvAddr;
@@ -25,14 +25,14 @@ public class MqSender {
 	
     private DefaultMQProducer producer;
     
-	public MqSender() {
+	public WithDrawalSender() {
 	}
-	
-	public void send(Object msg){
+
+	public void send(WithDrawalMsg msg){
 		try{
 			String json = JsonUtils.toJson(msg);
 	        byte[] msgBuff = json.getBytes(RemotingHelper.DEFAULT_CHARSET);
-			Message mqMsg = new Message(MQConstant.TRANSFER, msg.getClass().getSimpleName(), msgBuff);
+			Message mqMsg = new Message(MQConstant.WITHDRAWAL, msg.getClass().getSimpleName(), msgBuff);
 	        SendResult sendResult = producer().send(mqMsg);
 	        System.out.printf("%s%n", sendResult);
 		}catch(Exception e){

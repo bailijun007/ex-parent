@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PLPayService {
 
-	@Value("${plpay.server.host}")
+	@Value("${plpay.server.host:}")
 	private String apiHost;
 	
 	

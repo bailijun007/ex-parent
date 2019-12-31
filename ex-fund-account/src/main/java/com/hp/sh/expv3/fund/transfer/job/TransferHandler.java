@@ -31,7 +31,7 @@ public class TransferHandler {
 	/**
 	 * 处理已付款，未同步余额的记录
 	 */
-    @MQListener(group=MQConstant.GROUP, topic = MQConstant.TOPIC)
+    @MQListener(group=MQConstant.GROUP1, topic = MQConstant.TRANSFER)
 	public void handleOnePendingSynch(NewTransfer msg) {
 		fundTransferCoreApi.handleOne(msg.getUserId(), msg.getId());
 	}

@@ -12,11 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
 import com.hp.sh.expv3.fund.cash.constant.PayChannel;
 import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.cash.dao.WithdrawalRecordDAO;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
+import com.hp.sh.expv3.fund.cash.mq.WithDrawalSender;
+import com.hp.sh.expv3.fund.cash.mq.WithDrawalMsg;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
@@ -38,6 +41,8 @@ public class WithdrawalService {
 
 	@Autowired
 	private WithdrawalRecordDAO withdrawalRecordDAO;
+	@Autowired
+	private WithDrawalSender mqSender;
 
 	public void createWithdrawal(Long userId, String asset, String account, BigDecimal amount, String transactionId, Integer channelId) {
 		
@@ -74,6 +79,9 @@ public class WithdrawalService {
 		record.setModified(DbDateUtils.now());
 		this.withdrawalRecordDAO.update(record);
 		this.cutBalance(record);
+		
+		//发消息
+		mqSender.send(new WithDrawalMsg(record.getUserId(), record.getId()));
 		return record;
 	}
 	
@@ -114,6 +122,7 @@ public class WithdrawalService {
 		this.returnBalance(rr);
 	}
 	
+	@CrossDB
 	public List<WithdrawalRecord> findPendingWithDrawal(Page page) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", page);
@@ -121,6 +130,11 @@ public class WithdrawalService {
 		params.put("payStatus", PaymentStatus.PENDING);
 		List<WithdrawalRecord> list = this.withdrawalRecordDAO.queryList(params);
 		return list;
+	}
+	
+	public WithdrawalRecord getWithdrawal(Long userId, Long id){
+		WithdrawalRecord record = this.withdrawalRecordDAO.findById(userId, id);
+		return record;
 	}
 
 	int _______同步余额_________; //因为是同库，使用本地事务

@@ -15,7 +15,10 @@ import com.hp.sh.chainserver.client.WithDrawResponse;
 import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
+import com.hp.sh.expv3.fund.cash.mq.WithDrawalMsg;
 import com.hp.sh.expv3.fund.cash.service.complex.WithdrawalService;
+import com.hp.sh.expv3.fund.transfer.constant.MQConstant;
+import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
 @EnableScheduling
@@ -46,6 +49,12 @@ public class WithdrawalPayJob {
 				this.handleOne(record);
 			}
 		}
+	}
+	
+    @MQListener(group=MQConstant.GROUP2, topic = MQConstant.WITHDRAWAL)
+	public void handleOnePendingSynch(WithDrawalMsg msg) {
+		WithdrawalRecord record = withdrawalService.getWithdrawal(msg.getUserId(), msg.getId());
+		this.handleOne(record);
 	}
 	
 	private void handleOne(WithdrawalRecord record){
