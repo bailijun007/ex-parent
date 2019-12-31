@@ -184,10 +184,12 @@ public enum EventEnum implements EnumDescribe {
     public static Map<Integer, EventEnum> code2Enum = EnumSet.allOf(EventEnum.class).stream().collect(Collectors
             .toMap(vo -> vo.getCode(), Function.identity(), (oldValue, newValue) -> newValue));
 
+    @Override
     public int getCode() {
         return this.code;
     }
 
+    @Override
     public String getConstant() {
         return this.constant;
     }

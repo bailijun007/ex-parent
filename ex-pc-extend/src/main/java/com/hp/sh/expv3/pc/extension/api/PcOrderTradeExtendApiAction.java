@@ -40,11 +40,18 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         return result;
     }
 
+    /**
+     * 查询成交记录
+     * @param asset 资产
+     * @param symbol    交易对
+     * @param gtTradeId  请求大于trade_id的数据
+     * @param ltTradeId 请求小于trade_id的数据
+     * @param count 返回条数
+     * @return
+     */
     @Override
     public List<PcOrderTradeDetailVo> queryTradeRecord(String asset, String symbol, Long gtTradeId, Long ltTradeId, Integer count) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || count == null) {
-            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
-        }
+        checkParam(asset, symbol, count);
         //如果同时传了gtTradeId和ltTradeId 则以gtOrderId为查询条件，同时不传，则查全部
         if (gtTradeId != null && ltTradeId != null) {
             ltTradeId = null;
@@ -57,6 +64,35 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         this.toResult(result, voList);
 
         return result;
+    }
+
+    /**
+     * 查询最新成交记录
+     * @param asset 资产
+     * @param symbol  交易对
+     * @param count 返回条数，最大100条
+     * @return
+     */
+    @Override
+    public List<PcOrderTradeDetailVo> queryLastTradeRecord(String asset, String symbol, Integer count) {
+        checkParam(asset, symbol, count);
+
+        List<PcOrderTradeDetailVo> result = new ArrayList<>();
+        List<PcOrderTradeVo> voList = pcOrderTradeService.queryLastTradeRecord(asset, symbol, count);
+        //封装结果集
+        this.toResult(result, voList);
+
+        return result;
+    }
+
+    private void checkParam(String asset, String symbol, Integer count) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || count == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        if(count>100){
+            throw new ExException(PcCommonErrorCode.MORE_THAN_MAX_ROW);
+        }
+
     }
 
 

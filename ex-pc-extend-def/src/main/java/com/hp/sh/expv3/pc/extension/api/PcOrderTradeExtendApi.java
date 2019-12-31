@@ -48,6 +48,20 @@ public interface PcOrderTradeExtendApi {
             @RequestParam(value = "count", required = true) Integer count);
 
 
+    @ApiOperation(value = "查询最新成交记录")
+    @GetMapping(value = "/api/extension/pc/trade/queryLastTradeRecord")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型，多个以逗号分割", example = "BTC,ETH", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对，多个以逗号分割", example = "BTC_USDT,BTC_ETH", required = true),
+             @ApiImplicitParam(name = "count ", value = "返回条数（最大100条）", example = "10", required = true)
+    })
+    List<PcOrderTradeDetailVo> queryLastTradeRecord(
+            @RequestParam(value = "asset") String asset,
+            @RequestParam(value = "symbol", required = true) String symbol,
+            @RequestParam(value = "count", required = true) Integer count);
+
+
+
     @ApiOperation(value = "查小于某个时间点的最大的一条记录")
     @GetMapping(value = "/api/extension/pc/trade/selectLessTimeTrade")
     @ApiImplicitParams({

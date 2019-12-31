@@ -189,6 +189,20 @@
         LIMIT 0,${limit}
     </select>
 
+    <select id="queryLastTradeRecord" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order_trade
+        <where>
+
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+
+        </where>
+        ORDER BY id desc
+        LIMIT 0,${limit}
+    </select>
+
     <select id="getRealisedPnl" resultType="java.math.BigDecimal">
         select IFNULL(SUM(pnl),0)
         from pc_order_trade

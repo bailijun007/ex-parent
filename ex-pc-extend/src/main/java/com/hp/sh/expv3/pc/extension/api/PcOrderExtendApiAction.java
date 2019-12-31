@@ -112,24 +112,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         return result;
     }
 
-    /**
-     * 获取最新历史委托记录
-     *
-     * @param asset  资产
-     * @param symbol 交易对
-     * @param count  返回条数
-     * @return
-     */
-    @Override
-    public List<UserOrderVo> queryLastHistoryRecord(String asset, String symbol, Integer count) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || count == null) {
-            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
-        }
-        List<UserOrderVo> list = new ArrayList<>();
-        List<PcOrderVo> voList = pcOrderExtendService.queryOrders(null, asset, symbol, null, null, null, null, null, count, null);
-        convertOrderList(list, voList);
-        return list;
-    }
+
 
     @Override
     public List<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {

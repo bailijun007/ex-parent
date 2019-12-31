@@ -96,5 +96,15 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         return list;
     }
 
+    @Override
+    public List<PcOrderTradeVo> queryLastTradeRecord(String asset, String symbol, Integer count) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("limit", count);
+        List<PcOrderTradeVo> list = pcOrderTradeDAO.queryLastTradeRecord(map);
+        return list;
+    }
+
 
 }

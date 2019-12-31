@@ -1,0 +1,8 @@
+/usr/local/redis/bin/redis-cli -h 192.168.0.68 -p 16373 -a 456
+
+subscribe account fund:account:BTC pc:account:BTC pc:book:BTC:BTC_USD pc:order:BTC:BTC_USD pc:trade:BTC:BTC_USD pc:pos:BTC:BTC_USD pc:markPrice:BTC:BTC_USD pc:book:BTC:ETH_USD pc:order:BTC:ETH_USD pc:trade:BTC:ETH_USD pc:pos:BTC:ETH_USD pc:markPrice:BTC:ETH_USD
+
+subscribe account fund:account:ETH pc:account:ETH pc:book:ETH:BTC_USD pc:order:ETH:BTC_USD pc:trade:ETH:BTC_USD pc:pos:ETH:BTC_USD pc:markPrice:ETH:BTC_USD pc:book:ETH:ETH_USD pc:order:ETH:ETH_USD pc:trade:ETH:ETH_USD pc:pos:ETH:ETH_USD pc:markPrice:ETH:ETH_USD
+
+/usr/local/redis/bin/redis-cli -h 192.168.0.68 -p 16375 -a 456
+subscribe account fund:account:BTC pc:account:BTC pc:book:BTC:BTC_USD pc:order:BTC:BTC_USD pc:trade:BTC:BTC_USD pc:pos:BTC:BTC_USD pc:markPrice:BTC:BTC_USD pc:book:BTC:ETH_USD pc:order:BTC:ETH_USD pc:trade:BTC:ETH_USD pc:pos:BTC:ETH_USD pc:markPrice:BTC:ETH_USD

@@ -178,7 +178,7 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
             List<PcOrder4MatchBo> limitBidOrders = snapshot.getLimitBidOrders();
 
             if (null != limitAskOrders) {
-                for (PcOrder4MatchBo askOrder : limitAskOrders) {
+                limitAskOrders.forEach(askOrder -> {
                     if (context.allOpenOrders.containsKey(askOrder.getOrderId())) {
                         logger.error("order in snapshot duplicated,asset:{},symbol:{},accountId:{},orderId:{}.", this.getAsset(), this.getSymbol(), askOrder.getAccountId(), askOrder.getOrderId());
                     } else {
@@ -186,19 +186,21 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
                         context.limitAskQueue.add(askOrder);
                         context.allOpenOrders.put(askOrder.getOrderId(), askOrder);
                     }
-                }
+                });
+
             }
 
             if (null != limitBidOrders) {
-                for (PcOrder4MatchBo bidOrder : limitBidOrders) {
-                    if (context.allOpenOrders.containsKey(bidOrder.getOrderId())) {
-                        logger.error("order in snapshot duplicated,asset:{},symbol:{},accountId:{},orderId:{}.", this.getAsset(), this.getSymbol(), bidOrder.getAccountId(), bidOrder.getOrderId());
-                    } else {
-                        PcOrder4MatchBoUtil.extendSetter(bidOrder);
-                        context.limitBidQueue.add(bidOrder);
-                        context.allOpenOrders.put(bidOrder.getOrderId(), bidOrder);
-                    }
-                }
+                limitBidOrders.forEach(bidOrder -> {
+                            if (context.allOpenOrders.containsKey(bidOrder.getOrderId())) {
+                                logger.error("order in snapshot duplicated,asset:{},symbol:{},accountId:{},orderId:{}.", this.getAsset(), this.getSymbol(), bidOrder.getAccountId(), bidOrder.getOrderId());
+                            } else {
+                                PcOrder4MatchBoUtil.extendSetter(bidOrder);
+                                context.limitBidQueue.add(bidOrder);
+                                context.allOpenOrders.put(bidOrder.getOrderId(), bidOrder);
+                            }
+                        }
+                );
             }
 
             /**
