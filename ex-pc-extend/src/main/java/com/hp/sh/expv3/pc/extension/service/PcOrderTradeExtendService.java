@@ -23,4 +23,6 @@ public interface PcOrderTradeExtendService {
     List<PcOrderTradeVo> selectAllTradeListByUser(String asset, String symbol, Long userId);
 
     List<PcOrderTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long statTime, Long endTime,Long userId);
+
+    List<PcOrderTradeVo> queryLastTradeRecord(String asset, String symbol, Integer count);
 }
