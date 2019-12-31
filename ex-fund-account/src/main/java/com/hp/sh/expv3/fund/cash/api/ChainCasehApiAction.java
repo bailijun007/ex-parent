@@ -50,6 +50,7 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	public String getDepositAddress(Long userId, String asset){
 		Integer symbolId = asset2Symbol.getSymbol(asset);
 		String address = chainService.getAddress(userId, symbolId);
+        System.out.println("address = " + address);
 		return address;
 	}
 	
