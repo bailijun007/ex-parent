@@ -124,10 +124,14 @@ public abstract class PcOrderHandler implements ApplicationContextAware {
         if (PcOrderTypeEnum.LIMIT.getCode() == takerOrder.getOrderType()) {
             if (PcOrderTimeInForceEnum.GOOD_TILL_CANCEL.getCode() == takerOrder.getTimeInForce()) {
                 continueMatch(context, takerOrder, sameSideQueue);
+                BigDecimal displayNumber = PcUtil.calcBookNumber(takerOrder.getNumber(), takerOrder.getFilledNumber(), takerOrder.getDisplayNumber());
+                bookUpdate(context, takerOrder.getOrderId(), takerOrder.getBidFlag(), takerOrder.getPrice(), displayNumber);
             } else if (PcOrderTimeInForceEnum.MAKER_ONLY.getCode() == takerOrder.getTimeInForce()) {
                 if (context.getMatchResult().isCancelFlag()) {
                     cancelAndComplete(context, takerOrder, sameSideQueue);
                 } else {
+                    BigDecimal displayNumber = PcUtil.calcBookNumber(takerOrder.getNumber(), takerOrder.getFilledNumber(), takerOrder.getDisplayNumber());
+                    bookUpdate(context, takerOrder.getOrderId(), takerOrder.getBidFlag(), takerOrder.getPrice(), displayNumber);
                     continueMatch(context, takerOrder, sameSideQueue);
                 }
             } else if (PcOrderTimeInForceEnum.IMMEDIATE_OR_CANCEL.getCode() == takerOrder.getTimeInForce()

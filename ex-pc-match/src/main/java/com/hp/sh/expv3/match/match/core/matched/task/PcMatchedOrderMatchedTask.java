@@ -152,7 +152,7 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
 
     private void sendNotifyMsg() {
 
-        if (null != tradeList && (!tradeList.isEmpty())) {
+        if (null != bookUpdateList && (!bookUpdateList.isEmpty())) {
             try {
                 sendBookMsg();
                 sendTradeMsg();
@@ -191,9 +191,7 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
 
     private void saveTradeList(List<PcTradeBo> tradeList) {
         List<List<PcTradeBo>> batchTrade = Lists.partition(tradeList, batchSize);
-        for (List<PcTradeBo> trades : batchTrade) {
-            pcTradeDAO.batchSave(trades);
-        }
+        batchTrade.forEach(pcTradeDAO::batchSave);
     }
 
     /**
@@ -218,9 +216,7 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
         } else {
             // 使用上次的matchTxId覆盖
             Long existMatchTxId = existMatches.get(0).getMatchTxId();
-            for (PcTradeBo pcMatchBo : tradeList) {
-                pcMatchBo.setMatchTxId(existMatchTxId);
-            }
+            tradeList.forEach(pcMatchBo -> pcMatchBo.setMatchTxId(existMatchTxId));
             needSave = new ArrayList<>(tradeList.size());
             Map<Long, PcTrade> id2Match = existMatches.stream().collect(Collectors.toMap(PcTrade::getMkOrderId, Function.identity()));
             for (PcTradeBo match : tradeList) {
@@ -253,9 +249,7 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
         if (null != tradeList && (!tradeList.isEmpty())) {
             // send match as trade
             List<TradeListMsgDto.TradeMsgDto> trades = new ArrayList<>();
-            for (PcTradeBo pcMatchBo : tradeList) {
-                trades.add(buildTrade(pcMatchBo));
-            }
+            tradeList.forEach(pcMatchBo -> trades.add(buildTrade(pcMatchBo)));
             tradeListMsgDto.setTrades(trades);
         }
         if (null == tradeListMsgDto.getTrades() || tradeListMsgDto.getTrades().isEmpty()) {
