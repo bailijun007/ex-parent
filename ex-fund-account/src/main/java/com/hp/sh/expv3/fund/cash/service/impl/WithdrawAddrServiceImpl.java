@@ -1,7 +1,6 @@
 
 package com.hp.sh.expv3.fund.cash.service.impl;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +13,7 @@ import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.fund.cash.dao.WithdrawalAddrDAO;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalAddr;
 import com.hp.sh.expv3.fund.cash.service.WithdrawAddrService;
+import com.hp.sh.expv3.utils.DbDateUtils;
 
 /**
  * 
@@ -29,7 +29,7 @@ public class WithdrawAddrServiceImpl implements WithdrawAddrService{
 
 	@Override
 	public void save(WithdrawalAddr withdrawalAddr){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		if(withdrawalAddr.getId()==null){
 			withdrawalAddr.setCreated(now);
 			withdrawalAddr.setModified(now);
@@ -42,7 +42,7 @@ public class WithdrawAddrServiceImpl implements WithdrawAddrService{
 
 	@Override
 	public void batchSave(List<WithdrawalAddr> list){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		for(WithdrawalAddr withdrawalAddr:list){
 			if(withdrawalAddr.getId()==null){
 				withdrawalAddr.setCreated(now);
@@ -57,7 +57,7 @@ public class WithdrawAddrServiceImpl implements WithdrawAddrService{
 
 	@Override
 	public void update(WithdrawalAddr withdrawalAddr){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		withdrawalAddr.setModified(now);
 		this.withdrawalAddrDAO.update(withdrawalAddr);
 	}

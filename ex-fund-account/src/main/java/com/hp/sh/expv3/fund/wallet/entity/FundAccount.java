@@ -23,7 +23,6 @@ public class FundAccount extends BaseAccountEntity {
 	private BigDecimal balance;
 	
 	//版本
-	@Version
 	private Long version;
 	
 	public FundAccount() {
@@ -45,6 +44,7 @@ public class FundAccount extends BaseAccountEntity {
 		this.asset = asset;
 	}
 
+	@Version
 	public Long getVersion() {
 		return version;
 	}

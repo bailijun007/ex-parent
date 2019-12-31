@@ -64,7 +64,7 @@
         <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
         <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
         <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
-        <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>if>
+        <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>
     </sql>
 
     <sql id="Base_Column_List">
@@ -95,6 +95,67 @@
         <include refid="simple_where"/>
     </select>
 
+    <select id="selectLessTimeTrade" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order_trade
+       <where>
+           <if test="asset!=null and asset!=''">
+               and asset=#{asset}
+           </if>
+           <if test="symbol!=null and symbol!=''">
+               and symbol=#{symbol}
+           </if>
+           <if test="tradeTime!=null">
+               and trade_time &lt; #{tradeTime}
+           </if>
+       </where>
+        order by ${tradeTime} desc
+        limit 0,1
+    </select>
+
+
+    <select id="selectAllTradeListByUser" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order_trade
+        <where>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+            <if test="symbol!=null and symbol!=''">
+                and symbol=#{symbol}
+            </if>
+            <if test="userId!=null">
+                and user_id = #{userId}
+            </if>
+        </where>
+        order by id asc
+    </select>
+
+    <select id="selectTradeListByTimeInterval" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order_trade
+        <where>
+            <if test="userId!=null">
+                and user_id = #{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+            <if test="symbol!=null and symbol!=''">
+                and symbol=#{symbol}
+            </if>
+            <if test="tradeTimeBegin!=null and tradeTimeBegin!=''">
+                and trade_time &gt;=#{tradeTimeBegin}
+            </if>
+            <if test="tradeTimeEnd!=null and tradeTimeEnd!=''">
+                and trade_time &lt;=#{tradeTimeEnd}
+            </if>
+        </where>
+        order by id asc
+    </select>
 
     <select id="queryTradeRecords" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
         select

@@ -2,7 +2,6 @@
 package com.hp.sh.expv3.pc.module.order.dao;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -31,13 +30,13 @@ public interface PcOrderDAO extends BaseAccountDataMapper<PcOrder, Long> {
 			@Param("userId") Long userId, 
 			@Param("newStatus") Integer newStatus, 
 			@Param("oldStatus") Integer oldStatus,
-			@Param("modified") Date modified);
+			@Param("modified") Long modified);
 
 	public long updateCancelStatus(
 			@Param("orderId") Long orderId,
 			@Param("userId") Long userId, 
 			@Param("cancelStatus") Integer cancelStatus, 
-			@Param("modified") Date modified);
+			@Param("modified") Long modified);
 
 	public BigDecimal getClosingVolume(@Param("userId") Long userId, @Param("posId") Long posId);
 

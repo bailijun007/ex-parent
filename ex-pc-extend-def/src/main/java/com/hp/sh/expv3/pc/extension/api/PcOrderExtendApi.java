@@ -70,7 +70,7 @@ public interface PcOrderExtendApi {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
-            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
             @ApiImplicitParam(name = "orderType ", value = "委托类型,1:限价,非必填 ,不填为全部类型"),
             @ApiImplicitParam(name = "longFlag", value = "是否：1-多仓，0-空仓", example = "1"),
             @ApiImplicitParam(name = "closeFlag", value = "是否:1-平仓,0-开", example = "1"),
@@ -81,7 +81,7 @@ public interface PcOrderExtendApi {
     })
     List<UserOrderVo> queryHistory(@RequestParam("userId") Long userId,
                                    @RequestParam(value = "asset") String asset,
-                                   @RequestParam("symbol") String symbol,
+                                   @RequestParam(value = "symbol", required = false) String symbol,
                                    @RequestParam(value = "orderType", required = false) Integer orderType,
                                    @RequestParam(value = "longFlag", required = false) Integer longFlag,
                                    @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
@@ -115,6 +115,28 @@ public interface PcOrderExtendApi {
                                @RequestParam("pageSize") Integer pageSize,
                                @RequestParam("lastOrderId") Long lastOrderId,
                                @RequestParam("nextPage") Integer nextPage);
+
+
+    @ApiOperation(value = "订单列表查询(后台admin接口)")
+    @GetMapping(value = "/api/extension/pc/order/pageQueryOrderList")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
+            @ApiImplicitParam(name = "orderId", value = "委托id", example = "1", required = false),
+            @ApiImplicitParam(name = "status", value = "(1:待报 2:已报 4:待撤销 8:已撤销 16:部分成交 32:全部成交) 选填 不填为全部"),
+            @ApiImplicitParam(name = "closeFlag", value = "是否:1-平仓,0-开", example = "1"),
+            @ApiImplicitParam(name = "pageNo ", value = "当前页数", example = "1", required = true),
+            @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "10", required = true)
+    })
+    PageResult<UserOrderVo> pageQueryOrderList(@RequestParam(value = "userId", required = false) Long userId,
+                                           @RequestParam(value = "asset", required = false) String asset,
+                                           @RequestParam(value = "symbol", required = false) String symbol,
+                                           @RequestParam(value = "status", required = false) Integer status,
+                                           @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
+                                           @RequestParam("orderId") Long orderId,
+                                           @RequestParam("pageNo") Integer pageNo,
+                                           @RequestParam("pageSize") Integer pageSize);
 
 
 }

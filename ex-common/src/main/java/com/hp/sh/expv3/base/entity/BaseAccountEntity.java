@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.base.entity;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import javax.persistence.MappedSuperclass;
 
@@ -18,24 +17,24 @@ public abstract class BaseAccountEntity implements UserData, Serializable{
 	public static final String USERID_PROPERTY = "userId";
 	
 	// 创建时间
-	private Date created;
+	private Long created;
 	
 	// 修改时间
-	private Date modified;
+	private Long modified;
 
-	public Date getCreated() {
+	public Long getCreated() {
 		return created;
 	}
 
-	public void setCreated(Date created) {
+	public void setCreated(Long created) {
 		this.created = created;
 	}
 
-	public Date getModified() {
+	public Long getModified() {
 		return modified;
 	}
 
-	public void setModified(Date modified) {
+	public void setModified(Long modified) {
 		this.modified = modified;
 	}
 	

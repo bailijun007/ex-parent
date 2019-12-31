@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.fund.transfer.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.fund.transfer.dao.FundTransferDAO;
 import com.hp.sh.expv3.fund.transfer.entity.FundTransfer;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -33,7 +33,7 @@ public class FundTransferCoreService {
 	 * @param amount
 	 */
 	public FundTransfer transfer(Long userId, String asset, Integer srcAccountType, Integer targetAccountType, BigDecimal amount) {
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		
 		FundTransfer transfer = new FundTransfer();
 		transfer.setSn(SnUtils.genTransferSn());
@@ -55,11 +55,11 @@ public class FundTransferCoreService {
 	}
 	
 	public void changeStatus(FundTransfer tr, Integer newStatsus){
-		this.changeStatus(tr.getUserId(), tr.getId(), newStatsus, tr.getStatus(), new Date());
+		this.changeStatus(tr.getUserId(), tr.getId(), newStatsus, tr.getStatus(), DbDateUtils.now());
 		tr.setStatus(newStatsus);
 	}
 	
-	public void changeStatus(Long userId, Long id, Integer newStatsus, Integer oldStatsus, Date modified) {
+	public void changeStatus(Long userId, Long id, Integer newStatsus, Integer oldStatsus, Long modified) {
 		int n = this.fundTransferDAO.changeStatus(userId, id, newStatsus, oldStatsus, modified);
 		if(n==0){
 			throw new RuntimeException("更新失败");

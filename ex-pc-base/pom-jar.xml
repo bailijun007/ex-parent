@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+	<artifactId>ex-pc-base-jar</artifactId>
+	<packaging>jar</packaging>
+    <description>永续合约基础服务</description>
+
+	<parent>
+		<groupId>com.hp.sh.expv3</groupId>
+		<artifactId>ex-parent</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	
+    <dependencies>
+		
+		<dependency>
+			<groupId>com.hp.sh.expv3</groupId>
+			<artifactId>ex-common3</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.hp.sh.expv3</groupId>
+			<artifactId>ex-pc-base-def</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+		</dependency>
+		
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<includes>
+						<include>/com/hp/sh/expv3/pc/calc/**</include>
+						<include>/com/hp/sh/expv3/pc/constant/**</include>
+						<include>/com/hp/sh/expv3/pc/error/**</include>
+						<include>/com/hp/sh/expv3/pc/component/**</include>
+						<include>/com/hp/sh/expv3/pc/strategy/**</include>
+						<include>**/entity/**</include>
+					</includes>
+				</configuration>
+			</plugin>
+		</plugins>
+	    <resources>
+	        <resource>
+	            <directory>src/main/resources</directory>
+	            <includes>
+	            	<include>com/hp/sh/expv3/pc/**</include>
+	            </includes>
+	        </resource>
+	    </resources>
+	</build>
+
+</project>

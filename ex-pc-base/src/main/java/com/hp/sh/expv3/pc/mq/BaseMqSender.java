@@ -3,6 +3,8 @@ package com.hp.sh.expv3.pc.mq;
 import org.apache.rocketmq.client.producer.MQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hp.sh.expv3.pc.constant.MqTopic;
@@ -11,6 +13,7 @@ import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 import com.hp.sh.rocketmq.codec.MsgCodec;
 
 public class BaseMqSender {
+	private static final Logger logger = LoggerFactory.getLogger(BaseMqSender.class);
 	
 	@Autowired
 	protected MQProducer producer;
@@ -32,7 +35,7 @@ public class BaseMqSender {
 	protected void send(Message mqMsg) {
 		try {
 	        SendResult sendResult = producer.send(mqMsg, new OrderMessageQueueSelector(), 0);
-	        System.out.printf("%s%n", sendResult);
+	        logger.info("send msg:{}-{}-{}", mqMsg.getTags(), mqMsg.getKeys(),sendResult.toString());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

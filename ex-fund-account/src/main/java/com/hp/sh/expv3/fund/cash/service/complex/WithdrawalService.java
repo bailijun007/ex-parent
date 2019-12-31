@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.fund.cash.service.complex;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +17,13 @@ import com.hp.sh.expv3.fund.cash.constant.PayChannel;
 import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.cash.dao.WithdrawalRecordDAO;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
-import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -42,7 +41,7 @@ public class WithdrawalService {
 
 	public void createWithdrawal(Long userId, String asset, String account, BigDecimal amount, String transactionId, Integer channelId) {
 		
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		WithdrawalRecord rr = new WithdrawalRecord();
 		rr.setSn(SnUtils.genDepositSn());
 		rr.setUserId(userId);
@@ -72,7 +71,7 @@ public class WithdrawalService {
 		WithdrawalRecord record = this.withdrawalRecordDAO.findById(userId, id);
 		record.setApprovalStatus(ApprovalStatus.APPROVED);
 		record.setSynchStatus(SynchStatus.SYNCH); // 下面同事务执行口扣款，所以这里直接设置为已同步
-		record.setModified(new Date());
+		record.setModified(DbDateUtils.now());
 		this.withdrawalRecordDAO.update(record);
 		this.cutBalance(record);
 		return record;
@@ -90,7 +89,7 @@ public class WithdrawalService {
 	}
 
 	public void onDrawSuccess(Long userId, Long id, String txHash){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		WithdrawalRecord rr = this.withdrawalRecordDAO.findById(userId, id);
 		rr.setTxHash(txHash);
 		rr.setPayTime(now);
@@ -101,7 +100,7 @@ public class WithdrawalService {
 	}
 
 	public void onDrawFail(Long userId, Long id){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		WithdrawalRecord rr = this.withdrawalRecordDAO.findById(userId, id);
 		rr.setPayTime(now);
 		rr.setPayFinishTime(now);
@@ -131,7 +130,7 @@ public class WithdrawalService {
 		FundCutRequest request = new FundCutRequest();
 		request.setAmount(record.getAmount());
 		request.setRemark("提现扣款:"+ PayChannel.getName(record.getChannelId()));
-		request.setTradeNo(record.getSn());
+		request.setTradeNo(SnUtils.genSynchCutSn(record.getSn()));
 		request.setTradeType(TradeType.WITHDRAWAL);
 		request.setUserId(record.getUserId());
 		
@@ -151,7 +150,7 @@ public class WithdrawalService {
 		FundAddRequest addRequest = new FundAddRequest();
 		addRequest.setAmount(rr.getAmount());
 		addRequest.setRemark("提现失败返回账户:"+ PayChannel.getName(rr.getChannelId()));
-		addRequest.setTradeNo(rr.getSn());
+		addRequest.setTradeNo(SnUtils.genSynchReturnSn(rr.getSn()));
 		addRequest.setTradeType(TradeType.WITHDRAWAL_RETURN);
 		addRequest.setUserId(rr.getUserId());
 		fundAccountCoreApi.add(addRequest);

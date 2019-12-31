@@ -80,7 +80,7 @@ public class PcPositionVo extends UserDataEntity {
 	/**
      * 维持保证金比率
      */
-    private BigDecimal holdRatio;
+    private BigDecimal holdMarginRatio;
 
     // 已扣手续费
     private BigDecimal feeCost;
@@ -234,15 +234,15 @@ public class PcPositionVo extends UserDataEntity {
 		this.liqPrice = liqPrice;
 	}
 
-	public BigDecimal getHoldRatio() {
-		return holdRatio;
-	}
+    public BigDecimal getHoldMarginRatio() {
+        return holdMarginRatio;
+    }
 
-	public void setHoldRatio(BigDecimal holdRatio) {
-		this.holdRatio = holdRatio;
-	}
+    public void setHoldMarginRatio(BigDecimal holdMarginRatio) {
+        this.holdMarginRatio = holdMarginRatio;
+    }
 
-	public BigDecimal getInitMargin() {
+    public BigDecimal getInitMargin() {
 		return initMargin;
 	}
 

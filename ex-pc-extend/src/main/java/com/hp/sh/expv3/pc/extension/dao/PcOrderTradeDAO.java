@@ -22,4 +22,10 @@ public interface PcOrderTradeDAO {
     BigDecimal getRealisedPnl(@Param("posId") Long posId, @Param("userId") Long userId, @Param("orderId") Long orderId);
 
     List<PcOrderTradeVo> queryTradeRecords(Map<String, Object> map);
+
+    PcOrderTradeVo selectLessTimeTrade(Map<String, Object> map);
+
+    List<PcOrderTradeVo> selectAllTradeListByUser(Map<String, Object> map);
+
+    List<PcOrderTradeVo> selectTradeListByTimeInterval(Map<String, Object> map);
 }

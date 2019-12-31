@@ -2,8 +2,9 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.error.DepositRecordExtErrorCode;
-import com.hp.sh.expv3.fund.extension.error.FundAccountExtErrorCode;
+import com.hp.sh.expv3.fund.extension.error.DepositExtError;
+import com.hp.sh.expv3.fund.extension.error.FundAccountExtError;
+import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import com.hp.sh.expv3.fund.extension.service.FundAccountExtendService;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
@@ -40,11 +41,11 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
     })
     public CapitalAccountVo getCapitalAccount(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset) {
         if (userId == null) {
-            throw new ExException(FundAccountExtErrorCode.PARAM_EMPTY);
+            throw new ExException(FundCommonError.PARAM_EMPTY);
         }
         CapitalAccountVo capitalAccount = fundAccountExtendServer.getCapitalAccount(userId, asset);
         if (null == capitalAccount) {
-            throw new ExException(DepositRecordExtErrorCode.ACCOUNT_NOT_FIND);
+            throw new ExException(FundCommonError.ACCOUNT_NOT_FIND);
         }
 
         //查询冻结资金
@@ -57,7 +58,7 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
     @Override
     public PageResult<CapitalAccountVo> findFundAccountList(Long userId, String asset, Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageSize == null) {
-            throw new ExException(FundAccountExtErrorCode.PARAM_EMPTY);
+            throw new ExException(FundCommonError.PARAM_EMPTY);
         }
         PageResult<CapitalAccountVo> result = new PageResult();
         List<CapitalAccountVo> voList = fundAccountExtendServer.fundAccountList(userId, asset);

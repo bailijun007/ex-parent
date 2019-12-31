@@ -1,10 +1,11 @@
 package com.hp.sh.expv3.pc.module.position.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ import com.hp.sh.expv3.utils.math.BigUtils;
 @Service
 @Transactional(rollbackFor=Exception.class)
 public class PcPositionService {
+	private static final Logger logger = LoggerFactory.getLogger(PcPositionService.class);
 
 	@Autowired
 	private PcPositionDAO pcPositionDAO;
@@ -77,7 +79,7 @@ public class PcPositionService {
 			return;
 		}
 		
-		Date now  = DbDateUtils.now();
+		Long now  = DbDateUtils.now();
 		
 		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
@@ -141,7 +143,15 @@ public class PcPositionService {
 	
 	private void closeFeeToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeResult, int longFlag) {
 		PcAddRequest request = new PcAddRequest();
-		request.setAmount(tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFeeReceivable()));
+		BigDecimal amount = tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFeeReceivable());
+		if(BigUtils.isZero(amount)){
+			return;
+		}
+		if(BigUtils.ltZero(amount)){
+			logger.error("穿仓。。。。");
+			return;
+		}
+		request.setAmount(amount);
 		request.setUserId(userId);
 		request.setAsset(asset);
 		request.setRemark(String.format("平仓。保证金：%s,收益:%s,手续费：-%s", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getFeeReceivable()));
@@ -163,7 +173,7 @@ public class PcPositionService {
 		this.pcAccountCoreService.add(request);
 	}
 
-	private void updateOrderStatus4Trade(PcOrder order, TradeResult tradeResult, Date now){
+	private void updateOrderStatus4Trade(PcOrder order, TradeResult tradeResult, Long now){
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getFee()));
@@ -176,7 +186,7 @@ public class PcPositionService {
 		this.pcOrderDAO.update(order);
 	}
 
-	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeResult, Long posId, Date now) {
+	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeResult, Long posId, Long now) {
 		PcOrderTrade orderTrade = new PcOrderTrade();
 
 		orderTrade.setId(null);
@@ -226,7 +236,6 @@ public class PcPositionService {
 		pcPosition.setAutoAddFlag(IntBool.NO);
 		pcPosition.setHoldMarginRatio(feeRatioService.getHoldRatio(userId, asset, symbol, BigDecimal.ZERO));
 
-//		Date now = new Date();
 //		pcPosition.setCreated(now );
 //		pcPosition.setModified(now);
 		//
@@ -358,6 +367,10 @@ public class PcPositionService {
 		//maker
 		this.handleTradeOrder(makerTradeVo);
 		
+	}
+
+	public PcPosition getPosition(long userId, String asset, String symbol, Long id) {
+		return this.pcPositionDAO.findById(userId, id);
 	}
 	
 }

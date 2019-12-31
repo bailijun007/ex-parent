@@ -1,9 +1,9 @@
 package com.hp.sh.expv3.pc.extension.service.impl;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.extension.constant.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.dao.PcPositionDAO;
+import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +53,13 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
     }
 
     @Override
-    public List<PcPositionVo> findCurrentPosition(Long userId, String asset, String symbol) {
+    public List<PcPositionVo> findPositionList(Long userId, String asset, String symbol,Long posId,Integer liqStatus) {
         Map<String, Object> map=new HashMap<>();
         map.put("userId",userId);
         map.put("asset",asset);
         map.put("symbol",symbol);
+        map.put("id",posId);
+        map.put("liqStatus",liqStatus);
         List<PcPositionVo> pcPositionVos = pcPositionDAO.queryList(map);
         return pcPositionVos;
     }

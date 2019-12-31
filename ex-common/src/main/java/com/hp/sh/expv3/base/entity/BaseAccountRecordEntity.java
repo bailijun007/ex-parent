@@ -6,6 +6,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import com.hp.sh.expv3.component.id.utils.GeneratorName;
+
 /**
  * 账户信息Entity 
  * @author lw
@@ -22,12 +24,15 @@ public abstract class BaseAccountRecordEntity extends BaseAccountEntity implemen
 	protected String requestId;
 
 	@Id
-	@GeneratedValue(generator="snowflake")
+	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
 	public Long getId() {
 		return id;
 	}
 
 	public void setId(Long id) {
+		if(id==0 && this.id!=null){
+			return;
+		}
 		this.id = id;
 	}
 

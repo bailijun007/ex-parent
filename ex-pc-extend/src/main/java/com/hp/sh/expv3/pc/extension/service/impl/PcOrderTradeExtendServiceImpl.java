@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +46,7 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         map.put("asset",asset);
         map.put("symbol",symbol);
         map.put("userId",userId);
-        String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(time));
-        map.put("createdBegin",start);
+        map.put("createdBegin",time);
         PcOrderTradeVo pcOrderTradeVo = pcOrderTradeDAO.queryOne(map);
         return pcOrderTradeVo;
     }
@@ -64,6 +62,38 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         List<PcOrderTradeVo> voList = pcOrderTradeDAO.queryTradeRecords(map);
 
         return voList;
+    }
+
+    @Override
+    public PcOrderTradeVo selectLessTimeTrade(String asset, String symbol, Long statTime) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("tradeTime", statTime);
+        PcOrderTradeVo vo = pcOrderTradeDAO.selectLessTimeTrade(map);
+        return vo;
+    }
+
+    @Override
+    public List<PcOrderTradeVo> selectAllTradeListByUser(String asset, String symbol, Long userId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("userId", userId);
+        List<PcOrderTradeVo> list = pcOrderTradeDAO.selectAllTradeListByUser(map);
+        return list;
+    }
+
+    @Override
+    public List<PcOrderTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long statTime, Long endTime,Long userId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("userId", userId);
+        map.put("tradeTimeBegin", statTime);
+        map.put("tradeTimeEnd", endTime);
+        List<PcOrderTradeVo> list = pcOrderTradeDAO.selectTradeListByTimeInterval(map);
+        return list;
     }
 
 

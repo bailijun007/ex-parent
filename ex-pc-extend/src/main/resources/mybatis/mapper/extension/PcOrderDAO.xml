@@ -106,7 +106,7 @@
             <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
             <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
             <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
-            <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>if>
+            <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>
         </where>
     </sql>
 
@@ -160,8 +160,9 @@
                     #{symbolList[${i}]}
                 </foreach>
             </if>
-            <if test="userId!=null">and user_id=#{userId}</if>
-
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
             <if test="gtOrderId!=null">
                 and id &gt;#{gtOrderId}
                 ORDER BY id asc

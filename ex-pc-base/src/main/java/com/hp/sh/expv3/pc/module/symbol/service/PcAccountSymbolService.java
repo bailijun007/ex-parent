@@ -2,7 +2,6 @@
 package com.hp.sh.expv3.pc.module.symbol.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +15,7 @@ import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.component.PcDefaultSymbolSetting;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 
 /**
@@ -37,9 +37,9 @@ public class PcAccountSymbolService{
 	public void create(Long userId, String asset, String symbol){
 		PcAccountSymbol as = this.get(userId, asset, symbol);
 		if(as!=null){
-			throw new ExException(CommonError.OBJ_DONT_EXIST);
+			return;
 		}
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		PcAccountSymbol entity = new PcAccountSymbol();
 		entity.setAsset(asset);
 		entity.setMarginMode(pcDefaultSymbolSetting.getMarginMode());

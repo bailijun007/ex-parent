@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.pc.module.position.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.TimeInForce;
 import com.hp.sh.expv3.pc.job.LiqHandleResult;
-import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcLiqRecordDAO;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
@@ -58,9 +56,6 @@ public class PcLiqService {
     @Autowired
     private PcPositionDAO pcPositionDAO;
     
-	@Autowired
-	private PcOrderDAO pcOrderDAO;
-	
 	@Autowired
 	private FeeRatioService feeRatioService;
     
@@ -152,16 +147,16 @@ public class PcLiqService {
 	}
 	
 	void doLiq(PcPosition pos){
-		Date now = DbDateUtils.now();
+		Long now = DbDateUtils.now();
 		//1、保存强平记录
 		PcLiqRecord record = this.saveLiqRecord(pos, now);
 		//2、清空仓位
 		this.clearLiqPos(pos, now);
 		//3、创建强平委托
-		this.createLiqOrder(record);
+//		this.createLiqOrder(record);
 	}
 	
-	private void clearLiqPos(PcPosition pos, Date now){
+	private void clearLiqPos(PcPosition pos, Long now){
 		pos.setVolume(BigDecimal.ZERO);
 		pos.setCloseFee(BigDecimal.ZERO);
 		pos.setPosMargin(BigDecimal.ZERO);
@@ -170,7 +165,7 @@ public class PcLiqService {
 		pcPositionDAO.update(pos);
 	}
 	
-	private PcLiqRecord saveLiqRecord(PcPosition pos, Date now){
+	private PcLiqRecord saveLiqRecord(PcPosition pos, Long now){
 		PcLiqRecord record = new PcLiqRecord();
 		record.setUserId(pos.getUserId());
 		record.setAsset(pos.getAsset());

@@ -16,6 +16,7 @@ import com.hp.sh.chainserver.client.NotifyResultParams;
 import com.hp.sh.chainserver.utils.ChainUtil;
 import com.hp.sh.expv3.base.BaseApiAction;
 import com.hp.sh.expv3.fund.cash.api.ChainCasehApi;
+import com.hp.sh.expv3.fund.cash.component.ExChainService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,17 +33,20 @@ public class TestBysCallbackAction extends BaseApiAction{
 	@Autowired
 	private ChainCasehApi chainCasehApi;
 	
+	@Autowired
+	private ExChainService exChainService;
+	
 	@ApiOperation(value = "创建充值通知")
 	@PostMapping("/deposit/create")
 	public void create(@RequestBody Map map){
-		NotifyCreateParams cp = ChainUtil.getCreateParams(map);
+		NotifyCreateParams cp = exChainService.getCreateParams(map);
 		chainCasehApi.createDeposit(Long.parseLong(cp.getUserId()), cp.getChainOrderId(), cp.getSymbolId(), cp.getAddress(), new BigDecimal(cp.getVolume()), cp.getTxHash());
 	}
 	
 	@ApiOperation(value = "支付结果通知")
 	@PostMapping("/deposit/notify/{status}")
 	public void depositNotify(@PathVariable String status, @RequestBody Map map){
-		NotifyResultParams np = ChainUtil.getNotifyParams(map);
+		NotifyResultParams np = exChainService.getNotifyParams(map);
 		int nstatus = "success".equals(status)?1:2;
 		Long userId = Long.parseLong(np.getUserId());
 		if(nstatus==1){

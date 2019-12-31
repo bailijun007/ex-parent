@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.pc.module.order.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +12,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.base.exceptions.CommonError;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.dev.CrossDB;
+import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -34,10 +35,12 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
+import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
@@ -72,6 +75,9 @@ public class PcOrderService {
 	@Autowired
 	private PcPositionService pcPositionService;
 	
+    @Autowired
+    private HoldPosStrategy holdPosStrategy;
+	
 	@Autowired
 	private PcOrderService self;
     
@@ -102,12 +108,15 @@ public class PcOrderService {
 //			throw new ExException(OrderError.CREATED);
 //		}
 		
-		//check 检查可平仓位
 		if(closeFlag==OrderFlag.ACTION_CLOSE){
+			this.checkLiqStatus(pos);
+			// 检查可平仓位
 			this.checkClosablePosition(pos, number);
+			// 检查价格
+			this.checkPrice(pos, price);
 		}
 		
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		
 		
 		//订单基本数据
@@ -158,6 +167,26 @@ public class PcOrderService {
 		return pcOrder;
 	}
 	
+	private void checkLiqStatus(PcPosition pos) {
+		if(pos==null){
+			return;
+		}
+		if(pos.getLiqStatus() == LiqStatus.FROZEN){
+			throw new ExException(OrderError.POS_LIQ);
+		}
+		if(pos.getLiqStatus() == LiqStatus.FORCE_CLOSE){
+			throw new ExException(OrderError.POS_LIQED);
+		}
+	}
+
+	private void checkPrice(PcPosition pos, BigDecimal price) {
+		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
+		BigDecimal bankruptPrice = this.holdPosStrategy.calcBankruptPrice(pos.getLongFlag(), pos.getMeanPrice(), _amount, pos.getPosMargin());
+		if(BigUtils.lt(price, bankruptPrice)){
+			throw new ExException(OrderError.BANKRUPT_PRICE);
+		}
+	}
+
 	private boolean existClientOrderId(long userId, String clientOrderId) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("userId", userId);
@@ -236,11 +265,15 @@ public class PcOrderService {
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void setPendingCancel(long userId, String asset, String symbol, long orderId){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
 		
 		this.checkCancelStatus(order);
+		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
+			PcPosition pos = this.pcPositionService.getPosition(userId, asset, symbol, order.getClosePosId());
+			this.checkLiqStatus(pos);	
+		}
 
 		long count = this.pcOrderDAO.updateCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now);
 		
@@ -252,6 +285,9 @@ public class PcOrderService {
 	}
 	
 	private void checkCancelStatus(PcOrder order){
+		if(order==null){
+			throw new ExException(CommonError.OBJ_DONT_EXIST);
+		}
 		if(order.getStatus() == OrderStatus.CANCELED){
 			throw new ExException(OrderError.CANCELED);
 		}
@@ -298,7 +334,7 @@ public class PcOrderService {
 		}
 		
 		//修改订单状态（撤销）
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		order.setCancelTime(now);
 		order.setCancelVolume(number);
 		order.setActiveFlag(PcOrder.NO);
@@ -317,7 +353,7 @@ public class PcOrderService {
 	}
 
 	public void setNewStatus(Long userId, Long orderId, Integer newStatus, Integer desiredOldStatus){
-		long count = this.pcOrderDAO.updateStatus(orderId, userId, newStatus, desiredOldStatus, new Date());
+		long count = this.pcOrderDAO.updateStatus(orderId, userId, newStatus, desiredOldStatus, DbDateUtils.now());
 		if(count!=1){
 //			throw new RuntimeException("更新失败，更新行数："+count);
 		}
@@ -348,7 +384,7 @@ public class PcOrderService {
 	}
 	
 	@CrossDB
-	public List<PcOrder> pageQuery(Page page, Integer status, Date modified){
+	public List<PcOrder> pageQuery(Page page, Integer status, Long modified){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", page);
 		params.put("status", status);

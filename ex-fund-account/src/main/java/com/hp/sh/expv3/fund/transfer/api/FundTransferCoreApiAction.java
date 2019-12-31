@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.transfer.constant.AccountType;
-import com.hp.sh.expv3.fund.transfer.constant.TransferError;
 import com.hp.sh.expv3.fund.transfer.entity.FundTransfer;
+import com.hp.sh.expv3.fund.transfer.error.TransferError;
 import com.hp.sh.expv3.fund.transfer.mq.MqSender;
 import com.hp.sh.expv3.fund.transfer.mq.msg.NewTransfer;
 import com.hp.sh.expv3.fund.transfer.service.FundTransferCoreService;
@@ -85,7 +85,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			}else if(record.getTargetAccountType()==AccountType.PC){
 				this.addPcFund(record);
 			}
-//			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SUCCESS);
+//			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_TARGET_COMPLETE);
 		case FundTransfer.STATUS_TARGET_COMPLETE:
 			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SUCCESS);
 		}
@@ -110,6 +110,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 		request.setTradeNo(record.getSn());
 		request.setTradeType(PcAccountTradeType.FUND_TO_PC);
 		request.setUserId(record.getUserId());
+		request.setAssociatedId(record.getId());
 		pcAccountCoreApi.add(request);
 	}
 

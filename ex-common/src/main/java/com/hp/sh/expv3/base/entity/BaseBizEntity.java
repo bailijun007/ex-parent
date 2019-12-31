@@ -1,14 +1,12 @@
 package com.hp.sh.expv3.base.entity;
 
-import static javax.persistence.GenerationType.IDENTITY;
-
 import java.io.Serializable;
-import java.util.Date;
 
-import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+
+import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 @MappedSuperclass
 public class BaseBizEntity implements Serializable {
@@ -20,38 +18,39 @@ public class BaseBizEntity implements Serializable {
 	public static final int NO = 0;
 	public static final int YES = 1;
 
-	@Id
-	@Column(name = "id", unique = true, nullable = false)
 	protected Long id;
 
 	// 创建时间
-	private Date created;
+	private Long created;
 	// 修改时间
-	private Date modified;
+	private Long modified;
 
 	@Id
-	@GeneratedValue(strategy = IDENTITY)
+	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
 	public Long getId() {
 		return id;
 	}
 
 	public void setId(Long id) {
+		if(id!=null && id==0 && this.id!=null){
+			return;
+		}
 		this.id = id;
 	}
 
-	public Date getCreated() {
+	public Long getCreated() {
 		return created;
 	}
 
-	public void setCreated(Date created) {
+	public void setCreated(Long created) {
 		this.created = created;
 	}
 
-	public Date getModified() {
+	public Long getModified() {
 		return modified;
 	}
 
-	public void setModified(Date modified) {
+	public void setModified(Long modified) {
 		this.modified = modified;
 	}
 

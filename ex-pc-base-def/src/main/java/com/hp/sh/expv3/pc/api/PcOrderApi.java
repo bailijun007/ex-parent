@@ -33,11 +33,11 @@ public interface PcOrderApi {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
         @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
-        @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+        @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = true),
         @ApiImplicitParam(name = "closeFlag", value = "开/平", example = "0", required = true),
         @ApiImplicitParam(name = "longFlag", value = "是否：1-多仓，0-空仓", example = "1", required = true),
         @ApiImplicitParam(name = "timeInForce", value = "成交有效时间", example = "0", required = true),
-        @ApiImplicitParam(name = "price", value = "价格", example = "10", required = true),
+        @ApiImplicitParam(name = "price", value = "价格", example = "5500", required = true),
         @ApiImplicitParam(name = "number", value = "数量（张）", example = "10", required = true),
         @ApiImplicitParam(name = "cliOrderId", value = "客户端订单ID", example = "12345", required = true)
     })

@@ -26,6 +26,7 @@ import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.pc.vo.request.FundRequest;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.SnUtils;
 
 /**
@@ -55,7 +56,7 @@ public class PcAccountCoreService{
 		if(fa!=null){
 			return InvokeResult.NOCHANGE;
 		}
-		this.newPcAccount(userId, asset, BigDecimal.ZERO, new Date());
+		this.newPcAccount(userId, asset, BigDecimal.ZERO, DbDateUtils.now());
 		
 		return InvokeResult.SUCCESS;
 	}
@@ -109,7 +110,7 @@ public class PcAccountCoreService{
 	}
 
 	protected int newRecord(PcAccountRecord record){
-		Date now = new Date();
+		Long now = DbDateUtils.now();
 		
 		//金额必须是正数
 		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
@@ -165,7 +166,7 @@ public class PcAccountCoreService{
 		}
 	}
 	
-	private PcAccount newPcAccount(Long userId, String asset, BigDecimal balance, Date now){
+	private PcAccount newPcAccount(Long userId, String asset, BigDecimal balance, Long now){
 		PcAccount account = new PcAccount();
 		account.setAsset(asset);
 		account.setBalance(balance);
