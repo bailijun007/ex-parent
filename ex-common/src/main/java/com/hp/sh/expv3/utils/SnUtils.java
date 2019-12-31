@@ -13,32 +13,53 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 public class SnUtils {
 	
 	public static String genTransferSn(){
-		return "TS"+genSn();
+		return "TS"+genTimeSn();
 	}
 	
 	public static String genRecordSn(){
-		return "RC"+genSn();
+		return "RC"+genTimeSn();
 	}
 	
 	public static String genDepositSn(){
-		String dstr = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
-		return "DP"+dstr;
+		return "DP"+genTimeSn();
 	}
 	
 	public static String genWithDrawSn(){
-		String dstr = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
-		return "WD"+dstr;
+		return "WD"+genTimeSn();
+	}
+
+	//c2c
+	public static String genPLPayInSn(){
+		return "PLIN"+genTimeSn();
+	}
+	
+	public static String genPLPayOutSn(){
+		return "PLOUT"+genTimeSn();
+	}
+	
+	//Synch
+	public static String genSynchAddSn(String sn){
+		return "A-"+genTimeSn();
+	}
+
+	public static String genSynchCutSn(String sn){
+		return "C-"+genTimeSn();
+	}
+
+	public static String genSynchReturnSn(String sn){
+		return "R-"+genTimeSn();
 	}
 	
 	public static String genRndSn(){
 		return genRndSn("");
 	}
+	
 	public static String genRndSn(String prefix){
 		String dstr = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		return "RND+prefix"+dstr;
 	}
-	
-	static String genSn(){
+
+	static String genTimeSn(){
 		String dstr = DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSS");
 		String nstr = RandomStringUtils.randomNumeric(4);
 		return dstr+nstr;

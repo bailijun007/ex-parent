@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.fund.cash.service.complex;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,7 +130,7 @@ public class WithdrawalService {
 		FundCutRequest request = new FundCutRequest();
 		request.setAmount(record.getAmount());
 		request.setRemark("提现扣款:"+ PayChannel.getName(record.getChannelId()));
-		request.setTradeNo(record.getSn());
+		request.setTradeNo(SnUtils.genSynchCutSn(record.getSn()));
 		request.setTradeType(TradeType.WITHDRAWAL);
 		request.setUserId(record.getUserId());
 		
@@ -151,7 +150,7 @@ public class WithdrawalService {
 		FundAddRequest addRequest = new FundAddRequest();
 		addRequest.setAmount(rr.getAmount());
 		addRequest.setRemark("提现失败返回账户:"+ PayChannel.getName(rr.getChannelId()));
-		addRequest.setTradeNo(rr.getSn());
+		addRequest.setTradeNo(SnUtils.genSynchReturnSn(rr.getSn()));
 		addRequest.setTradeType(TradeType.WITHDRAWAL_RETURN);
 		addRequest.setUserId(rr.getUserId());
 		fundAccountCoreApi.add(addRequest);
