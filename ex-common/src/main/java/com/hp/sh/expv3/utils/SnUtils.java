@@ -13,7 +13,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 public class SnUtils {
 	
 	public static String genTransferSn(){
-		return "TR"+genSn();
+		return "TS"+genSn();
 	}
 	
 	public static String genRecordSn(){
@@ -27,7 +27,7 @@ public class SnUtils {
 	
 	public static String genWithDrawSn(){
 		String dstr = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
-		return "DR"+dstr;
+		return "WD"+dstr;
 	}
 	
 	public static String genRndSn(){
