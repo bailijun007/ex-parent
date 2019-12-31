@@ -153,7 +153,7 @@ public class PcLiqService {
 		//2、清空仓位
 		this.clearLiqPos(pos, now);
 		//3、创建强平委托
-		this.createLiqOrder(record);
+//		this.createLiqOrder(record);
 	}
 	
 	private void clearLiqPos(PcPosition pos, Long now){

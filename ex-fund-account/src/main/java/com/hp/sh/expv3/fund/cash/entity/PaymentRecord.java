@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.fund.cash.entity;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import javax.persistence.MappedSuperclass;
 
