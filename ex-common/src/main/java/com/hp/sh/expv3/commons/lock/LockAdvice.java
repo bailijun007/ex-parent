@@ -61,7 +61,7 @@ public class LockAdvice {
 			if(realKey!=null){
 				this.unlock(realKey);
 			}
-			System.out.println("unlock it");
+			logger.debug("unlock it");
 		}      
     }
 	
