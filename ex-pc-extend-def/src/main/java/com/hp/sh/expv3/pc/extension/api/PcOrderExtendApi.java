@@ -91,6 +91,23 @@ public interface PcOrderExtendApi {
                                    @RequestParam("nextPage") Integer nextPage);
 
 
+
+
+
+    @ApiOperation(value = "获取最新历史委托记录")
+    @GetMapping(value = "/api/extension/pc/order/queryLastHistoryRecord")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "count ", value = "返回条数", example = "100", required = true)
+    })
+    List<UserOrderVo> queryLastHistoryRecord(
+                                   @RequestParam(value = "asset") String asset,
+                                   @RequestParam(value = "symbol") String symbol,
+                                   @RequestParam("count") Integer count);
+
+
+
     @ApiOperation(value = "获取当前用户所有委托,条件查询")
     @GetMapping(value = "/api/extension/pc/order/queryAll")
     @ApiImplicitParams({
