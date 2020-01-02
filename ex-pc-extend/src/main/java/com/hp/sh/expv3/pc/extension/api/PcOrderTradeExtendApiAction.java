@@ -26,7 +26,18 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
     @Autowired
     private PcOrderTradeExtendService pcOrderTradeService;
 
+    @Override
+    public List<PcOrderTradeDetailVo> queryOrderTradeDetail(Long userId, String asset, String symbol, String orderId) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || StringUtils.isEmpty(orderId)) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        List<PcOrderTradeDetailVo> result = new ArrayList<>();
+        List<PcOrderTradeVo> voList = pcOrderTradeService.queryOrderTrade(userId, asset, symbol, orderId);
+        //封装结果集
+        this.toResult(result, voList);
 
+        return result;
+    }
 
 
     /**
@@ -62,17 +73,17 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
      * @param count 返回条数，最大100条
      * @return
      */
-    @Override
-    public List<PcOrderTradeDetailVo> queryLastTradeRecord(String asset, String symbol, Integer count) {
-        checkParam(asset, symbol, count);
-
-        List<PcOrderTradeDetailVo> result = new ArrayList<>();
-        List<PcOrderTradeVo> voList = pcOrderTradeService.queryLastTradeRecord(asset, symbol, count);
-        //封装结果集
-        this.toResult(result, voList);
-
-        return result;
-    }
+//    @Override
+//    public List<PcOrderTradeDetailVo> queryLastTradeRecord(String asset, String symbol, Integer count) {
+//        checkParam(asset, symbol, count);
+//
+//        List<PcOrderTradeDetailVo> result = new ArrayList<>();
+//        List<PcOrderTradeVo> voList = pcOrderTradeService.queryLastTradeRecord(asset, symbol, count);
+//        //封装结果集
+//        this.toResult(result, voList);
+//
+//        return result;
+//    }
 
     private void checkParam(String asset, String symbol, Integer count) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || count == null) {

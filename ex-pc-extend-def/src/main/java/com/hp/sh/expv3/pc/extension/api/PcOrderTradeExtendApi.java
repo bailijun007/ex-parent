@@ -19,6 +19,16 @@ import java.util.List;
 @FeignClient(value = "ex-pc-extend")
 public interface PcOrderTradeExtendApi {
 
+    @ApiOperation(value = "查询当前委托的交易记录")
+    @GetMapping(value = "/api/extension/pc/trade/queryOrderTradeDetail")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "orderId ", value = "委托id", example = "1", required = true)
+    })
+    List<PcOrderTradeDetailVo> queryOrderTradeDetail(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
+                                                     @RequestParam("symbol") String symbol, @RequestParam("orderId") String orderId);
 
 
     @ApiOperation(value = "查询成交记录")
@@ -38,17 +48,17 @@ public interface PcOrderTradeExtendApi {
             @RequestParam(value = "count", required = true) Integer count);
 
 
-    @ApiOperation(value = "查询最新成交记录")
-    @GetMapping(value = "/api/extension/pc/trade/queryLastTradeRecord")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "asset", value = "资产类型，多个以逗号分割", example = "BTC,ETH", required = true),
-            @ApiImplicitParam(name = "symbol", value = "交易对，多个以逗号分割", example = "BTC_USDT,BTC_ETH", required = true),
-             @ApiImplicitParam(name = "count ", value = "返回条数（最大100条）", example = "10", required = true)
-    })
-    List<PcOrderTradeDetailVo> queryLastTradeRecord(
-            @RequestParam(value = "asset") String asset,
-            @RequestParam(value = "symbol", required = true) String symbol,
-            @RequestParam(value = "count", required = true) Integer count);
+//    @ApiOperation(value = "查询最新成交记录")
+//    @GetMapping(value = "/api/extension/pc/trade/queryLastTradeRecord")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "asset", value = "资产类型，多个以逗号分割", example = "BTC,ETH", required = true),
+//            @ApiImplicitParam(name = "symbol", value = "交易对，多个以逗号分割", example = "BTC_USDT,BTC_ETH", required = true),
+//             @ApiImplicitParam(name = "count ", value = "返回条数（最大100条）", example = "10", required = true)
+//    })
+//    List<PcOrderTradeDetailVo> queryLastTradeRecord(
+//            @RequestParam(value = "asset") String asset,
+//            @RequestParam(value = "symbol", required = true) String symbol,
+//            @RequestParam(value = "count", required = true) Integer count);
 
 
 

@@ -27,13 +27,21 @@ public class PcTradeExtendApiAction implements PcTradeExtendApi{
 
     @Override
     public List<PcTradeVo> queryLastTrade(String asset, String symbol, Integer count) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == count ) {
-            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
-        }
+        checkParam(asset, symbol, count);
 
         List<PcTradeVo> list = pcTradeExtendService.queryTradeResult(asset, symbol, count);
 
         return list;
+    }
+
+    private void checkParam(String asset, String symbol, Integer count) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == count ) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        if(count>100){
+            throw new ExException(PcCommonErrorCode.MORE_THAN_MAX_ROW);
+
+        }
     }
 
 }

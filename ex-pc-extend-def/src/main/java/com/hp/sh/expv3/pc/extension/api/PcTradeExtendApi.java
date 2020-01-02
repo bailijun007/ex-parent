@@ -20,7 +20,7 @@ import java.util.List;
 @FeignClient(value = "ex-pc-extend")
 public interface PcTradeExtendApi {
 
-    @ApiOperation(value = "查询当前委托的成交记录(撮合结果)")
+    @ApiOperation(value = "查询最新成交记录(撮合结果)")
     @GetMapping(value = "/api/extension/pc/trade/queryLastTrade")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
