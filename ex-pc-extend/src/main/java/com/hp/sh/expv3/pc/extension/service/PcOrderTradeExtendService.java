@@ -11,8 +11,6 @@ import java.util.List;
 public interface PcOrderTradeExtendService {
     BigDecimal getRealisedPnl(Long posId, Long userId);
 
-    List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId);
-
     PcOrderTradeVo getPcOrderTrade(Long refId, String asset, String symbol, Long userId, Long time);
 
 
@@ -25,4 +23,5 @@ public interface PcOrderTradeExtendService {
     List<PcOrderTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long statTime, Long endTime,Long userId);
 
     List<PcOrderTradeVo> queryLastTradeRecord(String asset, String symbol, Integer count);
+
 }

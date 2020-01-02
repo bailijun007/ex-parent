@@ -28,16 +28,7 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         return pcOrderTradeDAO.getRealisedPnl(posId,userId,null);
     }
 
-    @Override
-    public List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId) {
-        Map<String, Object> map=new HashMap<>();
-        map.put("userId",userId);
-        map.put("asset",asset);
-        map.put("symbol",symbol);
-        map.put("orderId",orderId);
-        List<PcOrderTradeVo> voList = pcOrderTradeDAO.queryList(map);
-        return voList;
-    }
+
 
     @Override
     public PcOrderTradeVo getPcOrderTrade(Long refId, String asset, String symbol, Long userId, Long time) {
@@ -105,6 +96,8 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         List<PcOrderTradeVo> list = pcOrderTradeDAO.queryLastTradeRecord(map);
         return list;
     }
+
+
 
 
 }

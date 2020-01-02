@@ -23,7 +23,7 @@
     </resultMap>
 
     <sql id="simple_where">
-        where 1=1
+       <where>
         <if test="idList!=null">and id in
             <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
                 #{idList[${i}]}
@@ -59,6 +59,7 @@
         <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
         <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
         <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>
+       </where>
     </sql>
 
     <sql id="Base_Column_List" >
@@ -81,6 +82,8 @@
         <include refid="Base_Column_List"/>
         from pc_trade
         <include refid="simple_where"/>
+        ORDER BY id desc
+        LIMIT 0,${count}
     </select>
 
 

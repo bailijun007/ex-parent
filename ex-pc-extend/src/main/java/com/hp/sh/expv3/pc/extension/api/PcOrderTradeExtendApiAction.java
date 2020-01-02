@@ -27,18 +27,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
     private PcOrderTradeExtendService pcOrderTradeService;
 
 
-    @Override
-    public List<PcOrderTradeDetailVo> queryOrderTradeDetail(Long userId, String asset, String symbol, String orderId) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || StringUtils.isEmpty(orderId)) {
-            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
-        }
-        List<PcOrderTradeDetailVo> result = new ArrayList<>();
-        List<PcOrderTradeVo> voList = pcOrderTradeService.queryOrderTrade(userId, asset, symbol, orderId);
-        //封装结果集
-        this.toResult(result, voList);
 
-        return result;
-    }
 
     /**
      * 查询成交记录
