@@ -83,7 +83,7 @@
         from pc_trade
         <include refid="simple_where"/>
         ORDER BY id desc
-        LIMIT 0,${count}
+        LIMIT 0,${limit}
     </select>
 
 

@@ -16,7 +16,7 @@ import java.util.List;
  * 永续合约_成交(撮合结果)
  * @author BaiLiJun  on 2020/1/2
  */
-@Api(tags = "永续合约用户订单成交记录扩展接口")
+@Api(tags = "永续合约_成交(撮合结果)")
 @FeignClient(value = "ex-pc-extend")
 public interface PcTradeExtendApi {
 

@@ -10,11 +10,11 @@ import java.time.Instant;
 @Component
 public class PLPayService {
 
-    @Value("${plpay.server.host:}")
-    private String apiHost;
-
-    @Value("${plpay.server.md5Key}")
-    private String md5Key;
+//    @Value("${plpay.server.host:}")
+//    private String apiHost;
+//
+//    @Value("${plpay.server.md5Key}")
+    private String md5Key="";
 
     /**
      * @param userId      用户id
