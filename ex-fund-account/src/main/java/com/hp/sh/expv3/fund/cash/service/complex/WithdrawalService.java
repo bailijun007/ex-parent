@@ -69,8 +69,7 @@ public class WithdrawalService {
 	
 	/**
 	 * 批准提现申请
-	 * @param userId 
-	 * @param applyId
+	 * @param userId
 	 */
 	public WithdrawalRecord approveWithdrawal(Long userId, Long id){
 		WithdrawalRecord record = this.withdrawalRecordDAO.findById(userId, id);
@@ -87,8 +86,7 @@ public class WithdrawalService {
 	
 	/**
 	 * 拒绝提现申请
-	 * @param userId 
-	 * @param applyId
+	 * @param userId
 	 */
 	public void rejectWithdrawal(Long userId, Long id){
 		WithdrawalRecord record = this.withdrawalRecordDAO.findById(userId, id);

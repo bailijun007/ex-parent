@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.hp.sh.expv3.base.mapper.BaseUserDataMapper;
 import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 
@@ -20,6 +21,6 @@ public interface C2cOrderDAO  {
 
 	public Long queryCount(Map<String,Object> params);
 
-   int saveC2cOrder(C2cOrder c2cOrder);
+   int saveC2cOrder(@Param("c2cOrder") C2cOrder c2cOrder);
 
 }

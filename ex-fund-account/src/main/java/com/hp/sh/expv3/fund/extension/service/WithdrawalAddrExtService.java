@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.fund.extension.service;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrParam;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,5 +14,5 @@ public interface WithdrawalAddrExtService {
 
     WithdrawalAddrVo getAddressByUserIdAndAsset(Long userId, String asset);
 
-    List<WithdrawalAddrVo> findWithdrawalAddr(Long userId, String asset);
+    PageResult<WithdrawalAddrVo> pageQueryWithdrawalAddrList(Long userId, String asset, Integer pageNo, Integer pageSize, Integer enabled);
 }

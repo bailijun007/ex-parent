@@ -14,6 +14,8 @@ public class C2cOrder implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
+    private Long id;
+
 	private String sn;
 	
 	//支付币种
@@ -192,5 +194,34 @@ public class C2cOrder implements Serializable {
 		this.approvalStatus = approvalStatus;
 	}
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "C2cOrder{" +
+                "id=" + id +
+                ", sn='" + sn + '\'' +
+                ", payCurrency='" + payCurrency + '\'' +
+                ", exchangeCurrency='" + exchangeCurrency + '\'' +
+                ", type=" + type +
+                ", price=" + price +
+                ", volume=" + volume +
+                ", amount=" + amount +
+                ", payStatus=" + payStatus +
+                ", payStatusDesc='" + payStatusDesc + '\'' +
+                ", payTime=" + payTime +
+                ", payFinishTime=" + payFinishTime +
+                ", synchStatus=" + synchStatus +
+                ", approvalStatus=" + approvalStatus +
+                ", created=" + created +
+                ", modified=" + modified +
+                ", userId=" + userId +
+                '}';
+    }
 }

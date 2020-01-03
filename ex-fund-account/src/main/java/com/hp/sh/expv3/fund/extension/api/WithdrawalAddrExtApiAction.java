@@ -1,20 +1,15 @@
 package com.hp.sh.expv3.fund.extension.api;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.error.DepositExtError;
-import com.hp.sh.expv3.fund.extension.error.AddressExtError;
 import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalAddrExtService;
-import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrParam;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2019/12/16
@@ -24,19 +19,13 @@ public class WithdrawalAddrExtApiAction implements  WithdrawalAddrExtApi{
    @Autowired
    private WithdrawalAddrExtService withdrawalAddrExtService;
 
+
     @Override
-    public List<WithdrawalAddrVo> findWithdrawalAddr(@RequestBody WithdrawalAddrParam param) {
-        if (param.getUserId()==null || param.getPageNo() == null || param.getPageSize() == null|| StringUtils.isEmpty(param.getAsset())) {
+    public PageResult<WithdrawalAddrVo> findWithdrawalAddr(Long userId, String asset, Integer pageNo, Integer pageSize, Integer enabled) {
+        if (userId==null || pageNo == null || pageSize == null) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }
-
-        List<WithdrawalAddrVo> addrVoList = withdrawalAddrExtService.findWithdrawalAddr(param.getUserId(), param.getAsset());
-        if(CollectionUtils.isEmpty(addrVoList)){
-            return addrVoList;
-        }
-        //分页
-        List<WithdrawalAddrVo> voList = addrVoList.stream().skip(param.getPageSize() * (param.getPageNo() - 1))
-                .limit(param.getPageSize()).collect(Collectors.toList());
-        return voList;
+        PageResult<WithdrawalAddrVo> result = withdrawalAddrExtService.pageQueryWithdrawalAddrList(userId, asset,pageNo,pageSize,enabled);
+        return result;
     }
 }
