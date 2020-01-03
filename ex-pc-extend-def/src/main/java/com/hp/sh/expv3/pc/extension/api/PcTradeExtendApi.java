@@ -48,6 +48,19 @@ public interface PcTradeExtendApi {
                                        @RequestParam(value = "startTime") Long startTime);
 
 
+    @ApiOperation(value = "大于等于这个时间点的最近的一条数据")
+    @GetMapping(value = "/api/extension/pc/trade/queryLastTradeByGtTime")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true)
+    })
+    PcTradeVo queryLastTradeByGtTime(@RequestParam(value = "asset", required = false) String asset,
+                                       @RequestParam(value = "symbol", required = false) String symbol,
+                                       @RequestParam(value = "startTime") Long startTime);
+
+
+
     @ApiOperation(value = "一段时间内总的成交量")
     @GetMapping(value = "/api/extension/pc/trade/getTotalTurnover")
     @ApiImplicitParams({

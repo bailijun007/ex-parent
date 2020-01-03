@@ -41,8 +41,18 @@ public class PcTradeExtendApiAction implements PcTradeExtendApi {
         if (null == startTime || type == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        List<PcTradeVo> list = pcTradeExtendService.queryTradeByGtTime(asset, symbol, startTime, null,type);
+        List<PcTradeVo> list = pcTradeExtendService.queryTradeByGtTime(asset, symbol, startTime, null, type);
         return list;
+    }
+
+    @Override
+    public PcTradeVo queryLastTradeByGtTime(String asset, String symbol, Long startTime) {
+        if (null == startTime || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        PcTradeVo pcTradeVo = pcTradeExtendService.queryLastTrade(asset, symbol, startTime,null);
+
+        return pcTradeVo;
     }
 
     @Override
@@ -50,7 +60,7 @@ public class PcTradeExtendApiAction implements PcTradeExtendApi {
         if (null == startTime || endTime == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        List<PcTradeVo> list = pcTradeExtendService.queryTradeByGtTime(asset, symbol, startTime, endTime,null);
+        List<PcTradeVo> list = pcTradeExtendService.queryTradeByGtTime(asset, symbol, startTime, endTime, null);
         BigDecimal total = list.stream().map(PcTradeVo::getNumber).reduce(BigDecimal.ZERO, BigDecimal::add);
         return total;
     }

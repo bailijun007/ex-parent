@@ -75,6 +75,10 @@
         <include refid="Base_Column_List"/>
         from pc_trade
         <include refid="simple_where"/>
+        <if test="orderBy!=null and orderBy!=''">
+            order by ${orderBy} desc
+        </if>
+        LIMIT 0,1
     </select>
 
     <select id="queryList" resultMap="PcTradeVo">
