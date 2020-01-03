@@ -35,7 +35,7 @@ public interface WithdrawalAddrExtApi {
     @GetMapping(value = "/api/extension/account/withdraw/address/query")
     public PageResult<WithdrawalAddrVo> findWithdrawalAddr(@RequestParam("userId") Long userId,
                                                            @RequestParam("asset") String asset,
-                                                           @RequestParam("pageNo") Integer pageNo,
+                                                           @RequestParam("pageNo") Long pageNo,
                                                            @RequestParam("pageSize") Integer pageSize,
                                                            @RequestParam("enabled") Integer enabled);
 

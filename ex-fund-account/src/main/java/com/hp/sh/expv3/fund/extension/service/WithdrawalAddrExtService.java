@@ -14,5 +14,5 @@ public interface WithdrawalAddrExtService {
 
     WithdrawalAddrVo getAddressByUserIdAndAsset(Long userId, String asset);
 
-    PageResult<WithdrawalAddrVo> pageQueryWithdrawalAddrList(Long userId, String asset, Integer pageNo, Integer pageSize, Integer enabled);
+    PageResult<WithdrawalAddrVo> pageQueryWithdrawalAddrList(Long userId, String asset, Long pageNo, Integer pageSize, Integer enabled);
 }

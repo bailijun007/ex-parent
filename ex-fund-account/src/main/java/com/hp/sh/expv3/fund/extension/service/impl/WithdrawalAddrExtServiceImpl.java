@@ -31,7 +31,7 @@ public class WithdrawalAddrExtServiceImpl implements WithdrawalAddrExtService {
     }
 
     @Override
-    public PageResult<WithdrawalAddrVo> pageQueryWithdrawalAddrList(Long userId, String asset, Integer pageNo, Integer pageSize, Integer enabled) {
+    public PageResult<WithdrawalAddrVo> pageQueryWithdrawalAddrList(Long userId, String asset, Long pageNo, Integer pageSize, Integer enabled) {
         PageResult<WithdrawalAddrVo> result=new PageResult<>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
@@ -44,7 +44,7 @@ public class WithdrawalAddrExtServiceImpl implements WithdrawalAddrExtService {
                    .collect(Collectors.toList());
            result.setList(list);
        }
-        result.setPageNo(pageNo);
+        result.setPageNo(Integer.parseInt(pageNo+""));
         int rowTotal = voList.size();
         result.setRowTotal(Long.parseLong(rowTotal+""));
         result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
