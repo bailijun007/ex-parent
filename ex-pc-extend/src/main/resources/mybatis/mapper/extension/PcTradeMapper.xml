@@ -82,9 +82,25 @@
         <include refid="Base_Column_List"/>
         from pc_trade
         <include refid="simple_where"/>
-        ORDER BY id desc
-        LIMIT 0,${limit}
+        <if test="orderBy!=null and orderBy!=''">
+            order by ${orderBy} desc
+        </if>
+        <if test="limit!=null and limit!=''">
+            LIMIT 0,${limit}
+        </if>
     </select>
 
+    <select id="queryTradeByGtTime" resultMap="PcTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_trade
+        <include refid="simple_where"/>
+        <if test="type!=null and type==1">
+            order by price desc
+        </if>
+        <if test="type!=null and type==2">
+            order by price asc
+        </if>
 
+    </select>
 </mapper>

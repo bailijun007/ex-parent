@@ -13,14 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author BaiLiJun  on 2020/1/2
  */
 @RestController
-public class PcTradeExtendApiAction implements PcTradeExtendApi{
+public class PcTradeExtendApiAction implements PcTradeExtendApi {
     @Autowired
     private PcTradeExtendService pcTradeExtendService;
 
@@ -34,13 +36,31 @@ public class PcTradeExtendApiAction implements PcTradeExtendApi{
         return list;
     }
 
-    private void checkParam(String asset, String symbol, Integer count) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == count ) {
+    @Override
+    public List<PcTradeVo> queryTradeByGtTime(String asset, String symbol, Integer type, Long startTime) {
+        if (null == startTime || type == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        if(count>100){
-            throw new ExException(PcCommonErrorCode.MORE_THAN_MAX_ROW);
+        List<PcTradeVo> list = pcTradeExtendService.queryTradeByGtTime(asset, symbol, startTime, null,type);
+        return list;
+    }
 
+    @Override
+    public BigDecimal getTotalTurnover(String asset, String symbol, Long startTime, Long endTime) {
+        if (null == startTime || endTime == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        List<PcTradeVo> list = pcTradeExtendService.queryTradeByGtTime(asset, symbol, startTime, endTime,null);
+        BigDecimal total = list.stream().map(PcTradeVo::getNumber).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return total;
+    }
+
+    private void checkParam(String asset, String symbol, Integer count) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == count) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        if (count > 100) {
+            throw new ExException(PcCommonErrorCode.MORE_THAN_MAX_ROW);
         }
     }
 

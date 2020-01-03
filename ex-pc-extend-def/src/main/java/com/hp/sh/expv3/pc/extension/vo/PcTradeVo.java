@@ -48,6 +48,7 @@ public class PcTradeVo implements Serializable {
     @ApiModelProperty("数量")
     private BigDecimal number;
 
+
     @ApiModelProperty("成交时间")
     private Long  tradeTime;
 
@@ -187,4 +188,5 @@ public class PcTradeVo implements Serializable {
     public void setSymbol(String symbol) {
         this.symbol = symbol;
     }
+
 }

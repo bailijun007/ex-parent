@@ -14,4 +14,5 @@ public interface PcTradeDAO {
 
     List<PcTradeVo> queryList(Map<String,Object> map);
 
+    List<PcTradeVo> queryTradeByGtTime(Map<String, Object> map);
 }
