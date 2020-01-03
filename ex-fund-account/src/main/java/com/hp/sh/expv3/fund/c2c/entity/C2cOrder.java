@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.fund.c2c.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
@@ -9,7 +10,7 @@ import com.hp.sh.expv3.base.entity.UserDataEntity;
  * @author wangjg
  *
  */
-public class C2cOrder extends UserDataEntity {
+public class C2cOrder implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -51,7 +52,40 @@ public class C2cOrder extends UserDataEntity {
 	//审批状态
 	private Integer approvalStatus;
 
-	public C2cOrder() {
+    // 创建时间
+    private Long created;
+    // 修改时间
+    private Long modified;
+
+    //用户ID
+    protected Long userId;
+
+
+    public Long getCreated() {
+        return created;
+    }
+
+    public void setCreated(Long created) {
+        this.created = created;
+    }
+
+    public Long getModified() {
+        return modified;
+    }
+
+    public void setModified(Long modified) {
+        this.modified = modified;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public C2cOrder() {
 	}
 
 	public String getSn() {
@@ -157,5 +191,6 @@ public class C2cOrder extends UserDataEntity {
 	public void setApprovalStatus(Integer approvalStatus) {
 		this.approvalStatus = approvalStatus;
 	}
+
 
 }

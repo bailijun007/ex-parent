@@ -12,12 +12,14 @@ import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
  * @author wangjg
  *
  */
-public interface C2cOrderDAO extends BaseUserDataMapper<C2cOrder,Long> {
+public interface C2cOrderDAO  {
 
 	public List<C2cOrder> queryList(Map<String,Object> params);
 	
 	public C2cOrder queryOne(Map<String,Object> params);
 
 	public Long queryCount(Map<String,Object> params);
+
+   int saveC2cOrder(C2cOrder c2cOrder);
 
 }

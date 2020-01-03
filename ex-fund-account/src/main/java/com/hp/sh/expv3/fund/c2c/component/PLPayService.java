@@ -2,6 +2,7 @@ package com.hp.sh.expv3.fund.c2c.component;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
 import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
 import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,27 +30,44 @@ public class PLPayService {
      *                    TODO 老王，入金回调如何确保幂等（高并发情况下，如何确认入金状态与入金账户的修改）
      * @return 返回转发的url地址，调用方需要转发到该地址获取数据
      */
-    public String rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal fabiAmt, BigDecimal tarVolume) {
+    public C2cOrder rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal fabiAmt, BigDecimal tarVolume) {
         //买家姓名
         String customerId = userId + "";
         //生成订单号
         String orderNo = getOrderNo();
         //订单币种
-        String orderCurrency = tarCurrency;
+        String orderCurrency = srcCurrency;
         //订单金额
         String orderAmount = fabiAmt.stripTrailingZeros().toPlainString();
         String receiveUrl = getReceiveUrl();
         String pickupUrl = getPickupUrl();
         //获取加密后的签名
-        String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount, orderCurrency, customerId);
-        //检查发送请求到第三方支付的url是否 返回code是200
-        Boolean b = pLpayClient.checkSendUrl(customerId, orderNo, orderCurrency, orderAmount, receiveUrl, pickupUrl, sign);
-        if (!b) {
-        //订单发送请求到第三方支付发生错误
-            throw new ExException(FundCommonError.SEND_REQUEST_TO_C2C_SERVICE_FAIL);
-        }
+//        String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount, orderCurrency, customerId);
+//        //检查发送请求到第三方支付的url是否 返回code是200
+//        Boolean b = pLpayClient.checkSendUrl(customerId, orderNo, orderCurrency, orderAmount, receiveUrl, pickupUrl, sign);
+//        if (!b) {
+//        //订单发送请求到第三方支付发生错误
+//            throw new ExException(FundCommonError.SEND_REQUEST_TO_C2C_SERVICE_FAIL);
+//        }
 
-        return "success";
+
+        //增加一条c2c订单记录
+        C2cOrder c2cOrder=new C2cOrder();
+        c2cOrder.setSn(orderNo);
+        c2cOrder.setPayCurrency(srcCurrency);
+        c2cOrder.setExchangeCurrency(tarCurrency);
+        c2cOrder.setType(1);
+        c2cOrder.setPayStatus(0);
+        c2cOrder.setPayStatusDesc("c2c充值");
+        c2cOrder.setPayTime(Instant.now().toEpochMilli());
+        c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
+        c2cOrder.setSynchStatus(0);
+        c2cOrder.setApprovalStatus(0);
+        c2cOrder.setUserId(userId);
+        c2cOrder.setCreated(Instant.now().toEpochMilli());
+        c2cOrder.setModified(Instant.now().toEpochMilli());
+
+        return c2cOrder;
     }
 
 

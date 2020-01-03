@@ -1,7 +1,10 @@
 package com.hp.sh.expv3.fund.c2c.component;
 
 import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
+import com.hp.sh.expv3.fund.c2c.service.BuyService;
 import org.apache.commons.collections4.MultiValuedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -16,6 +19,9 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 public class PLpayClient {
+    private static final Logger logger = LoggerFactory.getLogger(PLpayClient.class);
+
+
     @Value("${plpay.server.host}")
     private String apiHost;
 
@@ -34,6 +40,7 @@ public class PLpayClient {
 
     /**
      * 检查重定向请求是否成功
+     *
      * @param customerId
      * @param orderNo
      * @param orderCurrency
@@ -47,14 +54,15 @@ public class PLpayClient {
         String url = apiHost + "?orderNo=" + orderNo + "&customerId=" + customerId + "&orderCurrency=" + orderCurrency + "&orderAmount=" + orderAmount
                 + "&receiveUrl=" + receiveUrl + "&pickupUrl=" + pickupUrl + "&shopNo=" + shopNo + "&signType=" + signType + "&sign=" + sign;
 
-// todo 发送请求到第三方支付，发送之后只要不是系统错误即可
-// TODO 老杜要加个接口，见tg dddd:2020.01.02 17:25:17 : 查询某个用户一段时间的提币数量 ,请求参数 用户id 开始时间,结束时间,币种(可选,不填为全部币种),结果返回一个集合
-        RestTemplate restTemplate=new RestTemplate();
+        System.out.println("重定向请求url为 = " + url);
+        logger.info("重定向请求url为:{}", url);
+
+        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
-         int codeValue = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getStatusCodeValue();
-        if(codeValue==200){
+        int codeValue = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getStatusCodeValue();
+        if (codeValue == 200) {
             return Boolean.TRUE;
         }
 
@@ -75,6 +83,10 @@ public class PLpayClient {
     public String getSign(String pickupUrl, String receiveUrl, String orderNo, String orderAmount, String orderCurrency, String customerId) {
         String sign = pickupUrl + receiveUrl + signType + orderNo + orderAmount + orderCurrency + customerId + md5Key;
         String md5 = DigestUtils.md5DigestAsHex(sign.getBytes());
+
+        System.out.println("获取到加密后的签名 = " + md5);
+        logger.info("获取到加密后的签名:{}", md5);
+
         return md5;
     }
 

@@ -98,14 +98,11 @@
 	</select>
 
 
-	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
+	<insert id="saveC2cOrder">
 		insert into c2c_order (
-			sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified
+			sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,created,modified
 		)values(
-			#{sn},#{payCurrency},#{exchangeCurrency},#{type},#{price},#{volume},#{amount},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{approvalStatus},#{userId},#{id},#{created},#{modified}
+			#{sn},#{payCurrency},#{exchangeCurrency},#{type},#{price},#{volume},#{amount},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{approvalStatus},#{userId},#{created},#{modified}
 		)
 	</insert>
 	
@@ -113,9 +110,9 @@
 		update 
 			c2c_order
 		set 
-			sn=#{sn},pay_currency=#{payCurrency},exchange_currency=#{exchangeCurrency},type=#{type},price=#{price},volume=#{volume},amount=#{amount},pay_status=#{payStatus},pay_status_desc=#{payStatusDesc},pay_time=#{payTime},pay_finish_time=#{payFinishTime},synch_status=#{synchStatus},approval_status=#{approvalStatus},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+			pay_currency=#{payCurrency},exchange_currency=#{exchangeCurrency},type=#{type},price=#{price},volume=#{volume},amount=#{amount},pay_status=#{payStatus},pay_status_desc=#{payStatusDesc},pay_time=#{payTime},pay_finish_time=#{payFinishTime},synch_status=#{synchStatus},approval_status=#{approvalStatus},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
-			id=#{id}
+			sn=#{sn}
 	</update>
 
 	<delete id="delete">
