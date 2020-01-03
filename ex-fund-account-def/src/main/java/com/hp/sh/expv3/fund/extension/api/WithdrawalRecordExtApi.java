@@ -57,6 +57,22 @@ public interface WithdrawalRecordExtApi {
 
 
 
+    @ApiOperation("查询某个用户一段时间的提币数量")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "2", required = true),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "ETH", required = false),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = true),
+    })
+    @GetMapping(value = "/api/extension/account/withdrawal/queryUserWithdrawal")
+    public List<WithdrawalRecordVo> queryUserWithdrawal(@RequestParam(value = "userId") Long userId,
+                                                  @RequestParam(value = "asset",required = false) String asset,
+                                                  @RequestParam(value = "startTime") Long startTime,
+                                                  @RequestParam(value = "endTime") Long endTime);
+
+
+
+
     @ApiOperation("查询所有用户提币历史 后台admin专用")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "2", required = false),

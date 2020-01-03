@@ -36,7 +36,7 @@ public class WithdrawalRecordVo {
     @ApiModelProperty("创建时间")
     private Long ctime;
 
-    private Date created;
+    private Long created;
 
     @ApiModelProperty("提币时间")
     private Long withdrawTime;
@@ -92,11 +92,11 @@ public class WithdrawalRecordVo {
         this.ctime = ctime;
     }
 
-    public Date getCreated() {
+    public Long getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Long created) {
         this.created = created;
     }
 

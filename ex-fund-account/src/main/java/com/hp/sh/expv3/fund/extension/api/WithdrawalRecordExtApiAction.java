@@ -49,12 +49,8 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
         if (userId == null || timestamp == null || StringUtils.isEmpty(asset)) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }
-        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(timestamp));
-        List<WithdrawalRecordVo> voList = withdrawalRecordExtService.findWithdrawalRecordList(userId, asset, time);
-        for (WithdrawalRecordVo vo : voList) {
-            WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
-            vo.setTargetAddress(withdrawalAddrVo.getAddress());
-        }
+//        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(timestamp));
+        List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, timestamp, null);
         return voList;
     }
 
@@ -62,6 +58,26 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     public WithdrawalRecordVo queryLastHistory(Long userId, String asset) {
         WithdrawalRecordVo vo = withdrawalRecordExtService.queryLastHistory(userId, asset);
         return vo;
+    }
+
+    @Override
+    public List<WithdrawalRecordVo> queryUserWithdrawal(Long userId, String asset, Long startTime, Long endTime) {
+        if (userId == null || startTime == null || endTime == null || StringUtils.isEmpty(asset)) {
+            throw new ExException(FundCommonError.PARAM_EMPTY);
+        }
+        List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, startTime, endTime);
+        return voList;
+    }
+
+    private List<WithdrawalRecordVo> getWithdrawalRecordVos(Long userId, String asset, Long startTime, Long endTime) {
+        List<WithdrawalRecordVo> voList = withdrawalRecordExtService.findWithdrawalRecordList(userId, asset, startTime, endTime);
+        if(!CollectionUtils.isEmpty(voList)){
+            for (WithdrawalRecordVo vo : voList) {
+                WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
+                vo.setTargetAddress(withdrawalAddrVo.getAddress());
+            }
+        }
+        return voList;
     }
 
     @Override

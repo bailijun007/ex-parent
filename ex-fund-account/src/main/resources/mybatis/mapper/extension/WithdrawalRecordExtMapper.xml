@@ -87,10 +87,10 @@
                 and asset=#{asset}
             </if>
             <if test="payStatus!=null">  AND pay_status&lt;&gt; #{payStatus}</if>
-            <if test="createdBegin!=null and createdBegin!=''"> and created &gt;= #{createdBegin}</if>
-            <if test="createdEnd!=null and createdEnd!=''"> and created &lt;= #{createdEnd}</if>
-            <if test="modifiedBegin!=null and modifiedBegin!=''"> and modified &gt;= #{modifiedBegin}</if>
-            <if test="modifiedEnd!=null and modifiedEnd!=''"> and modified &lt;= #{modifiedEnd}</if>
+            <if test="createdBegin!=null"> and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null"> and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
 
         </where>
     </select>

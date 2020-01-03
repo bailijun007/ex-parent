@@ -24,6 +24,6 @@ public interface WithdrawalRecordExtService {
     WithdrawalRecordVo queryLastHistory(Long userId, String asset);
 
 
-    List<WithdrawalRecordVo> findWithdrawalRecordList(Long userId, String asset, String time);
+    List<WithdrawalRecordVo> findWithdrawalRecordList(Long userId, String asset, Long startTime,Long endTime);
 
 }

@@ -30,9 +30,9 @@ public class C2cOrderCallbackAction {
     @Autowired
     private PLpayClient pLpayClient;
 
-    @ApiOperation(value = "创建c2c充值通知")
-    @PostMapping("/deposit/create")
-    public String create(@RequestBody NotifyParam param) {
+    @ApiOperation(value = "订单成功回调通知")
+    @PostMapping("/deposit/notify")
+    public String notify(@RequestBody NotifyParam param) {
         //验证签名是否是伪造的
         boolean sign = pLpayClient.getNotifySign(param);
         if (!sign) {

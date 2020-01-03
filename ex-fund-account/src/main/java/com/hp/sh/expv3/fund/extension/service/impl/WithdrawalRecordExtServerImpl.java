@@ -41,8 +41,8 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
         }
         for (WithdrawalRecordVo historyVo : list) {
             Optional<WithdrawalRecordVo> vo = Optional.ofNullable(historyVo);
-            historyVo.setCtime(vo.map(d -> d.getCreated().getTime()).orElse(null));
-            historyVo.setWithdrawTime(vo.map(d -> d.getCreated().getTime()).orElse(null));
+            historyVo.setCtime(vo.map(d -> d.getCreated()).orElse(null));
+            historyVo.setWithdrawTime(vo.map(d -> d.getCreated()).orElse(null));
         }
 
         return list;
@@ -56,12 +56,13 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
     }
 
     @Override
-    public List<WithdrawalRecordVo> findWithdrawalRecordList(Long userId, String asset, String time) {
+    public List<WithdrawalRecordVo> findWithdrawalRecordList(Long userId, String asset, Long startTime,Long endTime) {
         Map<String, Object> map=new HashMap<>();
         map.put("userId",userId);
         map.put("asset",asset);
         map.put("payStatus",2);
-        map.put("createdBegin",time);
+        map.put("createdBegin",startTime);
+        map.put("createdEnd",endTime);
         List<WithdrawalRecordVo> recordVos = withdrawalRecordExtMapper.queryHistoryByTime(map);
         return recordVos;
     }

@@ -35,7 +35,7 @@ public class PLPayService {
         //生成订单号
         String orderNo = getOrderNo();
         //订单币种
-        String orderCurrency = srcCurrency;
+        String orderCurrency = tarCurrency;
         //订单金额
         String orderAmount = fabiAmt.stripTrailingZeros().toPlainString();
         String receiveUrl = getReceiveUrl();
