@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Param;
  * @author wangjg
  *
  */
-public interface C2cOrderDAO  {
+public interface C2cOrderDAO extends BaseUserDataMapper<C2cOrder,Long>  {
 
 	public List<C2cOrder> queryList(Map<String,Object> params);
 	
@@ -21,6 +21,6 @@ public interface C2cOrderDAO  {
 
 	public Long queryCount(Map<String,Object> params);
 
-   int saveC2cOrder(@Param("c2cOrder") C2cOrder c2cOrder);
+//   int saveC2cOrder(@Param("c2cOrder") C2cOrder c2cOrder);
 
 }

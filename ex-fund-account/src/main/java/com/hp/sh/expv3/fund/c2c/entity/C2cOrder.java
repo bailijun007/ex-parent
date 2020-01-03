@@ -10,11 +10,11 @@ import com.hp.sh.expv3.base.entity.UserDataEntity;
  * @author wangjg
  *
  */
-public class C2cOrder implements Serializable {
+public class C2cOrder extends UserDataEntity {
 	
 	private static final long serialVersionUID = 1L;
 
-    private Long id;
+
 
 	private String sn;
 	
@@ -54,38 +54,8 @@ public class C2cOrder implements Serializable {
 	//审批状态
 	private Integer approvalStatus;
 
-    // 创建时间
-    private Long created;
-    // 修改时间
-    private Long modified;
-
-    //用户ID
-    protected Long userId;
 
 
-    public Long getCreated() {
-        return created;
-    }
-
-    public void setCreated(Long created) {
-        this.created = created;
-    }
-
-    public Long getModified() {
-        return modified;
-    }
-
-    public void setModified(Long modified) {
-        this.modified = modified;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public C2cOrder() {
 	}
@@ -194,34 +164,5 @@ public class C2cOrder implements Serializable {
 		this.approvalStatus = approvalStatus;
 	}
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String toString() {
-        return "C2cOrder{" +
-                "id=" + id +
-                ", sn='" + sn + '\'' +
-                ", payCurrency='" + payCurrency + '\'' +
-                ", exchangeCurrency='" + exchangeCurrency + '\'' +
-                ", type=" + type +
-                ", price=" + price +
-                ", volume=" + volume +
-                ", amount=" + amount +
-                ", payStatus=" + payStatus +
-                ", payStatusDesc='" + payStatusDesc + '\'' +
-                ", payTime=" + payTime +
-                ", payFinishTime=" + payFinishTime +
-                ", synchStatus=" + synchStatus +
-                ", approvalStatus=" + approvalStatus +
-                ", created=" + created +
-                ", modified=" + modified +
-                ", userId=" + userId +
-                '}';
-    }
 }

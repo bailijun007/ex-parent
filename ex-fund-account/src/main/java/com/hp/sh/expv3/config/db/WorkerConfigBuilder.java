@@ -2,6 +2,7 @@ package com.hp.sh.expv3.config.db;
 
 import java.util.ArrayList;
 
+import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -42,7 +43,10 @@ public class WorkerConfigBuilder {
 
 	private static final String WITHDRAWAL_RECORD  = WithdrawalRecord.class.getName();
 	private static final int 	WITHDRAWAL_RECORD_ID  = 7;
-	
+
+	private static final String C2C_ORDER= C2cOrder.class.getName();
+	private static final int 	C2C_ORDER_ID  = 8;
+
 	@Value("${id.generator.dataCenterId}")
 	private int dataCenterId;
 	
@@ -68,6 +72,7 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, FUND_TRANSFER_ID, FUND_TRANSFER);
 		this.set(workerConfig, WITHDRAWAL_ADDR_ID, WITHDRAWAL_ADDR);
 		this.set(workerConfig, WITHDRAWAL_RECORD_ID, WITHDRAWAL_RECORD);
+		this.set(workerConfig, C2C_ORDER_ID, C2C_ORDER);
 	}
 	
 	private void set(WorkerConfig workerConfig, int seqId, String tableUUID){
