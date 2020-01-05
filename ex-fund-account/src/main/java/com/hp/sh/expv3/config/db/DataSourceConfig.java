@@ -51,6 +51,7 @@ public class DataSourceConfig {
 		builder.addTable("deposit_record");
 		builder.addTable("withdrawal_addr");
 		builder.addTable("withdrawal_record");
+		builder.addTable("c2c_order");
 		return builder.build();
 	}
 
