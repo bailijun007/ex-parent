@@ -312,7 +312,10 @@ public class PcOrderService {
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void cancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
-		
+		if(order.getStatus() == OrderStatus.CANCELED){
+			logger.warn("订单已经是取消状态了");
+			return;
+		}
 		this.checkCancelStatus(order);
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN){

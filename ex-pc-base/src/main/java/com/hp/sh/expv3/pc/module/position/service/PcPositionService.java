@@ -76,6 +76,7 @@ public class PcPositionService {
 		PcOrder order = this.pcOrderDAO.findById(matchedVo.getAccountId(), matchedVo.getOrderId());
 		boolean exist = this.chekOrderTrade(order, matchedVo);
 		if(exist){
+			logger.error("成交已处理过了");
 			return;
 		}
 		
