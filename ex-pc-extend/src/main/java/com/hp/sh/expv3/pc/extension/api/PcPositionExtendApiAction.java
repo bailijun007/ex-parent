@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.pc.extension.api;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -107,7 +108,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
                 currentPositionVo.setQty(positionVo.getVolume());
                 currentPositionVo.setBidFlag(positionVo.getLongFlag());
                 currentPositionVo.setAutoIncreaseFlag(positionVo.getAutoAddFlag());
-                currentPositionVo.setPosPnlRatio(realisedPnl.divide(positionVo.getInitMargin()));
+                currentPositionVo.setPosPnlRatio(realisedPnl.divide(positionVo.getInitMargin(),10, RoundingMode.HALF_UP));
                 currentPositionVo.setCtime(positionVo.getCreated());
 
                 HoldPosStrategy ps = positionStrategyContext.getHoldPosStrategy(positionVo.getAsset(), positionVo.getSymbol());

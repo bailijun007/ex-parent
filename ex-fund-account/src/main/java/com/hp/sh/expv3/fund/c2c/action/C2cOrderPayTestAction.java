@@ -42,7 +42,6 @@ public class C2cOrderPayTestAction {
                          @RequestParam("tarVolume")  BigDecimal tarVolume,  @RequestParam("fabiAmt") BigDecimal fabiAmt){
 
         C2cOrder c2cOrder = plPayService.rujin(userId, ratio, srcCurrency, tarCurrency, tarVolume, fabiAmt);
-        System.out.println("c2cOrder = " + c2cOrder.toString());
         buyService.saveC2cOrder(c2cOrder);
 
 

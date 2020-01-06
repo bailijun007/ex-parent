@@ -23,15 +23,10 @@ public class BuyService {
 
     public void saveC2cOrder(C2cOrder c2cOrder) {
         c2cOrderDAO.save(c2cOrder);
-//        System.out.println("c2cOrder = " + c2cOrder);
-//        int i = c2cOrderDAO.saveC2cOrder(c2cOrder);
-//
-//        System.out.println("i = " + i);
-
     }
 
     //通过sn修改订单
     public void update(C2cOrder c2cOrder) {
-//        c2cOrderDAO.update(c2cOrder);
+        c2cOrderDAO.updateBySn(c2cOrder);
     }
 }

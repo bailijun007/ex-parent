@@ -18,7 +18,8 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
  */
 public interface PcPositionDAO extends BaseUserDataMapper<PcPosition,Long> {
 
-	public int update(PcPosition entity);
+	@Override
+    public int update(PcPosition entity);
 
 	public List<PcPosition> queryList(Map<String,Object> params);
 	

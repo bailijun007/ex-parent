@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.hp.sh.expv3.dev.CrossDB;
+import com.hp.sh.expv3.utils.math.Precision;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +95,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                 vo.setAvgPrice(BigDecimal.ZERO);
                 vo.setFilledQty(orderVo.getFilledVolume());
                 vo.setCloseFlag(orderVo.getCloseFlag());
-                vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume()));
+                vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros());
                 vo.setOrderType(orderVo.getOrderType());
                 vo.setClientOid(orderVo.getClientOrderId());
                 list.add(vo);

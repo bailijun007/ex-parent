@@ -97,4 +97,18 @@ public class NotifyParam {
     public void setSign(String sign) {
         this.sign = sign;
     }
+
+    @Override
+    public String toString() {
+        return "NotifyParam{" +
+                "orderNo='" + orderNo + '\'' +
+                ", orderAmount=" + orderAmount +
+                ", orderCurrency='" + orderCurrency + '\'' +
+                ", paymentAmount=" + paymentAmount +
+                ", transactionId='" + transactionId + '\'' +
+                ", status='" + status + '\'' +
+                ", signType='" + signType + '\'' +
+                ", sign='" + sign + '\'' +
+                '}';
+    }
 }

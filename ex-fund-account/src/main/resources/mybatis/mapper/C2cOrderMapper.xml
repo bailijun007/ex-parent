@@ -4,104 +4,100 @@
 
 <mapper namespace="com.hp.sh.expv3.fund.c2c.dao.C2cOrderDAO">
 
-	<resultMap type="com.hp.sh.expv3.fund.c2c.entity.C2cOrder" id="C2cOrder">
-		<result column="sn" property="sn" />
-		<result column="pay_currency" property="payCurrency" />
-		<result column="exchange_currency" property="exchangeCurrency" />
-		<result column="type" property="type" />
-		<result column="price" property="price" />
-		<result column="volume" property="volume" />
-		<result column="amount" property="amount" />
-		<result column="pay_status" property="payStatus" />
-		<result column="pay_status_desc" property="payStatusDesc" />
-		<result column="pay_time" property="payTime" />
-		<result column="pay_finish_time" property="payFinishTime" />
-		<result column="synch_status" property="synchStatus" />
-		<result column="approval_status" property="approvalStatus" />
-		<result column="user_id" property="userId" />
-        <result column="id" property="id" />
-		<result column="created" property="created" />
-		<result column="modified" property="modified" />
-	</resultMap>
+    <resultMap type="com.hp.sh.expv3.fund.c2c.entity.C2cOrder" id="C2cOrder">
+        <result column="sn" property="sn"/>
+        <result column="pay_currency" property="payCurrency"/>
+        <result column="exchange_currency" property="exchangeCurrency"/>
+        <result column="type" property="type"/>
+        <result column="price" property="price"/>
+        <result column="volume" property="volume"/>
+        <result column="amount" property="amount"/>
+        <result column="pay_status" property="payStatus"/>
+        <result column="pay_status_desc" property="payStatusDesc"/>
+        <result column="pay_time" property="payTime"/>
+        <result column="pay_finish_time" property="payFinishTime"/>
+        <result column="synch_status" property="synchStatus"/>
+        <result column="approval_status" property="approvalStatus"/>
+        <result column="user_id" property="userId"/>
+        <result column="id" property="id"/>
+        <result column="created" property="created"/>
+        <result column="modified" property="modified"/>
+    </resultMap>
 
-	<sql id="Base_Column_List" >
+    <sql id="Base_Column_List">
 		sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified
 	</sql>
 
-	<sql id="simple_where" >
-		<where>
-		<if test="type!=null"> and type=#{type}</if>
-		<if test="payStatus!=null"> and pay_status=#{payStatus}</if>
-		<if test="payTime!=null"> and pay_time=#{payTime}</if>
-		<if test="payFinishTime!=null"> and pay_finish_time=#{payFinishTime}</if>
-		<if test="synchStatus!=null"> and synch_status=#{synchStatus}</if>
-		<if test="approvalStatus!=null"> and approval_status=#{approvalStatus}</if>
-		<if test="userId!=null"> and user_id=#{userId}</if>
-		<if test="id!=null"> and id=#{id}</if>
-		<if test="created!=null"> and created=#{created}</if>
-		<if test="modified!=null"> and modified=#{modified}</if>
-		<if test="keyword!=null and keyword!=''"> and sn like CONCAT('%',#{keyword},'%')</if>	
-		</where>
-	</sql>
+    <sql id="simple_where">
+        <where>
+            <if test="type!=null">and type=#{type}</if>
+            <if test="payStatus!=null">and pay_status=#{payStatus}</if>
+            <if test="payTime!=null">and pay_time=#{payTime}</if>
+            <if test="payFinishTime!=null">and pay_finish_time=#{payFinishTime}</if>
+            <if test="synchStatus!=null">and synch_status=#{synchStatus}</if>
+            <if test="approvalStatus!=null">and approval_status=#{approvalStatus}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="created!=null">and created=#{created}</if>
+            <if test="modified!=null">and modified=#{modified}</if>
+            <if test="keyword!=null and keyword!=''">and sn like CONCAT('%',#{keyword},'%')</if>
+        </where>
+    </sql>
 
-	<sql id="simple_query" >
-		select
-			<include refid="Base_Column_List" />
-		from c2c_order
-			<include refid="simple_where" />
-		<if test="orderBy!=null and orderBy!=''">
-			order by ${orderBy} <if test="!asc">desc</if>
-		</if>
+    <sql id="simple_query">
+        select
+        <include refid="Base_Column_List"/>
+        from c2c_order
+        <include refid="simple_where"/>
+        <if test="orderBy!=null and orderBy!=''">
+            order by ${orderBy}
+            <if test="!asc">desc</if>
+        </if>
 
-	</sql>
+    </sql>
 
-	<select id="pageQuery" resultMap="C2cOrder">
-		<include refid="simple_query" />
-	</select>
+    <select id="pageQuery" resultMap="C2cOrder">
+        <include refid="simple_query"/>
+    </select>
 
-	<select id="queryList" resultMap="C2cOrder">
-		<include refid="simple_query" />
-	</select>
+    <select id="queryList" resultMap="C2cOrder">
+        <include refid="simple_query"/>
+    </select>
 
-	<select id="queryOne" resultMap="C2cOrder">
-		<include refid="simple_query" />
-	</select>
+    <select id="queryOne" resultMap="C2cOrder">
+        <include refid="simple_query"/>
+    </select>
 
-	<select id="queryCount" resultType="long">
-		select 
-		<choose>
-			<when test="SUM!=null">
-				sum(${SUM})
-			</when>
-			<otherwise>
-				count(1)
-			</otherwise>
-		</choose>
-		from c2c_order
-		<include refid="simple_where" />
-	</select>
+    <select id="queryCount" resultType="long">
+        select
+        <choose>
+            <when test="SUM!=null">
+                sum(${SUM})
+            </when>
+            <otherwise>
+                count(1)
+            </otherwise>
+        </choose>
+        from c2c_order
+        <include refid="simple_where"/>
+    </select>
 
-	<select id="findById" resultMap="C2cOrder">
-		select
-			<include refid="Base_Column_List" />
-		from c2c_order
-			where id=#{id}
-	</select>
+    <select id="findById" resultMap="C2cOrder">
+        select
+        <include refid="Base_Column_List"/>
+        from c2c_order
+        where id=#{id}
+    </select>
 
-	<select id="exist" resultType="boolean">
-		select 
-			count(1)
-		from 
-			c2c_order
-		<include refid="simple_where" />
-		limit 1
-	</select>
+    <select id="exist" resultType="boolean">
+        select
+        count(1)
+        from
+        c2c_order
+        <include refid="simple_where"/>
+        limit 1
+    </select>
 
-
-	<!--<insert id="saveC2cOrder">-->
-		<!--insert into c2c_order (sn,pay_currency,exchange_currency,type,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,created,modified)-->
-		<!--values(#{c2cOrder.sn},#{c2cOrder.payCurrency},#{c2cOrder.exchangeCurrency},#{c2cOrder.type},#{c2cOrder.payStatus},#{c2cOrder.payStatusDesc},#{c2cOrder.payTime},#{c2cOrder.payFinishTime},#{c2cOrder.synchStatus},#{c2cOrder.approvalStatus},#{c2cOrder.userId},#{c2cOrder.created},#{c2cOrder.modified})-->
-	<!--</insert>-->
 
     <insert id="save">
         <selectKey resultType="long" order="AFTER" keyProperty="id">
@@ -114,7 +110,7 @@
         )
     </insert>
 
-	<update id="update">
+    <update id="update">
 		update 
 			c2c_order
 		set 
@@ -123,22 +119,76 @@
 			sn=#{sn}
 	</update>
 
-	<delete id="delete">
+
+    <update id="updateBySn">
+        update
+        c2c_order
+        <set>
+            <if test="payCurrency!=null and payCurrency!=''">
+                pay_currency=#{payCurrency},
+            </if>
+            <if test="exchangeCurrency!=null and exchangeCurrency!=''">
+                exchange_currency=#{exchangeCurrency},
+            </if>
+            <if test="type!=null">
+                `type`=#{type},
+            </if>
+            <if test="price!=null">
+                price=#{price},
+            </if>
+            <if test="volume!=null">
+                volume=#{volume},
+            </if>
+            <if test="amount!=null">
+                amount=#{amount},
+            </if>
+            <if test="payStatus!=null">
+                pay_status=#{payStatus},
+            </if>
+            <if test="payStatusDesc!=null and payStatusDesc!=''">
+                pay_status_desc=#{payStatusDesc},
+            </if>
+            <if test="payTime!=null">
+                pay_time=#{payTime},
+            </if>
+            <if test="payFinishTime!=null">
+                pay_finish_time=#{payFinishTime},
+            </if>
+            <if test="synchStatus!=null">
+                synch_status=#{synchStatus},
+            </if>
+            <if test="approvalStatus!=null">
+                approval_status=#{approvalStatus},
+            </if>
+            <if test="userId!=null">
+                user_id=#{userId},
+            </if>
+            <if test="created!=null">
+                created=#{created},
+            </if>
+            <if test="modified!=null">
+                modified=#{modified}
+            </if>
+        </set>
+        where   sn=#{sn}
+    </update>
+
+    <delete id="delete">
         delete from c2c_order where id=#{id}
     </delete>
 
     <delete id="condDelete">
         delete from c2c_order
-		<include refid="simple_where" />
+        <include refid="simple_where"/>
     </delete>
 
-	<!--  -->
-	
-	<select id="findBySn" resultMap="C2cOrder">
-		select
-			<include refid="Base_Column_List" />
-		from c2c_order
-			where user_id=#{userId} and sn=#{sn}
-	</select>
-	
+    <!--  -->
+
+    <select id="findBySn" resultMap="C2cOrder">
+        select
+        <include refid="Base_Column_List"/>
+        from c2c_order
+        where user_id=#{userId} and sn=#{sn}
+    </select>
+
 </mapper>

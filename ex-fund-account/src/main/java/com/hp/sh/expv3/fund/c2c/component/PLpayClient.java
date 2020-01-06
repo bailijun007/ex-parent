@@ -93,7 +93,7 @@ public class PLpayClient {
 
     /**
      * 通知签名校验
-     *
+     *MD5c2c157827741489168700USDTc2c1578277414891680000successpkriDZoEwB
      * @return
      */
     public boolean getNotifySign(@RequestBody NotifyParam param) {

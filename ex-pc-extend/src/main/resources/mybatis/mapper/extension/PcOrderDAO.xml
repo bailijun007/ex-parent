@@ -98,10 +98,10 @@
             <if test="cancelTime!=null">and cancel_time=#{cancelTime}</if>
             <if test="visibleFlag!=null">and visible_flag=#{visibleFlag}</if>
             <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
-            <if test="createOperator!=null and createOperator！=''">and create_operator=#{createOperator}</if>
-            <if test="cancelOperator!=null and cancelOperator！=''">and cancel_operator=#{cancelOperator}</if>
-            <if test="remark!=null and remark！=''">and remark=#{remark}</if>
-            <if test="clientOrderId!=null and clientOrderId！=''">and client_order_id=#{clientOrderId}</if>
+            <if test="createOperator!=null and createOperator!=''">and create_operator=#{createOperator}</if>
+            <if test="cancelOperator!=null and cancelOperator!=''">and cancel_operator=#{cancelOperator}</if>
+            <if test="remark!=null and remark!=''">and remark=#{remark}</if>
+            <if test="clientOrderId!=null and clientOrderId!=''">and client_order_id=#{clientOrderId}</if>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
             <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>

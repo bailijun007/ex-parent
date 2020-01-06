@@ -5,6 +5,7 @@ import com.hp.sh.expv3.pc.extension.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
+import com.hp.sh.expv3.utils.math.Precision;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -143,7 +144,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
                 vo.setAvgPrice(BigDecimal.ZERO);
                 vo.setFilledQty(orderVo.getFilledVolume());
                 vo.setCloseFlag(orderVo.getCloseFlag());
-                vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume()));
+                vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros());
                 vo.setOrderType(orderVo.getOrderType());
                 vo.setClientOid(orderVo.getClientOrderId());
                 list.add(vo);

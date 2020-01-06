@@ -8,6 +8,7 @@ import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
 import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
 import com.hp.sh.expv3.fund.extension.error.FundCommonError;
+import com.hp.sh.expv3.utils.math.Precision;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.Map;
 
@@ -57,12 +59,14 @@ public class C2cOrderCallbackAction {
 
         //更新一条c2c订单记录
         C2cOrder c2cOrder=new C2cOrder();
-        c2cOrder.setAmount(param.getOrderAmount());
+        BigDecimal orderAmount = param.getOrderAmount();
+        c2cOrder.setAmount(orderAmount);
         //计算USDT 就是 orderAmount* 0.975 / 你系统的CNY:USD汇率;
         BigDecimal volume = param.getOrderAmount().multiply(new BigDecimal("0.975")).divide(new BigDecimal("7"));
         c2cOrder.setVolume(volume);
         //价格=总额/volume
-        c2cOrder.setPrice(param.getOrderAmount().divide(volume));
+        BigDecimal price = orderAmount.divide(volume, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
+        c2cOrder.setPrice(price);
         if(param.getStatus().equals("success")){
             c2cOrder.setPayStatus(1);
         }else {
