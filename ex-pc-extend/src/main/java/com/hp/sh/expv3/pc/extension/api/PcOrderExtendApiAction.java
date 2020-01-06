@@ -51,9 +51,18 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
             ltOrderId = null;
         }
         List<UserOrderVo> result = new ArrayList<>();
-        List<String> assetList = Arrays.asList(asset.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
-        List<String> symbolList = Arrays.asList(symbol.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
-        List<Integer> statusList = Arrays.asList(status.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
+        List<String> assetList =null;
+        List<String> symbolList =null;
+        List<Integer> statusList =null;
+        if(StringUtils.isNotEmpty(asset)){
+         assetList = Arrays.asList(asset.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
+        }
+        if(StringUtils.isNotEmpty(symbol)){
+           symbolList = Arrays.asList(symbol.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
+        }
+        if(StringUtils.isNotEmpty(status)){
+            statusList = Arrays.asList(status.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
+        }
         List<PcOrderVo> list = pcOrderExtendService.queryOrderList(userId, assetList, symbolList, gtOrderId, ltOrderId, count, statusList);
         convertOrderList(result, list);
 

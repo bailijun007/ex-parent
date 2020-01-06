@@ -56,7 +56,7 @@
     </sql>
 
     <sql id="Base_Column_List" >
-	id,asset,symbol,margin_mode,hold_margin_ratio,short_leverage,long_leverage,long_max_leverage,short_max_leverage,cross_leverage,
+	id,asset,symbol,margin_mode,short_leverage,long_leverage,long_max_leverage,short_max_leverage,cross_leverage,
 	version,user_id,created,modified
     </sql>
 
