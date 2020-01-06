@@ -75,13 +75,11 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         PageResult<UserOrderVo> result = new PageResult<>();
         List<UserOrderVo> list = new ArrayList<>();
-        List<PcOrderVo> voList = pcOrderExtendService.queryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage);
-        convertOrderList(list, voList);
+        PageResult<PcOrderVo> voList = pcOrderExtendService.queryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,isTotalNumber);
+        convertOrderList(list, voList.getList());
 
         result.setList(list);
-        if (isTotalNumber == 1) {
-            result.setRowTotal(Long.parseLong(list.size() + ""));
-        }
+        result.setRowTotal(voList.getRowTotal());
         return result;
     }
 
@@ -118,8 +116,8 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     public List<UserOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
-        List<PcOrderVo> list = pcOrderExtendService.queryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage);
-        convertOrderList(result, list);
+        PageResult<PcOrderVo> list = pcOrderExtendService.queryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
+        convertOrderList(result, list.getList());
         return result;
     }
 
@@ -128,8 +126,8 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     public List<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
-        List<PcOrderVo> list = pcOrderExtendService.queryOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage);
-        convertOrderList(result, list);
+        PageResult<PcOrderVo> list = pcOrderExtendService.queryOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
+        convertOrderList(result, list.getList());
         return result;
     }
 

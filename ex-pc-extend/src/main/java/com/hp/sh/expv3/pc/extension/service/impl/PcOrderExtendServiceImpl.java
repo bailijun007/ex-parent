@@ -58,7 +58,8 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
-    public List<PcOrderVo> queryOrders(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage) {
+    public PageResult<PcOrderVo> queryOrders(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber) {
+        PageResult<PcOrderVo> result=new  PageResult<PcOrderVo>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
@@ -66,12 +67,21 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("orderType", orderType);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
-        map.put("lastOrderId", lastOrderId);
-        map.put("currentPage", currentPage);
-        map.put("pageSize", pageSize);
-        map.put("nextPage", nextPage);
+
+        if(isTotalNumber==null){
+            map.put("pageSize", pageSize);
+            map.put("lastOrderId", lastOrderId);
+            map.put("currentPage", currentPage);
+            map.put("nextPage", nextPage);
+
+        }else  if(isTotalNumber==1){
+            map.put("pageSize", Integer.MAX_VALUE);
+            List<PcOrderVo> pcOrderVos = pcOrderDAO.queryOrders(map);
+            result.setRowTotal(Long.valueOf(pcOrderVos.size()));
+        }
         List<PcOrderVo> pcOrderVos = pcOrderDAO.queryOrders(map);
-        return pcOrderVos;
+        result.setList(pcOrderVos);
+        return result;
     }
 
 

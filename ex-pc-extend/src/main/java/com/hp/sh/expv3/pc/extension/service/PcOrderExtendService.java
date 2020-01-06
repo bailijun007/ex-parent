@@ -20,7 +20,7 @@ public interface PcOrderExtendService {
 
     List<PcOrderVo> findCurrentUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag);
 
-    List<PcOrderVo> queryOrders(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage);
+    PageResult<PcOrderVo> queryOrders(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber);
 
     PcOrderVo getPcOrder(Long orderId, String asset, String symbol, Long userId);
 
