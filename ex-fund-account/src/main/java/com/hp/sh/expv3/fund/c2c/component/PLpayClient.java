@@ -37,11 +37,12 @@ public class PLpayClient {
     @Value("${expv3.base.url}")
     private String baseUrl;
 
+    @Value("${plpay.server.customerId}")
+    private String customerId;
 
     /**
      * 检查重定向请求是否成功
      *
-     * @param customerId
      * @param orderNo
      * @param orderCurrency
      * @param orderAmount
@@ -50,7 +51,7 @@ public class PLpayClient {
      * @param sign
      * @return 成功返回true 失败返回false
      */
-    public Boolean checkSendUrl(String customerId, String orderNo, String orderCurrency, String orderAmount, String receiveUrl, String pickupUrl, String sign) {
+    public Boolean checkSendUrl( String orderNo, String orderCurrency, String orderAmount, String receiveUrl, String pickupUrl, String sign) {
         String url = apiHost + "?orderNo=" + orderNo + "&customerId=" + customerId + "&orderCurrency=" + orderCurrency + "&orderAmount=" + orderAmount
                 + "&receiveUrl=" + receiveUrl + "&pickupUrl=" + pickupUrl + "&shopNo=" + shopNo + "&signType=" + signType + "&sign=" + sign;
 
@@ -77,10 +78,9 @@ public class PLpayClient {
      * @param orderNo
      * @param orderAmount
      * @param orderCurrency
-     * @param customerId
      * @return
      */
-    public String getSign(String pickupUrl, String receiveUrl, String orderNo, String orderAmount, String orderCurrency, String customerId) {
+    public String getSign(String pickupUrl, String receiveUrl, String orderNo, String orderAmount, String orderCurrency) {
         String sign = pickupUrl + receiveUrl + signType + orderNo + orderAmount + orderCurrency + customerId + md5Key;
         String md5 = DigestUtils.md5DigestAsHex(sign.getBytes());
 

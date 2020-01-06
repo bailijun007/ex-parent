@@ -32,7 +32,7 @@ public class PLPayService {
      */
     public C2cOrder rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal fabiAmt, BigDecimal tarVolume) {
         //买家姓名
-        String customerId = userId + "";
+//        String customerId = userId + "";
         //生成订单号
         String orderNo = getOrderNo();
         //订单币种
@@ -42,9 +42,9 @@ public class PLPayService {
         String receiveUrl = getReceiveUrl();
         String pickupUrl = getPickupUrl();
         //获取加密后的签名
-        String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount, orderCurrency, customerId);
+        String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount, orderCurrency);
         //检查发送请求到第三方支付的url是否 返回code是200
-        Boolean b = pLpayClient.checkSendUrl(customerId, orderNo, orderCurrency, orderAmount, receiveUrl, pickupUrl, sign);
+        Boolean b = pLpayClient.checkSendUrl(orderNo, orderCurrency, orderAmount, receiveUrl, pickupUrl, sign);
         if (!b) {
         //订单发送请求到第三方支付发生错误
             throw new ExException(FundCommonError.SEND_REQUEST_TO_C2C_SERVICE_FAIL);
