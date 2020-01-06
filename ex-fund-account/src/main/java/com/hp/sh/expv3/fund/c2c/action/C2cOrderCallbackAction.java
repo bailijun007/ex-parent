@@ -90,6 +90,7 @@ public class C2cOrderCallbackAction {
                 c2cOrder.setModified(Instant.now().toEpochMilli());
 //                c2cOrder.setId(c2cOrder1.getId());
 //                c2cOrder.setUserId(c2cOrder1.getUserId());
+                //这里需要掉接口 通过sn获取id和userid ,暂时写死
                 c2cOrder.setId(134240439896145920L);
                 c2cOrder.setUserId(0L);
                 buyService.updateByIdAndUserId(c2cOrder);
