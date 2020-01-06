@@ -107,6 +107,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                 vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros());
                 vo.setOrderType(orderVo.getOrderType());
                 vo.setClientOid(orderVo.getClientOrderId());
+                vo.setSymol(orderVo.getSymbol());
                 list.add(vo);
             }
         }
