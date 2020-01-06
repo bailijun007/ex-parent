@@ -93,12 +93,12 @@ public class PLPayService {
 
     //通知回调地址
     private String getReceiveUrl() {
-        return baseUrl + "/api/callback/c2c";
+        return baseUrl + "/api/callback/c2c/deposit/notify";
     }
 
     //交易完成跳转URL
     private String getPickupUrl() {
-        return baseUrl;
+        return baseUrl+"/api/callback/c2c/deposit/tradeSuccessSkip";
     }
 
 

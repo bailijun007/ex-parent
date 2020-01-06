@@ -120,4 +120,11 @@ public class C2cOrderCallbackAction {
 
     }
 
+    @ApiOperation(value = "交易完成跳转URL")
+    @PostMapping("/deposit/tradeSuccessSkip")
+    public String tradeSuccessSkip(){
+
+        return "success";
+    }
+
 }
