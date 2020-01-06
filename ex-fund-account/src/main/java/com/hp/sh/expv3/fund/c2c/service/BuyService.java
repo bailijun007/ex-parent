@@ -26,7 +26,8 @@ public class BuyService {
     }
 
     //通过sn修改订单
-    public void update(C2cOrder c2cOrder) {
-        c2cOrderDAO.updateBySn(c2cOrder);
+    public void updateBySn(C2cOrder c2cOrder) {
+//        c2cOrderDAO.update(c2cOrder);
+       c2cOrderDAO.updateBySn(c2cOrder);
     }
 }

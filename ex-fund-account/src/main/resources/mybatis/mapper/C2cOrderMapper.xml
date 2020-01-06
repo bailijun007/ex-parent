@@ -113,10 +113,10 @@
     <update id="update">
 		update 
 			c2c_order
-		set 
+		set
 			pay_currency=#{payCurrency},exchange_currency=#{exchangeCurrency},type=#{type},price=#{price},volume=#{volume},amount=#{amount},pay_status=#{payStatus},pay_status_desc=#{payStatusDesc},pay_time=#{payTime},pay_finish_time=#{payFinishTime},synch_status=#{synchStatus},approval_status=#{approvalStatus},user_id=#{userId},created=#{created},modified=#{modified}
-		where 
-			sn=#{sn}
+		where
+			id=#{id}
 	</update>
 
 

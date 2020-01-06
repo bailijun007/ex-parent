@@ -57,6 +57,8 @@ public class C2cOrderCallbackAction {
             throw new ExException(FundCommonError.ORDER_CALLBACK_NOTIFY_FIND_SIGN_ERROR);
         }
 
+        // TODO  幂等性检查
+
         //更新一条c2c订单记录
         C2cOrder c2cOrder=new C2cOrder();
         BigDecimal orderAmount = param.getOrderAmount();
@@ -77,7 +79,7 @@ public class C2cOrderCallbackAction {
         c2cOrder.setApprovalStatus(1);
         c2cOrder.setModified(Instant.now().toEpochMilli());
         c2cOrder.setSn(param.getOrderNo());
-        buyService.update(c2cOrder);
+        buyService.updateBySn(c2cOrder);
 
         // TODO 调用价钱方法和增加流水记录
 
