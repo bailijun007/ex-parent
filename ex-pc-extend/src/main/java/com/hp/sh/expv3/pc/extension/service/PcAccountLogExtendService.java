@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.pc.extension.service;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountLogVo;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Map;
  */
 public interface PcAccountLogExtendService {
 
-    List<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol);
+    PageResult<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize);
     void save(PcAccountLogVo pcAccountLogVo);
 
     PcAccountLogVo getPcAccountLog(PcAccountLogVo pcAccountLogVo);

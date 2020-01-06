@@ -44,7 +44,6 @@ public class C2cOrderPayTestAction {
         C2cOrder c2cOrder = plPayService.rujin(userId, ratio, srcCurrency, tarCurrency, tarVolume, fabiAmt);
         buyService.saveC2cOrder(c2cOrder);
 
-
         return "success";
     }
 

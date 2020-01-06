@@ -66,25 +66,20 @@ public class PcAccountExtendApiAction implements PcAccountExtendApi {
 
     @Override
     public PageResult<PcAccountExtVo> findContractAccountList(Long userId, String asset, Integer pageNo, Integer pageSize) {
-        PageResult<PcAccountExtVo> result=new PageResult();
-        List<PcAccountExtVo> list = pcAccountExtendService.findContractAccountList(userId, asset);
-        if (!CollectionUtils.isEmpty(list)) {
-            for (PcAccountExtVo vo : list) {
+        if (pageNo == null || pageSize == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+
+        PageResult<PcAccountExtVo> result = pcAccountExtendService.pageQueryContractAccountList(userId, asset, pageNo, pageSize);
+        if (!CollectionUtils.isEmpty(result.getList())) {
+            for (PcAccountExtVo vo : result.getList()) {
                 BigDecimal orderMargin = pcOrderExtendService.getGrossMargin(vo.getAccountId(), vo.getAsset());
                 vo.setOrderMargin(orderMargin);
                 BigDecimal posMargin = pcPositionExtendService.getPosMargin(vo.getAccountId(), vo.getAsset());
                 vo.setPoserMargin(posMargin);
                 vo.setTotal(vo.getAvailable().add(orderMargin).add(posMargin));
             }
-
-            List<PcAccountExtVo> voList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
-            result.setList(voList);
         }
-        Integer rowTotal = list.size();
-        result.setPageNo(pageNo);
-        result.setRowTotal(new Long(rowTotal+""));
-        result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
-
         return result;
     }
 

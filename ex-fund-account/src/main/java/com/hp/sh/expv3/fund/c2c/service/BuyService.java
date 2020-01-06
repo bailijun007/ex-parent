@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 买入服务
  *
@@ -26,8 +29,17 @@ public class BuyService {
     }
 
     //通过sn修改订单
-    public void updateBySn(C2cOrder c2cOrder) {
+    public void updateByIdAndUserId(C2cOrder c2cOrder) {
 //        c2cOrderDAO.update(c2cOrder);
-       c2cOrderDAO.updateBySn(c2cOrder);
+       c2cOrderDAO.updateByIdAndUserId(c2cOrder);
     }
+
+    //通过sn查询订单
+    public C2cOrder queryBySn(String sn) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("sn",sn);
+        C2cOrder c2cOrder = c2cOrderDAO.queryOne(map);
+        return c2cOrder;
+    }
+
 }

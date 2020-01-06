@@ -1,5 +1,8 @@
 package com.hp.sh.expv3.pc.extension.service.impl;
 
+import com.gitee.hupadev.base.api.PageResult;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.dao.PcPositionDAO;
@@ -53,13 +56,30 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
     }
 
     @Override
-    public List<PcPositionVo> findPositionList(Long userId, String asset, String symbol,Long posId,Integer liqStatus) {
+    public PageResult<PcPositionVo> pageQueryPositionList(Long userId, String asset, String symbol, Long posId, Integer liqStatus, Integer pageNo, Integer pageSize) {
+        PageHelper.startPage(pageNo,pageSize);
+        PageResult<PcPositionVo> pageResult=new PageResult<>();
         Map<String, Object> map=new HashMap<>();
         map.put("userId",userId);
         map.put("asset",asset);
         map.put("symbol",symbol);
         map.put("id",posId);
         map.put("liqStatus",liqStatus);
+        List<PcPositionVo> pcPositionVos = pcPositionDAO.queryList(map);
+        PageInfo<PcPositionVo> info = new PageInfo<>();
+        pageResult.setList(pcPositionVos);
+        pageResult.setPageNo(info.getPageNum());
+        pageResult.setPageCount(info.getPages());
+        pageResult.setRowTotal(info.getTotal());
+        return pageResult;
+    }
+
+    @Override
+    public List<PcPositionVo> findPositionList(Long userId, String asset, String symbol) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("userId",userId);
+        map.put("asset",asset);
+        map.put("symbol",symbol);
         List<PcPositionVo> pcPositionVos = pcPositionDAO.queryList(map);
         return pcPositionVos;
     }

@@ -63,7 +63,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         List<CurrentPositionVo> result = new ArrayList<>();
-        List<PcPositionVo> list = pcPositionExtendService.findPositionList(userId, asset, symbol, null, null);
+        List<PcPositionVo> list = pcPositionExtendService.findPositionList(userId, asset, symbol);
         this.convertPositionList(result, list);
 
         return result;
@@ -71,20 +71,18 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
 
     @Override
     public PageResult<CurrentPositionVo> findPositionList(Long userId, String asset, Long posId, Integer liqStatus, String symbol, Integer pageNo, Integer pageSize) {
+       if(pageNo==null||pageSize==null){
+           throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+       }
         PageResult<CurrentPositionVo> result = new PageResult<>();
         List<CurrentPositionVo> list = new ArrayList<>();
-        List<PcPositionVo> voList = pcPositionExtendService.findPositionList(userId, asset, symbol, posId, liqStatus);
-        this.convertPositionList(list, voList);
-        if (!CollectionUtils.isEmpty(list)) {
-            List<CurrentPositionVo> positionVos = list.stream().skip(pageSize * (pageNo - 1))
-                    .limit(pageSize)
-                    .collect(Collectors.toList());
-            result.setList(positionVos);
-        }
-        Integer rowTotal = list.size();
-        result.setPageNo(pageNo);
-        result.setRowTotal(new Long(rowTotal + ""));
-        result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
+        PageResult<PcPositionVo> voList = pcPositionExtendService.pageQueryPositionList(userId, asset, symbol, posId, liqStatus,pageNo,pageSize);
+        result.setPageNo(voList.getPageNo());
+        result.setPageCount(voList.getPageCount());
+        result.setRowTotal(voList.getRowTotal());
+        this.convertPositionList(list, voList.getList());
+
+        result.setList(list);
         return result;
     }
 

@@ -42,13 +42,13 @@ public class PLPayService {
         String receiveUrl = getReceiveUrl();
         String pickupUrl = getPickupUrl();
         //获取加密后的签名
-//        String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount, orderCurrency, customerId);
-//        //检查发送请求到第三方支付的url是否 返回code是200
-//        Boolean b = pLpayClient.checkSendUrl(customerId, orderNo, orderCurrency, orderAmount, receiveUrl, pickupUrl, sign);
-//        if (!b) {
-//        //订单发送请求到第三方支付发生错误
-//            throw new ExException(FundCommonError.SEND_REQUEST_TO_C2C_SERVICE_FAIL);
-//        }
+        String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount, orderCurrency, customerId);
+        //检查发送请求到第三方支付的url是否 返回code是200
+        Boolean b = pLpayClient.checkSendUrl(customerId, orderNo, orderCurrency, orderAmount, receiveUrl, pickupUrl, sign);
+        if (!b) {
+        //订单发送请求到第三方支付发生错误
+            throw new ExException(FundCommonError.SEND_REQUEST_TO_C2C_SERVICE_FAIL);
+        }
 
 
         //增加一条c2c订单记录

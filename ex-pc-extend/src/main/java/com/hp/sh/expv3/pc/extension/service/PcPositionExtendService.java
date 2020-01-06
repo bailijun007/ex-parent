@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.pc.extension.service;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
 
 import java.math.BigDecimal;
@@ -38,5 +39,7 @@ public interface PcPositionExtendService {
 	 */
     BigDecimal getPlRatio(Long userId, String asset, Long posId);
 
-    List<PcPositionVo> findPositionList(Long userId, String asset, String symbol,Long posId,Integer liqStatus);
+    PageResult<PcPositionVo> pageQueryPositionList(Long userId, String asset, String symbol, Long posId, Integer liqStatus, Integer pageNo, Integer pageSize);
+
+    List<PcPositionVo> findPositionList(Long userId, String asset, String symbol);
 }

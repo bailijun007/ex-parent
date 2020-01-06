@@ -149,7 +149,7 @@ public class DateUtil {
      *
      * @return: String
      */
-    public static String DateFormatOrderNum() {
+    public static String dateFormatOrderNum() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         Date date = new Date();//取时间
         return formatter.format(date);

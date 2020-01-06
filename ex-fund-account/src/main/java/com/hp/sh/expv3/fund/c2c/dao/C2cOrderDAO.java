@@ -16,11 +16,11 @@ import org.apache.ibatis.annotations.Param;
 public interface C2cOrderDAO extends BaseUserDataMapper<C2cOrder,Long>  {
 
 	public List<C2cOrder> queryList(Map<String,Object> params);
-	
-	public C2cOrder queryOne(Map<String,Object> params);
+
+    public C2cOrder queryOne(Map<String,Object> params);
 
 	public Long queryCount(Map<String,Object> params);
 
-    void updateBySn(C2cOrder c2cOrder);
+    void updateByIdAndUserId(C2cOrder c2cOrder);
 
 }

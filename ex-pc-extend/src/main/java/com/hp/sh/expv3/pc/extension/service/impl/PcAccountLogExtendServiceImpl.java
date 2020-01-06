@@ -1,5 +1,8 @@
 package com.hp.sh.expv3.pc.extension.service.impl;
 
+import com.gitee.hupadev.base.api.PageResult;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.extension.dao.PcAccountLogDAO;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
@@ -28,8 +31,10 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
 
 
     @Override
-    public List<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType,  Long startDate, Long endDate, String symbol) {
+    public PageResult<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize) {
+        PageResult<PcAccountLogVo> result=new PageResult<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        PageHelper.startPage(pageNo,pageSize);
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
@@ -49,7 +54,12 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         }
 
         List<PcAccountLogVo> list = pcAccountLogDAO.queryList(map);
-        return list;
+        PageInfo<PcAccountLogVo> info = new PageInfo<>();
+        result.setList(list);
+        result.setRowTotal(info.getTotal());
+        result.setPageNo(info.getPageNum());
+        result.setPageCount(info.getPages());
+        return result;
     }
 
     @Override

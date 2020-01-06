@@ -120,7 +120,7 @@
 	</update>
 
 
-    <update id="updateBySn">
+    <update id="updateByIdAndUserId">
         update
         c2c_order
         <set>
@@ -170,7 +170,8 @@
                 modified=#{modified}
             </if>
         </set>
-        where   sn=#{sn}
+        where   id=#{id}
+        AND user_id=#{userId}
     </update>
 
     <delete id="delete">

@@ -6,6 +6,9 @@ package com.hp.sh.expv3.pc.extension.service.impl;
 import java.math.BigDecimal;
 import java.util.*;
 
+import com.gitee.hupadev.base.api.PageResult;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.pc.extension.service.PcAccountExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountExtVo;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountVo;
@@ -51,12 +54,15 @@ public class PcAccountExtendServiceImpl implements PcAccountExtendService {
         return vo;
     }
 
-    @Override
-    public List<PcAccountExtVo> findContractAccountList(Long userId, String asset) {
+
+
+    public PageResult<PcAccountExtVo> pageQueryContractAccountList(Long userId, String asset, Integer pageNo, Integer pageSize) {
+        PageResult<PcAccountExtVo> pageResult=new PageResult<>();
         List<PcAccountExtVo> list=new ArrayList<>();
         Map<String, Object> map=new HashMap<>();
         map.put("userId",userId);
         map.put("asset",asset);
+        PageHelper.startPage(pageNo,pageSize);
         List<PcAccountVo> pcAccountVos = pcAccountDAO.queryList(map);
         if(!CollectionUtils.isEmpty(pcAccountVos)){
             for (PcAccountVo pcAccountVo : pcAccountVos) {
@@ -68,7 +74,12 @@ public class PcAccountExtendServiceImpl implements PcAccountExtendService {
                 list.add(extVo);
             }
         }
-        return list;
+        PageInfo<PcAccountExtVo> info = new PageInfo<>(list);
+        pageResult.setList(list);
+        pageResult.setPageNo(info.getPageNum());
+        pageResult.setPageCount(info.getPages());
+        pageResult.setRowTotal(info.getTotal());
+        return pageResult;
     }
 }
 

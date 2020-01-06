@@ -114,7 +114,6 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     }
 
 
-
     @Override
     public List<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
@@ -127,6 +126,9 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     @Override
     @CrossDB
     public PageResult<UserOrderVo> pageQueryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag, Long orderId, Integer pageNo, Integer pageSize) {
+        if (pageNo == null || pageSize == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
         PageResult<UserOrderVo> result = pcOrderExtendService.pageQueryOrderList(userId, asset, symbol, status, closeFlag, orderId, pageNo, pageSize);
         return result;
     }

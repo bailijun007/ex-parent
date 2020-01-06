@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.pc.extension.service.impl;
 
 import com.gitee.hupadev.base.api.PageResult;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
@@ -101,6 +103,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     @Override
     public PageResult<UserOrderVo> pageQueryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag, Long orderId, Integer pageNo, Integer pageSize) {
         PageResult<UserOrderVo> result = new PageResult<>();
+        PageHelper.startPage(pageNo,pageSize);
         Map<String, Object> map = new HashMap<>();
         map.put("id", orderId);
         map.put("userId", userId);
@@ -110,17 +113,14 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("closeFlag", closeFlag);
         List<UserOrderVo> list = new ArrayList<>();
         List<PcOrderVo> voList = pcOrderDAO.queryList(map);
+        PageInfo<PcOrderVo> info = new PageInfo<>();
+        result.setPageNo(info.getPageNum());
+        result.setRowTotal(info.getTotal());
+        result.setPageCount(info.getPages());
+        //转换成结果集返回
         convertOrderList(list, voList);
-        if(!CollectionUtils.isEmpty(list)){
-            List<UserOrderVo> orderVoList = list.stream().skip(pageSize * (pageNo - 1))
-                    .limit(pageSize)
-                    .collect(Collectors.toList());
-            result.setList(orderVoList);
-        }
-        Integer rowTotal = list.size();
-        result.setPageNo(pageNo);
-        result.setRowTotal(new Long(rowTotal+""));
-        result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
+
+        result.setList(list);
         return result;
     }
 

@@ -13,6 +13,6 @@ public interface PcAccountExtendService {
 
     public PcAccountExtVo findContractAccount(Long userId, String asset);
 
-    public List<PcAccountExtVo> findContractAccountList(Long userId, String asset);
+
 
 }
