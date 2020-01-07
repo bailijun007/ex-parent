@@ -21,6 +21,6 @@ public interface C2cOrderDAO extends BaseUserDataMapper<C2cOrder,Long>  {
 
 	public Long queryCount(Map<String,Object> params);
 
-    void updateByIdAndUserId(C2cOrder c2cOrder);
+    void updateBySnAndUserId(C2cOrder c2cOrder);
 
 }

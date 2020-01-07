@@ -34,7 +34,7 @@ public class PLPayService {
         //买家姓名
 //        String customerId = userId + "";
         //生成订单号
-        String orderNo = getOrderNo();
+        String orderNo = getOrderNo(userId);
         //订单币种
         String orderCurrency = srcCurrency;
         //订单金额
@@ -72,7 +72,7 @@ public class PLPayService {
 
 
     //生成并返回订单编号
-    private String getOrderNo() {
+    private String getOrderNo(long userId) {
         String s = "";
         for (int i = 0; i < 4; i++) {
             int random = (int) (Math.random() * 10);
@@ -81,7 +81,7 @@ public class PLPayService {
         Instant instant = Instant.now();
         long timestamp = instant.toEpochMilli();
         String prefix = "c2c";
-        String sn = prefix + timestamp + s;
+        String sn = prefix + timestamp + s+"-"+userId;
 
         return sn;
     }

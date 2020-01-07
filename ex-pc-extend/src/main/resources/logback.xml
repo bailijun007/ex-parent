@@ -38,20 +38,20 @@
         </triggeringPolicy>
     </appender>
 
-	<root level="info">
+	<root level="debug">
 		<appender-ref ref="STDOUT" />
 	</root>
 	
 	<logger name="springfox.documentation.spring" level="warn"></logger>
 	
     <springProfile name="prod">
-        <root level="INFO">
+        <root level="debug">
             <appender-ref ref="out2File" />
         </root>
     </springProfile>
     
     <springProfile name="dev">
-        <root level="info">
+        <root level="debug">
             <appender-ref ref="STDOUT" />
             <appender-ref ref="out2File" />
         </root>
@@ -62,7 +62,7 @@
     </springProfile>
     
     <springProfile name="local">
-        <root level="info">
+        <root level="debug">
             <appender-ref ref="STDOUT" />
         </root>
         
