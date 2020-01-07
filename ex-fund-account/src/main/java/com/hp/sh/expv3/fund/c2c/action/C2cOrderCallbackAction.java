@@ -64,35 +64,35 @@ public class C2cOrderCallbackAction {
         //c2c订单验证
 //        C2cOrder c2cOrder1 = buyService.queryBySn(param.getOrderNo());
 //        if (c2cOrder1 != null) {
-            lock.writeLock().lock();
-            try {
-                //更新一条c2c订单记录
-                C2cOrder c2cOrder = new C2cOrder();
-                BigDecimal orderAmount = param.getOrderAmount();
-                c2cOrder.setAmount(orderAmount);
-                //计算USDT 就是 orderAmount* 0.975 / 你系统的CNY:USD汇率;
-                BigDecimal volume = param.getOrderAmount().multiply(new BigDecimal("0.975")).divide(new BigDecimal("7"), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
-                c2cOrder.setVolume(volume);
-                //价格=总额/volume
-                BigDecimal price = orderAmount.divide(volume, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
-                c2cOrder.setPrice(price);
-                if (param.getStatus().equals("success")) {
-                    c2cOrder.setPayStatus(1);
-                } else {
-                    c2cOrder.setPayStatus(2);
-                }
-                c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
-                c2cOrder.setSynchStatus(1);
-                c2cOrder.setApprovalStatus(1);
-                c2cOrder.setModified(Instant.now().toEpochMilli());
+        lock.writeLock().lock();
+        try {
+            //更新一条c2c订单记录
+            C2cOrder c2cOrder = new C2cOrder();
+            BigDecimal orderAmount = param.getOrderAmount();
+            c2cOrder.setAmount(orderAmount);
+            //计算USDT 就是 orderAmount* 0.975 / 你系统的CNY:USD汇率;
+            BigDecimal volume = param.getOrderAmount().multiply(new BigDecimal("0.975")).divide(new BigDecimal("7"), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
+            c2cOrder.setVolume(volume);
+            //价格=总额/volume
+            BigDecimal price = orderAmount.divide(volume, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
+            c2cOrder.setPrice(price);
+            if (param.getStatus().equals("success")) {
+                c2cOrder.setPayStatus(1);
+            } else {
+                c2cOrder.setPayStatus(2);
+            }
+            c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
+            c2cOrder.setSynchStatus(1);
+            c2cOrder.setApprovalStatus(1);
+            c2cOrder.setModified(Instant.now().toEpochMilli());
 //                c2cOrder.setId(c2cOrder1.getId());
 //                c2cOrder.setUserId(c2cOrder1.getUserId());
-                //这里需要掉接口 通过sn获取id和userid ,暂时写死
-                c2cOrder.setId(134240439896145920L);
-                c2cOrder.setUserId(0L);
-                buyService.updateByIdAndUserId(c2cOrder);
+            //这里需要掉接口 通过sn获取id和userid ,暂时写死
+            c2cOrder.setId(134240439896145920L);
+            c2cOrder.setUserId(0L);
+            buyService.updateByIdAndUserId(c2cOrder);
 
-                // 调用价钱方法和增加流水记录
+            // 调用价钱方法和增加流水记录
 //                FundAddRequest request=new FundAddRequest();
 //                request.setUserId(c2cOrder1.getUserId());
 //                request.setAmount(orderAmount);
@@ -102,15 +102,13 @@ public class C2cOrderCallbackAction {
 //                request.setTradeType(1);
 //                fundAccountCoreApi.add(request);
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                lock.writeLock().unlock();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.writeLock().unlock();
+        }
 
 //        }
-
-
 
 
         return "success";
@@ -119,8 +117,9 @@ public class C2cOrderCallbackAction {
 
     @ApiOperation(value = "交易完成跳转URL")
     @GetMapping("/deposit/tradeSuccessSkip")
-    public String tradeSuccessSkip(){
-
+    public String tradeSuccessSkip() {
+        logger.info("进入交易完成跳转接口");
+        System.out.println("进入交易完成跳转接口  ");
         return "success";
     }
 
