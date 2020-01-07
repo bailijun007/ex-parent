@@ -48,7 +48,7 @@ public class C2cOrderCallbackAction {
     @ApiOperation(value = "订单成功回调通知")
     @ResultEntity
     @PostMapping("/deposit/notify")
-    public String notify(@RequestBody NotifyParam param) {
+    public String notify(@RequestBody(required = false) NotifyParam param) {
 
         System.out.println("收到订单成功回调通知 = " + param.toString());
         logger.info("收到订单成功回调通知:{}", param);
