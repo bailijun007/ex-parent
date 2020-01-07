@@ -115,7 +115,7 @@ public class C2cOrderCallbackAction {
     @ApiOperation(value = "订单成功回调通知")
     @RequestMapping(value = "/deposit/notify")
     public String notify(@RequestParam("orderAmount") BigDecimal orderAmount, @RequestParam("orderCurrency") String orderCurrency,
-                         @RequestParam("orderNo") String orderNo, @RequestParam("paymentAmount") BigDecimal paymentAmount,
+                         @RequestParam("orderNo") String orderNo, @RequestParam(value = "paymentAmount",required = false) BigDecimal paymentAmount,
                          @RequestParam("sign") String sign, @RequestParam("signType") String signType,
                          @RequestParam("status") String status, @RequestParam("transactionId") String transactionId) {
 
