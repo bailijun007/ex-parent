@@ -128,10 +128,10 @@ public class C2cOrderCallbackAction {
 
 
     @ApiOperation(value = "交易完成跳转URL")
+    @ResultEntity
     @GetMapping("/deposit/tradeSuccessSkip")
     public String tradeSuccessSkip() {
         logger.info("进入交易完成跳转接口");
-        System.out.println("进入交易完成跳转接口  ");
         return "success";
     }
 
