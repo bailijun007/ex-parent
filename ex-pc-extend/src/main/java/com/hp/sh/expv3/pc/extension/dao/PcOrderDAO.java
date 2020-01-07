@@ -22,4 +22,7 @@ public interface PcOrderDAO {
     List<PcOrderVo> queryOrders(Map<String, Object> map);
 
     List<PcOrderVo> queryOrderList(Map<String, Object> map);
+
+    //查询总条数
+    Long queryCount(Map<String, Object> map);
 }

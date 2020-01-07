@@ -75,9 +75,8 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
             map.put("nextPage", nextPage);
 
         }else  if(isTotalNumber==1){
-            map.put("pageSize", Integer.MAX_VALUE);
-            List<PcOrderVo> pcOrderVos = pcOrderDAO.queryOrders(map);
-            result.setRowTotal(Long.valueOf(pcOrderVos.size()));
+            Long count = pcOrderDAO.queryCount(map);
+            result.setRowTotal(count);
         }
         List<PcOrderVo> pcOrderVos = pcOrderDAO.queryOrders(map);
         result.setList(pcOrderVos);

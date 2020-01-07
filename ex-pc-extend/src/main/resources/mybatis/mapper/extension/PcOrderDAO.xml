@@ -176,6 +176,12 @@
         LIMIT 0,${limit}
     </select>
 
+
+    <select id="queryCount" resultType="java.lang.Long">
+        SELECT COUNT(id)  from pc_order
+        <include refid="simple_where"/>
+    </select>
+
     <select id="queryOrders" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
         select
         <include refid="Base_Column_List"/>
