@@ -38,9 +38,9 @@ public class DepositRecordHistoryVo implements Serializable {
     @ApiModelProperty("更新时间")
     private Long mtime;
 
-    private Date modified;
+    private Long modified;
 
-    private Date payTime;
+    private Long payTime;
 
     @ApiModelProperty("充币时间")
     private Long depositTime;
@@ -112,19 +112,19 @@ public class DepositRecordHistoryVo implements Serializable {
     public DepositRecordHistoryVo() {
     }
 
-    public Date getModified() {
+    public Long getModified() {
         return modified;
     }
 
-    public void setModified(Date modified) {
+    public void setModified(Long modified) {
         this.modified = modified;
     }
 
-    public Date getPayTime() {
+    public Long getPayTime() {
         return payTime;
     }
 
-    public void setPayTime(Date payTime) {
+    public void setPayTime(Long payTime) {
         this.payTime = payTime;
     }
 

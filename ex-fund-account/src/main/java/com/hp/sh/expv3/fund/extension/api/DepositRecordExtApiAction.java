@@ -50,18 +50,14 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
         if (pageNo == null || pageSize == null) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }
-        PageResult<DepositRecordHistoryVo> result = new PageResult<DepositRecordHistoryVo>();
-        List<DepositRecordHistoryVo> list = getAllUserDepositRecordHistoryVos(userId, asset, null, null, null);
-
-        if (!CollectionUtils.isEmpty(list)) {
-            List<DepositRecordHistoryVo> pageList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
-            result.setList(pageList);
+        PageResult<DepositRecordHistoryVo> result = depositRecordExtService.pageQueryDepositRecordHistory(userId, asset, pageNo, pageSize);
+        if(!CollectionUtils.isEmpty(result.getList())){
+            for (DepositRecordHistoryVo historyVo : result.getList()) {
+                String addr = depositAddrExtService.getAddressByUserIdAndAsset(historyVo.getUserId(), historyVo.getAsset());
+                historyVo.setAddress(addr);
+            }
         }
 
-        Integer rowTotal = list.size();
-        result.setPageNo(pageNo);
-        result.setRowTotal(new Long(rowTotal + ""));
-        result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
 
         return result;
     }
@@ -75,15 +71,5 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
         return list;
     }
 
-
-    private List<DepositRecordHistoryVo> getAllUserDepositRecordHistoryVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
-        List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
-        for (DepositRecordHistoryVo depositRecordHistoryVo : list) {
-            AddressVo addressVos = depositAddrExtService.getAddresses(depositRecordHistoryVo.getUserId(), depositRecordHistoryVo.getAsset());
-            depositRecordHistoryVo.setAddress(addressVos.getAddress());
-        }
-
-        return list;
-    }
 
 }

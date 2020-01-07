@@ -22,8 +22,8 @@ public class PLPayService {
 
     /**
      * @param userId      用户id
-     * @param ratio       买入估价
-     * @param srcCurrency 支付币种
+     * @param ratio       USD/CNY 汇率 例如： USD/CNY = 7.0298
+     * @param srcCurrency 支付币种 例如：
      * @param tarCurrency 兑换币种
      * @param fabiAmt     法定货币总金额
      * @param tarVolume   兑换成资产数量
@@ -31,8 +31,6 @@ public class PLPayService {
      * @return 返回转发的url地址，调用方需要转发到该地址获取数据
      */
     public C2cOrder rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal fabiAmt, BigDecimal tarVolume) {
-        //买家姓名
-//        String customerId = userId + "";
         //生成订单号
         String orderNo = getOrderNo(userId);
         //订单币种
@@ -56,6 +54,7 @@ public class PLPayService {
         c2cOrder.setSn(orderNo);
         c2cOrder.setPayCurrency(srcCurrency);
         c2cOrder.setExchangeCurrency(tarCurrency);
+        c2cOrder.setPrice(ratio);
         c2cOrder.setType(1);
         c2cOrder.setPayStatus(0);
         c2cOrder.setPayStatusDesc("c2c充值");

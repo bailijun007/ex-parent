@@ -8,7 +8,7 @@
         FROM deposit_record
         <where>
             <if test="userId!=null">
-                 user_id=#{userId}
+                user_id=#{userId}
             </if>
             <if test="asset!=null and asset!=''">
                 and asset=#{asset}
@@ -31,5 +31,18 @@
         </where>
     </select>
 
+    <select id="queryByUserIdAndAsset" resultType="com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo">
+        select id,asset,tx_hash txHash,amount volume, pay_status status,modified ,pay_time payTime,user_id userId
+        FROM deposit_record
+        <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+        </where>
+
+    </select>
 
 </mapper>

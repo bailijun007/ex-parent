@@ -15,7 +15,10 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -49,7 +52,7 @@ public class C2cOrderCallbackAction {
     @ResultEntity
     @RequestMapping(value = "/deposit/notify")
     public String notify(@RequestParam("orderAmount") BigDecimal orderAmount, @RequestParam("orderCurrency") String orderCurrency,
-                         @RequestParam("orderNo") String orderNo, @RequestParam(value = "paymentAmount",required = false) BigDecimal paymentAmount,
+                         @RequestParam("orderNo") String orderNo, @RequestParam(value = "paymentAmount", required = false) BigDecimal paymentAmount,
                          @RequestParam("sign") String sign, @RequestParam("signType") String signType,
                          @RequestParam("status") String status, @RequestParam("transactionId") String transactionId) {
 
@@ -83,11 +86,17 @@ public class C2cOrderCallbackAction {
             C2cOrder c2cOrder = new C2cOrder();
             c2cOrder.setAmount(orderAmount);
             //计算USDT 就是 orderAmount* 0.975 / 你系统的CNY:USD汇率;
-            BigDecimal volume = param.getOrderAmount().multiply(new BigDecimal("0.975")).divide(new BigDecimal("7"), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
-            c2cOrder.setVolume(volume);
-            //价格=总额/volume
-            BigDecimal price = orderAmount.divide(volume, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
-            c2cOrder.setPrice(price);
+            /**
+             * 价格=汇率，在创建出入金时就已经确定
+             * 手续费率要保存
+             * USD/CNY = 7.0298
+             * 实际到账的币的数量 = 订单的金额* ( 1 - 手续费率) * 汇率
+             *                    = 订单的金额* ( 1 - 手续费率) / 7.0298
+             */
+
+            BigDecimal qty = param.getOrderAmount().multiply(BigDecimal.ONE.subtract(new BigDecimal("0.025"))).divide(new BigDecimal("7"), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
+            c2cOrder.setVolume(qty);
+
             if (param.getStatus().equals("success")) {
                 c2cOrder.setPayStatus(1);
             } else {

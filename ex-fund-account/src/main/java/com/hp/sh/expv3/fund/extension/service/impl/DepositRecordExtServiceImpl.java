@@ -1,10 +1,10 @@
 package com.hp.sh.expv3.fund.extension.service.impl;
 
-import com.hp.sh.expv3.commons.exception.ExException;
+import com.gitee.hupadev.base.api.PageResult;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.fund.extension.dao.DepositRecordExtMapper;
 import com.hp.sh.expv3.fund.extension.dao.FundAccountExtendMapper;
-import com.hp.sh.expv3.fund.extension.error.DepositExtError;
-import com.hp.sh.expv3.fund.extension.error.FundAccountExtError;
 import com.hp.sh.expv3.fund.extension.service.DepositRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -31,19 +33,32 @@ public class DepositRecordExtServiceImpl implements DepositRecordExtService {
 
     @Override
     public List<DepositRecordHistoryVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
-        if(pageStatus==null){
-            pageStatus=1;
+        if (pageStatus == null) {
+            pageStatus = 1;
         }
-        List<DepositRecordHistoryVo> list=depositRecordExtMapper.queryHistory(userId,asset,queryId,pageSize,pageStatus);
-        if (CollectionUtils.isEmpty(list)){
-                return list;
+        List<DepositRecordHistoryVo> list = depositRecordExtMapper.queryHistory(userId, asset, queryId, pageSize, pageStatus);
+        if (CollectionUtils.isEmpty(list)) {
+            return list;
         }
         for (DepositRecordHistoryVo historyVo : list) {
-            Optional<DepositRecordHistoryVo> vo=Optional.ofNullable(historyVo);
-            historyVo.setMtime( vo.map(d->d.getModified().getTime()).orElse(null));
-            historyVo.setDepositTime( vo.map(d->d.getPayTime().getTime()).orElse(null));
+            Optional<DepositRecordHistoryVo> vo = Optional.ofNullable(historyVo);
+            historyVo.setMtime(vo.map(d -> d.getModified()).orElse(null));
+            historyVo.setDepositTime(vo.map(d -> d.getPayTime()).orElse(null));
         }
 
         return list;
+    }
+
+    @Override
+    public PageResult<DepositRecordHistoryVo> pageQueryDepositRecordHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
+        PageResult<DepositRecordHistoryVo> pageResult=new PageResult<>();
+        PageHelper.startPage(pageNo,pageSize);
+        List<DepositRecordHistoryVo> list = depositRecordExtMapper.queryByUserIdAndAsset(userId,asset);
+        PageInfo<DepositRecordHistoryVo> info = new PageInfo<>(list);
+        pageResult.setList(list);
+        pageResult.setPageNo(info.getPageNum());
+        pageResult.setPageCount(info.getPages());
+        pageResult.setRowTotal(info.getTotal());
+        return pageResult;
     }
 }
