@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.fund.c2c.action;
 
-import com.hp.sh.chainserver.client.NotifyCreateParams;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.c2c.component.PLPayService;
 import com.hp.sh.expv3.fund.c2c.component.PLpayClient;
@@ -9,7 +8,6 @@ import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
 import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
-import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.utils.math.Precision;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -85,12 +81,12 @@ public class C2cOrderCallbackAction {
             c2cOrder.setSynchStatus(1);
             c2cOrder.setApprovalStatus(1);
             c2cOrder.setModified(Instant.now().toEpochMilli());
-//                c2cOrder.setId(c2cOrder1.getId());
-//                c2cOrder.setUserId(c2cOrder1.getUserId());
+            String orderNo = param.getOrderNo();
+            String[] split = orderNo.split("-");
+            c2cOrder.setSn(orderNo);
+            c2cOrder.setUserId(Long.parseLong(split[1]));
             //这里需要掉接口 通过sn获取id和userid ,暂时写死
-            c2cOrder.setId(134240439896145920L);
-            c2cOrder.setUserId(0L);
-            buyService.updateByIdAndUserId(c2cOrder);
+            buyService.updateBySnAndUserId(c2cOrder);
 
             // 调用价钱方法和增加流水记录
 //                FundAddRequest request=new FundAddRequest();

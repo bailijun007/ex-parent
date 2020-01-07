@@ -81,7 +81,7 @@ public class PLPayService {
         Instant instant = Instant.now();
         long timestamp = instant.toEpochMilli();
         String prefix = "c2c";
-        String sn = prefix + timestamp + s;
+        String sn = prefix + timestamp + s+"-"+userId;
 
         return sn;
     }
