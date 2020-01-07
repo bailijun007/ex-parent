@@ -66,7 +66,7 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
         map.put("id",posId);
         map.put("liqStatus",liqStatus);
         List<PcPositionVo> pcPositionVos = pcPositionDAO.queryList(map);
-        PageInfo<PcPositionVo> info = new PageInfo<>();
+        PageInfo<PcPositionVo> info = new PageInfo<>(pcPositionVos);
         pageResult.setList(pcPositionVos);
         pageResult.setPageNo(info.getPageNum());
         pageResult.setPageCount(info.getPages());

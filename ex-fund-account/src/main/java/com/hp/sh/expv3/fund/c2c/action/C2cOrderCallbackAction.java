@@ -9,12 +9,14 @@ import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
 import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.utils.math.Precision;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,6 +48,9 @@ public class C2cOrderCallbackAction {
 
     private static final Logger logger = LoggerFactory.getLogger(C2cOrderCallbackAction.class);
 
+    @Value("${plpay.server.c2c_fee_ratio}")
+    private String c2cFeeRatio;
+
     ReadWriteLock lock = new ReentrantReadWriteLock();
 
     @ApiOperation(value = "订单成功回调通知")
@@ -56,17 +61,8 @@ public class C2cOrderCallbackAction {
                          @RequestParam("sign") String sign, @RequestParam("signType") String signType,
                          @RequestParam("status") String status, @RequestParam("transactionId") String transactionId) {
 
-
         NotifyParam param = new NotifyParam();
-        param.setOrderAmount(orderAmount);
-        param.setOrderCurrency(orderCurrency);
-        param.setOrderNo(orderNo);
-        param.setPaymentAmount(paymentAmount);
-        param.setSign(sign);
-        param.setSignType(signType);
-        param.setStatus(status);
-        param.setTransactionId(transactionId);
-
+        getNotifyParam(orderAmount, orderCurrency, orderNo, paymentAmount, sign, signType, status, transactionId, param);
 
         System.out.println("收到订单成功回调通知 = " + param.toString());
         logger.info("收到订单成功回调通知:{}", param);
@@ -78,61 +74,59 @@ public class C2cOrderCallbackAction {
         }
 
         //c2c订单验证
-//        C2cOrder c2cOrder1 = buyService.queryBySn(param.getOrderNo());
-//        if (c2cOrder1 != null) {
-        lock.writeLock().lock();
-        try {
-            //更新一条c2c订单记录
-            C2cOrder c2cOrder = new C2cOrder();
-            c2cOrder.setAmount(orderAmount);
-            //计算USDT 就是 orderAmount* 0.975 / 你系统的CNY:USD汇率;
-            /**
-             * 价格=汇率，在创建出入金时就已经确定
-             * 手续费率要保存
-             * USD/CNY = 7.0298
-             * 实际到账的币的数量 = 订单的金额* ( 1 - 手续费率) * 汇率
-             *                    = 订单的金额* ( 1 - 手续费率) / 7.0298
-             */
-
-            BigDecimal qty = param.getOrderAmount().multiply(BigDecimal.ONE.subtract(new BigDecimal("0.025"))).divide(new BigDecimal("7"), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
-            c2cOrder.setVolume(qty);
-
-            if (param.getStatus().equals("success")) {
+        String[] split = orderNo.split("-");
+        Long userId = Long.parseLong(split[1]);
+        C2cOrder c2cOrder1 = buyService.queryBySnAndUserId(param.getOrderNo(), userId);
+        if (c2cOrder1 != null && param.getStatus().equals("success")) {
+            lock.writeLock().lock();
+            try {
+                //更新一条c2c订单记录
+                C2cOrder c2cOrder = new C2cOrder();
+                c2cOrder.setAmount(orderAmount);
+                //计算USDT 就是 orderAmount*( 1 - 手续费率) / 你系统的CNY:USD汇率;
+                BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
+                BigDecimal qty = param.getOrderAmount().multiply(feeRatio).divide(c2cOrder1.getPrice(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
+                c2cOrder.setVolume(qty);
                 c2cOrder.setPayStatus(1);
-            } else {
-                c2cOrder.setPayStatus(2);
+                c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
+                c2cOrder.setSynchStatus(1);
+                c2cOrder.setApprovalStatus(1);
+                c2cOrder.setModified(Instant.now().toEpochMilli());
+                c2cOrder.setSn(orderNo);
+                c2cOrder.setUserId(userId);
+                //这里需要掉接口 通过sn获取id和userid ,暂时写死
+                buyService.updateBySnAndUserId(c2cOrder);
+
+                // 调用价钱方法和增加流水记录
+                FundAddRequest request=new FundAddRequest();
+                request.setUserId(userId);
+                request.setAmount(orderAmount);
+                request.setAsset(param.getOrderCurrency());
+                request.setRemark("c2c充值");
+                request.setTradeNo(c2cOrder1.getSn());
+                request.setTradeType(1);
+                fundAccountCoreApi.add(request);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                lock.writeLock().unlock();
             }
-            c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
-            c2cOrder.setSynchStatus(1);
-            c2cOrder.setApprovalStatus(1);
-            c2cOrder.setModified(Instant.now().toEpochMilli());
-            String[] split = orderNo.split("-");
-            c2cOrder.setSn(orderNo);
-            c2cOrder.setUserId(Long.parseLong(split[1]));
-            //这里需要掉接口 通过sn获取id和userid ,暂时写死
-            buyService.updateBySnAndUserId(c2cOrder);
-
-            // 调用价钱方法和增加流水记录
-//                FundAddRequest request=new FundAddRequest();
-//                request.setUserId(c2cOrder1.getUserId());
-//                request.setAmount(orderAmount);
-//                request.setAsset(param.getOrderCurrency());
-//                request.setRemark("c2c充值");
-//                request.setTradeNo(c2cOrder1.getSn());
-//                request.setTradeType(1);
-//                fundAccountCoreApi.add(request);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            lock.writeLock().unlock();
+        } else {
+            throw new ExException(FundCommonError.ORDER_CALLBACK_NOTIFY_FAIL);
         }
-
-//        }
-
-
         return "success";
+    }
 
+    private void getNotifyParam(@RequestParam("orderAmount") BigDecimal orderAmount, @RequestParam("orderCurrency") String orderCurrency, @RequestParam("orderNo") String orderNo, @RequestParam(value = "paymentAmount", required = false) BigDecimal paymentAmount, @RequestParam("sign") String sign, @RequestParam("signType") String signType, @RequestParam("status") String status, @RequestParam("transactionId") String transactionId, NotifyParam param) {
+        param.setOrderAmount(orderAmount);
+        param.setOrderCurrency(orderCurrency);
+        param.setOrderNo(orderNo);
+        param.setPaymentAmount(paymentAmount);
+        param.setSign(sign);
+        param.setSignType(signType);
+        param.setStatus(status);
+        param.setTransactionId(transactionId);
     }
 
 

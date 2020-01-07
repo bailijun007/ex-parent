@@ -122,7 +122,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("closeFlag", closeFlag);
         List<UserOrderVo> list = new ArrayList<>();
         List<PcOrderVo> voList = pcOrderDAO.queryList(map);
-        PageInfo<PcOrderVo> info = new PageInfo<>();
+        PageInfo<PcOrderVo> info = new PageInfo<>(voList);
         result.setPageNo(info.getPageNum());
         result.setRowTotal(info.getTotal());
         result.setPageCount(info.getPages());

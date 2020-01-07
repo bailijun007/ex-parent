@@ -54,7 +54,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         }
 
         List<PcAccountLogVo> list = pcAccountLogDAO.queryList(map);
-        PageInfo<PcAccountLogVo> info = new PageInfo<>();
+        PageInfo<PcAccountLogVo> info = new PageInfo<>(list);
         result.setList(list);
         result.setRowTotal(info.getTotal());
         result.setPageNo(info.getPageNum());

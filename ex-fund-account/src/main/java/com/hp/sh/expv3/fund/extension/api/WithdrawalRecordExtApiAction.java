@@ -82,23 +82,17 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
 
     @Override
     public PageResult<WithdrawalRecordVo> queryAllUserHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
-        PageResult<WithdrawalRecordVo> result = new PageResult<WithdrawalRecordVo>();
         if (pageNo == null || pageSize == null) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }
 
-        List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, null, null, null);
-        if (!CollectionUtils.isEmpty(voList)) {
-            List<WithdrawalRecordVo> pageList = voList.stream().skip(pageSize * (pageNo - 1))
-                    .limit(pageSize)
-                    .collect(Collectors.toList());
-            result.setList(pageList);
-        }
-
-        Integer rowTotal = voList.size();
-        result.setPageNo(pageNo);
-        result.setRowTotal(new Long(rowTotal + ""));
-        result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
+        PageResult<WithdrawalRecordVo> result = withdrawalRecordExtService.pageQueryHistory(userId, asset, pageNo, pageSize);
+       if(!CollectionUtils.isEmpty(result.getList())){
+           for (WithdrawalRecordVo vo : result.getList()) {
+               WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
+               vo.setTargetAddress(withdrawalAddrVo.getAddress());
+           }
+       }
 
         return result;
     }

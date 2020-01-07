@@ -21,4 +21,6 @@ public interface WithdrawalRecordExtMapper {
     List<WithdrawalRecordVo> queryHistoryByTime(Map<String,Object> map);
 
     WithdrawalRecordVo queryLastHistory(@Param("userId") Long userId,@Param("asset") String asset);
+
+    List<WithdrawalRecordVo> queryByUserIdAndAsset(@Param("userId") Long userId,@Param("asset") String asset);
 }
