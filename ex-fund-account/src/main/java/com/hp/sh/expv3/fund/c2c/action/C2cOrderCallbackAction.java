@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.fund.c2c.action;
 
+import com.gitee.hupadev.base.api.ResultEntity;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.c2c.component.PLPayService;
 import com.hp.sh.expv3.fund.c2c.component.PLpayClient;
@@ -113,6 +114,7 @@ public class C2cOrderCallbackAction {
 
 
     @ApiOperation(value = "订单成功回调通知")
+    @ResultEntity
     @RequestMapping(value = "/deposit/notify")
     public String notify(@RequestParam("orderAmount") BigDecimal orderAmount, @RequestParam("orderCurrency") String orderCurrency,
                          @RequestParam("orderNo") String orderNo, @RequestParam(value = "paymentAmount",required = false) BigDecimal paymentAmount,
