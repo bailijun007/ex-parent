@@ -117,7 +117,7 @@ public class PcPositionService {
 		////////// 订单 ///////////
 		
 		//修改订单状态
-		this.updateOrderStatus4Trade(order, tradeResult, now);
+		this.updateOrder4Trade(order, tradeResult, now);
 		
 		//////////pc_account ///////////
 		if(order.getLiqFlag()==IntBool.YES){//强平委托
@@ -174,7 +174,7 @@ public class PcPositionService {
 		this.pcAccountCoreService.add(request);
 	}
 
-	private void updateOrderStatus4Trade(PcOrder order, TradeResult tradeResult, Long now){
+	private void updateOrder4Trade(PcOrder order, TradeResult tradeResult, Long now){
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getFee()));
