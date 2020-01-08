@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author BaiLiJun  on 2019/12/16
@@ -30,10 +29,10 @@ public class WithdrawalAddrVo implements Serializable {
     private Long userId;
 
 
-    private Date created;
+    private Long created;
 
 
-    private Date modified;
+    private Long modified;
 
 
     public Integer getEnabled() {
@@ -52,19 +51,19 @@ public class WithdrawalAddrVo implements Serializable {
         this.userId = userId;
     }
 
-    public Date getCreated() {
+    public Long getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Long created) {
         this.created = created;
     }
 
-    public Date getModified() {
+    public Long getModified() {
         return modified;
     }
 
-    public void setModified(Date modified) {
+    public void setModified(Long modified) {
         this.modified = modified;
     }
 

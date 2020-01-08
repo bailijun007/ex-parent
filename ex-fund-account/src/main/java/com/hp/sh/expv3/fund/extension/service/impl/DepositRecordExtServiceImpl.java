@@ -37,13 +37,12 @@ public class DepositRecordExtServiceImpl implements DepositRecordExtService {
             pageStatus = 1;
         }
         List<DepositRecordHistoryVo> list = depositRecordExtMapper.queryHistory(userId, asset, queryId, pageSize, pageStatus);
-        if (CollectionUtils.isEmpty(list)) {
-            return list;
-        }
-        for (DepositRecordHistoryVo historyVo : list) {
-            Optional<DepositRecordHistoryVo> vo = Optional.ofNullable(historyVo);
-            historyVo.setMtime(vo.map(d -> d.getModified()).orElse(null));
-            historyVo.setDepositTime(vo.map(d -> d.getPayTime()).orElse(null));
+        if (!CollectionUtils.isEmpty(list)) {
+            for (DepositRecordHistoryVo historyVo : list) {
+                Optional<DepositRecordHistoryVo> vo = Optional.ofNullable(historyVo);
+                historyVo.setMtime(vo.map(d -> d.getModified()).orElse(null));
+                historyVo.setDepositTime(vo.map(d -> d.getPayTime()).orElse(null));
+            }
         }
 
         return list;
@@ -54,6 +53,12 @@ public class DepositRecordExtServiceImpl implements DepositRecordExtService {
         PageResult<DepositRecordHistoryVo> pageResult=new PageResult<>();
         PageHelper.startPage(pageNo,pageSize);
         List<DepositRecordHistoryVo> list = depositRecordExtMapper.queryByUserIdAndAsset(userId,asset);
+       if(!CollectionUtils.isEmpty(list)){
+           for (DepositRecordHistoryVo historyVo : list) {
+               Optional<DepositRecordHistoryVo> vo = Optional.ofNullable(historyVo);
+               historyVo.setMtime(vo.map(DepositRecordHistoryVo::getModified).orElse(null));
+           }
+       }
         PageInfo<DepositRecordHistoryVo> info = new PageInfo<>(list);
         pageResult.setList(list);
         pageResult.setPageNo(info.getPageNum());

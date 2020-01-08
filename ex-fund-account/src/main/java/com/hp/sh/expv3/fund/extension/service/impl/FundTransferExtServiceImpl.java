@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.fund.extension.service.impl;
 
 import com.gitee.hupadev.base.api.PageResult;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.extension.dao.FundTransferExtMapper;
 import com.hp.sh.expv3.fund.extension.error.FundTransferExtError;
@@ -34,7 +36,7 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
         }
         for (FundTransferExtVo transferExtVo : voList) {
             Optional<FundTransferExtVo> vo = Optional.ofNullable(transferExtVo);
-            transferExtVo.setCtime(vo.map(t -> t.getCreated().getTime()).orElse(null));
+            transferExtVo.setCtime(vo.map(t -> t.getCreated()).orElse(null));
             int status = vo.filter(t -> t.getStatus() == 8).map(t -> t.getStatus()).orElse(2);
             if (status == 2) {
                 transferExtVo.setStatus(status);
@@ -47,16 +49,17 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
     }
 
     @Override
-    public List<FundTransferExtVo> queryAllUserHistory(Long userId, String asset) {
+    public PageResult<FundTransferExtVo> queryAllUserHistory(Long userId, String asset, Integer pageNo,Integer pageSize) {
+        PageResult<FundTransferExtVo> pageResult=new PageResult<>();
         Map<String, Object> map=new HashMap<>();
         map.put("userId",userId);
         map.put("asset",asset);
+        PageHelper.startPage(pageNo,pageSize);
         List<FundTransferExtVo> voList = fundTransferExtMapper.queryList(map);
-
         if (!CollectionUtils.isEmpty(voList)) {
             for (FundTransferExtVo transferExtVo : voList) {
                 Optional<FundTransferExtVo> vo = Optional.ofNullable(transferExtVo);
-                transferExtVo.setCtime(vo.map(t -> t.getCreated().getTime()).orElse(null));
+                transferExtVo.setCtime(vo.map(t -> t.getCreated()).orElse(null));
                 int status = vo.filter(t -> t.getStatus() == 8).map(t -> t.getStatus()).orElse(2);
                 if (status == 2) {
                     transferExtVo.setStatus(status);
@@ -66,6 +69,11 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
             }
         }
 
-        return voList;
+        PageInfo<FundTransferExtVo> info = new PageInfo<>(voList);
+        pageResult.setList(voList);
+        pageResult.setPageNo(info.getPageNum());
+        pageResult.setPageCount(info.getPages());
+        pageResult.setRowTotal(info.getTotal());
+        return pageResult;
     }
 }

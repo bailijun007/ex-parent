@@ -60,24 +60,17 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
         if (pageNo == null || pageSize == null) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }
-        PageResult<CapitalAccountVo> result = new PageResult();
-        List<CapitalAccountVo> voList = fundAccountExtendServer.fundAccountList(userId, asset);
-        if (!CollectionUtils.isEmpty(voList)) {
-            for (CapitalAccountVo vo : voList) {
+
+        PageResult<CapitalAccountVo> result = fundAccountExtendServer.pageQueryAccountList(userId, asset,  pageNo,  pageSize);
+        if (!CollectionUtils.isEmpty(result.getList())) {
+            for (CapitalAccountVo vo : result.getList()) {
                 //查询冻结资金
                 BigDecimal frozenCapital = withdrawalRecordExtServer.getFrozenCapital(vo.getAccountId(), vo.getAsset());
                 vo.setLock(frozenCapital);
                 vo.setTotalAssets(frozenCapital.add(vo.getAvailable()));
             }
-
-            List<CapitalAccountVo> list = voList.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
-            result.setList(list);
         }
 
-        Integer rowTotal = voList.size();
-        result.setPageNo(pageNo);
-        result.setRowTotal(Long.valueOf(rowTotal + ""));
-        result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
         return result;
     }
 

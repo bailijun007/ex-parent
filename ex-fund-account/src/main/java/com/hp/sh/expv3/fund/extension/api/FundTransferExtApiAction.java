@@ -38,18 +38,18 @@ public class FundTransferExtApiAction implements FundTransferExtApi {
         if (pageSize == null || pageNo == null) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }
-        PageResult<FundTransferExtVo> result = new PageResult();
-        List<FundTransferExtVo> list = fundTransferExtService.queryAllUserHistory(userId, asset);
 
-        if(!CollectionUtils.isEmpty(list)){
-            List<FundTransferExtVo> voList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
-            result.setList(voList);
-        }
+        PageResult<FundTransferExtVo> result = fundTransferExtService.queryAllUserHistory(userId, asset,pageNo,pageSize);
 
-        Integer rowTotal = list.size();
-        result.setPageNo(pageNo);
-        result.setRowTotal(Long.valueOf(rowTotal + ""));
-        result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
+//        if(!CollectionUtils.isEmpty(list)){
+//            List<FundTransferExtVo> voList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
+//            result.setList(voList);
+//        }
+//
+//        Integer rowTotal = list.size();
+//        result.setPageNo(pageNo);
+//        result.setRowTotal(Long.valueOf(rowTotal + ""));
+//        result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
         return result;
     }
 }

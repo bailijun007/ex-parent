@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 充值记录历史
@@ -37,6 +36,9 @@ public class DepositRecordHistoryVo implements Serializable {
 
     @ApiModelProperty("更新时间")
     private Long mtime;
+
+    @ApiModelProperty("创建时间")
+    private Long ctime;
 
     private Long modified;
 
@@ -134,5 +136,13 @@ public class DepositRecordHistoryVo implements Serializable {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Long getCtime() {
+        return ctime;
+    }
+
+    public void setCtime(Long ctime) {
+        this.ctime = ctime;
     }
 }

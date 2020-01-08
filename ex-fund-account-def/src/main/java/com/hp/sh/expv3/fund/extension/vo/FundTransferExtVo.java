@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * @author BaiLiJun  on 2019/12/16
@@ -24,7 +23,7 @@ public class FundTransferExtVo implements Serializable {
     @ApiModelProperty("转账时间")
     private Long ctime;
 
-    private Date created;
+    private Long created;
 
     @ApiModelProperty("状态：1-成功，2-失败")
     private Integer status;
@@ -67,11 +66,11 @@ public class FundTransferExtVo implements Serializable {
         this.ctime = ctime;
     }
 
-    public Date getCreated() {
+    public Long getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Long created) {
         this.created = created;
     }
 

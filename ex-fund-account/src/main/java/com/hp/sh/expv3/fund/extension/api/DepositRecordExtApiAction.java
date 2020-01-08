@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +46,14 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
         return list;
     }
 
+    /**
+     * 查询所有用户充币历史记录
+     * @param userId
+     * @param asset
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
     @Override
     public PageResult<DepositRecordHistoryVo> queryAllUserHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageSize == null) {
@@ -64,8 +73,9 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
 
     private List<DepositRecordHistoryVo> getDepositRecordHistoryVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
-        String addr = depositAddrExtService.getAddressByUserIdAndAsset(userId, asset);
         for (DepositRecordHistoryVo historyVo : list) {
+            String addr = depositAddrExtService.getAddressByUserIdAndAsset(userId, asset);
+
             historyVo.setAddress(addr);
         }
         return list;

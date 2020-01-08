@@ -1,5 +1,8 @@
 package com.hp.sh.expv3.fund.extension.service.impl;
 
+import com.gitee.hupadev.base.api.PageResult;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.fund.extension.dao.FundAccountExtendMapper;
 import com.hp.sh.expv3.fund.extension.service.FundAccountExtendService;
 import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
@@ -27,11 +30,18 @@ public class FundAccountExtendServerImpl implements FundAccountExtendService {
     }
 
     @Override
-    public List<CapitalAccountVo> fundAccountList(Long userId, String asset) {
+    public PageResult<CapitalAccountVo> pageQueryAccountList(Long userId, String asset, Integer pageNo, Integer pageSize) {
+        PageResult<CapitalAccountVo> pageResult=new PageResult<>();
         Map<String, Object> map=new HashMap<>();
         map.put("userId",userId);
         map.put("asset",asset);
+        PageHelper.startPage(pageNo,pageSize);
         List<CapitalAccountVo> voList = fundAccountExtendMapper.queryList(map);
-        return voList;
+        PageInfo<CapitalAccountVo> info = new PageInfo<>(voList);
+        pageResult.setList(voList);
+        pageResult.setPageNo(info.getPageNum());
+        pageResult.setPageCount(info.getPages());
+        pageResult.setRowTotal(info.getTotal());
+        return pageResult;
     }
 }

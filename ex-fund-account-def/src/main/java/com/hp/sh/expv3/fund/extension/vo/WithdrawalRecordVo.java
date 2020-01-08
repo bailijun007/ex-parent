@@ -3,8 +3,8 @@ package com.hp.sh.expv3.fund.extension.vo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 提币历史Vo
@@ -12,17 +12,15 @@ import java.util.Date;
  * @author BaiLiJun  on 2019/12/16
  */
 @ApiModel("提币历史Vo")
-public class WithdrawalRecordVo {
+public class WithdrawalRecordVo implements Serializable {
     @ApiModelProperty("id")
     private Long id;
 
-
+    @ApiModelProperty("币种")
     private String asset;
 
     private Long userId;
 
-    @ApiModelProperty("币种")
-    private String symbol;
 
     @ApiModelProperty("哈希值")
     private String txHash;
@@ -52,13 +50,6 @@ public class WithdrawalRecordVo {
         this.id = id;
     }
 
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
 
     public String getTxHash() {
         return txHash;

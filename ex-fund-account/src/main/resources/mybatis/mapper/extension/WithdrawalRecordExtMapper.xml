@@ -96,7 +96,7 @@
     </select>
 
     <select id="queryLastHistory" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id,asset symbol,  amount, pay_status  status,created,account
+        select id,asset,   amount, pay_status  status,created,account,user_id userId
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -126,7 +126,7 @@
 
 
     <select id="queryList" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id, user_id,asset ,  amount, pay_status  status,created,account
+        select id, user_id,asset ,  amount, pay_status  status,created,account ,created ctime
         FROM withdrawal_record
         <where>
             <if test="userId!=null">

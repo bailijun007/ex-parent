@@ -2,9 +2,7 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.error.DepositExtError;
 import com.hp.sh.expv3.fund.extension.error.FundCommonError;
-import com.hp.sh.expv3.fund.extension.error.WithdrawalExtError;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalAddrExtService;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo;
@@ -13,17 +11,13 @@ import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2019/12/16
@@ -58,18 +52,41 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
         return voList;
     }
 
+    /**
+     * 获取最新提币历史
+     * TODO txHash 哈希值 数据库缺字段，后期让老王加上或者掉老王接口
+     *
+     * @param userId 用户id
+     * @param asset  资产
+     * @return
+     */
     @Override
     public WithdrawalRecordVo queryLastHistory(Long userId, String asset) {
         WithdrawalRecordVo vo = withdrawalRecordExtService.queryLastHistory(userId, asset);
+        WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(userId, asset);
+        Optional<WithdrawalAddrVo> addrVo = Optional.ofNullable(withdrawalAddrVo);
+        vo.setTargetAddress(addrVo.map(WithdrawalAddrVo::getAddress).orElse(null));
         return vo;
     }
 
+    /**
+     * 查询某个用户一段时间的提币数量
+     * <p>
+     * txHash 哈希值 数据库缺字段，后期让老王加上或者掉老王接口
+     *
+     * @param userId    用户id
+     * @param asset     资产
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return
+     */
     @Override
     public List<WithdrawalRecordVo> queryUserWithdrawal(Long userId, String asset, Long startTime, Long endTime) {
         if (userId == null || startTime == null || endTime == null || StringUtils.isEmpty(asset)) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }
         List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, startTime, endTime);
+
         return voList;
     }
 
@@ -78,14 +95,15 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
         if (!CollectionUtils.isEmpty(voList)) {
             for (WithdrawalRecordVo vo : voList) {
                 WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
-                vo.setTargetAddress(withdrawalAddrVo.getAddress());
+                Optional<WithdrawalAddrVo> addrVo = Optional.ofNullable(withdrawalAddrVo);
+                vo.setTargetAddress(addrVo.map(WithdrawalAddrVo::getAddress).orElse(null));
             }
         }
         return voList;
     }
 
     @Override
-    public PageResult<WithdrawalRecordVo> queryAllUserHistory(Long userId, String asset, Long startTime, Long endTime,Integer approvalStatus, Integer pageNo, Integer pageSize) {
+    public PageResult<WithdrawalRecordVo> queryAllUserHistory(Long userId, String asset, Long startTime, Long endTime, Integer approvalStatus, Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageSize == null) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }
@@ -98,7 +116,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
             endTime = now.toEpochMilli();
         }
 
-        PageResult<WithdrawalRecordVo> result = withdrawalRecordExtService.pageQueryHistory(userId, asset, pageNo, pageSize, startTime, endTime,approvalStatus);
+        PageResult<WithdrawalRecordVo> result = withdrawalRecordExtService.pageQueryHistory(userId, asset, pageNo, pageSize, startTime, endTime, approvalStatus);
         if (!CollectionUtils.isEmpty(result.getList())) {
             for (WithdrawalRecordVo vo : result.getList()) {
                 WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
@@ -114,7 +132,8 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
         List<WithdrawalRecordVo> voList = withdrawalRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
         for (WithdrawalRecordVo vo : voList) {
             WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
-            vo.setTargetAddress(withdrawalAddrVo.getAddress());
+            Optional<WithdrawalAddrVo> voOptional = Optional.ofNullable(withdrawalAddrVo);
+            vo.setTargetAddress(voOptional.map(WithdrawalAddrVo::getAddress).orElse(null));
         }
         return voList;
     }

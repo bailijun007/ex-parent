@@ -21,7 +21,7 @@ public class WithdrawalAddrExtApiAction implements  WithdrawalAddrExtApi{
 
 
     @Override
-    public PageResult<WithdrawalAddrVo> findWithdrawalAddr(Long userId, String asset, Long pageNo, Integer pageSize, Integer enabled) {
+    public PageResult<WithdrawalAddrVo> findWithdrawalAddr(Long userId, String asset, Integer pageNo, Integer pageSize, Integer enabled) {
         if (userId==null || pageNo == null || pageSize == null) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }

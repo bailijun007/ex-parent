@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.fund.extension.service;
 
+import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.fund.extension.dao.FundAccountExtendMapper;
 import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,5 +18,5 @@ public interface FundAccountExtendService {
 
     public CapitalAccountVo getCapitalAccount(Long userId, String asset) ;
 
-    List<CapitalAccountVo> fundAccountList(Long userId, String asset);
+    PageResult<CapitalAccountVo> pageQueryAccountList(Long userId, String asset, Integer pageNo, Integer pageSize);
 }

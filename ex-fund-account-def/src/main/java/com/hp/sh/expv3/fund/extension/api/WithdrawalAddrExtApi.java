@@ -26,18 +26,18 @@ public interface WithdrawalAddrExtApi {
 
     @ApiOperation("查询提币地址")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId",value = "用户id"),
+            @ApiImplicitParam(name = "userId",value = "用户id",required = true),
             @ApiImplicitParam(name = "asset",value = "资产"),
-            @ApiImplicitParam(name = "pageNo",value = "当前页"),
-            @ApiImplicitParam(name = "pageSize",value = "每页显示多少条"),
+            @ApiImplicitParam(name = "pageNo",value = "当前页",required = true),
+            @ApiImplicitParam(name = "pageSize",value = "每页显示多少条",required = true),
             @ApiImplicitParam(name = "enabled",value = "1:启用/0:禁用")
     })
     @GetMapping(value = "/api/extension/account/withdraw/address/query")
-    public PageResult<WithdrawalAddrVo> findWithdrawalAddr(@RequestParam("userId") Long userId,
-                                                           @RequestParam("asset") String asset,
-                                                           @RequestParam("pageNo") Long pageNo,
+    public PageResult<WithdrawalAddrVo> findWithdrawalAddr(@RequestParam(value = "userId",required = true) Long userId,
+                                                           @RequestParam(value = "asset",required = false) String asset,
+                                                           @RequestParam("pageNo") Integer pageNo,
                                                            @RequestParam("pageSize") Integer pageSize,
-                                                           @RequestParam("enabled") Integer enabled);
+                                                           @RequestParam(value = "enabled",required = false) Integer enabled);
 
 
 }

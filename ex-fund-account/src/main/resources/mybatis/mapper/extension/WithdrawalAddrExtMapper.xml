@@ -26,9 +26,11 @@
     </select>
 
     <select id="findWithdrawalAddr" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo">
-        SELECT id,asset,address,remark FROM withdrawal_addr
+        SELECT id,asset, user_id userId, enabled, address,remark,created,modified FROM withdrawal_addr
         <where>
-            enabled=1
+            <if test="enabled!=null">
+                enabled=#{enabled}
+            </if>
             <if test="userId!=null">
                 and user_id=#{userId}
             </if>
