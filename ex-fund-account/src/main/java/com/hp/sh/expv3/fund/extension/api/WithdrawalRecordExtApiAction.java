@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -71,7 +73,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
 
     private List<WithdrawalRecordVo> getWithdrawalRecordVos(Long userId, String asset, Long startTime, Long endTime) {
         List<WithdrawalRecordVo> voList = withdrawalRecordExtService.findWithdrawalRecordList(userId, asset, startTime, endTime);
-        if(!CollectionUtils.isEmpty(voList)){
+        if (!CollectionUtils.isEmpty(voList)) {
             for (WithdrawalRecordVo vo : voList) {
                 WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
                 vo.setTargetAddress(withdrawalAddrVo.getAddress());
@@ -81,18 +83,23 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     }
 
     @Override
-    public PageResult<WithdrawalRecordVo> queryAllUserHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
+    public PageResult<WithdrawalRecordVo> queryAllUserHistory(Long userId, String asset, Long startTime, Long endTime, Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageSize == null) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }
+        Instant now = Instant.now();
+        if (startTime == null && endTime == null) {
+            endTime =now.toEpochMilli();
+        }
 
-        PageResult<WithdrawalRecordVo> result = withdrawalRecordExtService.pageQueryHistory(userId, asset, pageNo, pageSize);
-       if(!CollectionUtils.isEmpty(result.getList())){
-           for (WithdrawalRecordVo vo : result.getList()) {
-               WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
-               vo.setTargetAddress(withdrawalAddrVo.getAddress());
-           }
-       }
+        PageResult<WithdrawalRecordVo> result = withdrawalRecordExtService.pageQueryHistory(userId, asset, pageNo, pageSize, startTime ,endTime);
+        if (!CollectionUtils.isEmpty(result.getList())) {
+            for (WithdrawalRecordVo vo : result.getList()) {
+                WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
+                Optional<WithdrawalAddrVo> optional = Optional.ofNullable(withdrawalAddrVo);
+                vo.setTargetAddress(optional.map(WithdrawalAddrVo::getAddress).orElse(null));
+            }
+        }
 
         return result;
     }

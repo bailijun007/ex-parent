@@ -27,5 +27,5 @@ public interface WithdrawalRecordExtService {
 
     List<WithdrawalRecordVo> findWithdrawalRecordList(Long userId, String asset, Long startTime,Long endTime);
 
-    PageResult<WithdrawalRecordVo> pageQueryHistory(Long userId, String asset, Integer pageNo, Integer pageSize);
+    PageResult<WithdrawalRecordVo> pageQueryHistory(Long userId, String asset, Integer pageNo, Integer pageSize, Long startTime, Long endTime);
 }

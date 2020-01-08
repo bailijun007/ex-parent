@@ -71,10 +71,17 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
     }
 
     @Override
-    public PageResult<WithdrawalRecordVo> pageQueryHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
+    public PageResult<WithdrawalRecordVo> pageQueryHistory(Long userId, String asset, Integer pageNo, Integer pageSize, Long startTime, Long endTime) {
         PageResult<WithdrawalRecordVo> pageResult = new PageResult<>();
         PageHelper.startPage(pageNo, pageSize);
-        List<WithdrawalRecordVo> list = withdrawalRecordExtMapper.queryByUserIdAndAsset(userId, asset);
+//        List<WithdrawalRecordVo> list = withdrawalRecordExtMapper.queryByUserIdAndAsset(userId, asset);
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId",userId);
+        map.put("asset",asset);
+        map.put("modifiedBegin",startTime);
+        map.put("modifiedEnd",endTime);
+        List<WithdrawalRecordVo> list = withdrawalRecordExtMapper.queryList(map);
+
         PageInfo<WithdrawalRecordVo> info = new PageInfo<>(list);
         pageResult.setList(list);
         pageResult.setPageNo(info.getPageNum());

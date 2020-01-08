@@ -111,7 +111,7 @@
     </select>
 
     <select id="queryByUserIdAndAsset" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id,asset symbol,  amount, pay_status  status,created,account
+        select id, user_id,asset ,  amount, pay_status  status,created,account
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -120,6 +120,24 @@
             <if test="asset!=null and asset!=''">
                 and asset=#{asset}
             </if>
+        </where>
+        ORDER BY id desc
+    </select>
+
+
+    <select id="queryList" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
+        select id, user_id,asset ,  amount, pay_status  status,created,account
+        FROM withdrawal_record
+        <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+            <if test="modifiedBegin!=null"> and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+
         </where>
         ORDER BY id desc
     </select>
