@@ -25,7 +25,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-		sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified
+		id,sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified
 	</sql>
 
     <sql id="simple_where">
@@ -39,8 +39,10 @@
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="id!=null">and id=#{id}</if>
             <if test="sn!=null">and sn=#{sn}</if>
-            <if test="created!=null">and created=#{created}</if>
-            <if test="modified!=null">and modified=#{modified}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null">and modified &gt;=#{modifiedBegin}</if>
+            <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
             <if test="keyword!=null and keyword!=''">and sn like CONCAT('%',#{keyword},'%')</if>
         </where>
     </sql>
@@ -174,6 +176,35 @@
         where   sn=#{sn}
         AND user_id=#{userId}
     </update>
+
+    <select id="pageQueryByPayStatus" resultType="com.hp.sh.expv3.fund.c2c.entity.C2cOrder">
+        select
+        <include refid="Base_Column_List"/>
+        from c2c_order
+        <where>
+            <if test="payStatus!=null">
+                pay_status=#{payStatus}
+            </if>
+            <choose>
+                <when test="nextPage==1 and pageSize!=null and id!=null">
+                    and id &gt; #{id}
+                    ORDER BY id asc
+                    LIMIT 0,${pageSize}
+                </when>
+                <when test="nextPage==-1 and pageSize!=null and id!=null">
+                    and id&lt; #{id}
+                    ORDER BY id desc
+                    LIMIT 0,${pageSize}
+                </when>
+                <otherwise>
+                    ORDER BY id desc
+                    LIMIT 0,${pageSize}
+                </otherwise>
+            </choose>
+        </where>
+
+    </select>
+
 
     <delete id="delete">
         delete from c2c_order where id=#{id}

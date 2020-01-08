@@ -23,4 +23,5 @@ public interface C2cOrderDAO extends BaseUserDataMapper<C2cOrder,Long>  {
 
     void updateBySnAndUserId(C2cOrder c2cOrder);
 
+    List<C2cOrder> pageQueryByPayStatus(@Param("payStatus") Integer payStatus,@Param("nextPage") Integer nextPage, @Param("pageSize")Integer pageSize, @Param("id")Integer id);
 }
