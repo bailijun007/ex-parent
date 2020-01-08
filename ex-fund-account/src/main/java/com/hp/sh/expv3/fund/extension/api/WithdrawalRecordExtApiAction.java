@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -83,16 +85,20 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     }
 
     @Override
-    public PageResult<WithdrawalRecordVo> queryAllUserHistory(Long userId, String asset, Long startTime, Long endTime, Integer pageNo, Integer pageSize) {
+    public PageResult<WithdrawalRecordVo> queryAllUserHistory(Long userId, String asset, Long startTime, Long endTime,Integer approvalStatus, Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageSize == null) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }
+
+        LocalDate localDate = LocalDate.now();
         Instant now = Instant.now();
+
         if (startTime == null && endTime == null) {
-            endTime =now.toEpochMilli();
+            startTime = localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli();
+            endTime = now.toEpochMilli();
         }
 
-        PageResult<WithdrawalRecordVo> result = withdrawalRecordExtService.pageQueryHistory(userId, asset, pageNo, pageSize, startTime ,endTime);
+        PageResult<WithdrawalRecordVo> result = withdrawalRecordExtService.pageQueryHistory(userId, asset, pageNo, pageSize, startTime, endTime,approvalStatus);
         if (!CollectionUtils.isEmpty(result.getList())) {
             for (WithdrawalRecordVo vo : result.getList()) {
                 WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());

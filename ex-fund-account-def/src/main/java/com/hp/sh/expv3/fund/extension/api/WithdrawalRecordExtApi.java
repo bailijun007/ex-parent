@@ -79,12 +79,14 @@ public interface WithdrawalRecordExtApi {
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "ETH", required = false),
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false),
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false),
+            @ApiImplicitParam(name = "approvalStatus", value = "审批状态(4:审批中 5:审批通过:6:拒绝)", required = false),
             @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
     @GetMapping(value = "/api/extension/account/withdrawal/queryAllUserHistory")
     public PageResult<WithdrawalRecordVo> queryAllUserHistory(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "asset", required = false) String asset,
                                                               @RequestParam(value = "startTime", required = false) Long startTime, @RequestParam(value = "endTime", required = false) Long endTime,
+                                                              @RequestParam(value = "approvalStatus", required = false) Integer approvalStatus,
                                                               @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize") Integer pageSize);
 
 

@@ -137,7 +137,7 @@
             </if>
             <if test="modifiedBegin!=null"> and modified &gt;= #{modifiedBegin}</if>
             <if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
-
+            <if test="approvalStatus!=null"> and approval_status=#{approvalStatus}</if>
         </where>
         ORDER BY id desc
     </select>
