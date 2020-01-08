@@ -1,7 +1,9 @@
 package com.hp.sh.expv3.fund.c2c.component;
 
+import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
+import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +43,7 @@ public class PLpayClient {
     private String customerId;
 
     /**
-     * 检查重定向请求是否成功
+     * 转发请求到第三方支付，并返回支付路径
      *
      * @param orderNo
      * @param orderCurrency
@@ -51,7 +53,7 @@ public class PLpayClient {
      * @param sign
      * @return 成功返回true 失败返回false
      */
-    public Boolean checkSendUrl( String orderNo, String orderCurrency, String orderAmount, String receiveUrl, String pickupUrl, String sign) {
+    public String sendRequestUrl( String orderNo, String orderCurrency, String orderAmount, String receiveUrl, String pickupUrl, String sign) {
         String url = apiHost + "?orderNo=" + orderNo + "&customerId=" + customerId + "&orderCurrency=" + orderCurrency + "&orderAmount=" + orderAmount
                 + "&receiveUrl=" + receiveUrl + "&pickupUrl=" + pickupUrl + "&shopNo=" + shopNo + "&signType=" + signType + "&sign=" + sign;
 
@@ -63,11 +65,11 @@ public class PLpayClient {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         int codeValue = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getStatusCodeValue();
-        if (codeValue == 200) {
-            return Boolean.TRUE;
+        if (codeValue != 200) {
+            throw new ExException(FundCommonError.SEND_REQUEST_TO_C2C_SERVICE_FAIL);
         }
 
-        return Boolean.FALSE;
+        return url;
     }
 
     /**

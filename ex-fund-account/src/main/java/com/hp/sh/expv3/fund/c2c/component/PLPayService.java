@@ -4,6 +4,7 @@ import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
 import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
+import com.hp.sh.expv3.fund.c2c.service.BuyService;
 import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,9 @@ public class PLPayService {
     @Value("${expv3.base.url}")
     private String baseUrl;
 
+    @Autowired
+    private BuyService buyService;
+
     /**
      * @param userId      用户id
      * @param ratio       USD/CNY 汇率 例如： USD/CNY = 7.0298
@@ -30,7 +34,7 @@ public class PLPayService {
      *                    TODO 老王，入金回调如何确保幂等（高并发情况下，如何确认入金状态与入金账户的修改）
      * @return 返回转发的url地址，调用方需要转发到该地址获取数据
      */
-    public C2cOrder rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal fabiAmt, BigDecimal tarVolume) {
+    public String rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal fabiAmt, BigDecimal tarVolume) {
         //生成订单号
         String orderNo = getOrderNo(userId);
         //订单币种
@@ -41,12 +45,8 @@ public class PLPayService {
         String pickupUrl = getPickupUrl();
         //获取加密后的签名
         String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount, orderCurrency);
-        //检查发送请求到第三方支付的url是否 返回code是200
-        Boolean b = pLpayClient.checkSendUrl(orderNo, orderCurrency, orderAmount, receiveUrl, pickupUrl, sign);
-        if (!b) {
-        //订单发送请求到第三方支付发生错误
-            throw new ExException(FundCommonError.SEND_REQUEST_TO_C2C_SERVICE_FAIL);
-        }
+        //转发请求到第三方支付，并返回支付路径
+        String url = pLpayClient.sendRequestUrl(orderNo, orderCurrency, orderAmount, receiveUrl, pickupUrl, sign);
 
 
         //增加一条c2c订单记录
@@ -65,8 +65,9 @@ public class PLPayService {
         c2cOrder.setUserId(userId);
         c2cOrder.setCreated(Instant.now().toEpochMilli());
         c2cOrder.setModified(Instant.now().toEpochMilli());
+        buyService.saveC2cOrder(c2cOrder);
 
-        return c2cOrder;
+        return url;
     }
 
 

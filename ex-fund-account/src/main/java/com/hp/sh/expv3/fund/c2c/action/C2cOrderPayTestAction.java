@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.fund.c2c.action;
 
+import com.gitee.hupadev.base.api.ResultEntity;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.c2c.component.PLPayService;
 import com.hp.sh.expv3.fund.c2c.component.PLpayClient;
@@ -36,15 +37,15 @@ public class C2cOrderPayTestAction {
 
 
     @ApiOperation(value = "创建c2c充值订单")
+    @ResultEntity
     @GetMapping("/deposit/create")
     public String create(@RequestParam("userId") long userId, @RequestParam("ratio") BigDecimal ratio,
                          @RequestParam("srcCurrency")  String srcCurrency,  @RequestParam("tarCurrency") String tarCurrency,
                          @RequestParam("tarVolume")  BigDecimal tarVolume,  @RequestParam("fabiAmt") BigDecimal fabiAmt){
 
-        C2cOrder c2cOrder = plPayService.rujin(userId, ratio, srcCurrency, tarCurrency, tarVolume, fabiAmt);
-        buyService.saveC2cOrder(c2cOrder);
+        String s = plPayService.rujin(userId, ratio, srcCurrency, tarCurrency, tarVolume, fabiAmt);
 
-        return "success";
+        return s;
     }
 
 }
