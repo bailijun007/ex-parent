@@ -38,6 +38,7 @@
             <if test="approvalStatus!=null">and approval_status=#{approvalStatus}</if>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="id!=null">and id=#{id}</if>
+            <if test="sn!=null">and sn=#{sn}</if>
             <if test="created!=null">and created=#{created}</if>
             <if test="modified!=null">and modified=#{modified}</if>
             <if test="keyword!=null and keyword!=''">and sn like CONCAT('%',#{keyword},'%')</if>

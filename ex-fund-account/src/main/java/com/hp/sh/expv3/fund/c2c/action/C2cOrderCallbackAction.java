@@ -76,7 +76,7 @@ public class C2cOrderCallbackAction {
         //c2c订单验证
         String[] split = orderNo.split("-");
         Long userId = Long.parseLong(split[1]);
-        C2cOrder c2cOrder1 = buyService.queryBySnAndUserId(param.getOrderNo(), userId);
+        C2cOrder c2cOrder1 = buyService.queryBySnAndUserId(orderNo, userId);
         if (c2cOrder1 != null && param.getStatus().equals("success")) {
             lock.writeLock().lock();
             try {
