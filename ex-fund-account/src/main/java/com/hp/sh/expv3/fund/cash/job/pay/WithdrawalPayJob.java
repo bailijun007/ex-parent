@@ -51,7 +51,7 @@ public class WithdrawalPayJob {
 		}
 	}
 	
-    @MQListener(group=MQConstant.GROUP2, topic = MQConstant.WITHDRAWAL)
+    @MQListener(group=MQConstant.GROUP2, topic = MQConstant.TOPIC_WITHDRAWAL)
 	public void handleOnePendingSynch(WithDrawalMsg msg) {
 		WithdrawalRecord record = withdrawalService.getWithdrawal(msg.getUserId(), msg.getId());
 		this.handleOne(record);

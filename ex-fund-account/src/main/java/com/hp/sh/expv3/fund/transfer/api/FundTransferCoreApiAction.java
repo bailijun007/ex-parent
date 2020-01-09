@@ -65,7 +65,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 		//转帐记录
 		FundTransfer transfer = fundTransferCoreService.transfer(userId, asset, srcAccountType, targetAccountType, amount);
 		
-		mqSender.send(new NewTransfer(transfer.getUserId(), transfer.getId()));
+		mqSender.sendMsg(new NewTransfer(transfer.getUserId(), transfer.getId()));
 	}
 
 	@Override
