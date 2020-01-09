@@ -188,7 +188,10 @@
         <include refid="Base_Column_List"/>
         from pc_order
         <where>
-            active_flag=1
+
+            <if test="activeFlag!=null">
+                and active_flag=#{activeFlag}
+            </if>
             <if test="userId!=null">
                 and user_id=#{userId}
             </if>
@@ -232,6 +235,9 @@
         <include refid="Base_Column_List"/>
         from pc_order
         <where>
+            <if test="activeFlag!=null">
+                and active_flag=#{activeFlag}
+            </if>
             <if test="userId!=null">
                 user_id=#{userId}
             </if>

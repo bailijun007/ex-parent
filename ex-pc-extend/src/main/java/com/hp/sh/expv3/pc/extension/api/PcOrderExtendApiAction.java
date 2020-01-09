@@ -112,21 +112,49 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     }
 
 
+    /**
+     * 获取当前用户历史委托
+     * @param userId
+     * @param asset
+     * @param symbol
+     * @param orderType
+     * @param longFlag
+     * @param closeFlag
+     * @param currentPage
+     * @param pageSize
+     * @param lastOrderId
+     * @param nextPage
+     * @return
+     */
     @Override
     public List<UserOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
-        PageResult<PcOrderVo> list = pcOrderExtendService.queryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
+        PageResult<PcOrderVo> list = pcOrderExtendService.queryHistoryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
         convertOrderList(result, list.getList());
         return result;
     }
 
 
+    /**
+     * 获取当前用户所有委托
+     * @param userId
+     * @param asset
+     * @param symbol
+     * @param status
+     * @param longFlag
+     * @param closeFlag
+     * @param currentPage
+     * @param pageSize
+     * @param lastOrderId
+     * @param nextPage
+     * @return
+     */
     @Override
     public List<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
-        PageResult<PcOrderVo> list = pcOrderExtendService.queryOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
+        PageResult<PcOrderVo> list = pcOrderExtendService.queryAllOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
         convertOrderList(result, list.getList());
         return result;
     }
