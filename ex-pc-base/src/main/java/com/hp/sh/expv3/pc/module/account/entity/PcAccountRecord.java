@@ -6,7 +6,7 @@ package com.hp.sh.expv3.pc.module.account.entity;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.base.entity.BaseAccountRecordEntity;
+import com.hp.sh.expv3.base.entity.BaseRecordEntity;
 
 /**
  * 永续合约_账户明细
@@ -14,12 +14,10 @@ import com.hp.sh.expv3.base.entity.BaseAccountRecordEntity;
  * @author lw
  *
  */
-public class PcAccountRecord extends BaseAccountRecordEntity	 {
+public class PcAccountRecord extends BaseRecordEntity	 {
 
 	private static final long serialVersionUID = 1L;
 	
-	//用户ID
-	private Long userId;
 
 	//资产
 	private String asset;
@@ -52,14 +50,6 @@ public class PcAccountRecord extends BaseAccountRecordEntity	 {
 	private Long associatedId;
 
 	public PcAccountRecord() {
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 
 	public String getAsset() {

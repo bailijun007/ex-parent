@@ -5,12 +5,12 @@
 package com.hp.sh.expv3.pc.module.order.entity;
 
 
-import com.hp.sh.expv3.base.entity.BaseAccountRecordEntity;
+import com.hp.sh.expv3.base.entity.BaseRecordEntity;
 
 /**
  * 订单日志
  */
-public class PcOrderLog extends BaseAccountRecordEntity{
+public class PcOrderLog extends BaseRecordEntity{
 
 	public static final int TYPE_CREATE = 1;
 	public static final int TYPE_CANCEL = 2;
@@ -21,8 +21,6 @@ public class PcOrderLog extends BaseAccountRecordEntity{
 	
 	private static final long serialVersionUID = 1L;
 
-	private Long userId;
-	
 	private Long orderId;
 	
 	private Integer type;
@@ -30,14 +28,6 @@ public class PcOrderLog extends BaseAccountRecordEntity{
 	private Integer triggerType;
 
     public PcOrderLog() {
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 
 	public Long getOrderId() {
