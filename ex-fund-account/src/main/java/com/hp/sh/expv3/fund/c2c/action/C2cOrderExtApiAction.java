@@ -29,7 +29,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
      * @return
      */
     @Override
-    public PageResult<C2cOrderVo> pageQueryByPayStatus(Integer payStatus, Integer nextPage, Integer pageSize, Integer id) {
+    public PageResult<C2cOrderVo> pageQueryByPayStatus(Integer payStatus, Integer nextPage, Integer pageSize, Long id) {
         if (pageSize == null || nextPage == null || pageSize == null) {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }

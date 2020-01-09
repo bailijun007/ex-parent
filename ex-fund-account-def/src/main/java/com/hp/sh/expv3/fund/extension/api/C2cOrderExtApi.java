@@ -27,6 +27,6 @@ public interface C2cOrderExtApi {
     })
     @GetMapping(value = "/api/extension/c2c/order/pageQueryByPayStatus")
     public PageResult<C2cOrderVo> pageQueryByPayStatus(@RequestParam("payStatus") Integer payStatus, @RequestParam("nextPage") Integer nextPage,
-                                                       @RequestParam("pageSize") Integer pageSize, @RequestParam(value = "id",required = false) Integer id);
+                                                       @RequestParam("pageSize") Integer pageSize, @RequestParam(value = "id",required = false) Long id);
 
 }
