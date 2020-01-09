@@ -17,6 +17,7 @@ public interface PcOrderExtendService {
     BigDecimal getGrossMargin( Long userId,String asset);
 
     List<PcOrderVo> orderList(Long closePosId, Long userId);
+    List<PcOrderVo> activeOrderList(Long closePosId, Long userId);
 
     List<PcOrderVo> findCurrentUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag);
 
