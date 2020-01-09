@@ -84,17 +84,7 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         return list;
     }
 
-    @Override
-    public List<PcOrderTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long statTime, Long endTime,Long userId) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("asset", asset);
-        map.put("symbol", symbol);
-        map.put("userId", userId);
-        map.put("tradeTimeBegin", statTime);
-        map.put("tradeTimeEnd", endTime);
-        List<PcOrderTradeVo> list = pcOrderTradeDAO.selectTradeListByTimeInterval(map);
-        return list;
-    }
+
 
     @Override
     public List<PcOrderTradeVo> queryLastTradeRecord(String asset, String symbol, Integer count) {

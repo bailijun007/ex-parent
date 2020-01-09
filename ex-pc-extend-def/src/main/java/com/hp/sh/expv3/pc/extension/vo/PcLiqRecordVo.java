@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * @author BaiLiJun  on 2019/12/25
@@ -38,10 +37,10 @@ public class PcLiqRecordVo implements Serializable {
     private BigDecimal bankruptPrice;
 
     @ApiModelProperty("创建时间")
-    private Date created;
+    private Long created;
 
     @ApiModelProperty("修改时间")
-    private Date modified;
+    private Long modified;
 
     @ApiModelProperty("成交价格")
     private BigDecimal liqPrice;
@@ -127,19 +126,19 @@ public class PcLiqRecordVo implements Serializable {
         this.bankruptPrice = bankruptPrice;
     }
 
-    public Date getCreated() {
+    public Long getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Long created) {
         this.created = created;
     }
 
-    public Date getModified() {
+    public Long getModified() {
         return modified;
     }
 
-    public void setModified(Date modified) {
+    public void setModified(Long modified) {
         this.modified = modified;
     }
 

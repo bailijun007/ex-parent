@@ -48,16 +48,24 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
     @Autowired
     private PcOrderExtendService pcOrderExtendService;
 
+    /**
+     * 查询pc永续合约账户
+     * @param userId 用户id
+     * @param asset 资产
+     * @param tradeType  类型 0.全部,1.成交开多,2.成交开空,3.成交平多,4.成交平空,5.转入,6.转出,7.手动追加保证金,8.减少保证金,9.自动追加保证金,10.调低杠杆追加保证金,11.强平平多,12强平平空
+     * @param historyType 1.最近两天,2.两天到三个月
+     * @param startDate 开始时间(当history_type是2时,填写)
+     * @param endDate 结束时间 (当history_type是2时,填写)
+     * @param pageNo 当前页
+     * @param pageSize 页大小
+     * @param symbol 交易对
+     * @return
+     */
     @Override
     public PageResult<PcAccountRecordLogVo> findContractAccountList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || tradeType == null || null == userId || historyType == null || pageNo == null || pageSize == null) {
-            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
-        }
+        tradeType = this.checkParam(userId, asset, tradeType, historyType, startDate, endDate, pageNo, pageSize, symbol);
 
-        if (tradeType == 0) {
-            tradeType = null;
-        }
-
+        //获取面值
         BigDecimal faceValue = this.getFaceValue(asset, symbol);
 
         PageResult<PcAccountRecordLogVo> result = new PageResult<PcAccountRecordLogVo>();
@@ -95,6 +103,23 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
         result.setList(list);
 
         return result;
+    }
+
+    private Integer checkParam(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || tradeType == null || null == userId || historyType == null || pageNo == null || pageSize == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+
+        if (tradeType == 0) {
+            tradeType = null;
+        }
+
+        if (historyType == 2) {
+            if (startDate == null || endDate == null) {
+                throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+            }
+        }
+        return tradeType;
     }
 
     //封装开平仓数据
@@ -151,6 +176,12 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
         recordLogVo.setOrderPrice(liqPrice);
     }
 
+    /**
+     * 获取面值
+     * @param asset 资产
+     * @param symbol 交易对
+     * @return
+     */
     public BigDecimal getFaceValue(String asset, String symbol) {
         PcContractVO vo = this.getPcContract(asset, symbol);
         Optional<PcContractVO> optional = Optional.ofNullable(vo);

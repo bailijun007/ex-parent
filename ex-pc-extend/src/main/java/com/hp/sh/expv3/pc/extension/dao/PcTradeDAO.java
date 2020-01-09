@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.pc.extension.dao;
 
 import com.hp.sh.expv3.pc.extension.vo.PcTradeVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -15,4 +16,6 @@ public interface PcTradeDAO {
     List<PcTradeVo> queryList(Map<String,Object> map);
 
     List<PcTradeVo> queryTradeByGtTime(Map<String, Object> map);
+
+    List<PcTradeVo> selectTradeListByTimeInterval(@Param("asset") String asset,@Param("symbol") String symbol,@Param("tradeTimeBegin")  Long tradeTimeBegin,@Param("tradeTimeEnd") Long tradeTimeEnd,@Param("userId") Long userId);
 }

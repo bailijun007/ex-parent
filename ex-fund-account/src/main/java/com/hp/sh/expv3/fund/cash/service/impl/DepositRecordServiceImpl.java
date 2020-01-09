@@ -1,10 +1,8 @@
 package com.hp.sh.expv3.fund.cash.service.impl;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +60,7 @@ public class DepositRecordServiceImpl implements DepositRecordService{
 	}
 
 	@Override
-	public List<DepositRecord> pageQuery(Page page, Long userId, Integer type, Integer channelId, Integer status, Date beginTime, Date endTime) {
+	public List<DepositRecord> pageQuery(Page page, Long userId, Integer type, Integer channelId, Integer status, Long beginTime, Long endTime) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", page);
 		params.put("userId", userId);

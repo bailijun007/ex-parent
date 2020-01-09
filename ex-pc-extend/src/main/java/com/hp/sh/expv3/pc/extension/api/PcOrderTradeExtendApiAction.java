@@ -66,24 +66,6 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         return result;
     }
 
-    /**
-     * 查询最新成交记录
-     * @param asset 资产
-     * @param symbol  交易对
-     * @param count 返回条数，最大100条
-     * @return
-     */
-//    @Override
-//    public List<PcOrderTradeDetailVo> queryLastTradeRecord(String asset, String symbol, Integer count) {
-//        checkParam(asset, symbol, count);
-//
-//        List<PcOrderTradeDetailVo> result = new ArrayList<>();
-//        List<PcOrderTradeVo> voList = pcOrderTradeService.queryLastTradeRecord(asset, symbol, count);
-//        //封装结果集
-//        this.toResult(result, voList);
-//
-//        return result;
-//    }
 
     private void checkParam(String asset, String symbol, Integer count) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || count == null) {
@@ -107,6 +89,9 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
     @CrossDB
     @Override
     public PcOrderTradeDetailVo selectLessTimeTrade(String asset, String symbol, Long statTime) {
+        if (StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)||statTime == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
         PcOrderTradeVo vo = pcOrderTradeService.selectLessTimeTrade(asset, symbol, statTime);
         PcOrderTradeDetailVo detailVo = new PcOrderTradeDetailVo();
         if (vo != null) {
@@ -138,26 +123,6 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         return result;
     }
 
-    @CrossDB
-    @Override
-    public List<PcOrderTradeDetailVo> selectTradeListByTimeInterval(String asset, String symbol, Long statTime, Long endTime) {
-        List<PcOrderTradeDetailVo> result = new ArrayList<>();
-        List<PcOrderTradeVo> voList = pcOrderTradeService.selectTradeListByTimeInterval(asset, symbol, statTime,endTime,null);
-        this.toResult(result,voList);
-        return result;
-    }
-
-    @CrossDB
-    @Override
-    public List<PcOrderTradeDetailVo> selectTradeListByUser(String asset, String symbol, Long userId, Long statTime, Long endTime) {
-        if (userId == null) {
-            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
-        }
-        List<PcOrderTradeDetailVo> result = new ArrayList<>();
-        List<PcOrderTradeVo> voList = pcOrderTradeService.selectTradeListByTimeInterval(asset, symbol, statTime,endTime,userId);
-        this.toResult(result,voList);
-        return result;
-    }
 
 
     //封装结果集
