@@ -3,6 +3,7 @@ package com.hp.sh.expv3.fund.c2c.service;
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.fund.c2c.dao.C2cOrderDAO;
 import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
+import com.hp.sh.expv3.fund.extension.vo.C2cOrderVo;
 import groovy.util.logging.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +37,9 @@ public class QueryService {
      * @param id        主键id
      * @return
      */
-    public PageResult<C2cOrder> pageQueryByPayStatus(Integer payStatus, Integer nextPage, Integer pageSize, Integer id) {
-        PageResult<C2cOrder> pageResult = new PageResult<>();
-        List<C2cOrder> orderList = c2cOrderDAO.pageQueryByPayStatus(payStatus, nextPage, pageSize, id);
+    public PageResult<C2cOrderVo> pageQueryByPayStatus(Integer payStatus, Integer nextPage, Integer pageSize, Integer id) {
+        PageResult<C2cOrderVo> pageResult = new PageResult<>();
+        List<C2cOrderVo> orderList = c2cOrderDAO.pageQueryByPayStatus(payStatus, nextPage, pageSize, id);
         Map<String, Object> map = new HashMap<>();
         map.put("payStatus", payStatus);
         Long count = c2cOrderDAO.queryCount(map);
@@ -46,7 +47,7 @@ public class QueryService {
         pageResult.setRowTotal(count);
         Integer rowTotal = Integer.parseInt(String.valueOf(count));
         pageResult.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
-        return null;
+        return pageResult;
     }
 
 
