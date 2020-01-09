@@ -153,7 +153,7 @@
     <logger name="org.mybatis.spring" value="INFO" additivity="false"/>
     <logger name="org.apache.skywalking" value="INFO" additivity="false"/>
 
-    <logger name="com.hp.sh.expv3.match.component.notify.PcNotify"  level="DEBUG" additivity="false" >
+    <logger name="com.hp.sh.expv3.match.component.notify.BbNotify" level="DEBUG" additivity="false" >
         <appender-ref ref="pcNotify"/>
     </logger>
 

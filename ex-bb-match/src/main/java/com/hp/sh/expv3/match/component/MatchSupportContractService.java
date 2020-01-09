@@ -5,10 +5,10 @@
 package com.hp.sh.expv3.match.component;
 
 import com.alibaba.fastjson.JSON;
-import com.hp.sh.expv3.match.bo.PcContractBo;
-import com.hp.sh.expv3.match.config.setting.PcmatchRedisKeySetting;
-import com.hp.sh.expv3.match.config.setting.PcmatchSetting;
-import com.hp.sh.expv3.match.util.PcUtil;
+import com.hp.sh.expv3.match.bo.BbContractBo;
+import com.hp.sh.expv3.match.config.setting.BbmatchRedisKeySetting;
+import com.hp.sh.expv3.match.config.setting.BbmatchSetting;
+import com.hp.sh.expv3.match.util.BbUtil;
 import com.hp.sh.expv3.match.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +30,10 @@ public class MatchSupportContractService {
     private RedisUtil metadataRedisUtil;
 
     @Autowired
-    private PcmatchRedisKeySetting pcmatchRedisKeySetting;
+    private BbmatchRedisKeySetting bbmatchRedisKeySetting;
 
     @Autowired
-    private PcmatchSetting pcmatchSetting;
+    private BbmatchSetting bbmatchSetting;
 
     private Set<String> supportAssetSymbol = new HashSet<>();
 
@@ -45,15 +45,15 @@ public class MatchSupportContractService {
             }
         }
 
-        Map<String, String> contractName2Contract = metadataRedisUtil.hgetAll(pcmatchRedisKeySetting.getPcContractPattern());
+        Map<String, String> contractName2Contract = metadataRedisUtil.hgetAll(bbmatchRedisKeySetting.getBbPattern());
         if (null != contractName2Contract || contractName2Contract.size() > 0) {
             for (Map.Entry<String, String> kv : contractName2Contract.entrySet()) {
                 String value = kv.getValue();
                 if (null != value) {
                     try {
-                        PcContractBo pcContractBo = JSON.parseObject(value, PcContractBo.class);
-                        if (null != pcContractBo.getContractGroup() && pcmatchSetting.getMatchGroupId().intValue() == pcContractBo.getContractGroup().intValue()) {
-                            supportAssetSymbol.add(PcUtil.concatAssetAndSymbol(null, pcContractBo.getAsset(), pcContractBo.getSymbol()));
+                        BbContractBo bbBo = JSON.parseObject(value, BbContractBo.class);
+                        if (null != bbBo.getContractGroup() && bbmatchSetting.getMatchGroupId().intValue() == bbBo.getContractGroup().intValue()) {
+                            supportAssetSymbol.add(BbUtil.concatAssetAndSymbol(null, bbBo.getAsset(), bbBo.getSymbol()));
                         }
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);

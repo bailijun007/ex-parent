@@ -2,14 +2,13 @@
  * @author zw
  * @date 2019/8/5
  */
-package com.hp.sh.expv3.match.match.core.match.thread.impl;
+package com.hp.sh.expv3.match.match.core.matched.thread.impl;
 
 import com.hp.sh.expv3.match.thread.def.ITask;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
 import com.hp.sh.expv3.match.thread.def.IThreadWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +18,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
-@Qualifier("threadWorkerMatchImpl")
 @Scope("prototype")
-public class ThreadWorkerMatchImpl implements IThreadWorker, Runnable {
+public class ThreadWorkerMatchedImpl implements IThreadWorker, Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     String assetSymbol;
     IThreadManager manager;
-    //ExecutorService executorService = Executors.newSingleThreadExecutor();
     Thread thread = null;
     ITask initTask = null;
     private AtomicBoolean isRunning = new AtomicBoolean(false);
@@ -36,12 +33,10 @@ public class ThreadWorkerMatchImpl implements IThreadWorker, Runnable {
         return isRunning;
     }
 
-    // 此队列为公平优先级队列，需要一个相同优先级时，先入先出的队列
-    // 若是公平队列，则和 每批的消息数量有关，因此暂时使用了 ArrayBlockingQueue
-//        BlockingQueue<ITask> queue = new PriorityBlockingQueue<>(10240, Comparator.comparingLong(ITask::getPriority));
+    //        BlockingQueue<ITask> queue = new PriorityBlockingQueue<>(10240, Comparator.comparingLong(ITask::getPriority));
     BlockingQueue<ITask> queue = new ArrayBlockingQueue<>(102400);
 
-    public ThreadWorkerMatchImpl(IThreadManager manager) {
+    public ThreadWorkerMatchedImpl(IThreadManager manager) {
         this.manager = manager;
     }
 
@@ -175,7 +170,7 @@ public class ThreadWorkerMatchImpl implements IThreadWorker, Runnable {
     }
 
     void onQuit() {
-        logger.info(thread.getName() + " quit.");
+        logger.warn(thread.getName() + " quit");
     }
 
     @Override
