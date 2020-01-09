@@ -111,9 +111,29 @@
         select
         <include refid="Base_Column_List"/>
         from pc_trade
-        <include refid="simple_where"/>
+       <where>
+           <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+           <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+           <if test="tradeTimeBegin!=null">and trade_time &gt;=#{tradeTimeBegin}</if>
+           <if test="tradeTimeEnd!=null">and trade_time &lt;#{tradeTimeEnd}</if>
+           <if test="userId!=null">and user_id=#{userId}</if>
+       </where>
         order by trade_time asc
     </select>
 
+
+    <select id="queryLastTrade" resultMap="PcTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_trade
+        <where>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="tradeTime!=null">and trade_time &lt; #{tradeTime}</if>
+
+        </where>
+        order by trade_time desc
+
+    </select>
 
 </mapper>

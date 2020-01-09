@@ -14,7 +14,7 @@ public interface PcTradeExtendService {
     List<PcTradeVo> queryTradeByGtTime(String asset, String symbol, Long startTime, Long endTime, Integer type);
 
 
-    PcTradeVo queryLastTrade(String asset, String symbol, Long startTime, Long endTime);
+    PcTradeVo queryLastTrade(String asset, String symbol, Long startTime);
 
     List<PcTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long startTime, Long endTime,Long userId);
 }

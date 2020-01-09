@@ -43,7 +43,7 @@ public class PcTradeExtendApiAction implements PcTradeExtendApi {
         if (null == startTime || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        PcTradeVo pcTradeVo = pcTradeExtendService.queryLastTrade(asset, symbol, startTime, null);
+        PcTradeVo pcTradeVo = pcTradeExtendService.queryLastTrade(asset, symbol, startTime);
 
         return pcTradeVo;
     }
