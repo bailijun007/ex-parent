@@ -178,8 +178,50 @@
 
 
     <select id="queryCount" resultType="java.lang.Long">
-        SELECT COUNT(id)  from pc_order
+        SELECT COUNT(id) from pc_order
         <include refid="simple_where"/>
+    </select>
+
+
+    <select id="queryUserActivityOrder" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order
+        <where>
+            active_flag=1
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+            <if test="symbol!=null and symbol!=''">
+                and symbol=#{symbol}
+            </if>
+            <if test="orderType!=null">
+                and order_type=#{orderType}
+            </if>
+            <if test="longFlag!=null">
+                and long_flag=#{longFlag}
+            </if>
+            <if test="closeFlag!=null">
+                and close_flag=#{closeFlag}
+            </if>
+            <choose>
+                <when test="nextPage==1 and pageSize!=null and lastOrderId!=null">
+                    and id &gt; #{lastOrderId}
+                    ORDER BY id asc
+                </when>
+                <when test="nextPage==-1 and pageSize!=null and lastOrderId!=null">
+                    and id &lt; #{lastOrderId}
+                    ORDER BY id desc
+                </when>
+                <otherwise>
+                    ORDER BY id desc
+                </otherwise>
+            </choose>
+        </where>
+        LIMIT 0,${pageSize}
     </select>
 
     <select id="queryOrders" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">

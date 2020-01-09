@@ -38,7 +38,7 @@ public interface PcOrderExtendApi {
 
 
     @ApiOperation(value = "获取当前用户活动委托")
-    @GetMapping(value = "/api/extension/pc/order/queryUserOrder")
+    @GetMapping(value = "/api/extension/pc/order/queryUserActivityOrder")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
@@ -52,7 +52,7 @@ public interface PcOrderExtendApi {
             @ApiImplicitParam(name = "lastOrderId ", value = "当前页最后一张委托的id", example = "10", required = false),
             @ApiImplicitParam(name = "nextPage ", value = " 翻页标记,-1 上一页,1.下一页 ", example = "1", required = true)
     })
-    PageResult<UserOrderVo> queryUserOrder(@RequestParam("userId") Long userId,
+    PageResult<UserOrderVo> queryUserActivityOrder(@RequestParam("userId") Long userId,
                                            @RequestParam("asset") String asset,
                                            @RequestParam("symbol") String symbol,
                                            @RequestParam(value = "orderType", required = false) Integer orderType,
