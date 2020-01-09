@@ -49,7 +49,7 @@ public interface PcTradeExtendApi {
 
 
     @ApiOperation(value = "小于某个时间点的最近的一条数据")
-    @GetMapping(value = "/api/extension/pc/trade/queryLastTradeByGtTime")
+    @GetMapping(value = "/api/extension/pc/trade/queryLastTradeByLtTime")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
