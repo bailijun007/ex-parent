@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -72,9 +73,10 @@ public class PcPositionService {
     private ApplicationEventPublisher publisher;
 	
 	//处理成交订单
-	public void handleTradeOrder(PcTradeMsg matchedVo){
-		PcOrder order = this.pcOrderService.getOrder(matchedVo.getAccountId(), matchedVo.getOrderId());
-		boolean exist = this.chekOrderTrade(order, matchedVo);
+    @LockIt(key="${trade.accountId}-${trade.asset}-${trade.symbol}")
+	public void handleTradeOrder(PcTradeMsg trade){
+		PcOrder order = this.pcOrderService.getOrder(trade.getAccountId(), trade.getOrderId());
+		boolean exist = this.chekOrderTrade(order, trade);
 		if(exist){
 			logger.error("成交已处理过了");
 			return;
@@ -82,10 +84,10 @@ public class PcPositionService {
 		
 		Long now  = DbDateUtils.now();
 		
-		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
+		PcPosition pcPosition = this.getCurrentPosition(trade.getAccountId(), trade.getAsset(), trade.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
-		TradeResult tradeResult = this.positionStrategy.calcTradeResult(matchedVo, order, pcPosition);
+		TradeResult tradeResult = this.positionStrategy.calcTradeResult(trade, order, pcPosition);
 		
 		////////// 仓位 ///////////
 		//如果仓位不存在则创建新仓位
@@ -112,7 +114,7 @@ public class PcPositionService {
 		}
 		
 		////////// 成交记录  ///////////
-		PcOrderTrade pcOrderTrade = this.saveOrderTrade(matchedVo, order, tradeResult, pcPosition.getId(), now);
+		PcOrderTrade pcOrderTrade = this.saveOrderTrade(trade, order, tradeResult, pcPosition.getId(), now);
 		
 		////////// 订单 ///////////
 		

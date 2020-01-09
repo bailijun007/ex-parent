@@ -182,8 +182,14 @@ public class PcOrderService {
 	private void checkPrice(PcPosition pos, BigDecimal price) {
 		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
 		BigDecimal bankruptPrice = this.holdPosStrategy.calcBankruptPrice(pos.getLongFlag(), pos.getMeanPrice(), _amount, pos.getPosMargin());
-		if(BigUtils.gt(price, bankruptPrice)){
-			throw new ExException(PcOrderError.BANKRUPT_PRICE);
+		if(IntBool.isTrue(pos.getLongFlag())){
+			if(BigUtils.lt(price, bankruptPrice)){
+				throw new ExException(PcOrderError.BANKRUPT_PRICE);
+			}
+		}else{
+			if(BigUtils.gt(price, bankruptPrice)){
+				throw new ExException(PcOrderError.BANKRUPT_PRICE);
+			}
 		}
 	}
 

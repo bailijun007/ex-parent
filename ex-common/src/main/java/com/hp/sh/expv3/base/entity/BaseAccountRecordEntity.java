@@ -6,11 +6,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
-import com.hp.sh.expv3.commons.mybatis.InsertRequestId;
 import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 /**
- * 账户信息Entity 
+ * 修改记录Entity
  * @author lw
  *
  */

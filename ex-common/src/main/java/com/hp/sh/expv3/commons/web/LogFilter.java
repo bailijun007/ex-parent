@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.hp.sh.expv3.commons.ctx.RequestContext;
+
 //@WebFilter(filterName = "myLogFilter", urlPatterns = { "/api/**" })
 public class LogFilter implements Filter {
 	
