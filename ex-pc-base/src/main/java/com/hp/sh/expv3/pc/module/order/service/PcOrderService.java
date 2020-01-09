@@ -182,7 +182,7 @@ public class PcOrderService {
 	private void checkPrice(PcPosition pos, BigDecimal price) {
 		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
 		BigDecimal bankruptPrice = this.holdPosStrategy.calcBankruptPrice(pos.getLongFlag(), pos.getMeanPrice(), _amount, pos.getPosMargin());
-		if(BigUtils.lt(price, bankruptPrice)){
+		if(BigUtils.gt(price, bankruptPrice)){
 			throw new ExException(PcOrderError.BANKRUPT_PRICE);
 		}
 	}
@@ -355,7 +355,8 @@ public class PcOrderService {
 		return;
 	}
 
-	public void setPendingNew(Long userId, Long orderId){
+	@LockIt(key="${userId}-${asset}-${symbol}")
+	public void setPendingNew(long userId, String asset, String symbol, long orderId){
 		long count = this.pcOrderDAO.updateStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, DbDateUtils.now());
 		if(count!=1){
 //			throw new RuntimeException("更新失败，更新行数："+count);

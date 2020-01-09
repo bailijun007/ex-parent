@@ -28,7 +28,7 @@ public class MatchMqConsumer {
 	
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(MatchNotMatchMsg msg){
-		this.pcOrderService.setPendingNew(msg.getAccountId(), msg.getOrderId());
+		this.pcOrderService.setPendingNew(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
 	}
 	
 	//取消订单
