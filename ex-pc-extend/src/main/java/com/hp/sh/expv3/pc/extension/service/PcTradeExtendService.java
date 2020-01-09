@@ -15,4 +15,6 @@ public interface PcTradeExtendService {
 
 
     PcTradeVo queryLastTrade(String asset, String symbol, Long startTime, Long endTime);
+
+    List<PcTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long startTime, Long endTime,Long userId);
 }

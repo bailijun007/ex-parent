@@ -56,9 +56,40 @@ public interface PcTradeExtendApi {
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = true)
     })
     PcTradeVo queryLastTradeByGtTime(@RequestParam(value = "asset", required = false) String asset,
-                                       @RequestParam(value = "symbol", required = false) String symbol,
-                                       @RequestParam(value = "startTime") Long startTime);
+                                     @RequestParam(value = "symbol", required = false) String symbol,
+                                     @RequestParam(value = "startTime") Long startTime);
 
+
+    @ApiOperation(value = "通过一个时间区间获取数据包含开始时间，升序排列")
+    @GetMapping(value = "/api/extension/pc/trade/selectTradeListByTimeInterval")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = true)
+    })
+    List<PcTradeVo> selectTradeListByTimeInterval(@RequestParam(value = "asset", required = true) String asset,
+                                                  @RequestParam(value = "symbol", required = true) String symbol,
+                                                  @RequestParam(value = "startTime") Long startTime,
+                                                  @RequestParam(value = "endTime") Long endTime);
+
+
+    @ApiOperation(value = "查某个时间区间某个用户的成交记录")
+    @GetMapping(value = "/api/extension/pc/trade/selectTradeListByUser")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "userId ", value = "用户id", required = true),
+            @ApiImplicitParam(name = "startTime ", value = "开始时间", required = false),
+            @ApiImplicitParam(name = "endTime ", value = "结束时间", required = false)
+    })
+    List<PcTradeVo> selectTradeListByUser(
+            @RequestParam(value = "asset", required = true) String asset,
+            @RequestParam(value = "symbol", required = true) String symbol,
+            @RequestParam(value = "userId", required = true) Long userId,
+            @RequestParam(value = "startTime", required = false) Long startTime,
+            @RequestParam(value = "endTime", required = false) Long endTime
+    );
 
 
     @ApiOperation(value = "一段时间内总的成交量")
@@ -73,7 +104,6 @@ public interface PcTradeExtendApi {
                                 @RequestParam(value = "symbol", required = false) String symbol,
                                 @RequestParam(value = "startTime") Long startTime,
                                 @RequestParam(value = "endTime") Long endTime);
-
 
 
 }

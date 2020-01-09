@@ -7,15 +7,12 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.extension.dao.PcAccountLogDAO;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcAccountLogExtendService;
-import com.hp.sh.expv3.pc.extension.util.DateUtil;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountLogVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +30,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
     @Override
     public PageResult<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize) {
         PageResult<PcAccountLogVo> result=new PageResult<>();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime localDateTime = LocalDateTime.now();
         PageHelper.startPage(pageNo,pageSize);
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
@@ -42,14 +39,14 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         map.put("symbol", symbol);
         try {
             if (historyType == 1) {
-                String beginDate = DateUtil.findLatelyDate(-2);
-                Date begin = dateFormat.parse(beginDate);
-                map.put("timeBegin", begin.getTime());
+                LocalDateTime minusDays = localDateTime.minusDays(2L);
+                long timeBegin = minusDays.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+                map.put("timeBegin", timeBegin);
             } else if (historyType == 2) {
                 map.put("timeBegin", startDate);
                 map.put("timeEnd", endDate);
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

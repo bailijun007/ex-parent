@@ -110,7 +110,7 @@
                and trade_time &lt; #{tradeTime}
            </if>
        </where>
-        order by ${tradeTime} desc
+        order by trade_time desc
         limit 0,1
     </select>
 

@@ -1,9 +1,7 @@
 
 package com.hp.sh.expv3.fund.cash.service;
 
-import java.util.Date;
 import java.util.List;
-
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.fund.cash.entity.DepositRecord;
 
@@ -32,7 +30,7 @@ public interface DepositRecordService {
 	 * @param status
 	 * @return
 	 */
-	public List<DepositRecord> pageQuery(Page page, Long userId, Integer type, Integer channelId, Integer status, Date beginTime, Date endTime);
+	public List<DepositRecord> pageQuery(Page page, Long userId, Integer type, Integer channelId, Integer status, Long beginTime, Long endTime);
 	
 	void save(DepositRecord depositRecord);
 
