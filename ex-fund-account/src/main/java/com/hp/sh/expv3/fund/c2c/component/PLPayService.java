@@ -38,7 +38,11 @@ public class PLPayService {
         //生成订单号
         String orderNo = getOrderNo(userId);
         //订单币种
-        String orderCurrency = srcCurrency;
+        String orderCurrency =null;
+        if(srcCurrency.equals("CNY")){
+             orderCurrency = "INR";
+        }
+
         //订单金额
         String orderAmount = fabiAmt.stripTrailingZeros().toPlainString();
         String receiveUrl = getReceiveUrl();

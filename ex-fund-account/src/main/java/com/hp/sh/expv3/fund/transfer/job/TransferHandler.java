@@ -23,7 +23,7 @@ public class TransferHandler {
 	/**
 	 * 处理已付款，未同步余额的记录
 	 */
-	@Scheduled(cron = "0 0/10 * * * ?")
+	@Scheduled(cron = "0 * * * * ?")
 	public void handlePendingSynch() {
 		fundTransferCoreApi.handlePending();
 	}

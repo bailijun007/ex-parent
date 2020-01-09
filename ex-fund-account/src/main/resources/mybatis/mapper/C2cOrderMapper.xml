@@ -177,11 +177,14 @@
         AND user_id=#{userId}
     </update>
 
-    <select id="pageQueryByPayStatus" resultType="com.hp.sh.expv3.fund.c2c.entity.C2cOrder">
+    <select id="pageQueryByPayStatus" resultType="com.hp.sh.expv3.fund.extension.vo.C2cOrderVo">
         select
         <include refid="Base_Column_List"/>
         from c2c_order
         <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
             <if test="payStatus!=null">
                 pay_status=#{payStatus}
             </if>

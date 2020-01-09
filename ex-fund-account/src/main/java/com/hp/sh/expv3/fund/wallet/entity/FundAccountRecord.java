@@ -2,16 +2,14 @@ package com.hp.sh.expv3.fund.wallet.entity;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.base.entity.BaseAccountRecordEntity;
+import com.hp.sh.expv3.base.entity.BaseRecordEntity;
 
 /**
  * 账变明细
  * @author wangjg
  */
-public class FundAccountRecord extends BaseAccountRecordEntity {
+public class FundAccountRecord extends BaseRecordEntity {
 	private static final long serialVersionUID = 1L;
-	
-	private Long userId;
 	
 	//资产
 	private String asset;
@@ -113,14 +111,6 @@ public class FundAccountRecord extends BaseAccountRecordEntity {
 
 	public void setSerialNo(Long serialNo) {
 		this.serialNo = serialNo;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 
 	public String toValueString() {

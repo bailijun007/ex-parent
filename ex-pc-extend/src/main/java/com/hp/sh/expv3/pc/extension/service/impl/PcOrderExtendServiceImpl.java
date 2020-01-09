@@ -133,6 +133,32 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         return result;
     }
 
+    @Override
+    public PageResult<PcOrderVo> queryUserActivityOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber) {
+        PageResult<PcOrderVo> result=new  PageResult<PcOrderVo>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("orderType", orderType);
+        map.put("longFlag", longFlag);
+        map.put("closeFlag", closeFlag);
+
+        if(isTotalNumber==null){
+            map.put("pageSize", pageSize);
+            map.put("lastOrderId", lastOrderId);
+            map.put("currentPage", currentPage);
+            map.put("nextPage", nextPage);
+
+        }else  if(isTotalNumber==1){
+            Long count = pcOrderDAO.queryCount(map);
+            result.setRowTotal(count);
+        }
+        List<PcOrderVo> pcOrderVos = pcOrderDAO.queryUserActivityOrder(map);
+        result.setList(pcOrderVos);
+        return result;
+    }
+
 
     /**
      * 转换成结果集返回

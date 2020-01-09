@@ -16,7 +16,7 @@ import com.hp.sh.expv3.fund.transfer.entity.FundTransfer;
  */
 public interface FundTransferDAO extends BaseAccountDataMapper<FundTransfer, Long> {
 
-	public List<FundTransfer> queryPending(Page page);
+	public List<FundTransfer> queryPending(Page page, @Param("notStatus1") Integer notStatus1, @Param("notStatus2") Integer notStatus2);
 
 	public FundTransfer findByTradeNo(@Param("userId") Long userId, @Param("tradeNo") String tradeNo);
 
@@ -25,6 +25,7 @@ public interface FundTransferDAO extends BaseAccountDataMapper<FundTransfer, Lon
 		@Param("id") Long id,
 		@Param("newStatus") Integer newStatus, 
 		@Param("oldStatus") Integer oldStatus,
+		@Param("errorInfo") String errorInfo,
 		@Param("modified") Long modified
 	);
 

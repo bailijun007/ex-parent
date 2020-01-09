@@ -6,20 +6,22 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
-import com.hp.sh.expv3.commons.mybatis.InsertRequestId;
 import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 /**
- * 账户信息Entity 
+ * 修改记录Entity
  * @author lw
  *
  */
 @MappedSuperclass
-public abstract class BaseAccountRecordEntity extends BaseAccountEntity implements UserData, Serializable{
+public abstract class BaseRecordEntity extends BaseAccountEntity implements UserData, Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
 	private Long id;
+	
+	//用户ID
+	protected Long userId;
 	
 	//请求ID
 	protected String requestId;
@@ -37,7 +39,15 @@ public abstract class BaseAccountRecordEntity extends BaseAccountEntity implemen
 		this.id = id;
 	}
 
-//	@InsertRequestId
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	//	@InsertRequestId
 	public String getRequestId() {
 		return requestId;
 	}

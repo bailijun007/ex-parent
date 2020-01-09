@@ -2,27 +2,26 @@ package com.hp.sh.expv3.fund.transfer.entity;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.base.entity.BaseAccountRecordEntity;
+import com.hp.sh.expv3.base.entity.BaseRecordEntity;
 
 /**
  * 资金划转
  * @author wangjg
  *
  */
-public class FundTransfer extends BaseAccountRecordEntity {
+public class FundTransfer extends BaseRecordEntity {
 	
 	private static final long serialVersionUID = 1L;
 	
 	public static final int STATUS_NEW = 1; // 创建
 	
-	public static final int STATUS_SRC_COMPLETE = 2; // 源账号完成
+	public static final int STATUS_SRC_COMPLETE = 3; // 源账号完成
 	
-	public static final int STATUS_TARGET_COMPLETE = 4; // 目标账号完成
+	public static final int STATUS_TARGET_COMPLETE = 7; // 目标账号完成
 	
-	public static final int STATUS_SUCCESS = 8; // 成功
+	public static final int STATUS_SUCCESS = 15; // 成功
 	
-	//用户ID
-	private Long userId;
+	public static final int STATUS_FAIL = 16; // 失败
 	
 	//单号
 	protected String sn;
@@ -44,9 +43,12 @@ public class FundTransfer extends BaseAccountRecordEntity {
     
     //目标账户ID
     private long targetAccountId;
-    
+
     //备注
     private String remark;
+    
+    //错误信息
+    private String errorInfo;
 
     //状态 @see #STATUS_*
     private Integer status;
@@ -126,19 +128,20 @@ public class FundTransfer extends BaseAccountRecordEntity {
 		this.status = status;
 	}
 
-	public Long getUserId() {
-		return userId;
+	public String getErrorInfo() {
+		return errorInfo;
 	}
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
+	public void setErrorInfo(String errorInfo) {
+		this.errorInfo = errorInfo;
 	}
 
 	@Override
 	public String toString() {
-		return "FunTransfer [sn=" + sn + ", asset=" + asset + ", amount=" + amount + ", srcAccountType="
-				+ srcAccountType + ", targetAccountType=" + targetAccountType + ", srcAccountId=" + srcAccountId
-				+ ", targetAccountId=" + targetAccountId + ", remark=" + remark + ", status=" + status + "]";
+		return "FundTransfer [userId=" + userId + ", sn=" + sn + ", asset=" + asset + ", amount=" + amount
+				+ ", srcAccountType=" + srcAccountType + ", targetAccountType=" + targetAccountType + ", srcAccountId="
+				+ srcAccountId + ", targetAccountId=" + targetAccountId + ", remark=" + remark + ", errorInfo="
+				+ errorInfo + ", status=" + status + "]";
 	}
 
 }

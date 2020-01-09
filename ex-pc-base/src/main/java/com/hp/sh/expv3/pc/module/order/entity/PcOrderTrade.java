@@ -67,6 +67,9 @@ public class PcOrderTrade extends UserDataEntity {
 	//未成交（张数）
 	private BigDecimal remainVolume;
 	
+	//撮合事务Id
+	private Long matchTxId;
+	
 	@Transient
 	private Integer tradType;
 
@@ -192,6 +195,14 @@ public class PcOrderTrade extends UserDataEntity {
 
 	public void setRemainVolume(BigDecimal remainVolume) {
 		this.remainVolume = remainVolume;
+	}
+
+	public Long getMatchTxId() {
+		return matchTxId;
+	}
+
+	public void setMatchTxId(Long matchTxId) {
+		this.matchTxId = matchTxId;
 	}
 
 	@Override

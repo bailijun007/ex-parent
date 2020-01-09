@@ -3,11 +3,14 @@ package com.hp.sh.expv3.fund.transfer.api;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.lock.LockAdvice;
 import com.hp.sh.expv3.fund.transfer.constant.AccountType;
 import com.hp.sh.expv3.fund.transfer.entity.FundTransfer;
 import com.hp.sh.expv3.fund.transfer.error.TransferError;
@@ -16,13 +19,17 @@ import com.hp.sh.expv3.fund.transfer.mq.msg.NewTransfer;
 import com.hp.sh.expv3.fund.transfer.service.FundTransferCoreService;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
+import com.hp.sh.expv3.fund.wallet.error.WalletError;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 import com.hp.sh.expv3.pc.api.PcAccountCoreApi;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
+import com.hp.sh.expv3.pc.error.PcAccountError;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 @RestController
 public class FundTransferCoreApiAction implements FundTransferCoreApi {
+	private static final Logger logger = LoggerFactory.getLogger(FundTransferCoreApiAction.class);
 
 	@Autowired
 	private FundAccountCoreApi fundAccountCoreApi;
@@ -42,6 +49,20 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			throw new ExException(TransferError.ACCOUNT_TYPE);
 		}
 		
+		//检查余额
+		if(srcAccountType==AccountType.FUND){
+			BigDecimal balance = this.fundAccountCoreApi.getBalance(userId, asset);
+			if(BigUtils.lt(balance, amount)){
+				throw new ExException(WalletError.NOT_ENOUGH);
+			}
+		}else if(srcAccountType==AccountType.PC){
+			BigDecimal balance = this.pcAccountCoreApi.getBalance(userId, asset);
+			if(BigUtils.lt(balance, amount)){
+				throw new ExException(PcAccountError.BALANCE_NOT_ENOUGH);
+			}
+		}
+		
+		//转帐记录
 		FundTransfer transfer = fundTransferCoreService.transfer(userId, asset, srcAccountType, targetAccountType, amount);
 		
 		mqSender.send(new NewTransfer(transfer.getUserId(), transfer.getId()));
@@ -56,7 +77,14 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 				break;
 			}
 			for(FundTransfer record : list){
-				this.handleOne(record);
+				try{
+					this.handleOne(record);
+				}catch(Exception e){
+					logger.error("处理转账失败", e);
+					if(record.getStatus()!=FundTransfer.STATUS_SUCCESS && record.getStatus()!=FundTransfer.STATUS_TARGET_COMPLETE){
+						this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_FAIL, e.getMessage());
+					}
+				}
 			}
 		}
 	}
@@ -77,7 +105,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 				this.cutPcFund(record);
 			}
 			//修改状态
-			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SRC_COMPLETE);
+			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SRC_COMPLETE, null);
 		case FundTransfer.STATUS_SRC_COMPLETE:
 			//增加目标账户
 			if(record.getTargetAccountType()==AccountType.FUND){
@@ -87,7 +115,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			}
 //			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_TARGET_COMPLETE);
 		case FundTransfer.STATUS_TARGET_COMPLETE:
-			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SUCCESS);
+			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SUCCESS, null);
 		}
 	}
 

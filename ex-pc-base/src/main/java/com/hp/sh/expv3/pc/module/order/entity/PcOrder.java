@@ -6,7 +6,6 @@ package com.hp.sh.expv3.pc.module.order.entity;
 
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 

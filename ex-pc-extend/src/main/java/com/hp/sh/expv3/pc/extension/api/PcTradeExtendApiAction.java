@@ -39,11 +39,11 @@ public class PcTradeExtendApiAction implements PcTradeExtendApi {
     }
 
     @Override
-    public PcTradeVo queryLastTradeByGtTime(String asset, String symbol, Long startTime) {
+    public PcTradeVo queryLastTradeByLtTime(String asset, String symbol, Long startTime) {
         if (null == startTime || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        PcTradeVo pcTradeVo = pcTradeExtendService.queryLastTrade(asset, symbol, startTime, null);
+        PcTradeVo pcTradeVo = pcTradeExtendService.queryLastTrade(asset, symbol, startTime);
 
         return pcTradeVo;
     }

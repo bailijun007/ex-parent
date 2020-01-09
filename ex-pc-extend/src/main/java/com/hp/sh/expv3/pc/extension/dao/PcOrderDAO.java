@@ -25,4 +25,6 @@ public interface PcOrderDAO {
 
     //查询总条数
     Long queryCount(Map<String, Object> map);
+
+    List<PcOrderVo> queryUserActivityOrder(Map<String, Object> map);
 }

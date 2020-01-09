@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.hp.sh.expv3.base.mapper.BaseUserDataMapper;
 import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
+import com.hp.sh.expv3.fund.extension.vo.C2cOrderVo;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -23,5 +24,5 @@ public interface C2cOrderDAO extends BaseUserDataMapper<C2cOrder,Long>  {
 
     void updateBySnAndUserId(C2cOrder c2cOrder);
 
-    List<C2cOrder> pageQueryByPayStatus(@Param("payStatus") Integer payStatus,@Param("nextPage") Integer nextPage, @Param("pageSize")Integer pageSize, @Param("id")Integer id);
+    List<C2cOrderVo> pageQueryByPayStatus(@Param("payStatus") Integer payStatus, @Param("nextPage") Integer nextPage, @Param("pageSize")Integer pageSize, @Param("id")Long id,@Param("userId") Long userId);
 }

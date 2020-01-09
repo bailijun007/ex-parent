@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -20,11 +21,11 @@ import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
-import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
@@ -51,7 +52,7 @@ public class PcPositionService {
 	private PcOrderTradeDAO pcOrderTradeDAO;
 	
 	@Autowired
-	private PcOrderDAO pcOrderDAO;
+	private PcOrderService pcOrderService;
 	
 	@Autowired
 	private PcAccountSymbolDAO pcAccountSymbolDAO;
@@ -72,9 +73,10 @@ public class PcPositionService {
     private ApplicationEventPublisher publisher;
 	
 	//处理成交订单
-	public void handleTradeOrder(PcTradeMsg matchedVo){
-		PcOrder order = this.pcOrderDAO.findById(matchedVo.getAccountId(), matchedVo.getOrderId());
-		boolean exist = this.chekOrderTrade(order, matchedVo);
+    @LockIt(key="${trade.accountId}-${trade.asset}-${trade.symbol}")
+	public void handleTradeOrder(PcTradeMsg trade){
+		PcOrder order = this.pcOrderService.getOrder(trade.getAccountId(), trade.getOrderId());
+		boolean exist = this.chekOrderTrade(order, trade);
 		if(exist){
 			logger.error("成交已处理过了");
 			return;
@@ -82,10 +84,10 @@ public class PcPositionService {
 		
 		Long now  = DbDateUtils.now();
 		
-		PcPosition pcPosition = this.getCurrentPosition(matchedVo.getAccountId(), matchedVo.getAsset(), matchedVo.getSymbol(), order.getLongFlag());
+		PcPosition pcPosition = this.getCurrentPosition(trade.getAccountId(), trade.getAsset(), trade.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
-		TradeResult tradeResult = this.positionStrategy.calcTradeResult(matchedVo, order, pcPosition);
+		TradeResult tradeResult = this.positionStrategy.calcTradeResult(trade, order, pcPosition);
 		
 		////////// 仓位 ///////////
 		//如果仓位不存在则创建新仓位
@@ -112,7 +114,7 @@ public class PcPositionService {
 		}
 		
 		////////// 成交记录  ///////////
-		PcOrderTrade pcOrderTrade = this.saveOrderTrade(matchedVo, order, tradeResult, pcPosition.getId(), now);
+		PcOrderTrade pcOrderTrade = this.saveOrderTrade(trade, order, tradeResult, pcPosition.getId(), now);
 		
 		////////// 订单 ///////////
 		
@@ -184,7 +186,7 @@ public class PcPositionService {
         order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setModified(now);
-		this.pcOrderDAO.update(order);
+		this.pcOrderService.updateOrder4Trad(order);
 	}
 
 	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeResult, Long posId, Long now) {
@@ -215,6 +217,8 @@ public class PcPositionService {
 		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
 		
 		orderTrade.setRemainVolume(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeResult.getVolume()));
+		
+		orderTrade.setMatchTxId(tradeMsg.getMatchTxId());
 		
 		this.pcOrderTradeDAO.save(orderTrade);
 		

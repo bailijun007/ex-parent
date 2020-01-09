@@ -25,7 +25,10 @@
                     ORDER BY id desc
                     LIMIT 0,${pageSize}
                 </when>
-
+                <otherwise>
+                    ORDER BY id desc
+                    LIMIT 0,${pageSize}
+                </otherwise>
 
             </choose>
         </where>

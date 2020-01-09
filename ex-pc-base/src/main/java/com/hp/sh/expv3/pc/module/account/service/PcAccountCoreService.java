@@ -18,7 +18,7 @@ import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.constant.FundFlowDirection;
 import com.hp.sh.expv3.constant.InvokeResult;
-import com.hp.sh.expv3.pc.error.AccountError;
+import com.hp.sh.expv3.pc.error.PcAccountError;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountDAO;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountRecordDAO;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccount;
@@ -161,7 +161,7 @@ public class PcAccountCoreService{
 		//检查余额
 		if(FundFlowDirection.EXPENSES==record.getType()){
 			if(newBalance.compareTo(BigDecimal.ZERO) < 0){
-				throw new ExException(AccountError.BALANCE_NOT_ENOUGH);
+				throw new ExException(PcAccountError.BALANCE_NOT_ENOUGH);
 			}
 		}
 	}
@@ -188,7 +188,7 @@ public class PcAccountCoreService{
 			String ov = oldRcd.toValueString();
 			String nv = record.toValueString();
 			if(!ov.equals(nv)){
-				throw new ExException(AccountError.INCONSISTENT_REQUESTS);
+				throw new ExException(PcAccountError.INCONSISTENT_REQUESTS);
 			}
 		}
 		
@@ -196,6 +196,9 @@ public class PcAccountCoreService{
 	}
 
 	private PcAccountRecord req2record(FundRequest request){
+		if(request.getAmount()==null){
+			throw new ExException(CommonError.PARAM_REQUIRED);
+		}
 		PcAccountRecord record = new PcAccountRecord();
 		record.setAmount(request.getAmount());
 		record.setAsset(request.getAsset());

@@ -46,14 +46,8 @@ public class PcTradeExtendServiceImpl implements PcTradeExtendService {
     }
 
     @Override
-    public PcTradeVo queryLastTrade(String asset, String symbol, Long startTime, Long endTime) {
-        Map<String, Object> map=new HashMap<>();
-        map.put("asset",asset);
-        map.put("symbol",symbol);
-        map.put("orderBy","id");
-        map.put("createdBegin",startTime);
-        map.put("createdEnd",endTime);
-        PcTradeVo pcTradeVo = pcTradeDAO.queryOne(map);
+    public PcTradeVo queryLastTrade(String asset, String symbol, Long startTime) {
+        PcTradeVo pcTradeVo = pcTradeDAO.queryLastTrade(asset,symbol,startTime);
         return pcTradeVo;
     }
 
