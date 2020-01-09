@@ -182,6 +182,9 @@
         <include refid="Base_Column_List"/>
         from c2c_order
         <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
             <if test="payStatus!=null">
                 pay_status=#{payStatus}
             </if>
