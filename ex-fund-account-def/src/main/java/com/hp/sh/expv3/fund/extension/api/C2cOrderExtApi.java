@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.fund.extension.api;
 
 import com.gitee.hupadev.base.api.PageResult;
+import com.gitee.hupadev.base.api.ResultEntity;
 import com.hp.sh.expv3.fund.extension.vo.C2cOrderVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -9,6 +10,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.math.BigDecimal;
 
 /**
  * @author BaiLiJun  on 2020/1/9
@@ -23,10 +26,28 @@ public interface C2cOrderExtApi {
             @ApiImplicitParam(name = "id", value = "主键编号", example = "1", required = false),
             @ApiImplicitParam(name = "payStatus", value = "支付状态:0-待支付，1-支付成功，2-支付失败,3:已取消, 4-同步余额, 5-审核中, 6-审核通过", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true),
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "0", required = true),
             @ApiImplicitParam(name = "nextPage", value = "1:下一页，-1：上一页", example = "1", required = true)
     })
     @GetMapping(value = "/api/extension/c2c/order/pageQueryByPayStatus")
     public PageResult<C2cOrderVo> pageQueryByPayStatus(@RequestParam("payStatus") Integer payStatus, @RequestParam("nextPage") Integer nextPage,
-                                                       @RequestParam("pageSize") Integer pageSize, @RequestParam(value = "id",required = false) Integer id);
+                                                       @RequestParam("pageSize") Integer pageSize, @RequestParam(value = "id", required = false) Long id,
+                                                       @RequestParam("userId") Long userId);
+
+
+    @ApiOperation(value = "创建c2c充值订单")
+    @ResultEntity
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "0", required = true),
+            @ApiImplicitParam(name = "ratio", value = "USD/CNY 汇率 例如： USD/CNY = 7.0298", example = "7.0298", required = true),
+            @ApiImplicitParam(name = "srcCurrency", value = "支付币种", example = "INR", required = true),
+            @ApiImplicitParam(name = "tarCurrency", value = "兑换币种", example = "USDT", required = true),
+            @ApiImplicitParam(name = "fabiAmt", value = "法定货币总金额", example = "7000", required = true),
+            @ApiImplicitParam(name = "tarVolume", value = "兑换成资产数量", example = "975", required = true)
+    })
+    @GetMapping("/api/extension/c2c/order/deposit/create")
+    public String create(@RequestParam("userId") long userId, @RequestParam("ratio") BigDecimal ratio,
+                         @RequestParam("srcCurrency")  String srcCurrency, @RequestParam("tarCurrency") String tarCurrency,
+                         @RequestParam("tarVolume")  BigDecimal tarVolume, @RequestParam("fabiAmt") BigDecimal fabiAmt);
 
 }

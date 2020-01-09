@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="5 seconds">
 
-	<springProperty scope="context" name="rootLevel" source="log.root.level"/>
-	<springProperty scope="context" name="rootAppender" source="log.root.appender"/>
+    <springProperty scope="context" name="rootLevel" source="log.root.level"/>
+    <springProperty scope="context" name="rootAppender" source="log.root.appender"/>
 
-	<property name="log.dir" value="/opt/logs/pc-base"></property>
+    <property name="log.dir" value="/opt/logs/pc-base"></property>
 
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
-		</encoder>
-	</appender>
-	
-	<appender name="out2File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="out2File" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--日志文件输出的文件名-->
         <file>${log.dir}.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -38,37 +38,37 @@
         </triggeringPolicy>
     </appender>
 
-	<root level="debug">
-		<appender-ref ref="STDOUT" />
-	</root>
-	
-	<logger name="springfox.documentation.spring" level="warn"></logger>
-	
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <logger name="springfox.documentation.spring" level="warn"></logger>
+
     <springProfile name="prod">
-        <root level="debug">
+        <root level="INFO">
             <appender-ref ref="out2File" />
         </root>
     </springProfile>
-    
+
     <springProfile name="dev">
-        <root level="debug">
+        <root level="info">
             <appender-ref ref="STDOUT" />
             <appender-ref ref="out2File" />
         </root>
-        
-		<logger name="com.hp.sh.expv3" level="debug"></logger>
-		<logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
-        
+
+        <logger name="com.hp.sh.expv3" level="debug"></logger>
+        <logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
+
     </springProfile>
-    
+
     <springProfile name="local">
-        <root level="debug">
+        <root level="info">
             <appender-ref ref="STDOUT" />
         </root>
-        
-		<logger name="com.hp.sh.expv3" level="debug"></logger>
-		<logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
-        
+
+        <logger name="com.hp.sh.expv3" level="debug"></logger>
+        <logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
+
     </springProfile>
-	
+
 </configuration>

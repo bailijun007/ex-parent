@@ -1,13 +1,8 @@
 package com.hp.sh.expv3.fund.c2c.action;
 
 import com.gitee.hupadev.base.api.ResultEntity;
-import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.c2c.component.PLPayService;
-import com.hp.sh.expv3.fund.c2c.component.PLpayClient;
-import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
-import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
-import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -16,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 
 /**
  * @author BaiLiJun  on 2020/1/2
@@ -24,7 +18,7 @@ import java.time.Instant;
 @Api(tags = "C2c充值测试接口")
 @RestController
 @RequestMapping("/api/c2c/pay")
-public class C2cOrderPayTestAction {
+public class C2cOrderPayApiAction {
     @Autowired
     private PLPayService plPayService;
 
@@ -33,7 +27,7 @@ public class C2cOrderPayTestAction {
     private BuyService buyService;
 
 
-    private static final Logger logger = LoggerFactory.getLogger(C2cOrderPayTestAction.class);
+    private static final Logger logger = LoggerFactory.getLogger(C2cOrderPayApiAction.class);
 
 
     @ApiOperation(value = "创建c2c充值订单")
