@@ -26,9 +26,10 @@
 		<module>ex-fund-account-def</module>
 		<module>ex-pc-base</module>
 		<module>ex-pc-base-def</module>
-		<module>ex-pc-match</module>
 		<module>ex-pc-extend</module>
 		<module>ex-pc-extend-def</module>
+		<module>ex-pc-match</module>
+		<module>ex-bb-match</module>
 	</modules>
 
     <dependencies>
