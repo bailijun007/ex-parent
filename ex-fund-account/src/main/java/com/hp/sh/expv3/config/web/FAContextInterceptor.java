@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.hp.sh.expv3.commons.web.RequestContext;
+import com.hp.sh.expv3.commons.ctx.RequestContext;
 
 /**
  * @author wangjg

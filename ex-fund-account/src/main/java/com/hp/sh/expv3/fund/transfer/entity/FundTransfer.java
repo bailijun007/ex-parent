@@ -2,14 +2,14 @@ package com.hp.sh.expv3.fund.transfer.entity;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.base.entity.BaseAccountRecordEntity;
+import com.hp.sh.expv3.base.entity.BaseRecordEntity;
 
 /**
  * 资金划转
  * @author wangjg
  *
  */
-public class FundTransfer extends BaseAccountRecordEntity {
+public class FundTransfer extends BaseRecordEntity {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -22,9 +22,6 @@ public class FundTransfer extends BaseAccountRecordEntity {
 	public static final int STATUS_SUCCESS = 15; // 成功
 	
 	public static final int STATUS_FAIL = 16; // 失败
-	
-	//用户ID
-	private Long userId;
 	
 	//单号
 	protected String sn;
@@ -129,14 +126,6 @@ public class FundTransfer extends BaseAccountRecordEntity {
 
 	public void setStatus(Integer status) {
 		this.status = status;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 
 	public String getErrorInfo() {

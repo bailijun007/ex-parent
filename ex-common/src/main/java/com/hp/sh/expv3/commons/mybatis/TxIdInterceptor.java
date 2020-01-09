@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.gitee.hupadev.commons.mybatis.AbstractInterceptor;
 import com.gitee.hupadev.commons.mybatis.util.EntityUtil;
-import com.hp.sh.expv3.commons.ctx.RequestContext;
+import com.hp.sh.expv3.commons.ctx.TxIdContext;
 
 /**
  * 从环境变量取ReqeustId并保存
@@ -20,9 +20,9 @@ import com.hp.sh.expv3.commons.ctx.RequestContext;
  *
  */
 @Intercepts({ @Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class }) })
-public class RequestIdInterceptor extends AbstractInterceptor {
+public class TxIdInterceptor extends AbstractInterceptor {
 
-    private Logger logger = LoggerFactory.getLogger(RequestIdInterceptor.class);
+    private Logger logger = LoggerFactory.getLogger(TxIdInterceptor.class);
 
     public Object intercept(Invocation invocation) throws Throwable {
     	if(this.isEntity(invocation)){
@@ -30,7 +30,7 @@ public class RequestIdInterceptor extends AbstractInterceptor {
             MappedStatement ms = (MappedStatement) args[0];
             Object entity = args[1];
             
-            this.setRequestId(ms, entity);
+            this.setTxId(ms, entity);
             
             Object result = invocation.proceed();
             return result;
@@ -39,23 +39,16 @@ public class RequestIdInterceptor extends AbstractInterceptor {
     	}
     }
     
-    private void setRequestId(final MappedStatement ms, final Object entity) {
-    	Object requestId = RequestContext.getRequestId();
-    	if(requestId==null){
+    private void setTxId(final MappedStatement ms, final Object entity) {
+    	Object txId = TxIdContext.getTxId();
+    	if(txId==null){
     		return;
     	}
     	
         if (ms.getSqlCommandType() == SqlCommandType.INSERT) {
-        	EntityUtil.AnnoProperty<InsertRequestId> requestIdAnno = EntityUtil.findAnnoProperty(entity.getClass(), InsertRequestId.class);
+        	EntityUtil.AnnoProperty<TxId> requestIdAnno = EntityUtil.findAnnoProperty(entity.getClass(), TxId.class);
             if (requestIdAnno!=null) {
-            	requestIdAnno.setValue(entity, requestId);
-            }
-        }
-    	
-        if (ms.getSqlCommandType() == SqlCommandType.UPDATE) {
-        	EntityUtil.AnnoProperty<UpdateRequestId> requestIdAnno = EntityUtil.findAnnoProperty(entity.getClass(), UpdateRequestId.class);
-            if (requestIdAnno!=null) {
-            	requestIdAnno.setValue(entity, requestId);
+            	requestIdAnno.setValue(entity, txId);
             }
         }
         

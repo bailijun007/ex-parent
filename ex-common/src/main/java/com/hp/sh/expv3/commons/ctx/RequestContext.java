@@ -1,9 +1,4 @@
-package com.hp.sh.expv3.commons.web;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.servlet.HandlerInterceptor;
+package com.hp.sh.expv3.commons.ctx;
 
 /**
  * 请求上下文

@@ -4,7 +4,7 @@
  */
 package com.hp.sh.expv3.pc.extension.vo;
 
-import com.hp.sh.expv3.base.entity.BaseAccountRecordEntity;
+import com.hp.sh.expv3.base.entity.BaseRecordEntity;
 
 import java.math.BigDecimal;
 
@@ -14,12 +14,9 @@ import java.math.BigDecimal;
  * @author lw
  *
  */
-public class PcAccountRecordVo extends BaseAccountRecordEntity	 {
+public class PcAccountRecordVo extends BaseRecordEntity	 {
 
 	private static final long serialVersionUID = 1L;
-
-	//用户ID
-	private Long userId;
 
 	//资产
 	private String asset;
@@ -52,14 +49,6 @@ public class PcAccountRecordVo extends BaseAccountRecordEntity	 {
 	private Long associatedId;
 
 	public PcAccountRecordVo() {
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 
 	public String getAsset() {

@@ -41,6 +41,10 @@ public class LockAdvice {
 
     @Around("lockPointcut()")
     public Object exeLock(ProceedingJoinPoint joinPoint) throws Throwable {
+		return this.doExeLock(joinPoint);
+    }
+    
+    public Object doExeLock(ProceedingJoinPoint joinPoint) throws Throwable {
 		if(this.locker == null){
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
