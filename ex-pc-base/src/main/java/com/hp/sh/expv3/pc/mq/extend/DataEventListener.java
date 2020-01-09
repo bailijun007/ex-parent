@@ -14,6 +14,7 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.msg.EventMsg;
 import com.hp.sh.expv3.pc.msg.EventType;
+import com.hp.sh.expv3.pc.msg.OrderEventMsg;
 
 /**
  * 发送事件消息
@@ -36,7 +37,10 @@ public class DataEventListener {
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void afterCommit(PcOrderTrade orderTrade) {
-		EventMsg orderMsg = new EventMsg(EventType.ORDER, orderTrade.getOrderId(), orderTrade.getCreated(), orderTrade.getUserId(), orderTrade.getAsset(), orderTrade.getSymbol());
+		OrderEventMsg orderMsg = new OrderEventMsg(EventType.ORDER, orderTrade.getOrderId(), orderTrade.getCreated(), orderTrade.getUserId(), orderTrade.getAsset(), orderTrade.getSymbol());
+		orderMsg.setMakerFlag(orderTrade.getMakerFlag());
+		orderMsg.setTradeAmt(orderTrade.getVolume());
+		orderMsg.setTradeMatchId(""+orderTrade.getMatchTxId());
 		this.sendEventMsg(orderMsg);
 		
 		EventMsg posMsg = new EventMsg(EventType.POS, orderTrade.getPosId(), orderTrade.getCreated(), orderTrade.getUserId(), orderTrade.getAsset(), orderTrade.getSymbol());

@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.pc.module.position.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,9 +22,9 @@ import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.MarginMode;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
-import com.hp.sh.expv3.pc.error.PositonError;
+import com.hp.sh.expv3.pc.error.PcPositonError;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
-import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
@@ -35,7 +34,6 @@ import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
-import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
@@ -51,7 +49,7 @@ public class PcPositionMarginService {
 	private PcPositionDAO pcPositionDAO;
 	
 	@Autowired
-	private PcOrderDAO pcOrderDAO;
+	private PcOrderService pcOrderService;
 	
 	@Autowired
 	private PcAccountSymbolDAO pcAccountSymbolDAO;
@@ -86,8 +84,8 @@ public class PcPositionMarginService {
         }
         
         //是否有活跃委托
-        if (this.hasActiveOrder(userId, asset, symbol, longFlag)) {
-            throw new ExException(PositonError.HAVE_ACTIVE_ORDER);
+        if (pcOrderService.hasActiveOrder(userId, asset, symbol, longFlag)) {
+            throw new ExException(PcPositonError.HAVE_ACTIVE_ORDER);
         }
         
         //修改设置
@@ -99,7 +97,7 @@ public class PcPositionMarginService {
         if (pos != null && leverage.compareTo(pos.getLeverage()) != 0) {
 
             if (pos.getLiqStatus()==LiqStatus.FROZEN) {
-                throw new ExException(PositonError.LIQING);
+                throw new ExException(PcPositonError.LIQING);
             }
 
             Long now = DbDateUtils.now();
@@ -170,18 +168,6 @@ public class PcPositionMarginService {
 		return pcAccountSymbol;
 	}
 
-	private boolean hasActiveOrder(long userId, String asset, String symbol, Integer longFlag) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", userId);
-		params.put("asset", asset);
-		params.put("symbol", symbol);
-		params.put("longFlag", longFlag);
-		params.put("activeFlag", IntBool.YES);
-		params.put("liqFlag", IntBool.NO);
-		Long count = this.pcOrderDAO.queryCount(params);
-		return count>0;
-	}
-
 	/**
 	 * 
 	 * @param userId
@@ -203,7 +189,7 @@ public class PcPositionMarginService {
 		if(optType==ChangeMarginOptType.CUT){
 			BigDecimal diff = this.getMinMarginDiff(pos);
 			if(BigUtils.ltZero(diff)){
-				throw new ExException(PositonError.NO_MORE_MARGIN);
+				throw new ExException(PcPositonError.NO_MORE_MARGIN);
 			}
 		}
 		
@@ -247,7 +233,7 @@ public class PcPositionMarginService {
 
 	private void cutLeverageMargin(Long userId, String asset, Long posId, BigDecimal amount) {
 		PcCutRequest request = new PcCutRequest();
-		request.setAmount(request.getAmount());
+		request.setAmount(amount);
 		request.setUserId(userId);
 		request.setAsset(asset);
 		request.setRemark("调低杠杆追加保证金");
@@ -259,7 +245,7 @@ public class PcPositionMarginService {
 	
 	private void cutManualMargin(Long userId, String asset, Long posId, BigDecimal amount) {
 		PcCutRequest request = new PcCutRequest();
-		request.setAmount(request.getAmount());
+		request.setAmount(amount);
 		request.setUserId(userId);
 		request.setAsset(asset);
 		request.setRemark("手动追加保证金");
@@ -271,7 +257,7 @@ public class PcPositionMarginService {
 	
 	private void returnManualMargin(Long userId, String asset, Long posId, BigDecimal amount) {
 		PcAddRequest request = new PcAddRequest();
-		request.setAmount(request.getAmount());
+		request.setAmount(amount);
 		request.setUserId(userId);
 		request.setAsset(asset);
 		request.setRemark("仓位减少保证金");
@@ -313,7 +299,7 @@ public class PcPositionMarginService {
 	
 	private void cutAutoMargin(Long userId, String asset, Long posId, BigDecimal amount) {
 		PcCutRequest request = new PcCutRequest();
-		request.setAmount(request.getAmount());
+		request.setAmount(amount);
 		request.setUserId(userId);
 		request.setAsset(asset);
 		request.setRemark("自动追加保证金");

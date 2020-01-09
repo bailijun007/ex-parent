@@ -20,11 +20,11 @@ import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
-import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
@@ -51,7 +51,7 @@ public class PcPositionService {
 	private PcOrderTradeDAO pcOrderTradeDAO;
 	
 	@Autowired
-	private PcOrderDAO pcOrderDAO;
+	private PcOrderService pcOrderService;
 	
 	@Autowired
 	private PcAccountSymbolDAO pcAccountSymbolDAO;
@@ -73,7 +73,7 @@ public class PcPositionService {
 	
 	//处理成交订单
 	public void handleTradeOrder(PcTradeMsg matchedVo){
-		PcOrder order = this.pcOrderDAO.findById(matchedVo.getAccountId(), matchedVo.getOrderId());
+		PcOrder order = this.pcOrderService.getOrder(matchedVo.getAccountId(), matchedVo.getOrderId());
 		boolean exist = this.chekOrderTrade(order, matchedVo);
 		if(exist){
 			logger.error("成交已处理过了");
@@ -184,7 +184,7 @@ public class PcPositionService {
         order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setModified(now);
-		this.pcOrderDAO.update(order);
+		this.pcOrderService.updateOrder4Trad(order);
 	}
 
 	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeResult, Long posId, Long now) {
@@ -215,6 +215,8 @@ public class PcPositionService {
 		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
 		
 		orderTrade.setRemainVolume(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeResult.getVolume()));
+		
+		orderTrade.setMatchTxId(tradeMsg.getMatchTxId());
 		
 		this.pcOrderTradeDAO.save(orderTrade);
 		

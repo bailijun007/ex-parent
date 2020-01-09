@@ -20,6 +20,9 @@ import com.hp.sh.expv3.pc.msg.PcAccountLog;
 @Component
 public class WorkerConfigBuilder {
 	
+	public static final String TX = "tx";
+	private static final int TX_ID = 0;
+	
 	private static final String PC_ACCOUNT = PcAccount.class.getName();
 	private static final int PC_ACCOUNT_ID = 1;
 
@@ -61,6 +64,7 @@ public class WorkerConfigBuilder {
 	}
 	
 	private void set(WorkerConfig workerConfig){
+		this.set(workerConfig, TX_ID, TX);
 		this.set(workerConfig, PC_ACCOUNT_ID, PC_ACCOUNT);
 		this.set(workerConfig, PC_ACCOUNT_LOG_ID, PC_ACCOUNT_LOG);
 		this.set(workerConfig, PC_ACCOUNT_RECORD_ID, PC_ACCOUNT_RECORD);

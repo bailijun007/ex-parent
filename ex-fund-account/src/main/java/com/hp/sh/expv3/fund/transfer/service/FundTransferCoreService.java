@@ -54,20 +54,20 @@ public class FundTransferCoreService {
 		return transfer;
 	}
 	
-	public void changeStatus(FundTransfer tr, Integer newStatsus){
-		this.changeStatus(tr.getUserId(), tr.getId(), newStatsus, tr.getStatus(), DbDateUtils.now());
+	public void changeStatus(FundTransfer tr, Integer newStatsus, String errorInfo){
+		this.changeStatus(tr.getUserId(), tr.getId(), newStatsus, tr.getStatus(), errorInfo, DbDateUtils.now());
 		tr.setStatus(newStatsus);
 	}
 	
-	public void changeStatus(Long userId, Long id, Integer newStatsus, Integer oldStatsus, Long modified) {
-		int n = this.fundTransferDAO.changeStatus(userId, id, newStatsus, oldStatsus, modified);
+	void changeStatus(Long userId, Long id, Integer newStatsus, Integer oldStatsus, String errorInfo, Long modified) {
+		int n = this.fundTransferDAO.changeStatus(userId, id, newStatsus, oldStatsus, errorInfo, modified);
 		if(n==0){
 			throw new RuntimeException("更新失败");
 		}
 	}
 
 	public List<FundTransfer> findPending(Page page) {
-		List<FundTransfer> list = this.fundTransferDAO.queryPending(page);
+		List<FundTransfer> list = this.fundTransferDAO.queryPending(page, FundTransfer.STATUS_SUCCESS, FundTransfer.STATUS_FAIL);
 		return list;
 	}
 

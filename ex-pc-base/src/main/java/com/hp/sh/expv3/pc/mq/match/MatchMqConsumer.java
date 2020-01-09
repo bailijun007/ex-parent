@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MqTags;
 import com.hp.sh.expv3.pc.constant.MqTopic;
-import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.mq.match.msg.MatchNotMatchMsg;
@@ -29,7 +28,7 @@ public class MatchMqConsumer {
 	
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(MatchNotMatchMsg msg){
-		this.pcOrderService.setNewStatus(msg.getAccountId(), msg.getOrderId(), OrderStatus.NEW, OrderStatus.PENDING_NEW);
+		this.pcOrderService.setPendingNew(msg.getAccountId(), msg.getOrderId());
 	}
 	
 	//取消订单
