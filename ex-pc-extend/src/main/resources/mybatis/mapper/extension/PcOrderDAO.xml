@@ -220,6 +220,7 @@
                 </when>
                 <otherwise>
                     ORDER BY id desc
+                    LIMIT 0,${pageSize}
                 </otherwise>
             </choose>
         </where>
@@ -262,6 +263,7 @@
                 </when>
                 <otherwise>
                     ORDER BY id desc
+                    LIMIT 0,${pageSize}
                 </otherwise>
             </choose>
         </where>
