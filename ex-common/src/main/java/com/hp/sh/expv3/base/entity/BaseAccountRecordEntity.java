@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import com.hp.sh.expv3.commons.mybatis.InsertRequestId;
 import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 /**
@@ -36,6 +37,7 @@ public abstract class BaseAccountRecordEntity extends BaseAccountEntity implemen
 		this.id = id;
 	}
 
+//	@InsertRequestId
 	public String getRequestId() {
 		return requestId;
 	}

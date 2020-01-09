@@ -28,31 +28,31 @@ public class DataSourceConfig {
 		return ds;
 	}
 
-	@Order(2)
-	@Bean("secondDataSource")
-	@ConfigurationProperties(prefix = "spring.datasource.hikari.second")
-	public DataSource secondDataSource() {
-		HikariDataSource ds = new HikariDataSource();
-		return ds;
-	}
-	
-	
-	@Primary
-	@Order(3)
-	@Bean("shardingDataSource")
-	public DataSource shardingDataSource(@Qualifier("primaryDataSource") DataSource primaryDataSource, List<DataSource> dsList) throws SQLException {
-		// 配置分片规则
-		FunShardingBuilder builder = new FunShardingBuilder();
-		builder.setDsList(dsList);
-		builder.addTable("fund_account");
-		builder.addTable("fund_account_record");
-		builder.addTable("fund_transfer");
-		builder.addTable("deposit_addr");
-		builder.addTable("deposit_record");
-		builder.addTable("withdrawal_addr");
-		builder.addTable("withdrawal_record");
-		builder.addTable("c2c_order");
-		return builder.build();
-	}
+//	@Order(2)
+//	@Bean("secondDataSource")
+//	@ConfigurationProperties(prefix = "spring.datasource.hikari.second")
+//	public DataSource secondDataSource() {
+//		HikariDataSource ds = new HikariDataSource();
+//		return ds;
+//	}
+//	
+//	
+//	@Primary
+//	@Order(3)
+//	@Bean("shardingDataSource")
+//	public DataSource shardingDataSource(@Qualifier("primaryDataSource") DataSource primaryDataSource, List<DataSource> dsList) throws SQLException {
+//		// 配置分片规则
+//		FunShardingBuilder builder = new FunShardingBuilder();
+//		builder.setDsList(dsList);
+//		builder.addTable("fund_account");
+//		builder.addTable("fund_account_record");
+//		builder.addTable("fund_transfer");
+//		builder.addTable("deposit_addr");
+//		builder.addTable("deposit_record");
+//		builder.addTable("withdrawal_addr");
+//		builder.addTable("withdrawal_record");
+//		builder.addTable("c2c_order");
+//		return builder.build();
+//	}
 
 }
