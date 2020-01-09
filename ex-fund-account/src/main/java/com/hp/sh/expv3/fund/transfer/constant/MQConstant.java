@@ -6,7 +6,7 @@ public class MQConstant {
 	
 	public static final String GROUP2 = "withdrawal";
 
-	public static final String TRANSFER = "transfer";
+	public static final String TOPIC_TRANSFER = "transfer";
 	
-	public static final String WITHDRAWAL = "withdrawal";
+	public static final String TOPIC_WITHDRAWAL = "withdrawal";
 }
