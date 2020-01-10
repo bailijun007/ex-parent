@@ -4,8 +4,6 @@
 <mapper namespace="com.hp.sh.expv3.pc.module.account.dao.PcAccountRecordDAO">
 
 	<resultMap type="com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord" id="PcAccountRecord">
-		<result column="id" property="id" />
-		<result column="user_id" property="userId" />
 		<result column="asset" property="asset" />
 		<result column="sn" property="sn" />
 		<result column="type" property="type" />
@@ -16,13 +14,16 @@
 		<result column="trade_type" property="tradeType" />
 		<result column="serial_no" property="serialNo" />
 		<result column="associated_id" property="associatedId" />
+		<result column="tx_id" property="txId" />
 		<result column="request_id" property="requestId" />
+		<result column="user_id" property="userId" />
+		<result column="id" property="id" />
 		<result column="created" property="created" />
 		<result column="modified" property="modified" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,user_id,asset,sn,type,amount,remark,balance,trade_no,trade_type,serial_no,associated_id,request_id,created,modified
+		asset,sn,type,amount,remark,balance,trade_no,trade_type,serial_no,associated_id,tx_id,request_id,user_id,id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -108,17 +109,17 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into pc_account_record (
-			id,user_id,asset,sn,type,amount,remark,balance,trade_no,trade_type,serial_no,associated_id,request_id,created,modified
+			asset,sn,type,amount,remark,balance,trade_no,trade_type,serial_no,associated_id,tx_id,request_id,user_id,id,created,modified
 		)values(
-			#{id},#{userId},#{asset},#{sn},#{type},#{amount},#{remark},#{balance},#{tradeNo},#{tradeType},#{serialNo},#{associatedId},#{requestId},#{created},#{modified}
+			#{asset},#{sn},#{type},#{amount},#{remark},#{balance},#{tradeNo},#{tradeType},#{serialNo},#{associatedId},#{txId},#{requestId},#{userId},#{id},#{created},#{modified}
 		)
 	</insert>
 	
 	<update id="update">
 		update 
-			PcAccountRecord
+			pc_account_record
 		set 
-			user_id=#{userId},asset=#{asset},sn=#{sn},type=#{type},amount=#{amount},remark=#{remark},balance=#{balance},trade_no=#{tradeNo},trade_type=#{tradeType},serial_no=#{serialNo},associated_id=#{associatedId},request_id=#{requestId},created=#{created},modified=#{modified}
+			asset=#{asset},sn=#{sn},type=#{type},amount=#{amount},remark=#{remark},balance=#{balance},trade_no=#{tradeNo},trade_type=#{tradeType},serial_no=#{serialNo},associated_id=#{associatedId},tx_id=#{txId},request_id=#{requestId},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>

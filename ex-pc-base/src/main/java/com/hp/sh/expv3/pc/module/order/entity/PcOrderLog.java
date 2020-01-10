@@ -1,7 +1,3 @@
-/**
- * @author zw
- * @date 2019/7/19
- */
 package com.hp.sh.expv3.pc.module.order.entity;
 
 
