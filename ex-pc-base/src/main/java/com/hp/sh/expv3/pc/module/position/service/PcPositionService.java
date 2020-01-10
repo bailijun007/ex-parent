@@ -169,7 +169,7 @@ public class PcPositionService {
 		request.setAmount(tradeData.getMakerFeeDiff());
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("返还开仓手续费差额：%d", tradeData.getMakerFeeDiff()));
+		request.setRemark(String.format("返还开仓手续费差额：%s", tradeData.getMakerFeeDiff()));
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(PcAccountTradeType.RETURN_FEE_DIFF);
 		request.setAssociatedId(orderTradeId);

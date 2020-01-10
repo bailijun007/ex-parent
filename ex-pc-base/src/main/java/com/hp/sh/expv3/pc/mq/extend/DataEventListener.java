@@ -10,8 +10,10 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import com.gitee.hupadev.commons.cache.RedisPublisher;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.order.entity.PcOrderLog;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
+import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
 import com.hp.sh.expv3.pc.msg.EventMsg;
 import com.hp.sh.expv3.pc.msg.EventType;
 import com.hp.sh.expv3.pc.msg.OrderEventMsg;
@@ -55,7 +57,8 @@ public class DataEventListener {
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(PcOrder order) {
+	public void afterCommit(PcOrderEvent orderEvent) {
+		PcOrder order = orderEvent.getPcOrder();
 		EventMsg msg = new EventMsg(EventType.ORDER, order.getId(), order.getCreated(), order.getUserId(), order.getAsset(), order.getSymbol());
 		this.sendEventMsg(msg);
 		

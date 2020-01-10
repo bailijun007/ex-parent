@@ -124,7 +124,7 @@
 		set 
 			user_id=#{userId},sn=#{sn},asset=#{asset},amount=#{amount},src_account_type=#{srcAccountType},target_account_type=#{targetAccountType},src_account_id=#{srcAccountId},target_account_id=#{targetAccountId},remark=#{remark},error_info=#{errorInfo},status=#{status},id=#{id},request_id=#{requestId},created=#{created},modified=#{modified}
 		where 
-			id=#{id}
+			id=#{id} and user_id=#{userId}
 	</update>
 
 	<!--  -->
