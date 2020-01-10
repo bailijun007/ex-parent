@@ -7,6 +7,7 @@ import java.util.Optional;
 import com.hp.sh.expv3.pc.extension.service.PcAccountLogExtendService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,13 +28,8 @@ public class EventMqConsumer {
     @MQListener(topic = MsgConstant.EVENT_TOPIC, orderly = MQListener.ORDERLY_YES)
     public void handleMsg(PcAccountLog msg) {
         logger.info("收到消息:{}", msg);
-        Optional<PcAccountLog> optional = Optional.ofNullable(msg);
-        PcAccountLogVo vo = new PcAccountLogVo(optional.map(PcAccountLog::getType).orElse(null),
-                optional.map(PcAccountLog::getUserId).orElse(null),
-                optional.map(PcAccountLog::getAsset).orElse(null),
-                optional.map(PcAccountLog::getSymbol).orElse(null),
-                optional.map(PcAccountLog::getRefId).orElse(null),
-                optional.map(PcAccountLog::getTime).orElse(null));
+        PcAccountLogVo vo = new PcAccountLogVo();
+        BeanUtils.copyProperties(msg,vo);
         PcAccountLogVo pcAccountLogVo = pcAccountLogExtendService.getPcAccountLog(vo);
         if (pcAccountLogVo == null) {
             pcAccountLogExtendService.save(vo);
