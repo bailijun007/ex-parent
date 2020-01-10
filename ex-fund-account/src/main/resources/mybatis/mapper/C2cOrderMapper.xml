@@ -186,7 +186,7 @@
                 user_id=#{userId}
             </if>
             <if test="payStatus!=null">
-                pay_status=#{payStatus}
+              and   pay_status=#{payStatus}
             </if>
             <choose>
                 <when test="nextPage==1 and id!=null">
