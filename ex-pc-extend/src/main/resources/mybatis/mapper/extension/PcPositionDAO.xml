@@ -115,4 +115,20 @@
         <include refid="simple_where"/>
     </select>
 
+    <select id="queryActivePosition" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_position
+        <include refid="simple_where"/>
+        and volume &gt; 0
+    </select>
+
+    <select id="getAvgPrice" resultType="java.math.BigDecimal">
+        select mean_price  from pc_position
+        where user_id=#{userId}
+        and asset=#{asset}
+        and symbol=#{symbol}
+        and volume=#{volume}
+    </select>
+
 </mapper>

@@ -75,12 +75,26 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
     }
 
     @Override
-    public List<PcPositionVo> findPositionList(Long userId, String asset, String symbol) {
+    public List<PcPositionVo> findActivePosition(Long userId, String asset, String symbol) {
         Map<String, Object> map=new HashMap<>();
         map.put("userId",userId);
         map.put("asset",asset);
         map.put("symbol",symbol);
-        List<PcPositionVo> pcPositionVos = pcPositionDAO.queryList(map);
+        List<PcPositionVo> pcPositionVos = pcPositionDAO.queryActivePosition(map);
         return pcPositionVos;
+    }
+
+    /**
+     * 均价，仓位为0时，表示最后一次仓位变动时的均价meanPrice
+     * @param userId
+     * @param asset
+     * @param symbol
+     * @return
+     */
+    @Override
+    public BigDecimal getAvgPrice(Long userId, String asset, String symbol) {
+        Integer volume=0;
+        return pcPositionDAO.getAvgPrice(userId,asset,symbol,volume);
+
     }
 }

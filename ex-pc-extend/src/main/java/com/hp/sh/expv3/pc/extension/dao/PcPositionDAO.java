@@ -18,4 +18,8 @@ public interface PcPositionDAO {
     PcPositionVo queryOne(Map<String,Object> map);
 
     List<PcPositionVo> queryList(Map<String,Object> map);
+
+    List<PcPositionVo> queryActivePosition(Map<String,Object> map);
+
+    BigDecimal getAvgPrice(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol")  String symbol, @Param("volume") Integer volume);
 }

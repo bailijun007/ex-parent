@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * @author BaiLiJun  on 2020/1/2
@@ -76,10 +77,9 @@ public class PcTradeExtendApiAction implements PcTradeExtendApi {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
 
-        LocalDate localDate=LocalDate.now();
         if(startTime==null||endTime==null){
-            startTime = localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli();
             endTime= Instant.now().toEpochMilli();
+            startTime = endTime - ((endTime + TimeZone.getDefault().getRawOffset()) % (24 * 60 * 60 * 1000L));
         }
 
         List<PcTradeVo> pcTradeVo = pcTradeExtendService.selectTradeListByTimeInterval(asset, symbol, startTime, endTime, userId);

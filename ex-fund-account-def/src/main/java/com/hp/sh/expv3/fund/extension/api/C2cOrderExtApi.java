@@ -47,7 +47,26 @@ public interface C2cOrderExtApi {
     })
     @GetMapping("/api/extension/c2c/order/deposit/create")
     public String create(@RequestParam("userId") long userId, @RequestParam("ratio") BigDecimal ratio,
-                         @RequestParam("srcCurrency")  String srcCurrency, @RequestParam("tarCurrency") String tarCurrency,
-                         @RequestParam("tarVolume")  BigDecimal tarVolume, @RequestParam("fabiAmt") BigDecimal fabiAmt);
+                         @RequestParam("srcCurrency") String srcCurrency, @RequestParam("tarCurrency") String tarCurrency,
+                         @RequestParam("tarVolume") BigDecimal tarVolume, @RequestParam("fabiAmt") BigDecimal fabiAmt);
+
+
+    @ApiOperation(value = "创建c2c体现订单")
+    @ResultEntity
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "0", required = true),
+            @ApiImplicitParam(name = "bank", value = "开户银行", example = "农业银行", required = true),
+            @ApiImplicitParam(name = "bankCardName", value = "银行卡收款姓名", example = "张三", required = true),
+            @ApiImplicitParam(name = "bankCard", value = "银行卡号", example = "846546468546465456", required = true),
+            @ApiImplicitParam(name = "targetAssetNum", value = "资产出金数量", example = "352", required = true),
+            @ApiImplicitParam(name = "fabiAmount", value = "出金金额（法币）", example = "3520", required = true),
+            @ApiImplicitParam(name = "targetAsset", value = "兑换资产", example = "USD", required = true),
+            @ApiImplicitParam(name = "sourceAsset", value = "原资产", example = "CNY", required = true)
+    })
+    @GetMapping("/api/extension/c2c/order/withdrawal/withdrawalOrder")
+    public String withdrawalOrder(@RequestParam("userId") Long userId,
+                                  @RequestParam("bank") String bank, @RequestParam("bankCardName") String bankCardName,
+                                  @RequestParam("targetAssetNum") BigDecimal targetAssetNum, @RequestParam("fabiAmount") BigDecimal fabiAmount,
+                                  @RequestParam("targetAsset") String targetAsset, @RequestParam("sourceAsset") String sourceAsset);
 
 }
