@@ -60,7 +60,7 @@ public interface C2cOrderExtApi {
             @ApiImplicitParam(name = "bankCard", value = "银行卡号", example = "846546468546465456", required = true),
             @ApiImplicitParam(name = "targetAssetNum", value = "资产出金数量", example = "352", required = true),
             @ApiImplicitParam(name = "fabiAmount", value = "出金金额（法币）", example = "3520", required = true),
-            @ApiImplicitParam(name = "targetAsset", value = "兑换资产", example = "USD", required = true),
+            @ApiImplicitParam(name = "targetAsset", value = "兑换资产", example = "USDT", required = true),
             @ApiImplicitParam(name = "sourceAsset", value = "原资产", example = "CNY", required = true)
     })
     @GetMapping("/api/extension/c2c/order/withdrawal/withdrawalOrder")
