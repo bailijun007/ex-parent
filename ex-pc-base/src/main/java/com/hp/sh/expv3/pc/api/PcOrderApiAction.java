@@ -12,6 +12,7 @@ import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.match.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingNewMsg;
+import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.utils.BidUtils;
 
 @RestController
@@ -25,6 +26,9 @@ public class PcOrderApiAction implements PcOrderApi {
 	
 	@Autowired
 	private MatchMqSender matchMqSender;
+	
+	@Autowired
+	private PositionStrategyContext strategyContext;
 	
 	/**
 	 * 创建订单
@@ -89,11 +93,11 @@ public class PcOrderApiAction implements PcOrderApi {
 		this.matchMqSender.sendBookResetMsg(msg);
 	}
 	
-	public BigDecimal maxOpenVolume(Long userId, String asset, String symbol, Long longFlag){
+	@Override
+	public BigDecimal getMaxOpenVolume(Long userId, String asset, String symbol, Long longFlag, BigDecimal leverage){
 		BigDecimal balance = this.pcAccountCoreService.getBalance(userId, asset);
-		BigDecimal singleCost = null;
-		BigDecimal v = balance.divide(singleCost);
-		return v;
+		BigDecimal maxOpenVolume = strategyContext.calcMaxOpenVolume(userId, asset, symbol, longFlag, leverage, balance);
+		return maxOpenVolume;
 	}
 
 }

@@ -222,7 +222,7 @@ public class PcPositionService {
 		
 		this.pcOrderTradeDAO.save(orderTrade);
 		
-		orderTrade.setTradType(this.getLogType(order.getCloseFlag(), order.getLongFlag()));
+		orderTrade.setLogType(this.getLogType(order.getCloseFlag(), order.getLongFlag()));
 		
 		publisher.publishEvent(orderTrade);
 		
@@ -317,7 +317,8 @@ public class PcPositionService {
 	private boolean chekOrderTrade(PcOrder order, PcTradeMsg tradeMsg) {
 		if(order==null){
 			logger.error("成交订单不存在：orderId={}", tradeMsg.getOrderId());
-			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
+//			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
+			return true;
 		}
 		
 		//检查重复请求

@@ -49,7 +49,7 @@ public class LogEventListener {
 		logMsg.setAsset(orderTrade.getAsset());
 		logMsg.setSymbol(orderTrade.getSymbol());
 		logMsg.setTime(orderTrade.getCreated());
-		logMsg.setType(orderTrade.getTradType());
+		logMsg.setType(orderTrade.getLogType());
 		logMsg.setRefId(orderTrade.getId());
 		
 		this.sendEventMsg(logMsg);

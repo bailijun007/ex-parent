@@ -15,6 +15,8 @@ public class Precision {
     
     public static final int LEVERAGE_PRECISION = 2;
     
+    public static final int INTEGER_PRECISION = 0;
+    
 	public static final RoundingMode LESS = RoundingMode.DOWN;
 	
 }

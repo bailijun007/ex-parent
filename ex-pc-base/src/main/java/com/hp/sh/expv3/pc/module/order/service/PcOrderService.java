@@ -12,7 +12,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gitee.hupadev.base.exceptions.CommonError;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
@@ -290,6 +289,7 @@ public class PcOrderService {
 		pcOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
 		
 		OrderRatioData ratioData = orderStrategy.calcOrderAmt(pcOrder);
+		
 		pcOrder.setOpenFee(ratioData.getOpenFee());
 		pcOrder.setCloseFee(ratioData.getCloseFee());
 		pcOrder.setOrderMargin(ratioData.getGrossMargin());

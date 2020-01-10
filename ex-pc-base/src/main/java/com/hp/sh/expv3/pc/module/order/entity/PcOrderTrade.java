@@ -71,7 +71,7 @@ public class PcOrderTrade extends UserDataEntity {
 	private Long txId;
 	
 	@Transient
-	private Integer tradType;
+	private Integer logType;
 
 	public PcOrderTrade() {
 		super();
@@ -220,15 +220,15 @@ public class PcOrderTrade extends UserDataEntity {
 				+ ", tradeSn=" + tradeSn + ", tradeId=" + tradeId + ", posId=" + posId + ", orderId=" + orderId
 				+ ", makerFlag=" + makerFlag + ", tradeTime=" + tradeTime + ", feeCollectorId=" + feeCollectorId
 				+ ", feeRatio=" + feeRatio + ", fee=" + fee + ", pnl=" + pnl + ", remainVolume=" + remainVolume
-				+ ", matchTxId=" + matchTxId + ", txId=" + txId + ", tradType=" + tradType + "]";
+				+ ", matchTxId=" + matchTxId + ", txId=" + txId + ", logType=" + logType + "]";
 	}
 
-	public Integer getTradType() {
-		return tradType;
+	public Integer getLogType() {
+		return logType;
 	}
 
-	public void setTradType(Integer tradType) {
-		this.tradType = tradType;
+	public void setLogType(Integer tradType) {
+		this.logType = tradType;
 	}
 
 }

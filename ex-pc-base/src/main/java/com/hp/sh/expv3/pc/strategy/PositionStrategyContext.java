@@ -20,10 +20,12 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
+import com.hp.sh.expv3.pc.strategy.vo.OrderFeeParamVo;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
+import com.hp.sh.expv3.utils.math.Precision;
 
 @Component
 public class PositionStrategyContext {
@@ -161,11 +163,27 @@ public class PositionStrategyContext {
 		return tradeResult;
 	}
 	
-	public BigDecimal calcMaxOpenVolume(String asset, String symbol, Long longFlag, BigDecimal balance){
-		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(asset, symbol);
-		BigDecimal singleCost = null;
-		BigDecimal v = balance.divide(singleCost);
-		return v;
+	public BigDecimal calcMaxOpenVolume(Long userId, String asset, String symbol, Long longFlag, BigDecimal leverage, BigDecimal balance){
+		BigDecimal latestPrice = this.markPriceService.getLatestPrice(asset, symbol);
+		
+		BigDecimal faceValue = this.metadataService.getFaceValue(asset, symbol);
+		BigDecimal initedMarginRatio = feeRatioService.getInitedMarginRatio(leverage);
+		BigDecimal openFeeRatio = feeRatioService.getOpenFeeRatio(userId, asset, symbol);
+		BigDecimal closeFeeRatio = feeRatioService.getCloseFeeRatio(userId, asset, symbol);
+		
+		OrderFeeParamVo orderParam = new OrderFeeParamVo();
+		orderParam.setVolume(BigDecimal.ONE);
+		orderParam.setFaceValue(faceValue);
+		orderParam.setCloseFeeRatio(closeFeeRatio);
+		orderParam.setOpenFeeRatio(openFeeRatio);
+		orderParam.setMarginRatio(initedMarginRatio);
+		orderParam.setPrice(latestPrice);
+
+		OrderRatioData ratioData = orderStrategy.calcOrderAmt(orderParam);
+		BigDecimal singleCost = ratioData.getGrossMargin();
+		
+		BigDecimal vol = balance.divide(singleCost, Precision.INTEGER_PRECISION, Precision.LESS);
+		return vol;
 	}
 	
 	public HoldPosStrategy getHoldPosStrategy(String asset, String symbol){

@@ -53,4 +53,8 @@ public interface PcOrderApi {
 	@GetMapping(value = "/api/pc/order/bookReset")
 	void bookReset(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
 
+	@ApiOperation(value = "获取最大可开仓数量")
+	@GetMapping(value = "/api/pc/order/maxOpenVolume")
+	BigDecimal getMaxOpenVolume(Long userId, String asset, String symbol, Long longFlag, BigDecimal leverage);
+
 }
