@@ -135,9 +135,6 @@
 	</select>
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into pc_order (
 			id,asset,symbol,close_flag,long_flag,leverage,volume,face_value,price,order_type,time_in_force,margin_mode,open_fee_ratio,close_fee_ratio,margin_ratio,client_order_id,open_fee,close_fee,order_margin,gross_margin,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,close_pos_id,trigger_flag,visible_flag,liq_flag,create_operator,cancel_operator,user_id,created,modified
 		)values(
@@ -153,15 +150,6 @@
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>
-
-	<delete id="delete">
-        delete from pc_order where id=#{id}
-    </delete>
-
-    <delete id="condDelete">
-        delete from pc_order
-		<include refid="simple_where" />
-    </delete>
 
 	<!--  -->
 	
@@ -181,7 +169,7 @@
 			status=#{cancelStatus}, modified=#{modified}, cancel_time=#{modified}
 		where 
 			id=#{orderId} and user_id=#{userId}
-			 and status != 4 and status != 6
+			and status != #{status1} and status != #{status2} and active_flag=#{activeFlag}
 	</update>
 
 	<select id="getClosingVolume" resultType="java.math.BigDecimal">

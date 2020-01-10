@@ -10,7 +10,6 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import com.gitee.hupadev.commons.cache.RedisPublisher;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrderLog;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
