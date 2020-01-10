@@ -8,6 +8,9 @@ import java.io.Serializable;
  * @author BaiLiJun  on 2019/12/25
  */
 public class PcAccountLogVo implements Serializable {
+    @ApiModelProperty("Id")
+    private Long id;
+
     @ApiModelProperty("事件类型")
     private Integer type;
 
@@ -36,6 +39,14 @@ public class PcAccountLogVo implements Serializable {
         this.symbol = symbol;
         this.refId = refId;
         this.time = time;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Integer getType() {
