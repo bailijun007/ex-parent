@@ -123,4 +123,12 @@
         and volume &gt; 0
     </select>
 
+    <select id="getAvgPrice" resultType="java.math.BigDecimal">
+        select mean_price  from pc_position
+        where user_id=#{userId}
+        and asset=#{asset}
+        and symbol=#{symbol}
+        and volume=#{volume}
+    </select>
+
 </mapper>
