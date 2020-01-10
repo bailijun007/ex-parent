@@ -75,7 +75,7 @@ public class PcMatchedBookSnapshotTask extends PcMatchedBaseTask {
         snapshot.setLimitAskOrders(limitAskOrders);
         snapshot.setLimitBidOrders(limitBidOrders);
         long rmqNextOffset = this.getCurrentMsgOffset() + 1;
-        snapshot.setRmqNextOffset(rmqNextOffset);
+        snapshot.setRmqCurrentOffset(this.getCurrentMsgOffset());
 
         String snapshotRedisKey = RedisKeyUtil.buildPcOrderSnapshotRedisKey(pcmatchRedisKeySetting.getPcOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
 

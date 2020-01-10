@@ -49,7 +49,7 @@ public class PcOrderSnapshotCreateTask extends PcOrderBaseTask implements ITask 
     public void run() {
         PcMatchHandlerContext context = PcMatchHandlerContext.getLocalContext();
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
-            pcMatchedTaskService.addOrderSnapshotTask(context, context.limitBidQueue, context.limitAskQueue, this.getCurrentMsgOffset());
+            pcMatchedTaskService.addOrderSnapshotTask(context, context.limitBidQueue, context.limitAskQueue, this.getCurrentMsgOffset(), this.getCurrentMsgId());
         }
     }
 }

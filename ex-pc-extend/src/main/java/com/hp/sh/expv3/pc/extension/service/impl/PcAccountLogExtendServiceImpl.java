@@ -62,10 +62,6 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
     @Override
     public void save(PcAccountLogVo pcAccountLogVo) {
         int count = pcAccountLogDAO.save(pcAccountLogVo);
-        if(count!=1){
-            throw new ExException(PcCommonErrorCode.SAVE_PC_ACCOUNT_LOG_FAIL);
-        }
-
     }
 
     @Override

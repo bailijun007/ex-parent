@@ -21,15 +21,15 @@ public interface PcMatchedTaskService {
 
     PcMatchedInitTask buildMatchedInitTask(String assetSymbol, String asset, String symbol);
 
-    void addMatchedBookResetTask(PcMatchHandlerContext context, List<BookEntry> entries, BigDecimal lastPrice, long currentMsgOffset);
+    void addMatchedBookResetTask(PcMatchHandlerContext context, List<BookEntry> entries, BigDecimal lastPrice, long currentMsgOffset, String currentMsgId);
 
-    void addOrderSnapshotTask(PcMatchHandlerContext context, PriorityQueue<PcOrder4MatchBo> limitBidQueue, PriorityQueue<PcOrder4MatchBo> limitAskQueue, long currentMsgOffset);
+    void addOrderSnapshotTask(PcMatchHandlerContext context, PriorityQueue<PcOrder4MatchBo> limitBidQueue, PriorityQueue<PcOrder4MatchBo> limitAskQueue, long currentMsgOffset, String currentMsgId);
 
-    void addMatchedOrderCancelByLiqTask(PcMatchHandlerContext context, long currentMsgOffset, Collection<PcOrder4MatchBo> order2CancelByLiq, PcPosLockedMqMsgDto msg);
+    void addMatchedOrderCancelByLiqTask(PcMatchHandlerContext context, long currentMsgOffset, String currentMsgId, Collection<PcOrder4MatchBo> order2CancelByLiq, PcPosLockedMqMsgDto msg);
 
-    void addMatchedOrderMatchedTask(PcMatchHandlerContext context, long currentMsgOffset, PcOrder4MatchBo takerOrder);
+    void addMatchedOrderMatchedTask(PcMatchHandlerContext context, long currentMsgOffset, String currentMsgId, PcOrder4MatchBo takerOrder);
 
-    void addMatchedOrderCancelTask(PcMatchHandlerContext context, long currentMsgOffset, long accountId, long orderId, BigDecimal cancelDeltaAmt);
+    void addMatchedOrderCancelTask(PcMatchHandlerContext context, long currentMsgOffset, String currentMsgId, long accountId, long orderId, BigDecimal cancelDeltaAmt);
 
     void logQueueSize(String asset, String symbol, IThreadWorker matchedThreadWorker, PcMatchedBaseTask currentMatchedTask);
 }

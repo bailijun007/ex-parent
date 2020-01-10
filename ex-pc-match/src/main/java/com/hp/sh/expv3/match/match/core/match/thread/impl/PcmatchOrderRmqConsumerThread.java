@@ -178,7 +178,8 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                     } else {
 
                         if (logger.isDebugEnabled()) {
-                            logger.debug("{}:size:{} {}-》{},last {}", topicName, msgFoundList.size(), offset, pullResult.getNextBeginOffset(), msgFoundList.get(msgFoundList.size() - 1).getQueueOffset());
+                            MessageExt messageExtLast = msgFoundList.get(msgFoundList.size() - 1);
+                            logger.debug("{}:size:{} {}-》{},last {},{}", topicName, msgFoundList.size(), offset, pullResult.getNextBeginOffset(), messageExtLast.getQueueOffset(), messageExtLast.getMsgId());
                         }
 
                         for (int i = 0; i < msgFoundList.size(); i++) {
@@ -190,6 +191,7 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
 
                             PcOrderBaseTask task = null;
                             long queueOffset = m.getQueueOffset();
+                            String currentMsgId = m.getMsgId();
                             // 按出现频率多少，排 if 的顺序
                             if (RmqTagEnum.PC_ORDER_PENDING_NEW.getConstant().equals(m.getTags())) {
                                 PcOrderMqMsgDto dto = JSON.parseObject(body, PcOrderMqMsgDto.class);
@@ -197,25 +199,24 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                                     dto.setFilledNumber(BigDecimal.ZERO);
                                 }
                                 PcOrder4MatchBo pcOrder4Match = PcOrder4MatchBoUtil.convert(dto);
-                                task = pcMatchTaskService.buildPcOrderNewTask(assetSymbol, asset, symbol, queueOffset, pcOrder4Match);
+                                task = pcMatchTaskService.buildPcOrderNewTask(assetSymbol, asset, symbol, queueOffset, currentMsgId, pcOrder4Match);
                                 matchWorker.addTask(task);
                             } else if (RmqTagEnum.PC_ORDER_PENDING_CANCEL.getConstant().equals(m.getTags())) {
                                 PcOrderMqMsgDto dto = JSON.parseObject(body, PcOrderMqMsgDto.class);
-                                task = pcMatchTaskService.buildPcOrderCancelTask(assetSymbol, asset, symbol, queueOffset, dto.getAccountId(), dto.getOrderId());
-                                task.setCurrentMsgOffset(m.getQueueOffset());
+                                task = pcMatchTaskService.buildPcOrderCancelTask(assetSymbol, asset, symbol, queueOffset, currentMsgId, dto.getAccountId(), dto.getOrderId());
                                 matchWorker.addTask(task);
                             } else if (RmqTagEnum.PC_BOOK_RESET.getConstant().equals(m.getTags())) {
-                                task = pcMatchTaskService.buildPcOrderBookReset(assetSymbol, asset, symbol, queueOffset);
+                                task = pcMatchTaskService.buildPcOrderBookReset(assetSymbol, asset, symbol, queueOffset, currentMsgId);
                                 matchWorker.addTask(task);
                             } else if (RmqTagEnum.PC_MATCH_ORDER_SNAPSHOT_CREATE.getConstant().equals(m.getTags())) {
-                                task = pcMatchTaskService.buildOrderSnapshotTask(assetSymbol, asset, symbol, queueOffset);
+                                task = pcMatchTaskService.buildOrderSnapshotTask(assetSymbol, asset, symbol, queueOffset, currentMsgId);
                                 matchWorker.addTask(task);
                             } else if (RmqTagEnum.PC_POS_LIQ_LOCKED.getConstant().equals(m.getTags())) {
                                 PcPosLockedMqMsgDto dto = JSON.parseObject(body, PcPosLockedMqMsgDto.class);
-                                task = pcMatchTaskService.buildPcOrderCancelByLiqTask(assetSymbol, asset, symbol, queueOffset, dto);
+                                task = pcMatchTaskService.buildPcOrderCancelByLiqTask(assetSymbol, asset, symbol, queueOffset, currentMsgId, dto);
                                 matchWorker.addTask(task);
                             } else if (RmqTagEnum.PC_ORDER_REBASE.getConstant().equals(m.getTags())) {
-                                task = pcMatchTaskService.buildOrderRebaseTask(assetSymbol, asset, symbol, queueOffset);
+                                task = pcMatchTaskService.buildOrderRebaseTask(assetSymbol, asset, symbol, queueOffset, currentMsgId);
                                 matchWorker.addTask(task);
                             } else {
                                 logger.error("get tags {} not define,go to exit -1", m.getTags());

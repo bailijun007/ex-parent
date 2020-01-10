@@ -61,7 +61,7 @@ public class PcOrderBookResetTask extends PcOrderBaseTask implements ITask {
 
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
             List<BookEntry> entries = pcOrderBookEventService.buildBookEntry(context.limitAskQueue, context.limitBidQueue);
-            pcMatchedTaskService.addMatchedBookResetTask(context, entries, context.getLastPrice(), this.getCurrentMsgOffset());
+            pcMatchedTaskService.addMatchedBookResetTask(context, entries, context.getLastPrice(), this.getCurrentMsgOffset(), this.getCurrentMsgId());
         }
 
     }

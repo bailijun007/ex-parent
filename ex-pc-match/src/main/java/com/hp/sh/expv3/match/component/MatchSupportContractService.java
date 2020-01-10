@@ -10,6 +10,8 @@ import com.hp.sh.expv3.match.config.setting.PcmatchRedisKeySetting;
 import com.hp.sh.expv3.match.config.setting.PcmatchSetting;
 import com.hp.sh.expv3.match.util.PcUtil;
 import com.hp.sh.expv3.match.util.RedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,8 @@ import java.util.Set;
 
 @Component
 public class MatchSupportContractService {
+
+    final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     @Qualifier("metadataRedisUtil")
@@ -46,9 +50,13 @@ public class MatchSupportContractService {
             for (Map.Entry<String, String> kv : contractName2Contract.entrySet()) {
                 String value = kv.getValue();
                 if (null != value) {
-                    PcContractBo pcContractBo = JSON.parseObject(value, PcContractBo.class);
-                    if (pcmatchSetting.getMatchGroupId().intValue() == pcContractBo.getContractGroup().intValue()) {
-                        supportAssetSymbol.add(PcUtil.concatAssetAndSymbol(null, pcContractBo.getAsset(), pcContractBo.getSymbol()));
+                    try {
+                        PcContractBo pcContractBo = JSON.parseObject(value, PcContractBo.class);
+                        if (null != pcContractBo.getContractGroup() && pcmatchSetting.getMatchGroupId().intValue() == pcContractBo.getContractGroup().intValue()) {
+                            supportAssetSymbol.add(PcUtil.concatAssetAndSymbol(null, pcContractBo.getAsset(), pcContractBo.getSymbol()));
+                        }
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
                     }
                 }
             }

@@ -92,7 +92,7 @@ public class PcOrderNewTask extends PcOrderBaseTask implements ApplicationContex
             break;
         }
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
-            pcMatchedTaskService.addMatchedOrderMatchedTask(context, this.getCurrentMsgOffset(), order);
+            pcMatchedTaskService.addMatchedOrderMatchedTask(context, this.getCurrentMsgOffset(), this.getCurrentMsgId(), order);
         }
         context.clear();
     }
