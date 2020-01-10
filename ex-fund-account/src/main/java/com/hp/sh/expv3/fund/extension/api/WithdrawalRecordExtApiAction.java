@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 /**
  * @author BaiLiJun  on 2019/12/16
@@ -108,12 +109,11 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
             throw new ExException(FundCommonError.PARAM_EMPTY);
         }
 
-        LocalDate localDate = LocalDate.now();
         Instant now = Instant.now();
-
         if (startTime == null && endTime == null) {
-            startTime = localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli();
             endTime = now.toEpochMilli();
+            startTime = endTime - ((endTime + TimeZone.getDefault().getRawOffset()) % (24 * 60 * 60 * 1000L));
+
         }
 
         PageResult<WithdrawalRecordVo> result = withdrawalRecordExtService.pageQueryHistory(userId, asset, pageNo, pageSize, startTime, endTime, approvalStatus);

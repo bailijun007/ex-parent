@@ -26,7 +26,7 @@ public class PcTradeExtendServiceImpl implements PcTradeExtendService {
         Map<String, Object> map=new HashMap<>();
         map.put("asset",asset);
         map.put("symbol",symbol);
-        map.put("orderBy","id");
+        map.put("orderBy","tradeTime");
         map.put("limit",count);
         List<PcTradeVo> list = pcTradeDAO.queryList(map);
         return list;
