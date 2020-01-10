@@ -9,6 +9,7 @@ import com.hp.sh.expv3.pc.calc.OrderFeeCalc;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
+import com.hp.sh.expv3.pc.strategy.data.OrderData;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.Precision;
@@ -26,7 +27,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * @param pcOrder
 	 * @return
 	 */
-	public OrderRatioData calcOrderAmt(PcOrder pcOrder){
+	public OrderRatioData calcOrderAmt(OrderData pcOrder){
 		//交易金额
 		BigDecimal amount = CompFieldCalc.calcAmount(pcOrder.getVolume(), pcOrder.getFaceValue());
 		//基础货币价值

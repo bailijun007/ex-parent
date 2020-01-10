@@ -86,5 +86,16 @@ public class PcAccountLog {
 	public void setTime(Long time) {
 		this.time = time;
 	}
-	
+
+    @Override
+    public String toString() {
+        return "PcAccountLog{" +
+                "type=" + type +
+                ", userId=" + userId +
+                ", asset='" + asset + '\'' +
+                ", symbol='" + symbol + '\'' +
+                ", refId=" + refId +
+                ", time=" + time +
+                '}';
+    }
 }

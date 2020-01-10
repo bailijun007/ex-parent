@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
-import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
@@ -169,7 +169,7 @@ public class PcPositionService {
 		request.setAmount(tradeData.getMakerFeeDiff());
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("返还开仓手续费差额：%d", tradeData.getMakerFeeDiff()));
+		request.setRemark(String.format("返还开仓手续费差额：%s", tradeData.getMakerFeeDiff()));
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(PcAccountTradeType.RETURN_FEE_DIFF);
 		request.setAssociatedId(orderTradeId);
@@ -316,7 +316,8 @@ public class PcPositionService {
 	//检查订单状态
 	private boolean chekOrderTrade(PcOrder order, PcTradeMsg tradeMsg) {
 		if(order==null){
-			throw new ExException(CommonError.OBJ_DONT_EXIST);
+			logger.error("成交订单不存在：orderId={}", tradeMsg.getOrderId());
+			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
 		}
 		
 		//检查重复请求

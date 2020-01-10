@@ -30,7 +30,7 @@ public interface FundTransferExtApi {
     })
     @GetMapping(value = "/api/extension/account/transfer/queryHistory")
     public List<FundTransferExtVo> queryHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset", required = false) String asset,
-                                                @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
+                                                @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize,
                                                 @RequestParam(value = "pageStatus") Integer pageStatus);
 
 
@@ -43,7 +43,7 @@ public interface FundTransferExtApi {
     })
     @GetMapping(value = "/api/extension/account/transfer/queryAllUserHistory")
     public PageResult<FundTransferExtVo> queryAllUserHistory(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "asset", required = false) String asset,
-                                                             @RequestParam(value = "pageSize") Integer pageSize, @RequestParam(value = "pageNo") Integer pageNo);
+                                                             @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize, @RequestParam(value = "pageNo") Integer pageNo);
 
 
 }

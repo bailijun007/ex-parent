@@ -1,7 +1,3 @@
-/**
- * @author 10086
- * @date 2019/10/30
- */
 package com.hp.sh.expv3.pc.module.order.entity;
 
 import java.math.BigDecimal;
@@ -9,6 +5,7 @@ import java.math.BigDecimal;
 import javax.persistence.Transient;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
+import com.hp.sh.expv3.commons.mybatis.TxId;
 import com.hp.sh.expv3.dev.Question;
 
 /**
@@ -69,6 +66,9 @@ public class PcOrderTrade extends UserDataEntity {
 	
 	//撮合事务Id
 	private Long matchTxId;
+	
+	//事务ID
+	private Long txId;
 	
 	@Transient
 	private Integer tradType;
@@ -204,13 +204,23 @@ public class PcOrderTrade extends UserDataEntity {
 	public void setMatchTxId(Long matchTxId) {
 		this.matchTxId = matchTxId;
 	}
+	
+	@TxId
+	public Long getTxId() {
+		return txId;
+	}
+
+	public void setTxId(Long txId) {
+		this.txId = txId;
+	}
 
 	@Override
 	public String toString() {
-		return "PcOrderTrade [asset=" + asset + ", symbol=" + symbol + ", orderId=" + orderId + ", price=" + price
-				+ ", volume=" + volume + ", tradeSn=" + tradeSn + ", makerFlag=" + makerFlag + ", tradeTime="
-				+ tradeTime + ", feeCollectorId=" + feeCollectorId + ", feeRatio=" + feeRatio + ", fee=" + fee
-				+ ", pnl=" + pnl + "]";
+		return "PcOrderTrade [asset=" + asset + ", symbol=" + symbol + ", price=" + price + ", volume=" + volume
+				+ ", tradeSn=" + tradeSn + ", tradeId=" + tradeId + ", posId=" + posId + ", orderId=" + orderId
+				+ ", makerFlag=" + makerFlag + ", tradeTime=" + tradeTime + ", feeCollectorId=" + feeCollectorId
+				+ ", feeRatio=" + feeRatio + ", fee=" + fee + ", pnl=" + pnl + ", remainVolume=" + remainVolume
+				+ ", matchTxId=" + matchTxId + ", txId=" + txId + ", tradType=" + tradType + "]";
 	}
 
 	public Integer getTradType() {

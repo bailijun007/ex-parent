@@ -37,7 +37,7 @@ public interface PcAccountExtendApi {
     List<PcAccountExtVo> findContractAccount(@RequestParam("userIds") String userIds, @RequestParam("asset") String asset);
 
 
-    @ApiOperation(value = "获取合约账户列表")
+    @ApiOperation(value = "获取合约账单列表")
     @GetMapping(value = "/api/extension/account/pc/findContractAccountList")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
@@ -47,7 +47,7 @@ public interface PcAccountExtendApi {
 
     })
     PageResult<PcAccountExtVo> findContractAccountList(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "asset", required = false) String asset,
-                                                       @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize", required = true) Integer pageSize);
+                                                       @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize", required = true,defaultValue = "20") Integer pageSize);
 
 
 }

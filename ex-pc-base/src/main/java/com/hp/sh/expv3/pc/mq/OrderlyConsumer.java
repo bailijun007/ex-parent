@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-import com.hp.sh.expv3.config.web.ExpMvcConfig;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 import com.hp.sh.expv3.pc.constant.MqTopic;
@@ -28,7 +27,7 @@ import com.hp.sh.rocketmq.impl.EndpointContext;
 
 @Configuration
 public class OrderlyConsumer {
-	private static final Logger logger = LoggerFactory.getLogger(ExpMvcConfig.class);
+	private static final Logger logger = LoggerFactory.getLogger(OrderlyConsumer.class);
 	
 	@Autowired
 	private RocketmqServerSetting setting;

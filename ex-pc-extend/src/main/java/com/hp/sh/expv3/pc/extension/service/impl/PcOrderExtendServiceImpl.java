@@ -45,6 +45,16 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
+    public List<PcOrderVo> activeOrderList(Long closePosId, Long userId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("closePosId", closePosId);
+        map.put("userId", userId);
+        map.put("activeFlag",1 ); // TODO xb
+        List<PcOrderVo> pcOrderVos = pcOrderDAO.queryList(map);
+        return pcOrderVos;
+    }
+
+    @Override
     public List<PcOrderVo> findCurrentUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
@@ -57,8 +67,23 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         return pcOrderVos;
     }
 
+    /**
+     * 查询所有委托
+     * @param userId
+     * @param asset
+     * @param symbol
+     * @param orderType
+     * @param longFlag
+     * @param closeFlag
+     * @param lastOrderId
+     * @param currentPage
+     * @param pageSize
+     * @param nextPage
+     * @param isTotalNumber
+     * @return
+     */
     @Override
-    public PageResult<PcOrderVo> queryOrders(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber) {
+    public PageResult<PcOrderVo> queryAllOrders(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber) {
         PageResult<PcOrderVo> result=new  PageResult<PcOrderVo>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
@@ -83,6 +108,32 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         return result;
     }
 
+    @Override
+    public PageResult<PcOrderVo> queryHistoryOrders(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber) {
+        PageResult<PcOrderVo> result=new  PageResult<PcOrderVo>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("orderType", orderType);
+        map.put("longFlag", longFlag);
+        map.put("closeFlag", closeFlag);
+        map.put("activeFlag", 0);
+
+        if(isTotalNumber==null){
+            map.put("pageSize", pageSize);
+            map.put("lastOrderId", lastOrderId);
+            map.put("currentPage", currentPage);
+            map.put("nextPage", nextPage);
+
+        }else  if(isTotalNumber==1){
+            Long count = pcOrderDAO.queryCount(map);
+            result.setRowTotal(count);
+        }
+        List<PcOrderVo> pcOrderVos = pcOrderDAO.queryOrders(map);
+        result.setList(pcOrderVos);
+        return result;
+    }
 
     @Override
     public PcOrderVo getPcOrder(Long orderId, String asset, String symbol, Long userId) {
@@ -133,6 +184,21 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         return result;
     }
 
+    /**
+     * 查询用户活动委托
+     * @param userId
+     * @param asset
+     * @param symbol
+     * @param orderType
+     * @param longFlag
+     * @param closeFlag
+     * @param lastOrderId
+     * @param currentPage
+     * @param pageSize
+     * @param nextPage
+     * @param isTotalNumber
+     * @return
+     */
     @Override
     public PageResult<PcOrderVo> queryUserActivityOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber) {
         PageResult<PcOrderVo> result=new  PageResult<PcOrderVo>();
@@ -143,6 +209,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("orderType", orderType);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
+        map.put("activeFlag", 1);
 
         if(isTotalNumber==null){
             map.put("pageSize", pageSize);

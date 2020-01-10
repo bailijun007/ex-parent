@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
@@ -15,6 +16,9 @@ import com.hp.sh.expv3.utils.BidUtils;
 
 @RestController
 public class PcOrderApiAction implements PcOrderApi {
+
+	@Autowired
+	private PcAccountCoreService pcAccountCoreService;
 	
 	@Autowired
 	private PcOrderService pcOrderService;
@@ -83,6 +87,13 @@ public class PcOrderApiAction implements PcOrderApi {
 		msg.setAsset(asset);
 		msg.setSymbol(symbol);
 		this.matchMqSender.sendBookResetMsg(msg);
+	}
+	
+	public BigDecimal maxOpenVolume(Long userId, String asset, String symbol, Long longFlag){
+		BigDecimal balance = this.pcAccountCoreService.getBalance(userId, asset);
+		BigDecimal singleCost = null;
+		BigDecimal v = balance.divide(singleCost);
+		return v;
 	}
 
 }

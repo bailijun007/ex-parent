@@ -21,6 +21,7 @@
 		<result column="pnl" property="pnl" />
 		<result column="remain_volume" property="remainVolume" />
 		<result column="match_tx_id" property="matchTxId" />
+		<result column="tx_id" property="txId" />
 		<result column="user_id" property="userId" />
 		<result column="id" property="id" />
 		<result column="created" property="created" />
@@ -28,7 +29,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		asset,symbol,price,volume,trade_sn,trade_id,pos_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,pnl,remain_volume,match_tx_id,user_id,id,created,modified
+		asset,symbol,price,volume,trade_sn,trade_id,pos_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,pnl,remain_volume,match_tx_id,tx_id,user_id,id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -113,9 +114,9 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into pc_order_trade (
-			asset,symbol,price,volume,trade_sn,trade_id,pos_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,pnl,remain_volume,match_tx_id,user_id,id,created,modified
+			asset,symbol,price,volume,trade_sn,trade_id,pos_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,pnl,remain_volume,match_tx_id,tx_id,user_id,id,created,modified
 		)values(
-			#{asset},#{symbol},#{price},#{volume},#{tradeSn},#{tradeId},#{posId},#{orderId},#{makerFlag},#{tradeTime},#{feeCollectorId},#{feeRatio},#{fee},#{pnl},#{remainVolume},#{matchTxId},#{userId},#{id},#{created},#{modified}
+			#{asset},#{symbol},#{price},#{volume},#{tradeSn},#{tradeId},#{posId},#{orderId},#{makerFlag},#{tradeTime},#{feeCollectorId},#{feeRatio},#{fee},#{pnl},#{remainVolume},#{matchTxId},#{txId},#{userId},#{id},#{created},#{modified}
 		)
 	</insert>
 	
@@ -123,7 +124,7 @@
 		update 
 			pc_order_trade
 		set 
-			asset=#{asset},symbol=#{symbol},price=#{price},volume=#{volume},trade_sn=#{tradeSn},trade_id=#{tradeId},pos_id=#{posId},order_id=#{orderId},maker_flag=#{makerFlag},trade_time=#{tradeTime},fee_collector_id=#{feeCollectorId},fee_ratio=#{feeRatio},fee=#{fee},pnl=#{pnl},remain_volume=#{remainVolume},match_tx_id=#{matchTxId},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},price=#{price},volume=#{volume},trade_sn=#{tradeSn},trade_id=#{tradeId},pos_id=#{posId},order_id=#{orderId},maker_flag=#{makerFlag},trade_time=#{tradeTime},fee_collector_id=#{feeCollectorId},fee_ratio=#{feeRatio},fee=#{fee},pnl=#{pnl},remain_volume=#{remainVolume},match_tx_id=#{matchTxId},tx_id=#{txId},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>

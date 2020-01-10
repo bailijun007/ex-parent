@@ -9,7 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * @author BaiLiJun  on 2020/1/2
@@ -62,16 +67,22 @@ public class PcTradeExtendApiAction implements PcTradeExtendApi {
         if (null == startTime || endTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        List<PcTradeVo> pcTradeVo = pcTradeExtendService.selectTradeListByTimeInterval(asset, symbol, startTime, endTime,null);
+        List<PcTradeVo> pcTradeVo = pcTradeExtendService.selectTradeListByTimeInterval(asset, symbol, startTime, endTime, null);
         return pcTradeVo;
     }
 
     @Override
     public List<PcTradeVo> selectTradeListByUser(String asset, String symbol, Long userId, Long startTime, Long endTime) {
-        if (null == startTime || endTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        List<PcTradeVo> pcTradeVo = pcTradeExtendService.selectTradeListByTimeInterval(asset, symbol, startTime, endTime,userId);
+
+        if(startTime==null||endTime==null){
+            endTime= Instant.now().toEpochMilli();
+            startTime = endTime - ((endTime + TimeZone.getDefault().getRawOffset()) % (24 * 60 * 60 * 1000L));
+        }
+
+        List<PcTradeVo> pcTradeVo = pcTradeExtendService.selectTradeListByTimeInterval(asset, symbol, startTime, endTime, userId);
         return pcTradeVo;
     }
 

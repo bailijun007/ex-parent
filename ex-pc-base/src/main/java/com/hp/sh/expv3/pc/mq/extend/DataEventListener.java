@@ -12,6 +12,7 @@ import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
+import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
 import com.hp.sh.expv3.pc.msg.EventMsg;
 import com.hp.sh.expv3.pc.msg.EventType;
 import com.hp.sh.expv3.pc.msg.OrderEventMsg;
@@ -41,6 +42,7 @@ public class DataEventListener {
 		orderMsg.setMakerFlag(orderTrade.getMakerFlag());
 		orderMsg.setTradeAmt(orderTrade.getVolume());
 		orderMsg.setTradeMatchId(""+orderTrade.getMatchTxId());
+		orderMsg.setExecId(""+orderTrade.getTxId());
 		this.sendEventMsg(orderMsg);
 		
 		EventMsg posMsg = new EventMsg(EventType.POS, orderTrade.getPosId(), orderTrade.getCreated(), orderTrade.getUserId(), orderTrade.getAsset(), orderTrade.getSymbol());
@@ -49,17 +51,18 @@ public class DataEventListener {
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void afterCommit(PcLiqRecord liqRecord) {
-		EventMsg msg = new EventMsg(EventType.ORDER, liqRecord.getPosId(), liqRecord.getCreated(), liqRecord.getUserId(), liqRecord.getAsset(), liqRecord.getSymbol());
+		EventMsg msg = new EventMsg(EventType.POS, liqRecord.getPosId(), liqRecord.getCreated(), liqRecord.getUserId(), liqRecord.getAsset(), liqRecord.getSymbol());
 		this.sendEventMsg(msg);
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(PcOrder order) {
+	public void afterCommit(PcOrderEvent orderEvent) {
+		PcOrder order = orderEvent.getPcOrder();
 		EventMsg msg = new EventMsg(EventType.ORDER, order.getId(), order.getCreated(), order.getUserId(), order.getAsset(), order.getSymbol());
 		this.sendEventMsg(msg);
 		
 		if(order.getClosePosId()!=null && order.getClosePosId()!=0){
-			EventMsg msg2 = new EventMsg(EventType.ORDER, order.getClosePosId(), order.getCreated(), order.getUserId(), order.getAsset(), order.getSymbol());
+			EventMsg msg2 = new EventMsg(EventType.POS, order.getClosePosId(), order.getCreated(), order.getUserId(), order.getAsset(), order.getSymbol());
 			this.sendEventMsg(msg2);
 		}
 	}

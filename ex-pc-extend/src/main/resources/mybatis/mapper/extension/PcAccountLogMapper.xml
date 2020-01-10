@@ -24,6 +24,7 @@
                     #{assetList[${i}]}
                 </foreach>
             </if>
+            <if test="id!=null">and id=#{id}</if>
             <if test="type!=null">and `type`=#{type}</if>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
@@ -35,13 +36,13 @@
     </sql>
 
     <sql id="Base_Column_List" >
-		`type`,user_id,asset,symbol,ref_id,`time`
+		id,`type`,user_id,asset,symbol,ref_id,`time`
 	</sql>
 
     <insert id="save">
         insert into pc_account_log
-        (`type`,user_id,asset,symbol,ref_id,`time`)
-        values(#{id},#{userId},#{asset},#{symbol},#{refId},#{time})
+        (`type`,user_id,asset,ref_id,`time`,symbol)
+        values(#{type},#{userId},#{asset},#{refId},#{time},#{symbol})
     </insert>
 
     <select id="queryOne" resultMap="PcAccountLogVo">

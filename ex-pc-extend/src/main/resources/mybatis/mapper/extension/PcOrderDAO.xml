@@ -188,7 +188,10 @@
         <include refid="Base_Column_List"/>
         from pc_order
         <where>
-            active_flag=1
+
+            <if test="activeFlag!=null">
+                and active_flag=#{activeFlag}
+            </if>
             <if test="userId!=null">
                 and user_id=#{userId}
             </if>
@@ -220,7 +223,7 @@
                 </when>
                 <otherwise>
                     ORDER BY id desc
-                    LIMIT 0,${pageSize}
+
                 </otherwise>
             </choose>
         </where>
@@ -232,8 +235,11 @@
         <include refid="Base_Column_List"/>
         from pc_order
         <where>
+            <if test="activeFlag!=null">
+                and active_flag=#{activeFlag}
+            </if>
             <if test="userId!=null">
-                user_id=#{userId}
+                and user_id=#{userId}
             </if>
             <if test="asset!=null and asset!=''">
                 and asset=#{asset}

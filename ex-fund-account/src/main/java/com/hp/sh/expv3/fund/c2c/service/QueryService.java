@@ -37,9 +37,12 @@ public class QueryService {
      * @param id        主键id
      * @return
      */
-    public PageResult<C2cOrderVo> pageQueryByPayStatus(Integer payStatus, Integer nextPage, Integer pageSize, Long id,Long userId) {
+    public PageResult<C2cOrderVo> pageQueryByPayStatus(Integer payStatus, Integer nextPage, Integer pageSize, Long id, Long userId) {
         PageResult<C2cOrderVo> pageResult = new PageResult<>();
-        List<C2cOrderVo> orderList = c2cOrderDAO.pageQueryByPayStatus(payStatus, nextPage, pageSize, id,userId);
+        if (null == pageSize) {
+            pageSize = 20;
+        }
+        List<C2cOrderVo> orderList = c2cOrderDAO.pageQueryByPayStatus(payStatus, nextPage, pageSize, id, userId);
         Map<String, Object> map = new HashMap<>();
         map.put("payStatus", payStatus);
         map.put("userId", userId);

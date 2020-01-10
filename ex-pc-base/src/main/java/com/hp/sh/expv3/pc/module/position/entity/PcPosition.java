@@ -1,7 +1,3 @@
-/**
- * @author zw
- * @date 2019/7/19
- */
 package com.hp.sh.expv3.pc.module.position.entity;
 
 import java.math.BigDecimal;
@@ -10,6 +6,8 @@ import com.hp.sh.expv3.base.entity.UserDataEntity;
 
 /**
  * 永续合约_仓位
+ * @author wangjg
+ *
  */
 public class PcPosition extends UserDataEntity {
 

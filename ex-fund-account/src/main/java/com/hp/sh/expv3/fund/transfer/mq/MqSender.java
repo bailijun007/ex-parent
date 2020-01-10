@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.hp.sh.expv3.fund.transfer.constant.MQConstant;
+import com.hp.sh.expv3.fund.transfer.mq.msg.NewTransfer;
 
 @Component
 public class MqSender {
@@ -28,11 +29,11 @@ public class MqSender {
 	public MqSender() {
 	}
 	
-	public void send(Object msg){
+	public void sendMsg(NewTransfer msg){
 		try{
 			String json = JsonUtils.toJson(msg);
 	        byte[] msgBuff = json.getBytes(RemotingHelper.DEFAULT_CHARSET);
-			Message mqMsg = new Message(MQConstant.TRANSFER, msg.getClass().getSimpleName(), msgBuff);
+			Message mqMsg = new Message(MQConstant.TOPIC_TRANSFER, msg.getClass().getSimpleName(), msgBuff);
 	        SendResult sendResult = producer().send(mqMsg);
 	        System.out.printf("%s%n", sendResult);
 		}catch(Exception e){

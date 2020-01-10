@@ -17,10 +17,13 @@ public interface PcOrderExtendService {
     BigDecimal getGrossMargin( Long userId,String asset);
 
     List<PcOrderVo> orderList(Long closePosId, Long userId);
+    List<PcOrderVo> activeOrderList(Long closePosId, Long userId);
 
     List<PcOrderVo> findCurrentUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag);
 
-    PageResult<PcOrderVo> queryOrders(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber);
+    PageResult<PcOrderVo> queryAllOrders(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber);
+
+    PageResult<PcOrderVo> queryHistoryOrders(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber);
 
     PcOrderVo getPcOrder(Long orderId, String asset, String symbol, Long userId);
 

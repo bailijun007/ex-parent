@@ -1,18 +1,15 @@
-/**
- * @author zw
- * @date 2019/7/19
- */
 package com.hp.sh.expv3.pc.module.order.entity;
 
 
 import java.math.BigDecimal;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
+import com.hp.sh.expv3.pc.strategy.data.OrderData;
 
 /**
  * 永续合约_订单（委托）
  */
-public class PcOrder extends UserDataEntity{
+public class PcOrder extends UserDataEntity implements OrderData{
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -174,7 +171,11 @@ public class PcOrder extends UserDataEntity{
 
     public PcOrder() {
 	}
-
+    
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
 	public String getAsset() {
 		return asset;
 	}

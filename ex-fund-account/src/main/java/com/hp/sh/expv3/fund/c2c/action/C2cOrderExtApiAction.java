@@ -7,8 +7,10 @@ import com.hp.sh.expv3.fund.c2c.component.PLPayService;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
 import com.hp.sh.expv3.fund.c2c.service.QueryService;
 import com.hp.sh.expv3.fund.extension.api.C2cOrderExtApi;
+import com.hp.sh.expv3.fund.extension.api.FundAccountExtApi;
 import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import com.hp.sh.expv3.fund.extension.vo.C2cOrderVo;
+import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -36,6 +38,9 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
     @Autowired
     private PLPayService plPayService;
 
+    @Autowired
+    private FundAccountExtApi fundAccountExtApi;
+
     /**
      * 通过支付状态分页查询c2c订单，不传则查全部
      *
@@ -54,18 +59,41 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
     }
 
     /**
-     *    * @param userId      用户id
-     *      * @param ratio       USD/CNY 汇率 例如： USD/CNY = 7.0298
-     *      * @param srcCurrency 支付币种 例如：
-     *      * @param tarCurrency 兑换币种
-     *      * @param fabiAmt     法定货币总金额
-     *      * @param tarVolume   兑换成资产数量
+     * * @param userId      用户id
+     * * @param ratio       USD/CNY 汇率 例如： USD/CNY = 7.0298
+     * * @param srcCurrency 支付币种 例如：
+     * * @param tarCurrency 兑换币种
+     * * @param fabiAmt     法定货币总金额
+     * * @param tarVolume   兑换成资产数量
+     *
      * @return
      */
     @Override
     public String create(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal tarVolume, BigDecimal fabiAmt) {
         String url = plPayService.rujin(userId, ratio, srcCurrency, tarCurrency, tarVolume, fabiAmt);
         return url;
+    }
+
+    /**
+     * 创建c2c体现订单
+     *
+     * @param userId         用户id
+     * @param bank           开户银行
+     * @param bankCardName   银行卡收款姓名
+     * @param targetAssetNum 资产出金数量
+     * @param fabiAmount     出金金额（法币）
+     * @param targetAsset    兑换资产
+     * @param sourceAsset    原资产
+     * @return
+     */
+    @Override
+    public String withdrawalOrder(Long userId, String bank, String bankCardName, BigDecimal targetAssetNum, BigDecimal fabiAmount, String targetAsset, String sourceAsset) {
+        //获取资产账户
+        CapitalAccountVo account = fundAccountExtApi.getCapitalAccount(userId, targetAsset);
+
+
+
+        return null;
     }
 
 

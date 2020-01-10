@@ -72,7 +72,9 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
 
     @Override
     public PageResult<UserOrderVo> queryUserActivityOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer isTotalNumber, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
-        checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
+        if (StringUtils.isEmpty(asset) || null == userId || currentPage == null || pageSize == null || nextPage == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
         PageResult<UserOrderVo> result = new PageResult<>();
         List<UserOrderVo> list = new ArrayList<>();
         PageResult<PcOrderVo> voList = pcOrderExtendService.queryUserActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,isTotalNumber);
@@ -98,7 +100,10 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                 vo.setQty(orderVo.getVolume());
                 vo.setLongFlag(orderVo.getLongFlag());
                 vo.setCtime(orderVo.getCreated());
-                //平均价 暂时写死，后期掉老王接口
+
+//                BigDecimal avgPrice = pcPositionExtendService.getAvgPrice(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymbol());
+//                vo.setAvgPrice(avgPrice);
+                // TODO 需要调老王接口
                 vo.setAvgPrice(BigDecimal.ZERO);
                 vo.setFilledQty(orderVo.getFilledVolume());
                 vo.setCloseFlag(orderVo.getCloseFlag());
@@ -112,21 +117,49 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     }
 
 
+    /**
+     * 获取当前用户历史委托
+     * @param userId
+     * @param asset
+     * @param symbol
+     * @param orderType
+     * @param longFlag
+     * @param closeFlag
+     * @param currentPage
+     * @param pageSize
+     * @param lastOrderId
+     * @param nextPage
+     * @return
+     */
     @Override
     public List<UserOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
-        PageResult<PcOrderVo> list = pcOrderExtendService.queryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
+        PageResult<PcOrderVo> list = pcOrderExtendService.queryHistoryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
         convertOrderList(result, list.getList());
         return result;
     }
 
 
+    /**
+     * 获取当前用户所有委托
+     * @param userId
+     * @param asset
+     * @param symbol
+     * @param status
+     * @param longFlag
+     * @param closeFlag
+     * @param currentPage
+     * @param pageSize
+     * @param lastOrderId
+     * @param nextPage
+     * @return
+     */
     @Override
     public List<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
-        PageResult<PcOrderVo> list = pcOrderExtendService.queryOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
+        PageResult<PcOrderVo> list = pcOrderExtendService.queryAllOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
         convertOrderList(result, list.getList());
         return result;
     }

@@ -32,7 +32,7 @@ public class WithDrawalSender {
 		try{
 			String json = JsonUtils.toJson(msg);
 	        byte[] msgBuff = json.getBytes(RemotingHelper.DEFAULT_CHARSET);
-			Message mqMsg = new Message(MQConstant.WITHDRAWAL, msg.getClass().getSimpleName(), msgBuff);
+			Message mqMsg = new Message(MQConstant.TOPIC_WITHDRAWAL, msg.getClass().getSimpleName(), msgBuff);
 	        SendResult sendResult = producer().send(mqMsg);
 	        System.out.printf("%s%n", sendResult);
 		}catch(Exception e){
