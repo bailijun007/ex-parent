@@ -19,12 +19,12 @@ import com.hp.sh.expv3.pc.msg.PcAccountLog;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
-@MQListener(topic = MsgConstant.EVENT_TOPIC, orderly = MQListener.ORDERLY_YES)
 public class EventMqConsumer {
     private static final Logger logger = LoggerFactory.getLogger(EventMqConsumer.class);
     @Autowired
     private PcAccountLogExtendService pcAccountLogExtendService;
 
+    @MQListener(topic = MsgConstant.EVENT_TOPIC, orderly = MQListener.ORDERLY_YES)
     public void handleMsg(PcAccountLog msg) {
         logger.info("收到消息:{}", msg);
         Optional<PcAccountLog> optional = Optional.ofNullable(msg);
