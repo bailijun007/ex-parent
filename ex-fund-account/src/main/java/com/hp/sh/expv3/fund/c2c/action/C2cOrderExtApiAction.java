@@ -68,5 +68,22 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         return url;
     }
 
+    /**
+     * 创建c2c体现订单
+     * @param userId 用户id
+     * @param bank 开户银行
+     * @param bankCardName 银行卡收款姓名
+     * @param targetAssetNum  资产出金数量
+     * @param fabiAmount 出金金额（法币）
+     * @param targetAsset 兑换资产
+     * @param sourceAsset 原资产
+     * @return
+     */
+    @Override
+    public String withdrawalOrder(Long userId, String bank, String bankCardName, BigDecimal targetAssetNum, BigDecimal fabiAmount, String targetAsset, String sourceAsset) {
+
+        return null;
+    }
+
 
 }

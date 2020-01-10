@@ -113,8 +113,10 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
                 BigDecimal pnl = ps.calcPnl(positionVo.getLongFlag(), positionVo.getVolume().multiply(positionVo.getFaceValue()), positionVo.getMeanPrice(), markPrice);
                 currentPositionVo.setPnl(pnl);
 
-                BigDecimal posMarginRatio = ps.calPosMarginRatio(positionVo.getPosMargin(), pnl, positionVo.getFaceValue(), positionVo.getVolume(), markPrice);
-                currentPositionVo.setPosMarginRatio(posMarginRatio);
+                if (positionVo.getVolume().compareTo(BigDecimal.ZERO) != 0 && positionVo.getFaceValue().compareTo(BigDecimal.ZERO) != 0) {
+                    BigDecimal posMarginRatio = ps.calPosMarginRatio(positionVo.getPosMargin(), pnl, positionVo.getFaceValue(), positionVo.getVolume(), markPrice);
+                    currentPositionVo.setPosMarginRatio(posMarginRatio);
+                }
 
                 result.add(currentPositionVo);
             }
