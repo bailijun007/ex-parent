@@ -100,8 +100,11 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                 vo.setQty(orderVo.getVolume());
                 vo.setLongFlag(orderVo.getLongFlag());
                 vo.setCtime(orderVo.getCreated());
-                BigDecimal avgPrice = pcPositionExtendService.getAvgPrice(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymbol());
-                vo.setAvgPrice(avgPrice);
+
+//                BigDecimal avgPrice = pcPositionExtendService.getAvgPrice(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymbol());
+//                vo.setAvgPrice(avgPrice);
+                // TODO 需要调老王接口
+                vo.setAvgPrice(BigDecimal.ZERO);
                 vo.setFilledQty(orderVo.getFilledVolume());
                 vo.setCloseFlag(orderVo.getCloseFlag());
                 vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros());
