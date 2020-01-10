@@ -41,8 +41,8 @@
 
     <insert id="save">
         insert into pc_account_log
-        (`type`,user_id,asset,ref_id,`time`)
-        values(#{type},#{userId},#{asset},#{refId},#{time})
+        (`type`,user_id,asset,ref_id,`time`,symbol)
+        values(#{type},#{userId},#{asset},#{refId},#{time},#{symbol})
     </insert>
 
     <select id="queryOne" resultMap="PcAccountLogVo">
