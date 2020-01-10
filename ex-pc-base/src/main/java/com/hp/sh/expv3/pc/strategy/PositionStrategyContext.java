@@ -161,6 +161,13 @@ public class PositionStrategyContext {
 		return tradeResult;
 	}
 	
+	public BigDecimal calcMaxOpenVolume(String asset, String symbol, Long longFlag, BigDecimal balance){
+		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(asset, symbol);
+		BigDecimal singleCost = null;
+		BigDecimal v = balance.divide(singleCost);
+		return v;
+	}
+	
 	public HoldPosStrategy getHoldPosStrategy(String asset, String symbol){
 		Integer strategyId = this.genStrategyId(asset, symbol);
 		StrategyBundle sb = strategyBundleMap.get(strategyId);
@@ -173,7 +180,7 @@ public class PositionStrategyContext {
 	}
 	
 	@Autowired(required=false)
-	public void setBundleList(List<StrategyBundle> bundleList){
+	private void setBundleList(List<StrategyBundle> bundleList){
 		for(StrategyBundle sb : bundleList){
 			this.strategyBundleMap.put(sb.strategyId(), sb);
 		}

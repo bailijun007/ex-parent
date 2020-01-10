@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
@@ -62,6 +63,7 @@ public class PcLiqService {
     @Autowired
     private ApplicationEventPublisher publisher;
 
+    @LockIt(key="${pos.userId}-${pos.asset}-${pos.symbol}")
 	public LiqHandleResult handleLiq(PcPosition pos) {
 		LiqHandleResult liqResult = new LiqHandleResult();
 		
@@ -119,6 +121,7 @@ public class PcLiqService {
 		this.pcPositionDAO.update(pos);
 	}
 
+	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list, Integer lastFlag) {
 		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(!pos.getId().equals(posId)){
@@ -137,7 +140,7 @@ public class PcLiqService {
 		
 		//取消订单
 		for(CancelOrder co : list){
-			this.pcOrderService.cancel(userId, asset, symbol, co.getOrderId(), co.getCancelNumber());
+			this.pcOrderService.cance4Liq(userId, asset, symbol, co.getOrderId(), co.getCancelNumber());
 		}
 		
 		//强平

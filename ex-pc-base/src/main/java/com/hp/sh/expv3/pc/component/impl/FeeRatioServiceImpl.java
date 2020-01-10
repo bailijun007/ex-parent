@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -23,6 +25,7 @@ import com.hp.sh.expv3.utils.math.Precision;
 @Primary
 @Component
 public class FeeRatioServiceImpl implements FeeRatioService {
+	private static final Logger logger = LoggerFactory.getLogger(FeeRatioServiceImpl.class);
 
     @Resource(name = "templateDB0")
     private StringRedisTemplate templateDB0;
@@ -87,12 +90,16 @@ public class FeeRatioServiceImpl implements FeeRatioService {
         String hashKey = asset + "__" + symbol;
         Object s = hashOperations.get(RedisKey.PC_POS_LEVEL, hashKey);
         if (null != s) {
-            List<PosLevelVo> voList = JSON.parseArray(s.toString(), PosLevelVo.class);
-            Optional<BigDecimal> first = voList.stream().filter(vo -> vo.getMinAmt().compareTo(volume) <= 0 && vo.getMaxAmt().compareTo(volume) >= 0)
-                    .map(PosLevelVo::getMinHoldMarginRatio).findFirst();
-            return first.orElse(BigDecimal.ZERO);
+        	try{
+	            List<PosLevelVo> voList = JSON.parseArray(s.toString(), PosLevelVo.class);
+	            Optional<BigDecimal> first = voList.stream().filter(vo -> vo.getMinAmt().compareTo(volume) <= 0 && vo.getMaxAmt().compareTo(volume) >= 0)
+	                    .map(PosLevelVo::getMinHoldMarginRatio).findFirst();
+	            return first.orElse(BigDecimal.ZERO);
+        	}catch(Exception e){
+        		logger.error("获取保证金率失败：{}, {},{},{}", userId, asset, symbol, volume, e);
+        		throw new RuntimeException(e);
+        	}
         }
-
 
         return BigDecimal.ZERO;
     }

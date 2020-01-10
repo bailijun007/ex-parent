@@ -302,22 +302,23 @@ public class PcOrderService {
 		
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
 		
-		this.canCancel(order);
+		this.canCancel(order, orderId);
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
 			PcPosition pos = this.pcPositionService.getPosition(userId, asset, symbol, order.getClosePosId());
 			this.checkLiqStatus(pos);	
 		}
 
-		long count = this.pcOrderDAO.updateCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now);
+		long count = this.pcOrderDAO.updateCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
 		
-		if(count!=1){
-			throw new RuntimeException("更新失败，更新行数："+count);
+		if(count==0){
+			logger.warn("撤单更新失败，orderId={}", orderId);
 		}
 	}
 	
-	private boolean canCancel(PcOrder order){
+	private boolean canCancel(PcOrder order, Long orderId){
 		if(order==null){
-			throw new ExException(CommonError.OBJ_DONT_EXIST);
+			logger.error("订单不存在：orderId={}", orderId);
+			return false;
 		}
 		if(order.getStatus() == OrderStatus.CANCELED){
 			return false;
@@ -333,6 +334,15 @@ public class PcOrderService {
 		}
 		return true;
 	}
+
+	@LockIt(key="${userId}-${asset}-${symbol}")
+	public void cancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
+		this.doCancel(userId, asset, symbol, orderId, number);
+	}
+	
+	public void cance4Liq(long userId, String asset, String symbol, long orderId, BigDecimal number){
+		this.doCancel(userId, asset, symbol, orderId, number);
+	}
 	
 	/**
 	 * 撤销委托
@@ -341,25 +351,30 @@ public class PcOrderService {
 	 * @param orderId 订单ID
 	 * @param number 撤几张合约
 	 */
-	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void cancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
+	private void doCancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		if(order==null){
+			logger.error("订单不存在:orderId={}", orderId);
+			return;
+		}
 		if(order.getStatus() == OrderStatus.CANCELED){
 			logger.warn("订单已经是取消状态了");
 			return;
 		}
 		
-		if(!this.canCancel(order)){
+		if(!this.canCancel(order, orderId)){
 			return;
 		}
+
+		BigDecimal remaining = order.getVolume().subtract(order.getFilledVolume());
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN){
 			//返还余额
-			if(BigUtils.ne(order.getVolume().subtract(order.getFilledVolume()), number)){
-				throw new ExException(PcOrderError.CANCELED_NUM_ERR);
+			if(number!=null && BigUtils.ne(remaining, number)){
+				logger.warn("取消数量不一致：{},{}", remaining, number);
 			}
 			
-			OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, number);
+			OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, remaining);
 			
 			BigDecimal cancelledGrossFee = ratioData.getGrossMargin();
 			
@@ -374,7 +389,7 @@ public class PcOrderService {
 		//修改订单状态（撤销）
 		Long now = DbDateUtils.now();
 		order.setCancelTime(now);
-		order.setCancelVolume(number);
+		order.setCancelVolume(remaining);
 		order.setActiveFlag(PcOrder.NO);
 		order.setStatus(OrderStatus.CANCELED);
 		
