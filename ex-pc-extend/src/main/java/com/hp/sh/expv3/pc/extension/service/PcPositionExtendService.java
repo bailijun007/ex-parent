@@ -41,5 +41,5 @@ public interface PcPositionExtendService {
 
     PageResult<PcPositionVo> pageQueryPositionList(Long userId, String asset, String symbol, Long posId, Integer liqStatus, Integer pageNo, Integer pageSize);
 
-    List<PcPositionVo> findPositionList(Long userId, String asset, String symbol);
+    List<PcPositionVo> findActivePosition(Long userId, String asset, String symbol);
 }

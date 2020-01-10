@@ -61,7 +61,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         List<CurrentPositionVo> result = new ArrayList<>();
-        List<PcPositionVo> list = pcPositionExtendService.findPositionList(userId, asset, symbol);
+        List<PcPositionVo> list = pcPositionExtendService.findActivePosition(userId, asset, symbol);
         this.convertPositionList(result, list);
 
         return result;

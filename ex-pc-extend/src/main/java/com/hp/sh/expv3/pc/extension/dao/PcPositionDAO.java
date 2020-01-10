@@ -18,4 +18,6 @@ public interface PcPositionDAO {
     PcPositionVo queryOne(Map<String,Object> map);
 
     List<PcPositionVo> queryList(Map<String,Object> map);
+
+    List<PcPositionVo> queryActivePosition(Map<String,Object> map);
 }
