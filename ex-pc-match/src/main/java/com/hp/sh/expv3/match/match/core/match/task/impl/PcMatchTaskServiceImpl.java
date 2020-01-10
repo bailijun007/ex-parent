@@ -30,30 +30,32 @@ public class PcMatchTaskServiceImpl implements PcMatchTaskService, ApplicationCo
     }
 
     @Override
-    public PcOrderNewTask buildPcOrderNewTask(String assetSymbol, String asset, String symbol, long currentOffset, PcOrder4MatchBo order) {
+    public PcOrderNewTask buildPcOrderNewTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId, PcOrder4MatchBo order) {
         PcOrderNewTask task = applicationContext.getBean(PcOrderNewTask.class);
         task.setAssetSymbol(assetSymbol);
         task.setAsset(asset);
         task.setSymbol(symbol);
         task.setPriority(MatchTaskConst.PRIORITY_ORDER_PENDING_NEW);
         task.setCurrentMsgOffset(currentOffset);
+        task.setCurrentMsgId(currentMsgId);
         task.setOrder(order);
         return task;
     }
 
     @Override
-    public PcOrderBookResetTask buildPcOrderBookReset(String assetSymbol, String asset, String symbol, long currentOffset) {
+    public PcOrderBookResetTask buildPcOrderBookReset(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId) {
         PcOrderBookResetTask task = applicationContext.getBean(PcOrderBookResetTask.class);
         task.setPriority(MatchTaskConst.PRIORITY_ORDER_BOOK_RESET);
         task.setAssetSymbol(assetSymbol);
         task.setAsset(asset);
         task.setSymbol(symbol);
         task.setCurrentMsgOffset(currentOffset);
+        task.setCurrentMsgId(currentMsgId);
         return task;
     }
 
     @Override
-    public PcOrderCancelTask buildPcOrderCancelTask(String assetSymbol, String asset, String symbol, long currentOffset, long accountId, long orderId) {
+    public PcOrderCancelTask buildPcOrderCancelTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId, long accountId, long orderId) {
         PcOrderCancelTask task = applicationContext.getBean(PcOrderCancelTask.class);
         task.setAssetSymbol(assetSymbol);
         task.setAsset(asset);
@@ -62,11 +64,12 @@ public class PcMatchTaskServiceImpl implements PcMatchTaskService, ApplicationCo
         task.setOrderId(orderId);
         task.setPriority(MatchTaskConst.PRIORITY_ORDER_PENDING_CANCEL);
         task.setCurrentMsgOffset(currentOffset);
+        task.setCurrentMsgId(currentMsgId);
         return task;
     }
 
     @Override
-    public PcOrderCancel4LiqTask buildPcOrderCancelByLiqTask(String assetSymbol, String asset, String symbol, long currentOffset, PcPosLockedMqMsgDto msg) {
+    public PcOrderCancel4LiqTask buildPcOrderCancelByLiqTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId, PcPosLockedMqMsgDto msg) {
         PcOrderCancel4LiqTask task = applicationContext.getBean(PcOrderCancel4LiqTask.class);
         task.setAssetSymbol(assetSymbol);
         task.setAsset(asset);
@@ -74,28 +77,31 @@ public class PcMatchTaskServiceImpl implements PcMatchTaskService, ApplicationCo
         task.setMsg(msg);
         task.setPriority(MatchTaskConst.PRIORITY_ORDER_CANCEL_BY_LIQ);
         task.setCurrentMsgOffset(currentOffset);
+        task.setCurrentMsgId(currentMsgId);
         return task;
     }
 
     @Override
-    public PcOrderSnapshotCreateTask buildOrderSnapshotTask(String assetSymbol, String asset, String symbol, long currentOffset) {
+    public PcOrderSnapshotCreateTask buildOrderSnapshotTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId) {
         PcOrderSnapshotCreateTask task = applicationContext.getBean(PcOrderSnapshotCreateTask.class);
         task.setAssetSymbol(assetSymbol);
         task.setAsset(asset);
         task.setSymbol(symbol);
         task.setPriority(MatchTaskConst.PRIORITY_ORDER_INIT);
         task.setCurrentMsgOffset(currentOffset);
+        task.setCurrentMsgId(currentMsgId);
         return task;
     }
 
     @Override
-    public PcOrderRebaseTask buildOrderRebaseTask(String assetSymbol, String asset, String symbol, long currentOffset) {
+    public PcOrderRebaseTask buildOrderRebaseTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId) {
         PcOrderRebaseTask task = applicationContext.getBean(PcOrderRebaseTask.class);
         task.setAssetSymbol(assetSymbol);
         task.setAsset(asset);
         task.setSymbol(symbol);
         task.setPriority(MatchTaskConst.PRIORITY_ORDER_INIT);
         task.setCurrentMsgOffset(currentOffset);
+        task.setCurrentMsgId(currentMsgId);
         return task;
     }
 

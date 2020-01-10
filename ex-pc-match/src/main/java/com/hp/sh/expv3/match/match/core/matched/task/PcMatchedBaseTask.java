@@ -24,6 +24,15 @@ public abstract class PcMatchedBaseTask extends BaseTask {
     private String symbol;
     private Long currentMsgOffset;
     private BigDecimal lastPrice;
+    private String currentMsgId;
+
+    public String getCurrentMsgId() {
+        return currentMsgId;
+    }
+
+    public void setCurrentMsgId(String currentMsgId) {
+        this.currentMsgId = currentMsgId;
+    }
 
     private IThreadWorker matchedThreadWorker;
 

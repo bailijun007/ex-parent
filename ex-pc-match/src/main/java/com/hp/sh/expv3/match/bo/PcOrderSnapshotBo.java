@@ -13,7 +13,15 @@ public class PcOrderSnapshotBo {
     private List<PcOrder4MatchBo> limitBidOrders;
 
     private BigDecimal lastPrice;
-    private Long rmqNextOffset;
+    private Long rmqCurrentOffset;
+
+    public Long getRmqCurrentOffset() {
+        return rmqCurrentOffset;
+    }
+
+    public void setRmqCurrentOffset(Long rmqCurrentOffset) {
+        this.rmqCurrentOffset = rmqCurrentOffset;
+    }
 
     public List<PcOrder4MatchBo> getLimitAskOrders() {
         return limitAskOrders;
@@ -39,11 +47,4 @@ public class PcOrderSnapshotBo {
         this.lastPrice = lastPrice;
     }
 
-    public Long getRmqNextOffset() {
-        return rmqNextOffset;
-    }
-
-    public void setRmqNextOffset(Long rmqNextOffset) {
-        this.rmqNextOffset = rmqNextOffset;
-    }
 }

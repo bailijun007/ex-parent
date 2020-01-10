@@ -106,7 +106,7 @@ public class PcOrderCancel4LiqTask extends PcOrderBaseTask implements Applicatio
         // book 信息懒处理，交由 matched 线程处理
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
             // 加入任务中
-            pcMatchedTaskService.addMatchedOrderCancelByLiqTask(context, this.getCurrentMsgOffset(), id2OrderToCancel.values(), msg);
+            pcMatchedTaskService.addMatchedOrderCancelByLiqTask(context, this.getCurrentMsgOffset(), this.getCurrentMsgId(), id2OrderToCancel.values(), msg);
         }
     }
 

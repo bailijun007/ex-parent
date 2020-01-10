@@ -172,7 +172,7 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
             String s = pcRedisUtil.hget(snapshotRedisKey, startSnapshotOffset + "");
             PcOrderSnapshotBo snapshot = JSON.parseObject(s, PcOrderSnapshotBo.class);
             context.setLastPrice(snapshot.getLastPrice());
-            this.setCurrentMsgOffset(snapshot.getRmqNextOffset());
+            this.setCurrentMsgOffset(snapshot.getRmqCurrentOffset() + 1);
 
             List<PcOrder4MatchBo> limitAskOrders = snapshot.getLimitAskOrders();
             List<PcOrder4MatchBo> limitBidOrders = snapshot.getLimitBidOrders();

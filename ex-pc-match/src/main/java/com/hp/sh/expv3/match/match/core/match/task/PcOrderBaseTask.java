@@ -14,6 +14,15 @@ public abstract class PcOrderBaseTask extends BaseTask implements ITask {
     private String symbol;
     private String assetSymbol;
     private Long currentMsgOffset;
+    private String currentMsgId;
+
+    public String getCurrentMsgId() {
+        return currentMsgId;
+    }
+
+    public void setCurrentMsgId(String currentMsgId) {
+        this.currentMsgId = currentMsgId;
+    }
 
     @Override
     public boolean onError(Exception ex) {
