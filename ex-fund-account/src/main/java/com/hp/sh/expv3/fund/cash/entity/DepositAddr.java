@@ -1,7 +1,3 @@
-/**
- * @author zw
- * @date 2019/8/27
- */
 package com.hp.sh.expv3.fund.cash.entity;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;

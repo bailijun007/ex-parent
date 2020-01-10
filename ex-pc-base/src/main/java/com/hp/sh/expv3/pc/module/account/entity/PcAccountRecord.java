@@ -1,12 +1,9 @@
-/**
- * @author zw
- * @date 2019/7/19
- */
 package com.hp.sh.expv3.pc.module.account.entity;
 
 import java.math.BigDecimal;
 
 import com.hp.sh.expv3.base.entity.BaseRecordEntity;
+import com.hp.sh.expv3.commons.mybatis.TxId;
 
 /**
  * 永续合约_账户明细
@@ -48,6 +45,9 @@ public class PcAccountRecord extends BaseRecordEntity	 {
 
 	//关联对象的ID
 	private Long associatedId;
+
+	//事务ID
+	private Long txId;
 
 	public PcAccountRecord() {
 	}
@@ -130,6 +130,15 @@ public class PcAccountRecord extends BaseRecordEntity	 {
 
 	public void setAssociatedId(Long associatedId) {
 		this.associatedId = associatedId;
+	}
+
+	@TxId
+	public Long getTxId() {
+		return txId;
+	}
+
+	public void setTxId(Long txId) {
+		this.txId = txId;
 	}
 
 	public String toValueString() {
