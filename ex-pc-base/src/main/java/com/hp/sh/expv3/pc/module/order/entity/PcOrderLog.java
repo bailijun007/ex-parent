@@ -10,8 +10,10 @@ import com.hp.sh.expv3.commons.mybatis.TxId;
 public class PcOrderLog extends BaseRecordEntity{
 
 	public static final int TYPE_CREATE = 1;
-	public static final int TYPE_CANCEL = 2;
-	public static final int TYPE_TRADE = 3;
+	public static final int TYPE_PENDING_NEW = 2;
+	public static final int TYPE_PENDING_CANCEL = 3;
+	public static final int TYPE_CANCEL = 4;
+	public static final int TYPE_TRADE = 5;
 
 	public static final int TRIGGER_TYPE_USER = 1;
 	public static final int TRIGGER_TYPE_SYS = 2;

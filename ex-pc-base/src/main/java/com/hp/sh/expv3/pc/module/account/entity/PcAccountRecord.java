@@ -37,7 +37,10 @@ public class PcAccountRecord extends BaseRecordEntity	 {
 	//调用方支付单号
 	private String tradeNo;
 	
-	//交易类型：1-资金转入，2-资金转出，3-下订单，4-撤单，4-追加保证金，5-平仓收益
+	/*
+	 * @see PcAccountTradeType#*
+	 * 交易类型：1-资金转入，2-资金转出，3-下订单，4-撤单，4-追加保证金，5-平仓收益
+	 */
 	private Integer tradeType;
 
 	//序号 @see PcAccount#version

@@ -302,7 +302,11 @@ public class PcOrderService {
 		
 		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
 		
-		this.canCancel(order, orderId);
+		if(!this.canCancel(order, orderId)){
+			logger.info("订单无法取消：{}", order);
+			return;
+		}
+		
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
 			PcPosition pos = this.pcPositionService.getPosition(userId, asset, symbol, order.getClosePosId());
 			this.checkLiqStatus(pos);	
@@ -311,8 +315,12 @@ public class PcOrderService {
 		long count = this.pcOrderDAO.updateCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
 		
 		if(count==0){
-			logger.warn("撤单更新失败，orderId={}", orderId);
+			logger.error("撤单更新失败，orderId={}", orderId);
+			return;
 		}
+		
+		//日志
+		this.saveOrderLog(userId, orderId, PcOrderLog.TRIGGER_TYPE_USER, PcOrderLog.TYPE_PENDING_CANCEL, now);
 	}
 	
 	private boolean canCancel(PcOrder order, Long orderId){
@@ -363,6 +371,7 @@ public class PcOrderService {
 		}
 		
 		if(!this.canCancel(order, orderId)){
+			logger.info("订单无法取消：{}", order);
 			return;
 		}
 
@@ -401,7 +410,7 @@ public class PcOrderService {
 		this.pcOrderDAO.update(order);
 		
 		//日志
-		PcOrderLog orderLog = this.saveOrderLog(order.getUserId(), order.getId(), PcOrderLog.TRIGGER_TYPE_USER, PcOrderLog.TYPE_CANCEL, now);
+		PcOrderLog orderLog = this.saveOrderLog(order.getUserId(), order.getId(), PcOrderLog.TRIGGER_TYPE_SYS, PcOrderLog.TYPE_CANCEL, now);
 		
 		this.publishOrderEvent(order, orderLog);
 		
@@ -412,11 +421,12 @@ public class PcOrderService {
 	public void setPendingNew(long userId, String asset, String symbol, long orderId){
 		long now = DbDateUtils.now();
 		long count = this.pcOrderDAO.updateStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, now);
-		if(count!=1){
-//			throw new RuntimeException("更新失败，更新行数："+count);
+		if(count==0){
+			logger.error("更新失败，orderId={}", orderId);
+			return;
 		}
 		//日志
-		this.saveOrderLog(userId, orderId, PcOrderLog.TRIGGER_TYPE_USER, PcOrderLog.TYPE_CANCEL, now);
+		this.saveOrderLog(userId, orderId, PcOrderLog.TRIGGER_TYPE_SYS, PcOrderLog.TYPE_PENDING_NEW, now);
 	}
 
 	/*

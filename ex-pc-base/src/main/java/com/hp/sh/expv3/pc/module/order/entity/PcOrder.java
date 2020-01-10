@@ -432,4 +432,18 @@ public class PcOrder extends UserDataEntity implements OrderData{
 		this.liqFlag = liqFlag;
 	}
 
+	@Override
+	public String toString() {
+		return "PcOrder [asset=" + asset + ", symbol=" + symbol + ", closeFlag=" + closeFlag + ", longFlag=" + longFlag
+				+ ", leverage=" + leverage + ", volume=" + volume + ", faceValue=" + faceValue + ", price=" + price
+				+ ", orderType=" + orderType + ", timeInForce=" + timeInForce + ", marginMode=" + marginMode
+				+ ", openFeeRatio=" + openFeeRatio + ", closeFeeRatio=" + closeFeeRatio + ", marginRatio=" + marginRatio
+				+ ", clientOrderId=" + clientOrderId + ", openFee=" + openFee + ", closeFee=" + closeFee
+				+ ", orderMargin=" + orderMargin + ", grossMargin=" + grossMargin + ", status=" + status
+				+ ", activeFlag=" + activeFlag + ", remark=" + remark + ", cancelTime=" + cancelTime + ", cancelVolume="
+				+ cancelVolume + ", feeCost=" + feeCost + ", filledVolume=" + filledVolume + ", closePosId="
+				+ closePosId + ", triggerFlag=" + triggerFlag + ", visibleFlag=" + visibleFlag + ", liqFlag=" + liqFlag
+				+ ", createOperator=" + createOperator + ", cancelOperator=" + cancelOperator + "]";
+	}
+
 }
