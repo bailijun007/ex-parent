@@ -74,7 +74,7 @@ public class PcAccountExtendServiceImpl implements PcAccountExtendService {
                 list.add(extVo);
             }
         }
-        PageInfo<PcAccountExtVo> info = new PageInfo<>(list);
+        PageInfo<PcAccountVo> info = new PageInfo<>(pcAccountVos);
         pageResult.setList(list);
         pageResult.setPageNo(info.getPageNum());
         pageResult.setPageCount(info.getPages());
