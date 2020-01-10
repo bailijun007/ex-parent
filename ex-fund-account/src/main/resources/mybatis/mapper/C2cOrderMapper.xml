@@ -186,15 +186,15 @@
                 user_id=#{userId}
             </if>
             <if test="payStatus!=null">
-                pay_status=#{payStatus}
+              and   pay_status=#{payStatus}
             </if>
             <choose>
-                <when test="nextPage==1 and pageSize!=null and id!=null">
+                <when test="nextPage==1 and id!=null">
                     and id &gt; #{id}
                     ORDER BY id asc
                     LIMIT 0,${pageSize}
                 </when>
-                <when test="nextPage==-1 and pageSize!=null and id!=null">
+                <when test="nextPage==-1 and id!=null">
                     and id&lt; #{id}
                     ORDER BY id desc
                     LIMIT 0,${pageSize}

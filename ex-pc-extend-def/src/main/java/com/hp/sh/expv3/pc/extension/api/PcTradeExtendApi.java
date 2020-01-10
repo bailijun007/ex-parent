@@ -52,7 +52,7 @@ public interface PcTradeExtendApi {
     @GetMapping(value = "/api/extension/pc/trade/queryLastTradeByLtTime")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
-            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = false),
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = true)
     })
     PcTradeVo queryLastTradeByLtTime(@RequestParam(value = "asset", required = false) String asset,
@@ -74,7 +74,7 @@ public interface PcTradeExtendApi {
                                                   @RequestParam(value = "endTime") Long endTime);
 
 
-    @ApiOperation(value = "查某个时间区间某个用户的成交记录")
+    @ApiOperation(value = "查某个时间区间某个用户的成交记录(不传时间则默认查今天的数据)")
     @GetMapping(value = "/api/extension/pc/trade/selectTradeListByUser")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),

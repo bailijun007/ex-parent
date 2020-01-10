@@ -72,7 +72,9 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
 
     @Override
     public PageResult<UserOrderVo> queryUserActivityOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer isTotalNumber, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
-        checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
+        if (StringUtils.isEmpty(asset) || null == userId || currentPage == null || pageSize == null || nextPage == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
         PageResult<UserOrderVo> result = new PageResult<>();
         List<UserOrderVo> list = new ArrayList<>();
         PageResult<PcOrderVo> voList = pcOrderExtendService.queryUserActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,isTotalNumber);

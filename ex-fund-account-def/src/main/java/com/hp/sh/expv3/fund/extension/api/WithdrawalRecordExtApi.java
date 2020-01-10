@@ -32,7 +32,7 @@ public interface WithdrawalRecordExtApi {
     })
     @GetMapping(value = "/api/extension/account/withdrawal/queryHistory")
     public List<WithdrawalRecordVo> queryHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset") String asset,
-                                                 @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize") Integer pageSize,
+                                                 @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize,
                                                  @RequestParam(value = "pageStatus") Integer pageStatus);
 
     @ApiOperation("通过时间戳获取用户提币记录（不含提币失败的）")
@@ -87,7 +87,7 @@ public interface WithdrawalRecordExtApi {
     public PageResult<WithdrawalRecordVo> queryAllUserHistory(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "asset", required = false) String asset,
                                                               @RequestParam(value = "startTime", required = false) Long startTime, @RequestParam(value = "endTime", required = false) Long endTime,
                                                               @RequestParam(value = "approvalStatus", required = false) Integer approvalStatus,
-                                                              @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize") Integer pageSize);
+                                                              @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize);
 
 
 }

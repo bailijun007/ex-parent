@@ -47,7 +47,7 @@ public interface PcAccountExtendApi {
 
     })
     PageResult<PcAccountExtVo> findContractAccountList(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "asset", required = false) String asset,
-                                                       @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize", required = true) Integer pageSize);
+                                                       @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize", required = true,defaultValue = "20") Integer pageSize);
 
 
 }

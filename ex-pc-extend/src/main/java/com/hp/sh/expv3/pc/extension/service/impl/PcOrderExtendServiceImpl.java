@@ -45,6 +45,16 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
+    public List<PcOrderVo> activeOrderList(Long closePosId, Long userId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("closePosId", closePosId);
+        map.put("userId", userId);
+        map.put("activeFlag",1 ); // TODO xb
+        List<PcOrderVo> pcOrderVos = pcOrderDAO.queryList(map);
+        return pcOrderVos;
+    }
+
+    @Override
     public List<PcOrderVo> findCurrentUserOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
