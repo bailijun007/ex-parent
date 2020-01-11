@@ -36,6 +36,9 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         map.put("userId", userId);
         map.put("asset", asset);
         map.put("type", tradeType);
+        if(tradeType==0){
+            map.put("type", null);
+        }
         map.put("symbol", symbol);
         try {
             if (historyType == 1) {
