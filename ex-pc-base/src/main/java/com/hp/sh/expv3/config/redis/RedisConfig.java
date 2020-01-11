@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -27,6 +29,7 @@ import com.gitee.hupadev.commons.cache.RedisSubscriber;
 @EnableCaching
 @Configuration
 public class RedisConfig {
+    private static final Logger logger = LoggerFactory.getLogger(RedisConfig.class);
 
 	@Primary
 	@Bean
@@ -75,7 +78,7 @@ public class RedisConfig {
 
 			@Override
 			public void onMessage(Object message) {
-				System.out.println("RedisSubscriber:" + message);
+				logger.info("RedisSubscriber:" + message);
 			}
 
 		});
