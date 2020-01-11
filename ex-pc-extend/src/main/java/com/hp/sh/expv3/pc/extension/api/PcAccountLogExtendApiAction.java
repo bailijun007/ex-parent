@@ -7,6 +7,7 @@ import com.hp.sh.expv3.pc.constant.RedisKey;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.*;
 import com.hp.sh.expv3.pc.extension.vo.*;
+import com.hp.sh.expv3.pc.msg.PcAccountLog;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2019/12/25
@@ -50,15 +50,16 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
 
     /**
      * 查询pc永续合约账户
-     * @param userId 用户id
-     * @param asset 资产
-     * @param tradeType  类型 0.全部,1.成交开多,2.成交开空,3.成交平多,4.成交平空,5.转入,6.转出,7.手动追加保证金,8.减少保证金,9.自动追加保证金,10.调低杠杆追加保证金,11.强平平多,12强平平空
+     *
+     * @param userId      用户id
+     * @param asset       资产
+     * @param tradeType   类型 0.全部,1.成交开多,2.成交开空,3.成交平多,4.成交平空,5.转入,6.转出,7.手动追加保证金,8.减少保证金,9.自动追加保证金,10.调低杠杆追加保证金,11.强平平多,12强平平空
      * @param historyType 1.最近两天,2.两天到三个月
-     * @param startDate 开始时间(当history_type是2时,填写)
-     * @param endDate 结束时间 (当history_type是2时,填写)
-     * @param pageNo 当前页
-     * @param pageSize 页大小
-     * @param symbol 交易对
+     * @param startDate   开始时间(当history_type是2时,填写)
+     * @param endDate     结束时间 (当history_type是2时,填写)
+     * @param pageNo      当前页
+     * @param pageSize    页大小
+     * @param symbol      交易对
      * @return
      */
     @Override
@@ -79,25 +80,38 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
             for (PcAccountLogVo pcAccountLogVo : pcAccountLogList.getList()) {
                 PcAccountRecordLogVo recordLogVo = new PcAccountRecordLogVo();
                 BeanUtils.copyProperties(pcAccountLogVo, recordLogVo);
-                if (tradeType == 11 || tradeType == 12) {
+//                recordLogVo.setTradeType(String.valueOf(pcAccountLogVo.getType()));
+                if (PcAccountLog.TYPE_LIQ_LONG == pcAccountLogVo.getType()
+                        || PcAccountLog.TYPE_LIQ_SHORT == pcAccountLogVo.getType()) {
+                    // TODO xb,
                     //封装强平数据
                     getPcLiqRecordData(faceValue, pcAccountLogVo, recordLogVo);
+                    list.add(recordLogVo);
                 }
-                if (tradeType == 5 || tradeType == 6) {
+                if (PcAccountLog.TYPE_FUND_TO_PC == pcAccountLogVo.getType()
+                        || PcAccountLog.TYPE_PC_TO_FUND == pcAccountLogVo.getType()) {
                     //封装转入转出数据
                     getPcAccountRecordData(faceValue, pcAccountLogVo, recordLogVo);
+                    list.add(recordLogVo);
                 }
 
-                if (tradeType == 7 || tradeType == 8 || tradeType == 9 || tradeType == 10) {
+                if (PcAccountLog.TYPE_ADD_TO_MARGIN == pcAccountLogVo.getType()
+                        || PcAccountLog.TYPE_REDUCE_MARGIN == pcAccountLogVo.getType()
+                        || PcAccountLog.TYPE_AUTO_ADD_MARGIN == pcAccountLogVo.getType()
+                        || PcAccountLog.TYPE_LEVERAGE_ADD_MARGIN == pcAccountLogVo.getType()) {
                     //封装追加/减少保证金数据
                     getAddOrReduceMarginData(faceValue, pcAccountLogVo, recordLogVo);
+                    list.add(recordLogVo);
                 }
-
-                if (tradeType == 0 || tradeType == 1 || tradeType == 2 || tradeType == 3 || tradeType == 4) {
+                if (PcAccountLog.TYPE_TRAD_OPEN_LONG == pcAccountLogVo.getType()
+                        || PcAccountLog.TYPE_TRAD_OPEN_SHORT == pcAccountLogVo.getType()
+                        || PcAccountLog.TYPE_TRAD_CLOSE_LONG == pcAccountLogVo.getType()
+                        || PcAccountLog.TYPE_TRAD_CLOSE_SHORT == pcAccountLogVo.getType()) {
                     //封装开平仓数据
                     getOrderTradeData(faceValue, pcAccountLogVo, recordLogVo);
+                    list.add(recordLogVo);
                 }
-                list.add(recordLogVo);
+
             }
         }
         result.setList(list);
@@ -108,10 +122,6 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
     private Integer checkParam(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || tradeType == null || null == userId || historyType == null || pageNo == null || pageSize == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
-        }
-
-        if (tradeType == 0) {
-            tradeType = null;
         }
 
         if (historyType == 2) {
@@ -126,18 +136,32 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
     private void getOrderTradeData(BigDecimal faceValue, PcAccountLogVo pcAccountLogVo, PcAccountRecordLogVo recordLogVo) {
         PcOrderTradeVo pcOrderTradeVo = pcOrderTradeExtendService.getPcOrderTrade(pcAccountLogVo.getRefId(), pcAccountLogVo.getAsset(), pcAccountLogVo.getSymbol(), pcAccountLogVo.getUserId(), pcAccountLogVo.getTime());
         Optional<PcOrderTradeVo> optional = Optional.ofNullable(pcOrderTradeVo);
-        recordLogVo.setTradeAmt(optional.map(o -> o.getVolume()).orElse(BigDecimal.ZERO));
-        recordLogVo.setNoTradeAmt(optional.map(o -> o.getRemainVolume()).orElse(BigDecimal.ZERO));
-        recordLogVo.setVolume(optional.map(o -> o.getPnl()).orElse(BigDecimal.ZERO));
-        recordLogVo.setTradePrice(optional.map(o -> o.getPrice()).orElse(BigDecimal.ZERO));
-        recordLogVo.setFeeRatio(optional.map(o -> o.getFeeRatio()).orElse(BigDecimal.ZERO));
-        recordLogVo.setFee(optional.map(o -> o.getFee()).orElse(BigDecimal.ZERO));
-        recordLogVo.setOrderId(optional.map(o -> o.getOrderId()).orElse(null));
-        PcOrderVo pcOrderVo = pcOrderExtendService.getPcOrder(pcOrderTradeVo.getOrderId(), pcAccountLogVo.getAsset(), pcAccountLogVo.getSymbol(), pcAccountLogVo.getUserId());
-        Optional<PcOrderVo> orderVoOptional = Optional.ofNullable(pcOrderVo);
-        recordLogVo.setOrderAmt(orderVoOptional.map(o -> o.getVolume()).orElse(BigDecimal.ZERO));
-        recordLogVo.setOrderType(orderVoOptional.map(o -> o.getOrderType()).orElse(null));
-        recordLogVo.setOrderPrice(orderVoOptional.map(o -> o.getPrice()).orElse(null));
+//        recordLogVo.setTradeAmt(optional.map(o -> o.getVolume()).orElse(BigDecimal.ZERO));
+//        recordLogVo.setNoTradeAmt(optional.map(o -> o.getRemainVolume()).orElse(BigDecimal.ZERO));
+//        recordLogVo.setVolume(optional.map(o -> o.getPnl()).orElse(BigDecimal.ZERO));
+//        recordLogVo.setTradePrice(optional.map(o -> o.getPrice()).orElse(BigDecimal.ZERO));
+//        recordLogVo.setFeeRatio(optional.map(o -> o.getFeeRatio()).orElse(BigDecimal.ZERO));
+//        recordLogVo.setFee(optional.map(o -> o.getFee()).orElse(BigDecimal.ZERO));
+//        recordLogVo.setOrderId(optional.map(o -> o.getOrderId()).orElse(null));
+        if (null != pcOrderTradeVo) {
+            recordLogVo.setTradeAmt(pcOrderTradeVo.getVolume());
+            recordLogVo.setNoTradeAmt(pcOrderTradeVo.getRemainVolume());
+            recordLogVo.setVolume(pcOrderTradeVo.getPnl());
+            recordLogVo.setTradePrice(pcOrderTradeVo.getPrice());
+            recordLogVo.setFeeRatio(pcOrderTradeVo.getFeeRatio());
+            recordLogVo.setFee(pcOrderTradeVo.getFee());
+            recordLogVo.setOrderId(pcOrderTradeVo.getOrderId());
+            Long orderId = pcOrderTradeVo.getOrderId();
+            String asset = pcAccountLogVo.getAsset();
+            String symbol = pcAccountLogVo.getSymbol();
+            Long userId = pcAccountLogVo.getUserId();
+            PcOrderVo pcOrderVo = pcOrderExtendService.getPcOrder(orderId, asset, symbol, userId);
+            Optional<PcOrderVo> orderVoOptional = Optional.ofNullable(pcOrderVo);
+            recordLogVo.setOrderAmt(orderVoOptional.map(o -> o.getVolume()).orElse(BigDecimal.ZERO));
+            recordLogVo.setOrderType(orderVoOptional.map(o -> o.getOrderType()).orElse(null));
+            recordLogVo.setOrderPrice(orderVoOptional.map(o -> o.getPrice()).orElse(null));
+        }
+
 
     }
 
@@ -178,7 +202,8 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
 
     /**
      * 获取面值
-     * @param asset 资产
+     *
+     * @param asset  资产
      * @param symbol 交易对
      * @return
      */
