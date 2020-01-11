@@ -80,7 +80,7 @@ public class PcPositionMarginService {
         
         //检查参数
         if(BigUtils.ltZero(leverage) || BigUtils.gt(leverage, accountSymbol.getLongMaxLeverage())){
-        	throw new ExException(CommonError.PARAM_ERROR);
+        	throw new ExException(PcPositonError.PARAM_GT_MAX_LEVERAGE);
         }
         
         //是否有活跃委托

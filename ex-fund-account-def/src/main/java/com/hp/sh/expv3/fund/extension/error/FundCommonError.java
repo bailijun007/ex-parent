@@ -16,7 +16,7 @@ public class FundCommonError extends ErrorCode {
 
 
 
-    protected FundCommonError(int code, String message) {
+    private FundCommonError(int code, String message) {
         super(code, message);
     }
 }

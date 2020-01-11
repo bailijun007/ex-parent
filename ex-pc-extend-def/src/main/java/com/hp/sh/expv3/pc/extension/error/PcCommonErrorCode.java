@@ -17,7 +17,7 @@ public class PcCommonErrorCode extends ErrorCode {
     public static final PcCommonErrorCode MORE_THAN_MAX_ROW= new PcCommonErrorCode(10603, "超过最大条数");
 
 
-    protected PcCommonErrorCode(int code, String message) {
+    private PcCommonErrorCode(int code, String message) {
         super(code, message);
     }
 }

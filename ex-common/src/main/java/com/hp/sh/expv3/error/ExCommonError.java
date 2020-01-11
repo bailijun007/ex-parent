@@ -10,6 +10,8 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
  */
 public class ExCommonError extends ErrorCode {
 
+    public static final ExCommonError PARAM_EMPTY = new ExCommonError(10100, "缺少必填参数!");
+    
 	//重复提交
 	public static final ExCommonError REPEAT_ORDER = new ExCommonError(10101, "重复提交！");
 	public static final ExCommonError OBJ_DONT_EXIST = new ExCommonError(10102, "对象不存在");
