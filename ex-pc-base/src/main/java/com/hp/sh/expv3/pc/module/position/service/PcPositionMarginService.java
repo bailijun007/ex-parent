@@ -59,7 +59,8 @@ public class PcPositionMarginService {
 	
 	@Autowired
 	private PcAccountCoreService pcAccountCoreService;
-	
+	@Autowired
+	private PcPositionService pcPositionService;
 	@Autowired
 	private MarkPriceService markPriceService;
 	@Autowired
@@ -136,7 +137,7 @@ public class PcPositionMarginService {
             pos.setLeverage(leverage);
             //保存仓位
             pos.setModified(now);
-            this.pcPositionDAO.update(pos);
+            this.pcPositionService.update(pos);
         }
         
 		return true;
@@ -209,7 +210,7 @@ public class PcPositionMarginService {
 		
 		//保存
 		pos.setModified(DbDateUtils.now());
-		this.pcPositionDAO.update(pos);
+		this.pcPositionService.update(pos);
 	}
 	
 	/**
@@ -293,7 +294,7 @@ public class PcPositionMarginService {
     		this.cutAutoMargin(pos.getUserId(), pos.getAsset(), pos.getId(), delta);
     		pos.setPosMargin(pos.getPosMargin().add(delta));
     		pos.setModified(DbDateUtils.now());
-    		this.pcPositionDAO.update(pos);
+    		this.pcPositionService.update(pos);
         }
 	}
 	

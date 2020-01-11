@@ -11,7 +11,7 @@ import com.gitee.hupadev.commons.cache.RedisPublisher;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
-import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
+import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
 import com.hp.sh.expv3.pc.msg.EventMsg;
 import com.hp.sh.expv3.pc.msg.EventType;
@@ -50,8 +50,8 @@ public class DataEventListener {
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(PcLiqRecord liqRecord) {
-		EventMsg msg = new EventMsg(EventType.POS, liqRecord.getPosId(), liqRecord.getCreated(), liqRecord.getUserId(), liqRecord.getAsset(), liqRecord.getSymbol());
+	public void afterCommit(PcPosition pcPosition) {
+		EventMsg msg = new EventMsg(EventType.POS, pcPosition.getId(), pcPosition.getCreated(), pcPosition.getUserId(), pcPosition.getAsset(), pcPosition.getSymbol());
 		this.sendEventMsg(msg);
 	}
 

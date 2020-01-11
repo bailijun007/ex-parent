@@ -109,7 +109,7 @@ public class PcLiqService {
 		}else{ //不强平
 			if(pos.getLiqStatus()!=LiqStatus.NON){
 				pos.setLiqStatus(LiqStatus.NON);
-				this.pcPositionDAO.update(pos);
+				this.pcPositionService.update(pos);
 			}
 			return false;
 		}
@@ -118,7 +118,7 @@ public class PcLiqService {
 	private void lockLiq(PcPosition pos) {
 		pos.setLiqStatus(LiqStatus.FROZEN);
 		pos.setModified(DbDateUtils.now());
-		this.pcPositionDAO.update(pos);
+		this.pcPositionService.update(pos);
 	}
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
@@ -165,7 +165,7 @@ public class PcLiqService {
 		pos.setPosMargin(BigDecimal.ZERO);
 		pos.setLiqStatus(LiqStatus.FORCE_CLOSE);
 		pos.setModified(now);
-		pcPositionDAO.update(pos);
+		pcPositionService.update(pos);
 	}
 	
 	private PcLiqRecord saveLiqRecord(PcPosition pos, Long now){

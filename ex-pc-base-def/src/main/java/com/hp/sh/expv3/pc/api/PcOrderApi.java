@@ -55,6 +55,6 @@ public interface PcOrderApi {
 
 	@ApiOperation(value = "获取最大可开仓数量")
 	@GetMapping(value = "/api/pc/order/maxOpenVolume")
-	BigDecimal getMaxOpenVolume(Long userId, String asset, String symbol, Long longFlag, BigDecimal leverage);
+	BigDecimal getMaxOpenVolume(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol, @RequestParam("longFlag") Long longFlag, @RequestParam("leverage") BigDecimal leverage);
 
 }

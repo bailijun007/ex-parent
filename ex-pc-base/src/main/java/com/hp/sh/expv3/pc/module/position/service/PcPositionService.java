@@ -110,7 +110,7 @@ public class PcPositionService {
 			this.pcPositionDAO.save(pcPosition);
 		}else{
 			pcPosition.setModified(now);
-			this.pcPositionDAO.update(pcPosition);
+			this.update(pcPosition);
 		}
 		
 		////////// 成交记录  ///////////
@@ -135,6 +135,11 @@ public class PcPositionService {
 		}
 		
 	}
+    
+    public void update(PcPosition pcPosition){
+    	this.pcPositionDAO.update(pcPosition);
+    	publisher.publishEvent(pcPosition);
+    }
 	
 	private int getLogType(int closeFlag, int longFlag){
 		if(IntBool.isFalse(closeFlag)){
