@@ -7,7 +7,10 @@ import com.hp.sh.expv3.pc.extension.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
+import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
 import com.hp.sh.expv3.utils.math.Precision;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,9 @@ import java.util.stream.Collectors;
 public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     @Autowired
     private PcOrderDAO pcOrderDAO;
+
+    @Autowired
+    private PositionStrategyContext positionStrategyContext;
 
     @Override
     public BigDecimal getGrossMargin(Long userId, String asset) {
@@ -242,11 +248,26 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
                 vo.setQty(orderVo.getVolume());
                 vo.setLongFlag(orderVo.getLongFlag());
                 vo.setCtime(orderVo.getCreated());
-                //平均价 暂时写死，后期掉老王接口
-                vo.setAvgPrice(BigDecimal.ZERO);
+                //平均价
+                OrderTrade orderTrade = new OrderTrade() {
+                    @Override
+                    public BigDecimal getVolume() {
+                        return orderVo.getVolume();
+                    }
+
+                    @Override
+                    public BigDecimal getPrice() {
+                        return orderVo.getPrice();
+                    }
+                };
+                List<OrderTrade> list1=new ArrayList<>();
+                list1.add(orderTrade);
+
+                BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(orderVo.getAsset(), orderVo.getSymbol(), orderVo.getLongFlag(), list1);
+                vo.setAvgPrice(meanPrice);
                 vo.setFilledQty(orderVo.getFilledVolume());
                 vo.setCloseFlag(orderVo.getCloseFlag());
-                vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros());
+                vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.PERCENT_PRECISION, Precision.LESS).stripTrailingZeros());
                 vo.setOrderType(orderVo.getOrderType());
                 vo.setClientOid(orderVo.getClientOrderId());
                 list.add(vo);
