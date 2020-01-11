@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.constant.RedisKey;
+import com.hp.sh.expv3.pc.extension.constant.CommonConstant;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.*;
 import com.hp.sh.expv3.pc.extension.vo.*;
 import com.hp.sh.expv3.pc.msg.PcAccountLog;
+import com.hp.sh.expv3.utils.math.Precision;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,24 +83,31 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                 PcAccountRecordLogVo recordLogVo = new PcAccountRecordLogVo();
                 BeanUtils.copyProperties(pcAccountLogVo, recordLogVo);
 //                recordLogVo.setTradeType(String.valueOf(pcAccountLogVo.getType()));
-                if (PcAccountLog.TYPE_LIQ_LONG == pcAccountLogVo.getType()
+                if (CommonConstant.TRADE_TYPE_ALL.equals(tradeType)
+                        || PcAccountLog.TYPE_LIQ_LONG == pcAccountLogVo.getType()
                         || PcAccountLog.TYPE_LIQ_SHORT == pcAccountLogVo.getType()) {
                     //封装强平数据
                     getPcLiqRecordData(faceValue, pcAccountLogVo, recordLogVo);
                     list.add(recordLogVo);
-                } else if (PcAccountLog.TYPE_FUND_TO_PC == pcAccountLogVo.getType()
+                }
+                if (CommonConstant.TRADE_TYPE_ALL.equals(tradeType)
+                        || PcAccountLog.TYPE_FUND_TO_PC == pcAccountLogVo.getType()
                         || PcAccountLog.TYPE_PC_TO_FUND == pcAccountLogVo.getType()) {
                     //封装转入转出数据
                     getPcAccountRecordData(faceValue, pcAccountLogVo, recordLogVo);
                     list.add(recordLogVo);
-                } else if (PcAccountLog.TYPE_ADD_TO_MARGIN == pcAccountLogVo.getType()
+                }
+                if (CommonConstant.TRADE_TYPE_ALL.equals(tradeType)
+                        || PcAccountLog.TYPE_ADD_TO_MARGIN == pcAccountLogVo.getType()
                         || PcAccountLog.TYPE_REDUCE_MARGIN == pcAccountLogVo.getType()
                         || PcAccountLog.TYPE_AUTO_ADD_MARGIN == pcAccountLogVo.getType()
                         || PcAccountLog.TYPE_LEVERAGE_ADD_MARGIN == pcAccountLogVo.getType()) {
                     //封装追加/减少保证金数据
                     getAddOrReduceMarginData(faceValue, pcAccountLogVo, recordLogVo);
                     list.add(recordLogVo);
-                } else if (PcAccountLog.TYPE_TRAD_OPEN_LONG == pcAccountLogVo.getType()
+                }
+                if (CommonConstant.TRADE_TYPE_ALL.equals(tradeType)
+                        || PcAccountLog.TYPE_TRAD_OPEN_LONG == pcAccountLogVo.getType()
                         || PcAccountLog.TYPE_TRAD_OPEN_SHORT == pcAccountLogVo.getType()
                         || PcAccountLog.TYPE_TRAD_CLOSE_LONG == pcAccountLogVo.getType()
                         || PcAccountLog.TYPE_TRAD_CLOSE_SHORT == pcAccountLogVo.getType()) {
@@ -119,7 +128,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
 
-        if (historyType == 2) {
+        if (CommonConstant.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
             if (startDate == null || endDate == null) {
                 throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
             }
@@ -188,7 +197,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
         recordLogVo.setTradeAmt(volume);
         recordLogVo.setOrderAmt(volume);
         recordLogVo.setNoTradeAmt(BigDecimal.ZERO);
-        recordLogVo.setVolume(pcLiqRecordVo.getVolume().multiply(faceValue).divide(liqPrice));
+        recordLogVo.setVolume(pcLiqRecordVo.getVolume().multiply(faceValue).divide(liqPrice, Precision.PERCENT_PRECISION, Precision.LESS));
         recordLogVo.setTradePrice(liqPrice);
         recordLogVo.setFee(fee);
         recordLogVo.setFeeRatio(feeRatio);

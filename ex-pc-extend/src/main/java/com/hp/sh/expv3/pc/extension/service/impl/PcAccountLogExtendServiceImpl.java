@@ -4,6 +4,7 @@ import com.gitee.hupadev.base.api.PageResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.pc.extension.constant.CommonConstant;
 import com.hp.sh.expv3.pc.extension.dao.PcAccountLogDAO;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcAccountLogExtendService;
@@ -36,7 +37,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         map.put("userId", userId);
         map.put("asset", asset);
         map.put("type", tradeType);
-        if(tradeType==0){
+        if(CommonConstant.TRADE_TYPE_ALL.equals(tradeType)){
             map.put("type", null);
         }
         map.put("symbol", symbol);
