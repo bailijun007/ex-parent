@@ -1,23 +1,20 @@
 package com.hp.sh.expv3.fund.extension.api;
 
-import com.gitee.hupadev.base.api.PageResult;
-import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.error.DepositExtError;
-import com.hp.sh.expv3.fund.extension.error.FundAccountExtError;
-import com.hp.sh.expv3.fund.extension.error.FundCommonError;
-import com.hp.sh.expv3.fund.extension.service.DepositAddrExtService;
-import com.hp.sh.expv3.fund.extension.service.DepositRecordExtService;
-import com.hp.sh.expv3.fund.extension.vo.AddressVo;
-import com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo;
-import io.swagger.annotations.Api;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.gitee.hupadev.base.api.PageResult;
+import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.fund.extension.error.FundCommonError;
+import com.hp.sh.expv3.fund.extension.service.DepositAddrExtService;
+import com.hp.sh.expv3.fund.extension.service.DepositRecordExtService;
+import com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo;
+
+import io.swagger.annotations.Api;
 
 /**
  * 充值记录扩展Api

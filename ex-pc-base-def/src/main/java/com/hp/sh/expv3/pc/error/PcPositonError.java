@@ -15,7 +15,7 @@ public class PcPositonError extends ErrorCode {
 	public static final PcPositonError NO_MORE_MARGIN = new PcPositonError(20202, "没有可减少的保证金");
 
 	public static final PcPositonError LIQING = new PcPositonError(20203, "强平中。。。");
-	public static final PcPositonError FORCE_CLOSE = new PcPositonError(20104, "仓位已强平!");
+	public static final PcPositonError FORCE_CLOSE = new PcPositonError(20204, "仓位已强平!");
 
 	private PcPositonError(int code, String message) {
 		super(code, message);

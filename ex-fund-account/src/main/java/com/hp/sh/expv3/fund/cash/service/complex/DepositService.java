@@ -14,11 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.exception.ExSysException;
+import com.hp.sh.expv3.error.ExCommonError;
+import com.hp.sh.expv3.error.ExSysError;
 import com.hp.sh.expv3.fund.cash.constant.PayChannel;
 import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.cash.dao.DepositRecordDAO;
 import com.hp.sh.expv3.fund.cash.entity.DepositRecord;
-import com.hp.sh.expv3.fund.cash.error.CashError;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
@@ -75,14 +77,14 @@ public class DepositService {
 		params.put("transactionId", chainOrderId);
 		Long count = this.depositRecordDAO.queryCount(params);
 		if(count>0){
-			throw new ExException(CashError.REPEAT_ORDER);
+			throw new ExException(ExCommonError.REPEAT_ORDER);
 		}
 	}
 
 	public void onPaySuccess(Long userId, String sn){
 		DepositRecord rr = this.depositRecordDAO.findBySn(userId, sn);
 		if(rr==null){
-			throw new ExException(CommonError.OBJ_DONT_EXIST);
+			throw new ExException(ExCommonError.OBJ_DONT_EXIST);
 		}
 		
 		if(rr.getPayStatus()==PaymentStatus.SUCCESS){
@@ -115,7 +117,7 @@ public class DepositService {
 		}
 		
 		if(rr.getPayStatus()==PaymentStatus.SUCCESS){
-			throw new RuntimeException("见鬼了！");
+			throw new ExSysException(ExSysError.BIZ_LOGIC_ERR);
 		}
 		
 		this.changePayStatus(rr, PaymentStatus.FAIL);

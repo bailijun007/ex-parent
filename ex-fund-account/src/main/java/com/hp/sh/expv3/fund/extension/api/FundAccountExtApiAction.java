@@ -1,24 +1,22 @@
 package com.hp.sh.expv3.fund.extension.api;
 
-import com.gitee.hupadev.base.api.PageResult;
-import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.error.DepositExtError;
-import com.hp.sh.expv3.fund.extension.error.FundAccountExtError;
-import com.hp.sh.expv3.fund.extension.error.FundCommonError;
-import com.hp.sh.expv3.fund.extension.service.FundAccountExtendService;
-import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
-import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.gitee.hupadev.base.api.PageResult;
+import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.fund.extension.error.FundCommonError;
+import com.hp.sh.expv3.fund.extension.service.FundAccountExtendService;
+import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
+import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
+
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * 资金账户相关请求

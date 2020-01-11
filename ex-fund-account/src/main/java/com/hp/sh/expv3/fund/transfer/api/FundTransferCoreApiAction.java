@@ -46,7 +46,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	@Override
 	public void transfer(Long userId, String asset, Integer srcAccountType, Integer targetAccountType, BigDecimal amount){
 		if(srcAccountType.equals(targetAccountType)){
-			throw new ExException(TransferError.ACCOUNT_TYPE);
+			throw new ExException(TransferError.SAME_ACCOUNT_TYPE);
 		}
 		
 		//检查余额

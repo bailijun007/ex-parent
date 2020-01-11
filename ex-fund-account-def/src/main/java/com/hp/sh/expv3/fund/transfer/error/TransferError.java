@@ -10,10 +10,11 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
  */
 public class TransferError extends ErrorCode {
 
-	public static final TransferError ACCOUNT_TYPE = new TransferError(10200, "账户类型错误");
+	public static final TransferError SAME_ACCOUNT_TYPE = new TransferError(10200, "账户类型不能相同");
 	
 	private TransferError(int code, String message) {
 		super(code, message);
 	}
 
 }
+  
