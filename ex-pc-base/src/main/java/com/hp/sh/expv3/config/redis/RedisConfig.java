@@ -79,7 +79,7 @@ public class RedisConfig {
 			}
 
 		});
-		rs.setChannel("pc:account:BTC");
+		rs.setChannel("pc:pos:BTC:BTC_USD");
 		new Thread(){
 			@Override
             public void run(){
