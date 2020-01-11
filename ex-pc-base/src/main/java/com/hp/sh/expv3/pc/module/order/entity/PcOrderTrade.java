@@ -7,12 +7,13 @@ import javax.persistence.Transient;
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.commons.mybatis.TxId;
 import com.hp.sh.expv3.dev.Question;
+import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
 
 /**
  * 永续合约_用户订单成交记录
  * 
  */
-public class PcOrderTrade extends UserDataEntity {
+public class PcOrderTrade extends UserDataEntity implements OrderTrade {
 
 	private static final long serialVersionUID = 1L;
 

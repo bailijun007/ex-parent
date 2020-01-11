@@ -198,10 +198,10 @@ public class PcOrderService {
 			return;
 		}
 		if(pos.getLiqStatus() == LiqStatus.FROZEN){
-			throw new ExException(PcOrderError.POS_LIQ);
+			throw new ExException(PcPositonError.LIQING);
 		}
 		if(pos.getLiqStatus() == LiqStatus.FORCE_CLOSE){
-			throw new ExException(PcOrderError.POS_LIQED);
+			throw new ExException(PcPositonError.FORCE_CLOSE);
 		}
 	}
 

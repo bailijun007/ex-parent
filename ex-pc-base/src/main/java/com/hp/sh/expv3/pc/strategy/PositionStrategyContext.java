@@ -17,9 +17,11 @@ import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
+import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeParamVo;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
@@ -185,6 +187,41 @@ public class PositionStrategyContext {
 		BigDecimal vol = balance.divide(singleCost, Precision.INTEGER_PRECISION, Precision.LESS);
 		return vol;
 	}
+
+	/**
+	 * 计算委托成交均价
+	 * (v1*f+v2*f+...) / (v1*f/p1+v2*f/p2+...)
+	 * 	=
+	 * (v1+v2+...) / (v1/p1+v2/p2+...)
+	 * 
+	 */
+	public BigDecimal calcOrderMeanPrice1(String asset, String symbol, int longFlag, List<? extends OrderTrade> tradeList){
+		BigDecimal totalVol = BigDecimal.ZERO;
+		BigDecimal totalVp = BigDecimal.ZERO;
+		
+		for(OrderTrade trade : tradeList){
+			totalVol.add(trade.getVolume());
+			totalVp.add(trade.getVolume().divide(trade.getPrice(), Precision.COMMON_PRECISION, Precision.LESS));
+		}
+		
+		BigDecimal meanPrice = totalVol.divide(totalVp, Precision.COMMON_PRECISION, Precision.LESS);
+		return meanPrice;
+	}
+
+	public BigDecimal calcOrderMeanPrice(String asset, String symbol, int longFlag, List<? extends OrderTrade> tradeList){
+		BigDecimal faceValue = BigDecimal.ONE;
+		BigDecimal amount = BigDecimal.ZERO;
+		BigDecimal baseValue = BigDecimal.ZERO;
+		HoldPosStrategy strategy = this.getHoldPosStrategy(asset, symbol);
+		for(OrderTrade trade : tradeList){
+			amount.add(CompFieldCalc.calcAmount(trade.getVolume(), faceValue));
+			baseValue.add(CompFieldCalc.calcBaseValue(trade.getVolume(), faceValue, trade.getPrice()));
+		}
+		BigDecimal meanPrice = strategy.calcMeanPrice(longFlag, baseValue, amount);
+		return meanPrice;
+	}
+	
+	int ____________________________;
 	
 	public HoldPosStrategy getHoldPosStrategy(String asset, String symbol){
 		Integer strategyId = this.genStrategyId(asset, symbol);

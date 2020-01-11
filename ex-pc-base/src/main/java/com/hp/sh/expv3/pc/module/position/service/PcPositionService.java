@@ -76,8 +76,8 @@ public class PcPositionService {
     @LockIt(key="${trade.accountId}-${trade.asset}-${trade.symbol}")
 	public void handleTradeOrder(PcTradeMsg trade){
 		PcOrder order = this.pcOrderService.getOrder(trade.getAccountId(), trade.getOrderId());
-		boolean exist = this.chekOrderTrade(order, trade);
-		if(exist){
+		boolean yes = this.canTrade(order, trade);
+		if(!yes){
 			logger.error("成交已处理过了");
 			return;
 		}
@@ -314,11 +314,16 @@ public class PcPositionService {
 	}
 
 	//检查订单状态
-	private boolean chekOrderTrade(PcOrder order, PcTradeMsg tradeMsg) {
+	private boolean canTrade(PcOrder order, PcTradeMsg tradeMsg) {
 		if(order==null){
 			logger.error("成交订单不存在：orderId={}", tradeMsg.getOrderId());
-//			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
-			return true;
+			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
+//			return false;
+		}
+		
+		BigDecimal remainVol = order.getVolume().subtract(order.getFilledVolume());
+		if(BigUtils.gt(tradeMsg.getNumber(), remainVol)){
+			return false;
 		}
 		
 		//检查重复请求
@@ -327,9 +332,9 @@ public class PcPositionService {
 		params.put("tradeSn", tradeMsg.uniqueKey());
 		Long count = this.pcOrderTradeDAO.queryCount(params);
 		if(count>0){
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	private void synchCollector(Long tradeOrderId, Long feeCollectorId, BigDecimal fee){

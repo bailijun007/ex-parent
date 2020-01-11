@@ -26,7 +26,7 @@ public interface MarkPriceService{
      * @return
      */
     default public BigDecimal getLatestPrice(String asset, String symbol){
-    	return new BigDecimal("7777");
+    	return getCurrentMarkPrice(asset, symbol);
     }
 
 }

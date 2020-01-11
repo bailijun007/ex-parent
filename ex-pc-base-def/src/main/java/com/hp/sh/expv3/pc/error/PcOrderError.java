@@ -21,10 +21,6 @@ public class PcOrderError extends ErrorCode {
 	
 	public static final PcOrderError BANKRUPT_PRICE = new PcOrderError(20104, "平仓委托价格不能低于破产价!");
 
-	public static final PcOrderError POS_LIQ = new PcOrderError(20105, "仓位强平中!");
-	
-	public static final PcOrderError POS_LIQED = new PcOrderError(20106, "仓位已强平!");
-	
 	private PcOrderError(int code, String message) {
 		super(code, message);
 	}
