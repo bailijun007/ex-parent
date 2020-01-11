@@ -22,6 +22,7 @@ import com.hp.sh.expv3.match.util.PcUtil;
 import com.hp.sh.expv3.match.util.Tuple2;
 import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
 import org.apache.rocketmq.client.consumer.PullResult;
+import org.apache.rocketmq.client.consumer.PullStatus;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageExt;
@@ -53,17 +54,32 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
     @Autowired
     private PcMatchTaskService pcMatchTaskService;
 
-    private long initOffset;
+    /**
+     * currentMsgOffset + 1
+     */
+    private long lastSentOffset;
+    /**
+     * currentMsgId
+     */
+    private String lastSentMsgId;
     private String asset;
     private String symbol;
     private String assetSymbol;
 
-    public long getInitOffset() {
-        return initOffset;
+    public String getLastSentMsgId() {
+        return lastSentMsgId;
     }
 
-    public void setInitOffset(long initOffset) {
-        this.initOffset = initOffset;
+    public void setLastSentMsgId(String lastSentMsgId) {
+        this.lastSentMsgId = lastSentMsgId;
+    }
+
+    public long getLastSentOffset() {
+        return lastSentOffset;
+    }
+
+    public void setLastSentOffset(long lastSentOffset) {
+        this.lastSentOffset = lastSentOffset;
     }
 
     public String getAsset() {
@@ -148,7 +164,7 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
         String topicName = PcRocketMqUtil.buildPcOrderTopicName(pcmatchRocketMqSetting.getPcOrderTopicNamePattern(), assetSymbolTuple.first, assetSymbolTuple.second);
 
         Set<MessageQueue> mqs = getMqs(consumer, topicName);
-        topic2Offset.put(topicName, initOffset);
+        topic2Offset.put(topicName, lastSentOffset + 1);
         topic2AssetSymbol.put(topicName, assetSymbol);
 
         while (true) {
@@ -165,6 +181,10 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
 
                     Long offset = topic2Offset.get(topicName);
                     PullResult pullResult = pull(consumer, mq, offset);
+                    if (PullStatus.OFFSET_ILLEGAL.equals(pullResult.getPullStatus())) {
+                        logger.debug("{}:offset illegal {},init offset:{},msgId:{},max offset:{}", topicName, offset, this.lastSentOffset, this.lastSentMsgId, pullResult.getMaxOffset());
+                        System.exit(-1);
+                    }
 
                     List<MessageExt> msgFoundList = pullResult.getMsgFoundList();
                     if (null == msgFoundList || msgFoundList.isEmpty()) {
