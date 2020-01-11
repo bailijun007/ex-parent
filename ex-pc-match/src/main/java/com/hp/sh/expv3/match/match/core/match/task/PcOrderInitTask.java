@@ -119,7 +119,8 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
         orderConsumer.setAsset(this.getAsset());
         orderConsumer.setSymbol(this.getSymbol());
         orderConsumer.setAssetSymbol(this.getAssetSymbol());
-        orderConsumer.setInitOffset(this.getCurrentMsgOffset());
+        orderConsumer.setLastSentOffset(this.getCurrentMsgOffset());
+        orderConsumer.setLastSentMsgId(this.getCurrentMsgId());
         orderConsumer.setName("PcMatchConsumer_" + getAsset() + "__" + this.getSymbol());
         orderConsumer.start();
         setSentMqOffset(context, sentMqOffset);
@@ -172,7 +173,7 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
             String s = pcRedisUtil.hget(snapshotRedisKey, startSnapshotOffset + "");
             PcOrderSnapshotBo snapshot = JSON.parseObject(s, PcOrderSnapshotBo.class);
             context.setLastPrice(snapshot.getLastPrice());
-            this.setCurrentMsgOffset(snapshot.getRmqCurrentOffset() + 1);
+            this.setCurrentMsgOffset(snapshot.getRmqCurrentOffset());
 
             List<PcOrder4MatchBo> limitAskOrders = snapshot.getLimitAskOrders();
             List<PcOrder4MatchBo> limitBidOrders = snapshot.getLimitBidOrders();

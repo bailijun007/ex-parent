@@ -74,12 +74,12 @@ public class PcMatchedBookSnapshotTask extends PcMatchedBaseTask {
         snapshot.setLastPrice(lastPrice);
         snapshot.setLimitAskOrders(limitAskOrders);
         snapshot.setLimitBidOrders(limitBidOrders);
-        long rmqNextOffset = this.getCurrentMsgOffset() + 1;
         snapshot.setRmqCurrentOffset(this.getCurrentMsgOffset());
+        snapshot.setRmqCurrentMsgId(this.getCurrentMsgId());
 
         String snapshotRedisKey = RedisKeyUtil.buildPcOrderSnapshotRedisKey(pcmatchRedisKeySetting.getPcOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
 
-        pcRedisUtil.hset(snapshotRedisKey, "" + rmqNextOffset, JsonUtil.toJsonString(snapshot));
+        pcRedisUtil.hset(snapshotRedisKey, "" + this.getCurrentMsgOffset(), JsonUtil.toJsonString(snapshot));
 
         logger.info("save snapshot at {}", System.currentTimeMillis());
 

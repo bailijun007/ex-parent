@@ -14,6 +14,15 @@ public class PcOrderSnapshotBo {
 
     private BigDecimal lastPrice;
     private Long rmqCurrentOffset;
+    private String rmqCurrentMsgId;
+
+    public String getRmqCurrentMsgId() {
+        return rmqCurrentMsgId;
+    }
+
+    public void setRmqCurrentMsgId(String rmqCurrentMsgId) {
+        this.rmqCurrentMsgId = rmqCurrentMsgId;
+    }
 
     public Long getRmqCurrentOffset() {
         return rmqCurrentOffset;
