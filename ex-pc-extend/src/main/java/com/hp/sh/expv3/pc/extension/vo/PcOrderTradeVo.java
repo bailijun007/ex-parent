@@ -6,6 +6,7 @@ package com.hp.sh.expv3.pc.extension.vo;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.dev.Question;
+import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
 
 import java.math.BigDecimal;
 
@@ -13,7 +14,7 @@ import java.math.BigDecimal;
  * 永续合约_用户订单成交记录
  * 
  */
-public class PcOrderTradeVo extends UserDataEntity {
+public class PcOrderTradeVo extends UserDataEntity implements OrderTrade{
 
 	private static final long serialVersionUID = 1L;
 
