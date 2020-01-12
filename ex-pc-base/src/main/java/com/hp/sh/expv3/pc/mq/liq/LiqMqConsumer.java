@@ -12,7 +12,7 @@ import com.hp.sh.expv3.pc.mq.liq.msg.LiqCancelledMsg;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
-@MQListener(topic = MqTopic.TOPIC_PCMATCH_BTC__BTC_USD, orderly=MQListener.ORDERLY_YES)
+@MQListener(orderly=MQListener.ORDERLY_YES)
 public class LiqMqConsumer {
 	private static final Logger logger = LoggerFactory.getLogger(LiqMqConsumer.class);
     

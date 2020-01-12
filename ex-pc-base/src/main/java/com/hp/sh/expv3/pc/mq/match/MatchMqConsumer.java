@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MqTags;
-import com.hp.sh.expv3.pc.constant.MqTopic;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.mq.match.msg.MatchNotMatchMsg;
@@ -16,7 +15,7 @@ import com.hp.sh.expv3.pc.msg.PcTradeMsg;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
-@MQListener(topic = MqTopic.TOPIC_PCMATCH_BTC__BTC_USD, orderly=MQListener.ORDERLY_YES)
+@MQListener(orderly=MQListener.ORDERLY_YES)
 public class MatchMqConsumer {
 	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer.class);
 
@@ -28,7 +27,7 @@ public class MatchMqConsumer {
 	
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(MatchNotMatchMsg msg){
-		this.pcOrderService.setPendingNew(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
+		this.pcOrderService.setNewStatus(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
 	}
 	
 	//取消订单

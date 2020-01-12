@@ -49,22 +49,26 @@ public class PcOrderApiAction implements PcOrderApi {
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
 
 		//send mq
+		this.sendOrderMsg(order);
+		
+		return order.getId();
+	}
+	
+	void sendOrderMsg(PcOrder order){
 		OrderPendingNewMsg msg = new OrderPendingNewMsg();
-		msg.setAccountId(userId);
-		msg.setAsset(asset);
-		msg.setBidFlag(BidUtils.getBidFlag(closeFlag, longFlag));
-		msg.setCloseFlag(closeFlag);
-		msg.setDisplayNumber(number);
-		msg.setNumber(number);
+		msg.setAccountId(order.getUserId());
+		msg.setAsset(order.getAsset());
+		msg.setBidFlag(BidUtils.getBidFlag(order.getCloseFlag(), order.getLongFlag()));
+		msg.setCloseFlag(order.getCloseFlag());
+		msg.setDisplayNumber(order.getVolume());
+		msg.setNumber(order.getVolume().subtract(order.getFilledVolume()));
 		msg.setOrderId(order.getId());
 		msg.setPrice(order.getPrice());
-		msg.setSymbol(symbol);
+		msg.setSymbol(order.getSymbol());
 		msg.setOrderType(order.getOrderType());
 		msg.setOrderTime(order.getCreated());
 		msg.setTimeInForce(order.getTimeInForce());
 		matchMqSender.sendPendingNew(msg);
-		
-		return order.getId();
 	}
 	
 	@Override

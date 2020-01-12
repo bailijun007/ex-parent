@@ -189,7 +189,7 @@ public class PcPositionMarginService {
 		//检查可减少的保证金
 		if(optType==ChangeMarginOptType.CUT){
 			BigDecimal diff = this.getMinMarginDiff(pos);
-			if(BigUtils.ltZero(diff)){
+			if(BigUtils.gt(amount, diff)){
 				throw new ExException(PcPositonError.NO_MORE_MARGIN);
 			}
 		}

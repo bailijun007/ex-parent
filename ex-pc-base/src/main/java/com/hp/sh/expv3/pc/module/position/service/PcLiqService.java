@@ -116,9 +116,11 @@ public class PcLiqService {
 	}
 	
 	private void lockLiq(PcPosition pos) {
-		pos.setLiqStatus(LiqStatus.FROZEN);
-		pos.setModified(DbDateUtils.now());
-		this.pcPositionService.update(pos);
+		if(pos.getLiqStatus()!=LiqStatus.FROZEN){
+			pos.setLiqStatus(LiqStatus.FROZEN);
+			pos.setModified(DbDateUtils.now());
+			this.pcPositionService.update(pos);
+		}
 	}
 
 	@LockIt(key="${userId}-${asset}-${symbol}")

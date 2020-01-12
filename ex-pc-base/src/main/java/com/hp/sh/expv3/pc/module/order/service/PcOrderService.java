@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.pc.module.order.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +172,7 @@ public class PcOrderService {
 		PcOrderLog pcOrderLog = this.saveOrderLog(pcOrder.getUserId(), pcOrder.getId(), PcOrderLog.TRIGGER_TYPE_USER, PcOrderLog.TYPE_CREATE, now);
 		
 		//事件
-		this.publishOrderEvent(pcOrder, pcOrderLog);
+//		this.publishOrderEvent(pcOrder, pcOrderLog);
 		
 		return pcOrder;
 	}
@@ -418,7 +419,7 @@ public class PcOrderService {
 	}
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void setPendingNew(long userId, String asset, String symbol, long orderId){
+	public void setNewStatus(long userId, String asset, String symbol, long orderId){
 		long now = DbDateUtils.now();
 		long count = this.pcOrderDAO.updateStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, now);
 		if(count==0){
@@ -426,7 +427,10 @@ public class PcOrderService {
 			return;
 		}
 		//日志
-		this.saveOrderLog(userId, orderId, PcOrderLog.TRIGGER_TYPE_SYS, PcOrderLog.TYPE_PENDING_NEW, now);
+		PcOrderLog orderLog = this.saveOrderLog(userId, orderId, PcOrderLog.TRIGGER_TYPE_SYS, PcOrderLog.TYPE_PENDING_NEW, now);
+		//事件
+		PcOrder pcOrder = this.pcOrderDAO.findById(userId, orderId);
+		this.publishOrderEvent(pcOrder, orderLog);
 	}
 
 	/*
@@ -463,6 +467,18 @@ public class PcOrderService {
 		params.put("liqFlag", IntBool.NO);
 		Long count = this.pcOrderDAO.queryCount(params);
 		return count>0;
+	}
+	
+	public List<PcOrder> queryActiveOrder(Long userId, String asset, String symbol, Integer longFlag) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
+		params.put("asset", asset);
+		params.put("symbol", symbol);
+		params.put("longFlag", longFlag);
+		params.put("activeFlag", IntBool.YES);
+		params.put("liqFlag", IntBool.NO);
+		List<PcOrder> list = this.pcOrderDAO.queryList(params);
+		return list;
 	}
 	
 	public PcOrder getOrder(long userId, Long orderId){

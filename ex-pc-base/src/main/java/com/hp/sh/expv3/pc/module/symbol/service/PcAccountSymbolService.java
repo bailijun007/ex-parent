@@ -34,10 +34,10 @@ public class PcAccountSymbolService{
 	private PcDefaultSymbolSetting pcDefaultSymbolSetting;
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void create(Long userId, String asset, String symbol){
+	public PcAccountSymbol create(Long userId, String asset, String symbol){
 		PcAccountSymbol as = this.get(userId, asset, symbol);
 		if(as!=null){
-			return;
+			return as;
 		}
 		Long now = DbDateUtils.now();
 		PcAccountSymbol entity = new PcAccountSymbol();
@@ -55,6 +55,7 @@ public class PcAccountSymbolService{
 		entity.setModified(now);
 		entity.setCreated(now);
 		pcAccountSymbolDAO.save(entity );
+		return entity;
 	}
 	
 	public PcAccountSymbol get(Long userId, String asset, String symbol){
@@ -68,6 +69,9 @@ public class PcAccountSymbolService{
 	
 	public BigDecimal getLeverage(long userId, String asset, String symbol, int longFlag){
 		PcAccountSymbol as = this.get(userId, asset, symbol);
+		if(as==null){
+			as = this.create(userId, asset, symbol);
+		}
 		if(IntBool.isTrue(longFlag)){	//多
 			return as.getLongLeverage();
 		}else{		//空
