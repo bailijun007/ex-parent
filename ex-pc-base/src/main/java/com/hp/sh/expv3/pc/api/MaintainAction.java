@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
 
@@ -16,6 +17,8 @@ import io.swagger.annotations.ApiOperation;
 public class MaintainAction{
 	@Autowired
 	private PcOrderService pcOrderService;
+	@Autowired
+	private PcOrderQueryService orderQueryService;
 	
 	@Autowired
 	private MatchMqSender matchMqSender;
@@ -27,7 +30,7 @@ public class MaintainAction{
 	@ApiOperation(value = "rebase")
 	@GetMapping(value = "/api/pc/maintain/rebase")	
 	public List<PcOrder> rebase(){
-		List<PcOrder> list = pcOrderService.queryActiveOrder(null, null, null, null);
+		List<PcOrder> list = orderQueryService.queryActiveOrder(null, null, null, null);
 		for(PcOrder order : list){
 			pcOrderApiAction.sendOrderMsg(order);
 		}

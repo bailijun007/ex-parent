@@ -2,21 +2,17 @@ package com.hp.sh.expv3.pc.module.order.service;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
-import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MetadataService;
@@ -28,15 +24,11 @@ import com.hp.sh.expv3.pc.constant.PcOrderType;
 import com.hp.sh.expv3.pc.error.PcOrderError;
 import com.hp.sh.expv3.pc.error.PcPositonError;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
-import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
-import com.hp.sh.expv3.pc.module.order.dao.PcOrderLogDAO;
 import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrderLog;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
-import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
@@ -60,10 +52,10 @@ public class PcOrderService {
 	private PcAccountSymbolService pcSymbolService;
 
 	@Autowired
-	private PcOrderDAO pcOrderDAO;
-
+	private PcOrderUpdateService orderUpdateService;
+	
 	@Autowired
-	private PcOrderLogDAO pcOrderLogDAO;
+	private PcOrderQueryService orderQueryService;
 	
 	@Autowired
 	private FeeRatioService feeRatioService;
@@ -86,9 +78,6 @@ public class PcOrderService {
 	@Autowired
 	private PcOrderService self;
     
-    @Autowired
-    private ApplicationEventPublisher publisher;
-
 	/**
 	 * 创建订单
 	 * @param userId 用户ID
@@ -113,12 +102,15 @@ public class PcOrderService {
 //			throw new ExException(PcOrderError.CREATED);
 //		}
 		
-		if(closeFlag==OrderFlag.ACTION_CLOSE){
-			this.checkLiqStatus(pos);
-			// 检查可平仓位
-			this.checkClosablePosition(pos, number);
-			// 检查价格
-			this.checkPrice(pos, price);
+		//非强平委托
+		if(IntBool.isFalse(liqFlag)){
+			if(closeFlag==OrderFlag.ACTION_CLOSE){
+				this.checkLiqStatus(pos);
+				// 检查可平仓位
+				this.checkClosablePosition(pos, number);
+				// 检查价格
+				this.checkPrice(pos, price);
+			}
 		}
 		
 		Long now = DbDateUtils.now();
@@ -160,37 +152,14 @@ public class PcOrderService {
 		
 		pcOrder.setVisibleFlag(visibleFlag);
 		
-		pcOrderDAO.save(pcOrder);
+		this.orderUpdateService.saveOrder(pcOrder);
 
 		//开仓押金扣除
 		if(closeFlag==OrderFlag.ACTION_OPEN){
 			this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin(), longFlag);
 		}
 		
-		//日志
-		PcOrderLog pcOrderLog = this.saveOrderLog(pcOrder.getUserId(), pcOrder.getId(), PcOrderLog.TRIGGER_TYPE_USER, PcOrderLog.TYPE_CREATE, now);
-		
-		//事件
-//		this.publishOrderEvent(pcOrder, pcOrderLog);
-		
 		return pcOrder;
-	}
-	
-	private PcOrderLog saveOrderLog(long userId, long orderId, int triggerType, int type, long now){
-		PcOrderLog pcOrderLog = new PcOrderLog();
-		pcOrderLog.setUserId(userId);
-		pcOrderLog.setOrderId(orderId);
-		pcOrderLog.setTriggerType(triggerType);
-		pcOrderLog.setType(type);
-		pcOrderLog.setCreated(now);
-		pcOrderLog.setModified(now);
-		pcOrderLogDAO.save(pcOrderLog);
-		return pcOrderLog;
-	}
-	
-	private void publishOrderEvent(PcOrder order, PcOrderLog pcOrderLog){
-		PcOrderEvent event = new PcOrderEvent(order, pcOrderLog);
-		publisher.publishEvent(event);
 	}
 	
 	private void checkLiqStatus(PcPosition pos) {
@@ -223,7 +192,7 @@ public class PcOrderService {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("userId", userId);
 		params.put("clientOrderId", clientOrderId);
-		Long count = this.pcOrderDAO.queryCount(params);
+		Long count = this.orderQueryService.queryCount(params);
 		return count>0;
 	}
 
@@ -298,9 +267,8 @@ public class PcOrderService {
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void setPendingCancel(long userId, String asset, String symbol, long orderId){
-		Long now = DbDateUtils.now();
 		
-		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		PcOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
 		if(!this.canCancel(order, orderId)){
 			logger.info("订单无法取消：{}", order);
@@ -311,16 +279,9 @@ public class PcOrderService {
 			PcPosition pos = this.pcPositionService.getPosition(userId, asset, symbol, order.getClosePosId());
 			this.checkLiqStatus(pos);	
 		}
-
-		long count = this.pcOrderDAO.updateCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
 		
-		if(count==0){
-			logger.error("撤单更新失败，orderId={}", orderId);
-			return;
-		}
-		
-		//日志
-		this.saveOrderLog(userId, orderId, PcOrderLog.TRIGGER_TYPE_USER, PcOrderLog.TYPE_PENDING_CANCEL, now);
+		Long now = DbDateUtils.now();
+		orderUpdateService.updateCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
 	}
 	
 	private boolean canCancel(PcOrder order, Long orderId){
@@ -360,7 +321,7 @@ public class PcOrderService {
 	 * @param number 撤几张合约
 	 */
 	private void doCancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
-		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+		PcOrder order = this.orderQueryService.getOrder(userId, orderId);
 		if(order==null){
 			logger.error("订单不存在:orderId={}", orderId);
 			return;
@@ -407,12 +368,7 @@ public class PcOrderService {
 		order.setOpenFee(BigDecimal.ZERO);
 		order.setCloseFee(BigDecimal.ZERO);
 		
-		this.pcOrderDAO.update(order);
-		
-		//日志
-		PcOrderLog orderLog = this.saveOrderLog(order.getUserId(), order.getId(), PcOrderLog.TRIGGER_TYPE_SYS, PcOrderLog.TYPE_CANCEL, now);
-		
-		this.publishOrderEvent(order, orderLog);
+		this.orderUpdateService.updateOrder(order, now);
 		
 		return;
 	}
@@ -420,16 +376,7 @@ public class PcOrderService {
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void setNewStatus(long userId, String asset, String symbol, long orderId){
 		long now = DbDateUtils.now();
-		long count = this.pcOrderDAO.updateStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, now);
-		if(count==0){
-			logger.error("更新失败，orderId={}", orderId);
-			return;
-		}
-		//日志
-		PcOrderLog orderLog = this.saveOrderLog(userId, orderId, PcOrderLog.TRIGGER_TYPE_SYS, PcOrderLog.TYPE_PENDING_NEW, now);
-		//事件
-		PcOrder pcOrder = this.pcOrderDAO.findById(userId, orderId);
-		this.publishOrderEvent(pcOrder, orderLog);
+		this.orderUpdateService.updateStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, now);
 	}
 
 	/*
@@ -443,61 +390,12 @@ public class PcOrderService {
 			throw new ExException(PcPositonError.POS_NOT_ENOUGH);
 		}
 		
-		BigDecimal closablePos = pos.getVolume();
-		
-		BigDecimal cpv = this.pcOrderDAO.getClosingVolume(pos.getUserId(), pos.getId());
-		if(cpv!=null){
-			closablePos = closablePos.subtract(cpv);
-		}
+		BigDecimal closablePos = orderQueryService.getClosablePosition(pos);
 		
         //判断可平仓位是否足够
         if (BigUtils.gt(number, closablePos)) {
             throw new ExException(PcPositonError.POS_NOT_ENOUGH);
         }
-	}
-	
-	public boolean hasActiveOrder(long userId, String asset, String symbol, Integer longFlag) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", userId);
-		params.put("asset", asset);
-		params.put("symbol", symbol);
-		params.put("longFlag", longFlag);
-		params.put("activeFlag", IntBool.YES);
-		params.put("liqFlag", IntBool.NO);
-		Long count = this.pcOrderDAO.queryCount(params);
-		return count>0;
-	}
-	
-	public List<PcOrder> queryActiveOrder(Long userId, String asset, String symbol, Integer longFlag) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", userId);
-		params.put("asset", asset);
-		params.put("symbol", symbol);
-		params.put("longFlag", longFlag);
-		params.put("activeFlag", IntBool.YES);
-		params.put("liqFlag", IntBool.NO);
-		List<PcOrder> list = this.pcOrderDAO.queryList(params);
-		return list;
-	}
-	
-	public PcOrder getOrder(long userId, Long orderId){
-		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
-		return order;
-	}
-	
-	public void updateOrder4Trad(PcOrder order){
-		this.pcOrderDAO.update(order);
-		this.saveOrderLog(order.getUserId(), order.getId(), PcOrderLog.TRIGGER_TYPE_SYS, PcOrderLog.TYPE_TRADE, order.getModified());
-	}
-	
-	@CrossDB
-	public List<PcOrder> pageQuery(Page page, Integer status, Long modified){
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("page", page);
-		params.put("status", status);
-		params.put("modifiedEnd", modified);
-		List<PcOrder> list = this.pcOrderDAO.queryList(params);
-		return list;
 	}
 	
 }

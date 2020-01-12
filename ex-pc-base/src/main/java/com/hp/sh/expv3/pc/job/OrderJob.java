@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -21,6 +22,8 @@ public class OrderJob {
 
     @Autowired
     private PcOrderService orderService;
+	@Autowired
+	private PcOrderQueryService orderQueryService;
 
 	@Autowired
 	private MatchMqSender matchMqSender;
@@ -30,7 +33,7 @@ public class OrderJob {
 		Long now = DbDateUtils.now();
 		Page page = new Page(1, 100, 1000L);
 		while(true){
-			List<PcOrder> list = this.orderService.pageQuery(page, OrderStatus.PENDING_NEW, System.currentTimeMillis()-1000*30);
+			List<PcOrder> list = this.orderQueryService.pageQuery(page, OrderStatus.PENDING_NEW, System.currentTimeMillis()-1000*30);
 			
 			if(list==null || list.isEmpty()){
 				break;

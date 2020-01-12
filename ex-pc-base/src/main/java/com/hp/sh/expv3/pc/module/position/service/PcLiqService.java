@@ -58,9 +58,6 @@ public class PcLiqService {
     @Autowired
     private PcLiqRecordDAO pcLiqRecordDAO;
     
-    @Autowired
-    private PcPositionDAO pcPositionDAO;
-    
 	@Autowired
 	private FeeRatioService feeRatioService;
     
@@ -206,7 +203,7 @@ public class PcLiqService {
 	}
 	
 	private void createLiqOrder(PcLiqRecord record){
-		PcPosition pos = this.pcPositionDAO.findById(record.getUserId(), record.getPosId());
+		PcPosition pos = pcPositionService.getPosition(record.getUserId(), record.getAsset(), record.getSymbol(), record.getPosId());
 		this.pcOrderService.create(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), OrderFlag.ACTION_CLOSE, record.getLongFlag(), TimeInForce.IMMEDIATE_OR_CANCEL, record.getBankruptPrice(), record.getVolume(), pos, IntBool.NO, IntBool.YES);
 	}
 

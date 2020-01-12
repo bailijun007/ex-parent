@@ -1,9 +1,7 @@
 package com.hp.sh.expv3.pc.module.position.service;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,11 +22,11 @@ import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.error.PcPositonError;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
-import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
-import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
+import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
@@ -46,16 +44,13 @@ import com.hp.sh.expv3.utils.math.BigUtils;
 public class PcPositionMarginService {
 
 	@Autowired
-	private PcPositionDAO pcPositionDAO;
+	private PcOrderQueryService orderQueryService;
 	
-	@Autowired
-	private PcOrderService pcOrderService;
-	
-	@Autowired
-	private PcAccountSymbolDAO pcAccountSymbolDAO;
-
 	@Autowired
 	private FeeRatioService feeRatioService;
+	
+	@Autowired
+	private PcAccountSymbolService accountSymbolService;
 	
 	@Autowired
 	private PcAccountCoreService pcAccountCoreService;
@@ -77,7 +72,11 @@ public class PcPositionMarginService {
             throw new ExException(CommonError.PARAM_ERROR);
         }
         
-        PcAccountSymbol accountSymbol = this.getAccountSymbol(userId, asset, symbol);
+        PcAccountSymbol accountSymbol = this.accountSymbolService.getOrCreate(userId, asset, symbol);
+        
+        if(accountSymbol==null){
+        	accountSymbol = this.accountSymbolService.create(userId, asset, symbol);
+        }
         
         //检查参数
         if(BigUtils.ltZero(leverage) || BigUtils.gt(leverage, accountSymbol.getLongMaxLeverage())){
@@ -85,7 +84,7 @@ public class PcPositionMarginService {
         }
         
         //是否有活跃委托
-        if (pcOrderService.hasActiveOrder(userId, asset, symbol, longFlag)) {
+        if (orderQueryService.hasActiveOrder(userId, asset, symbol, longFlag)) {
             throw new ExException(PcPositonError.HAVE_ACTIVE_ORDER);
         }
         
@@ -93,7 +92,7 @@ public class PcPositionMarginService {
         this.modifyAccountSymbol(accountSymbol, longFlag, leverage);
         
         //当前仓位
-        PcPosition pos = this.pcPositionDAO.getActivePos(userId, asset, symbol, longFlag);
+        PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
         
         if (pos != null && leverage.compareTo(pos.getLeverage()) != 0) {
 
@@ -155,18 +154,7 @@ public class PcPositionMarginService {
         	}
         	accountSymbol.setShortLeverage(leverage);
         }
-        Long now = DbDateUtils.now();
-		accountSymbol.setModified(now);
-        this.pcAccountSymbolDAO.update(accountSymbol);
-	}
-	
-	private PcAccountSymbol getAccountSymbol(long userId, String asset, String symbol) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", userId);
-		params.put("asset", asset);
-		params.put("symbol", symbol);
-		PcAccountSymbol pcAccountSymbol = this.pcAccountSymbolDAO.queryOne(params );
-		return pcAccountSymbol;
+        this.accountSymbolService.update(accountSymbol);
 	}
 
 	/**
@@ -181,7 +169,7 @@ public class PcPositionMarginService {
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void changeMargin(Long userId, String asset, String symbol, int longFlag, int optType, BigDecimal amount){
 		//当前仓位
-		PcPosition pos = this.pcPositionDAO.getActivePos(userId, asset, symbol, longFlag);
+		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(pos==null){
 			throw new ExException(CommonError.OBJ_DONT_EXIST);
 		}
@@ -270,7 +258,7 @@ public class PcPositionMarginService {
 	
 	public boolean setAutoAddFlag(long userId, String asset, String symbol, int longFlag, int autoAddFlag){
 		//当前仓位
-		PcPosition pos = this.pcPositionDAO.getActivePos(userId, asset, symbol, longFlag);
+		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(pos==null){
 			throw new ExException(CommonError.OBJ_DONT_EXIST);
 		}
@@ -279,7 +267,7 @@ public class PcPositionMarginService {
 	}
 
 	public List<PcPosition> queryActivePosList(Page page, Long userId, String asset, String symbol) {
-		List<PcPosition> list = this.pcPositionDAO.queryActivePosList(page, userId, asset, symbol);
+		List<PcPosition> list = this.pcPositionService.queryActivePosList(page, userId, asset, symbol);
 		return list;
 	}
 	

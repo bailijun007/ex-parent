@@ -2,6 +2,7 @@ package com.hp.sh.expv3.pc.module.position.service;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
+import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
@@ -25,7 +27,8 @@ import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
-import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderUpdateService;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
@@ -52,7 +55,10 @@ public class PcPositionService {
 	private PcOrderTradeDAO pcOrderTradeDAO;
 	
 	@Autowired
-	private PcOrderService pcOrderService;
+	private PcOrderUpdateService orderUpdateService;
+	
+	@Autowired
+	private PcOrderQueryService orderQueryService;
 	
 	@Autowired
 	private PcAccountSymbolDAO pcAccountSymbolDAO;
@@ -75,7 +81,7 @@ public class PcPositionService {
 	//处理成交订单
     @LockIt(key="${trade.accountId}-${trade.asset}-${trade.symbol}")
 	public void handleTradeOrder(PcTradeMsg trade){
-		PcOrder order = this.pcOrderService.getOrder(trade.getAccountId(), trade.getOrderId());
+		PcOrder order = this.orderQueryService.getOrder(trade.getAccountId(), trade.getOrderId());
 		boolean yes = this.canTrade(order, trade);
 		if(!yes){
 			logger.error("成交已处理过了");
@@ -107,7 +113,7 @@ public class PcPositionService {
 		if(isNewPos){
 			pcPosition.setCreated(now);
 			pcPosition.setModified(now);
-			this.pcPositionDAO.save(pcPosition);
+			this.save(pcPosition);
 		}else{
 			pcPosition.setModified(now);
 			this.update(pcPosition);
@@ -136,12 +142,7 @@ public class PcPositionService {
 		
 	}
     
-    public void update(PcPosition pcPosition){
-    	this.pcPositionDAO.update(pcPosition);
-    	publisher.publishEvent(pcPosition);
-    }
-	
-	private int getLogType(int closeFlag, int longFlag){
+    private int getLogType(int closeFlag, int longFlag){
 		if(IntBool.isFalse(closeFlag)){
 			return IntBool.isTrue(longFlag)?LogType.TYPE_TRAD_OPEN_LONG:LogType.TYPE_TRAD_CLOSE_SHORT;
 		}else{
@@ -191,7 +192,7 @@ public class PcPositionService {
         order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setModified(now);
-		this.pcOrderService.updateOrder4Trad(order);
+		this.orderUpdateService.updateOrder4Trad(order);
 	}
 
 	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeResult, Long posId, Long now) {
@@ -386,8 +387,22 @@ public class PcPositionService {
 		
 	}
 
+	private void save(PcPosition pcPosition) {
+		this.pcPositionDAO.save(pcPosition);
+	}
+
+	public void update(PcPosition pcPosition){
+		this.pcPositionDAO.update(pcPosition);
+		publisher.publishEvent(pcPosition);
+	}
+
 	public PcPosition getPosition(long userId, String asset, String symbol, Long id) {
 		return this.pcPositionDAO.findById(userId, id);
+	}
+
+	public List<PcPosition> queryActivePosList(Page page, Long userId, String asset, String symbol) {
+		List<PcPosition> list = this.pcPositionDAO.queryActivePosList(page, userId, asset, symbol);
+		return list;
 	}
 	
 }
