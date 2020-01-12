@@ -32,7 +32,7 @@ public class PcLiqRecord extends UserDataEntity {
 	//破产价
 	private BigDecimal bankruptPrice;
 	
-	 // 已成交量
+	 // 强平委托已成交量
 	private BigDecimal filledVolume;
 	
 	//强平价

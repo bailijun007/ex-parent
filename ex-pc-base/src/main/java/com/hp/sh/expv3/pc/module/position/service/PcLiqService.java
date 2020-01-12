@@ -3,6 +3,8 @@ package com.hp.sh.expv3.pc.module.position.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,8 @@ import com.hp.sh.expv3.utils.IntBool;
 @Service
 @Transactional(rollbackFor=Exception.class)
 public class PcLiqService {
+	private static final Logger logger = LoggerFactory.getLogger(PcLiqService.class);
+    
 
     @Autowired
     private PcPositionService pcPositionService;
@@ -126,6 +130,10 @@ public class PcLiqService {
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list, Integer lastFlag) {
 		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+		if(pos==null){
+			logger.error("当前仓位不存在!userId={}, symbol={}, longFlag={}。  强平仓位:{}", userId, symbol, longFlag, posId);
+			return;
+		}
 		if(!pos.getId().equals(posId)){
 			throw new RuntimeException("平仓，仓位ID与当前仓位ID不一致");
 		}
@@ -133,7 +141,7 @@ public class PcLiqService {
 		if(pos.getLiqStatus()==LiqStatus.FORCE_CLOSE){
 			return;
 		}
-		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getAsset());
+		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
 		
 		//检查触发强平
 		if(!this.checkAndResetLiqStatus(pos, markPrice)){
@@ -178,6 +186,7 @@ public class PcLiqService {
 		record.setPosId(pos.getId());
 		record.setLongFlag(pos.getLongFlag());
 		record.setVolume(pos.getVolume());
+		record.setFilledVolume(BigDecimal.ZERO);
 		record.setPosMargin(pos.getPosMargin());
 		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
 		BigDecimal bankruptPrice = this.holdPosStrategy.calcBankruptPrice(pos.getLongFlag(), pos.getMeanPrice(), _amount, pos.getPosMargin());
