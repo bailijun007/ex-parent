@@ -1,9 +1,9 @@
 package com.hp.sh.expv3.pc.strategy.aabb;
 
-import java.math.BigDecimal;
-
 import com.hp.sh.expv3.utils.math.DecimalUtil;
 import com.hp.sh.expv3.utils.math.Precision;
+
+import java.math.BigDecimal;
 
 /**
  * AABB价格计算器
@@ -48,16 +48,21 @@ class PcPriceCalc {
             return amt.multiply(posHoldMarginRatio.add(BigDecimal.ONE)).divide(posMargin.add(holdVolume), Precision.COMMON_PRECISION, DecimalUtil.MORE).max(BigDecimal.ZERO).stripTrailingZeros();
         } else {
             /**
-             * ( posMargin + pnl ) / ( amt / op ) = posHoldMarginRatio
+             * ( posMargin + pnl ) / ( amt / cp ) = posHoldMarginRatio
              * ( posMargin + (amt /cp ) - (amt/op) ) / ( amt / cp ) = posHoldMarginRatio
              * [ posMargin - (amt/op) + (amt /cp) ] / ( amt / cp ) = posHoldMarginRatio
-             * [ posMargin + (amt/cp) - (amt/op)  ] / ( amt / cp ) = posHoldMarginRatio
              * [( posMargin - (amt/op) ) / ( amt / cp ) ] + 1 = posHoldMarginRatio
              * [( posMargin - (amt/op) ) / ( amt / cp ) ] = posHoldMarginRatio - 1
              * [( posMargin - (amt/op) ) / (posHoldMarginRatio - 1) ] = ( amt / cp )
+             *  ( posMargin - (amt/op) ) / (posHoldMarginRatio - 1)   = ( amt / cp )
+             *  cp / (posHoldMarginRatio - 1) = amt / ( posMargin - (amt/op) )
              * cp = amt * (posHoldMarginRatio - 1) / (posMargin - v)
              */
-            return amt.multiply(posHoldMarginRatio.subtract(BigDecimal.ONE)).divide(posMargin.subtract(holdVolume), Precision.COMMON_PRECISION, DecimalUtil.MORE).max(BigDecimal.ZERO).stripTrailingZeros();
+            BigDecimal lp = amt.multiply(posHoldMarginRatio.subtract(BigDecimal.ONE)).divide(posMargin.subtract(holdVolume), Precision.COMMON_PRECISION, DecimalUtil.MORE);
+            if (lp.compareTo(BigDecimal.ZERO) < 0) {
+                lp = BigDecimal.valueOf(100000000L);
+            }
+            return lp.stripTrailingZeros();
         }
     }
 
@@ -75,7 +80,11 @@ class PcPriceCalc {
         if (isLong) {
             return amt.divide(volume.add(margin), scale, DecimalUtil.MORE).max(BigDecimal.ZERO).stripTrailingZeros();
         } else {
-            return amt.divide(volume.subtract(margin), scale, DecimalUtil.LESS).max(BigDecimal.ZERO).stripTrailingZeros();
+            BigDecimal bp = amt.divide(volume.subtract(margin), scale, DecimalUtil.LESS);
+            if (bp.compareTo(BigDecimal.ZERO) < 0) {
+                return BigDecimal.valueOf(100000000L);
+            }
+            return bp.stripTrailingZeros();
         }
     }
 
