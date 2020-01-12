@@ -23,10 +23,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PcMatchMqNotify {
@@ -188,15 +187,9 @@ public class PcMatchMqNotify {
 
         PcOrderSameSideCancelled4PosLockMqMsgDto dto = BeanCopyUtil.copy(msg);
 
-        List<List<PcOrderCancelMqMsgDto>> partitions = Lists.partition(Optional.ofNullable(cancelMqMsgs).orElse(new ArrayList<>()), 10);
-
-        for (int i = 0; i < partitions.size(); i++) {
-            if (i == partitions.size() - 1) {
-                dto.setLastFlag(CommonConst.YES);
-            } else {
-                dto.setLastFlag(CommonConst.NO);
-            }
-            dto.setCancelOrders(partitions.get(i));
+        if (null == cancelMqMsgs || cancelMqMsgs.size() == 0) {
+            dto.setLastFlag(CommonConst.YES);
+            dto.setCancelOrders(Collections.emptyList());
             Message message = buildMessage(
                     topic,// topic
                     "" + RmqTagEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED.getConstant(),// tag
@@ -206,6 +199,26 @@ public class PcMatchMqNotify {
             safeSend2MatchTopic(message, dto.getAccountId());
             if (logger.isDebugEnabled()) {
                 logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+            }
+        } else {
+            List<List<PcOrderCancelMqMsgDto>> partitions = Lists.partition(cancelMqMsgs, 10);
+            for (int i = 0; i < partitions.size(); i++) {
+                if (i == partitions.size() - 1) {
+                    dto.setLastFlag(CommonConst.YES);
+                } else {
+                    dto.setLastFlag(CommonConst.NO);
+                }
+                dto.setCancelOrders(partitions.get(i));
+                Message message = buildMessage(
+                        topic,// topic
+                        "" + RmqTagEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED.getConstant(),// tag
+                        "" + dto.getPosId(), // pos id
+                        dto// body
+                );
+                safeSend2MatchTopic(message, dto.getAccountId());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+                }
             }
         }
         return true;
