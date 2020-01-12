@@ -41,8 +41,13 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
     }
 	
 	/**
-	 * 计算仓位预估强评价
-	 * @return
+	 * 计算仓位的强平价(预估强平价)
+	 * @param longFlag 多/空
+	 * @param amount 持仓金额
+	 * @param meanPrice 均价 
+	 * @param holdMarginRatio 维持保证金率
+	 * @param posMargin 保证金
+	 * @return 强平价
 	 */
 	@Override
 	public BigDecimal calcLiqPrice(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
@@ -86,20 +91,6 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 	public BigDecimal calcPosPnl(int longFlag, BigDecimal amount, BigDecimal meanPrice, BigDecimal markPrice){
 		BigDecimal pnl = PnlCalc.calcPnl(longFlag, amount, meanPrice, markPrice);
 		return pnl;
-	}
-
-	/**
-	 * 计算仓位的强平价(预估强平价)
-	 * @param longFlag 多/空
-	 * @param amount 持仓金额
-	 * @param meanPrice 均价 
-	 * @param holdMarginRatio 维持保证金率
-	 * @param posMargin 保证金
-	 * @return 强平价
-	 */
-	@Override
-	public BigDecimal calcPosLiqPrice(int longFlag, BigDecimal amount, BigDecimal meanPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
-		return PcPriceCalc.calcLiqPrice(holdMarginRatio, IntBool.isTrue(longFlag), meanPrice, amount, posMargin, Precision.COMMON_PRECISION );
 	}
 	
 	/**

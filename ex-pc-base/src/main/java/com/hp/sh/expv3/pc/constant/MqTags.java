@@ -20,7 +20,7 @@ public class MqTags {
 	
 	public static final String TAGS_PC_POS_LIQ_LOCKED = "PC_POS_LIQ_LOCKED";
 	
-	public static final String TAGS_ORDER_ALL_CANCEL = "PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCEL";
+	public static final String TAGS_ORDER_ALL_CANCELLED = "PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED";
 
 	
 }
