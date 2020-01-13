@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.hp.sh.expv3.dev.CrossDB;
+import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
 import com.hp.sh.expv3.utils.math.Precision;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +42,9 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
 
     @Autowired
     private PcOrderTradeExtendService pcOrderTradeService;
+
+    @Autowired
+    private  PositionStrategyContext positionStrategyContext;
 
     @Override
     public List<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status) {
@@ -101,10 +106,22 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                 vo.setLongFlag(orderVo.getLongFlag());
                 vo.setCtime(orderVo.getCreated());
 
-//                BigDecimal avgPrice = pcPositionExtendService.getAvgPrice(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymbol());
-//                vo.setAvgPrice(avgPrice);
-                // TODO 需要调老王接口
-                vo.setAvgPrice(BigDecimal.ZERO);
+                //成交均价
+                OrderTrade orderTrade = new OrderTrade() {
+                    @Override
+                    public BigDecimal getVolume() {
+                        return orderVo.getVolume();
+                    }
+
+                    @Override
+                    public BigDecimal getPrice() {
+                        return orderVo.getPrice();
+                    }
+                };
+                List<OrderTrade> list1=new ArrayList<>();
+                list1.add(orderTrade);
+                BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(orderVo.getAsset(), orderVo.getSymbol(), orderVo.getLongFlag(), list1);
+                vo.setAvgPrice(meanPrice);
                 vo.setFilledQty(orderVo.getFilledVolume());
                 vo.setCloseFlag(orderVo.getCloseFlag());
                 vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros());
