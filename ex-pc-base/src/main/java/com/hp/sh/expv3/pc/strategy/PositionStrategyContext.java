@@ -214,8 +214,8 @@ public class PositionStrategyContext {
 		BigDecimal baseValue = BigDecimal.ZERO;
 		HoldPosStrategy strategy = this.getHoldPosStrategy(asset, symbol);
 		for(OrderTrade trade : tradeList){
-			amount.add(CompFieldCalc.calcAmount(trade.getVolume(), faceValue));
-			baseValue.add(CompFieldCalc.calcBaseValue(trade.getVolume(), faceValue, trade.getPrice()));
+			amount = amount.add(CompFieldCalc.calcAmount(trade.getVolume(), faceValue));
+			baseValue = baseValue.add(CompFieldCalc.calcBaseValue(trade.getVolume(), faceValue, trade.getPrice()));
 		}
 		BigDecimal meanPrice = strategy.calcMeanPrice(longFlag, baseValue, amount);
 		return meanPrice;
