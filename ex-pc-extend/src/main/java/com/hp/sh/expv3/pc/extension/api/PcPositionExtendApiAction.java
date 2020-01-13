@@ -90,7 +90,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
                 //已实现盈亏
                 BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(positionVo.getId(), positionVo.getUserId());
                 List<PcOrderVo> pcOrderVos = pcOrderExtendService.activeOrderList(positionVo.getId(), positionVo.getUserId());
-                BigDecimal volume = pcOrderVos.stream().map(PcOrderVo::getVolume).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal volume = pcOrderVos.stream().map(order -> order.getVolume().subtract(order.getFilledVolume())).reduce(BigDecimal.ZERO, BigDecimal::add);
                 CurrentPositionVo currentPositionVo = new CurrentPositionVo();
                 BeanUtils.copyProperties(positionVo, currentPositionVo);
                 currentPositionVo.setUserId(positionVo.getUserId());
