@@ -30,16 +30,16 @@ public class C2cOrderPayApiAction {
     private static final Logger logger = LoggerFactory.getLogger(C2cOrderPayApiAction.class);
 
 
-    @ApiOperation(value = "创建c2c充值订单")
-    @ResultEntity
-    @GetMapping("/deposit/create")
-    public String create(@RequestParam("userId") long userId, @RequestParam("ratio") BigDecimal ratio,
-                         @RequestParam("srcCurrency")  String srcCurrency,  @RequestParam("tarCurrency") String tarCurrency,
-                         @RequestParam("tarVolume")  BigDecimal tarVolume,  @RequestParam("fabiAmt") BigDecimal fabiAmt){
-
-        String s = plPayService.rujin(userId, ratio, srcCurrency, tarCurrency, tarVolume, fabiAmt);
-
-        return s;
-    }
+//    @ApiOperation(value = "创建c2c充值订单")
+//    @ResultEntity
+//    @GetMapping("/deposit/create")
+//    public String create(@RequestParam("userId") long userId, @RequestParam("ratio") BigDecimal ratio,
+//                         @RequestParam("srcCurrency")  String srcCurrency,  @RequestParam("tarCurrency") String tarCurrency,
+//                         @RequestParam("tarVolume")  BigDecimal tarVolume,  @RequestParam("fabiAmt") BigDecimal fabiAmt){
+//
+//        String s = plPayService.rujin(userId, ratio, srcCurrency, tarCurrency, tarVolume, fabiAmt);
+//
+//        return s;
+//    }
 
 }
