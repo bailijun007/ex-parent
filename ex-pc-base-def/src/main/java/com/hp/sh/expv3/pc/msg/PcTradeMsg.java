@@ -44,7 +44,7 @@ public class PcTradeMsg extends BaseSymbolMsg {
 	}
 	
 	public String uniqueKey(){
-		return "TRADEMSG-"+this.tradeId+"-"+opponentOrderId;
+		return "TRADE-"+this.tradeId+"-"+opponentOrderId;
 	}
 
 	public Long getAccountId() {

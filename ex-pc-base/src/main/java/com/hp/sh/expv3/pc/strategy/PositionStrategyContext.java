@@ -209,6 +209,9 @@ public class PositionStrategyContext {
 	}
 
 	public BigDecimal calcOrderMeanPrice(String asset, String symbol, int longFlag, List<? extends OrderTrade> tradeList){
+		if(tradeList==null || tradeList.isEmpty()){
+			return BigDecimal.ZERO;
+		}
 		BigDecimal faceValue = BigDecimal.ONE;
 		BigDecimal amount = BigDecimal.ZERO;
 		BigDecimal baseValue = BigDecimal.ZERO;

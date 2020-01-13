@@ -103,6 +103,21 @@ public class FeeRatioServiceImpl implements FeeRatioService {
 
         return BigDecimal.ZERO;
     }
+    
+    @Override
+    public BigDecimal getMaxLeverage(Long userId, String asset, String symbol, BigDecimal posVolume){
+    	PosLevelVo vo = this.findPosLevelVo(userId, asset, symbol, posVolume);
+    	return vo.getMaxLeverage();
+    }
+    
+    private PosLevelVo findPosLevelVo(Long userId, String asset, String symbol, BigDecimal volume) {
+        HashOperations hashOperations = templateDB0.opsForHash();
+        String hashKey = asset + "__" + symbol;
+        Object s = hashOperations.get(RedisKey.PC_POS_LEVEL, hashKey);
+        List<PosLevelVo> voList = JSON.parseArray(s.toString(), PosLevelVo.class);
+        Optional<PosLevelVo> first = voList.stream().filter(vo -> vo.getMinAmt().compareTo(volume) <= 0 && vo.getMaxAmt().compareTo(volume) >= 0).findFirst();
+        return first.get();
+    }
 
     /**
      * redis :

@@ -78,8 +78,16 @@ public class PcPositionMarginService {
         	accountSymbol = this.accountSymbolService.create(userId, asset, symbol);
         }
         
-        //检查参数
-        if(BigUtils.ltZero(leverage) || BigUtils.gt(leverage, accountSymbol.getLongMaxLeverage())){
+        //当前仓位
+        PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
+        BigDecimal posVolume = BigDecimal.ZERO;
+        if(pos!=null){
+        	posVolume = pos.getVolume();
+        }
+        
+		//检查参数
+        BigDecimal maxLeverage = feeRatioService.getMaxLeverage(userId, asset, symbol, posVolume);
+        if(BigUtils.ltZero(leverage) || BigUtils.gt(leverage, maxLeverage)){
         	throw new ExException(PcPositonError.PARAM_GT_MAX_LEVERAGE);
         }
         
@@ -90,9 +98,6 @@ public class PcPositionMarginService {
         
         //修改设置
         this.modifyAccountSymbol(accountSymbol, longFlag, leverage);
-        
-        //当前仓位
-        PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
         
         if (pos != null && leverage.compareTo(pos.getLeverage()) != 0) {
 

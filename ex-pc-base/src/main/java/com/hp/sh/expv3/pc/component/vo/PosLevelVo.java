@@ -18,7 +18,7 @@ public class PosLevelVo {
     private Long id;
     private BigDecimal maxAmt;
 
-    private Integer maxLeverage;
+    private BigDecimal maxLeverage;
 
     private BigDecimal minAmt;
 
@@ -71,11 +71,11 @@ public class PosLevelVo {
         this.maxAmt = maxAmt;
     }
 
-    public Integer getMaxLeverage() {
+    public BigDecimal getMaxLeverage() {
         return maxLeverage;
     }
 
-    public void setMaxLeverage(Integer maxLeverage) {
+    public void setMaxLeverage(BigDecimal maxLeverage) {
         this.maxLeverage = maxLeverage;
     }
 

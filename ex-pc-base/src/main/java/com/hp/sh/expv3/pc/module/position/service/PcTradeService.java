@@ -133,7 +133,7 @@ public class PcTradeService {
 			this.closeFeeToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult, order.getLongFlag());
 		}else{
 			if(BigUtils.ltZero(tradeResult.getFeeReceivable())){
-				this.openFeeDiffToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult);
+				this.openFeeDiffToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult.getMakerFeeDiff());
 			}
 		}
 		
@@ -167,12 +167,12 @@ public class PcTradeService {
 		this.pcAccountCoreService.add(request);
 	}
 	
-	private void openFeeDiffToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeData) {
+	private void openFeeDiffToPcAccount(Long userId, Long orderTradeId, String asset, BigDecimal makerFeeDiff) {
 		PcAddRequest request = new PcAddRequest();
-		request.setAmount(tradeData.getMakerFeeDiff());
+		request.setAmount(makerFeeDiff);
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("返还开仓手续费差额：%s", tradeData.getMakerFeeDiff()));
+		request.setRemark(String.format("返还开仓手续费差额：%s", makerFeeDiff));
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(PcAccountTradeType.RETURN_FEE_DIFF);
 		request.setAssociatedId(orderTradeId);
@@ -184,7 +184,9 @@ public class PcTradeService {
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getFee()));
 		}
-		order.setFeeCost(order.getFeeCost().add(tradeResult.getFeeReceivable()));
+		if(BigUtils.ltZero(tradeResult.getFeeReceivable())){
+			order.setFeeCost(order.getFeeCost().add(tradeResult.getFeeReceivable()));
+		}
 		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getVolume()));
         order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);

@@ -63,4 +63,8 @@ public interface FeeRatioService {
 	 */
 	BigDecimal getMakerCloseFeeRatio(long userId, String asset, String symbol);
 
+	default BigDecimal getMaxLeverage(Long userId, String asset, String symbol, BigDecimal posVolume){
+		return new BigDecimal(50);
+	}
+
 }
