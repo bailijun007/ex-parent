@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MqTags;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
-import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
+import com.hp.sh.expv3.pc.module.position.service.PcTradeService;
 import com.hp.sh.expv3.pc.mq.match.msg.MatchNotMatchMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.MatchedOrderCancelledMsg;
 import com.hp.sh.expv3.pc.msg.MatchedMsg;
@@ -23,7 +23,7 @@ public class MatchMqConsumer {
 	private PcOrderService pcOrderService;
 	
 	@Autowired
-	private PcPositionService pcPositionService;
+	private PcTradeService pcTradeService;
 	
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(MatchNotMatchMsg msg){
@@ -41,7 +41,7 @@ public class MatchMqConsumer {
 	@MQListener(tags=MqTags.TAGS_PC_TRADE)
 	public void handleTradeMsg(PcTradeMsg msg){
 		logger.info("收到消息:{}", msg);
-		pcPositionService.handleTradeOrder(msg);
+		pcTradeService.handleTradeOrder(msg);
 	}
 	
 	//撮合成功
