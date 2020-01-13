@@ -1,16 +1,17 @@
 package com.hp.sh.expv3.fund.c2c.service;
 
 import com.gitee.hupadev.base.api.PageResult;
+import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import com.hp.sh.expv3.fund.c2c.dao.C2cOrderDAO;
 import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
+import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
 import com.hp.sh.expv3.fund.extension.vo.C2cOrderVo;
 import groovy.util.logging.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,5 +55,18 @@ public class QueryService {
         return pageResult;
     }
 
+    public BigDecimal getLockC2cNumber(Long userId, String asset) {
+        // 获取到c2c 审核中的出金
+        List<C2cOrder> c2cOrders = c2cOrderDAO.queryList(new HashMap<String, Object>() {
+            {
+                put("userId", userId);
+                put("payCurrency", asset);
+                put("type", C2cConst.C2C_SELL);
+                put("approvalStatus", ApprovalStatus.IN_AUDIT);
+            }
+        });
+
+        return c2cOrders.stream().map(C2cOrder::getVolume).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
 }

@@ -52,21 +52,23 @@ public interface C2cOrderExtApi {
 
 
     @ApiOperation(value = "创建c2c体现订单")
-    @ResultEntity
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "0", required = true),
             @ApiImplicitParam(name = "bank", value = "开户银行", example = "农业银行", required = true),
             @ApiImplicitParam(name = "bankCardName", value = "银行卡收款姓名", example = "张三", required = true),
             @ApiImplicitParam(name = "bankCard", value = "银行卡号", example = "846546468546465456", required = true),
-            @ApiImplicitParam(name = "targetAssetNum", value = "资产出金数量", example = "352", required = true),
-            @ApiImplicitParam(name = "fabiAmount", value = "出金金额（法币）", example = "3520", required = true),
-            @ApiImplicitParam(name = "targetAsset", value = "兑换资产", example = "USDT", required = true),
-            @ApiImplicitParam(name = "sourceAsset", value = "原资产", example = "CNY", required = true)
+            @ApiImplicitParam(name = "srcAsset", value = "源资产", example = "BTC", required = true),
+            @ApiImplicitParam(name = "srcNum", value = "源资产数量", example = "1", required = true),
+            @ApiImplicitParam(name = "tarAsset", value = "目标资产", example = "CNY", required = true),
+            @ApiImplicitParam(name = "tarNum", value = "目标资产数量", example = "7000", required = true),
+            @ApiImplicitParam(name = "ratio", value = "兑换比率", example = "7.0298", required = true)
     })
     @GetMapping("/api/extension/c2c/order/withdrawal/withdrawalOrder")
     public String withdrawalOrder(@RequestParam("userId") Long userId,
                                   @RequestParam("bank") String bank, @RequestParam("bankCardName") String bankCardName,
-                                  @RequestParam("targetAssetNum") BigDecimal targetAssetNum, @RequestParam("fabiAmount") BigDecimal fabiAmount,
-                                  @RequestParam("targetAsset") String targetAsset, @RequestParam("sourceAsset") String sourceAsset);
+                                  @RequestParam("srcAsset") String srcAsset, @RequestParam("srcNum") BigDecimal srcNum,
+                                  @RequestParam("tarAsset") String tarAsset, @RequestParam("tarNum") BigDecimal tarNum,
+                                  @RequestParam("ratio")  BigDecimal ratio
+    );
 
 }
