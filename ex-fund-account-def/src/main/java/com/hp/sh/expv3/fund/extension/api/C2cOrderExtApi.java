@@ -68,7 +68,15 @@ public interface C2cOrderExtApi {
                                   @RequestParam("bank") String bank, @RequestParam("bankCardName") String bankCardName,
                                   @RequestParam("srcAsset") String srcAsset, @RequestParam("srcNum") BigDecimal srcNum,
                                   @RequestParam("tarAsset") String tarAsset, @RequestParam("tarNum") BigDecimal tarNum,
-                                  @RequestParam("ratio")  BigDecimal ratio
-    );
+                                  @RequestParam("ratio")  BigDecimal ratio);
+
+    @ApiOperation(value = "审核c2c体现订单")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "主键编号", example = "1", required = true),
+            @ApiImplicitParam(name = "auditStatus", value = "审核状态（5：审核通过，6：审核不通过）", example = "5", required = true)
+    })
+    @GetMapping("/api/extension/c2c/order/withdrawal/approvalC2cOrder")
+    public String approvalC2cOrder(@RequestParam("id")  Long id,@RequestParam("auditStatus")  Integer auditStatus);
+
 
 }

@@ -13,6 +13,8 @@ public class FundCommonError extends ErrorCode {
     public static final FundCommonError ORDER_CALLBACK_NOTIFY_FIND_SIGN_ERROR = new FundCommonError(10503, "订单成功回调通知签名不对");
     public static final FundCommonError ORDER_CALLBACK_NOTIFY_FAIL = new FundCommonError(10504, "订单回调通知失败");
     public static final FundCommonError ORDER_NOT_SUFFICIENT_FUNDS = new FundCommonError(10505, "余额不足");
+    public static final FundCommonError ORDER_NOT_FIND = new FundCommonError(10506, "订单不存在");
+    public static final FundCommonError UPDATE_C2C_ORDER_FAIL = new FundCommonError(10507, "更新c2c订单失败");
 
 
 

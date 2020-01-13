@@ -69,4 +69,7 @@ public class QueryService {
         return c2cOrders.stream().map(C2cOrder::getVolume).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    public C2cOrder queryById(Long id) {
+        return c2cOrderDAO.queryById(id);
+    }
 }

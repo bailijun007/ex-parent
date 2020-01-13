@@ -4,11 +4,14 @@ import com.gitee.hupadev.base.api.ResultEntity;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.c2c.component.PLPayService;
 import com.hp.sh.expv3.fund.c2c.component.PLpayClient;
+import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
 import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
+import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
 import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
+import com.hp.sh.expv3.fund.wallet.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.utils.math.Precision;
 import io.swagger.annotations.Api;
@@ -87,14 +90,13 @@ public class C2cOrderCallbackAction {
                 BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
                 BigDecimal qty = param.getOrderAmount().multiply(feeRatio).divide(c2cOrder1.getPrice(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
                 c2cOrder.setVolume(qty);
-                c2cOrder.setPayStatus(1);
+                c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
                 c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
-                c2cOrder.setSynchStatus(1);
-                c2cOrder.setApprovalStatus(1);
+                c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_TRUE);
+                c2cOrder.setApprovalStatus(ApprovalStatus.APPROVED);
                 c2cOrder.setModified(Instant.now().toEpochMilli());
                 c2cOrder.setSn(orderNo);
                 c2cOrder.setUserId(userId);
-                //这里需要掉接口 通过sn获取id和userid ,暂时写死
                 buyService.updateBySnAndUserId(c2cOrder);
 
                 // 调用价钱方法和增加流水记录
@@ -102,9 +104,9 @@ public class C2cOrderCallbackAction {
                 request.setUserId(userId);
                 request.setAmount(orderAmount);
                 request.setAsset(param.getOrderCurrency());
-                request.setRemark("c2c充值");
+                request.setRemark(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
                 request.setTradeNo(c2cOrder1.getSn());
-                request.setTradeType(1);
+                request.setTradeType(TradeType.DEPOSIT);
                 fundAccountCoreApi.add(request);
 
             } catch (Exception e) {

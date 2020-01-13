@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author BaiLiJun  on 2020/1/9
@@ -42,6 +44,8 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
 
     @Autowired
     private FundAccountExtApi fundAccountExtApi;
+
+    ReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
      * 通过支付状态分页查询c2c订单，不传则查全部
@@ -97,28 +101,50 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         BigDecimal c2cLockedVolume = queryService.getLockC2cNumber(userId, srcAsset);
         BigDecimal remain = account.getTotalAssets().subtract(account.getLock()).subtract(c2cLockedVolume).subtract(srcNum);
         if (remain.compareTo(BigDecimal.ZERO) >= 0) {
-            //生成c2c体现订单(体现状态为审核中)
-            C2cOrder c2cOrder = new C2cOrder();
-            c2cOrder.setSn(GenerateOrderNumUtils.getOrderNo(userId));
-            c2cOrder.setPayCurrency(srcAsset);
-            c2cOrder.setExchangeCurrency(tarAsset);
-            c2cOrder.setPrice(ratio);
-            c2cOrder.setType(C2cConst.C2C_SELL);
-            c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
-            c2cOrder.setPayStatusDesc(C2cConst.C2C_PAY_STATUS_DESC_WITHDRAWAL);
-            c2cOrder.setPayTime(Instant.now().toEpochMilli());
-            c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
-            c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_FALSE);
-            c2cOrder.setApprovalStatus(ApprovalStatus.IN_AUDIT);
-            c2cOrder.setUserId(userId);
-            c2cOrder.setCreated(Instant.now().toEpochMilli());
-            c2cOrder.setModified(Instant.now().toEpochMilli());
-            c2cOrder.setVolume(srcNum);
-            c2cOrder.setAmount(ratio.multiply(srcNum));
-            sellService.createC2cOut(c2cOrder);
+            lock.writeLock().lock();
+            try {
+                //生成c2c体现订单(体现状态为审核中)
+                C2cOrder c2cOrder = new C2cOrder();
+                c2cOrder.setSn(GenerateOrderNumUtils.getOrderNo(userId));
+                c2cOrder.setPayCurrency(srcAsset);
+                c2cOrder.setExchangeCurrency(tarAsset);
+                c2cOrder.setPrice(ratio);
+                c2cOrder.setType(C2cConst.C2C_SELL);
+                c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
+                c2cOrder.setPayStatusDesc(C2cConst.C2C_PAY_STATUS_DESC_WITHDRAWAL);
+                c2cOrder.setPayTime(Instant.now().toEpochMilli());
+                c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
+                c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_FALSE);
+                c2cOrder.setApprovalStatus(ApprovalStatus.IN_AUDIT);
+                c2cOrder.setUserId(userId);
+                c2cOrder.setCreated(Instant.now().toEpochMilli());
+                c2cOrder.setModified(Instant.now().toEpochMilli());
+                c2cOrder.setVolume(srcNum);
+                c2cOrder.setAmount(ratio.multiply(srcNum));
+                sellService.createC2cOut(c2cOrder);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                lock.writeLock().unlock();
+            }
             return "success";
         } else {
             throw new ExException(FundCommonError.ORDER_NOT_SUFFICIENT_FUNDS);
         }
+    }
+
+    @Override
+    public String approvalC2cOrder(Long id,Integer auditStatus) {
+        C2cOrder c2cOrder = queryService.queryById(id);
+       if(null==c2cOrder){
+           throw new ExException(FundCommonError.ORDER_NOT_FIND);
+       }
+        C2cOrder order =new C2cOrder();
+        order.setPayFinishTime(Instant.now().toEpochMilli());
+        order.setApprovalStatus(auditStatus);
+        order.setId(id);
+        sellService.updateById(order);
+
+        return "success";
     }
 }
