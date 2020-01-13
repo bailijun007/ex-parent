@@ -146,7 +146,7 @@ public class FeeRatioServiceImpl implements FeeRatioService {
      */
     @Override
     public BigDecimal getMakerCloseFeeRatio(long userId, String asset, String symbol) {
-        return findFeeRatio(userId, RedisKey.PC_FEE,  RedisKey.KEY_PREFIX_MAKER,templateDB0);
+        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.KEY_PREFIX_MAKER,templateDB0);
     }
 
 
