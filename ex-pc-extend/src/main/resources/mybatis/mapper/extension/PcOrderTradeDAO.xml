@@ -42,6 +42,11 @@
                 #{assetList[${i}]}
             </foreach>
         </if>
+        <if test="orderIds!=null">and order_id in
+            <foreach item="item" index="i" collection="orderIds" open="(" separator="," close=")">
+                #{orderIds[${i}]}
+            </foreach>
+        </if>
 
         <if test="id!=null">and id=#{id}</if>
         <if test="userId!=null">and user_id=#{userId}</if>

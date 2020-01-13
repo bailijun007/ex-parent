@@ -4,7 +4,9 @@ import com.gitee.hupadev.base.api.PageResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderDAO;
+import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
+import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
@@ -32,6 +34,8 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
 
     @Autowired
     private PositionStrategyContext positionStrategyContext;
+
+
 
     @Override
     public BigDecimal getGrossMargin(Long userId, String asset) {
@@ -248,23 +252,6 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
                 vo.setQty(orderVo.getVolume());
                 vo.setLongFlag(orderVo.getLongFlag());
                 vo.setCtime(orderVo.getCreated());
-                //平均价
-                OrderTrade orderTrade = new OrderTrade() {
-                    @Override
-                    public BigDecimal getVolume() {
-                        return orderVo.getVolume();
-                    }
-
-                    @Override
-                    public BigDecimal getPrice() {
-                        return orderVo.getPrice();
-                    }
-                };
-                List<OrderTrade> list1=new ArrayList<>();
-                list1.add(orderTrade);
-
-                BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(orderVo.getAsset(), orderVo.getSymbol(), orderVo.getLongFlag(), list1);
-                vo.setAvgPrice(meanPrice);
                 vo.setFilledQty(orderVo.getFilledVolume());
                 vo.setCloseFlag(orderVo.getCloseFlag());
                 vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.PERCENT_PRECISION, Precision.LESS).stripTrailingZeros());

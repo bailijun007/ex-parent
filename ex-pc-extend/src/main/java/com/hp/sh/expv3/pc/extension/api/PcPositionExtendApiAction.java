@@ -88,7 +88,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
         if (!CollectionUtils.isEmpty(list)) {
             for (PcPositionVo positionVo : list) {
                 //已实现盈亏
-                BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(positionVo.getId(), positionVo.getUserId());
+                BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(positionVo.getId(), positionVo.getUserId(),null);
                 List<PcOrderVo> pcOrderVos = pcOrderExtendService.activeOrderList(positionVo.getId(), positionVo.getUserId());
                 BigDecimal volume = pcOrderVos.stream().map(order -> order.getVolume().subtract(order.getFilledVolume())).reduce(BigDecimal.ZERO, BigDecimal::add);
                 CurrentPositionVo currentPositionVo = new CurrentPositionVo();
@@ -109,7 +109,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
 
                 HoldPosStrategy ps = positionStrategyContext.getHoldPosStrategy(positionVo.getAsset(), positionVo.getSymbol());
                 BigDecimal markPrice = markPriceService.getCurrentMarkPrice(positionVo.getAsset(), positionVo.getSymbol());
-                //未实现盈亏 掉老王接口
+                //未实现盈亏
                 BigDecimal pnl = ps.calcPnl(positionVo.getLongFlag(), positionVo.getVolume().multiply(positionVo.getFaceValue()), positionVo.getMeanPrice(), markPrice);
                 currentPositionVo.setPnl(pnl);
 
