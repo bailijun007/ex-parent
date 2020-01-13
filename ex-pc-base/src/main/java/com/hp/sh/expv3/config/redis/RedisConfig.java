@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -70,6 +71,7 @@ public class RedisConfig {
 		return rp;
 	}
 	
+	@ConditionalOnProperty(name="swagger.host")
 	@Bean
 	public RedisSubscriber testRs(RedisPool redisPool){
 		final RedisSubscriber rs = new RedisSubscriber(redisPool);
