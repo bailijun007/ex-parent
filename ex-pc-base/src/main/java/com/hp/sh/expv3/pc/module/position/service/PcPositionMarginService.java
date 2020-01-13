@@ -55,7 +55,7 @@ public class PcPositionMarginService {
 	@Autowired
 	private PcAccountCoreService pcAccountCoreService;
 	@Autowired
-	private PcPositionService pcPositionService;
+	private PcPositionDataService positionDataService;
 	@Autowired
 	private MarkPriceService markPriceService;
 	@Autowired
@@ -92,7 +92,7 @@ public class PcPositionMarginService {
         this.modifyAccountSymbol(accountSymbol, longFlag, leverage);
         
         //当前仓位
-        PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+        PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
         
         if (pos != null && leverage.compareTo(pos.getLeverage()) != 0) {
 
@@ -136,7 +136,7 @@ public class PcPositionMarginService {
             pos.setLeverage(leverage);
             //保存仓位
             pos.setModified(now);
-            this.pcPositionService.update(pos);
+            this.positionDataService.update(pos);
         }
         
 		return true;
@@ -169,7 +169,7 @@ public class PcPositionMarginService {
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void changeMargin(Long userId, String asset, String symbol, int longFlag, int optType, BigDecimal amount){
 		//当前仓位
-		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(pos==null){
 			throw new ExException(CommonError.OBJ_DONT_EXIST);
 		}
@@ -198,7 +198,7 @@ public class PcPositionMarginService {
 		
 		//保存
 		pos.setModified(DbDateUtils.now());
-		this.pcPositionService.update(pos);
+		this.positionDataService.update(pos);
 	}
 	
 	/**
@@ -258,7 +258,7 @@ public class PcPositionMarginService {
 	
 	public boolean setAutoAddFlag(long userId, String asset, String symbol, int longFlag, int autoAddFlag){
 		//当前仓位
-		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(pos==null){
 			throw new ExException(CommonError.OBJ_DONT_EXIST);
 		}
@@ -267,7 +267,7 @@ public class PcPositionMarginService {
 	}
 
 	public List<PcPosition> queryActivePosList(Page page, Long userId, String asset, String symbol) {
-		List<PcPosition> list = this.pcPositionService.queryActivePosList(page, userId, asset, symbol);
+		List<PcPosition> list = this.positionDataService.queryActivePosList(page, userId, asset, symbol);
 		return list;
 	}
 	
@@ -282,7 +282,7 @@ public class PcPositionMarginService {
     		this.cutAutoMargin(pos.getUserId(), pos.getAsset(), pos.getId(), delta);
     		pos.setPosMargin(pos.getPosMargin().add(delta));
     		pos.setModified(DbDateUtils.now());
-    		this.pcPositionService.update(pos);
+    		this.positionDataService.update(pos);
         }
 	}
 	

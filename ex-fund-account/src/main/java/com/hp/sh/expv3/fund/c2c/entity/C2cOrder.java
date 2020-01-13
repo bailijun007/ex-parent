@@ -43,8 +43,8 @@ public class C2cOrder extends UserDataEntity {
     @ApiModelProperty("总额")
     private BigDecimal amount;
 
-    //执行状态:0-待支付，1-支付成功，2-支付失败,3:已取消, 4-同步余额, 5-审核中, 6-审核通过
-    @ApiModelProperty("0-待支付，1-支付成功，2-支付失败,3:已取消, 4-同步余额, 5-审核中, 6-审核通过")
+    //执行状态:0-待支付，1-支付成功，2-支付失败,3:已取消
+    @ApiModelProperty("0-待支付，1-支付成功，2-支付失败,3:已取消")
     protected Integer payStatus;
 
     //支付状态描述
@@ -63,7 +63,10 @@ public class C2cOrder extends UserDataEntity {
     @ApiModelProperty("同步状态")
     protected Integer synchStatus;
 
-    //审批状态
+	/*
+	 * @see ApprovalStatus#*
+	 * 审批状态 
+	 */
     @ApiModelProperty("审批状态")
     private Integer approvalStatus;
 

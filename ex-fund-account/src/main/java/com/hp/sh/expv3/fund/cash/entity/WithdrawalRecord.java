@@ -9,7 +9,10 @@ public class WithdrawalRecord extends PaymentRecord {
 	
 	private static final long serialVersionUID = 1L;
 
-	//审批状态
+	/*
+	 * @see ApprovalStatus#*
+	 * 审批状态 
+	 */
 	private Integer approvalStatus;
 	
 	public WithdrawalRecord() {

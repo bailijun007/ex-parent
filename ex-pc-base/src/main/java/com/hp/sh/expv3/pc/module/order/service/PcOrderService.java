@@ -27,7 +27,7 @@ import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
-import com.hp.sh.expv3.pc.module.position.service.PcPositionService;
+import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
@@ -70,7 +70,7 @@ public class PcOrderService {
 	private CommonOrderStrategy orderStrategy;	
 	
 	@Autowired
-	private PcPositionService pcPositionService;
+	private PcPositionDataService positionDataService;
 	
     @Autowired
     private HoldPosStrategy holdPosStrategy;
@@ -91,7 +91,7 @@ public class PcOrderService {
 	 * @param amt 委托金额
 	 */
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
-		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
 		return self.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number, pos, IntBool.YES, IntBool.NO);
 	}
 	
@@ -276,7 +276,7 @@ public class PcOrderService {
 		}
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
-			PcPosition pos = this.pcPositionService.getPosition(userId, asset, symbol, order.getClosePosId());
+			PcPosition pos = this.positionDataService.getPosition(userId, asset, symbol, order.getClosePosId());
 			this.checkLiqStatus(pos);	
 		}
 		

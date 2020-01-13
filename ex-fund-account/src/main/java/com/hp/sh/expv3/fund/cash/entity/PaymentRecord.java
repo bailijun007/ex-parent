@@ -34,7 +34,7 @@ public abstract class PaymentRecord extends UserDataEntity {
 	//支付交易ID（支付服务商端生成）
 	protected String transactionId;
 	
-	//执行状态:0-pending，1-支付成功，2-支付失败, 3-同步余额, 4-审核中, 5-审核通过
+	//执行状态:0-pending，1-支付成功，2-支付失败
 	protected Integer payStatus;
 	
 	//支付状态描述

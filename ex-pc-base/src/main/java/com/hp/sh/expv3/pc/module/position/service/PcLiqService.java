@@ -20,7 +20,6 @@ import com.hp.sh.expv3.pc.constant.TimeInForce;
 import com.hp.sh.expv3.pc.job.LiqHandleResult;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcLiqRecordDAO;
-import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.mq.liq.msg.CancelOrder;
@@ -41,8 +40,8 @@ public class PcLiqService {
     
 
     @Autowired
-    private PcPositionService pcPositionService;
-    
+    private PcPositionDataService positionDataService;
+
     @Autowired
     private PcOrderService pcOrderService;
     
@@ -110,7 +109,7 @@ public class PcLiqService {
 		}else{ //不强平
 			if(pos.getLiqStatus()!=LiqStatus.NON){
 				pos.setLiqStatus(LiqStatus.NON);
-				this.pcPositionService.update(pos);
+				this.positionDataService.update(pos);
 			}
 			return false;
 		}
@@ -120,13 +119,13 @@ public class PcLiqService {
 		if(pos.getLiqStatus()!=LiqStatus.FROZEN){
 			pos.setLiqStatus(LiqStatus.FROZEN);
 			pos.setModified(DbDateUtils.now());
-			this.pcPositionService.update(pos);
+			this.positionDataService.update(pos);
 		}
 	}
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list, Integer lastFlag) {
-		PcPosition pos = this.pcPositionService.getCurrentPosition(userId, asset, symbol, longFlag);
+		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(pos==null){
 			logger.error("当前仓位不存在!userId={}, symbol={}, longFlag={}。  强平仓位:{}", userId, symbol, longFlag, posId);
 			return;
@@ -172,7 +171,7 @@ public class PcLiqService {
 		pos.setPosMargin(BigDecimal.ZERO);
 		pos.setLiqStatus(LiqStatus.FORCE_CLOSE);
 		pos.setModified(now);
-		pcPositionService.update(pos);
+		positionDataService.update(pos);
 	}
 	
 	private PcLiqRecord saveLiqRecord(PcPosition pos, Long now){
@@ -203,7 +202,7 @@ public class PcLiqService {
 	}
 	
 	private void createLiqOrder(PcLiqRecord record){
-		PcPosition pos = pcPositionService.getPosition(record.getUserId(), record.getAsset(), record.getSymbol(), record.getPosId());
+		PcPosition pos = positionDataService.getPosition(record.getUserId(), record.getAsset(), record.getSymbol(), record.getPosId());
 		this.pcOrderService.create(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), OrderFlag.ACTION_CLOSE, record.getLongFlag(), TimeInForce.IMMEDIATE_OR_CANCEL, record.getBankruptPrice(), record.getVolume(), pos, IntBool.NO, IntBool.YES);
 	}
 
