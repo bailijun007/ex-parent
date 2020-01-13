@@ -243,6 +243,32 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         PageResult<UserOrderVo> result = pcOrderExtendService.pageQueryOrderList(userId, asset, symbol, status, closeFlag, orderId, pageNo, pageSize);
+        List<OrderTrade> list = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(result.getList())) {
+            for (UserOrderVo orderVo : result.getList()) {
+                List<PcOrderTradeVo> orderTradeVoList = pcOrderTradeService.queryOrderTrade(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymol(), String.valueOf(orderVo.getId()));
+                if (!CollectionUtils.isEmpty(orderTradeVoList)) {
+                    for (PcOrderTradeVo pcOrderTradeVo : orderTradeVoList) {
+                        OrderTrade orderTrade = new OrderTrade() {
+                            @Override
+                            public BigDecimal getVolume() {
+                                return pcOrderTradeVo.getVolume();
+                            }
+                            @Override
+                            public BigDecimal getPrice() {
+                                return pcOrderTradeVo.getPrice();
+                            }
+                        };
+                        list.add(orderTrade);
+                    }
+                }
+                BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(asset, symbol, orderVo.getLongFlag(), list);
+                BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(null, orderVo.getUserId(), orderVo.getId());
+                orderVo.setAvgPrice(meanPrice);
+                orderVo.setRealisedPnl(realisedPnl);
+            }
+        }
+
         return result;
     }
 

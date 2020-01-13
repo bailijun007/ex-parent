@@ -252,23 +252,6 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
                 vo.setQty(orderVo.getVolume());
                 vo.setLongFlag(orderVo.getLongFlag());
                 vo.setCtime(orderVo.getCreated());
-                //平均价
-                OrderTrade orderTrade = new OrderTrade() {
-                    @Override
-                    public BigDecimal getVolume() {
-                        return orderVo.getVolume();
-                    }
-
-                    @Override
-                    public BigDecimal getPrice() {
-                        return orderVo.getPrice();
-                    }
-                };
-                List<OrderTrade> list1=new ArrayList<>();
-                list1.add(orderTrade);
-
-                BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(orderVo.getAsset(), orderVo.getSymbol(), orderVo.getLongFlag(), list1);
-                vo.setAvgPrice(meanPrice);
                 vo.setFilledQty(orderVo.getFilledVolume());
                 vo.setCloseFlag(orderVo.getCloseFlag());
                 vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.PERCENT_PRECISION, Precision.LESS).stripTrailingZeros());
