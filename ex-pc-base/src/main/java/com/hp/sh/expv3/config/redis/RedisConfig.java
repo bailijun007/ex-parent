@@ -77,10 +77,12 @@ public class RedisConfig {
 		this.testRs(redisPool, "pc:account:BTC");
 		this.testRs(redisPool, "pc:order:BTC:BTC_USD");
 		this.testRs(redisPool, "pc:pos:BTC:BTC_USD");
+		this.testRs(redisPool, "pc:user:symbol:BTC:BTC_USD");
 		
 		this.testRs(redisPool, "pc:account:ETH");
 		this.testRs(redisPool, "pc:order:ETH:ETH_USD");
 		this.testRs(redisPool, "pc:pos:ETH:ETH_USD");
+		this.testRs(redisPool, "pc:symbol:ETH:ETH_USD");
 		return null;
 	}
 	

@@ -7,5 +7,7 @@ public class EventType {
 	public static final int ORDER = 2;
 	
 	public static final int POS = 3;
+	
+	public static final int ACCOUNT_SYMBOL = 4;
 
 }

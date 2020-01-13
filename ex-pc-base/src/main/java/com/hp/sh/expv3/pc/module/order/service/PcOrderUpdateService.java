@@ -14,7 +14,6 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderLog;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
 import com.hp.sh.expv3.utils.DbDateUtils;
-import com.hp.sh.expv3.utils.IntBool;
 
 @Service
 @Transactional(rollbackFor=Exception.class)

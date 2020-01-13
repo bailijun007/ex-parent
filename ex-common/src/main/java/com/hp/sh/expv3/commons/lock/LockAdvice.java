@@ -63,9 +63,14 @@ public class LockAdvice {
 			return result;
 		}finally{
 			if(realKey!=null){
-				this.unlock(realKey);
+				try{
+					this.unlock(realKey);
+				}catch(Exception e){
+					logger.error("解锁失败：{}", realKey, e);
+					throw e;
+				}
 			}
-			logger.debug("unlock it");
+			logger.debug("unlock：{}", realKey);
 		}      
     }
 	

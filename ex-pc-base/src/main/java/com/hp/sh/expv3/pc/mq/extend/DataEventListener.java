@@ -12,6 +12,7 @@ import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
+import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
 import com.hp.sh.expv3.pc.msg.EventMsg;
 import com.hp.sh.expv3.pc.msg.EventType;
@@ -67,6 +68,12 @@ public class DataEventListener {
 		}
 	}
 	
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void afterCommit(PcAccountSymbol accountSymbol) {
+		EventMsg msg = new EventMsg(EventType.ACCOUNT_SYMBOL, accountSymbol.getId(), accountSymbol.getModified(), accountSymbol.getUserId(), accountSymbol.getAsset(), accountSymbol.getSymbol());
+		this.sendEventMsg(msg);
+	}
+	
 	private void sendEventMsg(EventMsg eventMsg) {
 		String channel = this.getChannel(eventMsg);
 		logger.debug("publish:{}", channel, eventMsg);
@@ -83,6 +90,9 @@ public class DataEventListener {
 		}
 		if(eventMsg.getType()==EventType.POS){
 			channel = "pc:pos:"+eventMsg.getAsset()+":"+eventMsg.getSymbol();
+		}
+		if(eventMsg.getType()==EventType.ACCOUNT_SYMBOL){
+			channel = "pc:symbol:"+eventMsg.getAsset()+":"+eventMsg.getSymbol();
 		}
 		channel.toString();
 		return channel;

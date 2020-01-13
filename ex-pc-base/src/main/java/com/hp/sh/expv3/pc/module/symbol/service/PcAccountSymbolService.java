@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,8 @@ public class PcAccountSymbolService{
 	
 	@Autowired
 	private PcDefaultSymbolSetting pcDefaultSymbolSetting;
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public PcAccountSymbol create(Long userId, String asset, String symbol){
@@ -90,7 +93,7 @@ public class PcAccountSymbolService{
 		PcAccountSymbol as = this.getOrCreate(userId, asset, symbol);
 		if(!as.getMarginMode().equals(marginMode)){
 			as.setMarginMode(marginMode);
-			this.pcAccountSymbolDAO.update(as);
+			this.update(as);
 		}
 	}
 
@@ -98,6 +101,7 @@ public class PcAccountSymbolService{
         Long now = DbDateUtils.now();
 		accountSymbol.setModified(now);
 		this.pcAccountSymbolDAO.update(accountSymbol);
+		publisher.publishEvent(accountSymbol);
 	}
 
 }
