@@ -1,12 +1,16 @@
 package com.hp.sh.expv3.pc.extension.api;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.gitee.hupadev.base.api.PageResult;
+import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.dev.CrossDB;
+import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
+import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
+import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
+import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
+import com.hp.sh.expv3.pc.extension.service.impl.PcAccountExtendServiceImpl;
+import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
+import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
+import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
 import com.hp.sh.expv3.utils.math.Precision;
@@ -16,15 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gitee.hupadev.base.api.PageResult;
-import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
-import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
-import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
-import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
-import com.hp.sh.expv3.pc.extension.service.impl.PcAccountExtendServiceImpl;
-import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
-import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2019/12/23
@@ -44,7 +45,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     private PcOrderTradeExtendService pcOrderTradeService;
 
     @Autowired
-    private  PositionStrategyContext positionStrategyContext;
+    private PositionStrategyContext positionStrategyContext;
 
     @Override
     public List<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status) {
@@ -56,16 +57,16 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
             ltOrderId = null;
         }
         List<UserOrderVo> result = new ArrayList<>();
-        List<String> assetList =null;
-        List<String> symbolList =null;
-        List<Integer> statusList =null;
-        if(StringUtils.isNotEmpty(asset)){
-         assetList = Arrays.asList(asset.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
+        List<String> assetList = null;
+        List<String> symbolList = null;
+        List<Integer> statusList = null;
+        if (StringUtils.isNotEmpty(asset)) {
+            assetList = Arrays.asList(asset.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
         }
-        if(StringUtils.isNotEmpty(symbol)){
-           symbolList = Arrays.asList(symbol.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
+        if (StringUtils.isNotEmpty(symbol)) {
+            symbolList = Arrays.asList(symbol.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
         }
-        if(StringUtils.isNotEmpty(status)){
+        if (StringUtils.isNotEmpty(status)) {
             statusList = Arrays.asList(status.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
         }
         List<PcOrderVo> list = pcOrderExtendService.queryOrderList(userId, assetList, symbolList, gtOrderId, ltOrderId, count, statusList);
@@ -82,7 +83,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         }
         PageResult<UserOrderVo> result = new PageResult<>();
         List<UserOrderVo> list = new ArrayList<>();
-        PageResult<PcOrderVo> voList = pcOrderExtendService.queryUserActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,isTotalNumber);
+        PageResult<PcOrderVo> voList = pcOrderExtendService.queryUserActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber);
         convertOrderList(list, voList.getList());
 
         result.setList(list);
@@ -136,6 +137,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
 
     /**
      * 获取当前用户历史委托
+     *
      * @param userId
      * @param asset
      * @param symbol
@@ -152,7 +154,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     public List<UserOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
-        PageResult<PcOrderVo> list = pcOrderExtendService.queryHistoryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
+        PageResult<PcOrderVo> list = pcOrderExtendService.queryHistoryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, null);
         convertOrderList(result, list.getList());
         return result;
     }
@@ -160,6 +162,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
 
     /**
      * 获取当前用户所有委托
+     *
      * @param userId
      * @param asset
      * @param symbol
@@ -176,7 +179,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     public List<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
-        PageResult<PcOrderVo> list = pcOrderExtendService.queryAllOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage,null);
+        PageResult<PcOrderVo> list = pcOrderExtendService.queryAllOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, null);
         convertOrderList(result, list.getList());
         return result;
     }
