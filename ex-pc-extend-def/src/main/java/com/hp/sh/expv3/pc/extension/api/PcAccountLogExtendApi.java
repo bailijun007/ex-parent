@@ -30,7 +30,7 @@ public interface PcAccountLogExtendApi {
             @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
-    PageResult<PcAccountRecordLogVo> findContractAccountList(@RequestParam(value = "userId", required = true) Long userId, @RequestParam(value = "asset", required = true) String asset,
+    PageResult<PcAccountRecordLogVo> query(@RequestParam(value = "userId", required = true) Long userId, @RequestParam(value = "asset", required = true) String asset,
                                                              @RequestParam(value = "tradeType", required = true) Integer tradeType, @RequestParam(value = "historyType", required = true) Integer historyType,
                                                              @RequestParam(value = "startDate", required = false) Long startDate, @RequestParam(value = "endDate", required = false) Long endDate,
                                                              @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize", required = true,defaultValue = "20") Integer pageSize,

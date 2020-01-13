@@ -71,6 +71,14 @@
         <include refid="simple_query"/>
     </select>
 
+
+    <select id="queryById" resultMap="C2cOrder">
+        select
+        <include refid="Base_Column_List"/>
+        from c2c_order
+        where id=#{id}
+    </select>
+
     <select id="queryCount" resultType="long">
         select
         <choose>
@@ -173,8 +181,62 @@
                 modified=#{modified}
             </if>
         </set>
-        where   sn=#{sn}
+        where sn=#{sn}
         AND user_id=#{userId}
+    </update>
+
+
+    <update id="updateById">
+        update
+        c2c_order
+        <set>
+            <if test="payCurrency!=null and payCurrency!=''">
+                pay_currency=#{payCurrency},
+            </if>
+            <if test="exchangeCurrency!=null and exchangeCurrency!=''">
+                exchange_currency=#{exchangeCurrency},
+            </if>
+            <if test="type!=null">
+                `type`=#{type},
+            </if>
+            <if test="price!=null">
+                price=#{price},
+            </if>
+            <if test="volume!=null">
+                volume=#{volume},
+            </if>
+            <if test="amount!=null">
+                amount=#{amount},
+            </if>
+            <if test="payStatus!=null">
+                pay_status=#{payStatus},
+            </if>
+            <if test="payStatusDesc!=null and payStatusDesc!=''">
+                pay_status_desc=#{payStatusDesc},
+            </if>
+            <if test="payTime!=null">
+                pay_time=#{payTime},
+            </if>
+            <if test="payFinishTime!=null">
+                pay_finish_time=#{payFinishTime},
+            </if>
+            <if test="synchStatus!=null">
+                synch_status=#{synchStatus},
+            </if>
+            <if test="approvalStatus!=null">
+                approval_status=#{approvalStatus},
+            </if>
+            <if test="userId!=null">
+                user_id=#{userId},
+            </if>
+            <if test="created!=null">
+                created=#{created},
+            </if>
+            <if test="modified!=null">
+                modified=#{modified}
+            </if>
+        </set>
+        where id=#{id}
     </update>
 
     <select id="pageQueryByPayStatus" resultType="com.hp.sh.expv3.fund.extension.vo.C2cOrderVo">
@@ -186,7 +248,7 @@
                 user_id=#{userId}
             </if>
             <if test="payStatus!=null">
-              and   pay_status=#{payStatus}
+                and pay_status=#{payStatus}
             </if>
             <choose>
                 <when test="nextPage==1 and id!=null">

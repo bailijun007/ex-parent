@@ -22,7 +22,11 @@ public interface C2cOrderDAO extends BaseUserDataMapper<C2cOrder,Long>  {
 
 	public Long queryCount(Map<String,Object> params);
 
-    void updateBySnAndUserId(C2cOrder c2cOrder);
+    int updateBySnAndUserId(C2cOrder c2cOrder);
+
+    int  updateById(C2cOrder c2cOrder);
 
     List<C2cOrderVo> pageQueryByPayStatus(@Param("payStatus") Integer payStatus, @Param("nextPage") Integer nextPage, @Param("pageSize")Integer pageSize, @Param("id")Long id,@Param("userId") Long userId);
+
+    C2cOrder queryById(@Param("id") Long id);
 }

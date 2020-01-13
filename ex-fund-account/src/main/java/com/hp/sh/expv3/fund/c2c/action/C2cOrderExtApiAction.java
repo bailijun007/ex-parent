@@ -1,27 +1,28 @@
 package com.hp.sh.expv3.fund.c2c.action;
 
 import com.gitee.hupadev.base.api.PageResult;
-import com.gitee.hupadev.base.api.ResultEntity;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.c2c.component.PLPayService;
-import com.hp.sh.expv3.fund.c2c.service.BuyService;
+import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
+import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
 import com.hp.sh.expv3.fund.c2c.service.QueryService;
+import com.hp.sh.expv3.fund.c2c.service.SellService;
+import com.hp.sh.expv3.fund.c2c.util.GenerateOrderNumUtils;
+import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
 import com.hp.sh.expv3.fund.extension.api.C2cOrderExtApi;
 import com.hp.sh.expv3.fund.extension.api.FundAccountExtApi;
 import com.hp.sh.expv3.fund.extension.error.FundCommonError;
 import com.hp.sh.expv3.fund.extension.vo.C2cOrderVo;
 import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author BaiLiJun  on 2020/1/9
@@ -36,10 +37,15 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
     private QueryService queryService;
 
     @Autowired
+    private SellService sellService;
+
+    @Autowired
     private PLPayService plPayService;
 
     @Autowired
     private FundAccountExtApi fundAccountExtApi;
+
+    ReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
      * 通过支付状态分页查询c2c订单，不传则查全部
@@ -77,30 +83,68 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
     /**
      * 创建c2c体现订单
      *
-     * @param userId         用户id
-     * @param bank           开户银行
-     * @param bankCardName   银行卡收款姓名
-     * @param targetAssetNum 资产出金数量
-     * @param fabiAmount     出金金额（法币）
-     * @param targetAsset    兑换资产
-     * @param sourceAsset    原资产
+     * @param userId       用户id
+     * @param bank         开户银行
+     * @param bankCardName 银行卡收款姓名
+     * @param srcAsset     原资产，比如BTC
+     * @param srcNum       资产出金数量 比如 1
+     * @param tarAsset     兑换资产 比如 CNY
+     * @param tarNum       出金金额（法币） 比如：7000
+     * @param ratio 兑换比率
      * @return
      */
     @Override
-    public String withdrawalOrder(Long userId, String bank, String bankCardName, BigDecimal targetAssetNum, BigDecimal fabiAmount, String targetAsset, String sourceAsset) {
+    public String withdrawalOrder(Long userId, String bank, String bankCardName, String srcAsset, BigDecimal srcNum, String tarAsset, BigDecimal tarNum, BigDecimal ratio) {
         //获取资产账户
-        CapitalAccountVo account = fundAccountExtApi.getCapitalAccount(userId, targetAsset);
+        CapitalAccountVo account = fundAccountExtApi.getCapitalAccount(userId, srcAsset);
+        //检查c2c 被冻结的资产
+        BigDecimal c2cLockedVolume = queryService.getLockC2cNumber(userId, srcAsset);
+        BigDecimal remain = account.getTotalAssets().subtract(account.getLock()).subtract(c2cLockedVolume).subtract(srcNum);
+        if (remain.compareTo(BigDecimal.ZERO) >= 0) {
+            lock.writeLock().lock();
+            try {
+                //生成c2c体现订单(体现状态为审核中)
+                C2cOrder c2cOrder = new C2cOrder();
+                c2cOrder.setSn(GenerateOrderNumUtils.getOrderNo(userId));
+                c2cOrder.setPayCurrency(srcAsset);
+                c2cOrder.setExchangeCurrency(tarAsset);
+                c2cOrder.setPrice(ratio);
+                c2cOrder.setType(C2cConst.C2C_SELL);
+                c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
+                c2cOrder.setPayStatusDesc(C2cConst.C2C_PAY_STATUS_DESC_WITHDRAWAL);
+                c2cOrder.setPayTime(Instant.now().toEpochMilli());
+                c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
+                c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_FALSE);
+                c2cOrder.setApprovalStatus(ApprovalStatus.IN_AUDIT);
+                c2cOrder.setUserId(userId);
+                c2cOrder.setCreated(Instant.now().toEpochMilli());
+                c2cOrder.setModified(Instant.now().toEpochMilli());
+                c2cOrder.setVolume(srcNum);
+                c2cOrder.setAmount(ratio.multiply(srcNum));
+                sellService.createC2cOut(c2cOrder);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                lock.writeLock().unlock();
+            }
+            return "success";
+        } else {
+            throw new ExException(FundCommonError.ORDER_NOT_SUFFICIENT_FUNDS);
+        }
+    }
 
-        //检查可用余额
-
-        //生成c2c体现订单(体现状态为审核中)
-
-
-
-
+    @Override
+    public String approvalC2cOrder(Long id,Integer auditStatus) {
+        C2cOrder c2cOrder = queryService.queryById(id);
+       if(null==c2cOrder){
+           throw new ExException(FundCommonError.ORDER_NOT_FIND);
+       }
+        C2cOrder order =new C2cOrder();
+        order.setPayFinishTime(Instant.now().toEpochMilli());
+        order.setApprovalStatus(auditStatus);
+        order.setId(id);
+        sellService.updateById(order);
 
         return "success";
     }
-
-
 }

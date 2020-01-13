@@ -1,11 +1,10 @@
 package com.hp.sh.expv3.fund.c2c.component;
 
-import com.gitee.hupadev.base.exceptions.CommonError;
-import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
-import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
-import com.hp.sh.expv3.fund.extension.error.FundCommonError;
+import com.hp.sh.expv3.fund.c2c.util.GenerateOrderNumUtils;
+import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -36,7 +35,7 @@ public class PLPayService {
      */
     public String rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal fabiAmt, BigDecimal tarVolume) {
         //生成订单号
-        String orderNo = getOrderNo(userId);
+        String orderNo = GenerateOrderNumUtils.getOrderNo(userId);
         //订单币种
         String orderCurrency =null;
         if(srcCurrency.equals("CNY")){
@@ -52,20 +51,19 @@ public class PLPayService {
         //转发请求到第三方支付，并返回支付路径
         String url = pLpayClient.sendRequestUrl(orderNo, orderCurrency, orderAmount, receiveUrl, pickupUrl, sign);
 
-
         //增加一条c2c订单记录
         C2cOrder c2cOrder=new C2cOrder();
         c2cOrder.setSn(orderNo);
         c2cOrder.setPayCurrency(srcCurrency);
         c2cOrder.setExchangeCurrency(tarCurrency);
         c2cOrder.setPrice(ratio);
-        c2cOrder.setType(1);
-        c2cOrder.setPayStatus(0);
-        c2cOrder.setPayStatusDesc("c2c充值");
+        c2cOrder.setType(C2cConst.C2C_BUY);
+        c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
+        c2cOrder.setPayStatusDesc(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
         c2cOrder.setPayTime(Instant.now().toEpochMilli());
         c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
-        c2cOrder.setSynchStatus(0);
-        c2cOrder.setApprovalStatus(0);
+        c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_FALSE);
+        c2cOrder.setApprovalStatus(ApprovalStatus.IN_AUDIT);
         c2cOrder.setUserId(userId);
         c2cOrder.setCreated(Instant.now().toEpochMilli());
         c2cOrder.setModified(Instant.now().toEpochMilli());
@@ -75,20 +73,7 @@ public class PLPayService {
     }
 
 
-    //生成并返回订单编号
-    private String getOrderNo(long userId) {
-        String s = "";
-        for (int i = 0; i < 4; i++) {
-            int random = (int) (Math.random() * 10);
-            s += random;
-        }
-        Instant instant = Instant.now();
-        long timestamp = instant.toEpochMilli();
-        String prefix = "c2c";
-        String sn = prefix + timestamp + s+"-"+userId;
 
-        return sn;
-    }
 
 
     private String getOrderAmout() {

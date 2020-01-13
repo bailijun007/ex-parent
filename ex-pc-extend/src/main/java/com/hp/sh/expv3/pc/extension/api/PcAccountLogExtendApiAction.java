@@ -65,7 +65,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
      * @return
      */
     @Override
-    public PageResult<PcAccountRecordLogVo> findContractAccountList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol) {
+    public PageResult<PcAccountRecordLogVo> query(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol) {
         this.checkParam(userId, asset, tradeType, historyType, startDate, endDate, pageNo, pageSize, symbol);
 
         //获取面值
@@ -82,7 +82,6 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
             for (PcAccountLogVo pcAccountLogVo : pcAccountLogList.getList()) {
                 PcAccountRecordLogVo recordLogVo = new PcAccountRecordLogVo();
                 BeanUtils.copyProperties(pcAccountLogVo, recordLogVo);
-//                recordLogVo.setTradeType(String.valueOf(pcAccountLogVo.getType()));
                 if (CommonConstant.TRADE_TYPE_ALL.equals(tradeType)
                         || PcAccountLog.TYPE_LIQ_LONG == pcAccountLogVo.getType()
                         || PcAccountLog.TYPE_LIQ_SHORT == pcAccountLogVo.getType()) {
@@ -139,14 +138,6 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
     //封装开平仓数据
     private void getOrderTradeData(BigDecimal faceValue, PcAccountLogVo pcAccountLogVo, PcAccountRecordLogVo recordLogVo) {
         PcOrderTradeVo pcOrderTradeVo = pcOrderTradeExtendService.getPcOrderTrade(pcAccountLogVo.getRefId(), pcAccountLogVo.getAsset(), pcAccountLogVo.getSymbol(), pcAccountLogVo.getUserId(), pcAccountLogVo.getTime());
-//        Optional<PcOrderTradeVo> optional = Optional.ofNullable(pcOrderTradeVo);
-//        recordLogVo.setTradeAmt(optional.map(o -> o.getVolume()).orElse(BigDecimal.ZERO));
-//        recordLogVo.setNoTradeAmt(optional.map(o -> o.getRemainVolume()).orElse(BigDecimal.ZERO));
-//        recordLogVo.setVolume(optional.map(o -> o.getPnl()).orElse(BigDecimal.ZERO));
-//        recordLogVo.setTradePrice(optional.map(o -> o.getPrice()).orElse(BigDecimal.ZERO));
-//        recordLogVo.setFeeRatio(optional.map(o -> o.getFeeRatio()).orElse(BigDecimal.ZERO));
-//        recordLogVo.setFee(optional.map(o -> o.getFee()).orElse(BigDecimal.ZERO));
-//        recordLogVo.setOrderId(optional.map(o -> o.getOrderId()).orElse(null));
         if (null != pcOrderTradeVo) {
             recordLogVo.setTradeAmt(pcOrderTradeVo.getVolume());
             recordLogVo.setNoTradeAmt(pcOrderTradeVo.getRemainVolume());
@@ -189,19 +180,22 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
     //封装强平数据
     private void getPcLiqRecordData(BigDecimal faceValue, PcAccountLogVo pcAccountLogVo, PcAccountRecordLogVo recordLogVo) {
         PcLiqRecordVo pcLiqRecordVo = pcLiqRecordService.getPcLiqRecord(pcAccountLogVo.getRefId(), pcAccountLogVo.getAsset(), pcAccountLogVo.getSymbol(), pcAccountLogVo.getUserId(), pcAccountLogVo.getTime());
-        Optional<PcLiqRecordVo> recordVoOptional = Optional.ofNullable(pcLiqRecordVo);
-        BigDecimal volume = recordVoOptional.map(r -> r.getVolume()).orElse(BigDecimal.ZERO);
-        BigDecimal liqPrice = recordVoOptional.map(r -> r.getLiqPrice()).orElse(BigDecimal.ZERO);
-        BigDecimal fee = recordVoOptional.map(r -> r.getFee()).orElse(BigDecimal.ZERO);
-        BigDecimal feeRatio = recordVoOptional.map(r -> r.getFeeRatio()).orElse(BigDecimal.ZERO);
-        recordLogVo.setTradeAmt(volume);
-        recordLogVo.setOrderAmt(volume);
-        recordLogVo.setNoTradeAmt(BigDecimal.ZERO);
-        recordLogVo.setVolume(pcLiqRecordVo.getVolume().multiply(faceValue).divide(liqPrice, Precision.PERCENT_PRECISION, Precision.LESS));
-        recordLogVo.setTradePrice(liqPrice);
-        recordLogVo.setFee(fee);
-        recordLogVo.setFeeRatio(feeRatio);
-        recordLogVo.setOrderPrice(liqPrice);
+       if(null!=pcLiqRecordVo){
+           Optional<PcLiqRecordVo> recordVoOptional = Optional.ofNullable(pcLiqRecordVo);
+           BigDecimal volume = recordVoOptional.map(r -> r.getVolume()).orElse(BigDecimal.ZERO);
+           BigDecimal liqPrice = recordVoOptional.map(r -> r.getLiqPrice()).orElse(BigDecimal.ZERO);
+           BigDecimal fee = recordVoOptional.map(r -> r.getFee()).orElse(BigDecimal.ZERO);
+           BigDecimal feeRatio = recordVoOptional.map(r -> r.getFeeRatio()).orElse(BigDecimal.ZERO);
+           recordLogVo.setTradeAmt(volume);
+           recordLogVo.setOrderAmt(volume);
+           recordLogVo.setNoTradeAmt(BigDecimal.ZERO);
+           recordLogVo.setVolume(pcLiqRecordVo.getVolume().multiply(faceValue).divide(liqPrice, Precision.PERCENT_PRECISION, Precision.LESS));
+           recordLogVo.setTradePrice(liqPrice);
+           recordLogVo.setFee(fee);
+           recordLogVo.setFeeRatio(feeRatio);
+           recordLogVo.setOrderPrice(liqPrice);
+       }
+
     }
 
     /**
