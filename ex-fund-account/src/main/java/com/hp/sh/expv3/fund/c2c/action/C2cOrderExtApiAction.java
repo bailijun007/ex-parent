@@ -91,9 +91,15 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         //获取资产账户
         CapitalAccountVo account = fundAccountExtApi.getCapitalAccount(userId, targetAsset);
 
+        //检查可用余额
+
+        //生成c2c体现订单(体现状态为审核中)
 
 
-        return null;
+
+
+
+        return "success";
     }
 
 
