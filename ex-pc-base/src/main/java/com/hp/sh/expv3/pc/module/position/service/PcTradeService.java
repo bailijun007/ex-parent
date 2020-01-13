@@ -184,9 +184,7 @@ public class PcTradeService {
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getFee()));
 		}
-		if(BigUtils.ltZero(tradeResult.getFeeReceivable())){
-			order.setFeeCost(order.getFeeCost().add(tradeResult.getFeeReceivable()));
-		}
+		order.setFeeCost(order.getFeeCost().add(tradeResult.getFeeReceivable()));
 		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getVolume()));
         order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);

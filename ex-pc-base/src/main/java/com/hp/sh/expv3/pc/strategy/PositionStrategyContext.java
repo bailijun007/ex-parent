@@ -220,6 +220,9 @@ public class PositionStrategyContext {
 			amount = amount.add(CompFieldCalc.calcAmount(trade.getVolume(), faceValue));
 			baseValue = baseValue.add(CompFieldCalc.calcBaseValue(trade.getVolume(), faceValue, trade.getPrice()));
 		}
+		if(BigUtils.isZero(baseValue)){
+			return BigDecimal.ZERO;
+		}
 		BigDecimal meanPrice = strategy.calcMeanPrice(longFlag, baseValue, amount);
 		return meanPrice;
 	}
