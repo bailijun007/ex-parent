@@ -74,28 +74,21 @@ public class RedisConfig {
 	@ConditionalOnProperty(name="swagger.host")
 	@Bean
 	public RedisSubscriber testRs(RedisPool redisPool){
-		final RedisSubscriber rs = new RedisSubscriber(redisPool);
-		rs.setCacheSerializer(new JsonCacheSerializer());
-		rs.setMsgListener(new MsgListener(){
-
-			@Override
-			public void onMessage(Object message) {
-				logger.info("RedisSubscriber:" + message);
-			}
-
-		});
-		rs.setChannel("pc:pos:BTC:BTC_USD");
-		new Thread(){
-			@Override
-            public void run(){
-				try{
-					rs.subscribe();
-				}catch(Exception e){
-					e.printStackTrace();
-				}
-			}
-		}.start();
-		return rs;
+		this.testRs(redisPool, "pc:account:BTC");
+		this.testRs(redisPool, "pc:order:BTC:BTC_USD");
+		this.testRs(redisPool, "pc:pos:BTC:BTC_USD");
+		
+		this.testRs(redisPool, "pc:account:ETH");
+		this.testRs(redisPool, "pc:order:ETH:ETH_USD");
+		this.testRs(redisPool, "pc:pos:ETH:ETH_USD");
+		return null;
+	}
+	
+	private void testRs(RedisPool redisPool, String...channels){
+		for(String channel:channels){
+			RedisSubscriberTest pos = new RedisSubscriberTest(channel, redisPool);
+			pos.start();
+		}
 	}
 	
 }
