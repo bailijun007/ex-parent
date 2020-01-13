@@ -171,7 +171,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                 vo.setCtime(orderVo.getCreated());
 
                 //成交均价
-                BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(asset, symbol, orderVo.getLongFlag(), orderId2OrderTradeList.get(orderVo.getId()));
+                BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(orderVo.getAsset(), orderVo.getSymbol(), orderVo.getLongFlag(), orderId2OrderTradeList.get(orderVo.getId()));
                 BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(null, orderVo.getUserId(), orderVo.getId());
                 vo.setAvgPrice(meanPrice);
                 vo.setFilledQty(orderVo.getFilledVolume());
@@ -254,6 +254,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                             public BigDecimal getVolume() {
                                 return pcOrderTradeVo.getVolume();
                             }
+
                             @Override
                             public BigDecimal getPrice() {
                                 return pcOrderTradeVo.getPrice();
