@@ -4,7 +4,9 @@ import com.gitee.hupadev.base.api.PageResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderDAO;
+import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
+import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
@@ -32,6 +34,8 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
 
     @Autowired
     private PositionStrategyContext positionStrategyContext;
+
+
 
     @Override
     public BigDecimal getGrossMargin(Long userId, String asset) {

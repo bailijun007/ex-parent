@@ -21,10 +21,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -70,7 +67,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
             statusList = Arrays.asList(status.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
         }
         List<PcOrderVo> list = pcOrderExtendService.queryOrderList(userId, assetList, symbolList, gtOrderId, ltOrderId, count, statusList);
-        convertOrderList(result, list);
+        convertOrderList2(result, list);
 
         return result;
     }
@@ -84,7 +81,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         PageResult<UserOrderVo> result = new PageResult<>();
         List<UserOrderVo> list = new ArrayList<>();
         PageResult<PcOrderVo> voList = pcOrderExtendService.queryUserActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber);
-        convertOrderList(list, voList.getList());
+        convertOrderList(userId, asset, symbol, list, voList.getList());
 
         result.setList(list);
         result.setRowTotal(voList.getRowTotal());
@@ -97,7 +94,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
      * @param list   最终返回的结果集
      * @param voList 需要转换的list集合
      */
-    private void convertOrderList(List<UserOrderVo> list, List<PcOrderVo> voList) {
+    private void convertOrderList2(List<UserOrderVo> list, List<PcOrderVo> voList) {
         if (!CollectionUtils.isEmpty(voList)) {
             for (PcOrderVo orderVo : voList) {
                 UserOrderVo vo = new UserOrderVo();
@@ -108,20 +105,24 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                 vo.setCtime(orderVo.getCreated());
 
                 //成交均价
-                OrderTrade orderTrade = new OrderTrade() {
-                    @Override
-                    public BigDecimal getVolume() {
-                        return orderVo.getVolume();
-                    }
+                List<PcOrderTradeVo> orderTradeVoList = pcOrderTradeService.queryOrderTrade(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymbol(), orderVo.getId() + "");
+                List<OrderTrade> ots = new ArrayList<>();
+                for (PcOrderTradeVo pcOrderTradeVo : orderTradeVoList) {
+                    OrderTrade ot = new OrderTrade() {
+                        @Override
+                        public BigDecimal getVolume() {
+                            return pcOrderTradeVo.getVolume();
+                        }
 
-                    @Override
-                    public BigDecimal getPrice() {
-                        return orderVo.getPrice();
-                    }
-                };
-                List<OrderTrade> list1=new ArrayList<>();
-                list1.add(orderTrade);
-                BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(orderVo.getAsset(), orderVo.getSymbol(), orderVo.getLongFlag(), list1);
+                        @Override
+                        public BigDecimal getPrice() {
+                            return pcOrderTradeVo.getPrice();
+                        }
+                    };
+                    ots.add(ot);
+                }
+                BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(orderVo.getAsset(), orderVo.getSymbol(), orderVo.getLongFlag(), ots);
+                BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(null, orderVo.getUserId(), orderVo.getId());
                 vo.setAvgPrice(meanPrice);
                 vo.setFilledQty(orderVo.getFilledVolume());
                 vo.setCloseFlag(orderVo.getCloseFlag());
@@ -129,7 +130,58 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                 vo.setOrderType(orderVo.getOrderType());
                 vo.setClientOid(orderVo.getClientOrderId());
                 vo.setSymol(orderVo.getSymbol());
+                vo.setRealisedPnl(realisedPnl);
                 list.add(vo);
+            }
+        }
+    }
+
+    /**
+     * 转换成结果集返回
+     *
+     * @param userList  最终返回的结果集
+     * @param orderList 需要转换的list集合
+     */
+    private void convertOrderList(Long userId, String asset, String symbol, List<UserOrderVo> userList, List<PcOrderVo> orderList) {
+        if (!CollectionUtils.isEmpty(orderList)) {
+
+            // 获取到所有入参集合的委托Id列表，作为批量查询的入参
+            List<Long> orderIds = orderList.stream().map(PcOrderVo::getId).collect(Collectors.toList());
+
+            // 查询多个委托对应的成交记录(order trade)
+            List<PcOrderTradeVo> orderTradeList = pcOrderTradeService.listOrderTrade(userId, asset, symbol, orderIds);
+
+            Map<Long, List<PcOrderTradeVo>> orderId2OrderTradeList = new HashMap<>();
+
+            for (PcOrderTradeVo pcOrderTradeVo : orderTradeList) {
+                List<PcOrderTradeVo> orderTradeVoList = orderId2OrderTradeList.get(pcOrderTradeVo.getOrderId());
+                if (null == orderTradeVoList) {
+                    orderTradeVoList = new ArrayList<>();
+                    orderId2OrderTradeList.put(pcOrderTradeVo.getOrderId(), orderTradeVoList);
+                }
+                orderTradeVoList.add(pcOrderTradeVo);
+            }
+
+            for (PcOrderVo orderVo : orderList) {
+                UserOrderVo vo = new UserOrderVo();
+                BeanUtils.copyProperties(orderVo, vo);
+                vo.setFee(orderVo.getFeeCost());
+                vo.setQty(orderVo.getVolume());
+                vo.setLongFlag(orderVo.getLongFlag());
+                vo.setCtime(orderVo.getCreated());
+
+                //成交均价
+                BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(asset, symbol, orderVo.getLongFlag(), orderId2OrderTradeList.get(orderVo.getId()));
+                BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(null, orderVo.getUserId(), orderVo.getId());
+                vo.setAvgPrice(meanPrice);
+                vo.setFilledQty(orderVo.getFilledVolume());
+                vo.setCloseFlag(orderVo.getCloseFlag());
+                vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros());
+                vo.setOrderType(orderVo.getOrderType());
+                vo.setClientOid(orderVo.getClientOrderId());
+                vo.setSymol(orderVo.getSymbol());
+                vo.setRealisedPnl(realisedPnl);
+                userList.add(vo);
             }
         }
     }
@@ -155,7 +207,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
         PageResult<PcOrderVo> list = pcOrderExtendService.queryHistoryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, null);
-        convertOrderList(result, list.getList());
+        convertOrderList(userId, asset, symbol, result, list.getList());
         return result;
     }
 
@@ -180,7 +232,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
         PageResult<PcOrderVo> list = pcOrderExtendService.queryAllOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, null);
-        convertOrderList(result, list.getList());
+        convertOrderList(userId, asset, symbol, result, list.getList());
         return result;
     }
 
