@@ -75,15 +75,16 @@ public class PcPositionMarginService {
         if (marginMode != MarginMode.FIXED) {
             throw new ExSysException(ExCommonError.UNSUPPORTED);
         }
-        
-        PcAccountSymbol accountSymbol = this.accountSymbolService.getOrCreate(userId, asset, symbol);
-        
-        if(accountSymbol==null){
-        	accountSymbol = this.accountSymbolService.create(userId, asset, symbol);
-        }
-        
-        //当前仓位
         PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
+        return this.changeLeverage(pos, leverage);
+	}
+	
+	public boolean changeLeverage(PcPosition pos, BigDecimal leverage){
+		long userId = pos.getUserId();
+		String asset = pos.getAsset();
+		String symbol = pos.getSymbol();
+		Integer longFlag = pos.getLongFlag();
+
         BigDecimal posVolume = BigDecimal.ZERO;
         if(pos!=null){
         	posVolume = pos.getVolume();
@@ -99,10 +100,12 @@ public class PcPositionMarginService {
         if (orderQueryService.hasActiveOrder(userId, asset, symbol, longFlag)) {
             throw new ExException(PcPositonError.HAVE_ACTIVE_ORDER);
         }
-        
+		
         //修改设置
+        PcAccountSymbol accountSymbol = this.accountSymbolService.getOrCreate(userId, asset, symbol);
         this.modifyAccountSymbol(accountSymbol, longFlag, leverage);
         
+        //仓位
         if (pos != null && leverage.compareTo(pos.getLeverage()) != 0) {
 
             if (pos.getLiqStatus()==LiqStatus.FROZEN) {
@@ -187,7 +190,7 @@ public class PcPositionMarginService {
 		if(optType==ChangeMarginOptType.CUT){
 			BigDecimal diff = this.getMinMarginDiff(pos);
 			if(BigUtils.gt(amount, diff)){
-				throw new ExException(PcPositonError.NO_MORE_MARGIN);
+				throw new ExException(PcPositonError.NO_MORE_MARGIN, amount, diff);
 			}
 		}
 		
@@ -223,12 +226,12 @@ public class PcPositionMarginService {
 		}
 		
 		//所需保证金
-		BigDecimal initedMarginRatio = feeRatioService.getInitedMarginRatio(pos.getLeverage());
-		BigDecimal initedMargin = orderStrategy.calMargin(pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice(), initedMarginRatio);
-		if(BigUtils.gt(initedMargin, posMargin)){
+		BigDecimal holdMarginRatio = feeRatioService.getHoldRatio(pos.getUserId(), pos.getAsset(), pos.getSymbol(), pos.getVolume());
+		BigDecimal holdMargin = orderStrategy.calMargin(pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice(), holdMarginRatio);
+		if(BigUtils.gt(holdMargin, posMargin)){
 			return BigDecimal.ZERO;
 		}
-		return posMargin.subtract(initedMargin);
+		return posMargin.subtract(holdMargin);
 	}
 
 	private void cutLeverageMargin(Long userId, String asset, Long posId, BigDecimal amount) {

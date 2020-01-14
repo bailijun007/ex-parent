@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.order.entity;
+package com.hp.sh.expv3.pc.constant;
 
 /**
  * 订单状态

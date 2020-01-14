@@ -43,7 +43,7 @@ public class LiquidationJob {
 			}
 			
 			for(PcPosition pos : list){
-				LiqHandleResult liqResult = pcLiqService.handleLiq(pos);
+				LiqHandleResult liqResult = pcLiqService.checkPosLiq(pos);
 				if(liqResult.isTrigger()){
 					this.sendLiqMsg(pos, liqResult);
 				}
