@@ -74,7 +74,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
 
         PageResult<PcAccountRecordLogVo> result = new PageResult<PcAccountRecordLogVo>();
         List<PcAccountRecordLogVo> list = new ArrayList<>();
-        PageResult<PcAccountLogVo>  pcAccountLogList = pcAccountLogExtendService.getPcAccountLogList(userId, asset, tradeType, historyType, startDate, endDate, symbol, pageNo, pageSize);
+        PageResult<PcAccountLogVo>  pcAccountLogList = pcAccountLogExtendService.pageQueryPcAccountLogList(userId, asset, tradeType, historyType, startDate, endDate, symbol, pageNo, pageSize);
         result.setPageNo(pcAccountLogList.getPageNo());
         result.setPageCount(pcAccountLogList.getPageCount());
         result.setRowTotal(pcAccountLogList.getRowTotal());

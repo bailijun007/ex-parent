@@ -29,7 +29,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
 
 
     @Override
-    public PageResult<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize) {
+    public PageResult<PcAccountLogVo> pageQueryPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize) {
         PageResult<PcAccountLogVo> result = new PageResult<>();
         LocalDateTime localDateTime = LocalDateTime.now();
         Map<String, Object> map = new HashMap<>();

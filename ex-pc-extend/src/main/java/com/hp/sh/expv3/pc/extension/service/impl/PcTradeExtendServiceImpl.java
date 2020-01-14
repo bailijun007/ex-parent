@@ -56,4 +56,10 @@ public class PcTradeExtendServiceImpl implements PcTradeExtendService {
         List<PcTradeVo> list = pcTradeDAO.selectTradeListByTimeInterval(asset,symbol,startTime,endTime,userId);
         return list;
     }
+
+    @Override
+    public List<PcTradeVo> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId) {
+        List<PcTradeVo> list = pcTradeDAO.selectTradeListByUserId(asset,symbol,startTime,endTime,userId);
+        return list;
+    }
 }

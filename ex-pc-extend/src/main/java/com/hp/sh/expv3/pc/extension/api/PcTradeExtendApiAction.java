@@ -73,16 +73,30 @@ public class PcTradeExtendApiAction implements PcTradeExtendApi {
 
     @Override
     public List<PcTradeVo> selectTradeListByUser(String asset, String symbol, Long userId, Long startTime, Long endTime) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null || startTime == null || endTime == null) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
 
-        if (startTime == null || endTime == null) {
+        if (startTime == null && endTime == null) {
             endTime = Instant.now().toEpochMilli();
             startTime = endTime - ((endTime + TimeZone.getDefault().getRawOffset()) % (24 * 60 * 60 * 1000L));
         }
 
         List<PcTradeVo> pcTradeVo = pcTradeExtendService.selectTradeListByTimeInterval(asset, symbol, startTime, endTime, userId);
+        return pcTradeVo;
+    }
+
+    @Override
+    public List<PcTradeVo> selectTradeListByUserId(String asset, String symbol, Long userId, Long startTime, Long endTime) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null ) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+
+        if (startTime == null && endTime == null) {
+            endTime = Instant.now().toEpochMilli();
+        }
+
+        List<PcTradeVo> pcTradeVo = pcTradeExtendService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId);
         return pcTradeVo;
     }
 

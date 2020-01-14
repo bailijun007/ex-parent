@@ -105,7 +105,7 @@ public interface PcOrderExtendApi {
             @ApiImplicitParam(name = "lastOrderId ", value = "当前页最后一张委托的id", example = "10", required = false),
             @ApiImplicitParam(name = "nextPage ", value = " 翻页标记,-1 上一页,1.下一页 ", example = "1", required = true)
     })
-    List<UserOrderVo> queryAll(@RequestParam("userId") Long userId,
+    PageResult<UserOrderVo> queryAll(@RequestParam("userId") Long userId,
                                @RequestParam("asset") String asset,
                                @RequestParam("symbol") String symbol,
                                @RequestParam(value = "status", required = false) Integer status,
