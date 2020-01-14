@@ -19,7 +19,7 @@ public class PcAccountRecordLogVo implements Serializable {
     private String remark;
 
     @ApiModelProperty("交易类型")
-    private String tradeType;
+    private Integer tradeType;
 
     @ApiModelProperty("成交数量")
     private BigDecimal tradeAmt;
@@ -94,11 +94,11 @@ public class PcAccountRecordLogVo implements Serializable {
         this.remark = remark;
     }
 
-    public String getTradeType() {
+    public Integer getTradeType() {
         return tradeType;
     }
 
-    public void setTradeType(String tradeType) {
+    public void setTradeType(Integer tradeType) {
         this.tradeType = tradeType;
     }
 

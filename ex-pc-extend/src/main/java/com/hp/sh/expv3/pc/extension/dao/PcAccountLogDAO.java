@@ -16,4 +16,9 @@ public interface PcAccountLogDAO {
 
     List<PcAccountLogVo> queryList(Map<String,Object> map);
 
+    Long queryCount(Map<String, Object> map);
+
+    List<PcAccountLogVo> queryByLimit(Map<String, Object> map);
+
+
 }
