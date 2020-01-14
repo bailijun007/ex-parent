@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,14 +21,26 @@ public class PcLiqRecordExtendServiceImpl implements PcLiqRecordExtendService {
     private PcLiqRecordDAO pcLiqRecordDAO;
 
     @Override
+    @Deprecated
     public PcLiqRecordVo getPcLiqRecord(Long refId, String asset, String symbol, Long userId, Long time) {
-        Map<String, Object> map=new HashMap<>();
-        map.put("id",refId);
-        map.put("asset",asset);
-        map.put("symbol",symbol);
-        map.put("userId",userId);
-        map.put("createdBegin",time);
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", refId);
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("userId", userId);
+        map.put("createdBegin", time);
         PcLiqRecordVo pcLiqRecordVo = pcLiqRecordDAO.queryOne(map);
         return pcLiqRecordVo;
+    }
+
+    @Override
+    public List<PcLiqRecordVo> listPcLiqRecord(String asset, String symbol, Long userId, List<Long> refIds) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("idList", refIds);
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("userId", userId);
+        List<PcLiqRecordVo> records = pcLiqRecordDAO.queryList(map);
+        return records;
     }
 }

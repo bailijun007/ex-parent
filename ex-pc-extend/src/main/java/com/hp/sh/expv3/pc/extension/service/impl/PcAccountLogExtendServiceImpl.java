@@ -7,6 +7,7 @@ import com.hp.sh.expv3.pc.extension.constant.ExtCommonConstant;
 import com.hp.sh.expv3.pc.extension.dao.PcAccountLogDAO;
 import com.hp.sh.expv3.pc.extension.service.PcAccountLogExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountLogVo;
+import com.hp.sh.expv3.pc.extension.vo.PcAccountRecordLogVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2019/12/25
@@ -83,7 +85,8 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
      * @param list
      */
     private void rePage(Integer pageNo, Integer pageSize, PageResult<PcAccountLogVo> result, Long count, List<PcAccountLogVo> list) {
-        result.setList(list);
+         List<PcAccountLogVo> voList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
+        result.setList(voList);
         result.setRowTotal(count);
         result.setPageNo(pageNo);
         Integer rowTotal = Integer.parseInt(String.valueOf(count));
