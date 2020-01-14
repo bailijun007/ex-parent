@@ -6,7 +6,6 @@ import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeDetailVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
-import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +122,16 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         return result;
     }
 
+    @Override
+    public List<PcOrderTradeDetailVo> selectPcFeeCollectByAccountId(String asset, String symbol, Long userId, Long statTime, Long endTime) {
+        if (userId == null||statTime==null||endTime==null||StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        List<PcOrderTradeDetailVo> result = new ArrayList<>();
+        List<PcOrderTradeVo> voList = pcOrderTradeService.selectPcFeeCollectByAccountId(asset, symbol, userId,statTime,endTime);
+        this.toResult(result,voList);
+        return result;
+    }
 
 
     //封装结果集

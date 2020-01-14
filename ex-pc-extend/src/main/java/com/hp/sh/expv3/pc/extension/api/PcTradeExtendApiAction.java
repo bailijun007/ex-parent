@@ -73,12 +73,12 @@ public class PcTradeExtendApiAction implements PcTradeExtendApi {
 
     @Override
     public List<PcTradeVo> selectTradeListByUser(String asset, String symbol, Long userId, Long startTime, Long endTime) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null || startTime == null || endTime == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
 
-        if(startTime==null||endTime==null){
-            endTime= Instant.now().toEpochMilli();
+        if (startTime == null || endTime == null) {
+            endTime = Instant.now().toEpochMilli();
             startTime = endTime - ((endTime + TimeZone.getDefault().getRawOffset()) % (24 * 60 * 60 * 1000L));
         }
 

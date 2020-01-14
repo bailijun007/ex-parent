@@ -53,16 +53,16 @@ public interface PcOrderExtendApi {
             @ApiImplicitParam(name = "nextPage ", value = " 翻页标记,-1 上一页,1.下一页 ", example = "1", required = true)
     })
     PageResult<UserOrderVo> queryUserActivityOrder(@RequestParam("userId") Long userId,
-                                           @RequestParam("asset") String asset,
-                                           @RequestParam(value = "symbol",required = false) String symbol,
-                                           @RequestParam(value = "orderType", required = false) Integer orderType,
-                                           @RequestParam(value = "longFlag", required = false) Integer longFlag,
-                                           @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
-                                           @RequestParam("isTotalNumber") Integer isTotalNumber,
-                                           @RequestParam("currentPage") Integer currentPage,
-                                           @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize,
-                                           @RequestParam(value = "lastOrderId", required = false) Long lastOrderId,
-                                           @RequestParam("nextPage") Integer nextPage);
+                                                   @RequestParam("asset") String asset,
+                                                   @RequestParam(value = "symbol", required = false) String symbol,
+                                                   @RequestParam(value = "orderType", required = false) Integer orderType,
+                                                   @RequestParam(value = "longFlag", required = false) Integer longFlag,
+                                                   @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
+                                                   @RequestParam("isTotalNumber") Integer isTotalNumber,
+                                                   @RequestParam("currentPage") Integer currentPage,
+                                                   @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize,
+                                                   @RequestParam(value = "lastOrderId", required = false) Long lastOrderId,
+                                                   @RequestParam("nextPage") Integer nextPage);
 
 
     @ApiOperation(value = "获取当前用户历史委托")
@@ -130,13 +130,15 @@ public interface PcOrderExtendApi {
             @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "10", required = true)
     })
     PageResult<UserOrderVo> pageQueryOrderList(@RequestParam(value = "userId", required = false) Long userId,
-                                           @RequestParam(value = "asset", required = false) String asset,
-                                           @RequestParam(value = "symbol", required = false) String symbol,
-                                           @RequestParam(value = "status", required = false) Integer status,
-                                           @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
-                                           @RequestParam("orderId") Long orderId,
-                                           @RequestParam("pageNo") Integer pageNo,
-                                           @RequestParam("pageSize") Integer pageSize);
+                                               @RequestParam(value = "asset", required = false) String asset,
+                                               @RequestParam(value = "symbol", required = false) String symbol,
+                                               @RequestParam(value = "status", required = false) Integer status,
+                                               @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
+                                               @RequestParam("orderId") Long orderId,
+                                               @RequestParam("pageNo") Integer pageNo,
+                                               @RequestParam("pageSize") Integer pageSize);
+
+
 
 
 }

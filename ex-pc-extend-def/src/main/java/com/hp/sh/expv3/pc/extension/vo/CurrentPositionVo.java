@@ -63,6 +63,9 @@ public class CurrentPositionVo implements Serializable {
     @ApiModelProperty("开仓时间")
     private Long ctime;
 
+    @ApiModelProperty("累计成交量")
+    private  BigDecimal accuVolume;
+
     public Long getUserId() {
         return userId;
     }
@@ -213,5 +216,13 @@ public class CurrentPositionVo implements Serializable {
 
     public void setCtime(Long ctime) {
         this.ctime = ctime;
+    }
+
+    public BigDecimal getAccuVolume() {
+        return accuVolume;
+    }
+
+    public void setAccuVolume(BigDecimal accuVolume) {
+        this.accuVolume = accuVolume;
     }
 }

@@ -104,5 +104,17 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         return list;
     }
 
+    @Override
+    public List<PcOrderTradeVo> selectPcFeeCollectByAccountId(String asset, String symbol, Long userId, Long statTime, Long endTime) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("userId", userId);
+        map.put("tradeTimeBegin", statTime);
+        map.put("tradeTimeEnd", endTime);
+        List<PcOrderTradeVo> list = pcOrderTradeDAO.selectPcFeeCollectByAccountId(map);
+        return list;
+    }
+
 
 }

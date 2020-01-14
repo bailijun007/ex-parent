@@ -97,4 +97,15 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
         return pcPositionDAO.getAvgPrice(userId,asset,symbol,volume);
 
     }
+
+    @Override
+    public List<PcPositionVo> selectPosByAccount(Long userId, String asset, String symbol, Long startTime) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("userId",userId);
+        map.put("asset",asset);
+        map.put("symbol",symbol);
+        map.put("modifiedBegin",startTime);
+        List<PcPositionVo> pcPositionVos = pcPositionDAO.selectPosByAccount(map);
+        return pcPositionVos;
+    }
 }

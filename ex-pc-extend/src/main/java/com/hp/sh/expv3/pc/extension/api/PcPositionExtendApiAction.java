@@ -84,6 +84,18 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
         return result;
     }
 
+    @Override
+    public List<CurrentPositionVo> selectPosByAccount(Long userId, String asset, String symbol, Long startTime) {
+        if (userId == null || startTime == null||StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        List<CurrentPositionVo> result = new ArrayList<>();
+        List<PcPositionVo> list =pcPositionExtendService.selectPosByAccount(userId,asset,symbol,startTime);
+        this.convertPositionList(result, list);
+
+        return result;
+    }
+
     private void convertPositionList(List<CurrentPositionVo> result, List<PcPositionVo> list) {
         if (!CollectionUtils.isEmpty(list)) {
             for (PcPositionVo positionVo : list) {
@@ -93,6 +105,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
                 BigDecimal volume = pcOrderVos.stream().map(order -> order.getVolume().subtract(order.getFilledVolume())).reduce(BigDecimal.ZERO, BigDecimal::add);
                 CurrentPositionVo currentPositionVo = new CurrentPositionVo();
                 BeanUtils.copyProperties(positionVo, currentPositionVo);
+                currentPositionVo.setAccuVolume(positionVo.getAccuVolume());
                 currentPositionVo.setUserId(positionVo.getUserId());
                 currentPositionVo.setRealisedPnl(realisedPnl);
                 //可平数量=this.volume -volume
