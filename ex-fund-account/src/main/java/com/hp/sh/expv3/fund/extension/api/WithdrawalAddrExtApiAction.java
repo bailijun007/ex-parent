@@ -2,7 +2,7 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.error.FundCommonError;
+import com.hp.sh.expv3.fund.extension.error.ExFundError;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalAddrExtService;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class WithdrawalAddrExtApiAction implements  WithdrawalAddrExtApi{
     @Override
     public PageResult<WithdrawalAddrVo> findWithdrawalAddr(Long userId, String asset, Integer pageNo, Integer pageSize, Integer enabled) {
         if (userId==null || pageNo == null || pageSize == null) {
-            throw new ExException(FundCommonError.PARAM_EMPTY);
+            throw new ExException(ExFundError.PARAM_EMPTY);
         }
         PageResult<WithdrawalAddrVo> result = withdrawalAddrExtService.pageQueryWithdrawalAddrList(userId, asset,pageNo,pageSize,enabled);
         return result;

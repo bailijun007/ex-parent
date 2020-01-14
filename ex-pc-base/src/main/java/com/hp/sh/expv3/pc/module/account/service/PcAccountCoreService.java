@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.constant.FundFlowDirection;
 import com.hp.sh.expv3.constant.InvokeResult;
+import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.pc.error.PcAccountError;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountDAO;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountRecordDAO;
@@ -104,7 +106,7 @@ public class PcAccountCoreService{
 	PcAccountRecord queryRecord(Long userId, String tradeNo){
 		PcAccountRecord record = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);
 		if(record==null){
-			throw new ExException(CommonError.OBJ_DONT_EXIST);
+			throw new ExSysException(ExCommonError.OBJ_DONT_EXIST);
 		}
 		return record;
 	}
@@ -114,7 +116,7 @@ public class PcAccountCoreService{
 		
 		//金额必须是正数
 		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
-			throw new ExException(CommonError.PARAM_ERROR);
+			throw new ExSysException(ExCommonError.PARAM_EMPTY);
 		}
 		
 		if(this.checkExist(record)){
@@ -197,7 +199,7 @@ public class PcAccountCoreService{
 
 	private PcAccountRecord req2record(FundRequest request){
 		if(request.getAmount()==null){
-			throw new ExException(CommonError.PARAM_REQUIRED);
+			throw new ExSysException(ExCommonError.PARAM_EMPTY);
 		}
 		PcAccountRecord record = new PcAccountRecord();
 		record.setAmount(request.getAmount());

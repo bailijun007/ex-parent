@@ -9,7 +9,7 @@ import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
 import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
 import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
-import com.hp.sh.expv3.fund.extension.error.FundCommonError;
+import com.hp.sh.expv3.fund.extension.error.ExFundError;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
@@ -73,7 +73,7 @@ public class C2cOrderCallbackAction {
         //验证签名是否是伪造的
         boolean b = pLpayClient.getNotifySign(param);
         if (!b) {
-            throw new ExException(FundCommonError.ORDER_CALLBACK_NOTIFY_FIND_SIGN_ERROR);
+            throw new ExException(ExFundError.ORDER_CALLBACK_NOTIFY_FIND_SIGN_ERROR);
         }
 
         //c2c订单验证
@@ -115,7 +115,7 @@ public class C2cOrderCallbackAction {
                 lock.writeLock().unlock();
             }
         } else {
-            throw new ExException(FundCommonError.ORDER_CALLBACK_NOTIFY_FAIL);
+            throw new ExException(ExFundError.ORDER_CALLBACK_NOTIFY_FAIL);
         }
         return "success";
     }

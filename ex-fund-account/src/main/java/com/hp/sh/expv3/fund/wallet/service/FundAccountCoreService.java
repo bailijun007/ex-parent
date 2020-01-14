@@ -5,7 +5,9 @@ package com.hp.sh.expv3.fund.wallet.service;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.constant.InvokeResult;
+import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.fund.wallet.constant.FundFlowDirection;
 import com.hp.sh.expv3.fund.wallet.dao.FundAccountDAO;
 import com.hp.sh.expv3.fund.wallet.dao.FundAccountRecordDAO;
@@ -91,7 +93,7 @@ public class FundAccountCoreService {
     FundAccountRecord queryRecord(Long userId, String tradeNo) {
         FundAccountRecord record = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);
         if (record == null) {
-            throw new ExException(CommonError.OBJ_DONT_EXIST);
+            throw new ExSysException(ExCommonError.OBJ_DONT_EXIST, userId, tradeNo);
         }
         return record;
     }
@@ -109,7 +111,7 @@ public class FundAccountCoreService {
 
         //金额必须是正数
         if (record.getAmount().compareTo(BigDecimal.ZERO) < 0) {
-            throw new ExException(CommonError.PARAM_ERROR);
+            throw new ExException(WalletError.PARAM_REQUIRE_POSITIVE);
         }
 
         if (this.checkExist(record)) {

@@ -3,7 +3,7 @@ package com.hp.sh.expv3.fund.c2c.component;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
-import com.hp.sh.expv3.fund.extension.error.FundCommonError;
+import com.hp.sh.expv3.fund.extension.error.ExFundError;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +65,7 @@ public class PLpayClient {
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         int codeValue = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getStatusCodeValue();
         if (codeValue != 200) {
-            throw new ExException(FundCommonError.SEND_REQUEST_TO_C2C_SERVICE_FAIL);
+            throw new ExException(ExFundError.SEND_REQUEST_TO_C2C_SERVICE_FAIL);
         }
 
         return url;

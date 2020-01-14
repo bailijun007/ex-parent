@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.error.FundCommonError;
+import com.hp.sh.expv3.fund.extension.error.ExFundError;
 import com.hp.sh.expv3.fund.extension.service.DepositAddrExtService;
 import com.hp.sh.expv3.fund.extension.service.DepositRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo;
@@ -36,7 +36,7 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
                                                      @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize,
                                                      @RequestParam(value = "pageStatus") Integer pageStatus) {
         if (userId == null || pageSize == null) {
-            throw new ExException(FundCommonError.PARAM_EMPTY);
+            throw new ExException(ExFundError.PARAM_EMPTY);
         }
         List<DepositRecordHistoryVo> list = getDepositRecordHistoryVos(userId, asset, queryId, pageSize, pageStatus);
 
@@ -54,7 +54,7 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
     @Override
     public PageResult<DepositRecordHistoryVo> queryAllUserHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageSize == null) {
-            throw new ExException(FundCommonError.PARAM_EMPTY);
+            throw new ExException(ExFundError.PARAM_EMPTY);
         }
         PageResult<DepositRecordHistoryVo> result = depositRecordExtService.pageQueryDepositRecordHistory(userId, asset, pageNo, pageSize);
         if(!CollectionUtils.isEmpty(result.getList())){

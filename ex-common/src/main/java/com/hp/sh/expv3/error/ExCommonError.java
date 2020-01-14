@@ -14,7 +14,11 @@ public class ExCommonError extends ErrorCode {
     
 	//重复提交
 	public static final ExCommonError REPEAT_ORDER = new ExCommonError(10101, "重复提交！");
+	
 	public static final ExCommonError OBJ_DONT_EXIST = new ExCommonError(10102, "对象不存在");
+
+	public static final ExCommonError UNSUPPORTED = new ExCommonError(10103, "不支持此功能");
+	
 	
 	private ExCommonError(int code, String message) {
 		super(code, message);

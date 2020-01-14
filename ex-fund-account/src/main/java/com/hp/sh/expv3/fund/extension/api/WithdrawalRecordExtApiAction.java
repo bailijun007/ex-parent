@@ -2,7 +2,7 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.extension.error.FundCommonError;
+import com.hp.sh.expv3.fund.extension.error.ExFundError;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalAddrExtService;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo;
@@ -35,7 +35,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     @Override
     public List<WithdrawalRecordVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         if (userId == null || pageSize == null || StringUtils.isEmpty(asset)) {
-            throw new ExException(FundCommonError.PARAM_EMPTY);
+            throw new ExException(ExFundError.PARAM_EMPTY);
         }
 
         List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, queryId, pageSize, pageStatus);
@@ -46,7 +46,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     @Override
     public List<WithdrawalRecordVo> queryHistoryByTime(Long userId, String asset, Long timestamp) {
         if (userId == null || timestamp == null || StringUtils.isEmpty(asset)) {
-            throw new ExException(FundCommonError.PARAM_EMPTY);
+            throw new ExException(ExFundError.PARAM_EMPTY);
         }
 //        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(timestamp));
         List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, timestamp, null);
@@ -84,7 +84,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     @Override
     public List<WithdrawalRecordVo> queryUserWithdrawal(Long userId, String asset, Long startTime, Long endTime) {
         if (userId == null || startTime == null || endTime == null || StringUtils.isEmpty(asset)) {
-            throw new ExException(FundCommonError.PARAM_EMPTY);
+            throw new ExException(ExFundError.PARAM_EMPTY);
         }
         List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, startTime, endTime);
 
@@ -106,7 +106,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     @Override
     public PageResult<WithdrawalRecordVo> queryAllUserHistory(Long userId, String asset, Long startTime, Long endTime, Integer approvalStatus, Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageSize == null) {
-            throw new ExException(FundCommonError.PARAM_EMPTY);
+            throw new ExException(ExFundError.PARAM_EMPTY);
         }
 
         Instant now = Instant.now();

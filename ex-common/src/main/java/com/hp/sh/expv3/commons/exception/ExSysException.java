@@ -9,22 +9,23 @@ public class ExSysException extends SysException{
 
 	public ExSysException() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public ExSysException(ErrorCode errorCode) {
 		super(errorCode);
-		// TODO Auto-generated constructor stub
 	}
 
-	public ExSysException(int code, String message, Throwable cause) {
-		super(code, message, cause);
-		// TODO Auto-generated constructor stub
+	public ExSysException(ErrorCode errorCode, Throwable cause) {
+		super(errorCode.getCode(), errorCode.getMessage(), cause);
 	}
-
+	
+	public ExSysException(ErrorCode errorCode, Object...errorData) {
+		this(errorCode);
+		super.setErrorData(errorData);
+	}
+	
 	public ExSysException(int code, String message) {
 		super(code, message);
-		// TODO Auto-generated constructor stub
 	}
 
 }

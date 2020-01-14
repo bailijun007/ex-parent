@@ -11,7 +11,7 @@ import com.hp.sh.expv3.fund.c2c.util.GenerateOrderNumUtils;
 import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
 import com.hp.sh.expv3.fund.extension.api.C2cOrderExtApi;
 import com.hp.sh.expv3.fund.extension.api.FundAccountExtApi;
-import com.hp.sh.expv3.fund.extension.error.FundCommonError;
+import com.hp.sh.expv3.fund.extension.error.ExFundError;
 import com.hp.sh.expv3.fund.extension.vo.C2cOrderVo;
 import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
     @Override
     public PageResult<C2cOrderVo> pageQueryByPayStatus(Integer payStatus, Integer nextPage, Integer pageSize, Long id, Long userId) {
         if (pageSize == null || nextPage == null || pageSize == null || userId == null) {
-            throw new ExException(FundCommonError.PARAM_EMPTY);
+            throw new ExException(ExFundError.PARAM_EMPTY);
         }
         return queryService.pageQueryByPayStatus(payStatus, nextPage, pageSize, id, userId);
     }
@@ -129,7 +129,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
             }
             return "success";
         } else {
-            throw new ExException(FundCommonError.ORDER_NOT_SUFFICIENT_FUNDS);
+            throw new ExException(ExFundError.ORDER_NOT_SUFFICIENT_FUNDS);
         }
     }
 
@@ -137,7 +137,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
     public String approvalC2cOrder(Long id,Integer auditStatus) {
         C2cOrder c2cOrder = queryService.queryById(id);
        if(null==c2cOrder){
-           throw new ExException(FundCommonError.ORDER_NOT_FIND);
+           throw new ExException(ExFundError.ORDER_NOT_FIND);
        }
         C2cOrder order =new C2cOrder();
         order.setPayFinishTime(Instant.now().toEpochMilli());
