@@ -37,6 +37,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
+        map.put("symbol", symbol);
         try {
             if (ExtCommonConstant.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {
                 LocalDateTime minusDays = localDateTime.minusDays(2L);
