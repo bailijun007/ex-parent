@@ -114,14 +114,16 @@ public class PositionStrategyContext {
 		}
 		
 		//maker fee
-		if(closeFlag==OrderFlag.ACTION_OPEN && matchedVo.getMakerFlag()==TradingRoles.MAKER){
-			BigDecimal makerFeeRatio = feeRatioService.getMakerOpenFeeRatio(userId, asset, symbol);
-			tradeResult.setMakerFeeRatio(makerFeeRatio);
-			tradeResult.setMakerFee(orderStrategy.calcFee(tradeResult.getBaseValue(), makerFeeRatio));
-		}else{
-			BigDecimal makerFeeRatio = feeRatioService.getMakerCloseFeeRatio(userId, asset, symbol);
-			tradeResult.setMakerFeeRatio(makerFeeRatio);
-			tradeResult.setMakerFee(orderStrategy.calcFee(tradeResult.getBaseValue(), makerFeeRatio));
+		if(matchedVo.getMakerFlag()==TradingRoles.MAKER){
+			if(closeFlag==OrderFlag.ACTION_OPEN){
+				BigDecimal makerFeeRatio = feeRatioService.getMakerOpenFeeRatio(userId, asset, symbol);
+				tradeResult.setMakerFeeRatio(makerFeeRatio);
+				tradeResult.setMakerFee(orderStrategy.calcFee(tradeResult.getBaseValue(), makerFeeRatio));
+			}else{
+				BigDecimal makerFeeRatio = feeRatioService.getMakerCloseFeeRatio(userId, asset, symbol);
+				tradeResult.setMakerFeeRatio(makerFeeRatio);
+				tradeResult.setMakerFee(orderStrategy.calcFee(tradeResult.getBaseValue(), makerFeeRatio));
+			}
 		}
 		
 		/* **************** 仓位累计数据 **************** */

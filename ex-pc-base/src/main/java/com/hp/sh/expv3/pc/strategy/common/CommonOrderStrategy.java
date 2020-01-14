@@ -58,7 +58,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 	
 	public BigDecimal calcFee(BigDecimal baseValue, BigDecimal feeRatio){
 		BigDecimal fee = OrderFeeCalc.calcFee(baseValue, feeRatio);
-		return fee;
+		return fee.stripTrailingZeros();
 	}
 	
 	/**
