@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public interface PcAccountLogExtendService {
 
-    PageResult<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize);
+    PageResult<PcAccountLogVo> pageQueryPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize);
     void save(PcAccountLogVo pcAccountLogVo);
 
     PcAccountLogVo getPcAccountLog(PcAccountLogVo pcAccountLogVo);

@@ -3,6 +3,7 @@ package com.hp.sh.expv3.pc.extension.api;
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.dev.CrossDB;
+import com.hp.sh.expv3.pc.extension.constant.ExtCommonConstant;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
@@ -229,12 +230,17 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
      * @return
      */
     @Override
-    public List<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
+    public PageResult<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
-        List<UserOrderVo> result = new ArrayList<>();
-        PageResult<PcOrderVo> list = pcOrderExtendService.queryAllOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, null);
-        convertOrderList(userId, asset, symbol, result, list.getList());
-        return result;
+        PageResult<UserOrderVo> pageResult = new PageResult<UserOrderVo>();
+        List<UserOrderVo> list = new ArrayList<>();
+        PageResult<PcOrderVo> voPageResult = pcOrderExtendService.queryAllOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, ExtCommonConstant.IS_PAGE_YES);
+        convertOrderList(userId, asset, symbol, list, voPageResult.getList());
+        pageResult.setList(list);
+        Integer rowTotal = Integer.parseInt(String.valueOf(voPageResult.getRowTotal()));
+        pageResult.setRowTotal(voPageResult.getRowTotal());
+        pageResult.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
+        return pageResult;
     }
 
     @Override
@@ -273,7 +279,6 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
 
         return result;
     }
-
 
 
     private void checkParam(Long userId, String asset, String symbol, Integer currentPage, Integer pageSize, Integer nextPage) {

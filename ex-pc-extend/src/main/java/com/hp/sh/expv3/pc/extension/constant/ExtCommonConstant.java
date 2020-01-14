@@ -59,4 +59,10 @@ public final class ExtCommonConstant {
     //historyType 1.最近两天,2.两天到三个月
     public static final Integer HISTORY_TYPE_LAST_THREE_MONTHS = 2;
 
+
+    //是否分页：1：分页，0不分页
+    public static final Integer IS_PAGE_YES = 1;
+    public static final Integer IS_PAGE_NO = 0;
+
+
 }

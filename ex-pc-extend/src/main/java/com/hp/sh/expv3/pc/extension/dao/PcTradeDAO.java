@@ -20,4 +20,6 @@ public interface PcTradeDAO {
     List<PcTradeVo> selectTradeListByTimeInterval(@Param("asset") String asset,@Param("symbol") String symbol,@Param("tradeTimeBegin")  Long tradeTimeBegin,@Param("tradeTimeEnd") Long tradeTimeEnd,@Param("userId") Long userId);
 
     PcTradeVo queryLastTrade(@Param("asset") String asset,@Param("symbol") String symbol,@Param("tradeTime")  Long tradeTime);
+
+    List<PcTradeVo> selectTradeListByUserId(@Param("asset") String asset,@Param("symbol") String symbol,@Param("tradeTimeBegin")  Long tradeTimeBegin,@Param("tradeTimeEnd") Long tradeTimeEnd,@Param("userId") Long userId);
 }

@@ -20,7 +20,7 @@ import java.util.List;
 public interface PcOrderTradeExtendApi {
 
     @ApiOperation(value = "查询当前委托的交易记录")
-    @GetMapping(value = "/api/extension/pc/trade/queryOrderTradeDetail")
+    @GetMapping(value = "/api/extension/pc/orderTrade/queryOrderTradeDetail")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
@@ -32,7 +32,7 @@ public interface PcOrderTradeExtendApi {
 
 
     @ApiOperation(value = "查询成交记录")
-    @GetMapping(value = "/api/extension/pc/trade/queryTradeRecord")
+    @GetMapping(value = "/api/extension/pc/orderTrade/queryTradeRecord")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型，多个以逗号分割", example = "BTC,ETH", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对，多个以逗号分割", example = "BTC_USDT,BTC_ETH", required = true),
@@ -48,7 +48,7 @@ public interface PcOrderTradeExtendApi {
             @RequestParam(value = "count", required = true) Integer count);
 
     @ApiOperation(value = "查小于某个时间点的最大的一条记录")
-    @GetMapping(value = "/api/extension/pc/trade/selectLessTimeTrade")
+    @GetMapping(value = "/api/extension/pc/orderTrade/selectLessTimeTrade")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
@@ -63,7 +63,7 @@ public interface PcOrderTradeExtendApi {
 
 
     @ApiOperation(value = "查某个用户的所有成交记录")
-    @GetMapping(value = "/api/extension/pc/trade/selectAllTradeListByUser")
+    @GetMapping(value = "/api/extension/pc/orderTrade/selectAllTradeListByUser")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
