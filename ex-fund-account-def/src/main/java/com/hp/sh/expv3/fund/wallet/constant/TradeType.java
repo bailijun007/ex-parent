@@ -21,5 +21,7 @@ public class TradeType {
 	
 	public static final int C2C_IN = 15;			//C2C买入
 	public static final int C2C_OUT = 16;			//C2C卖出
+	
+	public static final int RAKE_BACK = 17;			//返佣
 
 }
