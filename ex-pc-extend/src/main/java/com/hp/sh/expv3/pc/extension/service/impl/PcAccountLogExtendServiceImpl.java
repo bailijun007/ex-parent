@@ -3,17 +3,17 @@ package com.hp.sh.expv3.pc.extension.service.impl;
 import com.gitee.hupadev.base.api.PageResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.pc.extension.constant.CommonConstant;
+import com.hp.sh.expv3.pc.extension.constant.ExtCommonConstant;
 import com.hp.sh.expv3.pc.extension.dao.PcAccountLogDAO;
-import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcAccountLogExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountLogVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,38 +30,64 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
 
     @Override
     public PageResult<PcAccountLogVo> getPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize) {
-        PageResult<PcAccountLogVo> result=new PageResult<>();
+        PageResult<PcAccountLogVo> result = new PageResult<>();
         LocalDateTime localDateTime = LocalDateTime.now();
-        PageHelper.startPage(pageNo,pageSize);
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("type", tradeType);
-        if(CommonConstant.TRADE_TYPE_ALL.equals(tradeType)){
-            map.put("type", null);
-        }
         map.put("symbol", symbol);
         try {
-            if (historyType == 1) {
+            if (ExtCommonConstant.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {
                 LocalDateTime minusDays = localDateTime.minusDays(2L);
                 long timeBegin = minusDays.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
                 map.put("timeBegin", timeBegin);
-            } else if (historyType == 2) {
+            } else if (ExtCommonConstant.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
                 map.put("timeBegin", startDate);
                 map.put("timeEnd", endDate);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        List<PcAccountLogVo> list = pcAccountLogDAO.queryList(map);
-        PageInfo<PcAccountLogVo> info = new PageInfo<>(list);
-        result.setList(list);
-        result.setRowTotal(info.getTotal());
-        result.setPageNo(info.getPageNum());
-        result.setPageCount(info.getPages());
+        if (ExtCommonConstant.TRADE_TYPE_ALL.equals(tradeType)) {
+            Long count = pcAccountLogDAO.queryCount(map);
+            map.put("limit", count);
+            List<PcAccountLogVo> list = pcAccountLogDAO.queryByLimit(map);
+            rePage(pageNo, pageSize, result, count, list);
+        } else if (ExtCommonConstant.TRADE_TYPE_MAP.containsKey(tradeType)) {
+            List<Integer> typeList = ExtCommonConstant.TRADE_TYPE_MAP.get(tradeType);
+            map.put("types", typeList);
+            Long count = pcAccountLogDAO.queryCount(map);
+            map.put("limit", count);
+            List<PcAccountLogVo> list = pcAccountLogDAO.queryByLimit(map);
+            rePage(pageNo, pageSize, result, count, list);
+        } else {
+            PageHelper.startPage(pageNo, pageSize);
+            map.put("type", tradeType);
+            List<PcAccountLogVo> list = pcAccountLogDAO.queryList(map);
+            PageInfo<PcAccountLogVo> info = new PageInfo<>(list);
+            result.setList(list);
+            result.setRowTotal(info.getTotal());
+            result.setPageNo(info.getPageNum());
+            result.setPageCount(info.getPages());
+        }
 
         return result;
+    }
+
+    /**
+     * 重新手动分页
+     * @param pageNo
+     * @param pageSize
+     * @param result
+     * @param count
+     * @param list
+     */
+    private void rePage(Integer pageNo, Integer pageSize, PageResult<PcAccountLogVo> result, Long count, List<PcAccountLogVo> list) {
+        result.setList(list);
+        result.setRowTotal(count);
+        result.setPageNo(pageNo);
+        Integer rowTotal = Integer.parseInt(String.valueOf(count));
+        result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
     }
 
     @Override
@@ -71,7 +97,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
 
     @Override
     public PcAccountLogVo getPcAccountLog(PcAccountLogVo pcAccountLogVo) {
-        Map<String, Object> map=new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("type", pcAccountLogVo.getType());
         map.put("refId", pcAccountLogVo.getRefId());
         map.put("userId", pcAccountLogVo.getUserId());
