@@ -125,18 +125,13 @@ public class PcLiqService {
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list, Integer lastFlag) {
-		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
-		if(pos==null){
-			logger.error("当前仓位不存在!userId={}, symbol={}, longFlag={}。  强平仓位:{}", userId, symbol, longFlag, posId);
-			return;
-		}
-		if(!pos.getId().equals(posId)){
-			throw new RuntimeException("平仓，仓位ID与当前仓位ID不一致");
-		}
-		//强平过了
+		PcPosition pos = this.positionDataService.getPosition(userId, asset, symbol, posId);
+		
 		if(pos.getLiqStatus()==LiqStatus.FORCE_CLOSE){
+			logger.warn("仓位已经被强平：posId={}", posId);
 			return;
 		}
+		
 		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
 		
 		//检查触发强平
