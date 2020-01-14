@@ -77,7 +77,7 @@ public class DepositService {
 		params.put("transactionId", chainOrderId);
 		Long count = this.depositRecordDAO.queryCount(params);
 		if(count>0){
-			throw new ExException(ExCommonError.REPEAT_ORDER);
+			throw new ExSysException(ExCommonError.REPEAT_ORDER);
 		}
 	}
 

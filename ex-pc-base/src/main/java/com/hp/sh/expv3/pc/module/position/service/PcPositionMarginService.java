@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gitee.hupadev.base.exceptions.CommonError;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
@@ -74,7 +73,7 @@ public class PcPositionMarginService {
 	public boolean changeLeverage(long userId, String asset, String symbol, int marginMode, Integer longFlag, BigDecimal leverage){
         //逐渐or全仓
         if (marginMode != MarginMode.FIXED) {
-            throw new ExException(ExCommonError.UNSUPPORTED);
+            throw new ExSysException(ExCommonError.UNSUPPORTED);
         }
         
         PcAccountSymbol accountSymbol = this.accountSymbolService.getOrCreate(userId, asset, symbol);
@@ -272,7 +271,7 @@ public class PcPositionMarginService {
 		//当前仓位
 		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(pos==null){
-			throw new ExException(CommonError.OBJ_DONT_EXIST);
+			throw new ExSysException(ExCommonError.OBJ_DONT_EXIST);
 		}
 		pos.setAutoAddFlag(autoAddFlag);
 		return true;

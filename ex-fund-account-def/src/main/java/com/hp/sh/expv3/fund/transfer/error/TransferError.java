@@ -6,7 +6,7 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
 /**
  * 账户模块异常
  * -11001 ~ -11999 见： account_exception
- * 现金充提 :-11051 ~ -11060
+ * 转账 :-11051 ~ -11060
  *
  */
 public class TransferError extends ErrorCode {
