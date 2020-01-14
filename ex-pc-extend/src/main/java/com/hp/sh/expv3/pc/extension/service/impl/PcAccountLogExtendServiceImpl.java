@@ -60,6 +60,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         result.setRowTotal(info.getTotal());
         result.setPageNo(info.getPageNum());
         result.setPageCount(info.getPages());
+
         return result;
     }
 

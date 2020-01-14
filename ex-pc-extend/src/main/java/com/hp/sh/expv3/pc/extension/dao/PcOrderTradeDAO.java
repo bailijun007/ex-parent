@@ -30,4 +30,6 @@ public interface PcOrderTradeDAO {
     List<PcOrderTradeVo> selectTradeListByTimeInterval(Map<String, Object> map);
 
     List<PcOrderTradeVo> queryLastTradeRecord(Map<String, Object> map);
+
+    List<PcOrderTradeVo> selectPcFeeCollectByAccountId(Map<String, Object> map);
 }

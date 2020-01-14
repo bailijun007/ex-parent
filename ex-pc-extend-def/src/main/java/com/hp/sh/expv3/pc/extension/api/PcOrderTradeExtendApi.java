@@ -76,4 +76,17 @@ public interface PcOrderTradeExtendApi {
     );
 
 
+    @ApiOperation(value = "查询 成交记录列表(后台admin接口)")
+    @GetMapping(value = "/api/extension/pc/orderTrade/selectPcFeeCollectByAccountId")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "statTime", value = "开始时间", example = "1578886491000", required = true),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "1578891531000", required = true)
+    })
+    List<PcOrderTradeDetailVo> selectPcFeeCollectByAccountId(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol,
+                                                    @RequestParam("userId") Long userId, @RequestParam("statTime") Long statTime, @RequestParam("endTime") Long endTime);
+
+
 }

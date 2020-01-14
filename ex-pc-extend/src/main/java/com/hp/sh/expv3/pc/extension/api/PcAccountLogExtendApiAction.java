@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2019/12/25
@@ -117,7 +118,21 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
 
             }
         }
+
         result.setList(list);
+
+        //如果查询全部需要重新进行分页
+        if(CommonConstant.TRADE_TYPE_ALL.equals(tradeType)){
+            List<PcAccountRecordLogVo> logVoList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
+            result.setList(logVoList);
+            Integer rowTotal = list.size();
+            result.setPageNo(pageNo);
+            result.setRowTotal(new Long(rowTotal+""));
+            result.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
+
+        }
+
+
 
         return result;
     }

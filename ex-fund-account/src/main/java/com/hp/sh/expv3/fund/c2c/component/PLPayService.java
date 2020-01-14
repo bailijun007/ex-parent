@@ -37,7 +37,7 @@ public class PLPayService {
         //生成订单号
         String orderNo = GenerateOrderNumUtils.getOrderNo(userId);
         //订单币种
-        String orderCurrency =null;
+        String orderCurrency ="INR";
         if(srcCurrency.equals("CNY")){
              orderCurrency = "INR";
         }

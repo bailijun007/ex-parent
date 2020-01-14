@@ -35,4 +35,5 @@ public interface PcOrderTradeExtendService {
 
     List<PcOrderTradeVo> queryLastTradeRecord(String asset, String symbol, Integer count);
 
+    List<PcOrderTradeVo> selectPcFeeCollectByAccountId(String asset, String symbol, Long userId, Long statTime, Long endTime);
 }

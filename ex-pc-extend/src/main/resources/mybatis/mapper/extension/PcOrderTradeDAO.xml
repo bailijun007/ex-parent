@@ -208,6 +208,21 @@
         LIMIT 0,${limit}
     </select>
 
+    <select id="selectPcFeeCollectByAccountId" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order_trade
+        <where>
+            <if test="userId!=null"> user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="tradeTimeBegin!=null and tradeTimeBegin!=''">and trade_time &gt;= #{tradeTimeBegin}</if>
+            <if test="tradeTimeEnd!=null and tradeTimeEnd!=''">and trade_time &lt; #{tradeTimeEnd}</if>
+
+        </where>
+        ORDER BY id ASC
+    </select>
+
     <select id="getRealisedPnl" resultType="java.math.BigDecimal">
         select IFNULL(SUM(pnl),0)
         from pc_order_trade
