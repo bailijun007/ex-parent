@@ -57,7 +57,6 @@ public class PLpayClient {
         String url = apiHost + "?orderNo=" + orderNo + "&customerId=" + customerId + "&orderCurrency=" + orderCurrency + "&orderAmount=" + orderAmount
                 + "&receiveUrl=" + receiveUrl + "&pickupUrl=" + pickupUrl + "&shopNo=" + shopNo + "&signType=" + signType + "&sign=" + sign;
 
-        System.out.println("重定向请求url为 = " + url);
         logger.info("重定向请求url为:{}", url);
 
         RestTemplate restTemplate = new RestTemplate();
@@ -85,10 +84,7 @@ public class PLpayClient {
     public String getSign(String pickupUrl, String receiveUrl, String orderNo, String orderAmount, String orderCurrency) {
         String sign = pickupUrl + receiveUrl + signType + orderNo + orderAmount + orderCurrency + customerId + md5Key;
         String md5 = DigestUtils.md5DigestAsHex(sign.getBytes());
-
-        System.out.println("获取到加密后的签名 = " + md5);
         logger.info("获取到加密后的签名:{}", md5);
-
         return md5;
     }
 
