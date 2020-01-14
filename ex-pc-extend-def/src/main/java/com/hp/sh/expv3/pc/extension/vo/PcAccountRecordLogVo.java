@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * @author BaiLiJun  on 2019/12/24
  */
 public class PcAccountRecordLogVo implements Serializable {
-    @ApiModelProperty("金额")
+    @ApiModelProperty("金额") // baseValue
     private BigDecimal volume;
 
     @ApiModelProperty("已付费用")
@@ -21,13 +21,13 @@ public class PcAccountRecordLogVo implements Serializable {
     @ApiModelProperty("交易类型")
     private Integer tradeType;
 
-    @ApiModelProperty("成交数量")
+    @ApiModelProperty("成交数量") // 成交张数，volume
     private BigDecimal tradeAmt;
 
-    @ApiModelProperty("委托数量")
+    @ApiModelProperty("委托数量") // 委托张数，volume
     private BigDecimal orderAmt;
 
-    @ApiModelProperty("未成交数量")
+    @ApiModelProperty("未成交数量") // 未成交张数，volume
     private BigDecimal noTradeAmt;
 
     @ApiModelProperty("成交价格")

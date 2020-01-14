@@ -3,13 +3,12 @@ package com.hp.sh.expv3.pc.extension.service.impl;
 import com.hp.sh.expv3.pc.extension.dao.PcAccountRecordDAO;
 import com.hp.sh.expv3.pc.extension.service.PcAccountRecordExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountRecordVo;
-import com.hp.sh.expv3.pc.extension.vo.PcLiqRecordVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,13 +23,22 @@ public class PcAccountRecordExtendServiceImpl implements PcAccountRecordExtendSe
 
     @Override
     public PcAccountRecordVo getPcAccountRecord(Long refId, String asset, Long userId, Long time) {
-        Map<String, Object> map=new HashMap<>();
-        map.put("id",refId);
-        map.put("asset",asset);
-        map.put("userId",userId);
-        map.put("createdBegin",time);
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", refId);
+        map.put("asset", asset);
+        map.put("userId", userId);
+        map.put("createdBegin", time);
         PcAccountRecordVo pcAccountRecordVo = pcAccountRecordDAO.queryOne(map);
 
         return pcAccountRecordVo;
+    }
+
+    @Override
+    public List<PcAccountRecordVo> listPcAccountRecord(List<Long> refIds, String asset, Long userId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("idList", refIds);
+        map.put("asset", asset);
+        map.put("userId", userId);
+        return pcAccountRecordDAO.queryList(map);
     }
 }

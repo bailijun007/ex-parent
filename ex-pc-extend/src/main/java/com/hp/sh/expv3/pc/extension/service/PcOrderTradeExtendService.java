@@ -13,6 +13,8 @@ public interface PcOrderTradeExtendService {
 
     PcOrderTradeVo getPcOrderTrade(Long refId, String asset, String symbol, Long userId, Long time);
 
+    List<PcOrderTradeVo> listPcOrderTrade(List<Long> refIds, String asset, String symbol, Long userId);
+
     List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId);
 
     /**

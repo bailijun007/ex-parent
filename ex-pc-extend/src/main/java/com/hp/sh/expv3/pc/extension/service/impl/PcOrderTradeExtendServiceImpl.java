@@ -61,6 +61,16 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
+    public List<PcOrderTradeVo> listPcOrderTrade(List<Long> refIds, String asset, String symbol, Long userId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("idList", refIds);
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("userId", userId);
+        return pcOrderTradeDAO.queryList(map);
+    }
+
+    @Override
     public List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count) {
         Map<String, Object> map = new HashMap<>();
         map.put("assetList", assetList);
