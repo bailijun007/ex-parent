@@ -25,8 +25,8 @@ public class CommonOrderStrategy implements OrderStrategy {
 	/**
 	 * 计算新订单费用
 	 */
-	public OrderRatioData calcOrderAmt(OrderFeeParam pcOrder){
 		//交易金额
+	public OrderRatioData calcOrderAmt(OrderFeeParam pcOrder){
 		BigDecimal amount = CompFieldCalc.calcAmount(pcOrder.getVolume(), pcOrder.getFaceValue());
 		//基础货币价值
 		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, pcOrder.getPrice());
@@ -54,6 +54,16 @@ public class CommonOrderStrategy implements OrderStrategy {
 		orderAmount.setGrossMargin(grossMargin);
 		
 		return orderAmount;
+	}
+	
+	public BigDecimal calMargin(BigDecimal volume, BigDecimal faceValue, BigDecimal price, BigDecimal marginRatio){
+		BigDecimal amount = CompFieldCalc.calcAmount(volume, faceValue);
+		//基础货币价值
+		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, price);
+		
+		//保证金
+		BigDecimal orderMargin = OrderFeeCalc.calMargin(baseValue, marginRatio);
+		return orderMargin;
 	}
 	
 	public BigDecimal calcFee(BigDecimal baseValue, BigDecimal feeRatio){

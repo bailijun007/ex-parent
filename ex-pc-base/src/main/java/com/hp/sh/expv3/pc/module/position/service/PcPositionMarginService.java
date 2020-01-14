@@ -29,6 +29,7 @@ import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -64,6 +65,8 @@ public class PcPositionMarginService {
 	private HoldPosStrategy holdPosStrategy;
     @Autowired
     private PositionStrategyContext positionStrategyContext;
+    @Autowired
+    private CommonOrderStrategy orderStrategy;
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public boolean changeLeverage(long userId, String asset, String symbol, int marginMode, Integer longFlag, BigDecimal leverage){
@@ -213,16 +216,18 @@ public class PcPositionMarginService {
 	protected BigDecimal getMinMarginDiff(PcPosition pos){
 		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
 		BigDecimal pnl = holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(this.metadataService.getFaceValue(pos.getAsset(), pos.getSymbol())), pos.getMeanPrice(), markPrice);
-		BigDecimal posMargin = pos.getInitMargin();
+		BigDecimal posMargin = pos.getPosMargin();
 		if(BigUtils.ltZero(pnl)){
-			posMargin = posMargin.subtract(pnl);
+			posMargin = posMargin.add(pnl);
 		}
+		
 		//所需保证金
-		BigDecimal margin = BigDecimal.ONE.divide(pos.getLeverage());
-		if(BigUtils.gt(margin, posMargin)){
+		BigDecimal initedMarginRatio = feeRatioService.getInitedMarginRatio(pos.getLeverage());
+		BigDecimal initedMargin = orderStrategy.calMargin(pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice(), initedMarginRatio);
+		if(BigUtils.gt(initedMargin, posMargin)){
 			return BigDecimal.ZERO;
 		}
-		return posMargin.subtract(posMargin);
+		return posMargin.subtract(initedMargin);
 	}
 
 	private void cutLeverageMargin(Long userId, String asset, Long posId, BigDecimal amount) {

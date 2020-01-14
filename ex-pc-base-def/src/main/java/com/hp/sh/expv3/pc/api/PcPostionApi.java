@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiOperation;
 public interface PcPostionApi {
 
 	@ApiOperation(value = "修改保证金")
-	@GetMapping(value = "/api/pc/position/margin/add")
+	@GetMapping(value = "/api/pc/position/margin/changeMargin")
 	void changeMargin(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol, @RequestParam("longFlag") Integer longFlag, @RequestParam("optType") Integer optType, @RequestParam("amount") BigDecimal amount);
 	
 	@ApiOperation(value = "修改杠杆")

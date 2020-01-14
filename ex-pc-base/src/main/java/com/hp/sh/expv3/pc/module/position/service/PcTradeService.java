@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
+import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -271,7 +272,6 @@ public class PcTradeService {
 
 	private void modOpenPos(PcPosition pcPosition, TradeResult tradeResult) {
 		pcPosition.setVolume(pcPosition.getVolume().add(tradeResult.getVolume()));
-		pcPosition.setBaseValue(pcPosition.getBaseValue().add(tradeResult.getBaseValue()));
 		pcPosition.setPosMargin(pcPosition.getPosMargin().add(tradeResult.getOrderMargin()));
 		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeResult.getFeeReceivable()));
 		
@@ -281,15 +281,15 @@ public class PcTradeService {
 		
 		pcPosition.setLiqPrice(tradeResult.getNewPosLiqPrice());
 		
-		//累计量
 		pcPosition.setAccuVolume(pcPosition.getAccuVolume().add(tradeResult.getVolume()));
+		
+		pcPosition.setBaseValue(CompFieldCalc.calcBaseValue(pcPosition.getVolume(), pcPosition.getFaceValue(), pcPosition.getMeanPrice()));
 		pcPosition.setAccuBaseValue(pcPosition.getAccuBaseValue().add(tradeResult.getBaseValue()));
 		
 	}
 
 	private void modClosePos(PcPosition pcPosition, TradeResult tradeResult) {
 		pcPosition.setVolume(pcPosition.getVolume().subtract(tradeResult.getVolume()));
-		pcPosition.setBaseValue(pcPosition.getBaseValue().subtract(tradeResult.getBaseValue()));
 		pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(tradeResult.getOrderMargin()));
 		pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(tradeResult.getFeeReceivable()));
 		
@@ -299,6 +299,8 @@ public class PcTradeService {
 		
 		pcPosition.setLiqPrice(tradeResult.getNewPosLiqPrice());
 		
+		pcPosition.setBaseValue(CompFieldCalc.calcBaseValue(pcPosition.getVolume(), pcPosition.getFaceValue(), pcPosition.getMeanPrice()));
+		
 		pcPosition.setRealisedPnl(pcPosition.getRealisedPnl().add(tradeResult.getPnl()));
 
 	}
@@ -307,8 +309,8 @@ public class PcTradeService {
 	private boolean canTrade(PcOrder order, PcTradeMsg tradeMsg) {
 		if(order==null){
 			logger.error("成交订单不存在：orderId={}", tradeMsg.getOrderId());
-			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
-//			return false;
+//			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
+			return false;
 		}
 		
 		BigDecimal remainVol = order.getVolume().subtract(order.getFilledVolume());

@@ -35,7 +35,7 @@ public class TradeResult {
 	//新仓位价值
 	private BigDecimal newPosBaseValue;
 	
-	//新均价(此次成交后，仓位的均价)
+	//新仓位均价(此次成交后，仓位的均价)
 	private BigDecimal newPosMeanPrice;
 	//新预估强平价(此次成交后，仓位的强平价)
 	private BigDecimal newPosLiqPrice;
