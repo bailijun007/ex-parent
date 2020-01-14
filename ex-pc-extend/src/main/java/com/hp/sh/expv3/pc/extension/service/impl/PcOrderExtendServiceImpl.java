@@ -103,6 +103,12 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
         map.put("pageSize", pageSize);
+
+        isPage(lastOrderId, currentPage, pageSize, nextPage, isTotalNumber, result, map);
+        return result;
+    }
+
+    private void isPage(Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, PageResult<PcOrderVo> result, Map<String, Object> map) {
         List<PcOrderVo> pcOrderVos = null;
         if (isTotalNumber == null) {
             map.put("lastOrderId", lastOrderId);
@@ -112,13 +118,13 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
             result.setList(pcOrderVos);
         } else if (isTotalNumber == 1) {
             Long count = pcOrderDAO.queryCount(map);
-            map.put("limit", count);
             result.setRowTotal(count);
+            map.put("limit", count);
+            map.put("isTotalNumber", isTotalNumber);
             pcOrderVos = pcOrderDAO.queryOrders(map);
             List<PcOrderVo> voList = pcOrderVos.stream().skip(pageSize * (currentPage - 1)).limit(pageSize).collect(Collectors.toList());
             result.setList(voList);
         }
-        return result;
     }
 
     @Override
@@ -132,19 +138,9 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
         map.put("activeFlag", 0);
+        map.put("pageSize", pageSize);
+        isPage(lastOrderId, currentPage, pageSize, nextPage, isTotalNumber, result, map);
 
-        if (isTotalNumber == null) {
-            map.put("pageSize", pageSize);
-            map.put("lastOrderId", lastOrderId);
-            map.put("currentPage", currentPage);
-            map.put("nextPage", nextPage);
-
-        } else if (isTotalNumber == 1) {
-            Long count = pcOrderDAO.queryCount(map);
-            result.setRowTotal(count);
-        }
-        List<PcOrderVo> pcOrderVos = pcOrderDAO.queryOrders(map);
-        result.setList(pcOrderVos);
         return result;
     }
 

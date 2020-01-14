@@ -206,7 +206,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
      */
     @Override
     public List<UserOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
-        this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
+        this.checkParam(userId, asset, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
         PageResult<PcOrderVo> list = pcOrderExtendService.queryHistoryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, null);
         convertOrderList(userId, asset, symbol, result, list.getList());
@@ -231,7 +231,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
      */
     @Override
     public PageResult<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
-        this.checkParam(userId, asset, symbol, currentPage, pageSize, nextPage);
+        this.checkParam(userId, asset, currentPage, pageSize, nextPage);
         PageResult<UserOrderVo> pageResult = new PageResult<UserOrderVo>();
         List<UserOrderVo> list = new ArrayList<>();
         PageResult<PcOrderVo> voPageResult = pcOrderExtendService.queryAllOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, ExtCommonConstant.IS_PAGE_YES);
@@ -281,7 +281,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     }
 
 
-    private void checkParam(Long userId, String asset, String symbol, Integer currentPage, Integer pageSize, Integer nextPage) {
+    private void checkParam(Long userId, String asset, Integer currentPage, Integer pageSize, Integer nextPage) {
         if (StringUtils.isEmpty(asset) || null == userId || currentPage == null || pageSize == null || nextPage == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }

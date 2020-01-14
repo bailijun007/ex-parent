@@ -267,10 +267,11 @@
                     ORDER BY id desc
                     LIMIT 0,${pageSize}
                 </when>
-                <otherwise>
+                <when test="isTotalNumber==1">
                     ORDER BY id desc
                     LIMIT 0,${limit}
-                </otherwise>
+                </when>
+
             </choose>
         </where>
 
