@@ -103,7 +103,8 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                 refs.addAll(type2Refs.getOrDefault(PcAccountLog.TYPE_LIQ_LONG, Collections.emptyList()));
                 refs.addAll(type2Refs.getOrDefault(PcAccountLog.TYPE_LIQ_SHORT, Collections.emptyList()));
                 appendPcLiqRecordData(faceValue, asset, symbol, userId, refs);
-            } else if (type2Refs.containsKey(PcAccountLog.TYPE_ADD_TO_MARGIN)
+            }
+            if (type2Refs.containsKey(PcAccountLog.TYPE_ADD_TO_MARGIN)
                     || type2Refs.containsKey(PcAccountLog.TYPE_REDUCE_MARGIN)
                     || type2Refs.containsKey(PcAccountLog.TYPE_AUTO_ADD_MARGIN)
                     || type2Refs.containsKey(PcAccountLog.TYPE_LEVERAGE_ADD_MARGIN)
@@ -117,7 +118,8 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                 refs.addAll(type2Refs.getOrDefault(PcAccountLog.TYPE_FUND_TO_PC, Collections.emptyList()));
                 refs.addAll(type2Refs.getOrDefault(PcAccountLog.TYPE_PC_TO_FUND, Collections.emptyList()));
                 appendTransferMarginData(faceValue, asset, symbol, userId, refs);
-            }else if (type2Refs.containsKey(PcAccountLog.TYPE_TRAD_OPEN_LONG)
+            }
+            if (type2Refs.containsKey(PcAccountLog.TYPE_TRAD_OPEN_LONG)
                     || type2Refs.containsKey(PcAccountLog.TYPE_TRAD_OPEN_SHORT)
                     || type2Refs.containsKey(PcAccountLog.TYPE_TRAD_CLOSE_LONG)
                     || type2Refs.containsKey(PcAccountLog.TYPE_TRAD_CLOSE_SHORT)

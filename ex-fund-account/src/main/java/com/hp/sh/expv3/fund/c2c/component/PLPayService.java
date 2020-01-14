@@ -5,6 +5,7 @@ import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
 import com.hp.sh.expv3.fund.c2c.util.GenerateOrderNumUtils;
 import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
+import com.hp.sh.expv3.utils.math.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,9 @@ public class PLPayService {
 
     @Value("${expv3.base.url}")
     private String baseUrl;
+
+    @Value("${plpay.server.c2c_fee_ratio}")
+    private String c2cFeeRatio;
 
     @Autowired
     private BuyService buyService;
@@ -57,6 +61,10 @@ public class PLPayService {
         c2cOrder.setPayCurrency(srcCurrency);
         c2cOrder.setExchangeCurrency(tarCurrency);
         c2cOrder.setPrice(ratio);
+        c2cOrder.setVolume(tarVolume);
+        //计算USDT 就是 orderAmount*( 1 - 手续费率) / 你系统的CNY:USD汇率;
+        BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
+        c2cOrder.setAmount(fabiAmt.multiply(feeRatio).divide(ratio, Precision.COMMON_PRECISION, Precision.LESS));
         c2cOrder.setType(C2cConst.C2C_BUY);
         c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
         c2cOrder.setPayStatusDesc(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
