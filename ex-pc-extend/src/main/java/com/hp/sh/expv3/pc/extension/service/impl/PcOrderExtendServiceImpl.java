@@ -103,6 +103,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
         map.put("pageSize", pageSize);
+
         isPage(lastOrderId, currentPage, pageSize, nextPage, isTotalNumber, result, map);
         return result;
     }
@@ -119,6 +120,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
             Long count = pcOrderDAO.queryCount(map);
             result.setRowTotal(count);
             map.put("limit", count);
+            map.put("isTotalNumber", isTotalNumber);
             pcOrderVos = pcOrderDAO.queryOrders(map);
             List<PcOrderVo> voList = pcOrderVos.stream().skip(pageSize * (currentPage - 1)).limit(pageSize).collect(Collectors.toList());
             result.setList(voList);
