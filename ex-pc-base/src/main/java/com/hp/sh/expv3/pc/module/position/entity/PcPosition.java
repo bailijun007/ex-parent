@@ -3,6 +3,7 @@ package com.hp.sh.expv3.pc.module.position.entity;
 import java.math.BigDecimal;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
+import com.hp.sh.expv3.dev.Redundant;
 
 /**
  * 永续合约_仓位
@@ -81,6 +82,7 @@ public class PcPosition extends UserDataEntity {
 	/**
      * 维持保证金率
      */
+	@Redundant
     private BigDecimal holdMarginRatio;
     
     // 已扣手续费

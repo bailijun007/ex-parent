@@ -60,13 +60,12 @@ public class PositionStrategyContext {
 		String symbol = pos.getSymbol();
 		Integer longFlag = pos.getLongFlag();
 		BigDecimal leverage = pos.getLeverage();
-        BigDecimal feeRatio = feeRatioService.getCloseFeeRatio(userId, pos.getAsset(), pos.getSymbol());
         BigDecimal amount = pos.getVolume().multiply(metadataService.getFaceValue(asset, symbol));
         BigDecimal markPrice = markPriceService.getCurrentMarkPrice(asset, symbol);
         
         //新的仓位保证金
         BigDecimal initMarginRatio = feeRatioService.getInitedMarginRatio(leverage); 
-        BigDecimal initMargin = _holdPosStrategy.calcInitMargin(longFlag, initMarginRatio, amount, feeRatio, pos.getMeanPrice(), markPrice);
+        BigDecimal initMargin = _holdPosStrategy.calcInitMargin(longFlag, initMarginRatio, amount, pos.getMeanPrice(), markPrice);
         
         return initMargin;
 	}

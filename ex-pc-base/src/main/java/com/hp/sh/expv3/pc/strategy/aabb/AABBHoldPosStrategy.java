@@ -98,13 +98,12 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 	 * @param longFlag
 	 * @param initMarginRatio
 	 * @param amount
-	 * @param feeRatio
 	 * @param meanPrice
 	 * @param markPrice
 	 * @return
 	 */
 	@Override
-	public BigDecimal calcInitMargin(Integer longFlag, BigDecimal initMarginRatio, BigDecimal amount, BigDecimal feeRatio, BigDecimal meanPrice, BigDecimal markPrice) {
+	public BigDecimal calcInitMargin(Integer longFlag, BigDecimal initMarginRatio, BigDecimal amount, BigDecimal meanPrice, BigDecimal markPrice) {
         // ( 1 / leverage ) * volume = volume / leverage
         BigDecimal pnl = PnlCalc.calcPnl(longFlag, amount, meanPrice, markPrice);
         BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, meanPrice);

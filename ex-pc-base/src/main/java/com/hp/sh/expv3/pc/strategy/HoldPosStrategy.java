@@ -67,7 +67,7 @@ public interface HoldPosStrategy {
 	 * @param markPrice
 	 * @return
 	 */
-	public BigDecimal calcInitMargin(Integer longFlag, BigDecimal initMarginRatio, BigDecimal amount, BigDecimal feeRatio, BigDecimal meanPrice, BigDecimal markPrice) ;
+	public BigDecimal calcInitMargin(Integer longFlag, BigDecimal initMarginRatio, BigDecimal amount, BigDecimal meanPrice, BigDecimal markPrice) ;
 
 	/**
 	 * 计算破产价

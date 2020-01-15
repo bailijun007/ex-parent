@@ -73,6 +73,9 @@ public class PcTradeService {
 	@Autowired
 	private PositionStrategyContext positionStrategy;
     
+	@Autowired
+	private PcPositionMarginService positionMarginService;
+	
     @Autowired
     private ApplicationEventPublisher publisher;
 	
@@ -107,6 +110,17 @@ public class PcTradeService {
 		}else{
 			this.modClosePos(pcPosition, tradeResult);
 		}
+		
+		//修改维持保证金率
+		BigDecimal holdRatio = this.feeRatioService.getHoldRatio(pcPosition.getUserId(), pcPosition.getAsset(), pcPosition.getSymbol(), pcPosition.getVolume());
+		pcPosition.setHoldMarginRatio(holdRatio);
+		
+		//如果降档
+		BigDecimal maxLeverage = this.feeRatioService.getMaxLeverage(pcPosition.getUserId(), pcPosition.getAsset(), pcPosition.getSymbol(), pcPosition.getVolume());
+		if(BigUtils.gt(pcPosition.getLeverage(), maxLeverage)){
+			positionMarginService.downLeverage(pcPosition, maxLeverage, now);
+		}
+		
 		//保存
 		if(isNewPos){
 			pcPosition.setCreated(now);
