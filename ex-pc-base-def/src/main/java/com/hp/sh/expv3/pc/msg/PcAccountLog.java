@@ -2,6 +2,8 @@ package com.hp.sh.expv3.pc.msg;
 
 import javax.persistence.Table;
 
+import com.hp.sh.expv3.pc.constant.LogType;
+
 /**
  * 账户日志
  *

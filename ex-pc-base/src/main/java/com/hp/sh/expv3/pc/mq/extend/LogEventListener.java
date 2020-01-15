@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import com.hp.sh.expv3.pc.constant.LogType;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
-import com.hp.sh.expv3.pc.msg.LogType;
 import com.hp.sh.expv3.pc.msg.PcAccountLog;
 import com.hp.sh.expv3.utils.IntBool;
 

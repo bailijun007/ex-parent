@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.msg;
+package com.hp.sh.expv3.pc.constant;
 
 public class LogType {
 
