@@ -37,6 +37,8 @@ public interface C2cOrderExtApi {
 
     @ApiOperation(value = "创建c2c充值订单")
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "receiveUrl", value = "入金回调地址", example = "https://ex-fund.icocrop.io/api/callback/c2c/deposit/notify", required = true),
+            @ApiImplicitParam(name = "pickupUrl", value = "交易完成跳转URL", example = "https://ex-fund.icocrop.io/api/callback/c2c/deposit/tradeSuccessSkip", required = true),
             @ApiImplicitParam(name = "userId", value = "用户id", example = "0", required = true),
             @ApiImplicitParam(name = "ratio", value = "USD/CNY 汇率 例如： USD/CNY = 7.0298", example = "7.0298", required = true),
             @ApiImplicitParam(name = "srcCurrency", value = "支付币种", example = "INR", required = true),
@@ -47,7 +49,8 @@ public interface C2cOrderExtApi {
     @GetMapping("/api/extension/c2c/order/deposit/create")
     public String create(@RequestParam("userId") long userId, @RequestParam("ratio") BigDecimal ratio,
                          @RequestParam("srcCurrency") String srcCurrency, @RequestParam("tarCurrency") String tarCurrency,
-                         @RequestParam("tarVolume") BigDecimal tarVolume, @RequestParam("fabiAmt") BigDecimal fabiAmt);
+                         @RequestParam("tarVolume") BigDecimal tarVolume, @RequestParam("fabiAmt") BigDecimal fabiAmt,
+                         @RequestParam("receiveUrl") String receiveUrl, @RequestParam("pickupUrl") String pickupUrl);
 
 
     @ApiOperation(value = "创建c2c体现订单")

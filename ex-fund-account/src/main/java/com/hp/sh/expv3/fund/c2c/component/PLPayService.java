@@ -37,7 +37,7 @@ public class PLPayService {
      *                    TODO 老王，入金回调如何确保幂等（高并发情况下，如何确认入金状态与入金账户的修改）
      * @return 返回转发的url地址，调用方需要转发到该地址获取数据
      */
-    public String rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal fabiAmt, BigDecimal tarVolume) {
+    public String rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal fabiAmt, BigDecimal tarVolume,String receiveUrl,String pickupUrl) {
         //生成订单号
         String orderNo = GenerateOrderNumUtils.getOrderNo(userId);
         //订单币种
@@ -48,8 +48,8 @@ public class PLPayService {
 
         //订单金额
         String orderAmount = fabiAmt.stripTrailingZeros().toPlainString();
-        String receiveUrl = getReceiveUrl();
-        String pickupUrl = getPickupUrl();
+//        String receiveUrl = getReceiveUrl();
+//        String pickupUrl = getPickupUrl();
         //获取加密后的签名
         String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount, orderCurrency);
         //转发请求到第三方支付，并返回支付路径
@@ -89,14 +89,14 @@ public class PLPayService {
     }
 
     //通知回调地址
-    private String getReceiveUrl() {
-        return baseUrl + "api/callback/c2c/deposit/notify";
-    }
-
-    //交易完成跳转URL
-    private String getPickupUrl() {
-        return baseUrl+"api/callback/c2c/deposit/tradeSuccessSkip";
-    }
+//    private String getReceiveUrl() {
+//        return baseUrl + "api/callback/c2c/deposit/notify";
+//    }
+//
+//    //交易完成跳转URL
+//    private String getPickupUrl() {
+//        return baseUrl+"api/callback/c2c/deposit/tradeSuccessSkip";
+//    }
 
 
     private String getShopNo() {
