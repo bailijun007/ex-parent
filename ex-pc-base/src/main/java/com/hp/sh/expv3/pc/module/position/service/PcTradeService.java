@@ -156,7 +156,7 @@ public class PcTradeService {
     
     private int getLogType(int closeFlag, int longFlag){
 		if(IntBool.isFalse(closeFlag)){
-			return IntBool.isTrue(longFlag)?LogType.TYPE_TRAD_OPEN_LONG:LogType.TYPE_TRAD_CLOSE_SHORT;
+			return IntBool.isTrue(longFlag)?LogType.TYPE_TRAD_OPEN_LONG:LogType.TYPE_TRAD_OPEN_SHORT;
 		}else{
 			return IntBool.isTrue(longFlag)?LogType.TYPE_TRAD_CLOSE_LONG:LogType.TYPE_TRAD_CLOSE_SHORT;
 		}

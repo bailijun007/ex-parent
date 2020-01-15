@@ -10,8 +10,11 @@ import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
+import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
+import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.msg.PcAccountLog;
 import com.hp.sh.expv3.utils.IntBool;
+import com.hp.sh.expv3.utils.math.NumberUtils;
 
 /**
  * 发送事件消息
@@ -24,6 +27,9 @@ public class LogEventListener {
 	
 	@Autowired
 	private EventSender sender;
+	
+	@Autowired
+	private PcPositionDataService positionDataService;
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void afterCommit(PcAccountRecord pcAccountRecord) {
@@ -38,6 +44,11 @@ public class LogEventListener {
 		logMsg.setTime(pcAccountRecord.getCreated());
 		logMsg.setType(type);
 		logMsg.setRefId(pcAccountRecord.getId());
+		
+		if(NumberUtils.in(type, LogType.TYPE_ACCOUNT_ADD_TO_MARGIN, LogType.TYPE_ACCOUNT_REDUCE_MARGIN, LogType.TYPE_ACCOUNT_AUTO_ADD_MARGIN, LogType.TYPE_ACCOUNT_LEVERAGE_ADD_MARGIN)){
+			PcPosition pos = positionDataService.getPosition(pcAccountRecord.getUserId(), pcAccountRecord.getAssociatedId());
+			logMsg.setSymbol(pos.getSymbol());
+		}
 		
 		this.sendEventMsg(logMsg);
 	}

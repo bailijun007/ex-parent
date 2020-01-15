@@ -46,6 +46,10 @@ public class PcPositionDataService {
 		return pos;
 	}
 
+	public PcPosition getPosition(long userId, Long id) {
+		return this.pcPositionDAO.findById(userId, id);
+	}
+
 	public PcPosition getPosition(long userId, String asset, String symbol, Long id) {
 		return this.pcPositionDAO.findById(userId, id);
 	}
