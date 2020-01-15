@@ -66,7 +66,9 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
         WithdrawalRecordVo vo = withdrawalRecordExtService.queryLastHistory(userId, asset);
         WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(userId, asset);
         Optional<WithdrawalAddrVo> addrVo = Optional.ofNullable(withdrawalAddrVo);
-        vo.setTargetAddress(addrVo.map(WithdrawalAddrVo::getAddress).orElse(null));
+        if(null!=vo){
+            vo.setTargetAddress(addrVo.map(WithdrawalAddrVo::getAddress).orElse(null));
+        }
         return vo;
     }
 

@@ -53,9 +53,12 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
     @Override
     public WithdrawalRecordVo queryLastHistory(Long userId, String asset) {
         WithdrawalRecordVo vo = withdrawalRecordExtMapper.queryLastHistory(userId, asset);
-        Optional<WithdrawalRecordVo> recordVo = Optional.ofNullable(vo);
-        vo.setCtime(recordVo.map(WithdrawalRecordVo::getCreated).orElse(null));
-        vo.setWithdrawTime(recordVo.map(WithdrawalRecordVo::getCreated).orElse(null));
+        if (vo != null) {
+            Optional<WithdrawalRecordVo> recordVo = Optional.ofNullable(vo);
+            vo.setCtime(recordVo.map(WithdrawalRecordVo::getCreated).orElse(null));
+            vo.setWithdrawTime(recordVo.map(WithdrawalRecordVo::getCreated).orElse(null));
+        }
+
         return vo;
     }
 
@@ -68,7 +71,7 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
         map.put("createdBegin", startTime);
         map.put("createdEnd", endTime);
         List<WithdrawalRecordVo> recordVos = withdrawalRecordExtMapper.queryHistoryByTime(map);
-        if(!CollectionUtils.isEmpty(recordVos)){
+        if (!CollectionUtils.isEmpty(recordVos)) {
             for (WithdrawalRecordVo vo : recordVos) {
                 Optional<WithdrawalRecordVo> recordVo = Optional.ofNullable(vo);
                 vo.setCtime(recordVo.map(WithdrawalRecordVo::getCreated).orElse(null));
@@ -79,19 +82,19 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
     }
 
     @Override
-    public PageResult<WithdrawalRecordVo> pageQueryHistory(Long userId, String asset, Integer pageNo, Integer pageSize, Long startTime, Long endTime,Integer approvalStatus) {
+    public PageResult<WithdrawalRecordVo> pageQueryHistory(Long userId, String asset, Integer pageNo, Integer pageSize, Long startTime, Long endTime, Integer approvalStatus) {
         PageResult<WithdrawalRecordVo> pageResult = new PageResult<>();
         PageHelper.startPage(pageNo, pageSize);
 //        List<WithdrawalRecordVo> list = withdrawalRecordExtMapper.queryByUserIdAndAsset(userId, asset);
         Map<String, Object> map = new HashMap<>();
-        map.put("userId",userId);
-        map.put("asset",asset);
-        map.put("approvalStatus",approvalStatus);
-        map.put("modifiedBegin",startTime);
-        map.put("modifiedEnd",endTime);
+        map.put("userId", userId);
+        map.put("asset", asset);
+        map.put("approvalStatus", approvalStatus);
+        map.put("modifiedBegin", startTime);
+        map.put("modifiedEnd", endTime);
         List<WithdrawalRecordVo> list = withdrawalRecordExtMapper.queryList(map);
 
-        if(!CollectionUtils.isEmpty(list)){
+        if (!CollectionUtils.isEmpty(list)) {
             for (WithdrawalRecordVo vo : list) {
                 Optional<WithdrawalRecordVo> recordVo = Optional.ofNullable(vo);
                 vo.setWithdrawTime(recordVo.map(WithdrawalRecordVo::getCreated).orElse(null));
