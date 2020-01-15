@@ -9,6 +9,7 @@ import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
 import com.hp.sh.expv3.fund.c2c.entity.NotifyParam;
 import com.hp.sh.expv3.fund.c2c.service.BuyService;
 import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
+import com.hp.sh.expv3.fund.extension.api.C2cOrderCallbackApi;
 import com.hp.sh.expv3.fund.extension.error.ExFundError;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
@@ -33,10 +34,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * @author BaiLiJun  on 2020/1/2
  */
-@Api(tags = "C2c充值回调接口")
 @RestController
-@RequestMapping("/api/callback/c2c")
-public class C2cOrderCallbackAction {
+public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
     @Autowired
     private PLPayService plPayService;
 
@@ -56,9 +55,8 @@ public class C2cOrderCallbackAction {
 
     ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    @ApiOperation(value = "订单成功回调通知")
-    @ResultEntity
-    @RequestMapping(value = "/deposit/notify")
+
+    @Override
     public String notify(@RequestParam("orderAmount") BigDecimal orderAmount, @RequestParam("orderCurrency") String orderCurrency,
                          @RequestParam("orderNo") String orderNo, @RequestParam(value = "paymentAmount", required = false) BigDecimal paymentAmount,
                          @RequestParam("sign") String sign, @RequestParam("signType") String signType,
