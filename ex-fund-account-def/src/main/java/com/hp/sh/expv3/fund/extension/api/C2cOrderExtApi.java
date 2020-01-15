@@ -24,7 +24,7 @@ public interface C2cOrderExtApi {
     @ApiOperation("通过支付状态分页查询c2c充值订单，不传则查全部")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "主键编号", example = "1", required = false),
-            @ApiImplicitParam(name = "payStatus", value = "支付状态:0-待支付，1-支付成功，2-支付失败,3:已取消", example = "1", required = true),
+            @ApiImplicitParam(name = "payStatus", value = "支付状态:0-待支付，1-支付成功，2-支付失败,3:已取消4-同步余额, 5-审核中, 6-审核通过", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true),
             @ApiImplicitParam(name = "userId", value = "用户id", example = "0", required = true),
             @ApiImplicitParam(name = "nextPage", value = "1:下一页，-1：上一页", example = "1", required = true)
