@@ -28,11 +28,13 @@ public class SellService {
         c2cOrderDAO.save(c2cOrder);
     }
 
-    public void updateById(C2cOrder c2cOrder){
+    public C2cOrder updateById(C2cOrder c2cOrder){
         int count = c2cOrderDAO.updateById(c2cOrder);
         if(count!=1){
             throw new ExException(ExFundError.UPDATE_C2C_ORDER_FAIL);
         }
+         C2cOrder c2cOrder1 = c2cOrderDAO.queryById(c2cOrder.getId());
+        return c2cOrder1;
     }
 
 

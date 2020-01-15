@@ -14,6 +14,9 @@ import com.hp.sh.expv3.fund.extension.api.FundAccountExtApi;
 import com.hp.sh.expv3.fund.extension.error.ExFundError;
 import com.hp.sh.expv3.fund.extension.vo.C2cOrderVo;
 import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
+import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
+import com.hp.sh.expv3.fund.wallet.constant.TradeType;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -31,7 +35,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class C2cOrderExtApiAction implements C2cOrderExtApi {
 
     private static final Logger logger = LoggerFactory.getLogger(C2cOrderExtApiAction.class);
-
+    @Autowired
+    private FundAccountCoreApi fundAccountCoreApi;
 
     @Autowired
     private QueryService queryService;
@@ -90,7 +95,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
      * @param srcNum       资产出金数量 比如 1
      * @param tarAsset     兑换资产 比如 CNY
      * @param tarNum       出金金额（法币） 比如：7000
-     * @param ratio 兑换比率
+     * @param ratio        兑换比率
      * @return
      */
     @Override
@@ -134,16 +139,30 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
     }
 
     @Override
-    public String approvalC2cOrder(Long id,Integer auditStatus) {
+    public String approvalC2cOrder(Long id, Integer auditStatus) {
         C2cOrder c2cOrder = queryService.queryById(id);
-       if(null==c2cOrder){
-           throw new ExException(ExFundError.ORDER_NOT_FIND);
-       }
-        C2cOrder order =new C2cOrder();
+        if (null == c2cOrder) {
+            throw new ExException(ExFundError.ORDER_NOT_FIND);
+        }
+        C2cOrder order = new C2cOrder();
         order.setPayFinishTime(Instant.now().toEpochMilli());
         order.setApprovalStatus(auditStatus);
+        order.setPayStatus(auditStatus);
         order.setId(id);
-        sellService.updateById(order);
+        //更改订单状态
+        C2cOrder c2cOrder1 = sellService.updateById(order);
+
+        //如果审核通过需要调用减钱方法
+        if (c2cOrder1!=null) {
+            FundCutRequest request=new FundCutRequest();
+            request.setAsset(c2cOrder1.getExchangeCurrency());
+            request.setAmount(c2cOrder1.getVolume());
+            request.setTradeNo(c2cOrder1.getSn());
+            request.setTradeType(TradeType.CONSUME);
+            request.setRemark(c2cOrder1.getPayStatusDesc());
+            request.setUserId(c2cOrder1.getUserId());
+            fundAccountCoreApi.cut(request);
+        }
 
         return "success";
     }
@@ -153,7 +172,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         if (pageSize == null || pageNo == null) {
             throw new ExException(ExFundError.PARAM_EMPTY);
         }
-        return queryService.pageQueryByApprovalStatus(auditStatus,pageNo,pageSize,userId);
+        return queryService.pageQueryByApprovalStatus(auditStatus, pageNo, pageSize, userId);
 
     }
 }

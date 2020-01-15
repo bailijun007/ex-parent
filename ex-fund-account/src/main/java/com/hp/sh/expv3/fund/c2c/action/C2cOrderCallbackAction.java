@@ -101,8 +101,8 @@ public class C2cOrderCallbackAction {
                 // 调用价钱方法和增加流水记录
                 FundAddRequest request=new FundAddRequest();
                 request.setUserId(userId);
-                request.setAmount(orderAmount);
-                request.setAsset(param.getOrderCurrency());
+                request.setAmount(qty);
+                request.setAsset(c2cOrder.getExchangeCurrency());
                 request.setRemark(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
                 request.setTradeNo(c2cOrder1.getSn());
                 request.setTradeType(TradeType.DEPOSIT);

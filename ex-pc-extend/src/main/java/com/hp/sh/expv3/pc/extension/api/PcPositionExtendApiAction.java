@@ -13,6 +13,7 @@ import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.utils.math.Precision;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +101,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
         if (!CollectionUtils.isEmpty(list)) {
             for (PcPositionVo positionVo : list) {
                 //已实现盈亏
+                BigDecimal realisedPnl2 = positionVo.getRealisedPnl();
                 BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(positionVo.getId(), positionVo.getUserId(),null);
                 List<PcOrderVo> pcOrderVos = pcOrderExtendService.activeOrderList(positionVo.getId(), positionVo.getUserId());
                 BigDecimal volume = pcOrderVos.stream().map(order -> order.getVolume().subtract(order.getFilledVolume())).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -117,7 +119,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
                 currentPositionVo.setQty(positionVo.getVolume());
                 currentPositionVo.setBidFlag(positionVo.getLongFlag());
                 currentPositionVo.setAutoIncreaseFlag(positionVo.getAutoAddFlag());
-                currentPositionVo.setPosPnlRatio(realisedPnl.divide(positionVo.getInitMargin(), 10, RoundingMode.HALF_UP));
+                currentPositionVo.setPosPnlRatio(realisedPnl.divide(positionVo.getInitMargin(), Precision.PERCENT_PRECISION, Precision.LESS));
                 currentPositionVo.setCtime(positionVo.getCreated());
 
                 HoldPosStrategy ps = positionStrategyContext.getHoldPosStrategy(positionVo.getAsset(), positionVo.getSymbol());
