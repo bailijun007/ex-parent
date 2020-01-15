@@ -78,4 +78,8 @@ public final class ExtCommonConstant {
             add(PcAccountLog.TYPE_LEVERAGE_ADD_MARGIN);
         }});
     }
+
+//    activeFlag
+public static final Integer ACTIVE_FLAG = 1;
+
 }

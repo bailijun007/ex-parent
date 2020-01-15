@@ -261,17 +261,17 @@
             </if>
             <choose>
                 <when test="nextPage==1 and id!=null">
-                    and id &gt; #{id}
-                    ORDER BY id asc
-                    LIMIT 0,${pageSize}
-                </when>
-                <when test="nextPage==-1 and id!=null">
-                    and id&lt;= #{id}
+                    and id &lt;  #{id}
                     ORDER BY id desc
                     LIMIT 0,${pageSize}
                 </when>
-                <otherwise>
+                <when test="nextPage==-1 and id!=null">
+                    and id &gt;= #{id}
                     ORDER BY id asc
+                    LIMIT 0,${pageSize}
+                </when>
+                <otherwise>
+                    ORDER BY id desc
                     LIMIT 0,${pageSize}
                 </otherwise>
             </choose>
@@ -289,10 +289,10 @@
                user_id=#{userId}
            </if>
            <if test="type!=null">
-               type=#{type}
+             and  type=#{type}
            </if>
            <if test="approvalStatus!=null">
-               approval_status=#{approvalStatus}
+               and  approval_status=#{approvalStatus}
            </if>
        </where>
     </select>
