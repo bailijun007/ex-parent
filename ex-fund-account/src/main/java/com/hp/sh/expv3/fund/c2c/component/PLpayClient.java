@@ -24,23 +24,39 @@ public class PLpayClient {
     private static final Logger logger = LoggerFactory.getLogger(PLpayClient.class);
 
 
-    @Value("${plpay.server.host}")
+//    @Value("${plpay.server.host}")
+//    private String apiHost;
+//
+//    @Value("${plpay.server.shopNo}")
+//    private String shopNo;
+//
+//    @Value("${plpay.server.signType}")
+//    private String signType;
+//
+//    @Value("${plpay.server.md5Key}")
+//    private String md5Key;
+//
+//
+//    @Value("${plpay.server.customerId}")
+//    private String customerId;
+
+    @Value("${cnyPlpay.server.host}")
     private String apiHost;
 
-    @Value("${plpay.server.shopNo}")
+    @Value("${cnyPlpay.server.shopNo}")
     private String shopNo;
 
-    @Value("${plpay.server.signType}")
+    @Value("${cnyPlpay.server.signType}")
     private String signType;
 
-    @Value("${plpay.server.md5Key}")
+    @Value("${cnyPlpay.server.md5Key}")
     private String md5Key;
+
+    @Value("${cnyPlpay.server.customerId}")
+    private String customerId;
 
     @Value("${expv3.base.url}")
     private String baseUrl;
-
-    @Value("${plpay.server.customerId}")
-    private String customerId;
 
     /**
      * 转发请求到第三方支付，并返回支付路径
