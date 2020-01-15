@@ -15,7 +15,6 @@ import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
-import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.constant.ChangeMarginOptType;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.MarginMode;
@@ -66,16 +65,6 @@ public class PcPositionMarginService {
     @Autowired
     private CommonOrderStrategy orderStrategy;
 	
-	@LockIt(key="${userId}-${asset}-${symbol}")
-	public boolean changeLeverage(long userId, String asset, String symbol, int marginMode, Integer longFlag, BigDecimal leverage){
-        //逐渐or全仓
-        if (marginMode != MarginMode.FIXED) {
-            throw new ExSysException(ExCommonError.UNSUPPORTED);
-        }
-        PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
-        return this.changeLeverage(pos, leverage);
-	}
-	
 	public void downLeverage(PcPosition pos, BigDecimal leverage, long modifiedTime){
 		long userId = pos.getUserId();
 		String asset = pos.getAsset();
@@ -100,22 +89,31 @@ public class PcPositionMarginService {
         pos.setLeverage(leverage);
 	}
 	
-	public boolean changeLeverage(PcPosition pos, BigDecimal leverage){
-		long userId = pos.getUserId();
-		String asset = pos.getAsset();
-		String symbol = pos.getSymbol();
-		Integer longFlag = pos.getLongFlag();
+	@LockIt(key="${userId}-${asset}-${symbol}")
+	public boolean changeLeverage(long userId, String asset, String symbol, int marginMode, Integer longFlag, BigDecimal leverage){
+        //逐渐or全仓
+        if (marginMode != MarginMode.FIXED) {
+            throw new ExSysException(ExCommonError.UNSUPPORTED);
+        }
 
-        Long modifiedTime = DbDateUtils.now();
-
+        Long now = DbDateUtils.now();
+        
+        PcAccountSymbol accountSymbol = this.accountSymbolService.getOrCreate(userId, asset, symbol);
+        
+        if(accountSymbol==null){
+        	accountSymbol = this.accountSymbolService.create(userId, asset, symbol);
+        }
+        
+        //当前仓位
+        PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
         BigDecimal posVolume = BigDecimal.ZERO;
         if(pos!=null){
         	posVolume = pos.getVolume();
         }
         
 		//检查参数
-        BigDecimal maxLeverage = feeRatioService.getMaxLeverage(userId, asset, symbol, posVolume);
-        if(BigUtils.ltZero(leverage) || BigUtils.gt(leverage, maxLeverage)){
+        BigDecimal _maxLeverage = feeRatioService.getMaxLeverage(userId, asset, symbol, posVolume);
+        if(BigUtils.ltZero(leverage) || BigUtils.gt(leverage, _maxLeverage)){
         	throw new ExException(PcPositonError.PARAM_GT_MAX_LEVERAGE);
         }
         
@@ -123,12 +121,10 @@ public class PcPositionMarginService {
         if (orderQueryService.hasActiveOrder(userId, asset, symbol, longFlag)) {
             throw new ExException(PcPositonError.HAVE_ACTIVE_ORDER);
         }
-		
-        //修改设置
-        PcAccountSymbol accountSymbol = this.accountSymbolService.getOrCreate(userId, asset, symbol);
-        this.modifyAccountSymbol(accountSymbol, longFlag, leverage, modifiedTime);
         
-        //仓位
+        //修改设置
+        this.modifyAccountSymbol(accountSymbol, longFlag, leverage, now);
+        
         if (pos != null && leverage.compareTo(pos.getLeverage()) != 0) {
 
             if (pos.getLiqStatus()==LiqStatus.FROZEN) {
@@ -161,7 +157,7 @@ public class PcPositionMarginService {
             //修改杠杆值
             pos.setLeverage(leverage);
             //保存仓位
-            pos.setModified(modifiedTime);
+            pos.setModified(now);
             this.positionDataService.update(pos);
         }
         
