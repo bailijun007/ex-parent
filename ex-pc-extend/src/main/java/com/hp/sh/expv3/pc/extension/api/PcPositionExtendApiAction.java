@@ -1,5 +1,15 @@
 package com.hp.sh.expv3.pc.extension.api;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
@@ -11,19 +21,10 @@ import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
 import com.hp.sh.expv3.pc.extension.vo.CurrentPositionVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
+import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionStatVo;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.utils.math.Precision;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 永续合约_仓位 扩展接口
@@ -137,6 +138,13 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
             }
         }
     }
+    
+    @Override
+    public List<PcSymbolPositionStatVo> getSymbolPositionStat(String asset, String symbol){
+    	List<PcSymbolPositionStatVo> list = pcPositionExtendService.getSymbolPositionStat(asset, symbol);
+    	return list;
+    }
 
+    
 
 }

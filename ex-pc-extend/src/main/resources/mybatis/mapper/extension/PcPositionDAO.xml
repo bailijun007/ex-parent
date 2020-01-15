@@ -138,4 +138,17 @@
         and volume=#{volume}
     </select>
 
+    <select id="getSymbolPositionStat" resultType="com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionStatVo">
+		select 
+			long_flag, sum(volume) as volume 
+		from 
+			pc_position p 
+        where
+        	p.volume>0
+	        and asset=#{asset}
+	        and symbol=#{symbol}
+		group 
+			by long_flag
+    </select>
+
 </mapper>

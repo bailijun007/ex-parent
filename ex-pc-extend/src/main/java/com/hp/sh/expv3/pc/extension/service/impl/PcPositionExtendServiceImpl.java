@@ -9,6 +9,8 @@ import com.hp.sh.expv3.pc.extension.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
+import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionStatVo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,4 +110,10 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
         List<PcPositionVo> pcPositionVos = pcPositionDAO.selectPosByAccount(map);
         return pcPositionVos;
     }
+
+	@Override
+	public List<PcSymbolPositionStatVo> getSymbolPositionStat(String asset, String symbol) {
+		List<PcSymbolPositionStatVo> list = this.pcPositionDAO.getSymbolPositionStat(asset, symbol);
+		return list;
+	}
 }

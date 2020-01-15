@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.pc.extension.dao;
 
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
+import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionStatVo;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -24,4 +26,6 @@ public interface PcPositionDAO {
     BigDecimal getAvgPrice(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol")  String symbol, @Param("volume") Integer volume);
 
     List<PcPositionVo> selectPosByAccount(Map<String, Object> map);
+
+    List<PcSymbolPositionStatVo> getSymbolPositionStat(@Param("asset") String asset, @Param("symbol")  String symbol);
 }
