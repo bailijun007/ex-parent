@@ -70,8 +70,40 @@ public class C2cOrder extends UserDataEntity {
     @ApiModelProperty("审批状态")
     private Integer approvalStatus;
 
+    @ApiModelProperty("开户银行")
+    private String bank;
+
+    @ApiModelProperty("银行卡收款姓名")
+    private String bankCardName;
+
+    @ApiModelProperty("银行卡号")
+    private Long bankCard;
 
     public C2cOrder() {
+    }
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
+    }
+
+    public String getBankCardName() {
+        return bankCardName;
+    }
+
+    public void setBankCardName(String bankCardName) {
+        this.bankCardName = bankCardName;
+    }
+
+    public Long getBankCard() {
+        return bankCard;
+    }
+
+    public void setBankCard(Long bankCard) {
+        this.bankCard = bankCard;
     }
 
     public String getSn() {

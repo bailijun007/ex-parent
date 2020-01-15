@@ -99,7 +99,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
      * @return
      */
     @Override
-    public String withdrawalOrder(Long userId, String bank, String bankCardName, String srcAsset, BigDecimal srcNum, String tarAsset, BigDecimal tarNum, BigDecimal ratio) {
+    public String withdrawalOrder(Long userId, Long bankCard,String bank, String bankCardName, String srcAsset, BigDecimal srcNum, String tarAsset, BigDecimal tarNum, BigDecimal ratio) {
         //获取资产账户
         CapitalAccountVo account = fundAccountExtApi.getCapitalAccount(userId, srcAsset);
         //检查c2c 被冻结的资产
@@ -110,6 +110,9 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
             try {
                 //生成c2c体现订单(体现状态为审核中)
                 C2cOrder c2cOrder = new C2cOrder();
+                c2cOrder.setBank(bank);
+                c2cOrder.setBankCard(bankCard);
+                c2cOrder.setBankCardName(bankCardName);
                 c2cOrder.setSn(GenerateOrderNumUtils.getOrderNo(userId));
                 c2cOrder.setPayCurrency(srcAsset);
                 c2cOrder.setExchangeCurrency(tarAsset);

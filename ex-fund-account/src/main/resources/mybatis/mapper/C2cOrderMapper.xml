@@ -20,12 +20,15 @@
         <result column="approval_status" property="approvalStatus"/>
         <result column="user_id" property="userId"/>
         <result column="id" property="id"/>
+        <result column="bank" property="bank"/>
+        <result column="bank_card_name" property="bankCardName"/>
+        <result column="bank_card" property="bankCard"/>
         <result column="created" property="created"/>
         <result column="modified" property="modified"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-		id,sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified
+		id,sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified,bank,bank_card_name,bank_card
 	</sql>
 
     <sql id="simple_where">
@@ -39,6 +42,9 @@
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="id!=null">and id=#{id}</if>
             <if test="sn!=null">and sn=#{sn}</if>
+            <if test="bank!=null and bank!=''">and bank=#{bank}</if>
+            <if test="bankCardName!=null and bankCardName!=''">and bank_card_name=#{bankCardName}</if>
+            <if test="bankCard!=null and bankCard!=''">and bank_card=#{bankCard}</if>
             <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
             <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
             <if test="modifiedBegin!=null">and modified &gt;=#{modifiedBegin}</if>
@@ -115,9 +121,9 @@
             SELECT LAST_INSERT_ID() AS id
         </selectKey>
         insert into c2c_order (
-        sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified
+        sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified,bank,bank_card_name,bank_card
         )values(
-        #{sn},#{payCurrency},#{exchangeCurrency},#{type},#{price},#{volume},#{amount},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{approvalStatus},#{userId},#{id},#{created},#{modified}
+        #{sn},#{payCurrency},#{exchangeCurrency},#{type},#{price},#{volume},#{amount},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{approvalStatus},#{userId},#{id},#{created},#{modified},#{bank},#{bankCardName},#{bankCard}
         )
     </insert>
 

@@ -66,7 +66,7 @@ public interface C2cOrderExtApi {
             @ApiImplicitParam(name = "ratio", value = "兑换比率", example = "7.0298", required = true)
     })
     @GetMapping("/api/extension/c2c/order/withdrawal/withdrawalOrder")
-    public String withdrawalOrder(@RequestParam("userId") Long userId,
+    public String withdrawalOrder(@RequestParam("userId") Long userId,@RequestParam("bankCard") Long bankCard,
                                   @RequestParam("bank") String bank, @RequestParam("bankCardName") String bankCardName,
                                   @RequestParam("srcAsset") String srcAsset, @RequestParam("srcNum") BigDecimal srcNum,
                                   @RequestParam("tarAsset") String tarAsset, @RequestParam("tarNum") BigDecimal tarNum,
