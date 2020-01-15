@@ -217,12 +217,12 @@
                     LIMIT 0,${pageSize}
                 </when>
                 <when test="nextPage==-1 and pageSize!=null and lastOrderId!=null">
-                    and id &lt; #{lastOrderId}
+                    and id &lt;= #{lastOrderId}
                     ORDER BY id desc
                     LIMIT 0,${pageSize}
                 </when>
                 <otherwise>
-                    ORDER BY id desc
+                    ORDER BY id asc
 
                 </otherwise>
             </choose>

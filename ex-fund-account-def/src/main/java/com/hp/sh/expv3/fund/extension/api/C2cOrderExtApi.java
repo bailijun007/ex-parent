@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 public interface C2cOrderExtApi {
 
 
-    @ApiOperation("通过支付状态分页查询c2c订单，不传则查全部")
+    @ApiOperation("通过支付状态分页查询c2c充值订单，不传则查全部")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "主键编号", example = "1", required = false),
             @ApiImplicitParam(name = "payStatus", value = "支付状态:0-待支付，1-支付成功，2-支付失败,3:已取消", example = "1", required = true),

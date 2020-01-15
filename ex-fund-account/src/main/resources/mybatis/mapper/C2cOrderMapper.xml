@@ -244,8 +244,11 @@
         <include refid="Base_Column_List"/>
         from c2c_order
         <where>
+            <if test="type!=null">
+                type=#{type}
+            </if>
             <if test="userId!=null">
-                user_id=#{userId}
+             AND   user_id=#{userId}
             </if>
             <if test="payStatus!=null">
                 and pay_status=#{payStatus}
@@ -257,12 +260,12 @@
                     LIMIT 0,${pageSize}
                 </when>
                 <when test="nextPage==-1 and id!=null">
-                    and id&lt; #{id}
+                    and id&lt;= #{id}
                     ORDER BY id desc
                     LIMIT 0,${pageSize}
                 </when>
                 <otherwise>
-                    ORDER BY id desc
+                    ORDER BY id asc
                     LIMIT 0,${pageSize}
                 </otherwise>
             </choose>
@@ -275,7 +278,17 @@
         select
         <include refid="Base_Column_List"/>
         from c2c_order
-        <include refid="simple_where"/>
+       <where>
+           <if test="userId!=null">
+               user_id=#{userId}
+           </if>
+           <if test="type!=null">
+               type=#{type}
+           </if>
+           <if test="approvalStatus!=null">
+               approval_status=#{approvalStatus}
+           </if>
+       </where>
     </select>
 
     <delete id="delete">

@@ -42,13 +42,14 @@ public class QueryService {
      */
     public PageResult<C2cOrderVo> pageQueryByPayStatus(Integer payStatus, Integer nextPage, Integer pageSize, Long id, Long userId) {
         PageResult<C2cOrderVo> pageResult = new PageResult<>();
-        List<C2cOrderVo> orderList = c2cOrderDAO.pageQueryByPayStatus(payStatus, nextPage, pageSize, id, userId,C2cConst.C2C_BUY);
         Map<String, Object> map = new HashMap<>();
         map.put("payStatus", payStatus);
         map.put("userId", userId);
+        map.put("type", C2cConst.C2C_BUY);
         Long count = c2cOrderDAO.queryCount(map);
-        pageResult.setList(orderList);
         pageResult.setRowTotal(count);
+        List<C2cOrderVo> orderList = c2cOrderDAO.pageQueryByPayStatus(payStatus, nextPage, pageSize, id, userId,C2cConst.C2C_BUY);
+        pageResult.setList(orderList);
         Integer rowTotal = Integer.parseInt(String.valueOf(count));
         pageResult.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
         return pageResult;
