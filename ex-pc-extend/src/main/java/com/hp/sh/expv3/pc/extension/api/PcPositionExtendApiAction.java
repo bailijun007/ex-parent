@@ -22,6 +22,7 @@ import com.hp.sh.expv3.pc.extension.vo.CurrentPositionVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
 import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionStatVo;
+import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionTotalVo;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.utils.math.Precision;
@@ -144,6 +145,11 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
     	List<PcSymbolPositionStatVo> list = pcPositionExtendService.getSymbolPositionStat(asset, symbol);
     	return list;
     }
+
+	@Override
+	public PcSymbolPositionTotalVo getSymbolPositionTotal(String asset, String symbol) {
+		return pcPositionExtendService.getSymbolPositionTotal(asset, symbol);
+	}
 
     
 

@@ -11,6 +11,7 @@ import com.gitee.hupadev.base.api.PageResult;
 import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.hp.sh.expv3.pc.extension.vo.CurrentPositionVo;
 import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionStatVo;
+import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionTotalVo;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -76,11 +77,12 @@ public interface PcPositionExtendApi {
     })
 	List<PcSymbolPositionStatVo> getSymbolPositionStat(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
     
-    @ApiOperation(value = "查询合约持仓量")
-    default BigDecimal getSymbolPositionTotal(String asset, String symbol){
-    	List<PcSymbolPositionStatVo> list = this.getSymbolPositionStat(asset, symbol);
-    	BigDecimal total = BeanHelper.sum(list, "volume");
-    	return total;
-    }
+    @ApiOperation(value = "查询合约持仓量总数")
+    @GetMapping(value = "/api/extension/pc/position/symbolPositionTotal")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = true)
+    })
+    PcSymbolPositionTotalVo getSymbolPositionTotal(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
 
 }

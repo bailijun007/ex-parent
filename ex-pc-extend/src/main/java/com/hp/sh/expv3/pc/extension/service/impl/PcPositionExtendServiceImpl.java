@@ -1,15 +1,20 @@
 package com.hp.sh.expv3.pc.extension.service.impl;
 
 import com.gitee.hupadev.base.api.PageResult;
+import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
+import com.hp.sh.expv3.pc.extension.vo.PcPositionNumStatVo;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
+import com.hp.sh.expv3.pc.extension.vo.PcPositionVolumeStatVo;
 import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionStatVo;
+import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionTotalVo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -115,5 +120,43 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
 	public List<PcSymbolPositionStatVo> getSymbolPositionStat(String asset, String symbol) {
 		List<PcSymbolPositionStatVo> list = this.pcPositionDAO.getSymbolPositionStat(asset, symbol);
 		return list;
+	}
+
+	@Override
+	public PcSymbolPositionTotalVo getSymbolPositionTotal(String asset, String symbol) {
+		PcSymbolPositionTotalVo result = new PcSymbolPositionTotalVo();
+		List<PcPositionVolumeStatVo> volStat = this.pcPositionDAO.getPositionVolumeStat(asset, symbol);
+		Map<Object, PcPositionVolumeStatVo> volMap = BeanHelper.listToMap(volStat, "longFlag");
+		
+		
+		List<PcPositionNumStatVo> numStat = this.pcPositionDAO.getPositionNumStat(asset, symbol);
+		Map<Object, PcPositionNumStatVo> numMap = BeanHelper.listToMap(numStat, "longFlag");
+		
+
+		BigDecimal longVolume = BigDecimal.ZERO;
+		BigDecimal shortVolume = BigDecimal.ZERO;
+		BigDecimal longPosNum = BigDecimal.ZERO;
+		BigDecimal shortPosNum = BigDecimal.ZERO;
+		
+		if(volMap.get(OrderFlag.TYPE_LONG)!=null){
+			longVolume = volMap.get(OrderFlag.TYPE_LONG).getVolume();
+		}
+		if(volMap.get(OrderFlag.TYPE_SHORT)!=null){
+			shortVolume = volMap.get(OrderFlag.TYPE_SHORT).getVolume();
+		}
+		if(numMap.get(OrderFlag.TYPE_LONG)!=null){
+			longPosNum = numMap.get(OrderFlag.TYPE_LONG).getPosNum();
+		}
+		if(numMap.get(OrderFlag.TYPE_SHORT)!=null){
+			shortPosNum = numMap.get(OrderFlag.TYPE_SHORT).getPosNum();
+		}
+		
+		result.setAsset(asset);
+		result.setSymbol(symbol);
+		result.setLongVolume(longVolume);
+		result.setShortVolume(shortVolume);
+		result.setLongPosNum(longPosNum);
+		result.setShortPosNum(shortPosNum);
+		return result;
 	}
 }
