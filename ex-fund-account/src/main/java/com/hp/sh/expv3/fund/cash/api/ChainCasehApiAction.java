@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.fund.cash.api.vo.BysCreateResult;
 import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
 import com.hp.sh.expv3.fund.cash.constant.PayChannel;
@@ -63,9 +64,9 @@ public class ChainCasehApiAction implements ChainCasehApi{
 
 	//bys callback
 	@ApiOperation(value = "3、创建充值记录")
-	public String createDeposit(Long userId, String chainOrderId, String asset, String account, BigDecimal amount, String txHash) {
+	public BysCreateResult createDeposit(Long userId, String chainOrderId, String asset, String account, BigDecimal amount, String txHash) {
 		String sn = this.depositService.deposit(userId, asset, account, amount, chainOrderId, PayChannel.BYS, txHash);
-		return sn;
+		return new BysCreateResult(sn);
 	}
 	
 	//bys callback

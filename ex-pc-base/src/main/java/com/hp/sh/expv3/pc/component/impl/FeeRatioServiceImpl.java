@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.vo.PosLevelVo;
 import com.hp.sh.expv3.pc.constant.RedisKey;
+import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.Precision;
 
 /**
@@ -116,7 +117,13 @@ public class FeeRatioServiceImpl implements FeeRatioService {
         Object s = hashOperations.get(RedisKey.PC_POS_LEVEL, hashKey);
         List<PosLevelVo> voList = JSON.parseArray(s.toString(), PosLevelVo.class);
         Optional<PosLevelVo> first = voList.stream().filter(vo -> vo.getMinAmt().compareTo(volume) <= 0 && vo.getMaxAmt().compareTo(volume) >= 0).findFirst();
-        return first.get();
+        PosLevelVo result = null;
+        for(PosLevelVo vo : voList){
+        	if(BigUtils.between(volume, vo.getMinAmt(), vo.getMaxAmt())){
+        		result = vo;
+        	}
+        }
+        return result;
     }
 
     /**

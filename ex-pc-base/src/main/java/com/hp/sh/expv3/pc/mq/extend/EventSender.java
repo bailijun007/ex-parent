@@ -3,8 +3,8 @@ package com.hp.sh.expv3.pc.mq.extend;
 import org.apache.rocketmq.common.message.Message;
 import org.springframework.stereotype.Component;
 
+import com.hp.sh.expv3.pc.constant.MsgConstant;
 import com.hp.sh.expv3.pc.mq.BaseMqSender;
-import com.hp.sh.expv3.pc.msg.MsgConstant;
 import com.hp.sh.expv3.pc.msg.PcAccountLog;
 
 /**

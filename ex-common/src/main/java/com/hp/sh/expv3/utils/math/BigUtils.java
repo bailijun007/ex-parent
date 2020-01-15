@@ -51,5 +51,9 @@ public class BigUtils {
 	public static boolean le(BigDecimal v1, BigDecimal v2){
 		return v1.compareTo(v2)<=0;
 	}
+
+	public static boolean between(BigDecimal v, BigDecimal start, BigDecimal end){
+		return ge(v, start) && le(v, end);
+	}
 	
 }

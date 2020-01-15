@@ -8,6 +8,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.gitee.hupadev.commons.cache.RedisPublisher;
+import com.hp.sh.expv3.pc.constant.EventType;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
@@ -15,7 +16,6 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
 import com.hp.sh.expv3.pc.msg.EventMsg;
-import com.hp.sh.expv3.pc.msg.EventType;
 import com.hp.sh.expv3.pc.msg.OrderEventMsg;
 
 /**

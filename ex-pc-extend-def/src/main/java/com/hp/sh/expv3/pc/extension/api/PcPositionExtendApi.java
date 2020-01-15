@@ -1,17 +1,22 @@
 package com.hp.sh.expv3.pc.extension.api;
 
-import com.gitee.hupadev.base.api.PageResult;
-import com.hp.sh.expv3.pc.extension.vo.CurrentPositionVo;
-import com.hp.sh.expv3.pc.extension.vo.PcAccountExtVo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import java.math.BigDecimal;
+import java.util.List;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
+import com.gitee.hupadev.base.api.PageResult;
+import com.gitee.hupadev.commons.bean.BeanHelper;
+import com.hp.sh.expv3.pc.extension.vo.CurrentPositionVo;
+import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionStatVo;
+import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionTotalVo;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * @author BaiLiJun  on 2019/12/23
@@ -64,5 +69,20 @@ public interface PcPositionExtendApi {
     List<CurrentPositionVo> selectPosByAccount(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
                                                 @RequestParam("symbol") String symbol,@RequestParam("startTime") Long startTime);
 
+    @ApiOperation(value = "查询合约持仓量")
+    @GetMapping(value = "/api/extension/pc/position/symbolPositionStat")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = true)
+    })
+	List<PcSymbolPositionStatVo> getSymbolPositionStat(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
+    
+    @ApiOperation(value = "查询合约持仓量总数")
+    @GetMapping(value = "/api/extension/pc/position/symbolPositionTotal")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = true)
+    })
+    PcSymbolPositionTotalVo getSymbolPositionTotal(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
 
 }

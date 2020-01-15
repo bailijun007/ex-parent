@@ -23,9 +23,5 @@ public class ExSysException extends SysException{
 		this(errorCode);
 		super.setErrorData(errorData);
 	}
-	
-	public ExSysException(int code, String message) {
-		super(code, message);
-	}
 
 }

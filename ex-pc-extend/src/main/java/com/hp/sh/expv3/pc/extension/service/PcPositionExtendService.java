@@ -2,6 +2,8 @@ package com.hp.sh.expv3.pc.extension.service;
 
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
+import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionStatVo;
+import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionTotalVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -50,4 +52,8 @@ public interface PcPositionExtendService {
     BigDecimal getAvgPrice(Long userId, String asset, String symbol);
 
     List<PcPositionVo> selectPosByAccount(Long userId, String asset, String symbol, Long startTime);
+
+    List<PcSymbolPositionStatVo> getSymbolPositionStat(String asset, String symbol);
+
+	PcSymbolPositionTotalVo getSymbolPositionTotal(String asset, String symbol);
 }

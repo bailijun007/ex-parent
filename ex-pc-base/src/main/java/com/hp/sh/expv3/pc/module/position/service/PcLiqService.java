@@ -27,6 +27,7 @@ import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
+import com.hp.sh.expv3.utils.math.Precision;
 
 /**
  * 强平
@@ -64,7 +65,7 @@ public class PcLiqService {
     private ApplicationEventPublisher publisher;
 
     @LockIt(key="${pos.userId}-${pos.asset}-${pos.symbol}")
-	public LiqHandleResult handleLiq(PcPosition pos) {
+	public LiqHandleResult checkPosLiq(PcPosition pos) {
 		LiqHandleResult liqResult = new LiqHandleResult();
 		
 		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getSymbol());
@@ -102,6 +103,9 @@ public class PcLiqService {
 		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
 		BigDecimal posPnl = holdPosStrategy.calcPosPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
 		BigDecimal posMarginRatio = holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), posPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
+		//保留两位小数
+		posMarginRatio = posMarginRatio.setScale(Precision.LIQ_MARGIN_RATIO, Precision.LESS);
+		//维持保证金率
 		BigDecimal holdMarginRatio = pos.getHoldMarginRatio();
 		
 		if(posMarginRatio.compareTo(holdMarginRatio)<=0){ //强平

@@ -18,12 +18,13 @@ import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
+import com.hp.sh.expv3.pc.constant.LogType;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
+import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
-import com.hp.sh.expv3.pc.module.order.entity.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
@@ -32,7 +33,6 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
-import com.hp.sh.expv3.pc.msg.LogType;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
@@ -73,6 +73,9 @@ public class PcTradeService {
 	@Autowired
 	private PositionStrategyContext positionStrategy;
     
+	@Autowired
+	private PcPositionMarginService positionMarginService;
+	
     @Autowired
     private ApplicationEventPublisher publisher;
 	
@@ -107,6 +110,17 @@ public class PcTradeService {
 		}else{
 			this.modClosePos(pcPosition, tradeResult);
 		}
+		
+		//修改维持保证金率
+		BigDecimal holdRatio = this.feeRatioService.getHoldRatio(pcPosition.getUserId(), pcPosition.getAsset(), pcPosition.getSymbol(), pcPosition.getVolume());
+		pcPosition.setHoldMarginRatio(holdRatio);
+		
+		//如果降档
+		BigDecimal maxLeverage = this.feeRatioService.getMaxLeverage(pcPosition.getUserId(), pcPosition.getAsset(), pcPosition.getSymbol(), pcPosition.getVolume());
+		if(BigUtils.gt(pcPosition.getLeverage(), maxLeverage)){
+			positionMarginService.downLeverage(pcPosition, maxLeverage, now);
+		}
+		
 		//保存
 		if(isNewPos){
 			pcPosition.setCreated(now);
@@ -142,7 +156,7 @@ public class PcTradeService {
     
     private int getLogType(int closeFlag, int longFlag){
 		if(IntBool.isFalse(closeFlag)){
-			return IntBool.isTrue(longFlag)?LogType.TYPE_TRAD_OPEN_LONG:LogType.TYPE_TRAD_CLOSE_SHORT;
+			return IntBool.isTrue(longFlag)?LogType.TYPE_TRAD_OPEN_LONG:LogType.TYPE_TRAD_OPEN_SHORT;
 		}else{
 			return IntBool.isTrue(longFlag)?LogType.TYPE_TRAD_CLOSE_LONG:LogType.TYPE_TRAD_CLOSE_SHORT;
 		}

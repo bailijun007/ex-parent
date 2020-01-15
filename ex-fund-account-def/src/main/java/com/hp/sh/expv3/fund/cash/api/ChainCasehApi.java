@@ -9,6 +9,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.hp.sh.expv3.fund.cash.api.vo.BysCreateResult;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -28,7 +30,7 @@ public interface ChainCasehApi {
 
 	@ApiOperation("创建充币记录")
 	@GetMapping(value = "/api/cash/bys/createDeposit")
-	public String createDeposit(
+	public BysCreateResult createDeposit(
 			@RequestParam("userId") Long userId,
 			@RequestParam("chainOrderId") String chainOrderId, 
 			@RequestParam("symbolId") String symbolId, 
