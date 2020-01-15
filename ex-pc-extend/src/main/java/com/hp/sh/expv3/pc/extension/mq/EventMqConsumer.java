@@ -12,10 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.pc.constant.MsgConstant;
 import com.hp.sh.expv3.pc.extension.dao.PcAccountLogDAO;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountLogVo;
-import com.hp.sh.expv3.pc.msg.MsgConstant;
 import com.hp.sh.expv3.pc.msg.PcAccountLog;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
