@@ -67,7 +67,6 @@ public class C2cOrderCallbackAction {
         NotifyParam param = new NotifyParam();
         getNotifyParam(orderAmount, orderCurrency, orderNo, paymentAmount, sign, signType, status, transactionId, param);
 
-        System.out.println("收到订单成功回调通知 = " + param.toString());
         logger.info("收到订单成功回调通知:{}", param);
 
         //验证签名是否是伪造的

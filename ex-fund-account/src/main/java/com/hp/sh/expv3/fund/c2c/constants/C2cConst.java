@@ -4,7 +4,7 @@ package com.hp.sh.expv3.fund.c2c.constants;
  * @author BaiLiJun  on 2020/1/13
  */
 public final class C2cConst {
-
+    //1 买入，-1 卖出
     public static final int C2C_SELL = -1;
     public static final int C2C_BUY = 1;
 

@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.fund.c2c.service;
 
 import com.gitee.hupadev.base.api.PageResult;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import com.hp.sh.expv3.fund.c2c.dao.C2cOrderDAO;
 import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
@@ -40,10 +42,7 @@ public class QueryService {
      */
     public PageResult<C2cOrderVo> pageQueryByPayStatus(Integer payStatus, Integer nextPage, Integer pageSize, Long id, Long userId) {
         PageResult<C2cOrderVo> pageResult = new PageResult<>();
-        if (null == pageSize) {
-            pageSize = 20;
-        }
-        List<C2cOrderVo> orderList = c2cOrderDAO.pageQueryByPayStatus(payStatus, nextPage, pageSize, id, userId);
+        List<C2cOrderVo> orderList = c2cOrderDAO.pageQueryByPayStatus(payStatus, nextPage, pageSize, id, userId,C2cConst.C2C_BUY);
         Map<String, Object> map = new HashMap<>();
         map.put("payStatus", payStatus);
         map.put("userId", userId);
@@ -52,6 +51,20 @@ public class QueryService {
         pageResult.setRowTotal(count);
         Integer rowTotal = Integer.parseInt(String.valueOf(count));
         pageResult.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
+        return pageResult;
+    }
+
+
+    public PageResult<C2cOrderVo> pageQueryByApprovalStatus(Integer approvalStatus, Integer pageNo, Integer pageSize, Long userId) {
+        PageResult<C2cOrderVo> pageResult = new PageResult<>();
+        PageHelper.startPage(pageNo, pageSize);
+
+        List<C2cOrderVo> orderList = c2cOrderDAO.pageQueryByApprovalStatus(approvalStatus, userId,C2cConst.C2C_SELL);
+        PageInfo<C2cOrderVo> info = new PageInfo<>(orderList);
+        pageResult.setList(orderList);
+        pageResult.setRowTotal(info.getTotal());
+        pageResult.setPageNo(info.getPageNum());
+        pageResult.setPageCount(info.getPages());
         return pageResult;
     }
 

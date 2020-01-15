@@ -271,6 +271,13 @@
     </select>
 
 
+    <select id="pageQueryByApprovalStatus" resultType="com.hp.sh.expv3.fund.extension.vo.C2cOrderVo">
+        select
+        <include refid="Base_Column_List"/>
+        from c2c_order
+        <include refid="simple_where"/>
+    </select>
+
     <delete id="delete">
         delete from c2c_order where id=#{id}
     </delete>
