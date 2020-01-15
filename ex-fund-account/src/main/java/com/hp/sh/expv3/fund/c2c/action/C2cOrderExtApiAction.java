@@ -147,4 +147,13 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
 
         return "success";
     }
+
+    @Override
+    public PageResult<C2cOrderVo> queryAllWithdrawalOrder(Long userId, Integer auditStatus, Integer pageNo, Integer pageSize) {
+        if (pageSize == null || pageNo == null) {
+            throw new ExException(ExFundError.PARAM_EMPTY);
+        }
+        return queryService.pageQueryByApprovalStatus(auditStatus,pageNo,pageSize,userId);
+
+    }
 }
