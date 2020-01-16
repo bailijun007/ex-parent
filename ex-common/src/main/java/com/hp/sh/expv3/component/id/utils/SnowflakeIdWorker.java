@@ -6,6 +6,8 @@ package com.hp.sh.expv3.component.id.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Random;
+
 /**
  * Twitter_Snowflake<br>
  * SnowFlake的结构如下(每部分用-分开):<br>
@@ -255,7 +257,7 @@ public class SnowflakeIdWorker {
         }
         //时间戳改变，毫秒内序列重置
         else {
-            sequence = 0L;
+            sequence = new Random().nextInt(Long.valueOf(getMask(sequence)).intValue());
         }
 
         //上次生成ID的时间截
