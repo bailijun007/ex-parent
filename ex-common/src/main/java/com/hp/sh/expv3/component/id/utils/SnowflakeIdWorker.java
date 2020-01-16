@@ -257,7 +257,7 @@ public class SnowflakeIdWorker {
         }
         //时间戳改变，毫秒内序列重置
         else {
-            sequence = new Random().nextInt(Long.valueOf(getMask(sequence)).intValue());
+            sequence = new Random().nextInt(Long.valueOf(getMask(sequenceBits)).intValue());
         }
 
         //上次生成ID的时间截
