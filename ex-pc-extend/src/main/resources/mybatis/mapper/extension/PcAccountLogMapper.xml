@@ -62,6 +62,7 @@
         <include refid="Base_Column_List"/>
         FROM pc_account_log
         <include refid="simple_where"/>
+        order by `time` desc
     </select>
 
     <select id="queryCount" resultType="java.lang.Long">

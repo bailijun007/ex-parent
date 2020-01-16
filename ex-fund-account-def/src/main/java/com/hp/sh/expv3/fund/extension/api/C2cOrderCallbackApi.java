@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 /**api/callback/c2c
  * @author BaiLiJun  on 2020/1/15
  */
-@Api(tags = "c2c订单Api")
+@Api(tags = "c2c订单回调通知")
 @FeignClient(value = "ex-fund-account")
 public interface C2cOrderCallbackApi {
 
