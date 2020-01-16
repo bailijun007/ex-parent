@@ -11,8 +11,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gitee.hupadev.base.exceptions.CommonError;
-import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
@@ -89,7 +87,7 @@ public class PcTradeService {
 			return;
 		}
 		
-		Long now  = DbDateUtils.now();
+		Long now = DbDateUtils.now();
 		
 		PcPosition pcPosition = this.positionDataService.getCurrentPosition(trade.getAccountId(), trade.getAsset(), trade.getSymbol(), order.getLongFlag());
 		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
