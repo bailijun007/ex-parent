@@ -123,7 +123,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                     || type2Refs.containsKey(PcAccountLog.TYPE_TRAD_OPEN_SHORT)
                     || type2Refs.containsKey(PcAccountLog.TYPE_TRAD_CLOSE_LONG)
                     || type2Refs.containsKey(PcAccountLog.TYPE_TRAD_CLOSE_SHORT)
-                   ) {
+            ) {
                 List<PcAccountRecordLogVo> refs = new ArrayList<>();
                 refs.addAll(type2Refs.getOrDefault(PcAccountLog.TYPE_TRAD_OPEN_LONG, Collections.emptyList()));
                 refs.addAll(type2Refs.getOrDefault(PcAccountLog.TYPE_TRAD_OPEN_SHORT, Collections.emptyList()));
@@ -229,7 +229,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
         List<Long> refIds = recordLogVos.stream().map(PcAccountRecordLogVo::getRefId).collect(Collectors.toList());
         List<PcOrderTradeVo> pcLiqRecordVo = pcOrderTradeExtendService.listPcOrderTrade(refIds, asset, symbol, userId);
         if (null != pcLiqRecordVo) {
-             Map<Long, PcOrderTradeVo> id2Vo = pcLiqRecordVo.stream().collect(Collectors.toMap(PcOrderTradeVo::getId, Function.identity()));
+            Map<Long, PcOrderTradeVo> id2Vo = pcLiqRecordVo.stream().collect(Collectors.toMap(PcOrderTradeVo::getId, Function.identity()));
             for (PcAccountRecordLogVo recordLogVo : recordLogVos) {
                 Optional<PcOrderTradeVo> pcOrderTradeVo = Optional.ofNullable(id2Vo.get(recordLogVo.getRefId()));
 
@@ -239,7 +239,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                 recordLogVo.setTradePrice(pcOrderTradeVo.map(PcOrderTradeVo::getPrice).orElse(BigDecimal.ZERO));
                 recordLogVo.setFeeRatio(pcOrderTradeVo.map(PcOrderTradeVo::getFeeRatio).orElse(BigDecimal.ZERO));
                 recordLogVo.setFee(pcOrderTradeVo.map(PcOrderTradeVo::getFee).orElse(BigDecimal.ZERO));
-               Long orderId = pcOrderTradeVo.map(PcOrderTradeVo::getOrderId).orElse(null);
+                Long orderId = pcOrderTradeVo.map(PcOrderTradeVo::getOrderId).orElse(null);
                 recordLogVo.setOrderId(orderId);
                 PcOrderVo pcOrderVo = pcOrderExtendService.getPcOrder(orderId, asset, symbol, userId);
                 Optional<PcOrderVo> orderVoOptional = Optional.ofNullable(pcOrderVo);
@@ -306,7 +306,11 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                 recordLogVo.setTradeAmt(volume.multiply(faceValue));
                 recordLogVo.setOrderAmt(volume.multiply(faceValue));
                 recordLogVo.setNoTradeAmt(BigDecimal.ZERO);
-                recordLogVo.setVolume(volume.multiply(faceValue).divide(liqPrice, Precision.PERCENT_PRECISION, Precision.LESS));
+                if (BigDecimal.ZERO.compareTo(liqPrice) == 0) {
+                    recordLogVo.setVolume(BigDecimal.ZERO);
+                } else {
+                    recordLogVo.setVolume(volume.multiply(faceValue).divide(liqPrice, Precision.PERCENT_PRECISION, Precision.LESS));
+                }
                 recordLogVo.setTradePrice(liqPrice);
                 recordLogVo.setFee(fee);
                 recordLogVo.setFeeRatio(feeRatio);

@@ -212,17 +212,17 @@
             </if>
             <choose>
                 <when test="nextPage==1 and pageSize!=null and lastOrderId!=null">
-                    and id &gt; #{lastOrderId}
-                    ORDER BY id asc
-                    LIMIT 0,${pageSize}
-                </when>
-                <when test="nextPage==-1 and pageSize!=null and lastOrderId!=null">
-                    and id &lt;= #{lastOrderId}
+                    and id &lt;  #{lastOrderId}
                     ORDER BY id desc
                     LIMIT 0,${pageSize}
                 </when>
-                <otherwise>
+                <when test="nextPage==-1 and pageSize!=null and lastOrderId!=null">
+                    and id &gt;= #{lastOrderId}
                     ORDER BY id asc
+                    LIMIT 0,${pageSize}
+                </when>
+                <otherwise>
+                    ORDER BY id desc
 
                 </otherwise>
             </choose>
@@ -235,6 +235,9 @@
         <include refid="Base_Column_List"/>
         from pc_order
         <where>
+            <if test="status!=null">
+                status=#{status}
+            </if>
             <if test="activeFlag!=null">
                 and active_flag=#{activeFlag}
             </if>
@@ -258,19 +261,22 @@
             </if>
             <choose>
                 <when test="nextPage==1 and pageSize!=null and lastOrderId!=null">
-                    and id &gt; #{lastOrderId}
-                    ORDER BY id asc
+                    and id &lt; #{lastOrderId}
+                    ORDER BY id desc
                     LIMIT 0,${pageSize}
                 </when>
                 <when test="nextPage==-1 and pageSize!=null and lastOrderId!=null">
-                    and id &lt; #{lastOrderId}
-                    ORDER BY id desc
+                    and id &gt;= #{lastOrderId}
+                    ORDER BY id asc
                     LIMIT 0,${pageSize}
                 </when>
                 <when test="isTotalNumber==1">
                     ORDER BY id desc
                     LIMIT 0,${limit}
                 </when>
+                <otherwise>
+                    ORDER BY id desc
+                </otherwise>
 
             </choose>
         </where>
