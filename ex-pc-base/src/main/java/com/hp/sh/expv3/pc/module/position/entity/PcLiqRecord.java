@@ -38,6 +38,9 @@ public class PcLiqRecord extends UserDataEntity {
 	//强平价
 	private BigDecimal liqPrice;
 	
+	//仓位均价
+	private BigDecimal meanPrice;
+	
 	//手续费
 	private BigDecimal fee;
 	
@@ -133,6 +136,14 @@ public class PcLiqRecord extends UserDataEntity {
 
 	public void setFeeRatio(BigDecimal feeRatio) {
 		this.feeRatio = feeRatio;
+	}
+
+	public BigDecimal getMeanPrice() {
+		return meanPrice;
+	}
+
+	public void setMeanPrice(BigDecimal meanPrice) {
+		this.meanPrice = meanPrice;
 	}
 
 }

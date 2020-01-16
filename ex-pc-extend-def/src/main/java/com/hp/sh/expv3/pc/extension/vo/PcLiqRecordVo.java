@@ -44,6 +44,9 @@ public class PcLiqRecordVo implements Serializable {
 
     @ApiModelProperty("成交价格")
     private BigDecimal liqPrice;
+    
+    @ApiModelProperty("仓位均价")
+	private BigDecimal meanPrice;
 
     @ApiModelProperty("手续费")
     private BigDecimal fee;
@@ -165,4 +168,12 @@ public class PcLiqRecordVo implements Serializable {
     public void setFeeRatio(BigDecimal feeRatio) {
         this.feeRatio = feeRatio;
     }
+
+	public BigDecimal getMeanPrice() {
+		return meanPrice;
+	}
+
+	public void setMeanPrice(BigDecimal meanPrice) {
+		this.meanPrice = meanPrice;
+	}
 }
