@@ -6,6 +6,7 @@ package com.hp.sh.expv3.match.component.notify;
 
 import com.google.common.collect.Lists;
 import com.hp.sh.expv3.match.bo.PcTradeBo;
+import com.hp.sh.expv3.match.component.id.SnowflakeIdWorker;
 import com.hp.sh.expv3.match.component.rocketmq.PcMatchProducer;
 import com.hp.sh.expv3.match.config.setting.PcmatchRocketMqSetting;
 import com.hp.sh.expv3.match.constant.CommonConst;
@@ -241,7 +242,7 @@ public class PcMatchMqNotify {
         while (true) {
             try {
                 pcmatchProducer.send(message,
-                        (mqs, msg1, arg) -> mqs.get(Math.abs(Long.valueOf(accountId).intValue()) % mqs.size()),
+                        (mqs, msg1, arg) -> mqs.get(Math.abs(Long.valueOf(SnowflakeIdWorker.getTimeInMs(accountId)).intValue()) % mqs.size()),
                         0L);
                 break;
             } catch (Exception e) {
