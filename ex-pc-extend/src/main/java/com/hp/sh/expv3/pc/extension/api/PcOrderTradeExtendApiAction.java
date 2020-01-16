@@ -140,6 +140,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
             for (PcOrderTradeVo pcOrderTradeVo : voList) {
                 PcOrderTradeDetailVo detailVo = new PcOrderTradeDetailVo();
                 BeanUtils.copyProperties(pcOrderTradeVo, detailVo);
+                detailVo.setFee(detailVo.getFee().negate());
                 detailVo.setAsset(pcOrderTradeVo.getAsset());
                 detailVo.setSymbol(pcOrderTradeVo.getSymbol());
                 detailVo.setQty(pcOrderTradeVo.getVolume());

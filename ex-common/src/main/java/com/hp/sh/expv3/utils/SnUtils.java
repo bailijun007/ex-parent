@@ -11,11 +11,11 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 /**
  */
 public class SnUtils {
-	
+
 	public static String genTransferSn(){
 		return "TS"+genTimeSn();
 	}
-	
+
 	public static String genRecordSn(){
 		return "RC"+genTimeSn();
 	}
