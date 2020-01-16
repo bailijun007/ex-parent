@@ -235,6 +235,9 @@
         <include refid="Base_Column_List"/>
         from pc_order
         <where>
+            <if test="status!=null">
+                status=#{status}
+            </if>
             <if test="activeFlag!=null">
                 and active_flag=#{activeFlag}
             </if>
