@@ -37,7 +37,7 @@ public class PLPayService {
      *                    TODO 老王，入金回调如何确保幂等（高并发情况下，如何确认入金状态与入金账户的修改）
      * @return 返回转发的url地址，调用方需要转发到该地址获取数据
      */
-    public String rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal fabiAmt, BigDecimal tarVolume,String receiveUrl,String pickupUrl) {
+    public String rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal tarVolume, BigDecimal fabiAmt,String receiveUrl,String pickupUrl) {
         //生成订单号
         String orderNo = GenerateOrderNumUtils.getOrderNo(userId);
         //订单币种
