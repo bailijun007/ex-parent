@@ -18,8 +18,8 @@ public class PLPayService {
     @Autowired
     private PLpayClient pLpayClient;
 
-    @Value("${expv3.base.url}")
-    private String baseUrl;
+//    @Value("${expv3.base.url}")
+//    private String baseUrl;
 
     @Value("${plpay.server.c2c_fee_ratio}")
     private String c2cFeeRatio;
