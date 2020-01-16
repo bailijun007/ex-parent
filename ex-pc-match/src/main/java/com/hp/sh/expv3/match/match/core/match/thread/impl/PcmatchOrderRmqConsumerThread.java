@@ -208,10 +208,14 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                             String body = new String(m.getBody());
 
                             IThreadWorker matchWorker = threadManagerPcMatchImpl.getWorker(assetSymbol);
-
                             PcOrderBaseTask task = null;
                             long queueOffset = m.getQueueOffset();
                             String currentMsgId = m.getMsgId();
+
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("tag:{},offset:key:{},msgId:{},body:{}", m.getTags(), queueOffset, currentMsgId, body);
+                            }
+
                             // 按出现频率多少，排 if 的顺序
                             if (RmqTagEnum.PC_ORDER_PENDING_NEW.getConstant().equals(m.getTags())) {
                                 PcOrderMqMsgDto dto = JSON.parseObject(body, PcOrderMqMsgDto.class);
