@@ -191,6 +191,7 @@ public class PcLiqService {
 		
 		//log
 		record.setLiqPrice(pos.getLiqPrice());
+		record.setMeanPrice(pos.getMeanPrice());
 		record.setFee(pos.getCloseFee());
 		record.setFeeRatio(feeRatioService.getCloseFeeRatio(pos.getUserId(), pos.getAsset(), pos.getSymbol()));
 		
