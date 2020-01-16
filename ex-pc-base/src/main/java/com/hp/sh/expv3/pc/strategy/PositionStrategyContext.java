@@ -152,8 +152,9 @@ public class PositionStrategyContext {
 		//强平价
 		if(pcPosition!=null){
 			BigDecimal amount = pcPosition.getVolume().multiply(order.getFaceValue());
+			BigDecimal posMargin = IntBool.isTrue(closeFlag)?pcPosition.getPosMargin().subtract(tradeResult.getOrderMargin()):pcPosition.getPosMargin().add(tradeResult.getOrderMargin());
 			tradeResult.setNewPosLiqPrice(
-				_holdPosStrategy.calcLiqPrice(longFlag, amount, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), pcPosition.getPosMargin())
+				_holdPosStrategy.calcLiqPrice(longFlag, amount, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), posMargin)
 			);
 		}else{
 			BigDecimal holdRatio = feeRatioService.getHoldRatio(userId, asset, symbol, tradeResult.getVolume());
