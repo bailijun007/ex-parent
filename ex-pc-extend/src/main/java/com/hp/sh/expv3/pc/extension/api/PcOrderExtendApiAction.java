@@ -169,7 +169,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
             for (PcOrderVo orderVo : orderList) {
                 UserOrderVo vo = new UserOrderVo();
                 BeanUtils.copyProperties(orderVo, vo);
-                vo.setFee(orderVo.getFeeCost());
+                vo.setFee(orderVo.getFeeCost().negate());
                 vo.setQty(orderVo.getVolume());
                 vo.setLongFlag(orderVo.getLongFlag());
                 vo.setCtime(orderVo.getCreated());

@@ -221,7 +221,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                 recordLogVo.setVolume(pcOrderTradeVo.map(PcOrderTradeVo::getPnl).orElse(BigDecimal.ZERO));
                 recordLogVo.setTradePrice(pcOrderTradeVo.map(PcOrderTradeVo::getPrice).orElse(BigDecimal.ZERO));
                 recordLogVo.setFeeRatio(pcOrderTradeVo.map(PcOrderTradeVo::getFeeRatio).orElse(BigDecimal.ZERO));
-                recordLogVo.setFee(pcOrderTradeVo.map(PcOrderTradeVo::getFee).orElse(BigDecimal.ZERO));
+                recordLogVo.setFee(pcOrderTradeVo.map(pt->pt.getFee().negate()).orElse(BigDecimal.ZERO));
                 Long orderId = pcOrderTradeVo.map(PcOrderTradeVo::getOrderId).orElse(null);
                 recordLogVo.setOrderId(orderId);
                 PcOrderVo pcOrderVo = pcOrderExtendService.getPcOrder(orderId, asset, symbol, userId);
@@ -261,7 +261,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
         // TODO xb，这里有风险：资金转入转出没问题，但是保证金是和symbol相关的，这里没有用到
         List<PcAccountRecordVo> pcLiqRecordVo = pcAccountRecordExtendService.listPcAccountRecord(refIds, asset, userId);
         if (null != pcLiqRecordVo) {
-            final Map<Long, PcAccountRecordVo> id2Vo = pcLiqRecordVo.stream()
+             Map<Long, PcAccountRecordVo> id2Vo = pcLiqRecordVo.stream()
                     .collect(Collectors.toMap(PcAccountRecordVo::getId, Function.identity()));
             for (PcAccountRecordLogVo recordLogVo : recordLogVos) {
                 Optional<PcAccountRecordVo> recordVoOptional = Optional.ofNullable(id2Vo.get(recordLogVo.getRefId()));
@@ -302,7 +302,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                             .divide(meanPrice, Precision.PERCENT_PRECISION, Precision.LESS).negate());
                 }
                 recordLogVo.setTradePrice(liqPrice);
-                recordLogVo.setFee(fee);
+                recordLogVo.setFee(fee.negate());
                 recordLogVo.setFeeRatio(feeRatio);
                 recordLogVo.setOrderPrice(liqPrice);
             }
