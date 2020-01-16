@@ -265,8 +265,12 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                     .collect(Collectors.toMap(PcAccountRecordVo::getId, Function.identity()));
             for (PcAccountRecordLogVo recordLogVo : recordLogVos) {
                 Optional<PcAccountRecordVo> recordVoOptional = Optional.ofNullable(id2Vo.get(recordLogVo.getRefId()));
-                recordLogVo.setVolume(recordVoOptional.map(o -> o.getAmount()).orElse(BigDecimal.ZERO));
                 recordLogVo.setFee(BigDecimal.ZERO);
+                if(recordLogVo.getTradeType()==PcAccountLog.TYPE_REDUCE_MARGIN){
+                    recordLogVo.setVolume(recordVoOptional.map(o -> o.getAmount().negate()).orElse(BigDecimal.ZERO));
+                }else {
+                    recordLogVo.setVolume(recordVoOptional.map(o -> o.getAmount()).orElse(BigDecimal.ZERO));
+                }
             }
         }
     }

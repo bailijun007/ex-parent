@@ -64,7 +64,7 @@ public class PLPayService {
         c2cOrder.setVolume(tarVolume);
         //计算USDT 就是 orderAmount*( 1 - 手续费率) / 你系统的CNY:USD汇率;
         BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
-        c2cOrder.setAmount(fabiAmt.multiply(feeRatio).divide(ratio, Precision.COMMON_PRECISION, Precision.LESS));
+        c2cOrder.setAmount(ratio.multiply(tarVolume));
         c2cOrder.setType(C2cConst.C2C_BUY);
         c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
         c2cOrder.setPayStatusDesc(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
