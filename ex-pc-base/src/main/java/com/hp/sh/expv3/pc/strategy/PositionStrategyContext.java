@@ -17,7 +17,6 @@ import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
@@ -84,7 +83,7 @@ public class PositionStrategyContext {
 		int closeFlag = order.getCloseFlag();
 		int longFlag = order.getLongFlag();
 		
-		OrderRatioData tradeRatioAmt = orderStrategy.calcRaitoAmt(order, matchedVo.getNumber());
+		OrderRatioData tradeRatioData = orderStrategy.calcRaitoAmt(order, matchedVo.getNumber());
 		
 		BigDecimal faceValue = this.metadataService.getFaceValue(asset, symbol);
 		
@@ -99,8 +98,8 @@ public class PositionStrategyContext {
 		//手续费&率
 		if(closeFlag==OrderFlag.ACTION_OPEN){
 			tradeResult.setFeeRatio(order.getOpenFeeRatio());
-			tradeResult.setFee(tradeRatioAmt.getOpenFee());
-			tradeResult.setOrderMargin(tradeRatioAmt.getOrderMargin());//保证金
+			tradeResult.setFee(tradeRatioData.getOpenFee());
+			tradeResult.setOrderMargin(tradeRatioData.getOrderMargin());//保证金
 		}else{
 			BigDecimal closeFeeRatio = this.feeRatioService.getCloseFeeRatio(userId, asset, symbol);
 			BigDecimal closeFee = OrderFeeCalc.calcFee(tradeResult.getBaseValue(), closeFeeRatio);
@@ -144,7 +143,7 @@ public class PositionStrategyContext {
 
 		//此笔成交收益
 		if(IntBool.isTrue(closeFlag) && pcPosition!=null && BigUtils.gt(pcPosition.getMeanPrice(), BigDecimal.ZERO)){
-			BigDecimal pnl = _holdPosStrategy.calcPnl(longFlag, tradeRatioAmt.getAmount(), pcPosition.getMeanPrice(), tradeResult.getPrice());
+			BigDecimal pnl = _holdPosStrategy.calcPnl(longFlag, tradeRatioData.getAmount(), pcPosition.getMeanPrice(), tradeResult.getPrice());
 			tradeResult.setPnl(pnl);	
 		}else{
 			tradeResult.setPnl(BigDecimal.ZERO);

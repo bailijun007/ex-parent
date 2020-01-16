@@ -56,11 +56,19 @@ public class TradeResult {
 	}
 	
 	//应收手续费（考虑到maker收费优惠）
-	public BigDecimal getFeeReceivable(){
+	public BigDecimal getReceivableFee(){
 		if(makerFee!=null){
 			return makerFee;
 		}
 		return fee;
+	}
+	
+	//应收手续费率（考虑到maker收费优惠）
+	public BigDecimal getReceivableFeeRatio(){
+		if(makerFeeRatio!=null){
+			return makerFeeRatio;
+		}
+		return feeRatio;
 	}
 
 	public BigDecimal getPrice() {

@@ -147,7 +147,7 @@ public class PcTradeService {
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
 			this.closeFeeToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult, order.getLongFlag());
 		}else{
-			if(BigUtils.ltZero(tradeResult.getFeeReceivable())){
+			if(BigUtils.ltZero(tradeResult.getReceivableFee())){
 				this.openFeeDiffToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult.getMakerFeeDiff());
 			}
 		}
@@ -164,7 +164,7 @@ public class PcTradeService {
 	
 	private void closeFeeToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeResult, int longFlag) {
 		PcAddRequest request = new PcAddRequest();
-		BigDecimal amount = tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFeeReceivable());
+		BigDecimal amount = tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getReceivableFee());
 		if(BigUtils.isZero(amount)){
 			return;
 		}
@@ -175,7 +175,7 @@ public class PcTradeService {
 		request.setAmount(amount);
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("平仓。保证金：%s,收益:%s,手续费：-%s", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getFeeReceivable()));
+		request.setRemark(String.format("平仓。保证金：%s,收益:%s,手续费：-%s", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getReceivableFee()));
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_CLOSE_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setAssociatedId(orderTradeId);
@@ -199,7 +199,7 @@ public class PcTradeService {
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getFee()));
 		}
-		order.setFeeCost(order.getFeeCost().add(tradeResult.getFeeReceivable()));
+		order.setFeeCost(order.getFeeCost().add(tradeResult.getReceivableFee()));
 		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getVolume()));
         order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
@@ -217,8 +217,8 @@ public class PcTradeService {
 		orderTrade.setPrice(tradeMsg.getPrice());
 		orderTrade.setMakerFlag(tradeMsg.getMakerFlag());
 
-		orderTrade.setFee(tradeResult.getFeeReceivable());
-		orderTrade.setFeeRatio(tradeResult.getFeeRatio());
+		orderTrade.setFee(tradeResult.getReceivableFee());
+		orderTrade.setFeeRatio(tradeResult.getReceivableFeeRatio());
 		orderTrade.setPnl(tradeResult.getPnl());
 		
 		orderTrade.setUserId(order.getUserId());
@@ -287,11 +287,11 @@ public class PcTradeService {
 	private void modOpenPos(PcPosition pcPosition, TradeResult tradeResult) {
 		pcPosition.setVolume(pcPosition.getVolume().add(tradeResult.getVolume()));
 		pcPosition.setPosMargin(pcPosition.getPosMargin().add(tradeResult.getOrderMargin()));
-		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeResult.getFeeReceivable()));
+		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeResult.getReceivableFee()));
 		
 		pcPosition.setMeanPrice(tradeResult.getNewPosMeanPrice());
 		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeResult.getOrderMargin()));
-		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeResult.getFeeReceivable()));
+		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeResult.getReceivableFee()));
 		
 		pcPosition.setLiqPrice(tradeResult.getNewPosLiqPrice());
 		
@@ -305,11 +305,11 @@ public class PcTradeService {
 	private void modClosePos(PcPosition pcPosition, TradeResult tradeResult) {
 		pcPosition.setVolume(pcPosition.getVolume().subtract(tradeResult.getVolume()));
 		pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(tradeResult.getOrderMargin()));
-		pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(tradeResult.getFeeReceivable()));
+		pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(tradeResult.getReceivableFee()));
 		
 		pcPosition.setMeanPrice(tradeResult.getNewPosMeanPrice());
 		pcPosition.setInitMargin(pcPosition.getInitMargin().subtract(tradeResult.getOrderMargin()));
-		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeResult.getFeeReceivable()));
+		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeResult.getReceivableFee()));
 		
 		pcPosition.setLiqPrice(tradeResult.getNewPosLiqPrice());
 		
