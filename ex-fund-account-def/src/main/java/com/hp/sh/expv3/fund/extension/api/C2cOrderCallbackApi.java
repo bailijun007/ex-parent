@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
@@ -17,7 +18,7 @@ import java.math.BigDecimal;
 public interface C2cOrderCallbackApi {
 
     @ApiOperation(value = "订单成功回调通知")
-    @RequestMapping(value = "/api/callback/c2c/deposit/notify")
+    @RequestMapping(value = "/api/callback/c2c/deposit/notify",method = RequestMethod.POST)
     public String notify(@RequestParam("orderAmount") BigDecimal orderAmount, @RequestParam("orderCurrency") String orderCurrency,
                          @RequestParam("orderNo") String orderNo, @RequestParam(value = "paymentAmount", required = false) BigDecimal paymentAmount,
                          @RequestParam("sign") String sign, @RequestParam("signType") String signType,
