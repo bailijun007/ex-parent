@@ -14,6 +14,7 @@ import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
+import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -68,7 +69,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
             statusList = Arrays.asList(status.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
         }
         List<PcOrderVo> list = pcOrderExtendService.queryOrderList(userId, assetList, symbolList, gtOrderId, ltOrderId, count, statusList);
-        if(CollectionUtils.isEmpty(list)){
+        if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();
         }
         convertOrderList2(result, list);
@@ -99,44 +100,43 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
      * @param voList 需要转换的list集合
      */
     private void convertOrderList2(List<UserOrderVo> list, List<PcOrderVo> voList) {
-            for (PcOrderVo orderVo : voList) {
-                UserOrderVo vo = new UserOrderVo();
-                BeanUtils.copyProperties(orderVo, vo);
-                vo.setFee(orderVo.getFeeCost());
-                vo.setQty(orderVo.getVolume());
-                vo.setLongFlag(orderVo.getLongFlag());
-                vo.setCtime(orderVo.getCreated());
+        for (PcOrderVo orderVo : voList) {
+            UserOrderVo vo = new UserOrderVo();
+            BeanUtils.copyProperties(orderVo, vo);
+            vo.setFee(orderVo.getFeeCost());
+            vo.setQty(orderVo.getVolume());
+            vo.setLongFlag(orderVo.getLongFlag());
+            vo.setCtime(orderVo.getCreated());
 
-                //成交均价
-                List<PcOrderTradeVo> orderTradeVoList = pcOrderTradeService.queryOrderTrade(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymbol(), orderVo.getId() + "");
-                List<OrderTrade> ots = new ArrayList<>();
-                for (PcOrderTradeVo pcOrderTradeVo : orderTradeVoList) {
-                    OrderTrade ot = new OrderTrade() {
-                        @Override
-                        public BigDecimal getVolume() {
-                            return pcOrderTradeVo.getVolume();
-                        }
+            //成交均价
+            List<PcOrderTradeVo> orderTradeVoList = pcOrderTradeService.queryOrderTrade(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymbol(), orderVo.getId() + "");
+            List<OrderTrade> ots = new ArrayList<>();
+            for (PcOrderTradeVo pcOrderTradeVo : orderTradeVoList) {
+                OrderTrade ot = new OrderTrade() {
+                    @Override
+                    public BigDecimal getVolume() {
+                        return pcOrderTradeVo.getVolume();
+                    }
 
-                        @Override
-                        public BigDecimal getPrice() {
-                            return pcOrderTradeVo.getPrice();
-                        }
-                    };
-                    ots.add(ot);
-                }
-                 BigDecimal pnl = orderTradeVoList.stream().map(PcOrderTradeVo::getPnl).findFirst().orElse(null);
-                BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(orderVo.getAsset(), orderVo.getSymbol(), orderVo.getLongFlag(), ots);
-//                BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(null, orderVo.getUserId(), orderVo.getId());
-                vo.setAvgPrice(meanPrice);
-                vo.setFilledQty(orderVo.getFilledVolume());
-                vo.setCloseFlag(orderVo.getCloseFlag());
-                vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros());
-                vo.setOrderType(orderVo.getOrderType());
-                vo.setClientOid(orderVo.getClientOrderId());
-                vo.setSymol(orderVo.getSymbol());
-                vo.setRealisedPnl(pnl);
-                list.add(vo);
+                    @Override
+                    public BigDecimal getPrice() {
+                        return pcOrderTradeVo.getPrice();
+                    }
+                };
+                ots.add(ot);
             }
+            BigDecimal pnl = pcOrderTradeService.getOrderRealisedPnl(orderVo, orderTradeVoList);
+            BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(orderVo.getAsset(), orderVo.getSymbol(), orderVo.getLongFlag(), ots);
+            vo.setAvgPrice(meanPrice);
+            vo.setFilledQty(orderVo.getFilledVolume());
+            vo.setCloseFlag(orderVo.getCloseFlag());
+            vo.setTradeRatio(orderVo.getFilledVolume().divide(orderVo.getVolume(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros());
+            vo.setOrderType(orderVo.getOrderType());
+            vo.setClientOid(orderVo.getClientOrderId());
+            vo.setSymol(orderVo.getSymbol());
+            vo.setRealisedPnl(pnl);
+            list.add(vo);
+        }
 
     }
 
@@ -177,9 +177,9 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                 //成交均价
                 BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(orderVo.getAsset(), orderVo.getSymbol(), orderVo.getLongFlag(),
                         orderId2OrderTradeList.getOrDefault(orderVo.getId(), Collections.emptyList()));
-                BigDecimal pnl = orderId2OrderTradeList.get(orderVo.getId()).stream().map(PcOrderTradeVo::getPnl).findFirst().orElse(null);
 
-                //                BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(null, orderVo.getUserId(), orderVo.getId());
+                BigDecimal pnl = pcOrderTradeService.getOrderRealisedPnl(orderVo, orderId2OrderTradeList.get(orderVo.getId()));
+
                 vo.setAvgPrice(meanPrice);
                 vo.setFilledQty(orderVo.getFilledVolume());
                 vo.setCloseFlag(orderVo.getCloseFlag());
@@ -251,7 +251,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     @Override
     @CrossDB
     public PageResult<UserOrderVo> pageQueryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag, Long orderId, Integer pageNo, Integer pageSize) {
-        if (pageNo == null || pageSize == null||StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)) {
+        if (pageNo == null || pageSize == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         PageResult<UserOrderVo> result = pcOrderExtendService.pageQueryOrderList(userId, asset, symbol, status, closeFlag, orderId, pageNo, pageSize);
@@ -276,9 +276,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
                     }
                 }
                 BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(asset, symbol, orderVo.getLongFlag(), list);
-                BigDecimal pnl = orderTradeVoList.stream().map(PcOrderTradeVo::getPnl).findFirst().orElse(null);
-
-                //                BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(null, orderVo.getUserId(), orderVo.getId());
+                BigDecimal pnl = pcOrderTradeService.getOrderRealisedPnl(IntBool.isTrue(orderVo.getCloseFlag().intValue()), orderTradeVoList);
                 orderVo.setAvgPrice(meanPrice);
                 orderVo.setRealisedPnl(pnl);
             }

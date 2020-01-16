@@ -49,6 +49,7 @@
             <if test="liqPrice!=null">and liq_price=#{liqPrice}</if>
             <if test="fee!=null">and fee=#{fee}</if>
             <if test="feeRatio!=null">and fee_ratio=#{feeRatio}</if>
+            <if test="meanPrice!=null">and mean_price=#{meanPrice}</if>
             <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
             <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
             <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
@@ -58,7 +59,7 @@
 
     <sql id="Base_Column_List">
 	id,asset,symbol,pos_id,long_flag,volume,pos_margin,bankrupt_price,user_id,
-	liq_price,created,modified,fee,fee_ratio
+	liq_price,created,modified,fee,fee_ratio,mean_price
     </sql>
 
 

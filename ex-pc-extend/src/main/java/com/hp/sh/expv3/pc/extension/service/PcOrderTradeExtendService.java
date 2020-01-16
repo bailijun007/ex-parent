@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.pc.extension.service;
 
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
+import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -10,6 +11,12 @@ import java.util.List;
  */
 public interface PcOrderTradeExtendService {
     BigDecimal getRealisedPnl(Long posId, Long userId, Long orderId);
+
+    BigDecimal getOrderRealisedPnl(List<PcOrderTradeVo> orderTrades);
+
+    BigDecimal getOrderRealisedPnl(PcOrderVo order, List<PcOrderTradeVo> orderTrades);
+
+    BigDecimal getOrderRealisedPnl(boolean closeFlag, List<PcOrderTradeVo> orderTrades);
 
     PcOrderTradeVo getPcOrderTrade(Long refId, String asset, String symbol, Long userId, Long time);
 

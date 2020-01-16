@@ -30,10 +30,10 @@ public class PLPayService {
     /**
      * @param userId      用户id
      * @param ratio       USD/CNY 汇率 例如： USD/CNY = 7.0298
-     * @param srcCurrency 支付币种 例如：
-     * @param tarCurrency 兑换币种
-     * @param fabiAmt     法定货币总金额
-     * @param tarVolume   兑换成资产数量
+     * @param srcCurrency 支付币种 例如：CNY
+     * @param tarCurrency 兑换币种:USDT
+     * @param fabiAmt     法定货币总金额 100
+     * @param tarVolume   兑换成资产数量：14.5
      *                    TODO 老王，入金回调如何确保幂等（高并发情况下，如何确认入金状态与入金账户的修改）
      * @return 返回转发的url地址，调用方需要转发到该地址获取数据
      */

@@ -3,6 +3,8 @@ package com.hp.sh.expv3.pc.extension.service.impl;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
+import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
+import com.hp.sh.expv3.utils.IntBool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author BaiLiJun  on 2019/12/23
@@ -24,6 +27,36 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     @Override
     public BigDecimal getRealisedPnl(Long posId, Long userId, Long orderId) {
         return pcOrderTradeDAO.getRealisedPnl(posId, userId, null);
+    }
+
+    @Override
+    public BigDecimal getOrderRealisedPnl(List<PcOrderTradeVo> orderTrades) {
+        if (null == orderTrades) {
+            return BigDecimal.ZERO;
+        } else {
+            return orderTrades.stream()
+                    .filter(Objects::nonNull)
+                    .filter(ot -> Objects.nonNull(ot.getPnl()))
+                    .map(PcOrderTradeVo::getPnl)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+    }
+
+    @Override
+    public BigDecimal getOrderRealisedPnl(PcOrderVo order, List<PcOrderTradeVo> orderTrades) {
+        if (null == order) {
+            return BigDecimal.ZERO;
+        } else {
+            return getOrderRealisedPnl(IntBool.isTrue(order.getCloseFlag().intValue()), orderTrades);
+        }
+    }
+
+    @Override
+    public BigDecimal getOrderRealisedPnl(boolean closeFlag, List<PcOrderTradeVo> orderTrades) {
+        if (closeFlag) {
+            return getOrderRealisedPnl(orderTrades);
+        }
+        return BigDecimal.ZERO;
     }
 
     @Override
