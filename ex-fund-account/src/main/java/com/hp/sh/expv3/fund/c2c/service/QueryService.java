@@ -3,6 +3,7 @@ package com.hp.sh.expv3.fund.c2c.service;
 import com.gitee.hupadev.base.api.PageResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import com.hp.sh.expv3.fund.c2c.dao.C2cOrderDAO;
 import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
@@ -54,6 +55,12 @@ public class QueryService {
         return pageResult;
     }
 
+    @CrossDB
+    public List<C2cOrderVo> queryByPayStatus(Integer payStatus) {
+        List<C2cOrderVo> orderList = c2cOrderDAO.queryByPayStatus(payStatus);
+
+        return orderList;
+    }
 
     public PageResult<C2cOrderVo> pageQueryByApprovalStatus(Integer approvalStatus, Integer pageNo, Integer pageSize, Long userId) {
         PageResult<C2cOrderVo> pageResult = new PageResult<>();

@@ -153,13 +153,13 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         order.setApprovalStatus(auditStatus);
         order.setPayStatus(auditStatus);
         order.setId(id);
-        //更改订单状态
+        //更改订单状态 并返回该对象
         C2cOrder c2cOrder1 = sellService.updateById(order);
 
         //如果审核通过需要调用减钱方法
         if (c2cOrder1!=null) {
             FundCutRequest request=new FundCutRequest();
-            request.setAsset(c2cOrder1.getExchangeCurrency());
+            request.setAsset(c2cOrder1.getPayCurrency());
             request.setAmount(c2cOrder1.getVolume());
             request.setTradeNo(c2cOrder1.getSn());
             request.setTradeType(TradeType.C2C_OUT);
