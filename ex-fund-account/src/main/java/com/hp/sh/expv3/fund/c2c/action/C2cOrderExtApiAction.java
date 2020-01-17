@@ -102,9 +102,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
     public String withdrawalOrder(Long userId, Long bankCard,String bank, String bankCardName, String srcAsset, BigDecimal srcNum, String tarAsset, BigDecimal tarNum, BigDecimal ratio) {
         //获取资产账户
         CapitalAccountVo account = fundAccountExtApi.getCapitalAccount(userId, srcAsset);
-        //检查c2c 被冻结的资产
-        BigDecimal c2cLockedVolume = queryService.getLockC2cNumber(userId, srcAsset);
-        BigDecimal remain = account.getTotalAssets().subtract(account.getLock()).subtract(c2cLockedVolume).subtract(srcNum);
+        BigDecimal remain = account.getAvailable();
         if (remain.compareTo(BigDecimal.ZERO) >= 0) {
 //            lock.writeLock().lock();
             try {
@@ -157,7 +155,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         C2cOrder c2cOrder1 = sellService.updateById(order);
 
         //如果审核通过需要调用减钱方法
-        if (c2cOrder1!=null) {
+        if (c2cOrder1!=null||c2cOrder1.getApprovalStatus()==C2cConst.C2C_APPROVAL_STATUS_PASS) {
             FundCutRequest request=new FundCutRequest();
             request.setAsset(c2cOrder1.getPayCurrency());
             request.setAmount(c2cOrder1.getVolume());
