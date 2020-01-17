@@ -4,7 +4,7 @@
 	<springProperty scope="context" name="rootLevel" source="log.root.level"/>
 	<springProperty scope="context" name="rootAppender" source="log.root.appender"/>
 
-	<property name="log.dir" value="/var/logs/exvp3/fund-account"></property>
+	<property name="log.dir" value="/var/log/exvp3/fund-account"></property>
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>

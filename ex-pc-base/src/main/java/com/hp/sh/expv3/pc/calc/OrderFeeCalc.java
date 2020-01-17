@@ -28,30 +28,5 @@ public class OrderFeeCalc {
 	public static final BigDecimal calcFee(BigDecimal baseValue, BigDecimal ratio){
 		return ratio.multiply(baseValue);
 	}
-
-	/**
-	 * 计算总押金
-	 * @param openFee
-	 * @param closeFee
-	 * @param orderMargin
-	 * @return
-	 */
-	public static final BigDecimal calcGrossMargin(BigDecimal openFee, BigDecimal closeFee, BigDecimal orderMargin){
-		BigDecimal grossMargin = OrderFeeCalc.sum(openFee, closeFee, orderMargin);
-		return grossMargin;
-	}
-	
-	/**
-	 * 求和
-	 * @param values
-	 * @return
-	 */
-	private static final BigDecimal sum(BigDecimal...values){
-		BigDecimal result = BigDecimal.ZERO;
-		for(BigDecimal value : values){
-			result = result.add(value);
-		}
-		return result;
-	}
 	
 }
