@@ -55,7 +55,7 @@ public class OrderlyConsumer {
 
         	@Override
         	public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext context) {
-        		logger.debug("收到消息：{}", msgs);
+        		logger.info("收到消息：{}", msgs);
         		context.setAutoCommit(true);
         		try{
         			boolean success = endpointContext.consumeMessage(null, msgs);
@@ -66,7 +66,7 @@ public class OrderlyConsumer {
         			}
         		}catch(ReSendException re){
         			Throwable cause = ExceptionUtils.getRootCause(re);
-        			logger.debug(cause.getMessage(), cause);
+        			logger.error(cause.getMessage(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);

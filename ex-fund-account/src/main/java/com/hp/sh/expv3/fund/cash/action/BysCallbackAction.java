@@ -28,7 +28,7 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags="BYS充值回掉接口")
 @RestController
 @RequestMapping("/callback/bys")
-public class TestBysCallbackAction extends BaseApiAction{
+public class BysCallbackAction extends BaseApiAction{
 
 	@Autowired
 	private ChainCasehApi chainCasehApi;
