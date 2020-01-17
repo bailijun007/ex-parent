@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +68,7 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("payStatus", 2);
+        map.put("payStatus", C2cConst.WITHDRAWAL_RECORD_PAY_STATUS_PAYMENT_FAILED);
         map.put("createdBegin", startTime);
         map.put("createdEnd", endTime);
         List<WithdrawalRecordVo> recordVos = withdrawalRecordExtMapper.queryHistoryByTime(map);
