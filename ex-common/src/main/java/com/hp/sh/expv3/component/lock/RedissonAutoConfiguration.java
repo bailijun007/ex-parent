@@ -29,7 +29,7 @@ public class RedissonAutoConfiguration {
 	@Value("${spring.redis.database:0}")
 	private Integer database;
 	
-	@Value("${redisson.lock.prefix}")
+	@Value("${redisson.lock.prefix:redisson}")
     private String keyPrefix;
 	
     @Bean
