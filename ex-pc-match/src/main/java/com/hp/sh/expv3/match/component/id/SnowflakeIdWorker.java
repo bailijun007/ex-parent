@@ -354,10 +354,10 @@ public class SnowflakeIdWorker {
         int size = 0;
         Integer x = null;
         SnowflakeIdWorker idWorker = new SnowflakeIdWorker(2, 11, 0, 9).setId(3, 0, 0);
-        for (int i = 0; i <= 5000000; i++) {
+        for (int i = 0; i <= 1; i++) {
             long id = idWorker.nextId();
 //            System.out.println(Long.toBinaryString(id));
-            System.out.println(id);
+//            System.out.println(id);
 //            System.out.println("+++");
 //            if (size >= 2) {
 //                System.out.println(idWorker.getId64String(id) + ":id");
@@ -373,6 +373,8 @@ public class SnowflakeIdWorker {
         }
 
         System.out.println(System.currentTimeMillis() - now + "ms:" + size);
+
+        System.out.println(SnowflakeIdWorker.getTimeInMs(137572119566385152L)+"");
 
     }
 }
