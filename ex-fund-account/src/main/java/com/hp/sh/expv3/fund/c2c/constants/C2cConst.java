@@ -24,4 +24,9 @@ public final class C2cConst {
     public static final int C2C_SYNCH_STATUS_FALSE  = 0;
     public static final int C2C_SYNCH_STATUS_TRUE  = 1;
 
+
+    //体现状态:0-pending，1-支付成功，2-支付失败, 3-同步余额, 4-审核中, 5-审核通过'
+    public static final int WITHDRAWAL_RECORD_PAY_STATUS_PAYMENT_FAILED = 2;
+
+
 }
