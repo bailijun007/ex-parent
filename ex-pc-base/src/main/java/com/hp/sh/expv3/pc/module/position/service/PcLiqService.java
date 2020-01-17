@@ -27,6 +27,7 @@ import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
+import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.Precision;
 
 /**
@@ -108,7 +109,7 @@ public class PcLiqService {
 		//维持保证金率
 		BigDecimal holdMarginRatio = pos.getHoldMarginRatio();
 		
-		if(posMarginRatio.compareTo(holdMarginRatio)<=0){ //强平
+		if(BigUtils.le(posMarginRatio, holdMarginRatio)){ //强平
 			return true;
 		}else{ //不强平
 			if(pos.getLiqStatus()!=LiqStatus.NON){

@@ -58,10 +58,8 @@ public class PcPositionMarginService {
 	private PcPositionDataService positionDataService;
 	@Autowired
 	private MarkPriceService markPriceService;
-	@Autowired
-	private HoldPosStrategy holdPosStrategy;
     @Autowired
-    private PositionStrategyContext positionStrategyContext;
+    private PositionStrategyContext strategyContext;
     @Autowired
     private CommonOrderStrategy orderStrategy;
 	
@@ -81,8 +79,7 @@ public class PcPositionMarginService {
         this.modifyAccountSymbol(accountSymbol, longFlag, leverage, modifiedTime);
         
 		//重新计算预估强平价
-		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal liqPrice = holdPosStrategy.calcLiqPrice(longFlag, _amount, pos.getMeanPrice(), pos.getHoldMarginRatio(), pos.getPosMargin());
+		BigDecimal liqPrice = strategyContext.calcLiqPrice(pos);
 		pos.setLiqPrice(liqPrice);
         
         //修改杠杆值
@@ -150,8 +147,7 @@ public class PcPositionMarginService {
             /* 修改强平价 */
     		
     		//重新计算预估强平价
-    		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-    		BigDecimal liqPrice = holdPosStrategy.calcLiqPrice(longFlag, _amount, pos.getMeanPrice(), pos.getHoldMarginRatio(), pos.getPosMargin());
+    		BigDecimal liqPrice = strategyContext.calcLiqPrice(pos);
     		pos.setLiqPrice(liqPrice);
             
             //修改杠杆值
@@ -168,8 +164,9 @@ public class PcPositionMarginService {
         BigDecimal amount = pos.getVolume().multiply(pos.getFaceValue());
         BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
         //新的仓位保证金
-        BigDecimal initMarginRatio = feeRatioService.getInitedMarginRatio(leverage); 
-        BigDecimal initMargin = this.holdPosStrategy.calcInitMargin(pos.getLongFlag(), initMarginRatio, amount, pos.getMeanPrice(), markPrice);
+        BigDecimal initMarginRatio = feeRatioService.getInitedMarginRatio(leverage);
+		HoldPosStrategy holdPosStrategy = this.strategyContext.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
+        BigDecimal initMargin = holdPosStrategy.calcInitMargin(pos.getLongFlag(), initMarginRatio, amount, pos.getMeanPrice(), markPrice);
         return initMargin;
 	}
 
@@ -224,21 +221,27 @@ public class PcPositionMarginService {
 			pos.setPosMargin(pos.getPosMargin().subtract(amount));
 		}
 		
-//		//重新计算强平价
-//		BigDecimal liqPrice = this.calcLiqPrice(pos.getAsset(), pos.getSymbol(), longFlag, pos.getVolume(), pos.getMeanPrice(), pos.getHoldMarginRatio(), pos.getPosMargin());
-//		pos.setLiqPrice(liqPrice);
+		//重新计算强平价
+		BigDecimal liqPrice = this.calcLiqPrice(pos);
+		pos.setLiqPrice(liqPrice);
 		
 		//保存
 		pos.setModified(DbDateUtils.now());
 		this.positionDataService.update(pos);
 	}
 	
+	private BigDecimal calcLiqPrice(PcPosition pos) {
+		BigDecimal liqPrice = strategyContext.calcLiqPrice(pos);
+		return liqPrice;
+	}
+
 	/**
 	 * 可减少的保证金
 	 * @return
 	 */
 	protected BigDecimal getMinMarginDiff(PcPosition pos){
 		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
+		HoldPosStrategy holdPosStrategy = this.strategyContext.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
 		BigDecimal pnl = holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(pos.getFaceValue()), pos.getMeanPrice(), markPrice);
 		BigDecimal posMargin = pos.getPosMargin();
 		if(BigUtils.ltZero(pnl)){
@@ -290,6 +293,7 @@ public class PcPositionMarginService {
 		this.pcAccountCoreService.add(request);
 	}
 	
+	@LockIt(key="${userId}-${asset}-${symbol}")
 	public boolean setAutoAddFlag(long userId, String asset, String symbol, int longFlag, int autoAddFlag){
 		//当前仓位
 		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
@@ -297,6 +301,7 @@ public class PcPositionMarginService {
 			throw new ExSysException(ExCommonError.OBJ_DONT_EXIST);
 		}
 		pos.setAutoAddFlag(autoAddFlag);
+		this.positionDataService.update(pos);
 		return true;
 	}
 
@@ -306,7 +311,7 @@ public class PcPositionMarginService {
 	}
 	
 	public void autoAddMargin(PcPosition pos){
-		BigDecimal requestPosMargin = positionStrategyContext.calcInitMargin(pos);
+		BigDecimal requestPosMargin = strategyContext.calcInitMargin(pos);
         //超过了现有保证金,增加
         if (BigUtils.gt(requestPosMargin, pos.getPosMargin())) {
         	//扣余额
@@ -315,6 +320,11 @@ public class PcPositionMarginService {
         	delta = delta.min(balance);
     		this.cutAutoMargin(pos.getUserId(), pos.getAsset(), pos.getId(), delta);
     		pos.setPosMargin(pos.getPosMargin().add(delta));
+    		
+    		//重新计算强平价
+    		BigDecimal liqPrice = this.calcLiqPrice(pos);
+    		pos.setLiqPrice(liqPrice);
+    		
     		pos.setModified(DbDateUtils.now());
     		this.positionDataService.update(pos);
         }
