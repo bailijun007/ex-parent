@@ -54,8 +54,6 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 		return PcPriceCalc.calcLiqPrice( holdMarginRatio, IntBool.isTrue(longFlag), openPrice, amount, posMargin, Precision.COMMON_PRECISION );
 	}
 	
-	int ___________________;
-
 	/**
 	 * 计算仓位保证金率
 	 * 保证金率 =（保证金+未实现盈亏) / (合约面值*持仓张数／最新标记价格）
@@ -68,31 +66,7 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 		
 		return marginRatio;
 	}
-	
-	/**
-	 * 计算成交收益
-	 * @param longFlag 
-	 * @param amount 交易金额
-	 * @param meanPrice 开仓均价
-	 * @param price 成交价
-	 * @return
-	 */
-	@Override
-	public BigDecimal calcTradePnl(int longFlag, BigDecimal amount, BigDecimal meanPrice, BigDecimal price){
-		BigDecimal pnl = PnlCalc.calcPnl(longFlag, amount, meanPrice, price);
-		return pnl;
-	}
-	
-	/**
-	 * 计算仓位的未实现盈亏(浮动盈亏)
-	 * @return
-	 */
-	@Override
-	public BigDecimal calcPosPnl(int longFlag, BigDecimal amount, BigDecimal meanPrice, BigDecimal markPrice){
-		BigDecimal pnl = PnlCalc.calcPnl(longFlag, amount, meanPrice, markPrice);
-		return pnl;
-	}
-	
+
 	/**
 	 * 用 均价 标记价格 未实现盈亏 计算 仓位保证金
 	 * @param longFlag

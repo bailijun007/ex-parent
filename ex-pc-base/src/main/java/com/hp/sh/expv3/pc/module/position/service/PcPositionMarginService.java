@@ -63,6 +63,12 @@ public class PcPositionMarginService {
     @Autowired
     private CommonOrderStrategy orderStrategy;
 	
+    /**
+     * 超过最大杠杆时，修改杠杆。只修改对象的值，不保存。
+     * @param pos
+     * @param leverage
+     * @param modifiedTime
+     */
 	public void downLeverage(PcPosition pos, BigDecimal leverage, long modifiedTime){
 		long userId = pos.getUserId();
 		String asset = pos.getAsset();

@@ -27,10 +27,6 @@ public class PcOrderQueryService {
 	@Autowired
 	private PcOrderLogDAO pcOrderLogDAO;
 
-	public BigDecimal getClosingVolume(Long userId, Long id) {
-		return null;
-	}
-
 	public Long queryCount(Map<String, Object> params) {
 		return this.pcOrderDAO.queryCount(params);
 	}
@@ -39,13 +35,10 @@ public class PcOrderQueryService {
 		return this.pcOrderDAO.queryList(params);
 	}
 	
-	
-	
-	
 	/*
 	 * 获取可平仓位
 	 */
-	public BigDecimal getClosablePosition(PcPosition pos) {
+	public BigDecimal getClosingVolume(PcPosition pos) {
 		BigDecimal closablePos = pos.getVolume();
 		
 		BigDecimal cpv = this.pcOrderDAO.getClosingVolume(pos.getUserId(), pos.getId());

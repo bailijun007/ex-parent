@@ -10,16 +10,6 @@ import java.math.BigDecimal;
  */
 public interface HoldPosStrategy {
 	/**
-	 * 计算收益
-	 * @param longFlag 是否多仓
-	 * @param amt 成交金额
-	 * @param meanPrice 均价
-	 * @param closePrice 平仓价
-	 * @return
-	 */
-	public BigDecimal calcPnl(int longFlag, BigDecimal amt, BigDecimal meanPrice, BigDecimal closePrice) ;
-
-	/**
 	 * 成交均价
 	 * @param isLong
 	 * @param baseValue
@@ -42,20 +32,14 @@ public interface HoldPosStrategy {
 	public BigDecimal calPosMarginRatio(BigDecimal posMargin, BigDecimal posPnl, BigDecimal faceValue, BigDecimal volume, BigDecimal markPrice);
 
 	/**
-	 * 计算成交收益
-	 * @param longFlag 
-	 * @param amount 交易金额
-	 * @param meanPrice 开仓均价
-	 * @param price 成交价
+	 * 计算收益
+	 * @param longFlag 是否多仓
+	 * @param amt 成交金额
+	 * @param meanPrice 均价
+	 * @param closePrice 平仓价
 	 * @return
 	 */
-	public BigDecimal calcTradePnl(int longFlag, BigDecimal amount, BigDecimal meanPrice, BigDecimal price);
-
-	/**
-	 * 计算仓位的未实现盈亏(浮动盈亏)
-	 * @return
-	 */
-	public BigDecimal calcPosPnl(int longFlag, BigDecimal amount, BigDecimal meanPrice, BigDecimal markPrice);
+	public BigDecimal calcPnl(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal closePrice) ;
 
 	/**
 	 * 用 均价 标记价格 未实现盈亏 计算 仓位保证金
