@@ -2,6 +2,7 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import java.math.BigDecimal;
 
+import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import com.hp.sh.expv3.fund.c2c.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -50,7 +51,10 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
             throw new ExException(ExFundError.ACCOUNT_NOT_FIND);
         }
         //检查c2c 被冻结的资产
-        BigDecimal c2cLockedVolume = queryService.getLockC2cNumber(userId, asset);
+        BigDecimal c2cLockedVolume =BigDecimal.ZERO;
+        if(asset.equals(C2cConst.LOCKED_ASSET)){
+            c2cLockedVolume = queryService.getLockC2cNumber(userId,asset);
+        }
 
         //查询冻结资金
         BigDecimal frozenCapital = withdrawalRecordExtServer.getFrozenCapital(userId, asset);

@@ -36,4 +36,7 @@ public final class C2cConst {
     public static final int WITHDRAWAL_RECORD_PAY_STATUS_PAYMENT_FAILED = 2;
 
 
+    public static final String LOCKED_ASSET="USDT";
+
+
 }
