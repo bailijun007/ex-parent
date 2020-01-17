@@ -4,7 +4,7 @@
 	<springProperty scope="context" name="rootLevel" source="log.root.level"/>
 	<springProperty scope="context" name="rootAppender" source="log.root.appender"/>
 
-	<property name="log.dir" value="/var/log/exvp3/fund-account"></property>
+	<property name="log.dir" value="/data/hupa/logs/fund-account"></property>
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
@@ -14,7 +14,7 @@
 	
 	<appender name="out2File" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--日志文件输出的文件名-->
-        <file>${log.dir}.log</file>
+        <file>${log.dir}/all.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--归并日志文件输出的文件名-->
             <fileNamePattern>${log.dir}-%d{yyyy-MM-dd}.%i.log
@@ -39,7 +39,7 @@
     </appender>
     
 	<appender name="errorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.dir}-error.log</file>
+        <file>${log.dir}/error.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${log.dir}-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <MaxHistory>30</MaxHistory>
