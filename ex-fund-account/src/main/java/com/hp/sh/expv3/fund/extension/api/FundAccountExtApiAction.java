@@ -63,6 +63,9 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
         capitalAccount.setLock(frozen);
         //可用资产= 账户余额-c2c冻结资金
         BigDecimal balance = capitalAccount.getAvailable().subtract(c2cLockedVolume);
+        if(balance.compareTo(BigDecimal.ZERO)==-1){
+            throw new ExException(ExFundError.ORDER_NOT_SUFFICIENT_FUNDS);
+        }
         capitalAccount.setAvailable(balance);
         capitalAccount.setTotalAssets(frozen.add(balance));
         return capitalAccount;
