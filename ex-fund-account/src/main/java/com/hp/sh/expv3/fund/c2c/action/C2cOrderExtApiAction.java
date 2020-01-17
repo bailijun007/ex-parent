@@ -103,7 +103,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         //获取资产账户
         CapitalAccountVo account = fundAccountExtApi.getCapitalAccount(userId, srcAsset);
         BigDecimal remain = account.getAvailable();
-        if (remain.compareTo(BigDecimal.ZERO) >= 0) {
+        if (remain.subtract(srcNum).compareTo(BigDecimal.ZERO) >= 0) {
 //            lock.writeLock().lock();
             try {
                 //生成c2c体现订单(体现状态为审核中)
