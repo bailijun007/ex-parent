@@ -19,13 +19,13 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 	 * 计算收益
 	 * @param longFlag 是否多仓
 	 * @param amt 成交金额
-	 * @param meanPrice 均价
+	 * @param openPrice 均价
 	 * @param closePrice 平仓价
 	 * @return
 	 */
 	@Override
-	public BigDecimal calcPnl(int longFlag, BigDecimal amt, BigDecimal meanPrice, BigDecimal closePrice) {
-        return PnlCalc.calcPnl(longFlag, amt, meanPrice, closePrice);
+	public BigDecimal calcPnl(int longFlag, BigDecimal amt, BigDecimal openPrice, BigDecimal closePrice) {
+        return PnlCalc.calcPnl(longFlag, amt, openPrice, closePrice);
     }
 	
 	/**
