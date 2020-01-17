@@ -15,7 +15,7 @@ import java.math.BigDecimal;
  * <p>
  * case : AABB
  */
-class PcPriceCalc {
+public class PcPriceCalc {
 
     /**
      * 求强平价：即在 强平价时 平仓，收回的保证金占整个仓位价值 的比率 = 维持仓位保证金（纯粹的仓位维持保证金率，不包括其他的手续费率）

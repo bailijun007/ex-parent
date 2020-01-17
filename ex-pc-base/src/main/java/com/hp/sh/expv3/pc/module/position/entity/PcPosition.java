@@ -29,7 +29,7 @@ public class PcPosition extends UserDataEntity {
 	// 开仓杠杆 @see PcOrder#leverage
 	private BigDecimal entryLeverage;
 
-//	int ________________;
+	int ________________;
 
 	// 是否自动追加保证金标识
 	private Integer autoAddFlag;
@@ -37,14 +37,14 @@ public class PcPosition extends UserDataEntity {
 	// 当前杠杆
 	private BigDecimal leverage;
 
+	// 面值(单位：报价货币)
+	private BigDecimal faceValue;
+
 	/*
 	 * 仓位 张数 
 	 * posVolume
 	 */
 	private BigDecimal volume;
-	
-	// 面值(单位：报价货币)
-	private BigDecimal faceValue;
 	
 	/*
 	 * 仓位 基础货币 总价值（含义不明，不是 用当前价格计算的）（按均价计算的仓位价值）
@@ -77,7 +77,7 @@ public class PcPosition extends UserDataEntity {
 	 */
 	private BigDecimal initMargin;
     
-//  int _____________________________________________________;
+  int _____________________________________________________;
 
 	/**
      * 维持保证金率
