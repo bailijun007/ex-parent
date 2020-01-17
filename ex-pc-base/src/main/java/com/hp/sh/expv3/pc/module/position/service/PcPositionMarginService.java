@@ -205,7 +205,7 @@ public class PcPositionMarginService {
 		
 		//检查可减少的保证金
 		if(optType==ChangeMarginOptType.CUT){
-			BigDecimal diff = this.getMinMarginDiff(pos);
+			BigDecimal diff = this.getMinMarginDiff2(pos);
 			if(BigUtils.gt(amount, diff)){
 				throw new ExException(PcPositonError.NO_MORE_MARGIN, amount, diff);
 			}
@@ -255,6 +255,28 @@ public class PcPositionMarginService {
 			return BigDecimal.ZERO;
 		}
 		return posMargin.subtract(holdMargin);
+	}
+
+	/**
+	 * 可减少的保证金
+	 * @return
+	 */
+	protected BigDecimal getMinMarginDiff2(PcPosition pos){
+		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
+		HoldPosStrategy holdPosStrategy = this.strategyContext.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
+		BigDecimal pnl = holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(pos.getFaceValue()), pos.getMeanPrice(), markPrice);
+		BigDecimal posMargin = pos.getPosMargin();
+		if(BigUtils.ltZero(pnl)){//减掉浮亏
+			posMargin = posMargin.add(pnl);
+		}
+		
+		//所需保证金
+		BigDecimal initMarginRatio = feeRatioService.getInitedMarginRatio(pos.getLeverage());
+		BigDecimal initMargin = orderStrategy.calMargin(pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice(), initMarginRatio);
+		if(BigUtils.lt(posMargin, initMargin)){
+			return BigDecimal.ZERO;
+		}
+		return posMargin.subtract(initMargin);
 	}
 
 	private void cutLeverageMargin(Long userId, String asset, Long posId, BigDecimal amount) {

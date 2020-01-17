@@ -57,7 +57,7 @@ public class WithdrawalService {
 		rr.setCreated(now);
 		rr.setModified(now);
 		
-		rr.setTransactionId(null);
+		rr.setTransactionId(transactionId);
 		rr.setPayStatus(Paystatus.PENDING);
 		rr.setPayStatusDesc(null);
 		rr.setPayTime(null);
