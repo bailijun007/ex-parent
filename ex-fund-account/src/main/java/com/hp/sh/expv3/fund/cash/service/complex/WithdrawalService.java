@@ -76,14 +76,14 @@ public class WithdrawalService {
 	 */
 	public WithdrawalRecord approveWithdrawal(Long userId, Long id){
 		WithdrawalRecord record = this.withdrawalRecordDAO.findById(userId, id);
+		if(record.getApprovalStatus()!=ApprovalStatus.IN_AUDIT){
+			return null;
+		}
 		record.setApprovalStatus(ApprovalStatus.APPROVED);
 		record.setSynchStatus(SynchStatus.SYNCH); // 下面同事务执行口扣款，所以这里直接设置为已同步
 		record.setModified(DbDateUtils.now());
 		this.withdrawalRecordDAO.update(record);
 		this.cutBalance(record);
-		
-		//发消息
-		mqSender.send(new WithDrawalMsg(record.getUserId(), record.getId()));
 		return record;
 	}
 	
@@ -143,6 +143,7 @@ public class WithdrawalService {
 	@Deprecated
 	private void cutBalance(WithdrawalRecord record){
 		FundCutRequest request = new FundCutRequest();
+		request.setAsset(record.getAsset());
 		request.setAmount(record.getAmount());
 		request.setRemark("提现扣款:"+ PayChannel.getName(record.getChannelId()));
 		request.setTradeNo(SnUtils.genSynchCutSn(record.getSn()));

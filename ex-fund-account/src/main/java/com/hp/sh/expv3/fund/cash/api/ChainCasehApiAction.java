@@ -14,6 +14,9 @@ import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
 import com.hp.sh.expv3.fund.cash.constant.PayChannel;
 import com.hp.sh.expv3.fund.cash.entity.DepositAddr;
+import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
+import com.hp.sh.expv3.fund.cash.mq.WithDrawalMsg;
+import com.hp.sh.expv3.fund.cash.mq.WithDrawalSender;
 import com.hp.sh.expv3.fund.cash.service.DepositAddrService;
 import com.hp.sh.expv3.fund.cash.service.complex.DepositService;
 import com.hp.sh.expv3.fund.cash.service.complex.WithdrawalService;
@@ -51,6 +54,9 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	
 	@Autowired
 	private FundAccountCoreApi fundAccountCoreApi;
+	
+	@Autowired
+	private WithDrawalSender mqSender;
 	
 	int _____充值______;
 	
@@ -112,7 +118,12 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	@ApiOperation(value = "2、批准提现")
 	public void approve(Long userId, Long id){
 		//修改状态
-		withdrawalService.approveWithdrawal(userId, id);
+		WithdrawalRecord record = withdrawalService.approveWithdrawal(userId, id);
+		
+		//发消息
+		if(record!=null){
+			mqSender.send(new WithDrawalMsg(record.getUserId(), record.getId()));
+		}
 	}
 	
 	@Override
