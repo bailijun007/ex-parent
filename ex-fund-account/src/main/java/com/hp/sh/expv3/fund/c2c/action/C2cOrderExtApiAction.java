@@ -50,7 +50,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
     @Autowired
     private FundAccountExtApi fundAccountExtApi;
 
-    ReadWriteLock lock = new ReentrantReadWriteLock();
+//    ReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
      * 通过支付状态分页查询c2c订单，不传则查全部
@@ -106,7 +106,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         BigDecimal c2cLockedVolume = queryService.getLockC2cNumber(userId, srcAsset);
         BigDecimal remain = account.getTotalAssets().subtract(account.getLock()).subtract(c2cLockedVolume).subtract(srcNum);
         if (remain.compareTo(BigDecimal.ZERO) >= 0) {
-            lock.writeLock().lock();
+//            lock.writeLock().lock();
             try {
                 //生成c2c体现订单(体现状态为审核中)
                 C2cOrder c2cOrder = new C2cOrder();
@@ -131,9 +131,10 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
                 c2cOrder.setAmount(ratio.multiply(srcNum));
                 sellService.createC2cOut(c2cOrder);
             } catch (Exception e) {
+                logger.info("订单回调通知失败{}",e.getMessage());
                 e.printStackTrace();
             } finally {
-                lock.writeLock().unlock();
+//                lock.writeLock().unlock();
             }
             return "success";
         } else {
@@ -152,16 +153,16 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         order.setApprovalStatus(auditStatus);
         order.setPayStatus(auditStatus);
         order.setId(id);
-        //更改订单状态
+        //更改订单状态 并返回该对象
         C2cOrder c2cOrder1 = sellService.updateById(order);
 
         //如果审核通过需要调用减钱方法
         if (c2cOrder1!=null) {
             FundCutRequest request=new FundCutRequest();
-            request.setAsset(c2cOrder1.getExchangeCurrency());
+            request.setAsset(c2cOrder1.getPayCurrency());
             request.setAmount(c2cOrder1.getVolume());
             request.setTradeNo(c2cOrder1.getSn());
-            request.setTradeType(TradeType.CONSUME);
+            request.setTradeType(TradeType.C2C_OUT);
             request.setRemark(c2cOrder1.getPayStatusDesc());
             request.setUserId(c2cOrder1.getUserId());
             fundAccountCoreApi.cut(request);

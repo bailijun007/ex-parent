@@ -53,7 +53,7 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
     @Value("${plpay.server.c2c_fee_ratio}")
     private String c2cFeeRatio;
 
-    ReadWriteLock lock = new ReentrantReadWriteLock();
+//    ReadWriteLock lock = new ReentrantReadWriteLock();
 
 
     @Override
@@ -78,8 +78,8 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
         Long userId = Long.parseLong(split[1]);
         C2cOrder c2cOrder1 = buyService.queryBySnAndUserId(orderNo, userId);
         if (c2cOrder1 != null && param.getStatus().equals("success")) {
-            lock.writeLock().lock();
-            try {
+//            lock.writeLock().lock();
+
                 //更新一条c2c订单记录
                 C2cOrder c2cOrder = new C2cOrder();
                 c2cOrder.setAmount(orderAmount);
@@ -100,17 +100,13 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
                 FundAddRequest request=new FundAddRequest();
                 request.setUserId(userId);
                 request.setAmount(qty);
-                request.setAsset(c2cOrder.getExchangeCurrency());
+                request.setAsset(c2cOrder1.getExchangeCurrency());
                 request.setRemark(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
                 request.setTradeNo(c2cOrder1.getSn());
-                request.setTradeType(TradeType.DEPOSIT);
+                request.setTradeType(TradeType.C2C_IN);
                 fundAccountCoreApi.add(request);
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                lock.writeLock().unlock();
-            }
+
         } else {
             throw new ExException(ExFundError.ORDER_CALLBACK_NOTIFY_FAIL);
         }

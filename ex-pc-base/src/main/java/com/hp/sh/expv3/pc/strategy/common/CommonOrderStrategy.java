@@ -11,6 +11,7 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
 import com.hp.sh.expv3.pc.strategy.data.OrderFeeParam;
 import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
+import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.Precision;
 
@@ -41,7 +42,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 		BigDecimal orderMargin = OrderFeeCalc.calMargin(baseValue, pcOrder.getMarginRatio());
 		
 		//总押金
-		BigDecimal grossMargin = OrderFeeCalc.calcGrossMargin(closeFee, openFee, orderMargin);
+		BigDecimal grossMargin = BigCalc.sum(closeFee, openFee, orderMargin);
 
 		OrderRatioData orderAmount = new OrderRatioData();
 		orderAmount.setAmount(amount);
@@ -127,7 +128,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 			openFee = slope(number, order.getVolume(), order.getOpenFee());
 			closeFee = slope(number, order.getVolume(), order.getCloseFee());
 			orderMargin = slope(number, order.getVolume(), order.getOrderMargin());
-			grossMargin = OrderFeeCalc.calcGrossMargin(openFee, closeFee, orderMargin);
+			grossMargin = BigCalc.sum(openFee, closeFee, orderMargin);
 		}
 		
 		orderAmount.setOrderMargin(orderMargin);
