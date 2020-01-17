@@ -2,6 +2,8 @@ package com.hp.sh.expv3.fund.extension.api;
 
 import java.math.BigDecimal;
 
+import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
+import com.hp.sh.expv3.fund.c2c.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +33,9 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
     @Autowired
     private WithdrawalRecordExtService withdrawalRecordExtServer;
 
+    @Autowired
+    private QueryService queryService;
+
     @Override
     @ApiOperation("获取资金账户")
     @ApiImplicitParams({
@@ -45,11 +50,21 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
         if (null == capitalAccount) {
             throw new ExException(ExFundError.ACCOUNT_NOT_FIND);
         }
+        //检查c2c 被冻结的资产
+        BigDecimal c2cLockedVolume =BigDecimal.ZERO;
+        if(asset.equals(C2cConst.LOCKED_ASSET)){
+            c2cLockedVolume = queryService.getLockC2cNumber(userId,asset);
+        }
 
         //查询冻结资金
         BigDecimal frozenCapital = withdrawalRecordExtServer.getFrozenCapital(userId, asset);
-        capitalAccount.setLock(frozenCapital);
-        capitalAccount.setTotalAssets(frozenCapital.add(capitalAccount.getAvailable()));
+        //冻结资金 =c2c 被冻结的资产 + 合约冻结资金
+        BigDecimal frozen = frozenCapital.add(c2cLockedVolume);
+        capitalAccount.setLock(frozen);
+        //可用资产= 账户余额-c2c冻结资金
+        BigDecimal balance = capitalAccount.getAvailable().subtract(c2cLockedVolume);
+        capitalAccount.setAvailable(balance);
+        capitalAccount.setTotalAssets(frozen.add(balance));
         return capitalAccount;
     }
 
@@ -59,7 +74,7 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
             throw new ExException(ExFundError.PARAM_EMPTY);
         }
 
-        PageResult<CapitalAccountVo> result = fundAccountExtendServer.pageQueryAccountList(userId, asset,  pageNo,  pageSize);
+        PageResult<CapitalAccountVo> result = fundAccountExtendServer.pageQueryAccountList(userId, asset, pageNo, pageSize);
         if (!CollectionUtils.isEmpty(result.getList())) {
             for (CapitalAccountVo vo : result.getList()) {
                 //查询冻结资金

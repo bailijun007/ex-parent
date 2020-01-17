@@ -292,7 +292,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                 Optional<PcLiqRecordVo> recordVoOptional = Optional.ofNullable(id2Vo.get(recordLogVo.getRefId()));
 
                 BigDecimal volume = recordVoOptional.map(r -> r.getVolume()).orElse(BigDecimal.ZERO);
-                BigDecimal liqPrice = recordVoOptional.map(r -> r.getLiqPrice()).orElse(BigDecimal.ZERO);
+                BigDecimal liqPrice = recordVoOptional.map(r -> r.getLiqPrice()).orElse(null);
                 BigDecimal meanPrice = recordVoOptional.map(r -> r.getMeanPrice()).orElse(BigDecimal.ZERO);
                 BigDecimal fee = recordVoOptional.map(r -> r.getFee()).orElse(BigDecimal.ZERO);
                 BigDecimal feeRatio = recordVoOptional.map(r -> r.getFeeRatio()).orElse(BigDecimal.ZERO);
