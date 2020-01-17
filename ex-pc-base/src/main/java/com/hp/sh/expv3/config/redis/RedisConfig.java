@@ -21,7 +21,6 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import com.gitee.hupadev.commons.cache.JsonCacheSerializer;
-import com.gitee.hupadev.commons.cache.MsgListener;
 import com.gitee.hupadev.commons.cache.RedisCache;
 import com.gitee.hupadev.commons.cache.RedisPool;
 import com.gitee.hupadev.commons.cache.RedisPublisher;

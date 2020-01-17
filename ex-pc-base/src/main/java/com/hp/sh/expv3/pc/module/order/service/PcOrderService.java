@@ -390,7 +390,7 @@ public class PcOrderService {
 			throw new ExException(PcPositonError.POS_NOT_ENOUGH);
 		}
 		
-		BigDecimal closablePos = orderQueryService.getClosablePosition(pos);
+		BigDecimal closablePos = orderQueryService.getClosingVolume(pos);
 		
         //判断可平仓位是否足够
         if (BigUtils.gt(number, closablePos)) {

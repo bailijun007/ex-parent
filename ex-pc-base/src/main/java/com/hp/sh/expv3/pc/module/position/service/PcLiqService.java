@@ -102,7 +102,7 @@ public class PcLiqService {
 	 */
 	private boolean checkAndResetLiqStatus(PcPosition pos, BigDecimal markPrice) {
 		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal posPnl = holdPosStrategy.calcPosPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
+		BigDecimal posPnl = holdPosStrategy.calcPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
 		BigDecimal posMarginRatio = holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), posPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
 		//保留两位小数
 		posMarginRatio = posMarginRatio.setScale(Precision.LIQ_MARGIN_RATIO, Precision.LESS);

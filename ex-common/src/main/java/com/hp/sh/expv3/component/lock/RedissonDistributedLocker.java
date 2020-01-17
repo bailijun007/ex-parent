@@ -15,9 +15,11 @@ public class RedissonDistributedLocker implements Locker{
 
     @Autowired
     private RedissonClient redissonClient;
+    
+    private String keyPrefix = "redisson:lock:";
 
     public boolean lock(String lockKey, Integer timeout) {
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
         if(timeout!=null){
         	lock.lock(timeout, TimeUnit.SECONDS);
         }
@@ -25,13 +27,13 @@ public class RedissonDistributedLocker implements Locker{
     }
 
     public boolean unlock(String lockKey) {
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
         lock.unlock();
         return true;
     }
 
     public boolean tryLock(String lockKey, long waitTime, long leaseTime) {
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
         try {
             return lock.tryLock(waitTime, leaseTime, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
@@ -41,5 +43,9 @@ public class RedissonDistributedLocker implements Locker{
 
 	public void setRedissonClient(RedissonClient redissonClient) {
 		this.redissonClient = redissonClient;
+	}
+	
+	private String FULLKEY(String key){
+		return keyPrefix+key;
 	}
 }

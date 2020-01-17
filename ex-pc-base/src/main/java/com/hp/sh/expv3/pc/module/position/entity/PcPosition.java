@@ -24,6 +24,7 @@ public class PcPosition extends UserDataEntity {
 	private Integer longFlag;
 
 	// 保证金模式:1-全仓,2-逐仓
+	@Redundant
 	private int marginMode;
 
 	// 开仓杠杆 @see PcOrder#leverage

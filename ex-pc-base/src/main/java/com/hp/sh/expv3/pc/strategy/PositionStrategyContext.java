@@ -236,6 +236,25 @@ public class PositionStrategyContext {
 		return liqPrice;
 	}
 	
+	/**
+	 * 计算仓位浮动收益
+	 */
+	public BigDecimal calcFloatingPnl(PcPosition pos){
+		HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
+		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
+		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
+		return holdPosStrategy.calcPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
+	}
+	
+	/**
+	 * 计算仓位保证金率
+	 */
+	public BigDecimal calPosMarginRatio(PcPosition pos, BigDecimal floatingPnl){
+		HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
+		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
+		return holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), floatingPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
+	}
+	
 	int ____________________________;
 	
 	public HoldPosStrategy getHoldPosStrategy(String asset, String symbol){
