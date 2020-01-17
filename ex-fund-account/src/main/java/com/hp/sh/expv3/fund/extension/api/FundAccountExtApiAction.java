@@ -54,10 +54,13 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
 
         //查询冻结资金
         BigDecimal frozenCapital = withdrawalRecordExtServer.getFrozenCapital(userId, asset);
-       //冻结资金 =c2c 被冻结的资产 + 合约冻结资金
-        BigDecimal  frozen = frozenCapital.add(c2cLockedVolume);
+        //冻结资金 =c2c 被冻结的资产 + 合约冻结资金
+        BigDecimal frozen = frozenCapital.add(c2cLockedVolume);
         capitalAccount.setLock(frozen);
-        capitalAccount.setTotalAssets(frozen.add(capitalAccount.getAvailable()));
+        //可用资产= 账户余额-c2c冻结资金
+        BigDecimal balance = capitalAccount.getAvailable().subtract(c2cLockedVolume);
+        capitalAccount.setAvailable(balance);
+        capitalAccount.setTotalAssets(frozen.add(balance));
         return capitalAccount;
     }
 
@@ -67,7 +70,7 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
             throw new ExException(ExFundError.PARAM_EMPTY);
         }
 
-        PageResult<CapitalAccountVo> result = fundAccountExtendServer.pageQueryAccountList(userId, asset,  pageNo,  pageSize);
+        PageResult<CapitalAccountVo> result = fundAccountExtendServer.pageQueryAccountList(userId, asset, pageNo, pageSize);
         if (!CollectionUtils.isEmpty(result.getList())) {
             for (CapitalAccountVo vo : result.getList()) {
                 //查询冻结资金

@@ -80,8 +80,8 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
      * @return
      */
     @Override
-    public String create(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal tarVolume, BigDecimal fabiAmt,String receiveUrl,String pickupUrl) {
-        String url = plPayService.rujin(userId, ratio, srcCurrency, tarCurrency, tarVolume, fabiAmt,receiveUrl,pickupUrl);
+    public String create(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal tarVolume, BigDecimal fabiAmt, String receiveUrl, String pickupUrl) {
+        String url = plPayService.rujin(userId, ratio, srcCurrency, tarCurrency, tarVolume, fabiAmt, receiveUrl, pickupUrl);
         return url;
     }
 
@@ -99,7 +99,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
      * @return
      */
     @Override
-    public String withdrawalOrder(Long userId, Long bankCard,String bank, String bankCardName, String srcAsset, BigDecimal srcNum, String tarAsset, BigDecimal tarNum, BigDecimal ratio) {
+    public String withdrawalOrder(Long userId, Long bankCard, String bank, String bankCardName, String srcAsset, BigDecimal srcNum, String tarAsset, BigDecimal tarNum, BigDecimal ratio) {
         //获取资产账户
         CapitalAccountVo account = fundAccountExtApi.getCapitalAccount(userId, srcAsset);
         BigDecimal remain = account.getAvailable();
@@ -129,7 +129,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
                 c2cOrder.setAmount(ratio.multiply(srcNum));
                 sellService.createC2cOut(c2cOrder);
             } catch (Exception e) {
-                logger.info("订单回调通知失败{}",e.getMessage());
+                logger.info("订单回调通知失败{}", e.getMessage());
                 e.printStackTrace();
             } finally {
 //                lock.writeLock().unlock();
@@ -155,8 +155,8 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         C2cOrder c2cOrder1 = sellService.updateById(order);
 
         //如果审核通过需要调用减钱方法
-        if (c2cOrder1!=null||c2cOrder1.getApprovalStatus()==C2cConst.C2C_APPROVAL_STATUS_PASS) {
-            FundCutRequest request=new FundCutRequest();
+        if (c2cOrder1 != null && c2cOrder1.getApprovalStatus() == C2cConst.C2C_APPROVAL_STATUS_PASS) {
+            FundCutRequest request = new FundCutRequest();
             request.setAsset(c2cOrder1.getPayCurrency());
             request.setAmount(c2cOrder1.getVolume());
             request.setTradeNo(c2cOrder1.getSn());
