@@ -11,11 +11,11 @@ import com.hp.sh.expv3.fund.cash.service.DepositAddrService;
 import io.swagger.annotations.Api;
 
 /**
- * 提币地址接口
+ * 充值地址接口
  * @author wangjg
  *
  */
-@Api(tags="提币地址接口")
+@Api(tags="充值地址接口")
 @RestController
 public class DepositAddrApiAction implements DepositAddrApi {
 	private static final Logger logger = LoggerFactory.getLogger(DepositAddrApiAction.class);

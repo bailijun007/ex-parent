@@ -64,6 +64,9 @@ public class WithdrawalService {
 		rr.setPayFinishTime(null);
 		
 		rr.setSynchStatus(SynchStatus.NO);
+		
+		rr.setApprovalStatus(ApprovalStatus.IN_AUDIT);
+		
 		this.withdrawalRecordDAO.save(rr);
 	}
 	

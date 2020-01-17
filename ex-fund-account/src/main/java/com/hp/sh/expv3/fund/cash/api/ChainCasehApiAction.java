@@ -2,6 +2,7 @@ package com.hp.sh.expv3.fund.cash.api;
 
 import java.math.BigDecimal;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,13 @@ import com.hp.sh.expv3.fund.cash.api.vo.BysCreateResult;
 import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
 import com.hp.sh.expv3.fund.cash.constant.PayChannel;
+import com.hp.sh.expv3.fund.cash.entity.DepositAddr;
+import com.hp.sh.expv3.fund.cash.service.DepositAddrService;
 import com.hp.sh.expv3.fund.cash.service.complex.DepositService;
 import com.hp.sh.expv3.fund.cash.service.complex.WithdrawalService;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.error.WalletError;
+import com.hp.sh.expv3.utils.IntBool;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,16 +47,29 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	private WithdrawalService withdrawalService;
 	
 	@Autowired
+	private DepositAddrService depositAddrService;
+	
+	@Autowired
 	private FundAccountCoreApi fundAccountCoreApi;
 	
 	int _____充值______;
 	
 	@ApiOperation(value = "1、获取充币地址")
 	public String getDepositAddress(Long userId, String asset){
-		Integer symbolId = asset2Symbol.getSymbol(asset);
-		String address = chainService.getAddress(userId, symbolId);
-        System.out.println("address = " + address);
-		return address;
+		DepositAddr addr = depositAddrService.getDepositAddress(userId, asset);
+		if(addr==null){
+			Integer symbolId = asset2Symbol.getSymbol(asset);
+			String address = chainService.getAddress(userId, symbolId);
+	        System.out.println("address = " + address);
+	        addr = new DepositAddr();
+	        addr.setAsset(asset);
+	        addr.setUserId(userId);
+	        addr.setAddress(address);
+	        addr.setRemark("bys:"+symbolId);
+	        addr.setEnabled(IntBool.YES);
+	        this.depositAddrService.save(addr);
+		}
+        return addr.getAddress();
 	}
 	
 	@Override

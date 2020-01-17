@@ -23,6 +23,7 @@ public class WithdrawalAddrApiAction implements WithdrawalAddrApi{
 	@Override
 	public long save(long userId, String asset, String address, String remark) {
 		WithdrawalAddr withdrawalAddr = new WithdrawalAddr();
+		withdrawalAddr.setUserId(userId);
 		withdrawalAddr.setAddress(address);
 		withdrawalAddr.setAsset(asset);
 		withdrawalAddr.setEnabled(WithdrawalAddr.YES);
