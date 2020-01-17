@@ -205,7 +205,7 @@ public class PcPositionMarginService {
 		
 		//检查可减少的保证金
 		if(optType==ChangeMarginOptType.CUT){
-			BigDecimal diff = this.getMinMarginDiff2(pos);
+			BigDecimal diff = this.getMaxReducedMargin(pos);
 			if(BigUtils.gt(amount, diff)){
 				throw new ExException(PcPositonError.NO_MORE_MARGIN, amount, diff);
 			}
@@ -239,7 +239,7 @@ public class PcPositionMarginService {
 	 * 可减少的保证金
 	 * @return
 	 */
-	protected BigDecimal getMinMarginDiff(PcPosition pos){
+	protected BigDecimal getMinMarginDiff1(PcPosition pos){
 		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
 		HoldPosStrategy holdPosStrategy = this.strategyContext.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
 		BigDecimal pnl = holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(pos.getFaceValue()), pos.getMeanPrice(), markPrice);
@@ -261,7 +261,7 @@ public class PcPositionMarginService {
 	 * 可减少的保证金
 	 * @return
 	 */
-	protected BigDecimal getMinMarginDiff2(PcPosition pos){
+	public BigDecimal getMaxReducedMargin(PcPosition pos){
 		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
 		HoldPosStrategy holdPosStrategy = this.strategyContext.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
 		BigDecimal pnl = holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(pos.getFaceValue()), pos.getMeanPrice(), markPrice);
