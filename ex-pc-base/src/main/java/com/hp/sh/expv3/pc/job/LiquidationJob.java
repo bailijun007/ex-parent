@@ -32,7 +32,7 @@ public class LiquidationJob {
 	/**
 	 * 
 	 */
-	@Scheduled(cron = "${cron.liq:0/5 * * * * ?}")
+	@Scheduled(cron = "${cron.liq}")
 	public void handle() {
 		Page page = new Page(1, 100, 1000L);
 		while(true){
@@ -41,7 +41,7 @@ public class LiquidationJob {
 			if(list==null || list.isEmpty()){
 				break;
 			}
-			
+			logger.warn("强平:{}", list.size());
 			for(PcPosition pos : list){
 				LiqHandleResult liqResult = pcLiqService.checkPosLiq(pos);
 				if(liqResult.isTrigger()){
