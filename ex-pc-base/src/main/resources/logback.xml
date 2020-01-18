@@ -4,7 +4,7 @@
 	<springProperty scope="context" name="rootLevel" source="log.root.level"/>
 	<springProperty scope="context" name="rootAppender" source="log.root.appender"/>
 
-	<property name="log.dir" value="/data/hupa/logs/pc-base"></property>
+	<property name="log.dir" value="/data/hupa/logs/pcbase"></property>
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>

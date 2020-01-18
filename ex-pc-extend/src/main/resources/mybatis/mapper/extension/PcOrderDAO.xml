@@ -282,5 +282,32 @@
         </where>
 
     </select>
+    
+    <select id="queryNextList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
+        select
+        	<include refid="Base_Column_List"/>
+        from pc_order
+		<where>
+			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+			<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
+			<if test="visibleFlag!=null"> and visible_flag=#{visibleFlag}</if>
+			<if test="clientOrderId!=null and clientOrderId!=''">and client_order_id=#{clientOrderId}</if>
+			<if test="closeFlag!=null"> and close_flag=#{closeFlag}</if>
+			<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
+			<if test="orderType!=null"> and order_type=#{orderType}</if>
+			<if test="timeInForce!=null"> and time_in_force=#{timeInForce}</if>
+			<if test="marginMode!=null"> and margin_mode=#{marginMode}</if>
+			<if test="status!=null"> and status=#{status}</if>
+			<if test="activeFlag!=null"> and active_flag=#{activeFlag}</if>
+			<if test="cancelTimeStart!=null"> and cancel_time &gt;= #{cancelTimeStart}</if>
+			<if test="cancelTimeEnd!=null"> and cancel_time &lt;= #{cancelTimeEnd}</if>
+			<if test="closePosId!=null"> and close_pos_id=#{closePosId}</if>
+			<if test="triggerFlag!=null"> and trigger_flag=#{triggerFlag}</if>
+			
+			<if test="lastOrderId!=null"> and id &lt; #{lastOrderId}</if>
+		</where>
+		<if test="pageSize!=null"> LIMIT 0,${limit}</if>
+    </select>
 
 </mapper>
