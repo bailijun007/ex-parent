@@ -12,6 +12,7 @@ import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
+import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.springframework.beans.BeanUtils;
@@ -143,6 +144,22 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         isPage(lastOrderId, currentPage, pageSize, nextPage, isTotalNumber, result, map);
 
         return result;
+    }
+    
+    public List<PcOrderVo> queryHistory(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("status", status);
+        map.put("longFlag", longFlag);
+        map.put("closeFlag", closeFlag);
+        map.put("activeFlag", IntBool.YES);
+        
+        map.put("lastOrderId", lastOrderId);
+        map.put("pageSize", pageSize);
+        List<PcOrderVo> list = this.pcOrderDAO.queryNextList(map);
+        return list;
     }
 
     @Override
