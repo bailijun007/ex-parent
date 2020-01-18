@@ -39,24 +39,15 @@ public class SnUtils {
 	
 	//Synch
 	public static String genSynchAddSn(String sn){
-		return "A-"+genTimeSn();
+		return "A-"+sn;
 	}
 
 	public static String genSynchCutSn(String sn){
-		return "C-"+genTimeSn();
+		return "C-"+sn;
 	}
 
 	public static String genSynchReturnSn(String sn){
-		return "R-"+genTimeSn();
-	}
-	
-	public static String genRndSn(){
-		return genRndSn("");
-	}
-	
-	public static String genRndSn(String prefix){
-		String dstr = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
-		return "RND+prefix"+dstr;
+		return "R-"+sn;
 	}
 
 	static String genTimeSn(){
