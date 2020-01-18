@@ -25,6 +25,8 @@ public interface PcOrderExtendService {
 
     PageResult<PcOrderVo> queryHistoryOrders(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber);
 
+    List<PcOrderVo> queryHistory(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize);
+
     PcOrderVo getPcOrder(Long orderId, String asset, String symbol, Long userId);
 
     List<PcOrderVo> queryOrderList(Long userId, List<String> assetList, List<String> symbolList, Long gtOrderId, Long ltOrderId, Integer count, List<Integer> statusList);
@@ -33,4 +35,6 @@ public interface PcOrderExtendService {
 
     PageResult<PcOrderVo> queryUserActivityOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber);
 
+
+    PageResult<PcOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, Integer isPageYes);
 }
