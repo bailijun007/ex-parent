@@ -104,7 +104,7 @@ public class LockAdvice {
 				val = PropertyUtils.getSimpleProperty(val, varpp);
 			}
 			if(val==null){
-				logger.warn("lock key var is null：key={},var={},pvar={}", key, var, varpp);
+				logger.error("lock key var is null：key={},var={},pvar={}", key, var, varpp);
 			}
 			sb.append(val);
 			start = matcher.end();
