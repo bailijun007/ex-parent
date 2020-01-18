@@ -74,7 +74,8 @@ public class OrderlyConsumer {
         			logger.error(e.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
-        			logger.error(e.toString(), e);
+        			Throwable cause = ExceptionUtils.getRootCause(e);
+        			logger.error(cause.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		
