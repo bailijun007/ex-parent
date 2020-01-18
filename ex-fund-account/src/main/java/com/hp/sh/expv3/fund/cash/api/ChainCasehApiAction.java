@@ -87,9 +87,9 @@ public class ChainCasehApiAction implements ChainCasehApi{
 
 	//bys callback
 	@ApiOperation(value = "3、创建充值记录")
-	public BysCreateResult createDeposit(Long userId, String chainOrderId, String asset, String account, BigDecimal amount, String txHash) {
+	public String createDeposit(Long userId, String chainOrderId, String asset, String account, BigDecimal amount, String txHash) {
 		String sn = this.depositService.deposit(userId, asset, account, amount, chainOrderId, PayChannel.BYS, txHash);
-		return new BysCreateResult(sn);
+		return sn;
 	}
 	
 	//bys callback

@@ -30,7 +30,7 @@ public interface ChainCasehApi {
 
 	@ApiOperation("创建充币记录")
 	@GetMapping(value = "/api/cash/bys/createDeposit")
-	public BysCreateResult createDeposit(
+	public String createDeposit(
 			@RequestParam("userId") Long userId,
 			@RequestParam("chainOrderId") String chainOrderId, 
 			@RequestParam("symbolId") String symbolId, 
