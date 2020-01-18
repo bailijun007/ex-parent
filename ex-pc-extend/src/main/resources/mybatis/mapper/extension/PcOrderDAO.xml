@@ -308,7 +308,7 @@
             <if test="lastOrderId!=null">and id &lt; #{lastOrderId}</if>
         </where>
         ORDER BY id desc
-        <if test="pageSize!=null">
+        <if test="limit!=null">
             LIMIT 0,${limit}
         </if>
     </select>
