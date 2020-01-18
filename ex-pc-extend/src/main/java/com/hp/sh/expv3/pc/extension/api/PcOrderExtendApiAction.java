@@ -85,11 +85,17 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         }
         PageResult<UserOrderVo> result = new PageResult<>();
         List<UserOrderVo> list = new ArrayList<>();
-        PageResult<PcOrderVo> voList = pcOrderExtendService.queryUserActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber);
+        PageResult<PcOrderVo> voList = null;
+        if (lastOrderId == null) {
+            voList =pcOrderExtendService.queryActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber);
+        } else {
+            voList = pcOrderExtendService.queryUserActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber);
+        }
         convertOrderList(userId, asset, symbol, list, voList.getList());
 
         result.setList(list);
         result.setRowTotal(voList.getRowTotal());
+        result.setPageNo(currentPage);
         return result;
     }
 

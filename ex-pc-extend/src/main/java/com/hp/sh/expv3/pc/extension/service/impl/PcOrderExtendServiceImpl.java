@@ -126,6 +126,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
             pcOrderVos = pcOrderDAO.queryOrders(map);
 //            List<PcOrderVo> voList = pcOrderVos.stream().skip(pageSize * (currentPage - 1)).limit(pageSize).collect(Collectors.toList());
             result.setList(pcOrderVos);
+            result.setPageNo(currentPage);
         }
     }
 
@@ -237,20 +238,23 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("status", status);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
-        map.put("activeFlag", 1);
+        map.put("activeFlag", IntBool.YES);
 
-        if (isTotalNumber == null) {
-            map.put("pageSize", pageSize);
-            map.put("lastOrderId", lastOrderId);
-            map.put("currentPage", currentPage);
-            map.put("nextPage", nextPage);
-
-        } else if (isTotalNumber == 1) {
-            Long count = pcOrderDAO.queryCount(map);
-            result.setRowTotal(count);
-        }
-        List<PcOrderVo> pcOrderVos = pcOrderDAO.queryUserActivityOrder(map);
-        result.setList(pcOrderVos);
+        isPage(lastOrderId, currentPage, pageSize, nextPage, isTotalNumber, result, map);
+//        if (isTotalNumber == null) {
+//            map.put("pageSize", pageSize);
+//            map.put("lastOrderId", lastOrderId);
+//            map.put("currentPage", currentPage);
+//            map.put("nextPage", nextPage);
+//
+//        } else if (isTotalNumber == IntBool.YES) {
+//            Long count = pcOrderDAO.queryCount(map);
+//            result.setRowTotal(count);
+//            result.setPageNo(currentPage);
+//        }
+////        map.put("limit", pageSize);
+//        List<PcOrderVo> pcOrderVos = pcOrderDAO.queryUserActivityOrder(map);
+//        result.setList(pcOrderVos);
         return result;
     }
 
@@ -270,6 +274,26 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         List<PcOrderVo> list = this.pcOrderDAO.queryNextList(map);
         result.setRowTotal(Long.parseLong(String.valueOf(list.size())));
         result.setList(list);
+        return result;
+    }
+
+    @Override
+    public PageResult<PcOrderVo> queryActivityOrder(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber) {
+        PageResult<PcOrderVo> result = new PageResult<PcOrderVo>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("status", status);
+        map.put("longFlag", longFlag);
+        map.put("closeFlag", closeFlag);
+        map.put("activeFlag", IntBool.YES);
+        map.put("lastOrderId", lastOrderId);
+        map.put("limit", pageSize);
+        List<PcOrderVo> list = this.pcOrderDAO.queryNextList(map);
+        result.setList(list);
+        result.setRowTotal(Long.parseLong(String.valueOf(list.size())));
+        result.setPageNo(currentPage);
         return result;
     }
 
