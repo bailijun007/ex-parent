@@ -78,7 +78,7 @@ public class PcAccountCoreService{
 		PcAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.INCOME);
-		record.setSn(SnUtils.genRecordSn());
+		record.setSn(SnUtils.newRecordSn());
 		
 		return this.newRecord(record);
 	}
@@ -90,7 +90,7 @@ public class PcAccountCoreService{
 		PcAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.EXPENSES);
-		record.setSn(SnUtils.genRecordSn());
+		record.setSn(SnUtils.newRecordSn());
 		
 		return this.newRecord(record);
 	}

@@ -12,45 +12,45 @@ import org.apache.commons.lang3.time.DateFormatUtils;
  */
 public class SnUtils {
 
-	public static String genTransferSn(){
-		return "TS"+genTimeSn();
+	public static String newTransferSn(){
+		return "TS"+newTimeSn();
 	}
 
-	public static String genRecordSn(){
-		return "RC"+genTimeSn();
+	public static String newRecordSn(){
+		return "RC"+newTimeSn();
 	}
 	
-	public static String genDepositSn(){
-		return "DP"+genTimeSn();
+	public static String newDepositSn(){
+		return "DP"+newTimeSn();
 	}
 	
-	public static String genWithDrawSn(){
-		return "WD"+genTimeSn();
+	public static String newWithDrawSn(){
+		return "WD"+newTimeSn();
 	}
 
 	//c2c
-	public static String genPLPayInSn(){
-		return "PLIN"+genTimeSn();
+	public static String newPLPayInSn(){
+		return "PLIN"+newTimeSn();
 	}
 	
-	public static String genPLPayOutSn(){
-		return "PLOUT"+genTimeSn();
+	public static String newPLPayOutSn(){
+		return "PLOUT"+newTimeSn();
 	}
 	
 	//Synch
-	public static String genSynchAddSn(String sn){
+	public static String getSynchAddSn(String sn){
 		return "A-"+sn;
 	}
 
-	public static String genSynchCutSn(String sn){
+	public static String getSynchCutSn(String sn){
 		return "C-"+sn;
 	}
 
-	public static String genSynchReturnSn(String sn){
+	public static String getSynchReturnSn(String sn){
 		return "R-"+sn;
 	}
 
-	static String genTimeSn(){
+	static String newTimeSn(){
 		String dstr = DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSS");
 		String nstr = RandomStringUtils.randomNumeric(4);
 		return dstr+nstr;

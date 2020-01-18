@@ -48,7 +48,7 @@ public class WithdrawalService {
 		
 		Long now = DbDateUtils.now();
 		WithdrawalRecord rr = new WithdrawalRecord();
-		rr.setSn(SnUtils.genDepositSn());
+		rr.setSn(SnUtils.newDepositSn());
 		rr.setUserId(userId);
 		rr.setAsset(asset);
 		rr.setAccount(account);
@@ -146,7 +146,7 @@ public class WithdrawalService {
 		request.setAsset(record.getAsset());
 		request.setAmount(record.getAmount());
 		request.setRemark("提现扣款:"+ PayChannel.getName(record.getChannelId()));
-		request.setTradeNo(SnUtils.genSynchCutSn(record.getSn()));
+		request.setTradeNo(SnUtils.getSynchCutSn(record.getSn()));
 		request.setTradeType(TradeType.WITHDRAWAL);
 		request.setUserId(record.getUserId());
 		
@@ -166,7 +166,7 @@ public class WithdrawalService {
 		FundAddRequest addRequest = new FundAddRequest();
 		addRequest.setAmount(rr.getAmount());
 		addRequest.setRemark("提现失败返回账户:"+ PayChannel.getName(rr.getChannelId()));
-		addRequest.setTradeNo(SnUtils.genSynchReturnSn(rr.getSn()));
+		addRequest.setTradeNo(SnUtils.getSynchReturnSn(rr.getSn()));
 		addRequest.setTradeType(TradeType.WITHDRAWAL_RETURN);
 		addRequest.setUserId(rr.getUserId());
 		fundAccountCoreApi.add(addRequest);

@@ -47,7 +47,7 @@ public class DepositService {
 		Long now = DbDateUtils.now();
 		DepositRecord rr = new DepositRecord();
 
-		rr.setSn(SnUtils.genDepositSn());
+		rr.setSn(SnUtils.newDepositSn());
 		rr.setUserId(userId);
 		rr.setAsset(asset);
 		rr.setAccount(account);
@@ -142,7 +142,7 @@ public class DepositService {
 		addRequest.setAsset(rr.getAsset());
 		addRequest.setAmount(rr.getAmount());
 		addRequest.setRemark("充值:"+ PayChannel.getName(rr.getChannelId()));
-		addRequest.setTradeNo(SnUtils.genSynchAddSn(rr.getSn()));
+		addRequest.setTradeNo(SnUtils.getSynchAddSn(rr.getSn()));
 		addRequest.setTradeType(TradeType.DEPOSIT);
 		addRequest.setUserId(rr.getUserId());
 		fundAccountCoreApi.add(addRequest);
