@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
@@ -168,7 +169,7 @@ public class PcOrderService {
 			return;
 		}
 		if(pos.getLiqStatus() == LiqStatus.FROZEN){
-			throw new ExException(PcPositonError.LIQING);
+			throw new ExSysException(PcPositonError.LIQING);
 		}
 		if(pos.getLiqStatus() == LiqStatus.FORCE_CLOSE){
 			throw new ExException(PcPositonError.FORCE_CLOSE);
