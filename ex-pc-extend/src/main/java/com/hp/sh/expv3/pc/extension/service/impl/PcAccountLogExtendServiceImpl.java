@@ -52,14 +52,14 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         }
         if (ExtCommonConstant.TRADE_TYPE_ALL.equals(tradeType)) {
             Long count = pcAccountLogDAO.queryCount(map);
-            map.put("limit", count);
+            map.put("limit", pageSize);
             List<PcAccountLogVo> list = pcAccountLogDAO.queryByLimit(map);
             rePage(pageNo, pageSize, result, count, list);
         } else if (ExtCommonConstant.TRADE_TYPE_MAP.containsKey(tradeType)) {
             List<Integer> typeList = ExtCommonConstant.TRADE_TYPE_MAP.get(tradeType);
             map.put("types", typeList);
             Long count = pcAccountLogDAO.queryCount(map);
-            map.put("limit", count);
+            map.put("limit", pageSize);
             List<PcAccountLogVo> list = pcAccountLogDAO.queryByLimit(map);
             rePage(pageNo, pageSize, result, count, list);
         } else {
@@ -85,8 +85,8 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
      * @param list
      */
     private void rePage(Integer pageNo, Integer pageSize, PageResult<PcAccountLogVo> result, Long count, List<PcAccountLogVo> list) {
-         List<PcAccountLogVo> voList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
-        result.setList(voList);
+//         List<PcAccountLogVo> voList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
+        result.setList(list);
         result.setRowTotal(count);
         result.setPageNo(pageNo);
         Integer rowTotal = Integer.parseInt(String.valueOf(count));
