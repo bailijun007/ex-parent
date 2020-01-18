@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 import com.hp.sh.expv3.pc.constant.MqTopic;
@@ -68,9 +69,12 @@ public class OrderlyConsumer {
         			Throwable cause = ExceptionUtils.getRootCause(re);
         			logger.error(cause.getMessage(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
-        		}catch(Exception e){
+        		}catch(ExException e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error(cause.getMessage(), cause);
+        			logger.error(e.toString(), cause);
+        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
+        		}catch(Exception e){
+        			logger.error(e.toString(), e);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		

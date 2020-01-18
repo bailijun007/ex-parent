@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.constant.PcOrderLogType;
@@ -18,7 +17,6 @@ import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Service
-@Transactional(rollbackFor=Exception.class)
 public class PcOrderUpdateService {
 	private static final Logger logger = LoggerFactory.getLogger(PcOrderUpdateService.class);
 

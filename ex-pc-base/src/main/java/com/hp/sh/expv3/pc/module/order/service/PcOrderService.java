@@ -36,6 +36,7 @@ import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
+import com.hp.sh.expv3.utils.SnUtils;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
@@ -220,7 +221,7 @@ public class PcOrderService {
 		request.setAmount(amount);
 		request.setAsset(asset);
 		request.setRemark("开仓");
-		request.setTradeNo("O"+orderId);
+		request.setTradeNo(SnUtils.getOrderPaySn(""+orderId));
 		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_OPEN_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
@@ -232,7 +233,8 @@ public class PcOrderService {
 		request.setAmount(amount);
 		request.setAsset(asset);
 		request.setRemark("撤单还余额");
-		request.setTradeNo("C"+orderId);
+		request.setTradeNo(SnUtils.getCancelOrderReturnSn(""+orderId));
+		SnUtils.getSynchReturnSn(""+orderId);
 		request.setTradeType(PcAccountTradeType.ORDER_CANCEL);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
@@ -387,11 +389,10 @@ public class PcOrderService {
 			throw new ExException(PcPositonError.POS_NOT_ENOUGH);
 		}
 		if(pos.getLiqStatus()==LiqStatus.FROZEN){
-			throw new ExException(PcPositonError.POS_NOT_ENOUGH);
+			throw new ExException(PcPositonError.LIQING);
 		}
 		
 		BigDecimal closablePos = orderQueryService.getClosingVolume(pos);
-		
         //判断可平仓位是否足够
         if (BigUtils.gt(number, closablePos)) {
             throw new ExException(PcPositonError.POS_NOT_ENOUGH);

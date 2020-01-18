@@ -49,6 +49,14 @@ public class SnUtils {
 	public static String getSynchReturnSn(String sn){
 		return "R-"+sn;
 	}
+	
+	//order
+	public static String getOrderPaySn(String sn){
+		return "O-"+sn;
+	}
+	public static String getCancelOrderReturnSn(String sn){
+		return "CO-"+sn;
+	}
 
 	static String newTimeSn(){
 		String dstr = DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSS");

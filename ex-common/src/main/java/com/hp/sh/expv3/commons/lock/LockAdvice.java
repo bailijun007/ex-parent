@@ -75,7 +75,7 @@ public class LockAdvice {
     }
 	
 	private void lock(String realKey) {
-		this.locker.lock(realKey, 30);
+		this.locker.lock(realKey, 60);
 	}
 
 	private void unlock(String realKey) {

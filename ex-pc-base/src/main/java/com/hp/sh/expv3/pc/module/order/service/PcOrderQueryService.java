@@ -18,7 +18,7 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.utils.IntBool;
 
 @Service
-@Transactional(rollbackFor=Exception.class)
+@Transactional(readOnly=true)
 public class PcOrderQueryService {
 
 	@Autowired
