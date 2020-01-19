@@ -41,10 +41,11 @@ public class LiquidationJob {
 			if(list==null || list.isEmpty()){
 				break;
 			}
-			logger.warn("强平:{}", list.size());
+			logger.warn("激活仓位:{}", list.size());
 			for(PcPosition pos : list){
 				LiqHandleResult liqResult = pcLiqService.checkPosLiq(pos);
 				if(liqResult.isTrigger()){
+					logger.warn("触发强平:{}", pos);
 					this.sendLiqMsg(pos, liqResult);
 				}
 			}

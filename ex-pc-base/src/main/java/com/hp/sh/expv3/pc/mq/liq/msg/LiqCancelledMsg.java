@@ -61,4 +61,10 @@ public class LiqCancelledMsg extends BaseSymbolMsg{
 		this.lastFlag = lastFlag;
 	}
 
+	@Override
+	public String toString() {
+		return "LiqCancelledMsg [accountId=" + accountId + ", posId=" + posId + ", longFlag=" + longFlag + ", lastFlag="
+				+ lastFlag + ", cancelOrders=" + cancelOrders + "]";
+	}
+
 }

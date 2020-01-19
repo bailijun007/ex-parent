@@ -12,7 +12,6 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.error.ExCommonError;
-import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.constant.ChangeMarginOptType;
@@ -236,16 +235,45 @@ public class PcPositionMarginService {
 		this.positionDataService.update(pos);
 	}
 	
+	/**
+	 * 不验证，直接减，用于手动强平
+	 * @param userId
+	 * @param asset
+	 * @param symbol
+	 * @param longFlag
+	 * @param amount
+	 */
+	@Deprecated
+	@LockIt(key="${userId}-${asset}-${symbol}")
+	public void cutMargin(Long userId, String asset, String symbol, Long posId, BigDecimal amount){
+		//当前仓位
+		PcPosition pos = this.positionDataService.getPosition(userId, posId);
+		if(pos==null){
+			throw new ExSysException(ExCommonError.OBJ_DONT_EXIST);
+		}
+		//减少仓位保证金
+		this.returnManualMargin(userId, pos.getAsset(), pos.getId(), amount);
+		pos.setPosMargin(pos.getPosMargin().subtract(amount));
+		
+		//重新计算强平价
+		BigDecimal liqPrice = this.calcLiqPrice(pos);
+		pos.setLiqPrice(liqPrice);
+		
+		//保存
+		pos.setModified(DbDateUtils.now());
+		this.positionDataService.update(pos);
+	}
+	
 	private BigDecimal calcLiqPrice(PcPosition pos) {
 		BigDecimal liqPrice = strategyContext.calcLiqPrice(pos);
 		return liqPrice;
 	}
 
 	/**
-	 * 可减少的保证金
+	 * 强平保证金
 	 * @return
 	 */
-	protected BigDecimal getMinMarginDiff1(PcPosition pos){
+	public BigDecimal getLiqMarginDiff(PcPosition pos){
 		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
 		HoldPosStrategy holdPosStrategy = this.strategyContext.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
 		BigDecimal pnl = holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(pos.getFaceValue()), pos.getMeanPrice(), markPrice);
