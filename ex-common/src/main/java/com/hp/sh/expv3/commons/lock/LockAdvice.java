@@ -75,7 +75,7 @@ public class LockAdvice {
     }
 	
 	private void lock(String realKey) {
-		this.locker.lock(realKey, 30);
+		this.locker.lock(realKey, 60);
 	}
 
 	private void unlock(String realKey) {
@@ -104,7 +104,7 @@ public class LockAdvice {
 				val = PropertyUtils.getSimpleProperty(val, varpp);
 			}
 			if(val==null){
-				logger.warn("lock key var is null：key={},var={},pvar={}", key, var, varpp);
+				logger.error("lock key var is null：key={},var={},pvar={}", key, var, varpp);
 			}
 			sb.append(val);
 			start = matcher.end();

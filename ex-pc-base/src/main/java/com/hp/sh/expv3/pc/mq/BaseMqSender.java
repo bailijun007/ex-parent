@@ -63,7 +63,7 @@ public class BaseMqSender {
 	protected void send(Message mqMsg) {
 		try {
 	        SendResult sendResult = producer.send(mqMsg, new OrderMessageQueueSelector(), 0);
-	        logger.info("sendMsg:{}-{}-{}", mqMsg.getTags(), mqMsg.getKeys(),sendResult.toString());
+	        logger.info("sendMsg:{}->{}->{}->{}", mqMsg.getTags(), mqMsg.getTopic(), mqMsg.getKeys(),sendResult.toString());
 		} catch (Exception e) {
 			logger.error("发送失败:{}-{}-{}", mqMsg.getTags(), mqMsg.getKeys());
 			throw new RuntimeException(e);

@@ -64,13 +64,22 @@ public class PcPostionApiAction implements PcPostionApi {
 	@Override
 	public List<CurPositionVo> getCurrentPositionList(Long userId, String asset, String symbol){
 		List<CurPositionVo> list = new ArrayList<CurPositionVo>();
-		list.add(this.getCurrentPosition(userId, asset, symbol, OrderFlag.ACTION_OPEN));
-		list.add(this.getCurrentPosition(userId, asset, symbol, OrderFlag.ACTION_CLOSE));
+		CurPositionVo openPos = this.getCurrentPosition(userId, asset, symbol, OrderFlag.ACTION_OPEN);
+		if(openPos!=null){
+			list.add(openPos);
+		}
+		CurPositionVo closePos = this.getCurrentPosition(userId, asset, symbol, OrderFlag.ACTION_CLOSE);
+		if(closePos!=null){
+			list.add(closePos);
+		}
 		return list;
 	}
 	
 	public CurPositionVo getCurrentPosition(Long userId, String asset, String symbol, Integer longFlag){
 		PcPosition pos = posDataService.getCurrentPosition(userId, asset, symbol, longFlag);
+		if(pos==null){
+			return null;
+		}
 		
 		BigDecimal floatingPnl = strategyContext.calcFloatingPnl(pos);
 		BigDecimal posMarginRatio = strategyContext.calPosMarginRatio(pos, floatingPnl);

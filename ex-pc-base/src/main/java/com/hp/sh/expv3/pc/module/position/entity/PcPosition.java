@@ -299,4 +299,12 @@ public class PcPosition extends UserDataEntity {
 		this.liqPrice = liqPrice;
 	}
 
+	@Override
+	public String toString() {
+		return "PcPosition [id=" + id + ", userId=" + userId + ", asset=" + asset + ", symbol=" + symbol + ", longFlag="
+				+ longFlag + ", marginMode=" + marginMode + ", leverage=" + leverage + ", volume=" + volume
+				+ ", baseValue=" + baseValue + ", posMargin=" + posMargin + ", meanPrice=" + meanPrice
+				+ ", holdMarginRatio=" + holdMarginRatio + ", liqPrice=" + liqPrice + ", liqStatus=" + liqStatus + "]";
+	}
+
 }

@@ -13,7 +13,7 @@ public class WalletError extends ErrorCode {
 	//user
 	public static final WalletError TYPE_ERROR = new WalletError(-11001, "记录类型错误!");
 	
-	public static final WalletError INCONSISTENT_REQUESTS = new WalletError(-11002, "请求不一致!");
+	public static final WalletError INCONSISTENT_REQUESTS = new WalletError(-11002, "资金账户变更请求不一致!");
 
 	public static final WalletError NOT_ENOUGH = new WalletError(-11003, "余额不足！");
 	

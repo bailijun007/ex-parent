@@ -190,7 +190,7 @@ public class PcAccountCoreService{
 			String ov = oldRcd.toValueString();
 			String nv = record.toValueString();
 			if(!ov.equals(nv)){
-				throw new ExException(PcAccountError.INCONSISTENT_REQUESTS);
+				throw new ExSysException(PcAccountError.INCONSISTENT_REQUESTS, ov, nv);
 			}
 		}
 		

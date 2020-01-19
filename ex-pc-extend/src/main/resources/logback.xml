@@ -75,6 +75,7 @@
     <springProfile name="prod">
         <root level="INFO">
             <appender-ref ref="out2File" />
+            <appender-ref ref="errorFile" />
         </root>
     </springProfile>
 

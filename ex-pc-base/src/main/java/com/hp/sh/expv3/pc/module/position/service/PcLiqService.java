@@ -96,20 +96,12 @@ public class PcLiqService {
 	}
 
 	/*
-	 * 是否触发强平
+	 * 是否触发强平,如果没有改回强平状态
 	 * @param pos
 	 * @return 是否触发强平
 	 */
 	private boolean checkAndResetLiqStatus(PcPosition pos, BigDecimal markPrice) {
-		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal posPnl = holdPosStrategy.calcPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
-		BigDecimal posMarginRatio = holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), posPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
-		//保留两位小数
-		posMarginRatio = posMarginRatio.setScale(Precision.LIQ_MARGIN_RATIO, Precision.LESS);
-		//维持保证金率
-		BigDecimal holdMarginRatio = pos.getHoldMarginRatio();
-		
-		if(BigUtils.le(posMarginRatio, holdMarginRatio)){ //强平
+		if(checkLiqStatus(pos, markPrice)){ //强平
 			return true;
 		}else{ //不强平
 			if(pos.getLiqStatus()!=LiqStatus.NON){
@@ -118,6 +110,23 @@ public class PcLiqService {
 			}
 			return false;
 		}
+	}
+
+	/*
+	 * 是否触发强平
+	 * @param pos
+	 * @return 是否触发强平
+	 */
+	public boolean checkLiqStatus(PcPosition pos, BigDecimal markPrice) {
+		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
+		BigDecimal posPnl = holdPosStrategy.calcPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
+		BigDecimal posMarginRatio = holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), posPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
+		//保留两位小数
+		posMarginRatio = posMarginRatio.setScale(Precision.LIQ_MARGIN_RATIO, Precision.LESS);
+		//维持保证金率
+		BigDecimal holdMarginRatio = pos.getHoldMarginRatio();
+		
+		return BigUtils.le(posMarginRatio, holdMarginRatio);
 	}
 	
 	private void lockLiq(PcPosition pos) {
@@ -155,7 +164,12 @@ public class PcLiqService {
 		}
 	}
 	
-	void doLiq(PcPosition pos){
+    @LockIt(key="${pos.userId}-${pos.asset}-${pos.symbol}")
+	public void forceClose(PcPosition pos) {
+    	this.doLiq(pos);
+    }
+	
+	private void doLiq(PcPosition pos){
 		Long now = DbDateUtils.now();
 		//1、保存强平记录
 		PcLiqRecord record = this.saveLiqRecord(pos, now);
