@@ -33,11 +33,11 @@ public class DataSourceConfig {
 	private String jdbcUrl;
 	@Value("${spring.datasource.hikari.primary.username}")
 	private String username;
-	@Value("${spring.datasource.hikari.primary.password}")
-	private String password;
+	@Value("${bys.client.secret}")
+	private String bysSecret;
 	
 	@PostConstruct
 	public void printdbinfo(){
-		logger.error("url={},username={}, password={}", jdbcUrl, username, password);
+		logger.error("url={},username={}, bysSecret={}", jdbcUrl, username, bysSecret);
 	}
 }
