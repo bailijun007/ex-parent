@@ -49,6 +49,7 @@ public class LockAdvice {
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
 		String realKey=null;
+		long time = 0 ;
 		try{
 			Object[] args = joinPoint.getArgs();
 			MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -57,7 +58,8 @@ public class LockAdvice {
 			String configKey = lockIt.key();
 			String[] names = signature.getParameterNames();
 			realKey = getRealKey(configKey, args, names);
-			logger.debug("lock:{},{}", realKey, method);
+			time = System.currentTimeMillis();
+			logger.debug("lock:{},{},{}", realKey, method, time);
 			this.lock(realKey);
 			Object result = joinPoint.proceed(args);
 			return result;
@@ -65,12 +67,13 @@ public class LockAdvice {
 			if(realKey!=null){
 				try{
 					this.unlock(realKey);
+					time = System.currentTimeMillis()-time;
+					logger.debug("unlock：{},{},{}", realKey, time, (time/1000));
 				}catch(Exception e){
 					logger.error("解锁失败：{}", realKey, e);
 					throw e;
 				}
 			}
-			logger.debug("unlock：{}", realKey);
 		}      
     }
 	

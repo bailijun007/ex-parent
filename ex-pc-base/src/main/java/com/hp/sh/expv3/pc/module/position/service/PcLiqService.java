@@ -146,6 +146,11 @@ public class PcLiqService {
 			return;
 		}
 		
+		if(pos.getLiqStatus()==LiqStatus.NON){
+			logger.warn("仓位强平状态错误：posId={}", posId);
+			return;
+		}
+		
 		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
 		
 		//检查触发强平

@@ -389,10 +389,6 @@ public class PcOrderService {
 		if(pos==null){
 			throw new ExException(PcPositonError.POS_NOT_ENOUGH);
 		}
-		if(pos.getLiqStatus()==LiqStatus.FROZEN){
-			throw new ExException(PcPositonError.LIQING);
-		}
-		
 		BigDecimal closablePos = orderQueryService.getClosingVolume(pos);
         //判断可平仓位是否足够
         if (BigUtils.gt(number, closablePos)) {
