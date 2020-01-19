@@ -33,7 +33,7 @@ public interface ChainCasehApi {
 	public String createDeposit(
 			@RequestParam("userId") Long userId,
 			@RequestParam("chainOrderId") String chainOrderId, 
-			@RequestParam("symbolId") String symbolId, 
+			@RequestParam("asset") String asset, 
 			@RequestParam("account") String account,
 			@RequestParam("amount") BigDecimal amount, 
 			@RequestParam("txHash") String txHash);
