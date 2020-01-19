@@ -40,6 +40,12 @@ public class MaintainAction{
 	
 	@Autowired
 	private PcLiqService liqService;
+	
+	@ApiOperation(value = "version")
+	@GetMapping(value = "/api/pc/maintain/version")
+	public Integer version(){
+		return 1001;
+	}
 
 	@ApiOperation(value = "rebase")
 	@GetMapping(value = "/api/pc/maintain/rebase")	
