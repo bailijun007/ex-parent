@@ -66,5 +66,12 @@ public class LiqCancelledMsg extends BaseSymbolMsg{
 		return "LiqCancelledMsg [accountId=" + accountId + ", posId=" + posId + ", longFlag=" + longFlag + ", lastFlag="
 				+ lastFlag + ", cancelOrders=" + cancelOrders + "]";
 	}
+	
+	public static void main(String[] args) {
+		LiqCancelledMsg msg = new LiqCancelledMsg();
+		msg.setAccountId(138379937823358976L);
+		msg.setPosId(138530023660355584L);
+		System.out.println("收到强平撤销消息:"+msg);
+	}
 
 }

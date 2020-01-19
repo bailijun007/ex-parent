@@ -20,7 +20,7 @@ public class LiqMqConsumer {
 
 	@MQListener(tags = MqTags.TAGS_ORDER_ALL_CANCELLED)
 	public void handleCancelled(LiqCancelledMsg msg){
-		logger.info("收到强平撤销消息:{}", msg);
+		logger.warn("收到强平撤销消息:{}", msg);
 		pcLiqService.cancelCloseOrder(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getLongFlag(), msg.getPosId(), msg.getCancelOrders(), msg.getLastFlag());
 	}
     

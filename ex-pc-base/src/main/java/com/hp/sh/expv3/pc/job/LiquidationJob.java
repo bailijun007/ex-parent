@@ -41,7 +41,7 @@ public class LiquidationJob {
 			if(list==null || list.isEmpty()){
 				break;
 			}
-			logger.warn("激活仓位:{}", list.size());
+			logger.warn("活动仓位:{}", list.size());
 			for(PcPosition pos : list){
 				LiqHandleResult liqResult = pcLiqService.checkPosLiq(pos);
 				if(liqResult.isTrigger()){
