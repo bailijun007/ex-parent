@@ -88,9 +88,11 @@
     <!-- DEBUG级别日志 appender -->
     <appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- 过滤器，只记录DEBUG级别的日志 -->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>DEBUG</level>
-        </filter>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
+			<level>DEBUG</level>  
+			<onMatch>ACCEPT</onMatch>  
+			<onMismatch>DENY</onMismatch>  
+		</filter>
         <file>${log_dir}/debug-log.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
@@ -107,31 +109,9 @@
 		</encoder>
     </appender>
 
-    <!-- TRACE级别日志 appender -->
-    <appender name="TRACE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 过滤器，只记录ERROR级别的日志 -->
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>TRACE</level>
-        </filter>
-        <file>${log_dir}/trace-log.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 按天回滚 daily -->
-            <fileNamePattern>${log_dir}/trace/trace-log-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
-            <!-- 日志最大的历史 60天 -->
-            <maxHistory>${maxHistory}</maxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- 设置文件大于1KB进行压缩归档 -->
-                <maxFileSize>256MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
-		<encoder>
-			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
-		</encoder>
-    </appender>
-
     <!-- DEBUG级别日志 appender -->
-    <appender name="pcNotify" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log_dir}/pcNotify.log</file>
+    <appender name="mq" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_dir}/mq.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
             <fileNamePattern>${log_dir}/pcNotify/pcNotify-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
@@ -146,6 +126,14 @@
 			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
 		</encoder>
     </appender>
+    
+    <logger name="com.hp.sh.expv3.pc.mq" level="info" additivity="false">
+        <appender-ref ref="mq"/>
+    </logger>
+    
+    <logger name="com.hp.sh.rocketmq" level="info" additivity="false">
+        <appender-ref ref="mq"/>
+    </logger>
 
 	<root level="info">
 		<appender-ref ref="STDOUT" />
@@ -171,7 +159,6 @@
 	        <appender-ref ref="WARN"/>
 	        <appender-ref ref="INFO"/>
 	        <appender-ref ref="DEBUG"/>
-	        <appender-ref ref="TRACE"/>
         </root>
         
 		<logger name="com.hp.sh.expv3" level="info"></logger>
