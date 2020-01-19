@@ -140,7 +140,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("status", status);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
-        map.put("activeFlag", IntBool.YES);
+        map.put("activeFlag", IntBool.NO);
         map.put("pageSize", pageSize);
         isPage(lastOrderId, currentPage, pageSize, nextPage, isTotalNumber, result, map);
 
@@ -156,7 +156,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("status", status);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
-        map.put("activeFlag", IntBool.YES);
+        map.put("activeFlag", IntBool.NO);
         map.put("lastOrderId", lastOrderId);
         map.put("limit", pageSize);
         List<PcOrderVo> list = this.pcOrderDAO.queryNextList(map);
@@ -268,7 +268,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("status", status);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
-        map.put("activeFlag", IntBool.YES);
+
         map.put("lastOrderId", lastOrderId);
         map.put("limit", pageSize);
         List<PcOrderVo> list = this.pcOrderDAO.queryNextList(map);
