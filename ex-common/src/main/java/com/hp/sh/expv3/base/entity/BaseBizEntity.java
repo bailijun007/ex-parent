@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import com.hp.sh.expv3.component.context.ContextUtils;
 import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 @MappedSuperclass
@@ -39,7 +40,10 @@ public class BaseBizEntity implements Serializable {
 	}
 
 	public Long getCreated() {
-		return created;
+		if(this.id==null){
+			return null;
+		}
+		return ContextUtils.getSnowIdTime(this.getClass().getName(), id);
 	}
 
 	public void setCreated(Long created) {

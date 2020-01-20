@@ -45,10 +45,12 @@ public class ZwIdGenerator implements IdGenerator{
 		return GeneratorName.SNOWFLAKE;
 	}
 	
-	static class IdWorkerPair{
-	    private transient SnowflakeIdWorker snowflakeIdWorker;
-	    
-	    
+	public long getTimeStamp(String className, Long id){
+		String entityId = className;
+		Integer seqId = this.entitySequenceMap.get(entityId);
+		SnowflakeIdWorker idworker = idWorkerMap.get(seqId);
+		long time = idworker.getTime(id);
+		return time;
 	}
 
 }
