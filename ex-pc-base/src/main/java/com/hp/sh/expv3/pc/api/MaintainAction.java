@@ -20,6 +20,7 @@ import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
 import com.hp.sh.expv3.pc.module.position.vo.PosUID;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
+import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -57,7 +58,8 @@ public class MaintainAction{
 	@ApiOperation(value = "rebase")
 	@GetMapping(value = "/api/pc/maintain/rebase")	
 	public List<PcOrder> rebase(){
-		List<PcOrder> list = orderQueryService.queryRebaseOrder(null);
+		long now = DbDateUtils.now();
+		List<PcOrder> list = orderQueryService.queryRebaseOrder(null, now);
 		for(PcOrder order : list){
 			pcOrderApiAction.sendOrderMsg(order);
 		}
@@ -68,10 +70,11 @@ public class MaintainAction{
 	@ApiOperation(value = "queryResend")
 	@GetMapping(value = "/api/pc/maintain/queryResend")	
 	public Integer queryResend(){
+		long now = DbDateUtils.now();
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		while(true){
-			List<PcOrder> list = orderQueryService.queryRebaseOrder(page);
+			List<PcOrder> list = orderQueryService.queryRebaseOrder(page, now);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -93,8 +96,9 @@ public class MaintainAction{
 	public Integer resend(){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
+		long now = DbDateUtils.now()-2000;
 		while(true){
-			List<PcOrder> list = orderQueryService.queryRebaseOrder(page);
+			List<PcOrder> list = orderQueryService.queryRebaseOrder(page, now);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -105,7 +109,7 @@ public class MaintainAction{
 					pcOrderApiAction.sendOrderMsg(order);
 				}
 				try {
-					Thread.sleep(50);
+					Thread.sleep(20);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

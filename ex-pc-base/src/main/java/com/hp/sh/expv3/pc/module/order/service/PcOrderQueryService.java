@@ -61,7 +61,7 @@ public class PcOrderQueryService {
 		return count>0;
 	}
 	
-	public List<PcOrder> queryRebaseOrder(Page page) {
+	public List<PcOrder> queryRebaseOrder(Page page, Long createdEnd) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("activeFlag", IntBool.YES);
 		params.put("liqFlag", IntBool.NO);
@@ -69,6 +69,7 @@ public class PcOrderQueryService {
 		params.put("asc", true);
 		params.put("page", page);
 		params.put("status", OrderStatus.PENDING_NEW);
+		params.put("createdEnd", createdEnd);
 		List<PcOrder> list = this.pcOrderDAO.queryList(params);
 		return list;
 	}
