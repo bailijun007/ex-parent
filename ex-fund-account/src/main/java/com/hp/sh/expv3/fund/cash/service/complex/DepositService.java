@@ -133,6 +133,7 @@ public class DepositService {
 
 	public void changePayStatus(DepositRecord rr, int status){
 		rr.setPayStatus(status);
+		rr.setModified(DbDateUtils.now());
 		this.depositRecordDAO.update(rr);
 	}
 	
@@ -147,7 +148,8 @@ public class DepositService {
 		addRequest.setUserId(rr.getUserId());
 		fundAccountCoreApi.add(addRequest);
 		
-		rr.setSynchStatus(Paystatus.SYNCH);
+		rr.setSynchStatus(SynchStatus.SYNCH);
+		rr.setModified(DbDateUtils.now());
 		this.depositRecordDAO.update(rr);
 	}
 	
