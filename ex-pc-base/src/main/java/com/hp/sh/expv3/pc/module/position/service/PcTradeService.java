@@ -331,10 +331,7 @@ public class PcTradeService {
 		}
 		
 		//检查重复请求
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", order.getUserId());
-		params.put("tradeSn", tradeMsg.uniqueKey());
-		Long count = this.pcOrderTradeDAO.queryCount(params);
+		Long count = this.pcOrderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
 		if(count>0){
 			return false;
 		}

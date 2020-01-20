@@ -99,13 +99,16 @@
 			where id=#{id} and user_id=#{userId}
 	</select>
 
-	<select id="exist" resultType="boolean">
+	<select id="exist" resultType="long">
+	select EXISTS(
 		select 
-			count(1)
+			1
 		from 
 			pc_order_trade
-		<include refid="simple_where" />
+		where 
+			user_id=#{userId} and trade_sn=#{tradeSn}
 		limit 1
+	)
 	</select>
 
 
