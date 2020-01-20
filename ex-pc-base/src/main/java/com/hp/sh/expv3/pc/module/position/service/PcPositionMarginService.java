@@ -71,11 +71,6 @@ public class PcPositionMarginService {
 		String asset = pos.getAsset();
 		String symbol = pos.getSymbol();
 		Integer longFlag = pos.getLongFlag();
-		
-		//检查平仓状态
-        if (pos.getLiqStatus()==LiqStatus.FROZEN) {
-            throw new ExException(PcPositonError.LIQING);
-        }
 
         //修改设置
         PcAccountSymbol accountSymbol = this.accountSymbolService.getOrCreate(userId, asset, symbol);

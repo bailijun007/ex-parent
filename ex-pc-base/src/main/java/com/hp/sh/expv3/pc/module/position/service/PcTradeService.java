@@ -113,7 +113,7 @@ public class PcTradeService {
 		BigDecimal holdRatio = this.feeRatioService.getHoldRatio(pcPosition.getUserId(), pcPosition.getAsset(), pcPosition.getSymbol(), pcPosition.getVolume());
 		pcPosition.setHoldMarginRatio(holdRatio);
 		
-		//如果降档
+		//如果升档
 		BigDecimal maxLeverage = this.feeRatioService.getMaxLeverage(pcPosition.getUserId(), pcPosition.getAsset(), pcPosition.getSymbol(), pcPosition.getVolume());
 		if(BigUtils.gt(pcPosition.getLeverage(), maxLeverage)){
 			positionMarginService.downLeverage(pcPosition, maxLeverage, now);
