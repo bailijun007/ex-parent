@@ -174,7 +174,7 @@
 	        <appender-ref ref="ERROR"/>
         </root>
         
-		<logger name="com.hp.sh.expv3" level="info"></logger>
+		<logger name="com.hp.sh.expv3" level="debug"></logger>
 		<logger name="com.gitee.hupadev.base.spring.interceptor" level="info"></logger>
         
     </springProfile>

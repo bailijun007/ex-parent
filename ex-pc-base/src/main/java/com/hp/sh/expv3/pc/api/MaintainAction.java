@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.job.LiqHandleResult;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
@@ -15,7 +16,9 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcLiqService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
+import com.hp.sh.expv3.pc.module.position.vo.PosUID;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
+import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -40,6 +43,9 @@ public class MaintainAction{
 	
 	@Autowired
 	private PcLiqService liqService;
+    
+    @Autowired
+    private MarkPriceService markPriceService;
 	
 	@ApiOperation(value = "version")
 	@GetMapping(value = "/api/pc/maintain/version")
@@ -72,9 +78,10 @@ public class MaintainAction{
 	
 	@ApiOperation(value = "checkLiq")
 	@GetMapping(value = "/api/pc/maintain/liq/checkLiq")
-	public LiqHandleResult checkLiq(Long userId, String asset, String symbol, Long posId){
+	public boolean checkLiq(Long userId, Long posId){
 		PcPosition pos = this.positionDataService.getPosition(userId, posId);
-		return liqService.checkPosLiq(pos);
+		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getSymbol());
+		return liqService.checkLiqStatus(pos, markPriceVo.getMarkPrice());
 	}
 
 	@ApiOperation(value = "forceClose")

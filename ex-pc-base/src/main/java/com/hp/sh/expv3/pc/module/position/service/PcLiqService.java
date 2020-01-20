@@ -22,6 +22,7 @@ import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcLiqRecordDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
+import com.hp.sh.expv3.pc.module.position.vo.PosUID;
 import com.hp.sh.expv3.pc.mq.liq.msg.CancelOrder;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
@@ -66,31 +67,33 @@ public class PcLiqService {
     private ApplicationEventPublisher publisher;
 
     @LockIt(key="${pos.userId}-${pos.asset}-${pos.symbol}")
-	public LiqHandleResult checkPosLiq(PcPosition pos) {
+	public LiqHandleResult checkPosLiq(PosUID pos) {
+    	PcPosition pcPosition = this.positionDataService.getPosition(pos.getUserId(), pos.getId());
 		LiqHandleResult liqResult = new LiqHandleResult();
 		
-		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getSymbol());
+		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pcPosition.getAsset(), pcPosition.getSymbol());
 		//检查触发强平
-		if(!this.checkAndResetLiqStatus(pos, markPriceVo.getMarkPrice())){
+		if(!this.checkAndResetLiqStatus(pcPosition, markPriceVo.getMarkPrice())){
 			return liqResult;
 		}
 		
 		//追加保证金
-		if(pos.getAutoAddFlag()==IntBool.YES){
-			this.pcPositionMarginService.autoAddMargin(pos);
+		if(pcPosition.getAutoAddFlag()==IntBool.YES){
+			this.pcPositionMarginService.autoAddMargin(pcPosition);
 		}
 		
 		//检查触发强平
-		if(!this.checkAndResetLiqStatus(pos, markPriceVo.getMarkPrice())){
+		if(!this.checkAndResetLiqStatus(pcPosition, markPriceVo.getMarkPrice())){
 			return liqResult;
 		}
 		
 		//强平仓位,修改状态等
-		this.lockLiq(pos);
+		this.lockLiq(pcPosition);
 		
 		liqResult.setTrigger(true);
 		liqResult.setMarkPriceVo(markPriceVo);
-		liqResult.setLiqPrice(pos.getLiqPrice());
+		liqResult.setLiqPrice(pcPosition.getLiqPrice());
+		liqResult.setPcPosition(pcPosition);
 		return liqResult;
 		
 	}

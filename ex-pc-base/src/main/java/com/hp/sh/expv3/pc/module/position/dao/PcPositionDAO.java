@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.base.mapper.BaseUserDataMapper;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
+import com.hp.sh.expv3.pc.module.position.vo.PosUID;
 
 /**
  * 
@@ -36,6 +37,12 @@ public interface PcPositionDAO extends BaseUserDataMapper<PcPosition,Long> {
 			@Param("longFlag") int longFlag);
 
 	public List<PcPosition> queryActivePosList(
+			Page page,
+			@Param("userId") Long userId, 
+			@Param("asset") String asset,
+			@Param("symbol") String symbol);
+	
+	public List<PosUID> queryActivePosIdList(
 			Page page,
 			@Param("userId") Long userId, 
 			@Param("asset") String asset,

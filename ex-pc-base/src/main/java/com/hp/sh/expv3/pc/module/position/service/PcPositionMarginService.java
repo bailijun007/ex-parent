@@ -1,13 +1,11 @@
 package com.hp.sh.expv3.pc.module.position.service;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
@@ -359,11 +357,6 @@ public class PcPositionMarginService {
 		pos.setAutoAddFlag(autoAddFlag);
 		this.positionDataService.update(pos);
 		return true;
-	}
-
-	public List<PcPosition> queryActivePosList(Page page, Long userId, String asset, String symbol) {
-		List<PcPosition> list = this.positionDataService.queryActivePosList(page, userId, asset, symbol);
-		return list;
 	}
 	
 	public void autoAddMargin(PcPosition pos){

@@ -173,15 +173,15 @@
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
     </select>
-    
 
-    <select id="queryActivePosUserIdList" resultType="long">
+    <select id="queryActivePosIdList" resultType="com.hp.sh.expv3.pc.module.position.vo.PosUID">
         select
-        	DISTINCT user_id 
+        	id,user_id,asset,symbol,long_flag
         from
         	pc_position
         where
         	volume &gt; 0
+            <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
     </select>
