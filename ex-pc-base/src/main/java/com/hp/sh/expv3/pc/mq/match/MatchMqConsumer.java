@@ -37,6 +37,7 @@ public class MatchMqConsumer {
 	
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(MatchNotMatchMsg msg){
+		logger.info("收到撮合未成消息:{}", msg);
 		Runnable task = new Runnable(){
 			public void run(){
 				pcOrderService.setNewStatus(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.job.LiqHandleResult;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
@@ -56,11 +57,65 @@ public class MaintainAction{
 	@ApiOperation(value = "rebase")
 	@GetMapping(value = "/api/pc/maintain/rebase")	
 	public List<PcOrder> rebase(){
-		List<PcOrder> list = orderQueryService.queryActiveOrder(null, null, null, null);
+		List<PcOrder> list = orderQueryService.queryRebaseOrder(null);
 		for(PcOrder order : list){
 			pcOrderApiAction.sendOrderMsg(order);
 		}
 		return list;
+	}
+	
+
+	@ApiOperation(value = "queryResend")
+	@GetMapping(value = "/api/pc/maintain/queryResend")	
+	public Integer queryResend(){
+		int n = 0;
+		Page page = new Page(1, 200, 1000L);
+		while(true){
+			List<PcOrder> list = orderQueryService.queryRebaseOrder(page);
+			if(list==null||list.isEmpty()){
+				break;
+			}
+			
+			for(PcOrder order : list){
+				boolean isExist = matchMqSender.exist(order.getAsset(), order.getSymbol(), ""+order.getId(), order.getCreated());
+				if(!isExist){
+					n++;
+				}
+			}
+			
+			page.setPageNo(page.getPageNo()+1);
+		}
+		return n;
+	}
+
+	@ApiOperation(value = "resend")
+	@GetMapping(value = "/api/pc/maintain/resend")	
+	public Integer resend(){
+		int n = 0;
+		Page page = new Page(1, 200, 1000L);
+		while(true){
+			List<PcOrder> list = orderQueryService.queryRebaseOrder(page);
+			if(list==null||list.isEmpty()){
+				break;
+			}
+			
+			for(PcOrder order : list){
+				boolean isExist = matchMqSender.exist(order.getAsset(), order.getSymbol(), ""+order.getId(), order.getCreated());
+				if(!isExist){
+					pcOrderApiAction.sendOrderMsg(order);
+				}
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			n += list.size();
+			
+			page.setPageNo(page.getPageNo()+1);
+		}
+		return n;
 	}
 
 	@ApiOperation(value = "liqmargin")

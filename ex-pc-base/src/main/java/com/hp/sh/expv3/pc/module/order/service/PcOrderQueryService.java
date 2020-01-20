@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.dev.CrossDB;
+import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderLogDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
@@ -60,14 +61,14 @@ public class PcOrderQueryService {
 		return count>0;
 	}
 	
-	public List<PcOrder> queryActiveOrder(Long userId, String asset, String symbol, Integer longFlag) {
+	public List<PcOrder> queryRebaseOrder(Page page) {
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", userId);
-		params.put("asset", asset);
-		params.put("symbol", symbol);
-		params.put("longFlag", longFlag);
 		params.put("activeFlag", IntBool.YES);
 		params.put("liqFlag", IntBool.NO);
+		params.put("orderBy", "id");
+		params.put("asc", true);
+		params.put("page", page);
+		params.put("status", OrderStatus.PENDING_NEW);
 		List<PcOrder> list = this.pcOrderDAO.queryList(params);
 		return list;
 	}
