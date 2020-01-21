@@ -284,7 +284,7 @@ public class PcOrderService {
 		}
 		
 		Long now = DbDateUtils.now();
-		orderUpdateService.updateCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
+		orderUpdateService.setUserCancel(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
 	}
 	
 	private boolean canCancel(PcOrder order, Long orderId){
@@ -379,7 +379,7 @@ public class PcOrderService {
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void setNewStatus(long userId, String asset, String symbol, long orderId){
 		long now = DbDateUtils.now();
-		this.orderUpdateService.updateStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, now);
+		this.orderUpdateService.setNewStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, now);
 	}
 
 	/*

@@ -47,7 +47,7 @@ public class PcOrderUpdateService {
 		return orderLog;
 	}
 
-	public PcOrderLog updateStatus(long orderId, long userId, int newStatus, int pendingNew, long modified) {
+	public PcOrderLog setNewStatus(long orderId, long userId, int newStatus, int pendingNew, long modified) {
 		long count = this.pcOrderDAO.updateStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, modified);
 		if(count==0){
 			logger.error("更新失败，orderId={}", orderId);
@@ -63,7 +63,7 @@ public class PcOrderUpdateService {
 		return orderLog;
 	}
 
-	public void updateCancelStatus(long orderId, long userId, int cancelStatus, long modified, int status1, int status2, int activeFlag) {
+	public void setUserCancel(long orderId, long userId, int cancelStatus, long modified, int status1, int status2, int activeFlag) {
 		long count = this.pcOrderDAO.updateCancelStatus(orderId, userId, cancelStatus, modified, status1, status2, activeFlag);
 		
 		if(count==0){

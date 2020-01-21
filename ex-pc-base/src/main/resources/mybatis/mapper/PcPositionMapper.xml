@@ -129,7 +129,7 @@
 		update 
 			pc_position
 		set 
-			id=#{id},user_id=#{userId},asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},auto_add_flag=#{autoAddFlag},leverage=#{leverage},face_value=#{faceValue},volume=#{volume},base_value=#{baseValue},pos_margin=#{posMargin},close_fee=#{closeFee},mean_price=#{meanPrice},accu_base_value=#{accuBaseValue},accu_volume=#{accuVolume},init_margin=#{initMargin},hold_margin_ratio=#{holdMarginRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_status=#{liqStatus},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},version=#{version},created=#{created},modified=#{modified}
+			id=#{id},user_id=#{userId},asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},auto_add_flag=#{autoAddFlag},leverage=#{leverage},face_value=#{faceValue},volume=#{volume},base_value=#{baseValue},pos_margin=#{posMargin},close_fee=#{closeFee},mean_price=#{meanPrice},accu_base_value=#{accuBaseValue},accu_volume=#{accuVolume},init_margin=#{initMargin},hold_margin_ratio=#{holdMarginRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_status=#{liqStatus},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},version=${version}+1,created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId} and version=#{version}
 	</update>

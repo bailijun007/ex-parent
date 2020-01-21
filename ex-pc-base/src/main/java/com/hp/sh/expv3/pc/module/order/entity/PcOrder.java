@@ -3,6 +3,8 @@ package com.hp.sh.expv3.pc.module.order.entity;
 
 import java.math.BigDecimal;
 
+import javax.persistence.Version;
+
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.pc.strategy.data.OrderData;
 
@@ -151,6 +153,8 @@ public class PcOrder extends UserDataEntity implements OrderData{
      */
     private Integer triggerFlag;
 
+	//版本
+	private Long version;
     
     
 //    int ________强平_________;
@@ -358,6 +362,15 @@ public class PcOrder extends UserDataEntity implements OrderData{
 
 	public void setTriggerFlag(Integer triggerFlag) {
 		this.triggerFlag = triggerFlag;
+	}
+	
+	@Version
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 	public Long getCancelTime() {
