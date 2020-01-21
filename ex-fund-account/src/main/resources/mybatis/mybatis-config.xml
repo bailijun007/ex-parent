@@ -9,11 +9,10 @@
 
 	<plugins>
 		<plugin interceptor="com.gitee.hupadev.commons.mybatis.PageInterceptor"></plugin>
+		<plugin interceptor="com.hp.sh.expv3.commons.mybatis.ExpUpdateInterceptor"></plugin>
 		<plugin interceptor="com.gitee.hupadev.commons.mybatis.UpdateInterceptor">
 			<property name="idGeneratorFactoryClass" value="com.gitee.hupadev.commons.id.IdGeneratorFactory4Mybatis"/>
 		</plugin>
-		<plugin interceptor="com.hp.sh.expv3.commons.mybatis.RequestIdInterceptor"></plugin>
-		<plugin interceptor="com.hp.sh.expv3.commons.mybatis.TxIdInterceptor"></plugin>
 	</plugins>  
 
 </configuration>

@@ -87,7 +87,7 @@ public class OrderlyConsumer {
         return consumer;
 	}
 	
-	@PostConstruct
+//	@PostConstruct
 	public void start123() throws MQClientException{
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 		for(PcContractVO pc : pcList){

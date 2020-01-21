@@ -92,12 +92,12 @@ public class PcOrderService {
 	 * @param price 委托价格
 	 * @param amt 委托金额
 	 */
+	@LockIt(key="${userId}-${asset}-${symbol}")
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
 		return self.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number, pos, IntBool.YES, IntBool.NO);
 	}
 	
-	@LockIt(key="${userId}-${asset}-${symbol}")
 	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag, int liqFlag){
 		
 //		if(this.existClientOrderId(userId, cliOrderId)){
@@ -269,7 +269,7 @@ public class PcOrderService {
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void setPendingCancel(long userId, String asset, String symbol, long orderId){
+	public void setUserCancel(long userId, String asset, String symbol, long orderId){
 		
 		PcOrder order = this.orderQueryService.getOrder(userId, orderId);
 		

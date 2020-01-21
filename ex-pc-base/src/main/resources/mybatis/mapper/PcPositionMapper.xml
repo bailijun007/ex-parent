@@ -6,6 +6,7 @@
 
 	<resultMap type="com.hp.sh.expv3.pc.module.position.entity.PcPosition" id="PcPosition">
 		<result column="id" property="id" />
+		<result column="user_id" property="userId" />
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
 		<result column="long_flag" property="longFlag" />
@@ -13,8 +14,8 @@
 		<result column="entry_leverage" property="entryLeverage" />
 		<result column="auto_add_flag" property="autoAddFlag" />
 		<result column="leverage" property="leverage" />
-		<result column="volume" property="volume" />
 		<result column="face_value" property="faceValue" />
+		<result column="volume" property="volume" />
 		<result column="base_value" property="baseValue" />
 		<result column="pos_margin" property="posMargin" />
 		<result column="close_fee" property="closeFee" />
@@ -26,16 +27,16 @@
 		<result column="fee_cost" property="feeCost" />
 		<result column="realised_pnl" property="realisedPnl" />
 		<result column="liq_price" property="liqPrice" />
+		<result column="liq_status" property="liqStatus" />
 		<result column="liq_mark_price" property="liqMarkPrice" />
 		<result column="liq_mark_time" property="liqMarkTime" />
-		<result column="liq_status" property="liqStatus" />
-		<result column="user_id" property="userId" />
+		<result column="version" property="version" />
 		<result column="created" property="created" />
 		<result column="modified" property="modified" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,asset,symbol,long_flag,margin_mode,entry_leverage,auto_add_flag,leverage,volume,face_value,base_value,pos_margin,close_fee,mean_price,accu_base_value,accu_volume,init_margin,hold_margin_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
+		id,user_id,asset,symbol,long_flag,margin_mode,entry_leverage,auto_add_flag,leverage,face_value,volume,base_value,pos_margin,close_fee,mean_price,accu_base_value,accu_volume,init_margin,hold_margin_ratio,fee_cost,realised_pnl,liq_price,liq_status,liq_mark_price,liq_mark_time,version,created,modified
 	</sql>
 
     <sql id="simple_where">
@@ -117,13 +118,10 @@
     </select>
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into pc_position (
-			id,asset,symbol,long_flag,margin_mode,entry_leverage,auto_add_flag,leverage,volume,face_value,base_value,pos_margin,close_fee,mean_price,accu_base_value,accu_volume,init_margin,hold_margin_ratio,fee_cost,realised_pnl,liq_price,liq_mark_price,liq_mark_time,liq_status,user_id,created,modified
+			id,user_id,asset,symbol,long_flag,margin_mode,entry_leverage,auto_add_flag,leverage,face_value,volume,base_value,pos_margin,close_fee,mean_price,accu_base_value,accu_volume,init_margin,hold_margin_ratio,fee_cost,realised_pnl,liq_price,liq_status,liq_mark_price,liq_mark_time,version,created,modified
 		)values(
-			#{id},#{asset},#{symbol},#{longFlag},#{marginMode},#{entryLeverage},#{autoAddFlag},#{leverage},#{volume},#{faceValue},#{baseValue},#{posMargin},#{closeFee},#{meanPrice},#{accuBaseValue},#{accuVolume},#{initMargin},#{holdMarginRatio},#{feeCost},#{realisedPnl},#{liqPrice},#{liqMarkPrice},#{liqMarkTime},#{liqStatus},#{userId},#{created},#{modified}
+			#{id},#{userId},#{asset},#{symbol},#{longFlag},#{marginMode},#{entryLeverage},#{autoAddFlag},#{leverage},#{faceValue},#{volume},#{baseValue},#{posMargin},#{closeFee},#{meanPrice},#{accuBaseValue},#{accuVolume},#{initMargin},#{holdMarginRatio},#{feeCost},#{realisedPnl},#{liqPrice},#{liqStatus},#{liqMarkPrice},#{liqMarkTime},#{version},#{created},#{modified}
 		)
 	</insert>
 	
@@ -131,9 +129,9 @@
 		update 
 			pc_position
 		set 
-			asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},auto_add_flag=#{autoAddFlag},leverage=#{leverage},volume=#{volume},face_value=#{faceValue},base_value=#{baseValue},pos_margin=#{posMargin},close_fee=#{closeFee},mean_price=#{meanPrice},accu_base_value=#{accuBaseValue},accu_volume=#{accuVolume},init_margin=#{initMargin},hold_margin_ratio=#{holdMarginRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},liq_status=#{liqStatus},user_id=#{userId},created=#{created},modified=#{modified}
+			id=#{id},user_id=#{userId},asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},auto_add_flag=#{autoAddFlag},leverage=#{leverage},face_value=#{faceValue},volume=#{volume},base_value=#{baseValue},pos_margin=#{posMargin},close_fee=#{closeFee},mean_price=#{meanPrice},accu_base_value=#{accuBaseValue},accu_volume=#{accuVolume},init_margin=#{initMargin},hold_margin_ratio=#{holdMarginRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_status=#{liqStatus},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},version=#{version},created=#{created},modified=#{modified}
 		where 
-			id=#{id} and user_id=#{userId}
+			id=#{id} and user_id=#{userId} and version=#{version}
 	</update>
 
     <!--  -->

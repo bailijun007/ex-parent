@@ -2,6 +2,8 @@ package com.hp.sh.expv3.pc.module.position.entity;
 
 import java.math.BigDecimal;
 
+import javax.persistence.Version;
+
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.dev.Redundant;
 
@@ -30,7 +32,7 @@ public class PcPosition extends UserDataEntity {
 	// 开仓杠杆 @see PcOrder#leverage
 	private BigDecimal entryLeverage;
 
-	int ________________;
+//	int ________________;
 
 	// 是否自动追加保证金标识
 	private Integer autoAddFlag;
@@ -78,7 +80,7 @@ public class PcPosition extends UserDataEntity {
 	 */
 	private BigDecimal initMargin;
     
-  int _____________________________________________________;
+//  int _____________________________________________________;
 
 	/**
      * 维持保证金率
@@ -105,7 +107,9 @@ public class PcPosition extends UserDataEntity {
 
 	// 触发强平的标记时间
 	private Long liqMarkTime;
-
+	
+	//版本
+	private Long version;
 	
 	
 	//仓位已平空
@@ -298,7 +302,16 @@ public class PcPosition extends UserDataEntity {
 	public void setLiqPrice(BigDecimal liqPrice) {
 		this.liqPrice = liqPrice;
 	}
+	
+	@Version
+	public Long getVersion() {
+		return version;
+	}
 
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+	
 	@Override
 	public String toString() {
 		return "PcPosition [id=" + id + ", userId=" + userId + ", asset=" + asset + ", symbol=" + symbol + ", longFlag="
