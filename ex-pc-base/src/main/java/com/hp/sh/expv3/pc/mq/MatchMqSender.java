@@ -1,10 +1,17 @@
 package com.hp.sh.expv3.pc.mq;
 
+import java.util.List;
+
+import org.apache.rocketmq.client.QueryResult;
+import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.common.message.MessageExt;
+import org.apache.rocketmq.common.protocol.ResponseCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MqTags;
+import com.hp.sh.expv3.pc.constant.MqTopic;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.mq.liq.msg.LiqLockMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.BookResetMsg;
@@ -51,6 +58,25 @@ public class MatchMqSender extends BaseMqSender{
 
 	public void sendBookResetMsg(BookResetMsg msg) {
 	    this.sendOrderMsg(msg, MqTags.TAGS_PC_BOOK_RESET, MqTags.TAGS_PC_BOOK_RESET);
+	}
+	
+	public boolean exist(String asset, String symbol, String key, long createdTime) {
+		String topic = MqTopic.getOrderTopic(asset, symbol);
+		long begin = createdTime-1000*3600;
+		long end = createdTime+1000*3600*24*365;
+		try {
+			QueryResult result = this.producer.queryMessage(topic, key, 1, begin, end);
+			List<MessageExt> msgList = result.getMessageList();
+			return msgList!=null && msgList.size()>0;
+		} catch (MQClientException e) {
+			if(e.getResponseCode()==ResponseCode.NO_MESSAGE){
+				return false;
+			}else{
+				throw new RuntimeException(e);
+			}
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

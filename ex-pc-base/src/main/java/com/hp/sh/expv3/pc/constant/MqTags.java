@@ -22,5 +22,6 @@ public class MqTags {
 	
 	public static final String TAGS_ORDER_ALL_CANCELLED = "PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED";
 
+	public static final String PC_ORDER_REBASE = "PC_ORDER_REBASE";
 	
 }
