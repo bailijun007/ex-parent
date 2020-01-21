@@ -57,7 +57,6 @@ public class PcAccountSymbol extends UserDataEntity {
 	private BigDecimal crossMaxLeverage;
 
 	//版本
-	@Version
 	private Long version;
 	
 	public PcAccountSymbol() {
@@ -135,6 +134,7 @@ public class PcAccountSymbol extends UserDataEntity {
 		this.crossMaxLeverage = crossMaxLeverage;
 	}
 
+	@Version
 	public Long getVersion() {
 		return version;
 	}

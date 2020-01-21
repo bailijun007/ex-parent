@@ -132,15 +132,6 @@
 			id=#{id} and user_id=#{userId}
 	</update>
 
-	<delete id="delete">
-        delete from pc_order_trade where id=#{id}
-    </delete>
-
-    <delete id="condDelete">
-        delete from pc_order_trade
-		<include refid="simple_where" />
-    </delete>
-
 	<!--  -->
 	
 </mapper>

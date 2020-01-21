@@ -88,9 +88,6 @@
 
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into pc_order_log (
 			order_id,type,trigger_type,tx_id,request_id,user_id,id,created,modified
 		)values(
@@ -106,15 +103,6 @@
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>
-
-	<delete id="delete">
-        delete from pc_order_log where id=#{id}
-    </delete>
-
-    <delete id="condDelete">
-        delete from pc_order_log
-		<include refid="simple_where" />
-    </delete>
 
 	<!--  -->
 	

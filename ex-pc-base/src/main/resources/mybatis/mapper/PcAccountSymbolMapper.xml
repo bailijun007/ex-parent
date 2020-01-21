@@ -99,9 +99,6 @@
 
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into pc_account_symbol (
 			id,asset,symbol,short_leverage,long_leverage,margin_mode,cross_leverage,long_max_leverage,short_max_leverage,version,user_id,created,modified
 		)values(
@@ -113,9 +110,9 @@
 		update 
 			pc_account_symbol
 		set 
-			asset=#{asset},symbol=#{symbol},short_leverage=#{shortLeverage},long_leverage=#{longLeverage},margin_mode=#{marginMode},cross_leverage=#{crossLeverage},long_max_leverage=#{longMaxLeverage},short_max_leverage=#{shortMaxLeverage},version=#{version},user_id=#{userId},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},short_leverage=#{shortLeverage},long_leverage=#{longLeverage},margin_mode=#{marginMode},cross_leverage=#{crossLeverage},long_max_leverage=#{longMaxLeverage},short_max_leverage=#{shortMaxLeverage},version=${version}+1,user_id=#{userId},created=#{created},modified=#{modified}
 		where 
-			id=#{id} and user_id=#{userId}
+			id=#{id} and user_id=#{userId} and version=#{version}
 	</update>
 
 	<delete id="delete">
