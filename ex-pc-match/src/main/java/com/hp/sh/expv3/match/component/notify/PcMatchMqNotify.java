@@ -239,14 +239,20 @@ public class PcMatchMqNotify {
     }
 
     private boolean safeSend2MatchTopic(Message message, long accountId) {
+        boolean first = true;
         while (true) {
             try {
                 pcmatchProducer.send(message,
                         (mqs, msg1, arg) -> mqs.get(Math.abs(Long.valueOf(SnowflakeIdWorker.getTimeInMs(accountId)).intValue()) % mqs.size()),
-                        0L);
+                        accountId);
+                first = false;
                 break;
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                if (first) {
+                    logger.error(e.getMessage(), e);
+                } else {
+                    logger.error(e.getMessage());
+                }
             }
         }
         return true;

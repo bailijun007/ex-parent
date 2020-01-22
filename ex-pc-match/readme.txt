@@ -1,3 +1,5 @@
+rmq 优化:https://www.cnblogs.com/king1302217/p/10739348.html
+
 内存数据库，双机热备
 
 定时检查撮合是否存活，是否冲突，通过group的概念
