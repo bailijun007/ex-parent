@@ -284,7 +284,7 @@ public class PcOrderService {
 		}
 		
 		Long now = DbDateUtils.now();
-		orderUpdateService.setUserCancel(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
+		orderUpdateService.setUserCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
 	}
 	
 	private boolean canCancel(PcOrder order, Long orderId){

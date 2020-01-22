@@ -26,22 +26,25 @@ public interface PcOrderDAO extends BaseAccountDataMapper<PcOrder, Long> {
 	int update(PcOrder entity);
 
 	public long updateStatus(
-			@Param("orderId") Long orderId,
-			@Param("userId") Long userId, 
-			@Param("newStatus") Integer newStatus, 
-			@Param("oldStatus") Integer oldStatus,
-			@Param("modified") Long modified);
+		@Param("orderId") Long orderId,
+		@Param("userId") Long userId, 
+		@Param("newStatus") Integer newStatus, 
+		@Param("oldStatus") Integer oldStatus,
+		@Param("modified") Long modified
+	);
 
 	public long updateCancelStatus(
-			@Param("orderId") Long orderId,
-			@Param("userId") Long userId, 
-			@Param("cancelStatus") Integer cancelStatus, 
-			@Param("modified") Long modified,
-			@Param("status1") Integer status1,
-			@Param("status2") Integer status2,
-			@Param("activeFlag") Integer activeFlag
-			);
+		@Param("orderId") Long orderId,
+		@Param("userId") Long userId, 
+		@Param("cancelStatus") Integer cancelStatus, 
+		@Param("modified") Long modified,
+		@Param("status1") Integer status1,
+		@Param("status2") Integer status2,
+		@Param("activeFlag") Integer activeFlag
+	);
 
-	public BigDecimal getClosingVolume(@Param("userId") Long userId, @Param("posId") Long posId);
+	public BigDecimal getClosingVolume(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol, @Param("posId") Long posId);
+	
+	public List<PcOrder> queryActiveOrderList(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol);
 
 }

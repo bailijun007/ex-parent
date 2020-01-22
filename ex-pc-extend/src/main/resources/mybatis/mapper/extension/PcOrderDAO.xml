@@ -116,7 +116,13 @@
 		cancel_volume,close_pos_id,time_in_force,trigger_flag,cancel_time,visible_flag,active_flag,create_operator,cancel_operator,
 		remark,client_order_id,user_id,created,modified
 	</sql>
-
+	
+    <sql id="Base_Column_List2">
+		o.id,o.asset,o.symbol,o.close_flag,o.long_flag,o.margin_mode,o.leverage,o.price,o.order_type,o.volume,o.face_value,o.status,o.margin_ratio,
+		o.open_fee_ratio,o.close_fee_ratio,o.fee_cost,o.gross_margin,o.order_margin,o.open_fee,o.close_fee,o.filled_volume,o.cancel_volume,o.close_pos_id,
+		o.time_in_force,o.trigger_flag,o.cancel_time,o.visible_flag,o.active_flag,o.create_operator,o.cancel_operator,o.remark,o.client_order_id,
+		o.user_id,o.created,o.modified
+	</sql>
 
     <select id="getGrossMargin" resultType="java.math.BigDecimal">
         select IFNULL(SUM(gross_margin),0) from pc_order
@@ -284,30 +290,33 @@
     </select>
 
     <select id="queryNextList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
-        select
-        <include refid="Base_Column_List"/>
-        from pc_order
+		SELECT
+			<include refid="Base_Column_List2"/>
+		FROM
+			pc_active_order ao
+		LEFT JOIN 
+			pc_order o ON o.id = ao.id
         <where>
-            <if test="userId!=null">and user_id=#{userId}</if>
-            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
-            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
-            <if test="visibleFlag!=null">and visible_flag=#{visibleFlag}</if>
-            <if test="clientOrderId!=null and clientOrderId!=''">and client_order_id=#{clientOrderId}</if>
-            <if test="closeFlag!=null">and close_flag=#{closeFlag}</if>
-            <if test="longFlag!=null">and long_flag=#{longFlag}</if>
-            <if test="orderType!=null">and order_type=#{orderType}</if>
-            <if test="timeInForce!=null">and time_in_force=#{timeInForce}</if>
-            <if test="marginMode!=null">and margin_mode=#{marginMode}</if>
-            <if test="status!=null">and status=#{status}</if>
-            <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
-            <if test="cancelTimeStart!=null">and cancel_time &gt;= #{cancelTimeStart}</if>
-            <if test="cancelTimeEnd!=null">and cancel_time &lt;= #{cancelTimeEnd}</if>
-            <if test="closePosId!=null">and close_pos_id=#{closePosId}</if>
-            <if test="triggerFlag!=null">and trigger_flag=#{triggerFlag}</if>
+            <if test="userId!=null">and ao.user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
+            <if test="visibleFlag!=null">and o.visible_flag=#{visibleFlag}</if>
+            <if test="clientOrderId!=null and clientOrderId!=''">and o.client_order_id=#{clientOrderId}</if>
+            <if test="closeFlag!=null">and o.close_flag=#{closeFlag}</if>
+            <if test="longFlag!=null">and ao.long_flag=#{longFlag}</if>
+            <if test="orderType!=null">and o.order_type=#{orderType}</if>
+            <if test="timeInForce!=null">and o.time_in_force=#{timeInForce}</if>
+            <if test="marginMode!=null">and o.margin_mode=#{marginMode}</if>
+            <if test="status!=null">and o.status=#{status}</if>
+            <if test="activeFlag!=null">and o.active_flag=#{activeFlag}</if>
+            <if test="cancelTimeStart!=null">and o.cancel_time &gt;= #{cancelTimeStart}</if>
+            <if test="cancelTimeEnd!=null">and o.cancel_time &lt;= #{cancelTimeEnd}</if>
+            <if test="closePosId!=null">and o.close_pos_id=#{closePosId}</if>
+            <if test="triggerFlag!=null">and o.trigger_flag=#{triggerFlag}</if>
 
-            <if test="lastOrderId!=null">and id &lt; #{lastOrderId}</if>
+            <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
         </where>
-        ORDER BY id desc
+        ORDER BY ao.id desc
         <if test="limit!=null">
             LIMIT 0,${limit}
         </if>

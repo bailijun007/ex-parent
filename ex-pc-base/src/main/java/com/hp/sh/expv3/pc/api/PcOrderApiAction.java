@@ -1,18 +1,21 @@
 package com.hp.sh.expv3.pc.api;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.match.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.vo.response.ActiveOrderVo;
 import com.hp.sh.expv3.utils.BidUtils;
 
 @RestController
@@ -23,6 +26,9 @@ public class PcOrderApiAction implements PcOrderApi {
 	
 	@Autowired
 	private PcOrderService pcOrderService;
+
+	@Autowired
+	private PcOrderQueryService orderQueryService;
 	
 	@Autowired
 	private MatchMqSender matchMqSender;
@@ -104,4 +110,8 @@ public class PcOrderApiAction implements PcOrderApi {
 		return maxOpenVolume;
 	}
 
+	public List<ActiveOrderVo> queryActiveList(Long userId, String asset, String symbol){
+		List<ActiveOrderVo> list = orderQueryService.queryActiveList(userId, asset, symbol);
+		return list;
+	}
 }

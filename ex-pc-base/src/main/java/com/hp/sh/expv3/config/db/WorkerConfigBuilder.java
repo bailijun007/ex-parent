@@ -10,6 +10,7 @@ import com.hp.sh.expv3.component.id.config.SequencConfig;
 import com.hp.sh.expv3.component.id.config.WorkerConfig;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccount;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
+import com.hp.sh.expv3.pc.module.order.entity.PcActiveOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderLog;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
@@ -51,6 +52,10 @@ public class WorkerConfigBuilder {
 	private static final String PC_POSITION = PcPosition.class.getName();
 	private static final int PC_POSITION_ID = 9;
 	
+	private static final String PC_ACTIVE_ORDER = PcActiveOrder.class.getName();
+	private static final int PC_ACTIVE_ORDER_ID = 10;
+	
+	
 	@Value("${id.generator.dataCenterId}")
 	private int dataCenterId;
 	
@@ -78,6 +83,7 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, PC_ORDER_LOG_ID, PC_ORDER_LOG);
 		this.set(workerConfig, PC_ORDER_TRADE_ID, PC_ORDER_TRADE);
 		this.set(workerConfig, PC_POSITION_ID, PC_POSITION);
+		this.set(workerConfig, PC_ACTIVE_ORDER_ID, PC_ACTIVE_ORDER);
 	}
 	
 	private void set(WorkerConfig workerConfig, int seqId, String tableUUID){

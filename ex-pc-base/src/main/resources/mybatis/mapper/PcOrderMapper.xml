@@ -174,11 +174,30 @@
 	</update>
 
 	<select id="getClosingVolume" resultType="java.math.BigDecimal">
-		select
-			sum(volume-cancel_volume-filled_volume)
-		from pc_order
-			where user_id=#{userId} and close_pos_id=#{posId}
-			and active_flag=1
+		SELECT
+			sum(o.volume - o.cancel_volume - o.filled_volume)
+		FROM
+			pc_active_order ao
+		LEFT JOIN 
+			pc_order o ON o.id = ao.id
+		where 
+			ao.user_id=#{userId}
+			and ao.asset=#{asset}
+			and ao.symbol=#{symbol}
+			and o.close_pos_id=#{posId}
+	</select>
+	
+	<select id="queryActiveOrderList" resultMap="PcOrder">
+		SELECT
+			o.*
+		FROM
+			pc_active_order ao
+		LEFT JOIN 
+			pc_order o ON o.id = ao.id
+		where 
+			ao.user_id=#{userId}
+			and ao.asset=#{asset}
+			and ao.symbol=#{symbol}
 	</select>
 
 </mapper>

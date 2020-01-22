@@ -112,7 +112,7 @@ public class PcPositionMarginService {
         	throw new ExException(PcPositonError.PARAM_GT_MAX_LEVERAGE);
         }
         
-        //是否有活跃委托
+        //是否有活动委托
         if (orderQueryService.hasActiveOrder(userId, asset, symbol, longFlag)) {
             throw new ExException(PcPositonError.HAVE_ACTIVE_ORDER);
         }

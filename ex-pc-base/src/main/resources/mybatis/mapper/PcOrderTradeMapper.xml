@@ -134,4 +134,17 @@
 
 	<!--  -->
 	
+	<select id="queryOrderTrade" resultType="com.hp.sh.expv3.pc.strategy.vo.OrderTradeVo">
+		select
+			volume, price, order_id, id
+		from 
+			pc_order_trade
+		where
+			user_id=#{userId}
+		and order_id in
+			<foreach item="item" index="i" collection="orderIdList" open="(" separator="," close=")">
+			#{orderIdList[${i}]}
+			</foreach>
+	</select>
+	
 </mapper>

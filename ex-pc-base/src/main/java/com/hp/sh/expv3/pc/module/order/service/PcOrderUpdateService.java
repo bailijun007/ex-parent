@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.constant.PcOrderLogType;
 import com.hp.sh.expv3.pc.constant.TriggerType;
+import com.hp.sh.expv3.pc.module.order.dao.PcActiveOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderLogDAO;
+import com.hp.sh.expv3.pc.module.order.entity.PcActiveOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderLog;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
@@ -25,6 +27,9 @@ public class PcOrderUpdateService {
 
 	@Autowired
 	private PcOrderLogDAO pcOrderLogDAO;
+
+	@Autowired
+	private PcActiveOrderDAO pcActiveOrderDAO;
 	
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -34,8 +39,10 @@ public class PcOrderUpdateService {
 		//日志
 		Long now = DbDateUtils.now();
 		this.saveUserOrderLog(pcOrder.getUserId(), pcOrder.getId(), PcOrderLogType.CREATE, now);
+		
+		this.saveActiveOrder(pcOrder);
 	}
-
+	
 	public PcOrderLog updateOrder(PcOrder order, long now) {
 		this.pcOrderDAO.update(order);
 		
@@ -44,7 +51,16 @@ public class PcOrderUpdateService {
 		
 		this.publishOrderEvent(order, orderLog);
 		
+		this.updateActiveOrder(order);
+		
 		return orderLog;
+	}
+
+	public void updateOrder4Trad(PcOrder order){
+		this.pcOrderDAO.update(order);
+		this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.TRADE, order.getModified());
+		
+		this.updateActiveOrder(order);
 	}
 
 	public PcOrderLog setNewStatus(long orderId, long userId, int newStatus, int pendingNew, long modified) {
@@ -63,7 +79,7 @@ public class PcOrderUpdateService {
 		return orderLog;
 	}
 
-	public void setUserCancel(long orderId, long userId, int cancelStatus, long modified, int status1, int status2, int activeFlag) {
+	public void setUserCancelStatus(long orderId, long userId, int cancelStatus, long modified, int status1, int status2, int activeFlag) {
 		long count = this.pcOrderDAO.updateCancelStatus(orderId, userId, cancelStatus, modified, status1, status2, activeFlag);
 		
 		if(count==0){
@@ -73,11 +89,6 @@ public class PcOrderUpdateService {
 		
 		//日志
 		this.saveUserOrderLog(userId, orderId, PcOrderLogType.CHANGE_STATUS_CANCEL, modified);
-	}
-	
-	public void updateOrder4Trad(PcOrder order){
-		this.pcOrderDAO.update(order);
-		this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.TRADE, order.getModified());
 	}
 	
 	private PcOrderLog saveUserOrderLog(long userId, long orderId, int type, long now){
@@ -107,5 +118,20 @@ public class PcOrderUpdateService {
 	private void publishOrderEvent(PcOrder order, PcOrderLog pcOrderLog){
 		PcOrderEvent event = new PcOrderEvent(order, pcOrderLog);
 		publisher.publishEvent(event);
+	}
+
+	private void saveActiveOrder(PcOrder pcOrder) {
+		PcActiveOrder pcActiveOrder = new PcActiveOrder();
+		pcActiveOrder.setId(pcOrder.getId());
+		pcActiveOrder.setUserId(pcOrder.getUserId());
+		pcActiveOrder.setAsset(pcOrder.getAsset());
+		pcActiveOrder.setSymbol(pcOrder.getSymbol());
+		this.pcActiveOrderDAO.save(pcActiveOrder);
+	}
+
+	private void updateActiveOrder(PcOrder order) {
+		if(order.getActiveFlag()==PcOrder.NO){
+			this.pcActiveOrderDAO.delete(order.getId(), order.getUserId());
+		}
 	}
 }
