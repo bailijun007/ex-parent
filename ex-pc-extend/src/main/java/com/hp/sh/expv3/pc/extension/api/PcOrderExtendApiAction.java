@@ -85,11 +85,17 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         }
         PageResult<UserOrderVo> result = new PageResult<>();
         List<UserOrderVo> list = new ArrayList<>();
-        PageResult<PcOrderVo> voList = pcOrderExtendService.queryUserActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber);
+        PageResult<PcOrderVo> voList = null;
+        if (lastOrderId == null) {
+            voList =pcOrderExtendService.queryActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber);
+        } else {
+            voList = pcOrderExtendService.queryUserActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber);
+        }
         convertOrderList(userId, asset, symbol, list, voList.getList());
 
         result.setList(list);
         result.setRowTotal(voList.getRowTotal());
+        result.setPageNo(currentPage);
         return result;
     }
 
@@ -213,8 +219,14 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     public List<UserOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage) {
         this.checkParam(userId, asset, currentPage, pageSize, nextPage);
         List<UserOrderVo> result = new ArrayList<>();
-        PageResult<PcOrderVo> list = pcOrderExtendService.queryHistoryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, null);
-        convertOrderList(userId, asset, symbol, result, list.getList());
+        PageResult<PcOrderVo> list = null;
+        if (lastOrderId == null) {
+            List<PcOrderVo> voList = pcOrderExtendService.queryHistory(userId, asset, symbol, orderType, longFlag, closeFlag, null, pageSize);
+            convertOrderList(userId, asset, symbol, result, voList);
+        } else {
+            list = pcOrderExtendService.queryHistoryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, null);
+            convertOrderList(userId, asset, symbol, result, list.getList());
+        }
         return result;
     }
 
@@ -239,12 +251,17 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         this.checkParam(userId, asset, currentPage, pageSize, nextPage);
         PageResult<UserOrderVo> pageResult = new PageResult<UserOrderVo>();
         List<UserOrderVo> list = new ArrayList<>();
-        PageResult<PcOrderVo> voPageResult = pcOrderExtendService.queryAllOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, ExtCommonConstant.IS_PAGE_YES);
+        PageResult<PcOrderVo> voPageResult = null;
+        if (lastOrderId == null) {
+            voPageResult = pcOrderExtendService.queryAll(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, pageSize, ExtCommonConstant.IS_PAGE_YES);
+        } else {
+            voPageResult = pcOrderExtendService.queryAllOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, ExtCommonConstant.IS_PAGE_YES);
+        }
         convertOrderList(userId, asset, symbol, list, voPageResult.getList());
         pageResult.setList(list);
-        Integer rowTotal = Integer.parseInt(String.valueOf(voPageResult.getRowTotal()));
         pageResult.setRowTotal(voPageResult.getRowTotal());
-        pageResult.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
+        pageResult.setPageNo(currentPage);
+
         return pageResult;
     }
 

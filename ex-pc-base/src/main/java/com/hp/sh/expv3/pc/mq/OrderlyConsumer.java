@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 import com.hp.sh.expv3.pc.constant.MqTopic;
@@ -55,7 +56,7 @@ public class OrderlyConsumer {
 
         	@Override
         	public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext context) {
-        		logger.debug("收到消息：{}", msgs);
+        		logger.info("收到消息：{}", msgs);
         		context.setAutoCommit(true);
         		try{
         			boolean success = endpointContext.consumeMessage(null, msgs);
@@ -66,11 +67,15 @@ public class OrderlyConsumer {
         			}
         		}catch(ReSendException re){
         			Throwable cause = ExceptionUtils.getRootCause(re);
-        			logger.debug(cause.getMessage(), cause);
+        			logger.error(cause.getMessage(), cause);
+        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
+        		}catch(ExException e){
+        			Throwable cause = ExceptionUtils.getRootCause(e);
+        			logger.error(e.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error(cause.getMessage(), cause);
+        			logger.error(cause.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		

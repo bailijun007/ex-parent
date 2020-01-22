@@ -14,6 +14,4 @@ public class Paystatus {
 
 	public static final int FAIL = 2;//失败
 	
-	public static final int SYNCH = 3;//已同步余额
-	
 }

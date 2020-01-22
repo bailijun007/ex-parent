@@ -62,7 +62,7 @@ public class WithdrawalPayJob {
 		//调用充值接口
 		BigDecimal amount = record.getAmount();
 		Integer symbol = asset2Symbol.getSymbol(record.getAsset());
-		WithDrawResponse response = exChainService.draw(record.getUserId(), symbol , amount);
+		WithDrawResponse response = exChainService.draw(record.getUserId(), symbol , amount, record.getSn());
 		if( response.getStatus()!=WithDrawResponse.STATUS_FAIL ){
 			this.withdrawalService.onDrawSuccess(record.getUserId(), record.getId(), response.getTxHash());
 		}else{

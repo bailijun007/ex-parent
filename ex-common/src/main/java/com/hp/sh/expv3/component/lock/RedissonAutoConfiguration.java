@@ -26,6 +26,12 @@ public class RedissonAutoConfiguration {
 	@Value("${spring.redis.password}")
 	private String redisPassword;
 	
+	@Value("${spring.redis.database:0}")
+	private Integer database;
+	
+	@Value("${redisson.lock.prefix:redisson}")
+    private String keyPrefix;
+	
     @Bean
     public  RedissonClient getRedisson() throws IOException {
 
@@ -35,7 +41,8 @@ public class RedissonAutoConfiguration {
                 .setAddress("redis://"+redisHost+":"+redisPort)
                 .setTimeout(2000)
                 .setConnectionPoolSize(50)
-                .setConnectionMinimumIdleSize(10);
+                .setConnectionMinimumIdleSize(10)
+                .setDatabase(database);
         if(StringUtils.isNotBlank(redisPassword)){
         	bc.setPassword(redisPassword);
         }

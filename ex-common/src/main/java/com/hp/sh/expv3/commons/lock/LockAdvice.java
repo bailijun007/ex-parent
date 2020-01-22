@@ -49,6 +49,7 @@ public class LockAdvice {
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
 		String realKey=null;
+		long time = 0 ;
 		try{
 			Object[] args = joinPoint.getArgs();
 			MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -57,7 +58,8 @@ public class LockAdvice {
 			String configKey = lockIt.key();
 			String[] names = signature.getParameterNames();
 			realKey = getRealKey(configKey, args, names);
-			logger.debug("lock:{},{}", realKey, method);
+			time = System.currentTimeMillis();
+			logger.debug("lock:{},{},{}", realKey, method, time);
 			this.lock(realKey);
 			Object result = joinPoint.proceed(args);
 			return result;
@@ -65,17 +67,18 @@ public class LockAdvice {
 			if(realKey!=null){
 				try{
 					this.unlock(realKey);
+					time = System.currentTimeMillis()-time;
+					logger.debug("unlock：{},{},{}", realKey, time, (time/1000));
 				}catch(Exception e){
 					logger.error("解锁失败：{}", realKey, e);
 					throw e;
 				}
 			}
-			logger.debug("unlock：{}", realKey);
 		}      
     }
 	
 	private void lock(String realKey) {
-		this.locker.lock(realKey, 30);
+		this.locker.lock(realKey, 60);
 	}
 
 	private void unlock(String realKey) {
@@ -104,7 +107,7 @@ public class LockAdvice {
 				val = PropertyUtils.getSimpleProperty(val, varpp);
 			}
 			if(val==null){
-				logger.warn("lock key var is null：key={},var={},pvar={}", key, var, varpp);
+				logger.error("lock key var is null：key={},var={},pvar={}", key, var, varpp);
 			}
 			sb.append(val);
 			start = matcher.end();

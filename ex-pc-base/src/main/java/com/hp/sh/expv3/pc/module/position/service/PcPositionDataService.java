@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
+import com.hp.sh.expv3.pc.module.position.vo.PosUID;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
@@ -56,6 +57,11 @@ public class PcPositionDataService {
 
 	public List<PcPosition> queryActivePosList(Page page, Long userId, String asset, String symbol) {
 		List<PcPosition> list = this.pcPositionDAO.queryActivePosList(page, userId, asset, symbol);
+		return list;
+	}
+
+	public List<PosUID> queryActivePosIdList(Page page, Long userId, String asset, String symbol) {
+		List<PosUID> list = this.pcPositionDAO.queryActivePosIdList(page, userId, asset, symbol);
 		return list;
 	}
 	

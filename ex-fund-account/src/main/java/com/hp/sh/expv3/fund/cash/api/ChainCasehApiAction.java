@@ -8,14 +8,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.fund.cash.api.vo.BysCreateResult;
 import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
 import com.hp.sh.expv3.fund.cash.constant.PayChannel;
+import com.hp.sh.expv3.fund.cash.entity.DepositAddr;
+import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
+import com.hp.sh.expv3.fund.cash.mq.WithDrawalMsg;
+import com.hp.sh.expv3.fund.cash.mq.WithDrawalSender;
+import com.hp.sh.expv3.fund.cash.service.DepositAddrService;
 import com.hp.sh.expv3.fund.cash.service.complex.DepositService;
 import com.hp.sh.expv3.fund.cash.service.complex.WithdrawalService;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.error.WalletError;
+import com.hp.sh.expv3.utils.IntBool;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,16 +48,32 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	private WithdrawalService withdrawalService;
 	
 	@Autowired
+	private DepositAddrService depositAddrService;
+	
+	@Autowired
 	private FundAccountCoreApi fundAccountCoreApi;
+	
+	@Autowired
+	private WithDrawalSender mqSender;
 	
 	int _____充值______;
 	
 	@ApiOperation(value = "1、获取充币地址")
 	public String getDepositAddress(Long userId, String asset){
-		Integer symbolId = asset2Symbol.getSymbol(asset);
-		String address = chainService.getAddress(userId, symbolId);
-        System.out.println("address = " + address);
-		return address;
+		DepositAddr addr = depositAddrService.getDepositAddress(userId, asset);
+		if(addr==null){
+			Integer symbolId = asset2Symbol.getSymbol(asset);
+			String address = chainService.getAddress(userId, symbolId);
+	        System.out.println("address = " + address);
+	        addr = new DepositAddr();
+	        addr.setAsset(asset);
+	        addr.setUserId(userId);
+	        addr.setAddress(address);
+	        addr.setRemark("bys:"+symbolId);
+	        addr.setEnabled(IntBool.YES);
+	        this.depositAddrService.save(addr);
+		}
+        return addr.getAddress();
 	}
 	
 	@Override
@@ -64,9 +85,9 @@ public class ChainCasehApiAction implements ChainCasehApi{
 
 	//bys callback
 	@ApiOperation(value = "3、创建充值记录")
-	public BysCreateResult createDeposit(Long userId, String chainOrderId, String asset, String account, BigDecimal amount, String txHash) {
+	public String createDeposit(Long userId, String chainOrderId, String asset, String account, BigDecimal amount, String txHash) {
 		String sn = this.depositService.deposit(userId, asset, account, amount, chainOrderId, PayChannel.BYS, txHash);
-		return new BysCreateResult(sn);
+		return sn;
 	}
 	
 	//bys callback
@@ -95,7 +116,12 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	@ApiOperation(value = "2、批准提现")
 	public void approve(Long userId, Long id){
 		//修改状态
-		withdrawalService.approveWithdrawal(userId, id);
+		WithdrawalRecord record = withdrawalService.approveWithdrawal(userId, id);
+		
+		//发消息
+		if(record!=null){
+			mqSender.send(new WithDrawalMsg(record.getUserId(), record.getId()));
+		}
 	}
 	
 	@Override

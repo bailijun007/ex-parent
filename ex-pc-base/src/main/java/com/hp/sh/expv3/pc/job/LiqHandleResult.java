@@ -2,6 +2,7 @@ package com.hp.sh.expv3.pc.job;
 
 import java.math.BigDecimal;
 
+import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 
 public class LiqHandleResult {
@@ -13,6 +14,8 @@ public class LiqHandleResult {
     private BigDecimal liqPrice;
 	
 	private MarkPriceVo markPriceVo;
+	
+	private PcPosition pcPosition;
 
 	public boolean isTrigger() {
 		return trigger;
@@ -36,6 +39,14 @@ public class LiqHandleResult {
 
 	public void setMarkPriceVo(MarkPriceVo markPriceVo) {
 		this.markPriceVo = markPriceVo;
+	}
+
+	public PcPosition getPcPosition() {
+		return pcPosition;
+	}
+
+	public void setPcPosition(PcPosition pcPosition) {
+		this.pcPosition = pcPosition;
 	}
     
 }

@@ -36,7 +36,7 @@ public class FundTransferCoreService {
 		Long now = DbDateUtils.now();
 		
 		FundTransfer transfer = new FundTransfer();
-		transfer.setSn(SnUtils.genTransferSn());
+		transfer.setSn(SnUtils.newTransferSn());
 		transfer.setAsset(asset);
 		transfer.setAmount(amount);
 		transfer.setSrcAccountType(srcAccountType);

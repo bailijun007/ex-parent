@@ -19,9 +19,24 @@ public final class C2cConst {
     public static final String C2C_PAY_STATUS_DESC_WITHDRAWAL = "c2c体现";
     public static final String C2C_PAY_STATUS_DESC_PAY_OVERTIME = "支付超时";
 
+    //审批状态：4-审批中, 5-审批通过, 6-拒绝
+    public static final int C2C_APPROVAL_STATUS_IN_AUDIT  = 4;
+
+    public static final int C2C_APPROVAL_STATUS_PASS  = 5;
+
+    public static final int C2C_APPROVAL_STATUS_REJECTED  = 6;
+
 
     //同步状态 0：未同步，1：已同步
     public static final int C2C_SYNCH_STATUS_FALSE  = 0;
     public static final int C2C_SYNCH_STATUS_TRUE  = 1;
+
+
+    //体现状态:0-pending，1-支付成功，2-支付失败, 3-同步余额, 4-审核中, 5-审核通过'
+    public static final int WITHDRAWAL_RECORD_PAY_STATUS_PAYMENT_FAILED = 2;
+
+
+    public static final String LOCKED_ASSET="USDT";
+
 
 }

@@ -27,23 +27,24 @@ public interface WithdrawalRecordExtApi {
             @ApiImplicitParam(name = "userId", value = "用户id", example = "2", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "ETH", required = true),
             @ApiImplicitParam(name = "queryId", value = "充币记录表主键编号", example = "1", required = false),
-            @ApiImplicitParam(name = "pageStatus", value = "翻页状态：-1：上一页，1：下一页", example = "1"),
+            @ApiImplicitParam(name = "pageStatus", value = "翻页状态：-1：上一页，1：下一页", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
     @GetMapping(value = "/api/extension/account/withdrawal/queryHistory")
     public List<WithdrawalRecordVo> queryHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset") String asset,
-                                                 @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize,
+                                                 @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize,
                                                  @RequestParam(value = "pageStatus") Integer pageStatus);
 
     @ApiOperation("通过时间戳获取用户提币记录（不含提币失败的）")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "2", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "ETH", required = true),
-            @ApiImplicitParam(name = "timestamp", value = "时间戳", required = true)
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = true)
     })
     @GetMapping(value = "/api/extension/account/withdrawal/queryHistoryByTime")
     public List<WithdrawalRecordVo> queryHistoryByTime(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset") String asset,
-                                                       @RequestParam(value = "timestamp") Long timestamp);
+                                                       @RequestParam(value = "startTime") Long startTime, @RequestParam(value = "endTime") Long endTime);
 
 
     @ApiOperation("获取最新提币历史")
@@ -55,8 +56,6 @@ public interface WithdrawalRecordExtApi {
     public WithdrawalRecordVo queryLastHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset") String asset);
 
 
-
-
     @ApiOperation("查询某个用户一段时间的提币数量")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "2", required = true),
@@ -66,11 +65,9 @@ public interface WithdrawalRecordExtApi {
     })
     @GetMapping(value = "/api/extension/account/withdrawal/queryUserWithdrawal")
     public List<WithdrawalRecordVo> queryUserWithdrawal(@RequestParam(value = "userId") Long userId,
-                                                  @RequestParam(value = "asset",required = false) String asset,
-                                                  @RequestParam(value = "startTime") Long startTime,
-                                                  @RequestParam(value = "endTime") Long endTime);
-
-
+                                                        @RequestParam(value = "asset", required = false) String asset,
+                                                        @RequestParam(value = "startTime") Long startTime,
+                                                        @RequestParam(value = "endTime") Long endTime);
 
 
     @ApiOperation("查询所有用户提币历史 后台admin专用")
@@ -87,7 +84,7 @@ public interface WithdrawalRecordExtApi {
     public PageResult<WithdrawalRecordVo> queryAllUserHistory(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "asset", required = false) String asset,
                                                               @RequestParam(value = "startTime", required = false) Long startTime, @RequestParam(value = "endTime", required = false) Long endTime,
                                                               @RequestParam(value = "approvalStatus", required = false) Integer approvalStatus,
-                                                              @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize);
+                                                              @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize);
 
 
 }

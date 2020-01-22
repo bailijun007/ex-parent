@@ -48,7 +48,7 @@ public class WithdrawalService {
 		
 		Long now = DbDateUtils.now();
 		WithdrawalRecord rr = new WithdrawalRecord();
-		rr.setSn(SnUtils.genDepositSn());
+		rr.setSn(SnUtils.newDepositSn());
 		rr.setUserId(userId);
 		rr.setAsset(asset);
 		rr.setAccount(account);
@@ -57,13 +57,16 @@ public class WithdrawalService {
 		rr.setCreated(now);
 		rr.setModified(now);
 		
-		rr.setTransactionId(null);
+		rr.setTransactionId(transactionId);
 		rr.setPayStatus(Paystatus.PENDING);
 		rr.setPayStatusDesc(null);
 		rr.setPayTime(null);
 		rr.setPayFinishTime(null);
 		
 		rr.setSynchStatus(SynchStatus.NO);
+		
+		rr.setApprovalStatus(ApprovalStatus.IN_AUDIT);
+		
 		this.withdrawalRecordDAO.save(rr);
 	}
 	
@@ -73,14 +76,14 @@ public class WithdrawalService {
 	 */
 	public WithdrawalRecord approveWithdrawal(Long userId, Long id){
 		WithdrawalRecord record = this.withdrawalRecordDAO.findById(userId, id);
+		if(record.getApprovalStatus()!=ApprovalStatus.IN_AUDIT){
+			return null;
+		}
 		record.setApprovalStatus(ApprovalStatus.APPROVED);
 		record.setSynchStatus(SynchStatus.SYNCH); // 下面同事务执行口扣款，所以这里直接设置为已同步
 		record.setModified(DbDateUtils.now());
 		this.withdrawalRecordDAO.update(record);
 		this.cutBalance(record);
-		
-		//发消息
-		mqSender.send(new WithDrawalMsg(record.getUserId(), record.getId()));
 		return record;
 	}
 	
@@ -140,9 +143,10 @@ public class WithdrawalService {
 	@Deprecated
 	private void cutBalance(WithdrawalRecord record){
 		FundCutRequest request = new FundCutRequest();
+		request.setAsset(record.getAsset());
 		request.setAmount(record.getAmount());
 		request.setRemark("提现扣款:"+ PayChannel.getName(record.getChannelId()));
-		request.setTradeNo(SnUtils.genSynchCutSn(record.getSn()));
+		request.setTradeNo(SnUtils.getSynchCutSn(record.getSn()));
 		request.setTradeType(TradeType.WITHDRAWAL);
 		request.setUserId(record.getUserId());
 		
@@ -162,7 +166,7 @@ public class WithdrawalService {
 		FundAddRequest addRequest = new FundAddRequest();
 		addRequest.setAmount(rr.getAmount());
 		addRequest.setRemark("提现失败返回账户:"+ PayChannel.getName(rr.getChannelId()));
-		addRequest.setTradeNo(SnUtils.genSynchReturnSn(rr.getSn()));
+		addRequest.setTradeNo(SnUtils.getSynchReturnSn(rr.getSn()));
 		addRequest.setTradeType(TradeType.WITHDRAWAL_RETURN);
 		addRequest.setUserId(rr.getUserId());
 		fundAccountCoreApi.add(addRequest);

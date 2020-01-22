@@ -18,4 +18,9 @@ public class CancelOrder {
 	public void setCancelNumber(BigDecimal cancelNumber) {
 		this.cancelNumber = cancelNumber;
 	}
+	@Override
+	public String toString() {
+		return "CancelOrder [orderId=" + orderId + ", cancelNumber=" + cancelNumber + "]";
+	}
+	
 }

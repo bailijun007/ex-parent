@@ -22,6 +22,7 @@ import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcLiqRecordDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
+import com.hp.sh.expv3.pc.module.position.vo.PosUID;
 import com.hp.sh.expv3.pc.mq.liq.msg.CancelOrder;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
@@ -66,50 +67,44 @@ public class PcLiqService {
     private ApplicationEventPublisher publisher;
 
     @LockIt(key="${pos.userId}-${pos.asset}-${pos.symbol}")
-	public LiqHandleResult checkPosLiq(PcPosition pos) {
+	public LiqHandleResult checkPosLiq(PosUID pos) {
+    	PcPosition pcPosition = this.positionDataService.getPosition(pos.getUserId(), pos.getId());
 		LiqHandleResult liqResult = new LiqHandleResult();
 		
-		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getSymbol());
+		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pcPosition.getAsset(), pcPosition.getSymbol());
 		//检查触发强平
-		if(!this.checkAndResetLiqStatus(pos, markPriceVo.getMarkPrice())){
+		if(!this.checkAndResetLiqStatus(pcPosition, markPriceVo.getMarkPrice())){
 			return liqResult;
 		}
 		
 		//追加保证金
-		if(pos.getAutoAddFlag()==IntBool.YES){
-			this.pcPositionMarginService.autoAddMargin(pos);
+		if(pcPosition.getAutoAddFlag()==IntBool.YES){
+			this.pcPositionMarginService.autoAddMargin(pcPosition);
 		}
 		
 		//检查触发强平
-		if(!this.checkAndResetLiqStatus(pos, markPriceVo.getMarkPrice())){
+		if(!this.checkAndResetLiqStatus(pcPosition, markPriceVo.getMarkPrice())){
 			return liqResult;
 		}
 		
 		//强平仓位,修改状态等
-		this.lockLiq(pos);
+		this.lockLiq(pcPosition);
 		
 		liqResult.setTrigger(true);
 		liqResult.setMarkPriceVo(markPriceVo);
-		liqResult.setLiqPrice(pos.getLiqPrice());
+		liqResult.setLiqPrice(pcPosition.getLiqPrice());
+		liqResult.setPcPosition(pcPosition);
 		return liqResult;
 		
 	}
 
 	/*
-	 * 是否触发强平
+	 * 是否触发强平,如果没有改回强平状态
 	 * @param pos
 	 * @return 是否触发强平
 	 */
 	private boolean checkAndResetLiqStatus(PcPosition pos, BigDecimal markPrice) {
-		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal posPnl = holdPosStrategy.calcPosPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
-		BigDecimal posMarginRatio = holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), posPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
-		//保留两位小数
-		posMarginRatio = posMarginRatio.setScale(Precision.LIQ_MARGIN_RATIO, Precision.LESS);
-		//维持保证金率
-		BigDecimal holdMarginRatio = pos.getHoldMarginRatio();
-		
-		if(BigUtils.le(posMarginRatio, holdMarginRatio)){ //强平
+		if(checkLiqStatus(pos, markPrice)){ //强平
 			return true;
 		}else{ //不强平
 			if(pos.getLiqStatus()!=LiqStatus.NON){
@@ -118,6 +113,23 @@ public class PcLiqService {
 			}
 			return false;
 		}
+	}
+
+	/*
+	 * 是否触发强平
+	 * @param pos
+	 * @return 是否触发强平
+	 */
+	public boolean checkLiqStatus(PcPosition pos, BigDecimal markPrice) {
+		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
+		BigDecimal posPnl = holdPosStrategy.calcPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
+		BigDecimal posMarginRatio = holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), posPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
+		//保留两位小数
+		posMarginRatio = posMarginRatio.setScale(Precision.LIQ_MARGIN_RATIO, Precision.LESS);
+		//维持保证金率
+		BigDecimal holdMarginRatio = pos.getHoldMarginRatio();
+		
+		return BigUtils.le(posMarginRatio, holdMarginRatio);
 	}
 	
 	private void lockLiq(PcPosition pos) {
@@ -134,6 +146,11 @@ public class PcLiqService {
 		
 		if(pos.getLiqStatus()==LiqStatus.FORCE_CLOSE){
 			logger.warn("仓位已经被强平：posId={}", posId);
+			return;
+		}
+		
+		if(pos.getLiqStatus()==LiqStatus.NON){
+			logger.warn("仓位强平状态错误：posId={}", posId);
 			return;
 		}
 		
@@ -155,7 +172,12 @@ public class PcLiqService {
 		}
 	}
 	
-	void doLiq(PcPosition pos){
+    @LockIt(key="${pos.userId}-${pos.asset}-${pos.symbol}")
+	public void forceClose(PcPosition pos) {
+    	this.doLiq(pos);
+    }
+	
+	private void doLiq(PcPosition pos){
 		Long now = DbDateUtils.now();
 		//1、保存强平记录
 		PcLiqRecord record = this.saveLiqRecord(pos, now);

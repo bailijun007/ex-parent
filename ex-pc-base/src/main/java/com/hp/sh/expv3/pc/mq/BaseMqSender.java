@@ -61,12 +61,20 @@ public class BaseMqSender {
 	}
 
 	protected void send(Message mqMsg) {
-		try {
-	        SendResult sendResult = producer.send(mqMsg, new OrderMessageQueueSelector(), 0);
-	        logger.info("sendMsg:{}-{}-{}", mqMsg.getTags(), mqMsg.getKeys(),sendResult.toString());
-		} catch (Exception e) {
-			logger.error("发送失败:{}-{}-{}", mqMsg.getTags(), mqMsg.getKeys());
-			throw new RuntimeException(e);
+		int n = 0;
+		while(true){
+			try {
+		        SendResult sendResult = producer.send(mqMsg, new OrderMessageQueueSelector(), 0);
+		        logger.info("sendMsg:{}->{}->{}->{},{}", mqMsg.getTags(), mqMsg.getTopic(), mqMsg.getKeys(),(n++) ,sendResult.toString());
+		        break;
+			} catch (Exception e) {
+				logger.error("发送失败:{}-{}-{}", mqMsg.getTags(), mqMsg.getKeys(), e);
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
 		}
 	}
 

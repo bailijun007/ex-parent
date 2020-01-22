@@ -63,7 +63,7 @@ public class ExChainService{
 		return response.getIsOk();
 	}
 	
-	public WithDrawResponse draw(Long userId, Integer symbol, BigDecimal amount){
+	public WithDrawResponse draw(Long userId, Integer symbol, BigDecimal amount, String merWithdrawId){
 		WithDrawRequest request = new WithDrawRequest();
 		request.setAccount(""+userId);
 		request.setAddress(self.getAddress(userId, symbol));
@@ -71,6 +71,7 @@ public class ExChainService{
 		request.setMerWithdrawId(null);
 		request.setSymbol(symbol);
 		request.setValue(amount.toString());
+		request.setMerWithdrawId(merWithdrawId);
 		WithDrawResponse response = this.client().draw(request);
 		return response;
 	}

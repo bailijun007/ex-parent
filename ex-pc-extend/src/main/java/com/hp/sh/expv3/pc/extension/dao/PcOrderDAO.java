@@ -27,4 +27,6 @@ public interface PcOrderDAO {
     Long queryCount(Map<String, Object> map);
 
     List<PcOrderVo> queryUserActivityOrder(Map<String, Object> map);
+
+	List<PcOrderVo> queryNextList(Map<String, Object> map);
 }

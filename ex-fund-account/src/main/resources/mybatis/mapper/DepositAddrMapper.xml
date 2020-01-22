@@ -20,21 +20,14 @@
 
 	<sql id="simple_where">
 		<where>
-			<if test="idList!=null">
-				and id in
-				<foreach item="item" index="i" collection="idList" open="("
-					separator="," close=")">
-					#{idList[${i}]}
-				</foreach>
-			</if>
-			<if test="enabled!=null"> and enabled=#{enabled}</if>
 			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+			<if test="enabled!=null"> and enabled=#{enabled}</if>
 			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
 			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 			<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
 			<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
-			<if test="keyword!=null and keyword!=''">
-				and address like CONCAT('%',#{keyword},'%')
+			<if test="keyword!=null and keyword!=''"> and address like CONCAT('%',#{keyword},'%')
 			</if>
 		</where>
 	</sql>

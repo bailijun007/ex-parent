@@ -1,18 +1,15 @@
 package com.hp.sh.expv3.pc.module.position.service;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.error.ExCommonError;
-import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.constant.ChangeMarginOptType;
@@ -63,16 +60,17 @@ public class PcPositionMarginService {
     @Autowired
     private CommonOrderStrategy orderStrategy;
 	
+    /**
+     * 超过最大杠杆时，修改杠杆。只修改对象的值，不保存。
+     * @param pos
+     * @param leverage
+     * @param modifiedTime
+     */
 	public void downLeverage(PcPosition pos, BigDecimal leverage, long modifiedTime){
 		long userId = pos.getUserId();
 		String asset = pos.getAsset();
 		String symbol = pos.getSymbol();
 		Integer longFlag = pos.getLongFlag();
-		
-		//检查平仓状态
-        if (pos.getLiqStatus()==LiqStatus.FROZEN) {
-            throw new ExException(PcPositonError.LIQING);
-        }
 
         //修改设置
         PcAccountSymbol accountSymbol = this.accountSymbolService.getOrCreate(userId, asset, symbol);
@@ -205,7 +203,7 @@ public class PcPositionMarginService {
 		
 		//检查可减少的保证金
 		if(optType==ChangeMarginOptType.CUT){
-			BigDecimal diff = this.getMinMarginDiff(pos);
+			BigDecimal diff = this.getMaxReducedMargin(pos);
 			if(BigUtils.gt(amount, diff)){
 				throw new ExException(PcPositonError.NO_MORE_MARGIN, amount, diff);
 			}
@@ -230,16 +228,45 @@ public class PcPositionMarginService {
 		this.positionDataService.update(pos);
 	}
 	
+	/**
+	 * 不验证，直接减，用于手动强平
+	 * @param userId
+	 * @param asset
+	 * @param symbol
+	 * @param longFlag
+	 * @param amount
+	 */
+	@Deprecated
+	@LockIt(key="${userId}-${asset}-${symbol}")
+	public void cutMargin(Long userId, String asset, String symbol, Long posId, BigDecimal amount){
+		//当前仓位
+		PcPosition pos = this.positionDataService.getPosition(userId, posId);
+		if(pos==null){
+			throw new ExSysException(ExCommonError.OBJ_DONT_EXIST);
+		}
+		//减少仓位保证金
+		this.returnManualMargin(userId, pos.getAsset(), pos.getId(), amount);
+		pos.setPosMargin(pos.getPosMargin().subtract(amount));
+		
+		//重新计算强平价
+		BigDecimal liqPrice = this.calcLiqPrice(pos);
+		pos.setLiqPrice(liqPrice);
+		
+		//保存
+		pos.setModified(DbDateUtils.now());
+		this.positionDataService.update(pos);
+	}
+	
 	private BigDecimal calcLiqPrice(PcPosition pos) {
 		BigDecimal liqPrice = strategyContext.calcLiqPrice(pos);
 		return liqPrice;
 	}
 
 	/**
-	 * 可减少的保证金
+	 * 强平保证金
 	 * @return
 	 */
-	protected BigDecimal getMinMarginDiff(PcPosition pos){
+	public BigDecimal getLiqMarginDiff(PcPosition pos){
 		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
 		HoldPosStrategy holdPosStrategy = this.strategyContext.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
 		BigDecimal pnl = holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(pos.getFaceValue()), pos.getMeanPrice(), markPrice);
@@ -255,6 +282,28 @@ public class PcPositionMarginService {
 			return BigDecimal.ZERO;
 		}
 		return posMargin.subtract(holdMargin);
+	}
+
+	/**
+	 * 可减少的保证金
+	 * @return
+	 */
+	public BigDecimal getMaxReducedMargin(PcPosition pos){
+		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
+		HoldPosStrategy holdPosStrategy = this.strategyContext.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
+		BigDecimal pnl = holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume().multiply(pos.getFaceValue()), pos.getMeanPrice(), markPrice);
+		BigDecimal posMargin = pos.getPosMargin();
+		if(BigUtils.ltZero(pnl)){//减掉浮亏
+			posMargin = posMargin.add(pnl);
+		}
+		
+		//所需保证金
+		BigDecimal initMarginRatio = feeRatioService.getInitedMarginRatio(pos.getLeverage());
+		BigDecimal initMargin = orderStrategy.calMargin(pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice(), initMarginRatio);
+		if(BigUtils.lt(posMargin, initMargin)){
+			return BigDecimal.ZERO;
+		}
+		return posMargin.subtract(initMargin);
 	}
 
 	private void cutLeverageMargin(Long userId, String asset, Long posId, BigDecimal amount) {
@@ -303,11 +352,6 @@ public class PcPositionMarginService {
 		pos.setAutoAddFlag(autoAddFlag);
 		this.positionDataService.update(pos);
 		return true;
-	}
-
-	public List<PcPosition> queryActivePosList(Page page, Long userId, String asset, String symbol) {
-		List<PcPosition> list = this.positionDataService.queryActivePosList(page, userId, asset, symbol);
-		return list;
 	}
 	
 	public void autoAddMargin(PcPosition pos){

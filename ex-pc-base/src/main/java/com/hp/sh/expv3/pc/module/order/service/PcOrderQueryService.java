@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.dev.CrossDB;
+import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderLogDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
@@ -18,7 +19,7 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.utils.IntBool;
 
 @Service
-@Transactional(rollbackFor=Exception.class)
+@Transactional(readOnly=true)
 public class PcOrderQueryService {
 
 	@Autowired
@@ -26,10 +27,6 @@ public class PcOrderQueryService {
 
 	@Autowired
 	private PcOrderLogDAO pcOrderLogDAO;
-
-	public BigDecimal getClosingVolume(Long userId, Long id) {
-		return null;
-	}
 
 	public Long queryCount(Map<String, Object> params) {
 		return this.pcOrderDAO.queryCount(params);
@@ -39,13 +36,10 @@ public class PcOrderQueryService {
 		return this.pcOrderDAO.queryList(params);
 	}
 	
-	
-	
-	
 	/*
 	 * 获取可平仓位
 	 */
-	public BigDecimal getClosablePosition(PcPosition pos) {
+	public BigDecimal getClosingVolume(PcPosition pos) {
 		BigDecimal closablePos = pos.getVolume();
 		
 		BigDecimal cpv = this.pcOrderDAO.getClosingVolume(pos.getUserId(), pos.getId());
@@ -67,14 +61,15 @@ public class PcOrderQueryService {
 		return count>0;
 	}
 	
-	public List<PcOrder> queryActiveOrder(Long userId, String asset, String symbol, Integer longFlag) {
+	public List<PcOrder> queryRebaseOrder(Page page, Long createdEnd) {
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("userId", userId);
-		params.put("asset", asset);
-		params.put("symbol", symbol);
-		params.put("longFlag", longFlag);
 		params.put("activeFlag", IntBool.YES);
 		params.put("liqFlag", IntBool.NO);
+		params.put("orderBy", "id");
+		params.put("asc", true);
+		params.put("page", page);
+		params.put("status", OrderStatus.PENDING_NEW);
+		params.put("createdEnd", createdEnd);
 		List<PcOrder> list = this.pcOrderDAO.queryList(params);
 		return list;
 	}

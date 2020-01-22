@@ -145,8 +145,8 @@ public class PcAccountRecord extends BaseRecordEntity	 {
 	}
 
 	public String toValueString() {
-		return "[type=" + type + ", asset=" + asset + ", amount=" + amount + ", balance=" + balance
-				+ ", tradeNo=" + tradeNo + ", tradeType=" + tradeType + ", remark=" + remark + ", userId=" + this.getUserId()
+		return "[type=" + type + ", asset=" + asset + ", amount=" + amount + ", tradeNo=" 
+				+ tradeNo + ", tradeType=" + tradeType + ", remark=" + remark + ", userId=" + this.getUserId()
 				+ "]";
 	}
 	

@@ -34,7 +34,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
 
     @Override
     public List<WithdrawalRecordVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
-        if (userId == null || pageSize == null || StringUtils.isEmpty(asset)) {
+        if (userId == null || pageSize == null || StringUtils.isEmpty(asset)||pageStatus==null) {
             throw new ExException(ExFundError.PARAM_EMPTY);
         }
 
@@ -44,12 +44,12 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     }
 
     @Override
-    public List<WithdrawalRecordVo> queryHistoryByTime(Long userId, String asset, Long timestamp) {
-        if (userId == null || timestamp == null || StringUtils.isEmpty(asset)) {
+    public List<WithdrawalRecordVo> queryHistoryByTime(Long userId, String asset, Long startTime,Long endTime) {
+        if (userId == null || startTime == null || StringUtils.isEmpty(asset)|| endTime == null ) {
             throw new ExException(ExFundError.PARAM_EMPTY);
         }
 //        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(timestamp));
-        List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, timestamp, null);
+        List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, startTime, endTime);
         return voList;
     }
 
@@ -85,7 +85,7 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
      */
     @Override
     public List<WithdrawalRecordVo> queryUserWithdrawal(Long userId, String asset, Long startTime, Long endTime) {
-        if (userId == null || startTime == null || endTime == null || StringUtils.isEmpty(asset)) {
+        if (userId == null || startTime == null || endTime == null ) {
             throw new ExException(ExFundError.PARAM_EMPTY);
         }
         List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, startTime, endTime);

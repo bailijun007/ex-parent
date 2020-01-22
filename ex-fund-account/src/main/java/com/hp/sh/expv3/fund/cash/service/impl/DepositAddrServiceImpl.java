@@ -1,6 +1,9 @@
 
 package com.hp.sh.expv3.fund.cash.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +48,15 @@ public class DepositAddrServiceImpl implements DepositAddrService{
 	@Override
 	public DepositAddr findById(long userId, long id) {
 		return this.depositAddrDAO.findById(userId, id);
+	}
+
+	@Override
+	public DepositAddr getDepositAddress(Long userId, String asset) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
+		params.put("asset", asset);
+		DepositAddr addr = this.depositAddrDAO.queryOne(params);
+		return addr;
 	}
 
 }

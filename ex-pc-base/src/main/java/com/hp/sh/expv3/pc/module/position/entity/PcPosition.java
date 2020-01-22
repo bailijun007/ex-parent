@@ -24,6 +24,7 @@ public class PcPosition extends UserDataEntity {
 	private Integer longFlag;
 
 	// 保证金模式:1-全仓,2-逐仓
+	@Redundant
 	private int marginMode;
 
 	// 开仓杠杆 @see PcOrder#leverage
@@ -296,6 +297,14 @@ public class PcPosition extends UserDataEntity {
 
 	public void setLiqPrice(BigDecimal liqPrice) {
 		this.liqPrice = liqPrice;
+	}
+
+	@Override
+	public String toString() {
+		return "PcPosition [id=" + id + ", userId=" + userId + ", asset=" + asset + ", symbol=" + symbol + ", longFlag="
+				+ longFlag + ", marginMode=" + marginMode + ", leverage=" + leverage + ", volume=" + volume
+				+ ", baseValue=" + baseValue + ", posMargin=" + posMargin + ", meanPrice=" + meanPrice
+				+ ", holdMarginRatio=" + holdMarginRatio + ", liqPrice=" + liqPrice + ", liqStatus=" + liqStatus + "]";
 	}
 
 }

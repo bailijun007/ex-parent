@@ -16,4 +16,6 @@ public interface DepositAddrService {
 
 	public DepositAddr findById(long userId, long depositAddrId);
 
+	public DepositAddr getDepositAddress(Long userId, String asset);
+
 }
