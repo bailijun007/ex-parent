@@ -10,9 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.pc.module.order.entity.PcActiveOrder;
+import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.position.dao.PcActivePositionDAO;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
+import com.hp.sh.expv3.pc.module.position.entity.PcActivePosition;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.vo.PosUID;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
@@ -23,14 +28,19 @@ public class PcPositionDataService {
 	private PcPositionDAO pcPositionDAO;
 	
 	@Autowired
+	private PcActivePositionDAO pcActivePositionDAO;
+	
+	@Autowired
     private ApplicationEventPublisher publisher;
 	
 	public void save(PcPosition pcPosition) {
 		this.pcPositionDAO.save(pcPosition);
+		this.saveActivePos(pcPosition);
 	}
 
 	public void update(PcPosition pcPosition){
 		this.pcPositionDAO.update(pcPosition);
+		this.updateActivePos(pcPosition);
 		publisher.publishEvent(pcPosition);
 	}
 
@@ -63,6 +73,21 @@ public class PcPositionDataService {
 	public List<PosUID> queryActivePosIdList(Page page, Long userId, String asset, String symbol) {
 		List<PosUID> list = this.pcPositionDAO.queryActivePosIdList(page, userId, asset, symbol);
 		return list;
+	}
+
+	private void saveActivePos(PcPosition pcPosition) {
+		PcActivePosition pcActivePosition = new PcActivePosition();
+		pcActivePosition.setId(pcPosition.getId());
+		pcActivePosition.setUserId(pcPosition.getUserId());
+		pcActivePosition.setAsset(pcPosition.getAsset());
+		pcActivePosition.setSymbol(pcPosition.getSymbol());
+		this.pcActivePositionDAO.save(pcActivePosition);
+	}
+
+	private void updateActivePos(PcPosition pcPosition) {
+		if(BigUtils.isZero(pcPosition.getVolume())){
+			this.pcActivePositionDAO.delete(pcPosition.getId(), pcPosition.getUserId());
+		}
 	}
 	
 }

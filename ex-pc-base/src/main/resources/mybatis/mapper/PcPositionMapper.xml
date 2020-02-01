@@ -166,26 +166,30 @@
 
     <select id="queryActivePosList" resultMap="PcPosition">
         select
-        <include refid="Base_Column_List"/>
+        	p.*
         from
-        	pc_position
+        	pc_active_position ap
+		LEFT JOIN 
+			pc_position p ON p.id = ap.id
         where
-        	volume &gt; 0
-            <if test="userId!=null">and user_id=#{userId}</if>
-            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
-            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+        	ap.user_id=#{userId} 
+        	and ap.asset=#{asset} 
+        	and ap.symbol=#{symbol} 
+        order by ap.long_flag desc
     </select>
 
     <select id="queryActivePosIdList" resultType="com.hp.sh.expv3.pc.module.position.vo.PosUID">
         select
         	id,user_id,asset,symbol,long_flag
         from
-        	pc_position
-        where
-        	volume &gt; 0
+        	pc_active_position ap
+        <where>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+        </where>
+        order by 
+        	ap.long_flag desc
     </select>
 
 </mapper>

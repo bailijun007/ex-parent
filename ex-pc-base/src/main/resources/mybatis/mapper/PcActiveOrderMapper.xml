@@ -66,7 +66,7 @@
 		select
 			<include refid="Base_Column_List" />
 		from pc_active_order
-			where id=#{id}
+			where id=#{id} and user_id=#{userId}
 	</select>
 
 	<select id="exist" resultType="long">
