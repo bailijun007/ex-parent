@@ -36,6 +36,7 @@ public interface PcPositionDAO extends BaseUserDataMapper<PcPosition,Long> {
 			@Param("symbol") String symbol, 
 			@Param("longFlag") int longFlag);
 
+	@Deprecated
 	public List<PcPosition> queryActivePosList(
 			Page page,
 			@Param("userId") Long userId, 

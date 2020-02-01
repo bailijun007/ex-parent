@@ -7,7 +7,7 @@ import com.hp.sh.expv3.base.entity.UserData;
  */
 public class PcActivePosition implements UserData{
 	
-	//订单ID
+	//仓位ID
 	private Long id;
 	
 	//用户ID

@@ -152,12 +152,16 @@
 
     <select id="getActivePos" resultMap="PcPosition">
         select
-        <include refid="Base_Column_List"/>
+        	p.*
         from
-        	pc_position
+        	pc_active_position ap
+		LEFT JOIN 
+			pc_position p ON p.id = ap.id
         where
-        	user_id=#{userId} and asset=#{asset} and symbol=#{symbol} and long_flag=#{longFlag}
-        and volume &gt; 0
+        	ap.user_id=#{userId} 
+        	and ap.asset=#{asset} 
+        	and ap.symbol=#{symbol} 
+        	and ap.long_flag=#{longFlag}
     </select>
 
     <select id="queryActivePosList" resultMap="PcPosition">
