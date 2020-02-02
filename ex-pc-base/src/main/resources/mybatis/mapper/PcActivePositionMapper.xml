@@ -66,23 +66,21 @@
 		select
 			<include refid="Base_Column_List" />
 		from pc_active_position
-			where id=#{id}
+			where id=#{id} and user_id=#{userId}
 	</select>
 
-	<select id="exist" resultType="boolean">
-		select 
-			count(1)
-		from 
-			pc_active_position
-		<include refid="simple_where" />
-		limit 1
+	<select id="exist" resultType="long">
+		select EXISTS(
+			select 
+				1
+			from 
+				pc_active_position
+			<include refid="simple_where" />
+			limit 1
+		)
 	</select>
-
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into pc_active_position (
 			id,user_id,asset,symbol,long_flag
 		)values(
@@ -96,11 +94,11 @@
 		set 
 			id=#{id},user_id=#{userId},asset=#{asset},symbol=#{symbol},long_flag=#{longFlag}
 		where 
-			id=#{id}
+			id=#{id} and user_id=#{userId}
 	</update>
 
 	<delete id="delete">
-        delete from pc_active_position where id=#{id}
+        delete from pc_active_position where id=#{id} and user_id=#{userId}
     </delete>
 
     <delete id="condDelete">
@@ -110,7 +108,7 @@
 
 	<!--  -->
 	
-	<select id="queryActiveOrderIds" resultType="long">
+	<select id="queryActivePosIds" resultType="long">
 		select 
 			id 
 		from 
