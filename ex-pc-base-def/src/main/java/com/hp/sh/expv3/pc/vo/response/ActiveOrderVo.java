@@ -3,7 +3,7 @@ package com.hp.sh.expv3.pc.vo.response;
 import java.math.BigDecimal;
 
 /**
- * 活动仓位
+ * 活动委托
  * @author wangjg
  *
  */
