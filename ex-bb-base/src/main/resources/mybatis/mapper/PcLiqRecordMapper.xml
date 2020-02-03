@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.module.position.dao.PcLiqRecordDAO">
+
+	<resultMap type="com.hp.sh.expv3.bb.module.position.entity.PcLiqRecord" id="PcLiqRecord">
+		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="pos_id" property="posId" />
+		<result column="long_flag" property="longFlag" />
+		<result column="volume" property="volume" />
+		<result column="pos_margin" property="posMargin" />
+		<result column="bankrupt_price" property="bankruptPrice" />
+		<result column="filled_volume" property="filledVolume" />
+		<result column="liq_price" property="liqPrice" />
+		<result column="mean_price" property="meanPrice" />
+		<result column="fee" property="fee" />
+		<result column="fee_ratio" property="feeRatio" />
+		<result column="user_id" property="userId" />
+		<result column="id" property="id" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		asset,symbol,pos_id,long_flag,volume,pos_margin,bankrupt_price,filled_volume,liq_price,mean_price,fee,fee_ratio,user_id,id,created,modified
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+			<if test="idList!=null">
+			and id in
+			<foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+			#{idList[${i}]}
+			</foreach>
+			</if>
+			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+			<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
+			<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
+			<if test="posId!=null"> and pos_id=#{posId}</if>
+			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+			<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
+			<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+		</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from pc_liq_record
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="PcLiqRecord">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="PcLiqRecord">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="PcLiqRecord">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from pc_liq_record
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="PcLiqRecord">
+		select
+			<include refid="Base_Column_List" />
+		from pc_liq_record
+			where id=#{id} and user_id=#{userId}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			pc_liq_record
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+	<insert id="save">
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into pc_liq_record (
+			asset,symbol,pos_id,long_flag,volume,pos_margin,bankrupt_price,filled_volume,liq_price,mean_price,fee,fee_ratio,user_id,id,created,modified
+		)values(
+			#{asset},#{symbol},#{posId},#{longFlag},#{volume},#{posMargin},#{bankruptPrice},#{filledVolume},#{liqPrice},#{meanPrice},#{fee},#{feeRatio},#{userId},#{id},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			pc_liq_record
+		set 
+			asset=#{asset},symbol=#{symbol},pos_id=#{posId},long_flag=#{longFlag},volume=#{volume},pos_margin=#{posMargin},bankrupt_price=#{bankruptPrice},filled_volume=#{filledVolume},liq_price=#{liqPrice},mean_price=#{meanPrice},fee=#{fee},fee_ratio=#{feeRatio},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+		where 
+			id=#{id} and user_id=#{userId}
+	</update>
+
+	<delete id="delete">
+        delete from pc_liq_record where id=#{id} and user_id=#{userId}
+    </delete>
+
+    <delete id="condDelete">
+        delete from pc_liq_record
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+</mapper>

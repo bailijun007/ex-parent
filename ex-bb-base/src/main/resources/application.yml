@@ -1,0 +1,48 @@
+server: 
+  port: ${app.server.port}
+  servlet-path: /
+
+spring:
+  application:
+    name: ex-bb-base
+  messages:
+    fallbackToSystemLocale: false
+    basename: i18n/errors, i18n/messages
+  datasource:
+     connectionInitSql: "SET NAMES 'utf8mb4'"
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+    ignoreNull: true
+    defaultPropertyInclusion: NON_EMPTY 
+
+endpoints:
+  jmx:
+    enabled: true
+    unique-names: true
+
+mybatis: 
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  typeAliasesPackage: com.hp.sh.expv3.**.entity
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${app.registry.eureka.url}
+    healthcheck:
+      enabled: true
+      
+    registerWithEureka: true
+    fetchRegistry: true
+  instance:
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 5
+    prefer-ip-address: true
+    
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 10000
+  MaxAutoRetries: 0
+  MaxAutoRetriesNextServer: 1  	
