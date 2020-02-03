@@ -30,6 +30,8 @@
 		<module>ex-pc-extend-def</module>
 		<module>ex-pc-match</module>
 		<module>ex-bb-match</module>
+		<module>ex-bb-base</module>
+		<module>ex-bb-base-def</module>
 	</modules>
 
     <dependencies>
