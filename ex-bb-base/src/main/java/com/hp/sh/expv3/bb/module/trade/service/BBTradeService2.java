@@ -11,7 +11,7 @@ import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedResult;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
-public class BBTradeService {
+public class BBTradeService2 {
 	@Autowired
 	private BBTradeDAO bBTradeDAO;
 
