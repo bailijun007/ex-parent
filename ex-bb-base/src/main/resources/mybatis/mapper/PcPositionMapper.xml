@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.hp.sh.expv3.bb.module.position.dao.PcPositionDAO">
+<mapper namespace="com.hp.sh.expv3.bb.module.position.dao.BBPositionDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.position.entity.PcPosition" id="PcPosition">
+	<resultMap type="com.hp.sh.expv3.bb.module.position.entity.BBPosition" id="PcPosition">
 		<result column="id" property="id" />
 		<result column="user_id" property="userId" />
 		<result column="asset" property="asset" />
@@ -66,7 +66,7 @@
     <sql id="simple_query">
         select
         <include refid="Base_Column_List"/>
-        from pc_position
+        from bb_position
         <include refid="simple_where"/>
         <if test="orderBy!=null and orderBy!=''">
             order by ${orderBy}
@@ -97,14 +97,14 @@
                 count(1)
             </otherwise>
         </choose>
-        from pc_position
+        from bb_position
         <include refid="simple_where"/>
     </select>
 
     <select id="findById" resultMap="PcPosition">
         select
         <include refid="Base_Column_List"/>
-        from pc_position
+        from bb_position
         where id=#{id} and user_id=#{userId}
     </select>
 
@@ -112,13 +112,13 @@
         select
         count(1)
         from
-        pc_position
+        bb_position
         <include refid="simple_where"/>
         limit 1
     </select>
 
 	<insert id="save">
-		insert into pc_position (
+		insert into bb_position (
 			id,user_id,asset,symbol,long_flag,margin_mode,entry_leverage,auto_add_flag,leverage,face_value,volume,base_value,pos_margin,close_fee,mean_price,accu_base_value,accu_volume,init_margin,hold_margin_ratio,fee_cost,realised_pnl,liq_price,liq_status,liq_mark_price,liq_mark_time,version,created,modified
 		)values(
 			#{id},#{userId},#{asset},#{symbol},#{longFlag},#{marginMode},#{entryLeverage},#{autoAddFlag},#{leverage},#{faceValue},#{volume},#{baseValue},#{posMargin},#{closeFee},#{meanPrice},#{accuBaseValue},#{accuVolume},#{initMargin},#{holdMarginRatio},#{feeCost},#{realisedPnl},#{liqPrice},#{liqStatus},#{liqMarkPrice},#{liqMarkTime},#{version},#{created},#{modified}
@@ -127,7 +127,7 @@
 	
 	<update id="update">
 		update 
-			pc_position
+			bb_position
 		set 
 			id=#{id},user_id=#{userId},asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},auto_add_flag=#{autoAddFlag},leverage=#{leverage},face_value=#{faceValue},volume=#{volume},base_value=#{baseValue},pos_margin=#{posMargin},close_fee=#{closeFee},mean_price=#{meanPrice},accu_base_value=#{accuBaseValue},accu_volume=#{accuVolume},init_margin=#{initMargin},hold_margin_ratio=#{holdMarginRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_status=#{liqStatus},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},version=${version}+1,created=#{created},modified=#{modified}
 		where 
@@ -146,7 +146,7 @@
                 count(1)
             </otherwise>
         </choose>
-        from pc_position
+        from bb_position
         <include refid="simple_where"/>
     </select>
 
@@ -154,9 +154,9 @@
         select
         	p.*
         from
-        	pc_active_position ap
+        	bb_active_position ap
 		LEFT JOIN 
-			pc_position p ON p.id = ap.id
+			bb_position p ON p.id = ap.id
         where
         	ap.user_id=#{userId} 
         	and ap.asset=#{asset} 
@@ -168,9 +168,9 @@
         select
         	p.*
         from
-        	pc_active_position ap
+        	bb_active_position ap
 		LEFT JOIN 
-			pc_position p ON p.id = ap.id
+			bb_position p ON p.id = ap.id
         where
         	ap.user_id=#{userId} 
         	and ap.asset=#{asset} 
@@ -182,7 +182,7 @@
         select
         	id,user_id,asset,symbol,long_flag
         from
-        	pc_active_position ap
+        	bb_active_position ap
         <where>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>

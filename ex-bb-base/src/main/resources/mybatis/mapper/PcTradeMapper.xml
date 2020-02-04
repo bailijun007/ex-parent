@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.hp.sh.expv3.bb.module.trade.dao.PcTradeDAO">
+<mapper namespace="com.hp.sh.expv3.bb.module.trade.dao.BBTradeDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.trade.entity.PcMatchedResult" id="PcTrade">
+	<resultMap type="com.hp.sh.expv3.bb.module.trade.entity.BBMatchedResult" id="PcTrade">
 		<result column="id" property="id" />
 		<result column="match_tx_id" property="matchTxId" />
 		<result column="symbol" property="symbol" />
@@ -43,7 +43,7 @@
 	<sql id="simple_query" >
 		select
 			<include refid="Base_Column_List" />
-		from pc_trade
+		from bb_trade
 			<include refid="simple_where" />
 		<if test="orderBy!=null and orderBy!=''">
 			order by ${orderBy} <if test="!asc">desc</if>
@@ -73,14 +73,14 @@
 				count(1)
 			</otherwise>
 		</choose>
-		from pc_trade
+		from bb_trade
 		<include refid="simple_where" />
 	</select>
 
 	<select id="findById" resultMap="PcTrade">
 		select
 			<include refid="Base_Column_List" />
-		from pc_trade
+		from bb_trade
 			where id=#{id}
 	</select>
 
@@ -88,7 +88,7 @@
 		select 
 			count(1)
 		from 
-			pc_trade
+			bb_trade
 		<include refid="simple_where" />
 		limit 1
 	</select>
@@ -98,7 +98,7 @@
 		<selectKey resultType="long" order="AFTER" keyProperty="id">
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
-		insert into pc_trade (
+		insert into bb_trade (
 			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,number,trade_time
 		)values(
 			#{id},#{matchTxId},#{symbol},#{asset},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{tkCloseFlag},#{mkAccountId},#{mkOrderId},#{mkCloseFlag},#{price},#{number},#{tradeTime}
@@ -107,7 +107,7 @@
 	
 	<update id="update">
 		update 
-			pc_trade
+			bb_trade
 		set 
 			id=#{id},match_tx_id=#{matchTxId},symbol=#{symbol},asset=#{asset},tk_bid_flag=#{tkBidFlag},tk_account_id=#{tkAccountId},tk_order_id=#{tkOrderId},tk_close_flag=#{tkCloseFlag},mk_account_id=#{mkAccountId},mk_order_id=#{mkOrderId},mk_close_flag=#{mkCloseFlag},price=#{price},number=#{number},trade_time=#{tradeTime}
 		where 
@@ -115,11 +115,11 @@
 	</update>
 
 	<delete id="delete">
-        delete from pc_trade where id=#{id}
+        delete from bb_trade where id=#{id}
     </delete>
 
     <delete id="condDelete">
-        delete from pc_trade
+        delete from bb_trade
 		<include refid="simple_where" />
     </delete>
 

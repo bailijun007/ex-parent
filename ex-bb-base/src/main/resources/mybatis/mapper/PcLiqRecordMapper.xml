@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.hp.sh.expv3.bb.module.position.dao.PcLiqRecordDAO">
+<mapper namespace="com.hp.sh.expv3.bb.module.position.dao.BBLiqRecordDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.position.entity.PcLiqRecord" id="PcLiqRecord">
+	<resultMap type="com.hp.sh.expv3.bb.module.position.entity.BBLiqRecord" id="PcLiqRecord">
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
 		<result column="pos_id" property="posId" />
@@ -50,7 +50,7 @@
 	<sql id="simple_query" >
 		select
 			<include refid="Base_Column_List" />
-		from pc_liq_record
+		from bb_liq_record
 			<include refid="simple_where" />
 		<if test="orderBy!=null and orderBy!=''">
 			order by ${orderBy} <if test="!asc">desc</if>
@@ -80,14 +80,14 @@
 				count(1)
 			</otherwise>
 		</choose>
-		from pc_liq_record
+		from bb_liq_record
 		<include refid="simple_where" />
 	</select>
 
 	<select id="findById" resultMap="PcLiqRecord">
 		select
 			<include refid="Base_Column_List" />
-		from pc_liq_record
+		from bb_liq_record
 			where id=#{id} and user_id=#{userId}
 	</select>
 
@@ -95,7 +95,7 @@
 		select 
 			count(1)
 		from 
-			pc_liq_record
+			bb_liq_record
 		<include refid="simple_where" />
 		limit 1
 	</select>
@@ -104,7 +104,7 @@
 		<selectKey resultType="long" order="AFTER" keyProperty="id">
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
-		insert into pc_liq_record (
+		insert into bb_liq_record (
 			asset,symbol,pos_id,long_flag,volume,pos_margin,bankrupt_price,filled_volume,liq_price,mean_price,fee,fee_ratio,user_id,id,created,modified
 		)values(
 			#{asset},#{symbol},#{posId},#{longFlag},#{volume},#{posMargin},#{bankruptPrice},#{filledVolume},#{liqPrice},#{meanPrice},#{fee},#{feeRatio},#{userId},#{id},#{created},#{modified}
@@ -113,7 +113,7 @@
 	
 	<update id="update">
 		update 
-			pc_liq_record
+			bb_liq_record
 		set 
 			asset=#{asset},symbol=#{symbol},pos_id=#{posId},long_flag=#{longFlag},volume=#{volume},pos_margin=#{posMargin},bankrupt_price=#{bankruptPrice},filled_volume=#{filledVolume},liq_price=#{liqPrice},mean_price=#{meanPrice},fee=#{fee},fee_ratio=#{feeRatio},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
@@ -121,11 +121,11 @@
 	</update>
 
 	<delete id="delete">
-        delete from pc_liq_record where id=#{id} and user_id=#{userId}
+        delete from bb_liq_record where id=#{id} and user_id=#{userId}
     </delete>
 
     <delete id="condDelete">
-        delete from pc_liq_record
+        delete from bb_liq_record
 		<include refid="simple_where" />
     </delete>
 

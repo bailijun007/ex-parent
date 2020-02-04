@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.hp.sh.expv3.bb.module.account.dao.PcAccountDAO">
+<mapper namespace="com.hp.sh.expv3.bb.module.account.dao.BBAccountDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.account.entity.PcAccount" id="PcAccount">
+	<resultMap type="com.hp.sh.expv3.bb.module.account.entity.BBAccount" id="PcAccount">
 		<result column="asset" property="asset" />
 		<result column="balance" property="balance" />
 		<result column="version" property="version" />
@@ -40,7 +40,7 @@
 	<sql id="simple_query" >
 		select
 			<include refid="Base_Column_List" />
-		from pc_account
+		from bb_account
 			<include refid="simple_where" />
 		<if test="orderBy!=null and orderBy!=''">
 			order by ${orderBy} <if test="!asc">desc</if>
@@ -70,14 +70,14 @@
 				count(1)
 			</otherwise>
 		</choose>
-		from pc_account
+		from bb_account
 		<include refid="simple_where" />
 	</select>
 
 	<select id="findById" resultMap="PcAccount">
 		select
 			<include refid="Base_Column_List" />
-		from pc_account
+		from bb_account
 			where id=#{id} and user_id=#{userId}
 	</select>
 
@@ -85,14 +85,14 @@
 		select 
 			count(1)
 		from 
-			pc_account
+			bb_account
 		<include refid="simple_where" />
 		limit 1
 	</select>
 
 
 	<insert id="save">
-		insert into pc_account (
+		insert into bb_account (
 			asset,balance,version,user_id,created,modified
 		)values(
 			#{asset},#{balance},#{version},#{userId},#{created},#{modified}
@@ -101,7 +101,7 @@
 	
 	<update id="update">
 		update 
-			pc_account
+			bb_account
 		set 
 			asset=#{asset},balance=#{balance},version=${version}+1,user_id=#{userId},created=#{created},modified=#{modified}
 		where 
@@ -109,11 +109,11 @@
 	</update>
 
 	<delete id="delete">
-        delete from pc_account where id=#{id} and user_id=#{userId}
+        delete from bb_account where id=#{id} and user_id=#{userId}
     </delete>
 
     <delete id="condDelete">
-        delete from pc_account
+        delete from bb_account
 		<include refid="simple_where" />
     </delete>
 
@@ -122,14 +122,14 @@
 	<select id="get" resultMap="PcAccount">
 		select
 			<include refid="Base_Column_List" />
-		from pc_account
+		from bb_account
 			where user_id=#{userId} and asset=#{asset}
 	</select>
 
 	<select id="getAndLock" resultMap="PcAccount">
 		select
 			<include refid="Base_Column_List" />
-		from pc_account
+		from bb_account
 			where user_id=#{userId} and asset=#{asset} for update
 	</select>
 	

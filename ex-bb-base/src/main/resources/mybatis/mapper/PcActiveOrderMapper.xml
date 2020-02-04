@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.hp.sh.expv3.bb.module.order.dao.PcActiveOrderDAO">
+<mapper namespace="com.hp.sh.expv3.bb.module.order.dao.BBActiveOrderDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.PcActiveOrder" id="PcActiveOrder">
+	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBActiveOrder" id="PcActiveOrder">
 		<result column="id" property="id" />
 		<result column="user_id" property="userId" />
 		<result column="asset" property="asset" />
@@ -28,7 +28,7 @@
 	<sql id="simple_query" >
 		select
 			<include refid="Base_Column_List" />
-		from pc_active_order
+		from bb_active_order
 			<include refid="simple_where" />
 		<if test="orderBy!=null and orderBy!=''">
 			order by ${orderBy} <if test="!asc">desc</if>
@@ -58,14 +58,14 @@
 				count(1)
 			</otherwise>
 		</choose>
-		from pc_active_order
+		from bb_active_order
 		<include refid="simple_where" />
 	</select>
 
 	<select id="findById" resultMap="PcActiveOrder">
 		select
 			<include refid="Base_Column_List" />
-		from pc_active_order
+		from bb_active_order
 			where id=#{id} and user_id=#{userId}
 	</select>
 
@@ -74,14 +74,14 @@
 			select 
 				1
 			from 
-				pc_active_order
+				bb_active_order
 			<include refid="simple_where" />
 			limit 1
 		)
 	</select>
 
 	<insert id="save">
-		insert into pc_active_order (
+		insert into bb_active_order (
 			id,user_id,asset,symbol,long_flag
 		)values(
 			#{id},#{userId},#{asset},#{symbol},#{longFlag}
@@ -90,7 +90,7 @@
 	
 	<update id="update">
 		update 
-			pc_active_order
+			bb_active_order
 		set 
 			id=#{id},user_id=#{userId},asset=#{asset},symbol=#{symbol},long_flag=#{longFlag}
 		where 
@@ -98,11 +98,11 @@
 	</update>
 
 	<delete id="delete">
-        delete from pc_active_order where id=#{id} and user_id=#{userId}
+        delete from bb_active_order where id=#{id} and user_id=#{userId}
     </delete>
 
     <delete id="condDelete">
-        delete from pc_active_order
+        delete from bb_active_order
 		<include refid="simple_where" />
     </delete>
 
@@ -112,7 +112,7 @@
 		select 
 			id 
 		from 
-			pc_active_order
+			bb_active_order
 		where 
 			user_id=#{userId}
 			and asset=#{asset}

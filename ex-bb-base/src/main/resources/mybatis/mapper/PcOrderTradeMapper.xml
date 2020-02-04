@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.hp.sh.expv3.bb.module.order.dao.PcOrderTradeDAO">
+<mapper namespace="com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.PcOrderTrade" id="PcOrderTrade">
+	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade" id="PcOrderTrade">
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
 		<result column="price" property="price" />
@@ -58,7 +58,7 @@
 	<sql id="simple_query" >
 		select
 			<include refid="Base_Column_List" />
-		from pc_order_trade
+		from bb_order_trade
 			<include refid="simple_where" />
 		<if test="orderBy!=null and orderBy!=''">
 			order by ${orderBy} <if test="!asc">desc</if>
@@ -88,14 +88,14 @@
 				count(1)
 			</otherwise>
 		</choose>
-		from pc_order_trade
+		from bb_order_trade
 		<include refid="simple_where" />
 	</select>
 
 	<select id="findById" resultMap="PcOrderTrade">
 		select
 			<include refid="Base_Column_List" />
-		from pc_order_trade
+		from bb_order_trade
 			where id=#{id} and user_id=#{userId}
 	</select>
 
@@ -104,7 +104,7 @@
 		select 
 			1
 		from 
-			pc_order_trade
+			bb_order_trade
 		where 
 			user_id=#{userId} and trade_sn=#{tradeSn}
 		limit 1
@@ -116,7 +116,7 @@
 		<selectKey resultType="long" order="AFTER" keyProperty="id">
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
-		insert into pc_order_trade (
+		insert into bb_order_trade (
 			asset,symbol,price,volume,trade_sn,trade_id,pos_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,pnl,remain_volume,match_tx_id,tx_id,user_id,id,created,modified
 		)values(
 			#{asset},#{symbol},#{price},#{volume},#{tradeSn},#{tradeId},#{posId},#{orderId},#{makerFlag},#{tradeTime},#{feeCollectorId},#{feeRatio},#{fee},#{pnl},#{remainVolume},#{matchTxId},#{txId},#{userId},#{id},#{created},#{modified}
@@ -125,7 +125,7 @@
 	
 	<update id="update">
 		update 
-			pc_order_trade
+			bb_order_trade
 		set 
 			asset=#{asset},symbol=#{symbol},price=#{price},volume=#{volume},trade_sn=#{tradeSn},trade_id=#{tradeId},pos_id=#{posId},order_id=#{orderId},maker_flag=#{makerFlag},trade_time=#{tradeTime},fee_collector_id=#{feeCollectorId},fee_ratio=#{feeRatio},fee=#{fee},pnl=#{pnl},remain_volume=#{remainVolume},match_tx_id=#{matchTxId},tx_id=#{txId},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
@@ -138,7 +138,7 @@
 		select
 			volume, price, order_id, id
 		from 
-			pc_order_trade
+			bb_order_trade
 		where
 			user_id=#{userId}
 		and order_id in

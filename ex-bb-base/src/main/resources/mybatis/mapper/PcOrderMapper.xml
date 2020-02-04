@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.hp.sh.expv3.bb.module.order.dao.PcOrderDAO">
+<mapper namespace="com.hp.sh.expv3.bb.module.order.dao.BBOrderDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.PcOrder" id="PcOrder">
+	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBOrder" id="PcOrder">
 		<result column="id" property="id" />
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
@@ -85,7 +85,7 @@
 	<sql id="simple_query" >
 		select
 			<include refid="Base_Column_List" />
-		from pc_order
+		from bb_order
 			<include refid="simple_where" />
 		<if test="orderBy!=null and orderBy!=''">
 			order by ${orderBy} <if test="!asc">desc</if>
@@ -115,14 +115,14 @@
 				count(1)
 			</otherwise>
 		</choose>
-		from pc_order
+		from bb_order
 		<include refid="simple_where" />
 	</select>
 
 	<select id="findById" resultMap="PcOrder">
 		select
 			<include refid="Base_Column_List" />
-		from pc_order
+		from bb_order
 			where id=#{id} and user_id=#{userId}
 	</select>
 
@@ -130,13 +130,13 @@
 		select 
 			count(1)
 		from 
-			pc_order
+			bb_order
 		<include refid="simple_where" />
 		limit 1
 	</select>
 
 	<insert id="save">
-		insert into pc_order (
+		insert into bb_order (
 			id,asset,symbol,close_flag,long_flag,leverage,volume,face_value,price,order_type,time_in_force,margin_mode,open_fee_ratio,close_fee_ratio,margin_ratio,client_order_id,open_fee,close_fee,order_margin,gross_margin,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,close_pos_id,trigger_flag,version,visible_flag,liq_flag,create_operator,cancel_operator,user_id,created,modified
 		)values(
 			#{id},#{asset},#{symbol},#{closeFlag},#{longFlag},#{leverage},#{volume},#{faceValue},#{price},#{orderType},#{timeInForce},#{marginMode},#{openFeeRatio},#{closeFeeRatio},#{marginRatio},#{clientOrderId},#{openFee},#{closeFee},#{orderMargin},#{grossMargin},#{status},#{activeFlag},#{remark},#{cancelTime},#{cancelVolume},#{feeCost},#{filledVolume},#{closePosId},#{triggerFlag},#{version},#{visibleFlag},#{liqFlag},#{createOperator},#{cancelOperator},#{userId},#{created},#{modified}
@@ -145,7 +145,7 @@
 	
 	<update id="update">
 		update 
-			pc_order
+			bb_order
 		set 
 			asset=#{asset},symbol=#{symbol},close_flag=#{closeFlag},long_flag=#{longFlag},leverage=#{leverage},volume=#{volume},face_value=#{faceValue},price=#{price},order_type=#{orderType},time_in_force=#{timeInForce},margin_mode=#{marginMode},open_fee_ratio=#{openFeeRatio},close_fee_ratio=#{closeFeeRatio},margin_ratio=#{marginRatio},client_order_id=#{clientOrderId},open_fee=#{openFee},close_fee=#{closeFee},order_margin=#{orderMargin},gross_margin=#{grossMargin},status=#{status},active_flag=#{activeFlag},remark=#{remark},cancel_time=#{cancelTime},cancel_volume=#{cancelVolume},fee_cost=#{feeCost},filled_volume=#{filledVolume},close_pos_id=#{closePosId},trigger_flag=#{triggerFlag},version=${version}+1,visible_flag=#{visibleFlag},liq_flag=#{liqFlag},create_operator=#{createOperator},cancel_operator=#{cancelOperator},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
@@ -156,7 +156,7 @@
 	
 	<update id="updateStatus">
 		update 
-			pc_order
+			bb_order
 		set 
 			status=#{newStatus}, modified=#{modified}
 		where 
@@ -165,7 +165,7 @@
 
 	<update id="updateCancelStatus">
 		update 
-			pc_order
+			bb_order
 		set 
 			status=#{cancelStatus}, modified=#{modified}, cancel_time=#{modified}
 		where 
@@ -177,9 +177,9 @@
 		SELECT
 			sum(o.volume - o.cancel_volume - o.filled_volume)
 		FROM
-			pc_active_order ao
+			bb_active_order ao
 		LEFT JOIN 
-			pc_order o ON o.id = ao.id
+			bb_order o ON o.id = ao.id
 		where 
 			ao.user_id=#{userId}
 			and ao.asset=#{asset}
@@ -191,9 +191,9 @@
 		SELECT
 			o.*
 		FROM
-			pc_active_order ao
+			bb_active_order ao
 		LEFT JOIN 
-			pc_order o ON o.id = ao.id
+			bb_order o ON o.id = ao.id
 		where 
 			ao.user_id=#{userId}
 			and ao.asset=#{asset}

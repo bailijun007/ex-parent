@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.hp.sh.expv3.bb.module.order.dao.PcOrderLogDAO">
+<mapper namespace="com.hp.sh.expv3.bb.module.order.dao.BBOrderLogDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.PcOrderLog" id="PcOrderLog">
+	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBOrderLog" id="PcOrderLog">
 		<result column="order_id" property="orderId" />
 		<result column="type" property="type" />
 		<result column="trigger_type" property="triggerType" />
@@ -36,7 +36,7 @@
 	<sql id="simple_query" >
 		select
 			<include refid="Base_Column_List" />
-		from pc_order_log
+		from bb_order_log
 			<include refid="simple_where" />
 		<if test="orderBy!=null and orderBy!=''">
 			order by ${orderBy} <if test="!asc">desc</if>
@@ -66,14 +66,14 @@
 				count(1)
 			</otherwise>
 		</choose>
-		from pc_order_log
+		from bb_order_log
 		<include refid="simple_where" />
 	</select>
 
 	<select id="findById" resultMap="PcOrderLog">
 		select
 			<include refid="Base_Column_List" />
-		from pc_order_log
+		from bb_order_log
 			where id=#{id} and and user_id=#{userId}
 	</select>
 
@@ -81,14 +81,14 @@
 		select 
 			count(1)
 		from 
-			pc_order_log
+			bb_order_log
 		<include refid="simple_where" />
 		limit 1
 	</select>
 
 
 	<insert id="save">
-		insert into pc_order_log (
+		insert into bb_order_log (
 			order_id,type,trigger_type,tx_id,request_id,user_id,id,created,modified
 		)values(
 			#{orderId},#{type},#{triggerType},#{txId},#{requestId},#{userId},#{id},#{created},#{modified}
@@ -97,7 +97,7 @@
 	
 	<update id="update">
 		update 
-			pc_order_log
+			bb_order_log
 		set 
 			order_id=#{orderId},type=#{type},trigger_type=#{triggerType},tx_id=#{txId},request_id=#{requestId},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
