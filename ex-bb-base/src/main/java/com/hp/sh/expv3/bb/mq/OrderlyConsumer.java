@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import com.hp.sh.expv3.bb.component.MetadataService;
-import com.hp.sh.expv3.bb.component.vo.PcContractVO;
+import com.hp.sh.expv3.bb.component.vo.BBContractVO;
 import com.hp.sh.expv3.bb.constant.MqTopic;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.rocketmq.config.RocketmqServerSetting;
@@ -89,8 +89,8 @@ public class OrderlyConsumer {
 	
 //	@PostConstruct
 	public void start123() throws MQClientException{
-		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
-		for(PcContractVO pc : pcList){
+		List<BBContractVO> pcList = this.metadataService.getAllPcContract();
+		for(BBContractVO pc : pcList){
 			if(contractGroup.equals(pc.getContractGroup())){
 				this.buildConsumer(MqTopic.getMatchTopic(pc.getAsset(), pc.getSymbol()));
 			}

@@ -3,7 +3,7 @@ package com.hp.sh.expv3.bb.component;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.hp.sh.expv3.bb.component.vo.PcContractVO;
+import com.hp.sh.expv3.bb.component.vo.BBContractVO;
 
 /**
  * 面值查询
@@ -14,7 +14,7 @@ public interface MetadataService {
 
 	public BigDecimal getFaceValue(String asset, String symbol);
 
-	PcContractVO getPcContract(String asset, String symbol);
+	BBContractVO getPcContract(String asset, String symbol);
 
-	List<PcContractVO> getAllPcContract();
+	List<BBContractVO> getAllPcContract();
 }

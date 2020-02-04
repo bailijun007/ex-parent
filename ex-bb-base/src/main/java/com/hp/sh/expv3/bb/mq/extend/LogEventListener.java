@@ -6,13 +6,13 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.hp.sh.expv3.bb.constant.LogType;
-import com.hp.sh.expv3.bb.constant.PcAccountTradeType;
-import com.hp.sh.expv3.bb.module.account.entity.PcAccountRecord;
-import com.hp.sh.expv3.bb.module.order.entity.PcOrderTrade;
-import com.hp.sh.expv3.bb.module.position.entity.PcLiqRecord;
-import com.hp.sh.expv3.bb.module.position.entity.PcPosition;
-import com.hp.sh.expv3.bb.module.position.service.PcPositionDataService;
-import com.hp.sh.expv3.bb.msg.PcAccountLog;
+import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
+import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
+import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
+import com.hp.sh.expv3.bb.module.position.entity.BBLiqRecord;
+import com.hp.sh.expv3.bb.module.position.entity.BBPosition;
+import com.hp.sh.expv3.bb.module.position.service.BBPositionDataService;
+import com.hp.sh.expv3.bb.msg.BBAccountLog;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.NumberUtils;
 
@@ -29,24 +29,24 @@ public class LogEventListener {
 	private EventSender sender;
 	
 	@Autowired
-	private PcPositionDataService positionDataService;
+	private BBPositionDataService positionDataService;
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(PcAccountRecord pcAccountRecord) {
-		Integer type = this.getType(pcAccountRecord.getTradeType());
+	public void afterCommit(BBAccountRecord bBAccountRecord) {
+		Integer type = this.getType(bBAccountRecord.getTradeType());
 		if(type==null){
 			return;
 		}
-		PcAccountLog logMsg = new PcAccountLog();
-		logMsg.setUserId(pcAccountRecord.getUserId());
-		logMsg.setAsset(pcAccountRecord.getAsset());
+		BBAccountLog logMsg = new BBAccountLog();
+		logMsg.setUserId(bBAccountRecord.getUserId());
+		logMsg.setAsset(bBAccountRecord.getAsset());
 		logMsg.setSymbol(null);
-		logMsg.setTime(pcAccountRecord.getCreated());
+		logMsg.setTime(bBAccountRecord.getCreated());
 		logMsg.setType(type);
-		logMsg.setRefId(pcAccountRecord.getId());
+		logMsg.setRefId(bBAccountRecord.getId());
 		
 		if(NumberUtils.in(type, LogType.TYPE_ACCOUNT_ADD_TO_MARGIN, LogType.TYPE_ACCOUNT_REDUCE_MARGIN, LogType.TYPE_ACCOUNT_AUTO_ADD_MARGIN, LogType.TYPE_ACCOUNT_LEVERAGE_ADD_MARGIN)){
-			PcPosition pos = positionDataService.getPosition(pcAccountRecord.getUserId(), pcAccountRecord.getAssociatedId());
+			BBPosition pos = positionDataService.getPosition(bBAccountRecord.getUserId(), bBAccountRecord.getAssociatedId());
 			logMsg.setSymbol(pos.getSymbol());
 		}
 		
@@ -54,8 +54,8 @@ public class LogEventListener {
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(PcOrderTrade orderTrade) {
-		PcAccountLog logMsg = new PcAccountLog();
+	public void afterCommit(BBOrderTrade orderTrade) {
+		BBAccountLog logMsg = new BBAccountLog();
 		logMsg.setUserId(orderTrade.getUserId());
 		logMsg.setAsset(orderTrade.getAsset());
 		logMsg.setSymbol(orderTrade.getSymbol());
@@ -67,8 +67,8 @@ public class LogEventListener {
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(PcLiqRecord liqRecord) {
-		PcAccountLog logMsg = new PcAccountLog();
+	public void afterCommit(BBLiqRecord liqRecord) {
+		BBAccountLog logMsg = new BBAccountLog();
 		logMsg.setUserId(liqRecord.getUserId());
 		logMsg.setAsset(liqRecord.getAsset());
 		logMsg.setSymbol(liqRecord.getSymbol());
@@ -80,19 +80,19 @@ public class LogEventListener {
 	}
 
 	private Integer getType(int tradeType) {
-		if(tradeType==PcAccountTradeType.FUND_TO_PC){
+		if(tradeType==BBAccountTradeType.FUND_TO_PC){
 			return LogType.TYPE_ACCOUNT_FUND_TO_PC;
 		}
-		if(tradeType==PcAccountTradeType.PC_TO_FUND){
+		if(tradeType==BBAccountTradeType.PC_TO_FUND){
 			return LogType.TYPE_ACCOUNT_PC_TO_FUND;
 		}
-		if(tradeType>=PcAccountTradeType.ADD_TO_MARGIN && tradeType<=PcAccountTradeType.LEVERAGE_ADD_MARGIN){
+		if(tradeType>=BBAccountTradeType.ADD_TO_MARGIN && tradeType<=BBAccountTradeType.LEVERAGE_ADD_MARGIN){
 			return tradeType-1;
 		}
 		return null;
 	}
 
-	private void sendEventMsg(PcAccountLog logMsg) {
+	private void sendEventMsg(BBAccountLog logMsg) {
 		sender.sendEventMsg(logMsg);
 	}
 

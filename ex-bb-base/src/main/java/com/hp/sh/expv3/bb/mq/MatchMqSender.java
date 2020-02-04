@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.constant.MqTopic;
-import com.hp.sh.expv3.bb.module.order.entity.PcOrder;
+import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.mq.liq.msg.LiqLockMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.BookResetMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.OrderPendingCancelMsg;
@@ -30,7 +30,7 @@ public class MatchMqSender extends BaseMqSender{
         super.sendOrderMsg(lockMsg, MqTags.TAGS_PC_POS_LIQ_LOCKED, ""+lockMsg.keys());
 	}
 	
-	public void sendPendingNew(PcOrder order){
+	public void sendPendingNew(BBOrder order){
 		//send mq
 		OrderPendingNewMsg msg = new OrderPendingNewMsg();
 		msg.setAccountId(order.getUserId());

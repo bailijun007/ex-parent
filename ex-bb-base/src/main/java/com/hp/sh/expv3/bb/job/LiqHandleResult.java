@@ -2,7 +2,7 @@ package com.hp.sh.expv3.bb.job;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.bb.module.position.entity.PcPosition;
+import com.hp.sh.expv3.bb.module.position.entity.BBPosition;
 import com.hp.sh.expv3.bb.vo.response.MarkPriceVo;
 
 public class LiqHandleResult {
@@ -15,7 +15,7 @@ public class LiqHandleResult {
 	
 	private MarkPriceVo markPriceVo;
 	
-	private PcPosition pcPosition;
+	private BBPosition bBPosition;
 
 	public boolean isTrigger() {
 		return trigger;
@@ -41,12 +41,12 @@ public class LiqHandleResult {
 		this.markPriceVo = markPriceVo;
 	}
 
-	public PcPosition getPcPosition() {
-		return pcPosition;
+	public BBPosition getPcPosition() {
+		return bBPosition;
 	}
 
-	public void setPcPosition(PcPosition pcPosition) {
-		this.pcPosition = pcPosition;
+	public void setPcPosition(BBPosition bBPosition) {
+		this.bBPosition = bBPosition;
 	}
     
 }

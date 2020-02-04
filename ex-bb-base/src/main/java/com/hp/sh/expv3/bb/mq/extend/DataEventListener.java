@@ -9,12 +9,12 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.gitee.hupadev.commons.cache.RedisPublisher;
 import com.hp.sh.expv3.bb.constant.EventType;
-import com.hp.sh.expv3.bb.module.account.entity.PcAccountRecord;
-import com.hp.sh.expv3.bb.module.order.entity.PcOrder;
-import com.hp.sh.expv3.bb.module.order.entity.PcOrderTrade;
-import com.hp.sh.expv3.bb.module.position.entity.PcPosition;
-import com.hp.sh.expv3.bb.module.symbol.entity.PcAccountSymbol;
-import com.hp.sh.expv3.bb.mq.extend.msg.PcOrderEvent;
+import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
+import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
+import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
+import com.hp.sh.expv3.bb.module.position.entity.BBPosition;
+import com.hp.sh.expv3.bb.module.symbol.entity.BBAccountSymbol;
+import com.hp.sh.expv3.bb.mq.extend.msg.BBOrderEvent;
 import com.hp.sh.expv3.bb.msg.EventMsg;
 import com.hp.sh.expv3.bb.msg.OrderEventMsg;
 
@@ -32,13 +32,13 @@ public class DataEventListener {
 	private RedisPublisher publisher;
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(PcAccountRecord pcAccountRecord) {
-		EventMsg msg = new EventMsg(EventType.PC_ACCOUNT, pcAccountRecord.getId(), pcAccountRecord.getCreated(), pcAccountRecord.getUserId(), pcAccountRecord.getAsset(), null);
+	public void afterCommit(BBAccountRecord bBAccountRecord) {
+		EventMsg msg = new EventMsg(EventType.PC_ACCOUNT, bBAccountRecord.getId(), bBAccountRecord.getCreated(), bBAccountRecord.getUserId(), bBAccountRecord.getAsset(), null);
 		this.sendEventMsg(msg);
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(PcOrderTrade orderTrade) {
+	public void afterCommit(BBOrderTrade orderTrade) {
 		OrderEventMsg orderMsg = new OrderEventMsg(EventType.ORDER, orderTrade.getOrderId(), orderTrade.getCreated(), orderTrade.getUserId(), orderTrade.getAsset(), orderTrade.getSymbol());
 		orderMsg.setMakerFlag(orderTrade.getMakerFlag());
 		orderMsg.setTradeAmt(orderTrade.getVolume());
@@ -51,14 +51,14 @@ public class DataEventListener {
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(PcPosition pcPosition) {
-		EventMsg msg = new EventMsg(EventType.POS, pcPosition.getId(), pcPosition.getCreated(), pcPosition.getUserId(), pcPosition.getAsset(), pcPosition.getSymbol());
+	public void afterCommit(BBPosition bBPosition) {
+		EventMsg msg = new EventMsg(EventType.POS, bBPosition.getId(), bBPosition.getCreated(), bBPosition.getUserId(), bBPosition.getAsset(), bBPosition.getSymbol());
 		this.sendEventMsg(msg);
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(PcOrderEvent orderEvent) {
-		PcOrder order = orderEvent.getPcOrder();
+	public void afterCommit(BBOrderEvent orderEvent) {
+		BBOrder order = orderEvent.getPcOrder();
 		EventMsg msg = new EventMsg(EventType.ORDER, order.getId(), order.getCreated(), order.getUserId(), order.getAsset(), order.getSymbol());
 		this.sendEventMsg(msg);
 		
@@ -69,7 +69,7 @@ public class DataEventListener {
 	}
 	
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(PcAccountSymbol accountSymbol) {
+	public void afterCommit(BBAccountSymbol accountSymbol) {
 		EventMsg msg = new EventMsg(EventType.ACCOUNT_SYMBOL, accountSymbol.getId(), accountSymbol.getModified(), accountSymbol.getUserId(), accountSymbol.getAsset(), accountSymbol.getSymbol());
 		this.sendEventMsg(msg);
 	}

@@ -3,7 +3,7 @@ package com.hp.sh.expv3.bb.module.order.vo;
 public class Action {
 
 	/*
-	 * @see PcOrderLogType#*
+	 * @see BBOrderLogType#*
 	 * 动作
 	 */
 	private Integer optType;

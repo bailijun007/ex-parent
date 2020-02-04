@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.constant.MsgConstant;
 import com.hp.sh.expv3.bb.mq.BaseMqSender;
-import com.hp.sh.expv3.bb.msg.PcAccountLog;
+import com.hp.sh.expv3.bb.msg.BBAccountLog;
 
 /**
  * 发送事件消息
@@ -19,7 +19,7 @@ public class EventSender extends BaseMqSender {
 	public EventSender() {
 	}
 
-	public void sendEventMsg(PcAccountLog logMsg) {
+	public void sendEventMsg(BBAccountLog logMsg) {
 		String topic = MsgConstant.EVENT_TOPIC;
 		byte[] msgBuff = (byte[]) msgCodec.encode(logMsg);
 		Message mqMsg = new Message(topic, "" + logMsg.getType(), msgBuff);

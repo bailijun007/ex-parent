@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.bb.calc.CompFieldCalc;
 import com.hp.sh.expv3.bb.calc.OrderFeeCalc;
 import com.hp.sh.expv3.bb.constant.OrderFlag;
-import com.hp.sh.expv3.bb.module.order.entity.PcOrder;
+import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.strategy.OrderStrategy;
 import com.hp.sh.expv3.bb.strategy.data.OrderFeeParam;
 import com.hp.sh.expv3.bb.strategy.vo.OrderRatioData;
@@ -78,7 +78,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * @param volume 分量
 	 * @return
 	 */
-	public OrderRatioData calcRaitoAmt(PcOrder order, BigDecimal number){
+	public OrderRatioData calcRaitoAmt(BBOrder order, BigDecimal number){
 		OrderRatioData orderAmount = new OrderRatioData();
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 			this.calcOpenRaitoAmt(order, number, orderAmount);
@@ -88,7 +88,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 		return orderAmount;
 	}
 	
-	protected void calcCloseRaitoAmt(PcOrder order, BigDecimal number, OrderRatioData orderAmount) {
+	protected void calcCloseRaitoAmt(BBOrder order, BigDecimal number, OrderRatioData orderAmount) {
 		orderAmount.setOpenFee(BigDecimal.ZERO);
 		orderAmount.setCloseFee(BigDecimal.ZERO);
 		orderAmount.setOrderMargin(BigDecimal.ZERO);
@@ -107,7 +107,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * @param number
 	 * @return
 	 */
-	protected void calcOpenRaitoAmt(PcOrder order, BigDecimal number, OrderRatioData orderAmount){
+	protected void calcOpenRaitoAmt(BBOrder order, BigDecimal number, OrderRatioData orderAmount){
 		
 		BigDecimal openFee; 
 		BigDecimal closeFee; 

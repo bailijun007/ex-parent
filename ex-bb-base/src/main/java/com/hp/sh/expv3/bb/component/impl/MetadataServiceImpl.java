@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.component.MetadataService;
-import com.hp.sh.expv3.bb.component.vo.PcContractVO;
+import com.hp.sh.expv3.bb.component.vo.BBContractVO;
 import com.hp.sh.expv3.bb.constant.RedisKey;
 
 /**
@@ -46,33 +46,33 @@ public class MetadataServiceImpl implements MetadataService {
      */
     @Override
     public BigDecimal getFaceValue(String asset, String symbol) {
-        PcContractVO vo = this.getPcContract(asset, symbol);
-        Optional<PcContractVO> optional = Optional.ofNullable(vo);
+        BBContractVO vo = this.getPcContract(asset, symbol);
+        Optional<BBContractVO> optional = Optional.ofNullable(vo);
         BigDecimal decimal = optional.map(p -> p.getFaceValue()).orElse(BigDecimal.ZERO);
         return decimal;
     }
 
     @Override
-	public PcContractVO getPcContract(String asset, String symbol) {
+	public BBContractVO getPcContract(String asset, String symbol) {
         HashOperations hashOperations = templateDB0.opsForHash();
         String hashKey = asset+"__"+symbol;
         Object o = hashOperations.get(RedisKey.PC_CONTRACT, hashKey);
         String json = o.toString();
-        PcContractVO vo = JSON.parseObject(json, PcContractVO.class);
+        BBContractVO vo = JSON.parseObject(json, BBContractVO.class);
         return vo;
     }
 
     @Override
-    public List<PcContractVO> getAllPcContract(){
+    public List<BBContractVO> getAllPcContract(){
         HashOperations opsForHash = templateDB0.opsForHash();
         Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(RedisKey.PC_CONTRACT, ScanOptions.NONE);
 
-        List<PcContractVO> list = new ArrayList<>();
+        List<BBContractVO> list = new ArrayList<>();
         while (curosr.hasNext()) {
             Map.Entry<String, Object> entry = curosr.next();
             Object o = entry.getValue();
-            PcContractVO pcContractVO = JSON.parseObject(o.toString(), PcContractVO.class);
-            list.add(pcContractVO);
+            BBContractVO bBContractVO = JSON.parseObject(o.toString(), BBContractVO.class);
+            list.add(bBContractVO);
         }
 
 

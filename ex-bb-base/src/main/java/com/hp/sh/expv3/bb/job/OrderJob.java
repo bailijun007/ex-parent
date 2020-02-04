@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
-import com.hp.sh.expv3.bb.module.order.entity.PcOrder;
-import com.hp.sh.expv3.bb.module.order.service.PcOrderQueryService;
-import com.hp.sh.expv3.bb.module.order.service.PcOrderService;
+import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
+import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
+import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.mq.MatchMqSender;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
@@ -21,9 +21,9 @@ public class OrderJob {
     private static final Logger logger = LoggerFactory.getLogger(OrderJob.class);
 
     @Autowired
-    private PcOrderService orderService;
+    private BBOrderService orderService;
 	@Autowired
-	private PcOrderQueryService orderQueryService;
+	private BBOrderQueryService orderQueryService;
 
 	@Autowired
 	private MatchMqSender matchMqSender;
@@ -33,13 +33,13 @@ public class OrderJob {
 		Long now = DbDateUtils.now();
 		Page page = new Page(1, 100, 1000L);
 		while(true){
-			List<PcOrder> list = this.orderQueryService.pageQuery(page, OrderStatus.PENDING_NEW, System.currentTimeMillis()-1000*30);
+			List<BBOrder> list = this.orderQueryService.pageQuery(page, OrderStatus.PENDING_NEW, System.currentTimeMillis()-1000*30);
 			
 			if(list==null || list.isEmpty()){
 				break;
 			}
 			
-			for(PcOrder order : list){
+			for(BBOrder order : list){
 				matchMqSender.sendPendingNew(order);
 			}
 			
