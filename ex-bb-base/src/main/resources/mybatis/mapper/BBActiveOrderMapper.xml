@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.module.order.dao.BBActiveOrderDAO">
+
+	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBActiveOrder" id="PcActiveOrder">
+		<result column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="long_flag" property="longFlag" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		id,user_id,asset,symbol,long_flag
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+			<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
+			<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
+		</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from bb_active_order
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="PcActiveOrder">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="PcActiveOrder">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="PcActiveOrder">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from bb_active_order
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="PcActiveOrder">
+		select
+			<include refid="Base_Column_List" />
+		from bb_active_order
+			where id=#{id} and user_id=#{userId}
+	</select>
+
+	<select id="exist" resultType="long">
+		select EXISTS(
+			select 
+				1
+			from 
+				bb_active_order
+			<include refid="simple_where" />
+			limit 1
+		)
+	</select>
+
+	<insert id="save">
+		insert into bb_active_order (
+			id,user_id,asset,symbol,long_flag
+		)values(
+			#{id},#{userId},#{asset},#{symbol},#{longFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			bb_active_order
+		set 
+			id=#{id},user_id=#{userId},asset=#{asset},symbol=#{symbol},long_flag=#{longFlag}
+		where 
+			id=#{id} and user_id=#{userId}
+	</update>
+
+	<delete id="delete">
+        delete from bb_active_order where id=#{id} and user_id=#{userId}
+    </delete>
+
+    <delete id="condDelete">
+        delete from bb_active_order
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+	<select id="queryActiveOrderIds" resultType="long">
+		select 
+			id 
+		from 
+			bb_active_order
+		where 
+			user_id=#{userId}
+			and asset=#{asset}
+			and symbol=#{symbol}
+			<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
+	</select>
+	
+</mapper>
