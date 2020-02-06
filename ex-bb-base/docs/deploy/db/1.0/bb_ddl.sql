@@ -1,25 +1,25 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : 192.168.0.190-ex
-Source Server Version : 50726
-Source Host           : 192.168.0.190:3306
+Source Server         : localhost
+Source Server Version : 50716
+Source Host           : localhost:3306
 Source Database       : expv3-pc
 
 Target Server Type    : MYSQL
-Target Server Version : 50599
+Target Server Version : 50716
 File Encoding         : 65001
 
-Date: 2020-01-21 18:42:26
+Date: 2020-02-04 12:10:42
 */
 
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
--- Table structure for `pc_account`
+-- Table structure for `bb_account`
 -- ----------------------------
-DROP TABLE IF EXISTS `pc_account`;
-CREATE TABLE `pc_account` (
+DROP TABLE IF EXISTS `bb_account`;
+CREATE TABLE `bb_account` (
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产类型' ,
 `balance`  decimal(50,30) NOT NULL COMMENT '余额' ,
@@ -36,10 +36,10 @@ COMMENT='用户资金账户'
 ;
 
 -- ----------------------------
--- Table structure for `pc_account_log`
+-- Table structure for `bb_account_log`
 -- ----------------------------
-DROP TABLE IF EXISTS `pc_account_log`;
-CREATE TABLE `pc_account_log` (
+DROP TABLE IF EXISTS `bb_account_log`;
+CREATE TABLE `bb_account_log` (
 `id`  bigint(20) NOT NULL AUTO_INCREMENT ,
 `type`  int(11) NOT NULL COMMENT '事件类型' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户Id' ,
@@ -53,15 +53,14 @@ INDEX `idx_user_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='账户日志'
-AUTO_INCREMENT=667917
 
 ;
 
 -- ----------------------------
--- Table structure for `pc_account_record`
+-- Table structure for `bb_account_record`
 -- ----------------------------
-DROP TABLE IF EXISTS `pc_account_record`;
-CREATE TABLE `pc_account_record` (
+DROP TABLE IF EXISTS `bb_account_record`;
+CREATE TABLE `bb_account_record` (
 `id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
@@ -84,15 +83,14 @@ UNIQUE INDEX `un_sn` (`sn`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_账户明细'
-AUTO_INCREMENT=139801667267756033
 
 ;
 
 -- ----------------------------
--- Table structure for `pc_account_symbol`
+-- Table structure for `bb_account_symbol`
 -- ----------------------------
-DROP TABLE IF EXISTS `pc_account_symbol`;
-CREATE TABLE `pc_account_symbol` (
+DROP TABLE IF EXISTS `bb_account_symbol`;
+CREATE TABLE `bb_account_symbol` (
 `id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
@@ -102,6 +100,7 @@ CREATE TABLE `pc_account_symbol` (
 `long_max_leverage`  decimal(10,4) NOT NULL COMMENT '最大多仓杠杆' ,
 `short_max_leverage`  decimal(10,4) NOT NULL COMMENT '最大多空杠杆' ,
 `cross_leverage`  decimal(10,4) NOT NULL COMMENT '全仓杠杆' ,
+`cross_max_leverage`  decimal(10,0) NOT NULL COMMENT '最大全仓杠杆' ,
 `version`  bigint(20) NOT NULL COMMENT '版本' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
@@ -112,15 +111,54 @@ UNIQUE INDEX `user_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_账户设置'
-AUTO_INCREMENT=139399382565945345
 
 ;
 
 -- ----------------------------
--- Table structure for `pc_liq_record`
+-- Table structure for `bb_active_order`
 -- ----------------------------
-DROP TABLE IF EXISTS `pc_liq_record`;
-CREATE TABLE `pc_liq_record` (
+DROP TABLE IF EXISTS `bb_active_order`;
+CREATE TABLE `bb_active_order` (
+`id`  bigint(20) NOT NULL COMMENT '订单ID' ,
+`user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
+`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
+`symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
+`long_flag`  int(11) NOT NULL COMMENT '多空' ,
+PRIMARY KEY (`id`),
+INDEX `idx_userid` (`user_id`) USING BTREE ,
+INDEX `idx_symbol` (`symbol`) USING BTREE 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+COMMENT='永续合约_活动订单（委托）'
+
+;
+
+-- ----------------------------
+-- Table structure for `bb_active_position`
+-- ----------------------------
+DROP TABLE IF EXISTS `bb_active_position`;
+CREATE TABLE `bb_active_position` (
+`id`  bigint(20) NOT NULL COMMENT '仓位ID' ,
+`user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
+`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
+`symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
+`long_flag`  int(11) NOT NULL COMMENT '多空' ,
+PRIMARY KEY (`id`),
+INDEX `idx_userid` (`user_id`) USING BTREE ,
+INDEX `idx_symbol` (`symbol`) USING BTREE 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+COMMENT='永续合约_活动仓位'
+
+;
+
+-- ----------------------------
+-- Table structure for `bb_liq_record`
+-- ----------------------------
+DROP TABLE IF EXISTS `bb_liq_record`;
+CREATE TABLE `bb_liq_record` (
 `id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
@@ -142,15 +180,14 @@ PRIMARY KEY (`id`)
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_仓位'
-AUTO_INCREMENT=139426902984130561
 
 ;
 
 -- ----------------------------
--- Table structure for `pc_order`
+-- Table structure for `bb_order`
 -- ----------------------------
-DROP TABLE IF EXISTS `pc_order`;
-CREATE TABLE `pc_order` (
+DROP TABLE IF EXISTS `bb_order`;
+CREATE TABLE `bb_order` (
 `id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
@@ -187,6 +224,7 @@ CREATE TABLE `pc_order` (
 `client_order_id`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '客户自定义委托ID，用于与客户系统关联 （open api）' ,
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
+`version`  bigint(20) NOT NULL DEFAULT 0 ,
 PRIMARY KEY (`id`),
 INDEX `idx_userid_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE ,
 INDEX `idx_created` (`created`) USING BTREE 
@@ -194,15 +232,14 @@ INDEX `idx_created` (`created`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_订单（委托）'
-AUTO_INCREMENT=139801669432016897
 
 ;
 
 -- ----------------------------
--- Table structure for `pc_order_log`
+-- Table structure for `bb_order_log`
 -- ----------------------------
-DROP TABLE IF EXISTS `pc_order_log`;
-CREATE TABLE `pc_order_log` (
+DROP TABLE IF EXISTS `bb_order_log`;
+CREATE TABLE `bb_order_log` (
 `order_id`  bigint(20) NOT NULL ,
 `type`  int(11) NOT NULL ,
 `trigger_type`  int(11) NOT NULL ,
@@ -222,10 +259,10 @@ COMMENT='订单日志'
 ;
 
 -- ----------------------------
--- Table structure for `pc_order_trade`
+-- Table structure for `bb_order_trade`
 -- ----------------------------
-DROP TABLE IF EXISTS `pc_order_trade`;
-CREATE TABLE `pc_order_trade` (
+DROP TABLE IF EXISTS `bb_order_trade`;
+CREATE TABLE `bb_order_trade` (
 `id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
@@ -256,15 +293,14 @@ INDEX `idx_posid` (`pos_id`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_用户订单成交记录'
-AUTO_INCREMENT=139474850635874305
 
 ;
 
 -- ----------------------------
--- Table structure for `pc_position`
+-- Table structure for `bb_position`
 -- ----------------------------
-DROP TABLE IF EXISTS `pc_position`;
-CREATE TABLE `pc_position` (
+DROP TABLE IF EXISTS `bb_position`;
+CREATE TABLE `bb_position` (
 `id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
@@ -290,6 +326,7 @@ CREATE TABLE `pc_position` (
 `liq_mark_price`  decimal(50,30) NULL DEFAULT NULL COMMENT '强平' ,
 `liq_mark_time`  bigint(20) NULL DEFAULT NULL COMMENT '触发强平的标记时间' ,
 `liq_status`  int(11) NULL DEFAULT NULL COMMENT '仓位强平状态，0：未触发平仓，1：仓位被冻结，' ,
+`version`  bigint(20) NOT NULL DEFAULT 0 ,
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
 PRIMARY KEY (`id`),
@@ -299,15 +336,14 @@ INDEX `idx_volume` (`volume`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_仓位'
-AUTO_INCREMENT=139426914791096321
 
 ;
 
 -- ----------------------------
--- Table structure for `pc_trade`
+-- Table structure for `bb_trade`
 -- ----------------------------
-DROP TABLE IF EXISTS `pc_trade`;
-CREATE TABLE `pc_trade` (
+DROP TABLE IF EXISTS `bb_trade`;
+CREATE TABLE `bb_trade` (
 `id`  bigint(20) NOT NULL COMMENT 'id' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '交易对' ,
@@ -331,23 +367,3 @@ DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_成交(撮合结果)'
 
 ;
-
--- ----------------------------
--- Auto increment value for `pc_account_log`
--- ----------------------------
-ALTER TABLE `pc_account_log` AUTO_INCREMENT=667917;
-
--- ----------------------------
--- Auto increment value for `pc_account_record`
--- ----------------------------
-ALTER TABLE `pc_account_record` AUTO_INCREMENT=746618881;
-
--- ----------------------------
--- Auto increment value for `pc_order_trade`
--- ----------------------------
-ALTER TABLE `pc_order_trade` AUTO_INCREMENT=1061191681;
-
--- ----------------------------
--- Auto increment value for `pc_position`
--- ----------------------------
-ALTER TABLE `pc_position` AUTO_INCREMENT=1346404353;

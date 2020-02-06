@@ -6,11 +6,14 @@ package com.hp.sh.expv3.bb.module.trade.entity;
 
 import java.math.BigDecimal;
 
+import javax.persistence.Table;
+
 /**
- * 永续合约_成交(撮合结果)
+ * 撮合结果
  *
  */
-public class BBMatchedResult {
+@Table(name="bb_trade")
+public class BBMatchedTrade {
 
 	//id
 	private Long id;
@@ -48,7 +51,13 @@ public class BBMatchedResult {
     //成交时间
     private Long tradeTime;
     
-	public BBMatchedResult() {
+    ///////////////////////
+
+    private Integer makerHandleStatus;
+    
+    private Integer takerHandleStatus;
+    
+	public BBMatchedTrade() {
 	}
 
 	public Long getId() {
@@ -161,5 +170,21 @@ public class BBMatchedResult {
 
 	public void setTradeTime(Long tradeTime) {
 		this.tradeTime = tradeTime;
+	}
+
+	public Integer getMakerHandleStatus() {
+		return makerHandleStatus;
+	}
+
+	public void setMakerHandleStatus(Integer makerHandleStatus) {
+		this.makerHandleStatus = makerHandleStatus;
+	}
+
+	public Integer getTakerHandleStatus() {
+		return takerHandleStatus;
+	}
+
+	public void setTakerHandleStatus(Integer takerHandleStatus) {
+		this.takerHandleStatus = takerHandleStatus;
 	}
 }

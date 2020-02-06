@@ -25,11 +25,8 @@ public class ActiveOrderVo {
 	private Long created;
 	
     //是否:1-平仓,0-开
-    private Integer closeFlag;
+    private Integer bidFlag;
 	
-    //是否：1-多仓，0-空仓
-    private Integer longFlag;
-    
     //杠杆
     private BigDecimal leverage;
 
@@ -44,9 +41,6 @@ public class ActiveOrderVo {
 	
 	//委托价格
 	private BigDecimal price;
-	
-    //保证金 (统计成交记录)
-	private BigDecimal orderMargin;
 	
 	//已收手续费
     private BigDecimal feeCost;
@@ -97,20 +91,12 @@ public class ActiveOrderVo {
 		this.created = created;
 	}
 
-	public Integer getCloseFlag() {
-		return closeFlag;
+	public Integer getBidFlag() {
+		return bidFlag;
 	}
 
-	public void setCloseFlag(Integer closeFlag) {
-		this.closeFlag = closeFlag;
-	}
-
-	public Integer getLongFlag() {
-		return longFlag;
-	}
-
-	public void setLongFlag(Integer longFlag) {
-		this.longFlag = longFlag;
+	public void setBidFlag(Integer closeFlag) {
+		this.bidFlag = closeFlag;
 	}
 
 	public BigDecimal getLeverage() {
@@ -153,14 +139,6 @@ public class ActiveOrderVo {
 		this.price = price;
 	}
 
-	public BigDecimal getOrderMargin() {
-		return orderMargin;
-	}
-
-	public void setOrderMargin(BigDecimal orderMargin) {
-		this.orderMargin = orderMargin;
-	}
-
 	public BigDecimal getFeeCost() {
 		return feeCost;
 	}
@@ -175,15 +153,6 @@ public class ActiveOrderVo {
 
 	public void setStatus(Integer status) {
 		this.status = status;
-	}
-
-	@Override
-	public String toString() {
-		return "ActiveOrderVo [id=" + id + ", userId=" + userId + ", asset=" + asset + ", symbol=" + symbol
-				+ ", created=" + created + ", closeFlag=" + closeFlag + ", longFlag=" + longFlag + ", leverage="
-				+ leverage + ", filledVolume=" + filledVolume + ", filledRatio=" + filledRatio + ", meanPrice="
-				+ meanPrice + ", price=" + price + ", orderMargin=" + orderMargin + ", feeCost=" + feeCost + ", status="
-				+ status + "]";
 	}
 	
 }

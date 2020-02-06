@@ -64,4 +64,8 @@ public class SnUtils {
 		return dstr+nstr;
 	}
 
+	public static String getIncomeSn(Long orderTradeId) {
+		return "BTR"+orderTradeId;
+	}
+
 }

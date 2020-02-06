@@ -9,8 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.bb.api.BBAccountCoreApi;
+import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
 import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.commons.lock.LockAdvice;
 import com.hp.sh.expv3.fund.transfer.constant.AccountType;
 import com.hp.sh.expv3.fund.transfer.entity.FundTransfer;
 import com.hp.sh.expv3.fund.transfer.error.TransferError;
@@ -36,6 +37,9 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	
 	@Autowired
 	private PcAccountCoreApi pcAccountCoreApi;
+	
+	@Autowired
+	private BBAccountCoreApi bbAccountCoreApi;
 
 	@Autowired
 	private FundTransferCoreService fundTransferCoreService;
@@ -57,6 +61,11 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			}
 		}else if(srcAccountType==AccountType.PC){
 			BigDecimal balance = this.pcAccountCoreApi.getBalance(userId, asset);
+			if(BigUtils.lt(balance, amount)){
+				throw new ExException(PcAccountError.BALANCE_NOT_ENOUGH);
+			}
+		}else if(srcAccountType==AccountType.BB){
+			BigDecimal balance = this.bbAccountCoreApi.getBalance(userId, asset);
 			if(BigUtils.lt(balance, amount)){
 				throw new ExException(PcAccountError.BALANCE_NOT_ENOUGH);
 			}
@@ -103,6 +112,8 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 				this.cutFund(record);
 			}else if(record.getSrcAccountType()==AccountType.PC){
 				this.cutPcFund(record);
+			}else if(record.getSrcAccountType()==AccountType.BB){
+				this.cutBBFund(record);
 			}
 			//修改状态
 			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SRC_COMPLETE, null);
@@ -112,6 +123,8 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 				this.addFund(record);
 			}else if(record.getTargetAccountType()==AccountType.PC){
 				this.addPcFund(record);
+			}else if(record.getTargetAccountType()==AccountType.BB){
+				this.addBBFund(record);
 			}
 //			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_TARGET_COMPLETE);
 		case FundTransfer.STATUS_TARGET_COMPLETE:
@@ -142,6 +155,18 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 		pcAccountCoreApi.add(request);
 	}
 
+	private void addBBFund(FundTransfer record){
+		com.hp.sh.expv3.bb.vo.request.BBAddRequest request = new com.hp.sh.expv3.bb.vo.request.BBAddRequest();
+		request.setAmount(record.getAmount());
+		request.setAsset(record.getAsset());
+		request.setRemark(record.getRemark());
+		request.setTradeNo(record.getSn());
+		request.setTradeType(BBAccountTradeType.FUND_TO_BB);
+		request.setUserId(record.getUserId());
+		request.setAssociatedId(record.getId());
+		bbAccountCoreApi.add(request);
+	}
+
 	private void cutFund(FundTransfer record){
 		FundCutRequest request = new FundCutRequest();
 		request.setAmount(record.getAmount());
@@ -162,6 +187,17 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 		request.setTradeType(PcAccountTradeType.PC_TO_FUND);
 		request.setUserId(record.getUserId());
 		pcAccountCoreApi.cut(request);
+	}
+
+	private void cutBBFund(FundTransfer record){
+		com.hp.sh.expv3.bb.vo.request.BBCutRequest request = new com.hp.sh.expv3.bb.vo.request.BBCutRequest();
+		request.setAmount(record.getAmount());
+		request.setAsset(record.getAsset());
+		request.setRemark(record.getRemark());
+		request.setTradeNo(record.getSn());
+		request.setTradeType(BBAccountTradeType.BB_TO_FUND);
+		request.setUserId(record.getUserId());
+		bbAccountCoreApi.cut(request);
 	}
 	
 }

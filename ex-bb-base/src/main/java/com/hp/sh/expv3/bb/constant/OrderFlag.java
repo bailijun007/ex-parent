@@ -7,6 +7,12 @@ package com.hp.sh.expv3.bb.constant;
  */
 public class OrderFlag {
 	
+	//买
+	public static final int BID_BUY = 1;
+	
+	//卖
+	public static final int BID_SELL = 0;
+	
 	//开仓
 	public static final int ACTION_OPEN = 0;
 	

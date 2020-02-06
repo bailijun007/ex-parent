@@ -2,6 +2,7 @@ package com.hp.sh.expv3.bb.component.mock;
 
 import java.math.BigDecimal;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.component.FeeRatioService;
@@ -13,6 +14,7 @@ import com.hp.sh.expv3.utils.math.Precision;
  * @author lw
  *
  */
+@Primary
 @Component
 public class FeeRatioServiceMock implements FeeRatioService {
 
@@ -39,9 +41,9 @@ public class FeeRatioServiceMock implements FeeRatioService {
 	 */
 	private BigDecimal getFeeRatio(long userId, boolean isMaker) {
 		if (isMaker) {
-			return new BigDecimal("0.0025");
+			return new BigDecimal("0.1");
 		} else {
-			return new BigDecimal("0.0075");
+			return new BigDecimal("0.15");
 		}
 	
 	}

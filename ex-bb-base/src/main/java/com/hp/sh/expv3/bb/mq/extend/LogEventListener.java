@@ -5,16 +5,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.hp.sh.expv3.bb.constant.LogType;
 import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
+import com.hp.sh.expv3.bb.constant.LogType;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
-import com.hp.sh.expv3.bb.module.position.entity.BBLiqRecord;
-import com.hp.sh.expv3.bb.module.position.entity.BBPosition;
-import com.hp.sh.expv3.bb.module.position.service.BBPositionDataService;
 import com.hp.sh.expv3.bb.msg.BBAccountLog;
-import com.hp.sh.expv3.utils.IntBool;
-import com.hp.sh.expv3.utils.math.NumberUtils;
 
 /**
  * 发送事件消息
@@ -28,10 +23,7 @@ public class LogEventListener {
 	@Autowired
 	private EventSender sender;
 	
-	@Autowired
-	private BBPositionDataService positionDataService;
-
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
 	public void afterCommit(BBAccountRecord bBAccountRecord) {
 		Integer type = this.getType(bBAccountRecord.getTradeType());
 		if(type==null){
@@ -45,15 +37,10 @@ public class LogEventListener {
 		logMsg.setType(type);
 		logMsg.setRefId(bBAccountRecord.getId());
 		
-		if(NumberUtils.in(type, LogType.TYPE_ACCOUNT_ADD_TO_MARGIN, LogType.TYPE_ACCOUNT_REDUCE_MARGIN, LogType.TYPE_ACCOUNT_AUTO_ADD_MARGIN, LogType.TYPE_ACCOUNT_LEVERAGE_ADD_MARGIN)){
-			BBPosition pos = positionDataService.getPosition(bBAccountRecord.getUserId(), bBAccountRecord.getAssociatedId());
-			logMsg.setSymbol(pos.getSymbol());
-		}
-		
 		this.sendEventMsg(logMsg);
 	}
 
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
 	public void afterCommit(BBOrderTrade orderTrade) {
 		BBAccountLog logMsg = new BBAccountLog();
 		logMsg.setUserId(orderTrade.getUserId());
@@ -66,24 +53,11 @@ public class LogEventListener {
 		this.sendEventMsg(logMsg);
 	}
 
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(BBLiqRecord liqRecord) {
-		BBAccountLog logMsg = new BBAccountLog();
-		logMsg.setUserId(liqRecord.getUserId());
-		logMsg.setAsset(liqRecord.getAsset());
-		logMsg.setSymbol(liqRecord.getSymbol());
-		logMsg.setTime(liqRecord.getCreated());
-		logMsg.setType(IntBool.isTrue(liqRecord.getLongFlag())?LogType.TYPE_LIQ_LONG:LogType.TYPE_LIQ_SHORT);
-		logMsg.setRefId(liqRecord.getId());
-		
-		this.sendEventMsg(logMsg);
-	}
-
 	private Integer getType(int tradeType) {
-		if(tradeType==BBAccountTradeType.FUND_TO_PC){
+		if(tradeType==BBAccountTradeType.FUND_TO_BB){
 			return LogType.TYPE_ACCOUNT_FUND_TO_PC;
 		}
-		if(tradeType==BBAccountTradeType.PC_TO_FUND){
+		if(tradeType==BBAccountTradeType.BB_TO_FUND){
 			return LogType.TYPE_ACCOUNT_PC_TO_FUND;
 		}
 		if(tradeType>=BBAccountTradeType.ADD_TO_MARGIN && tradeType<=BBAccountTradeType.LEVERAGE_ADD_MARGIN){
@@ -93,7 +67,7 @@ public class LogEventListener {
 	}
 
 	private void sendEventMsg(BBAccountLog logMsg) {
-		sender.sendEventMsg(logMsg);
+//		sender.sendEventMsg(logMsg);
 	}
 
 }

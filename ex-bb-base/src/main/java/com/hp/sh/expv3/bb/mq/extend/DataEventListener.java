@@ -12,8 +12,6 @@ import com.hp.sh.expv3.bb.constant.EventType;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
-import com.hp.sh.expv3.bb.module.position.entity.BBPosition;
-import com.hp.sh.expv3.bb.module.symbol.entity.BBAccountSymbol;
 import com.hp.sh.expv3.bb.mq.extend.msg.BBOrderEvent;
 import com.hp.sh.expv3.bb.msg.EventMsg;
 import com.hp.sh.expv3.bb.msg.OrderEventMsg;
@@ -45,32 +43,12 @@ public class DataEventListener {
 		orderMsg.setTradeMatchId(""+orderTrade.getMatchTxId());
 		orderMsg.setExecId(""+orderTrade.getTxId());
 		this.sendEventMsg(orderMsg);
-		
-		EventMsg posMsg = new EventMsg(EventType.POS, orderTrade.getPosId(), orderTrade.getCreated(), orderTrade.getUserId(), orderTrade.getAsset(), orderTrade.getSymbol());
-		this.sendEventMsg(posMsg);
-	}
-
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(BBPosition bBPosition) {
-		EventMsg msg = new EventMsg(EventType.POS, bBPosition.getId(), bBPosition.getCreated(), bBPosition.getUserId(), bBPosition.getAsset(), bBPosition.getSymbol());
-		this.sendEventMsg(msg);
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void afterCommit(BBOrderEvent orderEvent) {
 		BBOrder order = orderEvent.getPcOrder();
 		EventMsg msg = new EventMsg(EventType.ORDER, order.getId(), order.getCreated(), order.getUserId(), order.getAsset(), order.getSymbol());
-		this.sendEventMsg(msg);
-		
-		if(order.getClosePosId()!=null && order.getClosePosId()!=0){
-			EventMsg msg2 = new EventMsg(EventType.POS, order.getClosePosId(), order.getCreated(), order.getUserId(), order.getAsset(), order.getSymbol());
-			this.sendEventMsg(msg2);
-		}
-	}
-	
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void afterCommit(BBAccountSymbol accountSymbol) {
-		EventMsg msg = new EventMsg(EventType.ACCOUNT_SYMBOL, accountSymbol.getId(), accountSymbol.getModified(), accountSymbol.getUserId(), accountSymbol.getAsset(), accountSymbol.getSymbol());
 		this.sendEventMsg(msg);
 	}
 	

@@ -21,6 +21,8 @@ public class BBOrderError extends ErrorCode {
 	public static final BBOrderError NOT_ACTIVE = new BBOrderError(-13004, "订单已经已结束!");
 	
 	public static final BBOrderError BANKRUPT_PRICE = new BBOrderError(-13005, "平仓委托价格不能低于破产价!");
+	
+	public static final BBOrderError ORDER_DONT_EXIST = new BBOrderError(-13006, "订单不存在!");
 
 	private BBOrderError(int code, String message) {
 		super(code, message);

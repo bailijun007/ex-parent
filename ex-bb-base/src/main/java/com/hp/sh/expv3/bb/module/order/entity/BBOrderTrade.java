@@ -28,17 +28,16 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 	//成交价
 	private BigDecimal price;
 
-	//成交量（张数）
+	//成交量（个数）
 	private BigDecimal volume;
+	
+	private Integer bidFlag;
 	
 	//交易序号
 	private String tradeSn;
 	
 	//交易ID
 	private Long tradeId;
-
-	//仓位ID
-	private Long posId;
 
 	//订单ID
 	private Long orderId;
@@ -59,10 +58,6 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 	
 	//手续费
 	private BigDecimal fee;
-	
-	//盈亏(此次成交的盈亏)
-	@Question(ask="没有用到，老项目里也没这个字段", answer="老杜用")
-	private BigDecimal pnl;
 	
 	//未成交（张数）
 	private BigDecimal remainVolume;
@@ -168,28 +163,12 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 		this.fee = fee;
 	}
 
-	public BigDecimal getPnl() {
-		return pnl;
-	}
-
-	public void setPnl(BigDecimal pnl) {
-		this.pnl = pnl;
-	}
-
 	public Long getTradeId() {
 		return tradeId;
 	}
 
 	public void setTradeId(Long tradeId) {
 		this.tradeId = tradeId;
-	}
-
-	public Long getPosId() {
-		return posId;
-	}
-
-	public void setPosId(Long posId) {
-		this.posId = posId;
 	}
 
 	public BigDecimal getRemainVolume() {
@@ -217,21 +196,29 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 		this.txId = txId;
 	}
 
-	@Override
-	public String toString() {
-		return "BBOrderTrade [asset=" + asset + ", symbol=" + symbol + ", price=" + price + ", volume=" + volume
-				+ ", tradeSn=" + tradeSn + ", tradeId=" + tradeId + ", posId=" + posId + ", orderId=" + orderId
-				+ ", makerFlag=" + makerFlag + ", tradeTime=" + tradeTime + ", feeCollectorId=" + feeCollectorId
-				+ ", feeRatio=" + feeRatio + ", fee=" + fee + ", pnl=" + pnl + ", remainVolume=" + remainVolume
-				+ ", matchTxId=" + matchTxId + ", txId=" + txId + ", logType=" + logType + "]";
-	}
-
 	public Integer getLogType() {
 		return logType;
 	}
 
 	public void setLogType(Integer tradType) {
 		this.logType = tradType;
+	}
+
+	public Integer getBidFlag() {
+		return bidFlag;
+	}
+
+	public void setBidFlag(Integer bidFlag) {
+		this.bidFlag = bidFlag;
+	}
+
+	@Override
+	public String toString() {
+		return "BBOrderTrade [asset=" + asset + ", symbol=" + symbol + ", price=" + price + ", volume=" + volume
+				+ ", tradeSn=" + tradeSn + ", tradeId=" + tradeId + ", orderId=" + orderId + ", makerFlag=" + makerFlag
+				+ ", tradeTime=" + tradeTime + ", feeCollectorId=" + feeCollectorId + ", feeRatio=" + feeRatio
+				+ ", fee=" + fee + ", remainVolume=" + remainVolume + ", matchTxId=" + matchTxId + ", txId=" + txId
+				+ ", logType=" + logType + "]";
 	}
 
 }

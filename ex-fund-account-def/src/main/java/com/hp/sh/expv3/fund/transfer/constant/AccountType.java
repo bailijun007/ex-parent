@@ -10,5 +10,7 @@ public class AccountType {
 	public static final int FUND = 1;
 	
 	public static final int PC = 2;
+	
+	public static final int BB = 3;
 
 }

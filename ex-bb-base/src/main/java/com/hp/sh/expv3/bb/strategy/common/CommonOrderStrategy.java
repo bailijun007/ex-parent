@@ -1,18 +1,25 @@
 package com.hp.sh.expv3.bb.strategy.common;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hp.sh.expv3.bb.calc.CompFieldCalc;
-import com.hp.sh.expv3.bb.calc.OrderFeeCalc;
+import com.hp.sh.expv3.bb.component.FeeRatioService;
+import com.hp.sh.expv3.bb.component.MetadataService;
 import com.hp.sh.expv3.bb.constant.OrderFlag;
+import com.hp.sh.expv3.bb.constant.TradingRoles;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
+import com.hp.sh.expv3.bb.msg.BBTradeMsg;
 import com.hp.sh.expv3.bb.strategy.OrderStrategy;
 import com.hp.sh.expv3.bb.strategy.data.OrderFeeParam;
+import com.hp.sh.expv3.bb.strategy.data.OrderTrade;
 import com.hp.sh.expv3.bb.strategy.vo.OrderRatioData;
+import com.hp.sh.expv3.bb.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigUtils;
+import com.hp.sh.expv3.utils.math.DecimalUtil;
 import com.hp.sh.expv3.utils.math.Precision;
 
 /**
@@ -22,24 +29,32 @@ import com.hp.sh.expv3.utils.math.Precision;
  */
 @Component
 public class CommonOrderStrategy implements OrderStrategy {
+
 	
+	@Autowired
+	private MetadataService metadataService;
+	
+	@Autowired
+	private FeeRatioService feeRatioService;
+    
 	/**
 	 * 计算新订单费用
 	 */
 		//交易金额
-	public OrderRatioData calcOrderAmt(OrderFeeParam pcOrder){
-		BigDecimal amount = CompFieldCalc.calcAmount(pcOrder.getVolume(), pcOrder.getFaceValue());
+	public OrderRatioData calcOrderAmt(OrderFeeParam orderParam){
+		BigDecimal amount = calcAmount(orderParam.getVolume(), orderParam.getPrice());
+		
 		//基础货币价值
-		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, pcOrder.getPrice());
+		BigDecimal baseValue = orderParam.getVolume();
 		
 		//开仓手续费
-		BigDecimal openFee = this.calcFee(baseValue, pcOrder.getOpenFeeRatio());
+		BigDecimal openFee = calcFee(baseValue, orderParam.getOpenFeeRatio());
 		
 		//平仓手续费
-		BigDecimal closeFee = this.calcFee(baseValue, pcOrder.getCloseFeeRatio());
+		BigDecimal closeFee = calcFee(baseValue, orderParam.getCloseFeeRatio());
 		
 		//保证金
-		BigDecimal orderMargin = OrderFeeCalc.calMargin(baseValue, pcOrder.getMarginRatio());
+		BigDecimal orderMargin = calMargin(amount, orderParam.getMarginRatio());
 		
 		//总押金
 		BigDecimal grossMargin = BigCalc.sum(closeFee, openFee, orderMargin);
@@ -57,21 +72,6 @@ public class CommonOrderStrategy implements OrderStrategy {
 		return orderAmount;
 	}
 	
-	public BigDecimal calMargin(BigDecimal volume, BigDecimal faceValue, BigDecimal price, BigDecimal marginRatio){
-		BigDecimal amount = CompFieldCalc.calcAmount(volume, faceValue);
-		//基础货币价值
-		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, price);
-		
-		//保证金
-		BigDecimal orderMargin = OrderFeeCalc.calMargin(baseValue, marginRatio);
-		return orderMargin;
-	}
-	
-	public BigDecimal calcFee(BigDecimal baseValue, BigDecimal feeRatio){
-		BigDecimal fee = OrderFeeCalc.calcFee(baseValue, feeRatio);
-		return fee.stripTrailingZeros();
-	}
-	
 	/**
 	 * 按比例计算费用
 	 * @param order 订单数据
@@ -80,7 +80,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 */
 	public OrderRatioData calcRaitoAmt(BBOrder order, BigDecimal number){
 		OrderRatioData orderAmount = new OrderRatioData();
-		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
+		if(order.getBidFlag() == OrderFlag.BID_BUY){
 			this.calcOpenRaitoAmt(order, number, orderAmount);
 		}else{
 			this.calcCloseRaitoAmt(order, number, orderAmount);
@@ -95,10 +95,9 @@ public class CommonOrderStrategy implements OrderStrategy {
 		orderAmount.setGrossMargin(BigDecimal.ZERO);
 		
 		BigDecimal amount = number.multiply(order.getFaceValue());
-		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, order.getPrice());
 
 		orderAmount.setAmount(amount);
-		orderAmount.setBaseValue(baseValue);
+		orderAmount.setBaseValue(number);
 	}
 
 	/**
@@ -139,12 +138,105 @@ public class CommonOrderStrategy implements OrderStrategy {
 
 		
 		BigDecimal amount = number.multiply(order.getFaceValue());
-		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, order.getPrice());
+		BigDecimal baseValue = number;
 
 		orderAmount.setAmount(amount);
 		orderAmount.setBaseValue(baseValue);
 	}
 	
+	int ____________________________;
+
+	public BigDecimal calcOrderMeanPrice(String asset, String symbol, List<? extends OrderTrade> tradeList){
+		if(tradeList==null || tradeList.isEmpty()){
+			return BigDecimal.ZERO;
+		}
+		BigDecimal amount = BigDecimal.ZERO;
+		BigDecimal vols = BigDecimal.ZERO;
+		for(OrderTrade trade : tradeList){
+			amount = amount.add(calcAmount(trade.getVolume(), trade.getPrice()));
+			vols = vols.add(trade.getVolume());
+		}
+		if(BigUtils.isZero(vols)){
+			return BigDecimal.ZERO;
+		}
+		BigDecimal meanPrice = calcEntryPrice(vols, amount);
+		return meanPrice;
+	}
+	
+    /**
+     * 计算成交均价
+     *
+     * @param isLong
+     * @param baseValue
+     * @param amt
+     * @return
+     */
+    private static BigDecimal calcEntryPrice(BigDecimal volume, BigDecimal amt) {
+    	return amt.divide(volume, Precision.COMMON_PRECISION, DecimalUtil.MORE).stripTrailingZeros();
+    }
+
+	int ___________________________;
+	
+	/**
+	 * 计算本单的各项数据
+	 * @param order
+	 * @param matchedVo
+	 * @param pcPosition
+	 * @return
+	 */
+	public TradeResult calcTradeResult(BBTradeMsg matchedVo, BBOrder order){
+		long userId = order.getUserId();
+		String asset = order.getAsset();
+		String symbol = order.getSymbol();
+		int bidFlag = order.getBidFlag();
+		
+		OrderRatioData orderRatioData = this.calcRaitoAmt(order, matchedVo.getNumber());
+		
+		TradeResult tradeResult = new TradeResult();
+	
+		tradeResult.setVolume(matchedVo.getNumber());
+		tradeResult.setPrice(matchedVo.getPrice());
+		tradeResult.setAmount(matchedVo.getPrice().multiply(matchedVo.getNumber()));
+		tradeResult.setBaseValue(matchedVo.getNumber());
+		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
+		
+		//手续费&率
+		if(bidFlag==OrderFlag.BID_BUY){
+			tradeResult.setFeeRatio(order.getOpenFeeRatio());
+			tradeResult.setFee(orderRatioData.getOpenFee());
+			tradeResult.setOrderMargin(orderRatioData.getOrderMargin()); //保证金
+		}else{
+			BigDecimal closeFeeRatio = this.feeRatioService.getCloseFeeRatio(userId, asset, symbol);
+			BigDecimal closeFee = tradeResult.getAmount().multiply(closeFeeRatio);
+	
+			tradeResult.setFeeRatio(closeFeeRatio);
+			tradeResult.setFee(closeFee);
+			
+			tradeResult.setOrderMargin(BigDecimal.ZERO);
+		}
+		
+		//maker fee
+		if(matchedVo.getMakerFlag()==TradingRoles.MAKER){
+			if(bidFlag==OrderFlag.ACTION_OPEN){
+				BigDecimal makerFeeRatio = feeRatioService.getMakerOpenFeeRatio(userId, asset, symbol);
+				tradeResult.setMakerFeeRatio(makerFeeRatio);
+				BigDecimal closeFee = tradeResult.getAmount().multiply(makerFeeRatio);
+				tradeResult.setMakerFee(closeFee);
+			}else{
+				BigDecimal makerFeeRatio = feeRatioService.getMakerCloseFeeRatio(userId, asset, symbol);
+				tradeResult.setMakerFeeRatio(makerFeeRatio);
+				BigDecimal closeFee = tradeResult.getAmount().multiply(makerFeeRatio);
+				tradeResult.setMakerFee(closeFee);
+			}
+		}
+		
+		/* **************** 仓位累计数据 **************** */
+		
+		return tradeResult;
+	}
+
+	int _____________________________;
+
 	/**
 	 * 按比例计算amount
 	 * @param number 比例分子
@@ -156,4 +248,22 @@ public class CommonOrderStrategy implements OrderStrategy {
 		return number.multiply(amount).divide(volume, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
 	}
 	
+	public static BigDecimal calcAmount(BigDecimal volume, BigDecimal price){
+		return volume.multiply(price);
+	}
+
+	public static BigDecimal calcFee(BigDecimal amount, BigDecimal feeRatio){
+		BigDecimal fee = amount.multiply(feeRatio);
+		return fee.stripTrailingZeros();
+	}
+	
+	/**
+	 * 计算保证金
+	 * @param baseValue 基础货币价值
+	 * @param ratio
+	 * @return
+	 */
+	public static final BigDecimal calMargin(BigDecimal amount, BigDecimal ratio){
+		return amount.multiply(ratio);
+	}
 }

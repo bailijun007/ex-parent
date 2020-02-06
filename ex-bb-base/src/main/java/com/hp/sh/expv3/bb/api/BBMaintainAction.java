@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.bb.api;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,17 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.bb.component.MarkPriceService;
-import com.hp.sh.expv3.bb.job.LiqHandleResult;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
-import com.hp.sh.expv3.bb.module.position.entity.BBPosition;
-import com.hp.sh.expv3.bb.module.position.service.BBLiqService;
-import com.hp.sh.expv3.bb.module.position.service.BBPositionDataService;
-import com.hp.sh.expv3.bb.module.position.service.BBPositionMarginService;
-import com.hp.sh.expv3.bb.module.position.vo.PosUID;
 import com.hp.sh.expv3.bb.mq.MatchMqSender;
-import com.hp.sh.expv3.bb.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -37,15 +29,6 @@ public class BBMaintainAction{
 	@Autowired
 	private BBOrderApiAction bBOrderApiAction;
 
-	@Autowired
-	private BBPositionDataService positionDataService;
-	
-	@Autowired
-	private BBPositionMarginService positionMarginService;
-	
-	@Autowired
-	private BBLiqService liqService;
-    
     @Autowired
     private MarkPriceService markPriceService;
 	
@@ -120,34 +103,6 @@ public class BBMaintainAction{
 			page.setPageNo(page.getPageNo()+1);
 		}
 		return n;
-	}
-
-	@ApiOperation(value = "liqmargin")
-	@GetMapping(value = "/api/bb/maintain/liq/liqmargin")
-	public BigDecimal liqMargin(Long userId, Long posId){
-		BBPosition pos = this.positionDataService.getPosition(userId, posId);
-		return this.positionMarginService.getLiqMarginDiff(pos);
-	}
-
-	@ApiOperation(value = "cutMargin")
-	@GetMapping(value = "/api/bb/maintain/liq/cutMargin")
-	public void cutMargin(Long userId, String asset, String symbol, Long posId, BigDecimal amount){
-		this.positionMarginService.cutMargin(userId, asset, symbol, posId, amount);
-	}
-	
-	@ApiOperation(value = "checkLiq")
-	@GetMapping(value = "/api/bb/maintain/liq/checkLiq")
-	public boolean checkLiq(Long userId, Long posId){
-		BBPosition pos = this.positionDataService.getPosition(userId, posId);
-		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getSymbol());
-		return liqService.checkLiqStatus(pos, markPriceVo.getMarkPrice());
-	}
-
-	@ApiOperation(value = "forceClose")
-	@GetMapping(value = "/api/bb/maintain/liq/forceClose")
-	public void forceClose(Long userId, String asset, String symbol, Long posId){
-		BBPosition pos = this.positionDataService.getPosition(userId, posId);
-		liqService.forceClose(pos);
 	}
 	
 }

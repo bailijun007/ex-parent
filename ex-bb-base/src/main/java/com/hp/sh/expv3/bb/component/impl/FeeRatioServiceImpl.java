@@ -23,7 +23,6 @@ import com.hp.sh.expv3.utils.math.Precision;
 /**
  * @author BaiLiJun  on 2019/12/18
  */
-@Primary
 @Component
 public class FeeRatioServiceImpl implements FeeRatioService {
 	private static final Logger logger = LoggerFactory.getLogger(FeeRatioServiceImpl.class);

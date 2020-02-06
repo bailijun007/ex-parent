@@ -13,11 +13,9 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.constant.MqTopic;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
-import com.hp.sh.expv3.bb.mq.liq.msg.LiqLockMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.BookResetMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.OrderPendingNewMsg;
-import com.hp.sh.expv3.utils.BidUtils;
 
 @Component
 public class MatchMqSender extends BaseMqSender{
@@ -26,17 +24,13 @@ public class MatchMqSender extends BaseMqSender{
 	public MatchMqSender() {
 	}
 	
-	public void sendLiqLockMsg(LiqLockMsg lockMsg){
-        super.sendOrderMsg(lockMsg, MqTags.TAGS_PC_POS_LIQ_LOCKED, ""+lockMsg.keys());
-	}
-	
 	public void sendPendingNew(BBOrder order){
 		//send mq
 		OrderPendingNewMsg msg = new OrderPendingNewMsg();
 		msg.setAccountId(order.getUserId());
 		msg.setAsset(order.getAsset());
-		msg.setBidFlag(BidUtils.getBidFlag(order.getCloseFlag(), order.getLongFlag()));
-		msg.setCloseFlag(order.getCloseFlag());
+		msg.setBidFlag(order.getBidFlag());
+		msg.setCloseFlag(order.getBidFlag());
 		msg.setDisplayNumber(order.getVolume());
 		msg.setNumber(order.getVolume());
 		msg.setOrderId(order.getId());

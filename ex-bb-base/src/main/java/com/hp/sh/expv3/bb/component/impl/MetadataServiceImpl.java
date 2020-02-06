@@ -46,10 +46,7 @@ public class MetadataServiceImpl implements MetadataService {
      */
     @Override
     public BigDecimal getFaceValue(String asset, String symbol) {
-        BBContractVO vo = this.getPcContract(asset, symbol);
-        Optional<BBContractVO> optional = Optional.ofNullable(vo);
-        BigDecimal decimal = optional.map(p -> p.getFaceValue()).orElse(BigDecimal.ZERO);
-        return decimal;
+        return BigDecimal.ONE;
     }
 
     @Override

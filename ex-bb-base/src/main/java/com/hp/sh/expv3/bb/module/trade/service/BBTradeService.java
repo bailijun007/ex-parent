@@ -7,16 +7,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.bb.module.trade.dao.BBTradeDAO;
-import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedResult;
+import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
-public class BBTradeService2 {
+public class BBTradeService {
 	@Autowired
 	private BBTradeDAO bBTradeDAO;
 
-	public void batchSave(List<BBMatchedResult> list) {
-		for(BBMatchedResult pt:list){
+	public void batchSave(List<BBMatchedTrade> list) {
+		for(BBMatchedTrade pt:list){
 			this.bBTradeDAO.save(pt);
 		}
 	}

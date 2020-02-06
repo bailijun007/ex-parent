@@ -10,29 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hp.sh.expv3.bb.calc.CompFieldCalc;
 import com.hp.sh.expv3.bb.component.FeeRatioService;
 import com.hp.sh.expv3.bb.component.MetadataService;
-import com.hp.sh.expv3.bb.constant.LiqStatus;
-import com.hp.sh.expv3.bb.constant.MarginMode;
-import com.hp.sh.expv3.bb.constant.OrderFlag;
-import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
 import com.hp.sh.expv3.bb.constant.BBOrderType;
-import com.hp.sh.expv3.bb.error.BBOrderError;
-import com.hp.sh.expv3.bb.error.BBPositonError;
+import com.hp.sh.expv3.bb.constant.OrderFlag;
+import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
-import com.hp.sh.expv3.bb.module.position.entity.BBPosition;
-import com.hp.sh.expv3.bb.module.position.service.BBPositionDataService;
-import com.hp.sh.expv3.bb.module.symbol.service.BBAccountSymbolService;
-import com.hp.sh.expv3.bb.strategy.HoldPosStrategy;
+import com.hp.sh.expv3.bb.module.order.vo.BBSymbol;
 import com.hp.sh.expv3.bb.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.BBCutRequest;
-import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -51,9 +41,6 @@ public class BBOrderService {
 	private static final Logger logger = LoggerFactory.getLogger(BBOrderService.class);
 	
 	@Autowired
-	private BBAccountSymbolService pcSymbolService;
-
-	@Autowired
 	private BBOrderUpdateService orderUpdateService;
 	
 	@Autowired
@@ -71,15 +58,6 @@ public class BBOrderService {
 	@Autowired
 	private CommonOrderStrategy orderStrategy;	
 	
-	@Autowired
-	private BBPositionDataService positionDataService;
-	
-    @Autowired
-    private HoldPosStrategy holdPosStrategy;
-	
-	@Autowired
-	private BBOrderService self;
-    
 	/**
 	 * 创建订单
 	 * @param userId 用户ID
@@ -93,101 +71,45 @@ public class BBOrderService {
 	 * @param amt 委托金额
 	 */
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public BBOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
-		BBPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
-		return self.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number, pos, IntBool.YES, IntBool.NO);
-	}
-	
-	public BBOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, BBPosition pos, Integer visibleFlag, int liqFlag){
+	public BBOrder create(long userId, String cliOrderId, String asset, String symbol, int bidFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		
 //		if(this.existClientOrderId(userId, cliOrderId)){
 //			throw new ExException(BBOrderError.CREATED);
 //		}
 		
-		//非强平委托
-		if(IntBool.isFalse(liqFlag)){
-			if(closeFlag==OrderFlag.ACTION_CLOSE){
-				this.checkLiqStatus(pos);
-				// 检查可平仓位
-				this.checkClosablePosition(pos, number);
-				// 检查价格
-				this.checkPrice(pos, price);
-			}
-		}
-		
 		Long now = DbDateUtils.now();
 		
-		
 		//订单基本数据
-		BBOrder bBOrder = new BBOrder();
+		BBOrder order = new BBOrder();
 		
-		bBOrder.setAsset(asset);
-		bBOrder.setSymbol(symbol);
-		bBOrder.setCloseFlag(closeFlag);
-		bBOrder.setLongFlag(longFlag);
-		bBOrder.setLeverage(pcSymbolService.getLeverage(userId, asset, symbol, longFlag));
-		bBOrder.setVolume(number);
-		bBOrder.setFaceValue(metadataService.getFaceValue(asset, symbol));
-		bBOrder.setPrice(price);
+		order.setAsset(asset);
+		order.setSymbol(symbol);
+		order.setBidFlag(bidFlag);
+		order.setVolume(number);
+		order.setPrice(price);
 		
-		bBOrder.setOrderType(BBOrderType.LIMIT);
-		bBOrder.setMarginMode(MarginMode.FIXED);
-		bBOrder.setTimeInForce(timeInForce);
-		bBOrder.setUserId(userId);
-		bBOrder.setCreated(now);
-		bBOrder.setModified(now);
-		bBOrder.setStatus(OrderStatus.PENDING_NEW);
-		bBOrder.setClientOrderId(cliOrderId);
-		bBOrder.setActiveFlag(IntBool.YES);
-		bBOrder.setLiqFlag(liqFlag);
+		order.setOrderType(BBOrderType.LIMIT);
+		order.setTimeInForce(timeInForce);
+		order.setUserId(userId);
+		order.setCreated(now);
+		order.setModified(now);
+		order.setStatus(OrderStatus.PENDING_NEW);
+		order.setClientOrderId(cliOrderId);
+		order.setActiveFlag(IntBool.YES);
+		order.setVersion(0L);
 		
-		/////////押金数据/////////
-		
-		if (IntBool.isTrue(closeFlag)) {
-			this.setCloseOrderFee(bBOrder);
-		}else{
-			this.setOpenOrderFee(bBOrder);
-		}
+		this.setFee(order);
 		
 		////////其他字段，后面随状态修改////////
-		this.setOther(bBOrder, pos);
+		this.setOther(order);
 		
-		bBOrder.setVisibleFlag(visibleFlag);
+		this.orderUpdateService.saveOrder(order);
 		
-		this.orderUpdateService.saveOrder(bBOrder);
-
-		//开仓押金扣除
-		if(closeFlag==OrderFlag.ACTION_OPEN){
-			this.cutBalance(userId, asset, bBOrder.getId(), bBOrder.getGrossMargin(), longFlag);
-		}
+		//押金
+		BBSymbol bs = new BBSymbol(symbol, bidFlag);
+		this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getGrossMargin());
 		
-		return bBOrder;
-	}
-	
-	private void checkLiqStatus(BBPosition pos) {
-		if(pos==null){
-			return;
-		}
-		if(pos.getLiqStatus() == LiqStatus.FROZEN){
-			throw new ExSysException(BBPositonError.LIQING);
-		}
-		if(pos.getLiqStatus() == LiqStatus.FORCE_CLOSE){
-			throw new ExException(BBPositonError.FORCE_CLOSE);
-		}
-	}
-
-	private void checkPrice(BBPosition pos, BigDecimal price) {
-		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal bankruptPrice = this.holdPosStrategy.calcBankruptPrice(pos.getLongFlag(), pos.getMeanPrice(), _amount, pos.getPosMargin());
-		if(IntBool.isTrue(pos.getLongFlag())){
-			if(BigUtils.lt(price, bankruptPrice)){
-				throw new ExException(BBOrderError.BANKRUPT_PRICE);
-			}
-		}else{
-			if(BigUtils.gt(price, bankruptPrice)){
-				throw new ExException(BBOrderError.BANKRUPT_PRICE);
-			}
-		}
+		return order;
 	}
 
 	private boolean existClientOrderId(long userId, String clientOrderId) {
@@ -198,14 +120,10 @@ public class BBOrderService {
 		return count>0;
 	}
 
-	private void setOther(BBOrder bBOrder, BBPosition pos){
+	private void setOther(BBOrder bBOrder){
 		bBOrder.setFeeCost(BigDecimal.ZERO);
 		bBOrder.setFilledVolume(BigDecimal.ZERO);
 		bBOrder.setCancelVolume(null);
-		if(bBOrder.getCloseFlag()==OrderFlag.ACTION_CLOSE){
-			bBOrder.setClosePosId(pos.getId());
-		}
-		bBOrder.setTriggerFlag(IntBool.NO);
 		bBOrder.setCancelTime(null);
 
 		////////////log////////////
@@ -217,13 +135,13 @@ public class BBOrderService {
 		bBOrder.setCancelVolume(BigDecimal.ZERO);
 	}
 	
-	private void cutBalance(Long userId, String asset, Long orderId, BigDecimal amount, int longFlag){
+	private void cutMargin(Long userId, String asset, Long orderId, BigDecimal amount){
 		BBCutRequest request = new BBCutRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
-		request.setRemark("开仓");
+		request.setRemark("BB委托");
 		request.setTradeNo(SnUtils.getOrderPaySn(""+orderId));
-		request.setTradeType(IntBool.isTrue(longFlag)?BBAccountTradeType.ORDER_OPEN_LONG:BBAccountTradeType.ORDER_CLOSE_SHORT);
+		request.setTradeType(BBAccountTradeType.ORDER);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
 		this.bBAccountCoreService.cut(request);
@@ -242,45 +160,25 @@ public class BBOrderService {
 		return this.bBAccountCoreService.add(request);
 	}
 
-	//设置平仓订单的各种费率，平仓订单
-	private void setCloseOrderFee(BBOrder bBOrder) {
-		bBOrder.setMarginRatio(BigDecimal.ZERO);
-		bBOrder.setOpenFeeRatio(BigDecimal.ZERO);
-		bBOrder.setCloseFeeRatio(BigDecimal.ZERO);
-		
-		bBOrder.setOrderMargin(BigDecimal.ZERO);
-		bBOrder.setOpenFee(BigDecimal.ZERO);
-		bBOrder.setCloseFee(BigDecimal.ZERO);
-		bBOrder.setGrossMargin(BigDecimal.ZERO);
-	}
-
 	//设置开仓订单的各种费率
-	private void setOpenOrderFee(BBOrder bBOrder) {
-		bBOrder.setMarginRatio(feeRatioService.getInitedMarginRatio(bBOrder.getLeverage()));
-		bBOrder.setOpenFeeRatio(feeRatioService.getOpenFeeRatio(bBOrder.getUserId(), bBOrder.getAsset(), bBOrder.getSymbol()));
-		bBOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(bBOrder.getUserId(), bBOrder.getAsset(), bBOrder.getSymbol()));
+	private void setFee(BBOrder order) {
+		BigDecimal feeRatio = this.feeRatioService.getOpenFeeRatio(order.getUserId(), order.getAsset(), order.getSymbol());
+		order.setOpenFeeRatio(feeRatio);
 		
-		OrderRatioData ratioData = orderStrategy.calcOrderAmt(bBOrder);
+		OrderRatioData ratioData = orderStrategy.calcOrderAmt(order);
+		order.setOrderMargin(ratioData.getOrderMargin());
+		order.setOpenFee(ratioData.getOpenFee());
 		
-		bBOrder.setOpenFee(ratioData.getOpenFee());
-		bBOrder.setCloseFee(ratioData.getCloseFee());
-		bBOrder.setOrderMargin(ratioData.getGrossMargin());
-		bBOrder.setGrossMargin(ratioData.getGrossMargin());
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void setUserCancel(long userId, String asset, String symbol, long orderId){
+	public void setPendingCancel(long userId, String asset, String symbol, long orderId){
 		
 		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
 		if(!this.canCancel(order, orderId)){
 			logger.info("订单无法取消：{}", order);
 			return;
-		}
-		
-		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
-			BBPosition pos = this.positionDataService.getPosition(userId, asset, symbol, order.getClosePosId());
-			this.checkLiqStatus(pos);	
 		}
 		
 		Long now = DbDateUtils.now();
@@ -308,14 +206,10 @@ public class BBOrderService {
 	}
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void cancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
-		this.doCancel(userId, asset, symbol, orderId, number);
+	public void setCancelled(long userId, String asset, String symbol, long orderId){
+		this.doCancel(userId, asset, symbol, orderId);
 	}
-	
-	public void cance4Liq(long userId, String asset, String symbol, long orderId, BigDecimal number){
-		this.doCancel(userId, asset, symbol, orderId, number);
-	}
-	
+
 	/**
 	 * 撤销委托
 	 * @param userId
@@ -323,7 +217,7 @@ public class BBOrderService {
 	 * @param orderId 订单ID
 	 * @param number 撤几张合约
 	 */
-	private void doCancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
+	private void doCancel(long userId, String asset, String symbol, long orderId){
 		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
 		if(order==null){
 			logger.error("订单不存在:orderId={}", orderId);
@@ -341,17 +235,12 @@ public class BBOrderService {
 
 		BigDecimal remaining = order.getVolume().subtract(order.getFilledVolume());
 		
-		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN){
-			//返还余额
-			if(number!=null && BigUtils.ne(remaining, number)){
-				logger.warn("取消数量不一致：{},{}", remaining, number);
-			}
-			
+		//退押金
+		if(order.getBidFlag()==OrderFlag.BID_BUY){
+//			
 			OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, remaining);
 			
-			BigDecimal cancelledGrossFee = ratioData.getGrossMargin();
-			
-			int result = this.returnCancelAmt(userId, asset, orderId, cancelledGrossFee);
+			int result = this.returnCancelAmt(userId, asset, orderId, ratioData.getGrossMargin());
 			if(result==InvokeResult.NOCHANGE){
 				//利用合约账户的幂等性实现本方法的幂等性
 				logger.warn("已经执行过了");
@@ -366,11 +255,6 @@ public class BBOrderService {
 		order.setActiveFlag(BBOrder.NO);
 		order.setStatus(OrderStatus.CANCELED);
 		
-		//清空押金
-		order.setOrderMargin(BigDecimal.ZERO);
-		order.setOpenFee(BigDecimal.ZERO);
-		order.setCloseFee(BigDecimal.ZERO);
-		
 		this.orderUpdateService.updateOrder(order, now);
 		
 		return;
@@ -380,20 +264,6 @@ public class BBOrderService {
 	public void setNewStatus(long userId, String asset, String symbol, long orderId){
 		long now = DbDateUtils.now();
 		this.orderUpdateService.setNewStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, now);
-	}
-
-	/*
-	 * 检查可平仓位
-	 */
-	private void checkClosablePosition(BBPosition pos, BigDecimal number) {
-		if(pos==null){
-			throw new ExException(BBPositonError.POS_NOT_ENOUGH);
-		}
-		BigDecimal closablePos = orderQueryService.getClosingVolume(pos);
-        //判断可平仓位是否足够
-        if (BigUtils.gt(number, closablePos)) {
-            throw new ExException(BBPositonError.POS_NOT_ENOUGH);
-        }
 	}
 	
 }

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
-import com.hp.sh.expv3.bb.module.position.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.match.msg.MatchNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.MatchedOrderCancelledMsg;
 import com.hp.sh.expv3.bb.msg.MatchedMsg;
@@ -28,9 +27,6 @@ public class MatchMqConsumer {
 	@Autowired
 	private BBOrderService bBOrderService;
 	
-	@Autowired
-	private BBTradeService bBTradeService;
-
 	private BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>(100);
 	
 	private ExecutorService pool = new ThreadPoolExecutor(1, 20, 300L, TimeUnit.SECONDS, queue);
@@ -49,14 +45,14 @@ public class MatchMqConsumer {
 	@MQListener(tags=MqTags.TAGS_CANCELLED)
 	public void handleCancelledMsg(MatchedOrderCancelledMsg msg){
 		logger.info("收到取消订单消息:{}", msg);
-		this.bBOrderService.cancel(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId(), msg.getCancelNumber());
+		this.bBOrderService.setCancelled(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
 	}
 	
 	//成交
 	@MQListener(tags=MqTags.TAGS_PC_TRADE)
 	public void handleTradeMsg(BBTradeMsg msg){
 		logger.info("收到成交消息:{}", msg);
-		bBTradeService.handleTradeOrder(msg);
+//		bBTradeService.handleTradeOrder(msg);
 	}
 	
 	//撮合成功

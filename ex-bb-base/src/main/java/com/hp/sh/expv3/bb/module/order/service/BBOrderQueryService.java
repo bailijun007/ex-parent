@@ -18,8 +18,7 @@ import com.hp.sh.expv3.bb.module.order.dao.BBOrderDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderLogDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
-import com.hp.sh.expv3.bb.module.position.entity.BBPosition;
-import com.hp.sh.expv3.bb.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.bb.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
 import com.hp.sh.expv3.dev.CrossDB;
@@ -42,28 +41,15 @@ public class BBOrderQueryService {
 	@Autowired
 	private BBOrderTradeDAO bBOrderTradeDAO;
 
-    @Autowired
-    private PositionStrategyContext positionStrategyContext;
-    
+	@Autowired
+	private CommonOrderStrategy orderStrategy;
+
 	public Long queryCount(Map<String, Object> params) {
 		return this.bBOrderDAO.queryCount(params);
 	}
 
 	public List<BBOrder> queryList(Map<String, Object> params) {
 		return this.bBOrderDAO.queryList(params);
-	}
-	
-	/*
-	 * 获取可平仓位
-	 */
-	public BigDecimal getClosingVolume(BBPosition pos) {
-		BigDecimal closablePos = pos.getVolume();
-		
-		BigDecimal cpv = this.bBOrderDAO.getClosingVolume(pos.getUserId(), pos.getAsset(), pos.getSymbol(), pos.getId());
-		if(cpv!=null){
-			closablePos = closablePos.subtract(cpv);
-		}
-		return closablePos;
 	}
 	
 	public boolean hasActiveOrder(long userId, String asset, String symbol, Integer longFlag) {
@@ -86,18 +72,16 @@ public class BBOrderQueryService {
 			activeOrderVo.setAsset(order.getAsset());
 			activeOrderVo.setSymbol(order.getSymbol());
 			activeOrderVo.setCreated(order.getCreated());
-			activeOrderVo.setCloseFlag(order.getCloseFlag());
-			activeOrderVo.setLongFlag(order.getLongFlag());
+			activeOrderVo.setBidFlag(order.getBidFlag());
 			activeOrderVo.setLeverage(order.getLeverage());
 			activeOrderVo.setFilledVolume(order.getFilledVolume());
 			activeOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
 			
 			List<OrderTradeVo> orderTradeList = _tradeListMap.get(order.getId());
-			BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), order.getLongFlag(), orderTradeList);
+			BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
 			
 			activeOrderVo.setMeanPrice(meanPrice);
 			activeOrderVo.setPrice(order.getPrice());
-			activeOrderVo.setOrderMargin(order.getOrderMargin());
 			activeOrderVo.setFeeCost(order.getFeeCost());
 			activeOrderVo.setStatus(order.getStatus());
 			

@@ -125,6 +125,9 @@ public class BBAccountCoreService{
 		BBAccount bBAccount = this.bBAccountDAO.getAndLock(record.getUserId(), record.getAsset());
 		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
 		if(bBAccount==null){
+			//检查余额
+			this.checkBalance(record, recordAmount);
+			
 			bBAccount = this.newPcAccount(record.getUserId(), record.getAsset(), recordAmount, now);
 		}else{
 			BigDecimal newBalance = bBAccount.getBalance().add(recordAmount);

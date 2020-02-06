@@ -4,7 +4,6 @@ package com.hp.sh.expv3.bb.module.order.entity;
 import java.math.BigDecimal;
 
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.bb.strategy.data.OrderData;
@@ -31,11 +30,7 @@ public class BBOrder extends UserDataEntity implements OrderData{
     /**
      * 是否:1-平仓,0-开
      */
-    private Integer closeFlag;
-    /**
-     * 是否：1-多仓，0-空仓
-     */
-    private Integer longFlag;
+    private Integer bidFlag;
     /**
      * 杠杆
      */
@@ -44,9 +39,6 @@ public class BBOrder extends UserDataEntity implements OrderData{
 	 * 合约张数
 	 */
 	private BigDecimal volume;
-
-	// 面值(单位：报价货币)
-	private BigDecimal faceValue;
 
 	/**
 	 * 委托价格（单位：报价货币）
@@ -63,12 +55,6 @@ public class BBOrder extends UserDataEntity implements OrderData{
 	 */
 	private Integer timeInForce;
 	
-	
-	/**
-	 * 保证金模式:1-全仓,2-逐仓
-	 */
-	private Integer marginMode;
-
 //	int ______系统设置_______;
 
     /**
@@ -76,16 +62,6 @@ public class BBOrder extends UserDataEntity implements OrderData{
 	 */
 	private BigDecimal openFeeRatio;
 
-	/**
-	 * 强平手续费率
-	 */
-	private BigDecimal closeFeeRatio;
-
-	/**
-	 * 保证金率，初始为 杠杆的倒数
-	 */
-	private BigDecimal marginRatio;
-	
 	/**
 	 * 客户自定义委托ID，用于与客户系统关联 （open api）
 	 */
@@ -99,20 +75,12 @@ public class BBOrder extends UserDataEntity implements OrderData{
 	private BigDecimal openFee;
 
 	/**
-	 * 平仓手续费，在下委托时提前收取(可能部分成交，按比例释放至仓位)
-	 */
-	private BigDecimal closeFee;
-
-	/**
 	 * 委托保证金
 	 */
 	private BigDecimal orderMargin;
 
-	/**
-	 * @deprecated
-	 * 总押金：委托保证金 + 开仓手续费 + 强平手续费 
-	 */
-	private BigDecimal grossMargin;
+	//保证金货币类型
+	private String marginCurrency;
 
 	/**
 	 * 委托状态，OrderStatus#*
@@ -146,28 +114,9 @@ public class BBOrder extends UserDataEntity implements OrderData{
 	 * 已成交量
 	 */
 	private BigDecimal filledVolume;
-	/**
-	 * 平仓委托对应的仓位Id
-	 */
-	private Long closePosId;
-	/**
-     * 是否已触发，用于止盈止损等触发式委托
-     */
-    private Integer triggerFlag;
 
 	//版本
 	private Long version;
-    
-    
-//    int ________强平_________;
-
-    /**
-     * 可见性，强平委托，自动减仓委托 都不可见
-     */
-    private Integer visibleFlag;
-    
-    //是否强平委托
-	private Integer liqFlag;
 
 //    int ________log__________;
 
@@ -177,11 +126,7 @@ public class BBOrder extends UserDataEntity implements OrderData{
 
     public BBOrder() {
 	}
-    
-	public void setId(Long id) {
-		this.id = id;
-	}
-	
+
 	public String getAsset() {
 		return asset;
 	}
@@ -198,28 +143,12 @@ public class BBOrder extends UserDataEntity implements OrderData{
 		this.symbol = symbol;
 	}
 
-	public Integer getCloseFlag() {
-		return closeFlag;
+	public Integer getBidFlag() {
+		return bidFlag;
 	}
 
-	public void setCloseFlag(Integer closeFlag) {
-		this.closeFlag = closeFlag;
-	}
-
-	public Integer getLongFlag() {
-		return longFlag;
-	}
-
-	public void setLongFlag(Integer longFlag) {
-		this.longFlag = longFlag;
-	}
-
-	public Integer getMarginMode() {
-		return marginMode;
-	}
-
-	public void setMarginMode(Integer marginMode) {
-		this.marginMode = marginMode;
+	public void setBidFlag(Integer closeFlag) {
+		this.bidFlag = closeFlag;
 	}
 
 	public BigDecimal getLeverage() {
@@ -228,6 +157,14 @@ public class BBOrder extends UserDataEntity implements OrderData{
 
 	public void setLeverage(BigDecimal leverage) {
 		this.leverage = leverage;
+	}
+
+	public BigDecimal getVolume() {
+		return volume;
+	}
+
+	public void setVolume(BigDecimal volume) {
+		this.volume = volume;
 	}
 
 	public BigDecimal getPrice() {
@@ -246,100 +183,21 @@ public class BBOrder extends UserDataEntity implements OrderData{
 		this.orderType = orderType;
 	}
 
-	public BigDecimal getVolume() {
-		return volume;
+	public Integer getTimeInForce() {
+		return timeInForce;
 	}
 
-	public void setVolume(BigDecimal volume) {
-		this.volume = volume;
+	public void setTimeInForce(Integer timeInForce) {
+		this.timeInForce = timeInForce;
 	}
 
-	public BigDecimal getFaceValue() {
-		return faceValue;
+
+	public String getClientOrderId() {
+		return clientOrderId;
 	}
 
-	public void setFaceValue(BigDecimal faceValue) {
-		this.faceValue = faceValue;
-	}
-
-	public BigDecimal getMarginRatio() {
-		return marginRatio;
-	}
-
-	public void setMarginRatio(BigDecimal marginRatio) {
-		this.marginRatio = marginRatio;
-	}
-
-	public BigDecimal getOpenFeeRatio() {
-		return openFeeRatio;
-	}
-
-	public void setOpenFeeRatio(BigDecimal openFeeRatio) {
-		this.openFeeRatio = openFeeRatio;
-	}
-
-	public BigDecimal getCloseFeeRatio() {
-		return closeFeeRatio;
-	}
-
-	public void setCloseFeeRatio(BigDecimal closeFeeRatio) {
-		this.closeFeeRatio = closeFeeRatio;
-	}
-
-	public BigDecimal getFeeCost() {
-		return feeCost;
-	}
-
-	public void setFeeCost(BigDecimal feeCost) {
-		this.feeCost = feeCost;
-	}
-
-	public BigDecimal getGrossMargin() {
-		return grossMargin;
-	}
-
-	public void setGrossMargin(BigDecimal grossMargin) {
-		this.grossMargin = grossMargin;
-	}
-
-	public BigDecimal getOrderMargin() {
-		return orderMargin;
-	}
-
-	public void setOrderMargin(BigDecimal orderMargin) {
-		this.orderMargin = orderMargin;
-	}
-
-	public BigDecimal getOpenFee() {
-		return openFee;
-	}
-
-	public void setOpenFee(BigDecimal openFee) {
-		this.openFee = openFee;
-	}
-
-	public BigDecimal getCloseFee() {
-		return closeFee;
-	}
-
-	public void setCloseFee(BigDecimal closeFee) {
-		this.closeFee = closeFee;
-	}
-
-	public BigDecimal getFilledVolume() {
-		return filledVolume;
-	}
-
-	public void setFilledVolume(BigDecimal filledVolume) {
-		this.filledVolume = filledVolume;
-	}
-
-	public Long getClosePosId() {
-		return closePosId;
-	}
-
-	public void setClosePosId(Long closePosId) {
-		this.closePosId = closePosId;
+	public void setClientOrderId(String clientOrderId) {
+		this.clientOrderId = clientOrderId;
 	}
 
 	public Integer getStatus() {
@@ -350,29 +208,20 @@ public class BBOrder extends UserDataEntity implements OrderData{
 		this.status = status;
 	}
 
-	public Integer getTimeInForce() {
-		return timeInForce;
+	public Integer getActiveFlag() {
+		return activeFlag;
 	}
 
-	public void setTimeInForce(Integer timeInForce) {
-		this.timeInForce = timeInForce;
+	public void setActiveFlag(Integer activeFlag) {
+		this.activeFlag = activeFlag;
 	}
 
-	public Integer getTriggerFlag() {
-		return triggerFlag;
+	public String getRemark() {
+		return remark;
 	}
 
-	public void setTriggerFlag(Integer triggerFlag) {
-		this.triggerFlag = triggerFlag;
-	}
-	
-	@Version
-	public Long getVersion() {
-		return version;
-	}
-
-	public void setVersion(Long version) {
-		this.version = version;
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 
 	public Long getCancelTime() {
@@ -383,20 +232,36 @@ public class BBOrder extends UserDataEntity implements OrderData{
 		this.cancelTime = cancelTime;
 	}
 
-	public Integer getVisibleFlag() {
-		return visibleFlag;
+	public BigDecimal getCancelVolume() {
+		return cancelVolume;
 	}
 
-	public void setVisibleFlag(Integer visibleFlag) {
-		this.visibleFlag = visibleFlag;
+	public void setCancelVolume(BigDecimal cancelVolume) {
+		this.cancelVolume = cancelVolume;
 	}
 
-	public Integer getActiveFlag() {
-		return activeFlag;
+	public BigDecimal getFeeCost() {
+		return feeCost;
 	}
 
-	public void setActiveFlag(Integer activeFlag) {
-		this.activeFlag = activeFlag;
+	public void setFeeCost(BigDecimal feeCost) {
+		this.feeCost = feeCost;
+	}
+
+	public BigDecimal getFilledVolume() {
+		return filledVolume;
+	}
+
+	public void setFilledVolume(BigDecimal filledVolume) {
+		this.filledVolume = filledVolume;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 	public String getCreateOperator() {
@@ -415,50 +280,59 @@ public class BBOrder extends UserDataEntity implements OrderData{
 		this.cancelOperator = cancelOperator;
 	}
 
-	public String getRemark() {
-		return remark;
+	public BigDecimal getOpenFee() {
+		return openFee;
 	}
 
-	public void setRemark(String remark) {
-		this.remark = remark;
+	public void setOpenFee(BigDecimal openFee) {
+		this.openFee = openFee;
 	}
 
-	public String getClientOrderId() {
-		return clientOrderId;
+	public BigDecimal getOpenFeeRatio() {
+		return openFeeRatio;
 	}
 
-	public void setClientOrderId(String clientOrderId) {
-		this.clientOrderId = clientOrderId;
+	public void setOpenFeeRatio(BigDecimal openFeeRatio) {
+		this.openFeeRatio = openFeeRatio;
 	}
 
-	public BigDecimal getCancelVolume() {
-		return cancelVolume;
+	public BigDecimal getOrderMargin() {
+		return orderMargin;
 	}
 
-	public void setCancelVolume(BigDecimal cancelVolume) {
-		this.cancelVolume = cancelVolume;
+	public void setOrderMargin(BigDecimal orderMargin) {
+		this.orderMargin = orderMargin;
 	}
-
-	public Integer getLiqFlag() {
-		return liqFlag;
-	}
-
-	public void setLiqFlag(Integer liqFlag) {
-		this.liqFlag = liqFlag;
+	
+	public BigDecimal getGrossMargin() {
+		return this.orderMargin.add(this.openFee);
 	}
 
 	@Override
-	public String toString() {
-		return "BBOrder [asset=" + asset + ", symbol=" + symbol + ", closeFlag=" + closeFlag + ", longFlag=" + longFlag
-				+ ", leverage=" + leverage + ", volume=" + volume + ", faceValue=" + faceValue + ", price=" + price
-				+ ", orderType=" + orderType + ", timeInForce=" + timeInForce + ", marginMode=" + marginMode
-				+ ", openFeeRatio=" + openFeeRatio + ", closeFeeRatio=" + closeFeeRatio + ", marginRatio=" + marginRatio
-				+ ", clientOrderId=" + clientOrderId + ", openFee=" + openFee + ", closeFee=" + closeFee
-				+ ", orderMargin=" + orderMargin + ", grossMargin=" + grossMargin + ", status=" + status
-				+ ", activeFlag=" + activeFlag + ", remark=" + remark + ", cancelTime=" + cancelTime + ", cancelVolume="
-				+ cancelVolume + ", feeCost=" + feeCost + ", filledVolume=" + filledVolume + ", closePosId="
-				+ closePosId + ", triggerFlag=" + triggerFlag + ", visibleFlag=" + visibleFlag + ", liqFlag=" + liqFlag
-				+ ", createOperator=" + createOperator + ", cancelOperator=" + cancelOperator + "]";
+	public BigDecimal getFaceValue() {
+		return BigDecimal.ONE;
 	}
 
+	@Override
+	public BigDecimal getMarginRatio() {
+		return BigDecimal.ONE;
+	}
+
+	@Override
+	public BigDecimal getCloseFeeRatio() {
+		return BigDecimal.ZERO;
+	}
+
+	public BigDecimal getCloseFee() {
+		return BigDecimal.ZERO;
+	}
+
+	public String getMarginCurrency() {
+		return marginCurrency;
+	}
+
+	public void setMarginCurrency(String marginCurrency) {
+		this.marginCurrency = marginCurrency;
+	}
+    
 }

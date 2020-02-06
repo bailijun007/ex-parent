@@ -4,7 +4,7 @@
 
 <mapper namespace="com.hp.sh.expv3.bb.module.trade.dao.BBTradeDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.trade.entity.BBMatchedResult" id="PcTrade">
+	<resultMap type="com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade" id="PcTrade">
 		<result column="id" property="id" />
 		<result column="match_tx_id" property="matchTxId" />
 		<result column="symbol" property="symbol" />
