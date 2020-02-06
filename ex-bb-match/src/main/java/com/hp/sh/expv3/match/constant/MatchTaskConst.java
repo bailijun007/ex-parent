@@ -13,6 +13,5 @@ public final class MatchTaskConst {
      * can and new 必须一致，用于定序
      */
     public static final int PRIORITY_ORDER_PENDING_CANCEL = PRIORITY_ORDER_PENDING_NEW;
-    public static final int PRIORITY_ORDER_CANCEL_BY_LIQ = PRIORITY_ORDER_PENDING_NEW;
 
 }

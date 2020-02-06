@@ -5,7 +5,7 @@
 package com.hp.sh.expv3.match.component;
 
 import com.alibaba.fastjson.JSON;
-import com.hp.sh.expv3.match.bo.BbContractBo;
+import com.hp.sh.expv3.match.bo.BbSymbolBo;
 import com.hp.sh.expv3.match.config.setting.BbmatchRedisKeySetting;
 import com.hp.sh.expv3.match.config.setting.BbmatchSetting;
 import com.hp.sh.expv3.match.util.BbUtil;
@@ -45,15 +45,15 @@ public class MatchSupportContractService {
             }
         }
 
-        Map<String, String> contractName2Contract = metadataRedisUtil.hgetAll(bbmatchRedisKeySetting.getBbPattern());
-        if (null != contractName2Contract || contractName2Contract.size() > 0) {
-            for (Map.Entry<String, String> kv : contractName2Contract.entrySet()) {
+        Map<String, String> symbolName2Symbol = metadataRedisUtil.hgetAll(bbmatchRedisKeySetting.getBbSymbolPattern());
+        if (null != symbolName2Symbol || symbolName2Symbol.size() > 0) {
+            for (Map.Entry<String, String> kv : symbolName2Symbol.entrySet()) {
                 String value = kv.getValue();
                 if (null != value) {
                     try {
-                        BbContractBo bbBo = JSON.parseObject(value, BbContractBo.class);
-                        if (null != bbBo.getContractGroup() && bbmatchSetting.getMatchGroupId().intValue() == bbBo.getContractGroup().intValue()) {
-                            supportAssetSymbol.add(BbUtil.concatAssetAndSymbol(null, bbBo.getAsset(), bbBo.getSymbol()));
+                        BbSymbolBo bbSymbolBo = JSON.parseObject(value, BbSymbolBo.class);
+                        if (null != bbSymbolBo.getBbGroupId() && bbmatchSetting.getMatchGroupId().intValue() == bbSymbolBo.getBbGroupId().intValue()) {
+                            supportAssetSymbol.add(BbUtil.concatAssetAndSymbol(null, bbSymbolBo.getAsset(), bbSymbolBo.getSymbol()));
                         }
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);

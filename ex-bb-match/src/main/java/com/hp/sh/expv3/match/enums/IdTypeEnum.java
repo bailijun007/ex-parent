@@ -19,6 +19,7 @@ public enum IdTypeEnum {
     POSITION(7),// 仓位
     MATCH(8),// 撮合
     TRANSFER(9),// 资金划转
+    // TODO bb
     ;
 
     public final int value;

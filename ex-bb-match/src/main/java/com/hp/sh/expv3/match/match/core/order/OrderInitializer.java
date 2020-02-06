@@ -5,6 +5,7 @@
 package com.hp.sh.expv3.match.match.core.order;
 
 import com.hp.sh.expv3.match.component.MatchSupportContractService;
+import com.hp.sh.expv3.match.config.setting.BbmatchSetting;
 import com.hp.sh.expv3.match.match.core.match.task.BbOrderInitTask;
 import com.hp.sh.expv3.match.match.core.match.task.def.BbMatchTaskService;
 import com.hp.sh.expv3.match.match.core.matched.task.BbMatchedInitTask;
@@ -44,6 +45,9 @@ public class OrderInitializer implements ApplicationContextAware {
     @Autowired
     @Qualifier("threadManagerBbMatchedImpl")
     private IThreadManager threadManagerBbMatchedImpl;
+
+    @Autowired
+    private BbmatchSetting bbmatchSetting;
 
     @Autowired
     private BbMatchTaskService bbMatchTaskService;

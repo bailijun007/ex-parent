@@ -5,6 +5,7 @@
 package com.hp.sh.expv3.match.component.notify;
 
 import com.hp.sh.expv3.match.bo.BbTradeBo;
+import com.hp.sh.expv3.match.component.id.SnowflakeIdWorker;
 import com.hp.sh.expv3.match.component.rocketmq.BbMatchProducer;
 import com.hp.sh.expv3.match.config.setting.BbmatchRocketMqSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
@@ -41,7 +42,7 @@ public class BbMatchMqNotify {
 
             Message message = buildMessage(
                     topic,// topic
-                    "" + RmqTagEnum.MATCH_ORDER_MATCHED.getConstant(),// tag
+                    "" + RmqTagEnum.BB_MATCH_ORDER_MATCHED.getConstant(),// tag
                     "" + tradeList.get(0).getTkOrderId(),
                     tradeList// body
             );
@@ -64,7 +65,7 @@ public class BbMatchMqNotify {
 
         Message message = buildMessage(
                 topic,// topic
-                "" + RmqTagEnum.MATCH_ORDER_NOT_MATCHED.getConstant(),// tag
+                "" + RmqTagEnum.BB_MATCH_ORDER_NOT_MATCHED.getConstant(),// tag
                 "" + orderId,
                 msg// body
         );
@@ -87,7 +88,7 @@ public class BbMatchMqNotify {
         msg.setCancelNumber(cancelDeltaAmt);
         Message message = buildMessage(
                 topic,// topic
-                "" + RmqTagEnum.MATCH_ORDER_CANCELLED.getConstant(),// tag
+                "" + RmqTagEnum.BB_MATCH_ORDER_CANCELLED.getConstant(),// tag
                 "" + orderId,
                 msg // body
         );
@@ -100,15 +101,32 @@ public class BbMatchMqNotify {
     }
 
     public boolean sendTrade(String asset, String symbol, List<BbTradeBo> tradeList) {
-        String topic = BbRocketMqUtil.buildBbAccountContractMqTopicName(bbmatchRocketMqSetting.getBbMatchTopicNamePattern(), asset, symbol);
 
-        for (BbTradeBo trade : tradeList) {
-            // TODO zw
+        if (null == tradeList || tradeList.isEmpty()) {
+        } else {
+            String topic = BbRocketMqUtil.buildBbAccountContractMqTopicName(bbmatchRocketMqSetting.getBbMatchTopicNamePattern(), asset, symbol);
+
+            for (BbTradeBo bbTradeBo : tradeList) {
+                Message msg = buildMessage(
+                        topic,// topic
+                        "" + RmqTagEnum.BB_MATCH.getConstant(),// tag
+                        "" + bbTradeBo.getTkOrderId(),
+                        bbTradeBo// body
+                );
+                safeSend2MatchTopic(msg, bbTradeBo.getTkAccountId());
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, msg.getTopic(), msg.getTags(), msg.getKeys(), JsonUtil.toJsonString(msg));
+                }
+            }
+
         }
+
         return true;
     }
 
     private Message buildMessage(String topic, String tags, String keys, Object o) {
+        // todo bb 同一类topic 可内聚
         try {
             return new Message(
                     topic,// topic
@@ -122,14 +140,20 @@ public class BbMatchMqNotify {
     }
 
     private boolean safeSend2MatchTopic(Message message, long accountId) {
+        boolean first = true;
         while (true) {
             try {
                 bbmatchProducer.send(message,
-                        (mqs, msg1, arg) -> mqs.get(Math.abs(Long.valueOf(accountId).intValue()) % mqs.size()),
-                        0L);
+                        (mqs, msg1, arg) -> mqs.get(Math.abs(Long.valueOf(SnowflakeIdWorker.getTimeInMs(accountId)).intValue()) % mqs.size()),
+                        accountId);
+                first = false;
                 break;
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                if (first) {
+                    logger.error(e.getMessage(), e);
+                } else {
+                    logger.error(e.getMessage());
+                }
             }
         }
         return true;

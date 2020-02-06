@@ -40,15 +40,6 @@ public final class CommonConst {
     public static final int BID_OPPOSITE = ASK;
     public static final int ASK_OPPOSITE = BID;
 
-    public static final int LONG_OPPOSITE = SHORT;
-    public static final int SHORT_OPPOSITE = LONG;
-
-    public static final int CLOSE_OPPOSITE = NO;
-    public static final int OPEN_OPPOSITE = YES;
-
-    public static final int ACCOUNT_TRANSFER_TARGET_RECEIVE_FLAG_YES = YES;
-    public static final int ACCOUNT_TRANSFER_TARGET_RECEIVE_FLAG_NO = NO;
-
     public static final int ORDER_VISIABLE_FLAG_YES = YES;
     public static final int ORDER_VISIABLE_FLAG_NO = NO;
 

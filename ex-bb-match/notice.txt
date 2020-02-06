@@ -1,0 +1,1 @@
+* idTypeEnum 统一，生成器统一

@@ -4,6 +4,7 @@
  */
 package com.hp.sh.expv3.match.util;
 
+
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.*;
@@ -57,7 +58,7 @@ public class RedisUtil {
 
     public <T> Map<String, T> hgetAll(String key, Class<T> cls) {
         JedisCommands jedis = getJedis();
-        Map<String, String> values;
+        Map<String, String> values ;
         try {
             values = jedis.hgetAll(key);
         } finally {
@@ -182,7 +183,7 @@ public class RedisUtil {
 
     public Set<String> hkeys(String key) {
         JedisCommands jedis = getJedis();
-        Set<String> keys;
+        Set<String> keys ;
         try {
             keys = jedis.hkeys(key);
         } finally {
@@ -312,7 +313,7 @@ public class RedisUtil {
 
     public List<String> hvals(String key) {
         JedisCommands jedis = getJedis();
-        List<String> values;
+        List<String> values ;
         try {
             values = jedis.hvals(key);
         } finally {
@@ -554,7 +555,7 @@ public class RedisUtil {
 
     public Set<Tuple> zrevrangeWithScores(String key, long start, long end) {
         JedisCommands jedis = getJedis();
-        Set<Tuple> tuples;
+        Set<Tuple> tuples ;
         try {
             tuples = jedis.zrevrangeWithScores(key, start, end);
         } finally {
@@ -583,7 +584,7 @@ public class RedisUtil {
     @Deprecated
     public Set<Tuple> zrangeWithScores(String key, long start, long end) {
         JedisCommands jedis = getJedis();
-        Set<Tuple> tuples;
+        Set<Tuple> tuples ;
         try {
             tuples = jedis.zrangeWithScores(key, start, end);
         } finally {

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -30,12 +31,12 @@ import java.util.concurrent.Executor;
 @ComponentScan("com.hp.sh.expv3")
 //@SpringBootApplication
 
-@EnableAutoConfiguration
-@SpringBootApplication
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableScheduling
-public class ExBbMatchApplication extends Application implements ApplicationContextAware {
+public class ExMatchApplication extends Application implements ApplicationContextAware {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExBbMatchApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExMatchApplication.class);
 
     @Autowired
     @Qualifier("threadManagerBbMatchImpl")
@@ -59,11 +60,11 @@ public class ExBbMatchApplication extends Application implements ApplicationCont
     public static void main(String[] args) {
         Thread.currentThread().setName("BbMatchMain");
 
-        ConfigurableApplicationContext ac = new SpringApplicationBuilder(ExBbMatchApplication.class)
+        ConfigurableApplicationContext ac = new SpringApplicationBuilder(ExMatchApplication.class)
                 .web(WebApplicationType.NONE)
                 .run(args);
 
-        ExBbMatchApplication main = ac.getBean(ExBbMatchApplication.class);
+        ExMatchApplication main = ac.getBean(ExMatchApplication.class);
 
         main.run();
     }

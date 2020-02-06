@@ -2,8 +2,6 @@ package com.hp.sh.expv3.match.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import sun.misc.Signal;
-//import sun.misc.SignalHandler;
 
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;

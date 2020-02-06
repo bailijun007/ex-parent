@@ -14,7 +14,7 @@ import static com.hp.sh.expv3.match.constant.CommonConst.*;
 
 
 /**
- * 永续合约工具类
+ * B工具类
  */
 public final class BbUtil {
 
@@ -25,6 +25,14 @@ public final class BbUtil {
     public static final BigDecimal calcBookNumber(BigDecimal number, BigDecimal filledNumber, BigDecimal displayNumber) {
         BigDecimal unfilledNumber = calcUnfilledNumber(number, filledNumber);
         return unfilledNumber.min(displayNumber).stripTrailingZeros();
+    }
+
+    public static final boolean isLiq(boolean isLong, BigDecimal liqPrice, BigDecimal markPrice) {
+        if (isLong) {
+            return markPrice.compareTo(liqPrice) <= 0;
+        } else {
+            return markPrice.compareTo(liqPrice) >= 0;
+        }
     }
 
     public static final int oppositeBidFlag(int bidFlag) {
@@ -66,8 +74,15 @@ public final class BbUtil {
     }
 
     public static final Tuple2<String, String> splitAssetAndSymbol(String assetSymbol, String spliter) {
-        String[] assetSymbols = assetSymbol.split(spliter);
+        String[] assetSymbols = assetSymbol.split(CommonConst.ASSET_SYMBOL_CONNECTOR);
         return new Tuple2<>(assetSymbols[0], assetSymbols[1]);
+    }
+
+    public static final String concatAccountIdAndAssetAndSymbol(String pattern, long accountId, String asset, String symbol) {
+        if (StringUtils.isEmpty(pattern)) {
+            pattern = "${accountId}_${asset}" + CommonConst.ASSET_SYMBOL_CONNECTOR + "${symbol}";
+        }
+        return StringReplaceUtil.replace(pattern, ImmutableMap.of("accountId", "" + accountId, "asset", asset, "symbol", symbol));
     }
 
     public static final int getLongFlag(int closeFlag, int bidFlag) {
@@ -86,12 +101,8 @@ public final class BbUtil {
         }
     }
 
-    public static String getBidDesc(int bidFlag) {
-        return getBidDesc(isBid(bidFlag));
-    }
-
-    public static String getBidDesc(boolean isBid) {
-        return isBid ? "buy" : "sell";
+    public static String getSpotBidDesc(int bidFlag) {
+        return isBid(bidFlag) ? "buy" : "sell";
     }
 
 }

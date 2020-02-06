@@ -28,10 +28,6 @@ public class BbmatchRocketMqSetting {
     private String bbMatchProducerGroupName;
     private String bbMatchProducerInstanceName;
 
-    public Logger getLogger() {
-        return logger;
-    }
-
     public String getBbOrderConsumerGroupName() {
         return bbOrderConsumerGroupName;
     }

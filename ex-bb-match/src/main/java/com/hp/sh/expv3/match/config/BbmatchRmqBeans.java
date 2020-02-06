@@ -42,7 +42,7 @@ public class BbmatchRmqBeans {
         return producer;
     }
 
-    @Bean(BbmatchConst.MODULE_NAME + "AccountContractProducer")
+    @Bean(BbmatchConst.MODULE_NAME + "AccountSymbolProducer")
     BbMatchProducer buildAccountContractProducer() throws MQClientException {
         BbMatchProducer producer = new BbMatchProducer();
         producer.setNamespace(rocketMqSetting.getNameSpace());
@@ -54,7 +54,7 @@ public class BbmatchRmqBeans {
         producer.setRetryTimesWhenSendAsyncFailed(3);
         producer.setRetryTimesWhenSendFailed(3);
         producer.start();
-        logger.info("{}AccountContractProducer {} {} Started.", BbmatchConst.MODULE_NAME, bbmatchRocketMqSetting.getBbOrderProducerGroupName(), bbmatchRocketMqSetting.getBbOrderProducerInstanceName());
+        logger.info("{}AccountSymbolProducer {} {} Started.", BbmatchConst.MODULE_NAME, bbmatchRocketMqSetting.getBbOrderProducerGroupName(), bbmatchRocketMqSetting.getBbOrderProducerInstanceName());
         return producer;
     }
 

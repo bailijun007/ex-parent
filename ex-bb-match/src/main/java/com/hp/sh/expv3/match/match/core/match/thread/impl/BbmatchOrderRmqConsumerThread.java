@@ -21,6 +21,7 @@ import com.hp.sh.expv3.match.util.BbUtil;
 import com.hp.sh.expv3.match.util.Tuple2;
 import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
 import org.apache.rocketmq.client.consumer.PullResult;
+import org.apache.rocketmq.client.consumer.PullStatus;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageExt;
@@ -52,17 +53,32 @@ public class BbmatchOrderRmqConsumerThread extends Thread {
     @Autowired
     private BbMatchTaskService bbMatchTaskService;
 
-    private long initOffset;
+    /**
+     * currentMsgOffset + 1
+     */
+    private long lastSentOffset;
+    /**
+     * currentMsgId
+     */
+    private String lastSentMsgId;
     private String asset;
     private String symbol;
     private String assetSymbol;
 
-    public long getInitOffset() {
-        return initOffset;
+    public String getLastSentMsgId() {
+        return lastSentMsgId;
     }
 
-    public void setInitOffset(long initOffset) {
-        this.initOffset = initOffset;
+    public void setLastSentMsgId(String lastSentMsgId) {
+        this.lastSentMsgId = lastSentMsgId;
+    }
+
+    public long getLastSentOffset() {
+        return lastSentOffset;
+    }
+
+    public void setLastSentOffset(long lastSentOffset) {
+        this.lastSentOffset = lastSentOffset;
     }
 
     public String getAsset() {
@@ -146,111 +162,112 @@ public class BbmatchOrderRmqConsumerThread extends Thread {
         Tuple2<String, String> assetSymbolTuple = BbUtil.splitAssetAndSymbol(assetSymbol);
         String topicName = BbRocketMqUtil.buildBbOrderTopicName(bbmatchRocketMqSetting.getBbOrderTopicNamePattern(), assetSymbolTuple.first, assetSymbolTuple.second);
 
-        Set<MessageQueue> mqs = getMqs(consumer, topicName);
-        topic2Offset.put(topicName, initOffset);
+        MessageQueue mq = getMqs(consumer, topicName);
+        topic2Offset.put(topicName, lastSentOffset + 1);
         topic2AssetSymbol.put(topicName, assetSymbol);
 
         while (true) {
 
-            for (MessageQueue mq : mqs) {
-//                	long offset = consumer.fetchConsumeOffset(mq, true);
-//                	PullResultExt pullResult =(PullResultExt)consumer.pull(mq, null, getMessageQueueOffset(mq), 32);
-                //消息未到达默认是阻塞10秒，private long consumerPullTimeoutMillis = 1000 * 10;
-//                    logger.info("{}:{}", mq.getTopic(), topic2Offset.get(mq.getTopic()));
-                try {
-                    String assetSymbol = topic2AssetSymbol.get(topicName);
-                    String asset = assetSymbolTuple.first;
-                    String symbol = assetSymbolTuple.second;
+            try {
+                String assetSymbol = topic2AssetSymbol.get(topicName);
+                String asset = assetSymbolTuple.first;
+                String symbol = assetSymbolTuple.second;
 
-                    Long offset = topic2Offset.get(topicName);
-                    PullResult pullResult = pull(consumer, mq, offset);
+                Long offset = topic2Offset.get(topicName);
+                PullResult pullResult = pull(consumer, mq, offset);
+                if (PullStatus.OFFSET_ILLEGAL.equals(pullResult.getPullStatus())) {
+                    logger.debug("{}:offset illegal {},init offset:{},msgId:{},max offset:{}", topicName, offset, this.lastSentOffset, this.lastSentMsgId, pullResult.getMaxOffset());
+                    System.exit(-1);
+                }
 
-                    List<MessageExt> msgFoundList = pullResult.getMsgFoundList();
-                    if (null == msgFoundList || msgFoundList.isEmpty()) {
-                        // 本批没有取到任何数据，期待下一次
-                        topic2Offset.put(topicName, pullResult.getNextBeginOffset());
-                        try {
-                            Thread.sleep(10L);
-                        } catch (InterruptedException e) {// catched ?
-                            e.printStackTrace();
-                        }
-                    } else {
+                List<MessageExt> msgFoundList = pullResult.getMsgFoundList();
+                if (null == msgFoundList || msgFoundList.isEmpty()) {
+                    // 本批没有取到任何数据，期待下一次
+                    topic2Offset.put(topicName, pullResult.getNextBeginOffset());
+                    try {
+                        // 的确是最后一条，则休息10ms，否则，休息1ms，继续拉取
+                        Thread.sleep(pullResult.getMaxOffset() + 1 == pullResult.getNextBeginOffset() ? 10L : 1L);
+                    } catch (InterruptedException e) {// catched ?
+                        e.printStackTrace();
+                    }
+                } else {
+
+                    if (logger.isDebugEnabled()) {
+                        MessageExt messageExtLast = msgFoundList.get(msgFoundList.size() - 1);
+                        logger.debug("{}:size:{} {}-》{},last {},{}", topicName, msgFoundList.size(), offset, pullResult.getNextBeginOffset(), messageExtLast.getQueueOffset(), messageExtLast.getMsgId());
+                    }
+
+                    for (int i = 0; i < msgFoundList.size(); i++) {
+                        MessageExt m = msgFoundList.get(i);
+                        topic2Offset.put(topicName, m.getQueueOffset() + 1);
+                        String body = new String(m.getBody());
+
+                        IThreadWorker matchWorker = threadManagerBbMatchImpl.getWorker(assetSymbol);
+                        BbOrderBaseTask task;
+                        long queueOffset = m.getQueueOffset();
+                        String currentMsgId = m.getMsgId();
 
                         if (logger.isDebugEnabled()) {
-                            logger.debug("{}:size:{} {}-》{},last {}", topicName, msgFoundList.size(), offset, pullResult.getNextBeginOffset(), msgFoundList.get(msgFoundList.size() - 1).getQueueOffset());
+                            logger.debug("tag:{},offset:key:{},msgId:{},body:{}", m.getTags(), queueOffset, currentMsgId, body);
                         }
 
-                        for (int i = 0; i < msgFoundList.size(); i++) {
-                            MessageExt m = msgFoundList.get(i);
-                            topic2Offset.put(topicName, m.getQueueOffset() + 1);
-                            String body = new String(m.getBody());
-
-                            IThreadWorker matchWorker = threadManagerBbMatchImpl.getWorker(assetSymbol);
-
-                            BbOrderBaseTask task = null;
-                            long queueOffset = m.getQueueOffset();
-                            // 按出现频率多少，排 if 的顺序
-                            if (RmqTagEnum.ORDER_PENDING_NEW.getConstant().equals(m.getTags())) {
-                                BbOrderMqMsgDto dto = JSON.parseObject(body, BbOrderMqMsgDto.class);
-                                if (null == dto.getFilledNumber()) {
-                                    dto.setFilledNumber(BigDecimal.ZERO);
-                                }
-                                BbOrder4MatchBo bbOrder4Match = BbOrder4MatchBoUtil.convert(dto);
-                                task = bbMatchTaskService.buildBbOrderNewTask(assetSymbol, asset, symbol, queueOffset, bbOrder4Match);
-                                matchWorker.addTask(task);
-                            } else if (RmqTagEnum.ORDER_PENDING_CANCEL.getConstant().equals(m.getTags())) {
-                                BbOrderMqMsgDto dto = JSON.parseObject(body, BbOrderMqMsgDto.class);
-                                task = bbMatchTaskService.buildBbOrderCancelTask(assetSymbol, asset, symbol, queueOffset, dto.getAccountId(), dto.getOrderId());
-                                task.setCurrentMsgOffset(m.getQueueOffset());
-                                matchWorker.addTask(task);
-                            } else if (RmqTagEnum.BOOK_RESET.getConstant().equals(m.getTags())) {
-                                task = bbMatchTaskService.buildBbOrderBookReset(assetSymbol, asset, symbol, queueOffset);
-                                matchWorker.addTask(task);
-                            } else if (RmqTagEnum.MATCH_ORDER_SNAPSHOT_CREATE.getConstant().equals(m.getTags())) {
-                                task = bbMatchTaskService.buildOrderSnapshotTask(assetSymbol, asset, symbol, queueOffset);
-                                matchWorker.addTask(task);
-                            } else if (RmqTagEnum.ORDER_REBASE.getConstant().equals(m.getTags())) {
-                                task = bbMatchTaskService.buildOrderRebaseTask(assetSymbol, asset, symbol, queueOffset);
-                                matchWorker.addTask(task);
-                            } else {
-                                logger.error("get tags {} not define,go to exit -1", m.getTags());
-                                System.exit(-1);
+                        // 按出现频率多少，排 if 的顺序
+                        if (RmqTagEnum.BB_ORDER_PENDING_NEW.getConstant().equals(m.getTags())) {
+                            BbOrderMqMsgDto dto = JSON.parseObject(body, BbOrderMqMsgDto.class);
+                            if (null == dto.getFilledNumber()) {
+                                dto.setFilledNumber(BigDecimal.ZERO);
                             }
-                        }
-                        try {
-                            Thread.sleep(2L);
-                        } catch (InterruptedException e) {
-                            logger.error(e.getMessage(), e);
+                            BbOrder4MatchBo bbOrder4Match = BbOrder4MatchBoUtil.convert(dto);
+                            task = bbMatchTaskService.buildBbOrderNewTask(assetSymbol, asset, symbol, queueOffset, currentMsgId, bbOrder4Match);
+                            matchWorker.addTask(task);
+                        } else if (RmqTagEnum.BB_ORDER_PENDING_CANCEL.getConstant().equals(m.getTags())) {
+                            BbOrderMqMsgDto dto = JSON.parseObject(body, BbOrderMqMsgDto.class);
+                            task = bbMatchTaskService.buildBbOrderCancelTask(assetSymbol, asset, symbol, queueOffset, currentMsgId, dto.getAccountId(), dto.getOrderId());
+                            matchWorker.addTask(task);
+                        } else if (RmqTagEnum.BB_BOOK_RESET.getConstant().equals(m.getTags())) {
+                            task = bbMatchTaskService.buildBbOrderBookReset(assetSymbol, asset, symbol, queueOffset, currentMsgId);
+                            matchWorker.addTask(task);
+                        } else if (RmqTagEnum.BB_MATCH_ORDER_SNAPSHOT_CREATE.getConstant().equals(m.getTags())) {
+                            task = bbMatchTaskService.buildOrderSnapshotTask(assetSymbol, asset, symbol, queueOffset, currentMsgId);
+                            matchWorker.addTask(task);
+                        } else if (RmqTagEnum.BB_ORDER_REBASE.getConstant().equals(m.getTags())) {
+                            task = bbMatchTaskService.buildOrderRebaseTask(assetSymbol, asset, symbol, queueOffset, currentMsgId);
+                            matchWorker.addTask(task);
+                        } else {
+                            logger.error("get tags {} not define,go to exit -1", m.getTags());
+                            System.exit(-1);
                         }
                     }
-                } catch (MQBrokerException e) {
-                    if (e.getResponseCode() == ResponseCode.TOPIC_NOT_EXIST) {
-                        logger.warn("{} deleted.rebase ", assetSymbolTuple);
-                        bbOrderMqNotify.sendBbOrderRebase(asset, symbol);
-                        mqs = getMqs(consumer, topicName);
-                    } else {
-                        logger.error(e.getErrorMessage());
-                        try {
-                            Thread.sleep(1000L);
-                        } catch (InterruptedException e1) {
-                        }
+                    try {
+                        Thread.sleep(2L);
+                    } catch (InterruptedException e) {
+                        logger.error(e.getMessage(), e);
                     }
-                } catch (Exception e) {
-                    logger.error(this.getName() + " stop:" + e.getMessage(), e);
-                    isStart.set(false);
                 }
+            } catch (MQBrokerException e) {
+                if (e.getResponseCode() == ResponseCode.TOPIC_NOT_EXIST) {
+                    logger.warn("{} deleted.rebase ", assetSymbolTuple);
+                    bbOrderMqNotify.sendBbOrderRebase(asset, symbol);
+                    mq = getMqs(consumer, topicName);
+                } else {
+                    logger.error(e.getErrorMessage());
+                    try {
+                        Thread.sleep(1000L);
+                    } catch (InterruptedException e1) {
+                    }
+                }
+            } catch (Exception e) {
+                logger.error(this.getName() + " stop:" + e.getMessage(), e);
+                isStart.set(false);
             }
         }
-//        }
-//        isStart.set(false);
     }
 
     @Autowired
     private BbOrderMqNotify bbOrderMqNotify;
 
-    protected Set<MessageQueue> getMqs(DefaultMQPullConsumer consumer, String topicName) {
+    protected MessageQueue getMqs(DefaultMQPullConsumer consumer, String topicName) {
 
-        Set<MessageQueue> mqs = new HashSet<>();
         while (true) {
             try {
                 Set<MessageQueue> qs = consumer.fetchSubscribeMessageQueues(topicName);
@@ -258,8 +275,8 @@ public class BbmatchOrderRmqConsumerThread extends Thread {
                     logger.error("rmq topic " + topicName + " config more than 1 queue");
                     System.exit(-1);
                 } else {
-                    mqs.addAll(qs);
-                    break;
+                    List<MessageQueue> mqs = new ArrayList<>(qs);
+                    return mqs.get(0);
                 }
             } catch (MQClientException e) {
                 if (e.getCause() instanceof MQClientException) {
@@ -276,7 +293,6 @@ public class BbmatchOrderRmqConsumerThread extends Thread {
                 System.exit(-1);
             }
         }
-        return mqs;
     }
 
     private PullResult pull(DefaultMQPullConsumer consumer, MessageQueue mq, long offset) throws MQBrokerException, RemotingException, MQClientException, InterruptedException {
@@ -284,11 +300,11 @@ public class BbmatchOrderRmqConsumerThread extends Thread {
             try {
                 return consumer.pull(mq,
                         String.join("||",
-                                RmqTagEnum.BOOK_RESET.getConstant(),
-                                RmqTagEnum.ORDER_PENDING_CANCEL.getConstant(),
-                                RmqTagEnum.MATCH_ORDER_SNAPSHOT_CREATE.getConstant(),
-                                RmqTagEnum.ORDER_PENDING_NEW.getConstant(),
-                                RmqTagEnum.ORDER_REBASE.getConstant()
+                                RmqTagEnum.BB_BOOK_RESET.getConstant(),
+                                RmqTagEnum.BB_ORDER_PENDING_CANCEL.getConstant(),
+                                RmqTagEnum.BB_MATCH_ORDER_SNAPSHOT_CREATE.getConstant(),
+                                RmqTagEnum.BB_ORDER_PENDING_NEW.getConstant(),
+                                RmqTagEnum.BB_ORDER_REBASE.getConstant()
                         ),
                         offset,
                         1024);

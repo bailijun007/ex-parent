@@ -64,18 +64,19 @@ public class BbMatchedTaskServiceImpl implements BbMatchedTaskService, Applicati
         return task;
     }
 
-    private void baseSet(BbMatchedBaseTask task, String asset, String symbol, String assetSymbol, long currentMsqOffset, IThreadWorker matchedThreadWorker) {
+    private void baseSet(BbMatchedBaseTask task, String asset, String symbol, String assetSymbol, long currentMsgOffset, String currentMsgId, IThreadWorker matchedThreadWorker) {
         task.setAsset(asset);
         task.setSymbol(symbol);
         task.setAssetSymbol(assetSymbol);
-        task.setCurrentMsgOffset(currentMsqOffset);
+        task.setCurrentMsgOffset(currentMsgOffset);
         task.setMatchedThreadWorker(matchedThreadWorker);
+        task.setCurrentMsgId(currentMsgId);
     }
 
     @Override
-    public void addMatchedBookResetTask(BbMatchHandlerContext context, List<BookEntry> entries, BigDecimal lastPrice, long currentMsgOffset) {
+    public void addMatchedBookResetTask(BbMatchHandlerContext context, List<BookEntry> entries, BigDecimal lastPrice, long currentMsgOffset, String currentMsgId) {
         BbMatchedBookResetTask task = applicationContext.getBean(BbMatchedBookResetTask.class);
-        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, context.matchedThreadWorker);
+        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, currentMsgId, context.matchedThreadWorker);
         task.setBookUpdateList(entries);
         task.setLastPrice(lastPrice);
         context.matchedThreadWorker.addTask(task);
@@ -98,7 +99,9 @@ public class BbMatchedTaskServiceImpl implements BbMatchedTaskService, Applicati
                               }
                           },
                 redisKey);
+
     }
+
 
     @Autowired
     @Qualifier(BbmatchConst.MODULE_NAME + "RedisUtil")
@@ -108,10 +111,10 @@ public class BbMatchedTaskServiceImpl implements BbMatchedTaskService, Applicati
     private BbmatchRedisKeySetting bbmatchRedisKeySetting;
 
     @Override
-    public void addMatchedOrderCancelTask(BbMatchHandlerContext context, long currentMsgOffset, long accountId, long orderId, BigDecimal cancelDeltaAmt) {
+    public void addMatchedOrderCancelTask(BbMatchHandlerContext context, long currentMsgOffset, String currentMsgId, long accountId, long orderId, BigDecimal cancelDeltaAmt) {
         // send book,and Rmq Order Canceled
         BbMatchedOrderCancelTask task = applicationContext.getBean(BbMatchedOrderCancelTask.class);
-        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, context.matchedThreadWorker);
+        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, currentMsgId, context.matchedThreadWorker);
         task.setAccountId(accountId);
         task.setOrderId(orderId);
         task.setCancelDeltaAmt(cancelDeltaAmt);
@@ -120,9 +123,9 @@ public class BbMatchedTaskServiceImpl implements BbMatchedTaskService, Applicati
     }
 
     @Override
-    public void addOrderSnapshotTask(BbMatchHandlerContext context, PriorityQueue<BbOrder4MatchBo> limitBidQueue, PriorityQueue<BbOrder4MatchBo> limitAskQueue, long currentMsgOffset) {
+    public void addOrderSnapshotTask(BbMatchHandlerContext context, PriorityQueue<BbOrder4MatchBo> limitBidQueue, PriorityQueue<BbOrder4MatchBo> limitAskQueue, long currentMsgOffset, String currentMsgId) {
         BbMatchedBookSnapshotTask task = applicationContext.getBean(BbMatchedBookSnapshotTask.class);
-        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, context.matchedThreadWorker);
+        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, currentMsgId, context.matchedThreadWorker);
         task.setLastPrice(context.getLastPrice());
 
         task.setLimitAskOrders(deepClone(limitAskQueue));
@@ -143,10 +146,11 @@ public class BbMatchedTaskServiceImpl implements BbMatchedTaskService, Applicati
         return ords;
     }
 
+
     @Override
-    public void addMatchedOrderMatchedTask(BbMatchHandlerContext context, long currentMsgOffset, BbOrder4MatchBo takerOrder) {
+    public void addMatchedOrderMatchedTask(BbMatchHandlerContext context, long currentMsgOffset, String currentMsgId, BbOrder4MatchBo takerOrder) {
         BbMatchedOrderMatchedTask task = applicationContext.getBean(BbMatchedOrderMatchedTask.class);
-        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, context.matchedThreadWorker);
+        baseSet(task, context.getAsset(), context.getSymbol(), context.getAssetSymbol(), currentMsgOffset, currentMsgId, context.matchedThreadWorker);
 
         task.setLastPrice(context.getLastPrice());
 

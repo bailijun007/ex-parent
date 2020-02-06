@@ -4,12 +4,14 @@
  */
 package com.hp.sh.expv3.match.bo;
 
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * 永续合约_成交(撮合结果)
+ * 现货_成交(撮合结果)
  */
-public class BbTradeBo {
+public class BbTradeBo implements Serializable{
 
     //id
     private Long id;
@@ -28,10 +30,16 @@ public class BbTradeBo {
     //taker订单ID
     private Long tkOrderId;
 
+    // todo bb
+    //taker是否平仓
+    private Integer tkCloseFlag;
+
     //maker账户Id
     private Long mkAccountId;
     //maker订单ID
     private Long mkOrderId;
+
+    // todo bb
     //maker是否平仓
     private Integer mkCloseFlag;
 
@@ -41,9 +49,6 @@ public class BbTradeBo {
     private BigDecimal number;
     //成交时间
     private Long tradeTime;
-
-    private Long created;
-    private Long modified;
 
     public Long getId() {
         return id;
@@ -101,6 +106,14 @@ public class BbTradeBo {
         this.tkOrderId = tkOrderId;
     }
 
+    public Integer getTkCloseFlag() {
+        return tkCloseFlag;
+    }
+
+    public void setTkCloseFlag(Integer tkCloseFlag) {
+        this.tkCloseFlag = tkCloseFlag;
+    }
+
     public Long getMkAccountId() {
         return mkAccountId;
     }
@@ -147,21 +160,5 @@ public class BbTradeBo {
 
     public void setTradeTime(Long tradeTime) {
         this.tradeTime = tradeTime;
-    }
-
-    public Long getCreated() {
-        return created;
-    }
-
-    public void setCreated(Long created) {
-        this.created = created;
-    }
-
-    public Long getModified() {
-        return modified;
-    }
-
-    public void setModified(Long modified) {
-        this.modified = modified;
     }
 }
