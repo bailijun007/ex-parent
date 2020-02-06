@@ -110,6 +110,7 @@ public class PcOrderApiAction implements PcOrderApi {
 		return maxOpenVolume;
 	}
 
+	@Override
 	public List<ActiveOrderVo> queryActiveList(Long userId, String asset, String symbol){
 		List<ActiveOrderVo> list = orderQueryService.queryActiveList(userId, asset, symbol);
 		return list;

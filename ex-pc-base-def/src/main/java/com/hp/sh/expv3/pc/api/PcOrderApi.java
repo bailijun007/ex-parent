@@ -1,10 +1,13 @@
 package com.hp.sh.expv3.pc.api;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.hp.sh.expv3.pc.vo.response.ActiveOrderVo;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -56,5 +59,9 @@ public interface PcOrderApi {
 	@ApiOperation(value = "获取最大可开仓数量")
 	@GetMapping(value = "/api/pc/order/maxOpenVolume")
 	BigDecimal getMaxOpenVolume(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol, @RequestParam("longFlag") Long longFlag, @RequestParam("leverage") BigDecimal leverage);
+
+	@ApiOperation(value = "获取活动委托")
+	@GetMapping(value = "/api/pc/order/queryActiveList")
+	List<ActiveOrderVo> queryActiveList(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
 
 }
