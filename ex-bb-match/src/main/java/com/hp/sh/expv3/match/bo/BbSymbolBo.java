@@ -7,13 +7,16 @@ package com.hp.sh.expv3.match.bo;
 import java.io.Serializable;
 
 /**
- * 永续合约_交易对信息
+ * 现货_交易对信息
  */
-public class BbContractBo implements Serializable {
+public class BbSymbolBo implements Serializable {
 
     private String asset;
     private String symbol;
-    private Integer contractGroup;// TODO zw
+    // TODO bb
+    private Integer contractGroup;
+    private Integer bbGroupId;
+
 
     public String getAsset() {
         return asset;
@@ -29,6 +32,14 @@ public class BbContractBo implements Serializable {
 
     public void setSymbol(String symbol) {
         this.symbol = symbol;
+    }
+
+    public Integer getBbGroupId() {
+        return bbGroupId;
+    }
+
+    public void setBbGroupId(Integer bbGroupId) {
+        this.bbGroupId = bbGroupId;
     }
 
     public Integer getContractGroup() {

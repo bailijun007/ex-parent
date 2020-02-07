@@ -9,15 +9,14 @@ import com.hp.sh.expv3.match.bo.BbOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.BbOrderSnapshotBo;
 import com.hp.sh.expv3.match.component.notify.BbOrderMqNotify;
 import com.hp.sh.expv3.match.config.setting.BbmatchRedisKeySetting;
-import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.constant.BbmatchConst;
-import com.hp.sh.expv3.match.match.core.match.task.def.BbMatchTaskService;
+import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.match.core.match.thread.BbMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.match.thread.impl.BbmatchOrderRmqConsumerThread;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
 import com.hp.sh.expv3.match.thread.def.IThreadWorker;
-import com.hp.sh.expv3.match.util.DecimalUtil;
 import com.hp.sh.expv3.match.util.BbOrder4MatchBoUtil;
+import com.hp.sh.expv3.match.util.DecimalUtil;
 import com.hp.sh.expv3.match.util.RedisKeyUtil;
 import com.hp.sh.expv3.match.util.RedisUtil;
 import org.slf4j.Logger;
@@ -44,9 +43,6 @@ public class BbOrderInitTask extends BbOrderBaseTask implements ApplicationConte
     final Logger logger = LoggerFactory.getLogger(getClass());
     private IThreadWorker matchedThreadWorker;
 
-    @Autowired
-    private BbMatchTaskService bbMatchTaskService;
-
     public IThreadWorker getMatchedThreadWorker() {
         return matchedThreadWorker;
     }
@@ -72,7 +68,7 @@ public class BbOrderInitTask extends BbOrderBaseTask implements ApplicationConte
 
     @Override
     public void run() {
-        Thread.currentThread().setName("BbMatchWok-" + getAssetSymbol());
+        Thread.currentThread().setName("BbMatWok-" + getAssetSymbol());
         BbMatchHandlerContext context = BbMatchHandlerContext.getLocalContext();
 
         context.setAssetSymbol(this.getAssetSymbol());
@@ -88,8 +84,6 @@ public class BbOrderInitTask extends BbOrderBaseTask implements ApplicationConte
         if (orders == null) {
             loadData(context, sentMqOffset);
         }
-
-        IThreadWorker worker = threadManagerMatchImpl.getWorker(this.getAssetSymbol());
 
         PriorityQueue<BbOrder4MatchBo> bidOrderQueue = context.getQueue(CommonConst.YES);
         PriorityQueue<BbOrder4MatchBo> askOrderQueue = context.getQueue(CommonConst.NO);
@@ -119,7 +113,8 @@ public class BbOrderInitTask extends BbOrderBaseTask implements ApplicationConte
         orderConsumer.setAsset(this.getAsset());
         orderConsumer.setSymbol(this.getSymbol());
         orderConsumer.setAssetSymbol(this.getAssetSymbol());
-        orderConsumer.setInitOffset(this.getCurrentMsgOffset());
+        orderConsumer.setLastSentOffset(this.getCurrentMsgOffset());
+        orderConsumer.setLastSentMsgId(this.getCurrentMsgId());
         orderConsumer.setName("BbMatchConsumer_" + getAsset() + "__" + this.getSymbol());
         orderConsumer.start();
         setSentMqOffset(context, sentMqOffset);
@@ -172,7 +167,7 @@ public class BbOrderInitTask extends BbOrderBaseTask implements ApplicationConte
             String s = bbRedisUtil.hget(snapshotRedisKey, startSnapshotOffset + "");
             BbOrderSnapshotBo snapshot = JSON.parseObject(s, BbOrderSnapshotBo.class);
             context.setLastPrice(snapshot.getLastPrice());
-            this.setCurrentMsgOffset(snapshot.getRmqNextOffset());
+            this.setCurrentMsgOffset(snapshot.getRmqCurrentOffset());
 
             List<BbOrder4MatchBo> limitAskOrders = snapshot.getLimitAskOrders();
             List<BbOrder4MatchBo> limitBidOrders = snapshot.getLimitBidOrders();

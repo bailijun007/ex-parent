@@ -4,13 +4,13 @@
  */
 package com.hp.sh.expv3.match.match.core.matched.task;
 
+import com.hp.sh.expv3.match.component.notify.BbMatchMqNotify;
+import com.hp.sh.expv3.match.component.notify.BbNotify;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.enums.EventEnum;
 import com.hp.sh.expv3.match.match.core.match.task.service.BbOrderBookEventService;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
 import com.hp.sh.expv3.match.msg.BookMsgDto.BookEntry;
-import com.hp.sh.expv3.match.component.notify.BbMatchMqNotify;
-import com.hp.sh.expv3.match.component.notify.BbNotify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +78,7 @@ public class BbMatchedOrderCancelTask extends BbMatchedBaseTask {
         bookMsgDto.setAsset(this.getAsset());
         bookMsgDto.setSymbol(this.getSymbol());
         bookMsgDto.setResetFlag(CommonConst.NO);
-        bookMsgDto.setMsgType(EventEnum.BOOK.getCode());
+        bookMsgDto.setMsgType(EventEnum.BB_BOOK.getCode());
 
         List<BookEntry> bookEntries = bbOrderBookEventService.buildBookEntry4Cancel(accountId, orderId);
 

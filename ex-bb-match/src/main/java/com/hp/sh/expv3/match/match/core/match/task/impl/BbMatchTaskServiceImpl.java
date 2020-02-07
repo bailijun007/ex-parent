@@ -29,30 +29,32 @@ public class BbMatchTaskServiceImpl implements BbMatchTaskService, ApplicationCo
     }
 
     @Override
-    public BbOrderNewTask buildBbOrderNewTask(String assetSymbol, String asset, String symbol, long currentOffset, BbOrder4MatchBo order) {
+    public BbOrderNewTask buildBbOrderNewTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId, BbOrder4MatchBo order) {
         BbOrderNewTask task = applicationContext.getBean(BbOrderNewTask.class);
         task.setAssetSymbol(assetSymbol);
         task.setAsset(asset);
         task.setSymbol(symbol);
         task.setPriority(MatchTaskConst.PRIORITY_ORDER_PENDING_NEW);
         task.setCurrentMsgOffset(currentOffset);
+        task.setCurrentMsgId(currentMsgId);
         task.setOrder(order);
         return task;
     }
 
     @Override
-    public BbOrderBookResetTask buildBbOrderBookReset(String assetSymbol, String asset, String symbol, long currentOffset) {
+    public BbOrderBookResetTask buildBbOrderBookReset(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId) {
         BbOrderBookResetTask task = applicationContext.getBean(BbOrderBookResetTask.class);
         task.setPriority(MatchTaskConst.PRIORITY_ORDER_BOOK_RESET);
         task.setAssetSymbol(assetSymbol);
         task.setAsset(asset);
         task.setSymbol(symbol);
         task.setCurrentMsgOffset(currentOffset);
+        task.setCurrentMsgId(currentMsgId);
         return task;
     }
 
     @Override
-    public BbOrderCancelTask buildBbOrderCancelTask(String assetSymbol, String asset, String symbol, long currentOffset, long accountId, long orderId) {
+    public BbOrderCancelTask buildBbOrderCancelTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId, long accountId, long orderId) {
         BbOrderCancelTask task = applicationContext.getBean(BbOrderCancelTask.class);
         task.setAssetSymbol(assetSymbol);
         task.setAsset(asset);
@@ -61,28 +63,31 @@ public class BbMatchTaskServiceImpl implements BbMatchTaskService, ApplicationCo
         task.setOrderId(orderId);
         task.setPriority(MatchTaskConst.PRIORITY_ORDER_PENDING_CANCEL);
         task.setCurrentMsgOffset(currentOffset);
+        task.setCurrentMsgId(currentMsgId);
         return task;
     }
 
     @Override
-    public BbOrderSnapshotCreateTask buildOrderSnapshotTask(String assetSymbol, String asset, String symbol, long currentOffset) {
+    public BbOrderSnapshotCreateTask buildOrderSnapshotTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId) {
         BbOrderSnapshotCreateTask task = applicationContext.getBean(BbOrderSnapshotCreateTask.class);
         task.setAssetSymbol(assetSymbol);
         task.setAsset(asset);
         task.setSymbol(symbol);
         task.setPriority(MatchTaskConst.PRIORITY_ORDER_INIT);
         task.setCurrentMsgOffset(currentOffset);
+        task.setCurrentMsgId(currentMsgId);
         return task;
     }
 
     @Override
-    public BbOrderRebaseTask buildOrderRebaseTask(String assetSymbol, String asset, String symbol, long currentOffset) {
+    public BbOrderRebaseTask buildOrderRebaseTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId) {
         BbOrderRebaseTask task = applicationContext.getBean(BbOrderRebaseTask.class);
         task.setAssetSymbol(assetSymbol);
         task.setAsset(asset);
         task.setSymbol(symbol);
         task.setPriority(MatchTaskConst.PRIORITY_ORDER_INIT);
         task.setCurrentMsgOffset(currentOffset);
+        task.setCurrentMsgId(currentMsgId);
         return task;
     }
 

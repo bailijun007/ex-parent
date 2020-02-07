@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
-
 @Configuration
 @ConfigurationProperties(prefix = BbmatchConst.MODULE_NAME + ".rmq")
 public class BbRocketMqSetting {
@@ -25,10 +23,6 @@ public class BbRocketMqSetting {
     private String bbMatchTopicNamePattern;
     private String bbMatchProducerGroupName;
     private String bbMatchProducerInstanceName;
-
-    public Logger getLogger() {
-        return logger;
-    }
 
     public String getBbOrderTopicNamePattern() {
         return bbOrderTopicNamePattern;

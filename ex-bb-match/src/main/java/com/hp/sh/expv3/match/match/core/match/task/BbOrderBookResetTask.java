@@ -61,7 +61,7 @@ public class BbOrderBookResetTask extends BbOrderBaseTask implements ITask {
 
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
             List<BookEntry> entries = bbOrderBookEventService.buildBookEntry(context.limitAskQueue, context.limitBidQueue);
-            bbMatchedTaskService.addMatchedBookResetTask(context, entries, context.getLastPrice(), this.getCurrentMsgOffset());
+            bbMatchedTaskService.addMatchedBookResetTask(context, entries, context.getLastPrice(), this.getCurrentMsgOffset(), this.getCurrentMsgId());
         }
 
     }

@@ -13,7 +13,24 @@ public class BbOrderSnapshotBo {
     private List<BbOrder4MatchBo> limitBidOrders;
 
     private BigDecimal lastPrice;
-    private Long rmqNextOffset;
+    private Long rmqCurrentOffset;
+    private String rmqCurrentMsgId;
+
+    public String getRmqCurrentMsgId() {
+        return rmqCurrentMsgId;
+    }
+
+    public void setRmqCurrentMsgId(String rmqCurrentMsgId) {
+        this.rmqCurrentMsgId = rmqCurrentMsgId;
+    }
+
+    public Long getRmqCurrentOffset() {
+        return rmqCurrentOffset;
+    }
+
+    public void setRmqCurrentOffset(Long rmqCurrentOffset) {
+        this.rmqCurrentOffset = rmqCurrentOffset;
+    }
 
     public List<BbOrder4MatchBo> getLimitAskOrders() {
         return limitAskOrders;
@@ -39,11 +56,4 @@ public class BbOrderSnapshotBo {
         this.lastPrice = lastPrice;
     }
 
-    public Long getRmqNextOffset() {
-        return rmqNextOffset;
-    }
-
-    public void setRmqNextOffset(Long rmqNextOffset) {
-        this.rmqNextOffset = rmqNextOffset;
-    }
 }

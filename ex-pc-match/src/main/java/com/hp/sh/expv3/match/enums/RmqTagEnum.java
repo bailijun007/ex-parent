@@ -19,7 +19,7 @@ public enum RmqTagEnum implements EnumDescribe {
     PC_ORDER_PENDING_CANCEL(EventEnum.PC_ORDER_PENDING_CANCEL.getCode(), EventEnum.PC_ORDER_PENDING_CANCEL.getConstant()),
 
     PC_TRADE(EventEnum.PC_TRADE.getCode(), EventEnum.PC_TRADE.getConstant()),
-    
+
     PC_MATCH_ORDER_MATCHED(EventEnum.PC_MATCH_ORDER_MATCHED.getCode(), EventEnum.PC_MATCH_ORDER_MATCHED.getConstant()),
 
     PC_MATCH_ORDER_NOT_MATCHED(EventEnum.PC_MATCH_ORDER_NOT_MATCHED.getCode(), EventEnum.PC_MATCH_ORDER_NOT_MATCHED.getConstant()),
@@ -36,7 +36,7 @@ public enum RmqTagEnum implements EnumDescribe {
     PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED(EventEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED.getCode(), EventEnum.PC_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED.getConstant()),
 
     PC_MATCH_CONSUMER_START(EventEnum.PC_MATCH_CONSUMER_START.getCode(), EventEnum.PC_MATCH_CONSUMER_START.getConstant()),
-    PC_ORDER_REBASE(-1, "PC_ORDER_REBASE"),
+    PC_ORDER_REBASE(EventEnum.PC_ORDER_REBASE.getCode(), EventEnum.PC_ORDER_REBASE.getConstant()),
     //
     ;
 

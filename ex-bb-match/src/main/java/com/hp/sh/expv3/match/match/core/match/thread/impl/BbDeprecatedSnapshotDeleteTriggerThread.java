@@ -6,7 +6,6 @@ package com.hp.sh.expv3.match.match.core.match.thread.impl;
 
 import com.hp.sh.expv3.match.config.setting.BbmatchRedisKeySetting;
 import com.hp.sh.expv3.match.constant.BbmatchConst;
-import com.hp.sh.expv3.match.match.core.order.OrderInitializer;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
 import com.hp.sh.expv3.match.util.BbUtil;
 import com.hp.sh.expv3.match.util.RedisKeyUtil;
@@ -28,8 +27,6 @@ public class BbDeprecatedSnapshotDeleteTriggerThread {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private OrderInitializer orderInitializer;
     @Autowired
     private BbmatchRedisKeySetting bbmatchRedisKeySetting;
 

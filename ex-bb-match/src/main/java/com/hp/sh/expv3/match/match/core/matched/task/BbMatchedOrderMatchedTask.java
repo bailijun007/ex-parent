@@ -113,13 +113,15 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
     }
 
     private void doLimit() {
-        if (null != tradeList && (!tradeList.isEmpty())) {
-            // TODO zw,send RMQ
+        if (null == tradeList || tradeList.isEmpty()) {
+        } else {
             bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
         }
 
         Long tkOrderId = takerOrder.getOrderId();
         Long tkAccountId = takerOrder.getAccountId();
+
+        // 现价才会有不同的时间有效性
         if (BbOrderTimeInForceEnum.GOOD_TILL_CANCEL.getCode() == takerOrder.getTimeInForce()) {
             if (takerOrder.getFilledNumber().compareTo(BigDecimal.ZERO) == 0) {
                 bbMatchMqNotify.sendOrderNotMatched(this.getAsset(), this.getSymbol(), tkAccountId, tkOrderId);
@@ -138,23 +140,12 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
         sendNotifyMsg();
     }
 
-    private void sendNotifyMsg() {
-
-        if (null != bookUpdateList && (!bookUpdateList.isEmpty())) {
-            try {
-                sendBookMsg();
-                sendTradeMsg();
-            } catch (Exception e) {
-                logger.warn(e.getMessage());
-            }
-        }
-    }
 
     private void doMarket() {
 
         // 先发成交消息
-        if (null != tradeList && (!tradeList.isEmpty())) {
-            // TODO zw,send RMQ
+        if (null == tradeList || tradeList.isEmpty()) {
+        } else {
             bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
         }
 
@@ -163,6 +154,11 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
         }
 
         sendNotifyMsg();
+    }
+
+    private void sendNotifyMsg() {
+        sendBookMsg();
+        sendTradeMsg();
     }
 
     private TradeListMsgDto.TradeMsgDto buildTrade(BbTradeBo trade) {
@@ -175,31 +171,40 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
     private int batchSize;
 
     private void sendBookMsg() {
-        // send book
-        BookMsgDto bookMsgDto = new BookMsgDto();
-        bookMsgDto.setLastPrice(this.getLastPrice());
-        bookMsgDto.setAsset(this.getAsset());
-        bookMsgDto.setSymbol(this.getSymbol());
-        bookMsgDto.setResetFlag(CommonConst.NO);
-        bookMsgDto.setMsgType(EventEnum.BOOK.getCode());
-        bookMsgDto.setOrders(this.bookUpdateList);
-        // prepared book end
-        bbNotify.safeNotify(this.getAsset(), this.getSymbol(), bookMsgDto);
+        if (null == bookUpdateList || bookUpdateList.isEmpty()) {
+        } else {
+            try {
+                // send book
+                BookMsgDto bookMsgDto = new BookMsgDto();
+                bookMsgDto.setLastPrice(this.getLastPrice());
+                bookMsgDto.setAsset(this.getAsset());
+                bookMsgDto.setSymbol(this.getSymbol());
+                bookMsgDto.setResetFlag(CommonConst.NO);
+                bookMsgDto.setMsgType(EventEnum.BB_BOOK.getCode());
+                bookMsgDto.setOrders(this.bookUpdateList);
+                // prepared book end
+                bbNotify.safeNotify(this.getAsset(), this.getSymbol(), bookMsgDto);
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
+            }
+        }
     }
 
     private void sendTradeMsg() {
-        TradeListMsgDto tradeListMsgDto = new TradeListMsgDto();
-        tradeListMsgDto.setLastPrice(this.getLastPrice());
-        tradeListMsgDto.setMatchTxId(this.getMatchTxId());
-        tradeListMsgDto.setMsgType(EventEnum.TRADE.getCode());
-        if (null != tradeList && (!tradeList.isEmpty())) {
+        if (null == tradeList || tradeList.isEmpty()) {
+        } else {
+
+            TradeListMsgDto tradeListMsgDto = new TradeListMsgDto();
+            tradeListMsgDto.setLastPrice(this.getLastPrice());
+            tradeListMsgDto.setMatchTxId(this.getMatchTxId());
+            tradeListMsgDto.setMsgType(EventEnum.BB_MATCH.getCode());
+
             // send match as trade
             List<TradeListMsgDto.TradeMsgDto> trades = new ArrayList<>();
             tradeList.forEach(bbMatchBo -> trades.add(buildTrade(bbMatchBo)));
+
             tradeListMsgDto.setTrades(trades);
-        }
-        if (null == tradeListMsgDto.getTrades() || tradeListMsgDto.getTrades().isEmpty()) {
-        } else {
+
             bbNotify.safeNotify(this.getAsset(), this.getSymbol(), tradeListMsgDto);
         }
     }

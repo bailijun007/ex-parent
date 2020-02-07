@@ -49,7 +49,7 @@ public class BbOrderSnapshotCreateTask extends BbOrderBaseTask implements ITask 
     public void run() {
         BbMatchHandlerContext context = BbMatchHandlerContext.getLocalContext();
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
-            bbMatchedTaskService.addOrderSnapshotTask(context, context.limitBidQueue, context.limitAskQueue, this.getCurrentMsgOffset());
+            bbMatchedTaskService.addOrderSnapshotTask(context, context.limitBidQueue, context.limitAskQueue, this.getCurrentMsgOffset(), this.getCurrentMsgId());
         }
     }
 }

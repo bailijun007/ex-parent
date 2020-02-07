@@ -12,6 +12,8 @@ public class BbOrder4MatchBo {
     private String asset;
     private String symbol;
     private Long accountId;
+    // todo bb
+    private Integer closeFlag;
     private Integer bidFlag;
     private Integer timeInForce;
     private BigDecimal number;
@@ -83,6 +85,14 @@ public class BbOrder4MatchBo {
 
     public void setOrderTime(Long orderTime) {
         this.orderTime = orderTime;
+    }
+
+    public Integer getCloseFlag() {
+        return closeFlag;
+    }
+
+    public void setCloseFlag(Integer closeFlag) {
+        this.closeFlag = closeFlag;
     }
 
     public BigDecimal getNumber() {

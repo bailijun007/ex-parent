@@ -44,12 +44,12 @@ public class ThreadWorkerServiceImpl implements ThreadWorkerService {
     }
 
     @Override
-    public IThreadWorker getMatchThreadWorker(String assetSymbol) {
+    public IThreadWorker getBbMatchThreadWorker(String assetSymbol) {
         return getThreadWorker(threadManagerBbMatchImpl, assetSymbol);
     }
 
     @Override
-    public IThreadWorker getMatchedThreadWorker(String assetSymbol) {
+    public IThreadWorker getBbMatchedThreadWorker(String assetSymbol) {
         return getThreadWorker(threadManagerBbMatchedImpl, assetSymbol);
     }
 

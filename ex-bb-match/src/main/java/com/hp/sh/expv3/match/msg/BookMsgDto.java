@@ -102,6 +102,7 @@ public class BookMsgDto extends BaseMessageDto {
         this.lastPrice = lastPrice;
     }
 
+
     public Integer getResetFlag() {
         return resetFlag;
     }

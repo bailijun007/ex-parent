@@ -19,13 +19,13 @@ public interface BbMatchedTaskService {
 
     BbMatchedInitTask buildMatchedInitTask(String assetSymbol, String asset, String symbol);
 
-    void addMatchedBookResetTask(BbMatchHandlerContext context, List<BookEntry> entries, BigDecimal lastPrice, long currentMsgOffset);
+    void addMatchedBookResetTask(BbMatchHandlerContext context, List<BookEntry> entries, BigDecimal lastPrice, long currentMsgOffset, String currentMsgId);
 
-    void addOrderSnapshotTask(BbMatchHandlerContext context, PriorityQueue<BbOrder4MatchBo> limitBidQueue, PriorityQueue<BbOrder4MatchBo> limitAskQueue, long currentMsgOffset);
+    void addOrderSnapshotTask(BbMatchHandlerContext context, PriorityQueue<BbOrder4MatchBo> limitBidQueue, PriorityQueue<BbOrder4MatchBo> limitAskQueue, long currentMsgOffset, String currentMsgId);
 
-    void addMatchedOrderMatchedTask(BbMatchHandlerContext context, long currentMsgOffset, BbOrder4MatchBo takerOrder);
+    void addMatchedOrderMatchedTask(BbMatchHandlerContext context, long currentMsgOffset, String currentMsgId, BbOrder4MatchBo takerOrder);
 
-    void addMatchedOrderCancelTask(BbMatchHandlerContext context, long currentMsgOffset, long accountId, long orderId, BigDecimal cancelDeltaAmt);
+    void addMatchedOrderCancelTask(BbMatchHandlerContext context, long currentMsgOffset, String currentMsgId, long accountId, long orderId, BigDecimal cancelDeltaAmt);
 
     void logQueueSize(String asset, String symbol, IThreadWorker matchedThreadWorker, BbMatchedBaseTask currentMatchedTask);
 }

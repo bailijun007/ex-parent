@@ -11,24 +11,25 @@ import java.util.stream.Collectors;
 
 public enum RmqTagEnum implements EnumDescribe {
 
-    BOOK_RESET(EventEnum.BOOK_RESET.getCode(), EventEnum.BOOK_RESET.getConstant()),
+    // BB_MATCH
+    BB_BOOK_RESET(EventEnum.BB_BOOK_RESET.getCode(), EventEnum.BB_BOOK_RESET.getConstant()),
 
-    ORDER_PENDING_NEW(EventEnum.ORDER_PENDING_NEW.getCode(), EventEnum.ORDER_PENDING_NEW.getConstant()),
+    BB_ORDER_PENDING_NEW(EventEnum.BB_ORDER_PENDING_NEW.getCode(), EventEnum.BB_ORDER_PENDING_NEW.getConstant()),
 
-    ORDER_PENDING_CANCEL(EventEnum.ORDER_PENDING_CANCEL.getCode(), EventEnum.ORDER_PENDING_CANCEL.getConstant()),
+    BB_ORDER_PENDING_CANCEL(EventEnum.BB_ORDER_PENDING_CANCEL.getCode(), EventEnum.BB_ORDER_PENDING_CANCEL.getConstant()),
 
-    TRADE(EventEnum.TRADE.getCode(), EventEnum.TRADE.getConstant()),
+    BB_MATCH(EventEnum.BB_MATCH.getCode(), EventEnum.BB_MATCH.getConstant()),
 
-    MATCH_ORDER_MATCHED(EventEnum.MATCH_ORDER_MATCHED.getCode(), EventEnum.MATCH_ORDER_MATCHED.getConstant()),
+    BB_MATCH_ORDER_MATCHED(EventEnum.BB_MATCH_ORDER_MATCHED.getCode(), EventEnum.BB_MATCH_ORDER_MATCHED.getConstant()),
 
-    MATCH_ORDER_NOT_MATCHED(EventEnum.MATCH_ORDER_NOT_MATCHED.getCode(), EventEnum.MATCH_ORDER_NOT_MATCHED.getConstant()),
+    BB_MATCH_ORDER_NOT_MATCHED(EventEnum.BB_MATCH_ORDER_NOT_MATCHED.getCode(), EventEnum.BB_MATCH_ORDER_NOT_MATCHED.getConstant()),
 
-    MATCH_ORDER_CANCELLED(EventEnum.MATCH_ORDER_CANCELLED.getCode(), EventEnum.MATCH_ORDER_CANCELLED.getConstant()),
+    BB_MATCH_ORDER_CANCELLED(EventEnum.BB_MATCH_ORDER_CANCELLED.getCode(), EventEnum.BB_MATCH_ORDER_CANCELLED.getConstant()),
 
-    MATCH_ORDER_SNAPSHOT_CREATE(EventEnum.MATCH_ORDER_SNAPSHOT_CREATE.getCode(), EventEnum.MATCH_ORDER_SNAPSHOT_CREATE.getConstant()),
+    BB_MATCH_ORDER_SNAPSHOT_CREATE(EventEnum.BB_MATCH_ORDER_SNAPSHOT_CREATE.getCode(), EventEnum.BB_MATCH_ORDER_SNAPSHOT_CREATE.getConstant()),
 
-    MATCH_CONSUMER_START(EventEnum.MATCH_CONSUMER_START.getCode(), EventEnum.MATCH_CONSUMER_START.getConstant()),
-    ORDER_REBASE(-1, "ORDER_REBASE"),
+    BB_MATCH_CONSUMER_START(EventEnum.BB_MATCH_CONSUMER_START.getCode(), EventEnum.BB_MATCH_CONSUMER_START.getConstant()),
+    BB_ORDER_REBASE(EventEnum.BB_ORDER_REBASE.getCode(), EventEnum.BB_ORDER_REBASE.getConstant()),
     //
     ;
 
