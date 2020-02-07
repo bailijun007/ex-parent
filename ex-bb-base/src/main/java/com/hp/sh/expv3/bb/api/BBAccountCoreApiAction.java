@@ -15,7 +15,7 @@ import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.BBCutRequest;
 
 /**
- * 永续合约账户核心接口
+ * 币币账户核心接口
  * @author wangjg
  */
 @RestController

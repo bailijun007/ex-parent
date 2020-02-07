@@ -32,9 +32,6 @@ public class CommonOrderStrategy implements OrderStrategy {
 
 	
 	@Autowired
-	private MetadataService metadataService;
-	
-	@Autowired
 	private FeeRatioService feeRatioService;
     
 	/**
@@ -48,7 +45,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 		BigDecimal baseValue = orderParam.getVolume();
 		
 		//开仓手续费
-		BigDecimal openFee = calcFee(baseValue, orderParam.getOpenFeeRatio());
+		BigDecimal openFee = calcFee(baseValue, orderParam.getFeeRatio());
 		
 		//平仓手续费
 		BigDecimal closeFee = calcFee(baseValue, orderParam.getCloseFeeRatio());
@@ -119,13 +116,13 @@ public class CommonOrderStrategy implements OrderStrategy {
 			orderMargin = BigDecimal.ZERO;
 			grossMargin = BigDecimal.ZERO;
 		}else if(BigUtils.eq(number, order.getVolume().subtract(order.getFilledVolume()))){
-			openFee = order.getOpenFee();
-			closeFee = order.getCloseFee();
+			openFee = order.getFee();
+			closeFee = BigDecimal.ZERO;
 			orderMargin = order.getOrderMargin();
 			grossMargin = order.getGrossMargin();
 		}else{
-			openFee = slope(number, order.getVolume(), order.getOpenFee());
-			closeFee = slope(number, order.getVolume(), order.getCloseFee());
+			openFee = slope(number, order.getVolume(), order.getFee());
+			closeFee = BigDecimal.ZERO;
 			orderMargin = slope(number, order.getVolume(), order.getOrderMargin());
 			grossMargin = BigCalc.sum(openFee, closeFee, orderMargin);
 		}
@@ -180,54 +177,46 @@ public class CommonOrderStrategy implements OrderStrategy {
 	/**
 	 * 计算本单的各项数据
 	 * @param order
-	 * @param matchedVo
+	 * @param tradeVo
 	 * @param pcPosition
 	 * @return
 	 */
-	public TradeResult calcTradeResult(BBTradeMsg matchedVo, BBOrder order){
+	public TradeResult calcTradeResult(BBTradeMsg tradeVo, BBOrder order){
 		long userId = order.getUserId();
 		String asset = order.getAsset();
 		String symbol = order.getSymbol();
 		int bidFlag = order.getBidFlag();
 		
-		OrderRatioData orderRatioData = this.calcRaitoAmt(order, matchedVo.getNumber());
-		
 		TradeResult tradeResult = new TradeResult();
 	
-		tradeResult.setVolume(matchedVo.getNumber());
-		tradeResult.setPrice(matchedVo.getPrice());
-		tradeResult.setAmount(matchedVo.getPrice().multiply(matchedVo.getNumber()));
-		tradeResult.setBaseValue(matchedVo.getNumber());
-		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
+		tradeResult.setVolume(tradeVo.getNumber());
+		tradeResult.setPrice(tradeVo.getPrice());
+		tradeResult.setAmount(tradeVo.getPrice().multiply(tradeVo.getNumber()));
+		tradeResult.setBaseValue(tradeVo.getNumber());
+		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeVo.getNumber())));
 		
-		//手续费&率
+		//剩余数量
+		tradeResult.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getVolume()));
+		//押金
 		if(bidFlag==OrderFlag.BID_BUY){
-			tradeResult.setFeeRatio(order.getOpenFeeRatio());
-			tradeResult.setFee(orderRatioData.getOpenFee());
-			tradeResult.setOrderMargin(orderRatioData.getOrderMargin()); //保证金
+			tradeResult.setOrderMargin(tradeResult.getAmount());
+			tradeResult.setRemainOrderMargin(order.getOrderMargin().subtract(tradeResult.getAmount()));
 		}else{
-			BigDecimal closeFeeRatio = this.feeRatioService.getCloseFeeRatio(userId, asset, symbol);
-			BigDecimal closeFee = tradeResult.getAmount().multiply(closeFeeRatio);
-	
-			tradeResult.setFeeRatio(closeFeeRatio);
-			tradeResult.setFee(closeFee);
-			
-			tradeResult.setOrderMargin(BigDecimal.ZERO);
+			tradeResult.setOrderMargin(tradeResult.getVolume());
+			tradeResult.setRemainOrderMargin(tradeResult.getRemainVolume());
 		}
 		
+		//手续费&率
+		tradeResult.setFeeRatio(order.getFeeRatio());
+		BigDecimal fee = tradeResult.getAmount().multiply(tradeResult.getFeeRatio());
+		tradeResult.setFee(fee);
+		
 		//maker fee
-		if(matchedVo.getMakerFlag()==TradingRoles.MAKER){
-			if(bidFlag==OrderFlag.ACTION_OPEN){
-				BigDecimal makerFeeRatio = feeRatioService.getMakerOpenFeeRatio(userId, asset, symbol);
-				tradeResult.setMakerFeeRatio(makerFeeRatio);
-				BigDecimal closeFee = tradeResult.getAmount().multiply(makerFeeRatio);
-				tradeResult.setMakerFee(closeFee);
-			}else{
-				BigDecimal makerFeeRatio = feeRatioService.getMakerCloseFeeRatio(userId, asset, symbol);
-				tradeResult.setMakerFeeRatio(makerFeeRatio);
-				BigDecimal closeFee = tradeResult.getAmount().multiply(makerFeeRatio);
-				tradeResult.setMakerFee(closeFee);
-			}
+		if(tradeVo.getMakerFlag()==TradingRoles.MAKER){
+			BigDecimal makerFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
+			tradeResult.setMakerFeeRatio(makerFeeRatio);
+			BigDecimal makerFee = tradeResult.getAmount().multiply(makerFeeRatio);
+			tradeResult.setMakerFee(makerFee);
 		}
 		
 		/* **************** 仓位累计数据 **************** */

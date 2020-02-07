@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.component.FeeRatioService;
-import com.hp.sh.expv3.utils.math.Precision;
 
 /**
  * 查询保证金费率，redis或db
@@ -19,17 +18,7 @@ import com.hp.sh.expv3.utils.math.Precision;
 public class FeeRatioServiceMock implements FeeRatioService {
 
 	@Override
-	public BigDecimal getInitedMarginRatio(BigDecimal leverage) {
-		return BigDecimal.ONE.divide(leverage, Precision.PERCENT_PRECISION, Precision.LESS);
-	}
-
-	@Override
-	public BigDecimal getOpenFeeRatio(long userId, String asset, String symbol) {
-		return getFeeRatio(userId, false);
-	}
-
-	@Override
-	public BigDecimal getCloseFeeRatio(long userId, String asset, String symbol) {
+	public BigDecimal getTakerFeeRatio(long userId, String asset, String symbol) {
 		return getFeeRatio(userId, false);
 	}
 
@@ -47,21 +36,9 @@ public class FeeRatioServiceMock implements FeeRatioService {
 		}
 	
 	}
-
-	@Override
-	public BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume) {
-		return new BigDecimal("0.005");
-	}
-	
-	int ___________;
 	
 	@Override
-	public BigDecimal getMakerOpenFeeRatio(long userId, String asset, String symbol) {
-		return getFeeRatio(userId, true);
-	}
-
-	@Override
-	public BigDecimal getMakerCloseFeeRatio(long userId, String asset, String symbol) {
+	public BigDecimal getMakerFeeRatio(long userId, String asset, String symbol) {
 		return getFeeRatio(userId, true);
 	}
 

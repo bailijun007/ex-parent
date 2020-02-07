@@ -9,7 +9,7 @@ import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.bb.strategy.data.OrderData;
 
 /**
- * 永续合约_订单（委托）
+ * 币币_订单（委托）
  */
 @Table(name="bb_order")
 public class BBOrder extends UserDataEntity implements OrderData{
@@ -46,7 +46,7 @@ public class BBOrder extends UserDataEntity implements OrderData{
 	private BigDecimal price;
 
     /**
-     * 永续合约委托类型 @see BBOrderType#*
+     * 币币委托类型 @see BBOrderType#*
      */
     private Integer orderType;
     
@@ -60,7 +60,7 @@ public class BBOrder extends UserDataEntity implements OrderData{
     /**
 	 * 开仓手续费率
 	 */
-	private BigDecimal openFeeRatio;
+	private BigDecimal feeRatio;
 
 	/**
 	 * 客户自定义委托ID，用于与客户系统关联 （open api）
@@ -72,7 +72,7 @@ public class BBOrder extends UserDataEntity implements OrderData{
 	/**
 	 * 开仓手续费,成交时修改(可能部分成交，按比例释放)
 	 */
-	private BigDecimal openFee;
+	private BigDecimal fee;
 
 	/**
 	 * 委托保证金
@@ -80,7 +80,7 @@ public class BBOrder extends UserDataEntity implements OrderData{
 	private BigDecimal orderMargin;
 
 	//保证金货币类型
-	private String marginCurrency;
+	private String orderMarginCurrency;
 
 	/**
 	 * 委托状态，OrderStatus#*
@@ -126,6 +126,29 @@ public class BBOrder extends UserDataEntity implements OrderData{
 
     public BBOrder() {
 	}
+	
+	public BigDecimal getGrossMargin() {
+		return this.orderMargin.add(this.fee);
+	}
+	
+	int ____________________________;
+	
+	@Override
+	public BigDecimal getFaceValue() {
+		return BigDecimal.ONE;
+	}
+
+	@Override
+	public BigDecimal getMarginRatio() {
+		return BigDecimal.ONE;
+	}
+
+	@Override
+	public BigDecimal getCloseFeeRatio() {
+		return BigDecimal.ZERO;
+	}
+	
+	int _____________________________;
 
 	public String getAsset() {
 		return asset;
@@ -147,8 +170,8 @@ public class BBOrder extends UserDataEntity implements OrderData{
 		return bidFlag;
 	}
 
-	public void setBidFlag(Integer closeFlag) {
-		this.bidFlag = closeFlag;
+	public void setBidFlag(Integer bidFlag) {
+		this.bidFlag = bidFlag;
 	}
 
 	public BigDecimal getLeverage() {
@@ -191,6 +214,13 @@ public class BBOrder extends UserDataEntity implements OrderData{
 		this.timeInForce = timeInForce;
 	}
 
+	public BigDecimal getFeeRatio() {
+		return feeRatio;
+	}
+
+	public void setFeeRatio(BigDecimal feeRatio) {
+		this.feeRatio = feeRatio;
+	}
 
 	public String getClientOrderId() {
 		return clientOrderId;
@@ -198,6 +228,30 @@ public class BBOrder extends UserDataEntity implements OrderData{
 
 	public void setClientOrderId(String clientOrderId) {
 		this.clientOrderId = clientOrderId;
+	}
+
+	public BigDecimal getFee() {
+		return fee;
+	}
+
+	public void setFee(BigDecimal fee) {
+		this.fee = fee;
+	}
+
+	public BigDecimal getOrderMargin() {
+		return orderMargin;
+	}
+
+	public void setOrderMargin(BigDecimal orderMargin) {
+		this.orderMargin = orderMargin;
+	}
+
+	public String getOrderMarginCurrency() {
+		return orderMarginCurrency;
+	}
+
+	public void setOrderMarginCurrency(String orderMarginCurrency) {
+		this.orderMarginCurrency = orderMarginCurrency;
 	}
 
 	public Integer getStatus() {
@@ -278,61 +332,6 @@ public class BBOrder extends UserDataEntity implements OrderData{
 
 	public void setCancelOperator(String cancelOperator) {
 		this.cancelOperator = cancelOperator;
-	}
-
-	public BigDecimal getOpenFee() {
-		return openFee;
-	}
-
-	public void setOpenFee(BigDecimal openFee) {
-		this.openFee = openFee;
-	}
-
-	public BigDecimal getOpenFeeRatio() {
-		return openFeeRatio;
-	}
-
-	public void setOpenFeeRatio(BigDecimal openFeeRatio) {
-		this.openFeeRatio = openFeeRatio;
-	}
-
-	public BigDecimal getOrderMargin() {
-		return orderMargin;
-	}
-
-	public void setOrderMargin(BigDecimal orderMargin) {
-		this.orderMargin = orderMargin;
-	}
-	
-	public BigDecimal getGrossMargin() {
-		return this.orderMargin.add(this.openFee);
-	}
-
-	@Override
-	public BigDecimal getFaceValue() {
-		return BigDecimal.ONE;
-	}
-
-	@Override
-	public BigDecimal getMarginRatio() {
-		return BigDecimal.ONE;
-	}
-
-	@Override
-	public BigDecimal getCloseFeeRatio() {
-		return BigDecimal.ZERO;
-	}
-
-	public BigDecimal getCloseFee() {
-		return BigDecimal.ZERO;
-	}
-
-	public String getMarginCurrency() {
-		return marginCurrency;
-	}
-
-	public void setMarginCurrency(String marginCurrency) {
-		this.marginCurrency = marginCurrency;
 	}
     
 }

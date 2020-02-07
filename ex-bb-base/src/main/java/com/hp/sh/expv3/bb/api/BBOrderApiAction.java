@@ -36,7 +36,7 @@ public class BBOrderApiAction implements BBOrderApi {
 	 * @param userId 用户ID
 	 * @param cliOrderId 客户端订单ID
 	 * @param asset 资产
-	 * @param symbol 合约品种
+	 * @param symbol 币币交易品种
 	 * @param bidFlag 是否平仓：开/平
 	 * @param longFlag 多/空
 	 * @param timeInForce 生效机制

@@ -8,7 +8,7 @@ import javax.persistence.Version;
 import com.hp.sh.expv3.base.entity.BaseAccountEntity;
 
 /**
- * 永续合约_账户
+ * 币币_账户
  * @author lw
  *
  */

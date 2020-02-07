@@ -14,38 +14,12 @@ import com.hp.sh.expv3.dev.Question;
 public interface FeeRatioService {
 
 	/**
-	 * 获取初始化保证金率
-	 * 
-	 * @param leverage
-	 * @return
-	 */
-	BigDecimal getInitedMarginRatio(BigDecimal leverage);
-
-	/**
 	 * 获取开仓手续费率
 	 * 
 	 * @param userId
 	 * @return
 	 */
-	BigDecimal getOpenFeeRatio(long userId, String asset, String symbol);
-
-	/**
-	 * 平仓手续费率
-	 * 
-	 * @param userId
-	 * @return
-	 */
-	BigDecimal getCloseFeeRatio(long userId, String asset, String symbol);
-
-	/**
-	 * 维持保证金率
-	 * @param userId
-	 * @param asset
-	 * @param symbol
-	 * @param volume
-	 * @return
-	 */
-	BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume);
+	BigDecimal getTakerFeeRatio(long userId, String asset, String symbol);
 
 	/**
 	 * 获取maker开仓手续费率
@@ -53,18 +27,6 @@ public interface FeeRatioService {
 	 * @param userId
 	 * @return
 	 */
-	BigDecimal getMakerOpenFeeRatio(long userId, String asset, String symbol);
-
-	/**
-	 * 获取maker平仓手续费率
-	 * 
-	 * @param userId
-	 * @return
-	 */
-	BigDecimal getMakerCloseFeeRatio(long userId, String asset, String symbol);
-
-	default BigDecimal getMaxLeverage(Long userId, String asset, String symbol, BigDecimal posVolume){
-		return new BigDecimal(50);
-	}
+	BigDecimal getMakerFeeRatio(long userId, String asset, String symbol);
 
 }

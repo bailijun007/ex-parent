@@ -8,10 +8,9 @@ import javax.persistence.Transient;
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.bb.strategy.data.OrderTrade;
 import com.hp.sh.expv3.commons.mybatis.TxId;
-import com.hp.sh.expv3.dev.Question;
 
 /**
- * 永续合约_用户订单成交记录
+ * 币币_用户订单成交记录
  * 
  */
 @Table(name="bb_order_trade")

@@ -8,7 +8,7 @@ import com.hp.sh.expv3.base.entity.BaseRecordEntity;
 import com.hp.sh.expv3.commons.mybatis.TxId;
 
 /**
- * 永续合约_账户明细
+ * 币币_账户明细
  * 
  * @author lw
  *

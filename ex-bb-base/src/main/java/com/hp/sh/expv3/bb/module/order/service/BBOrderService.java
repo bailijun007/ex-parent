@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.bb.component.FeeRatioService;
-import com.hp.sh.expv3.bb.component.MetadataService;
 import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
 import com.hp.sh.expv3.bb.constant.BBOrderType;
 import com.hp.sh.expv3.bb.constant.OrderFlag;
@@ -51,9 +50,6 @@ public class BBOrderService {
 	
 	@Autowired
 	private BBAccountCoreService bBAccountCoreService;
-	
-	@Autowired
-	private MetadataService metadataService;
 	
 	@Autowired
 	private CommonOrderStrategy orderStrategy;	
@@ -162,12 +158,12 @@ public class BBOrderService {
 
 	//设置开仓订单的各种费率
 	private void setFee(BBOrder order) {
-		BigDecimal feeRatio = this.feeRatioService.getOpenFeeRatio(order.getUserId(), order.getAsset(), order.getSymbol());
-		order.setOpenFeeRatio(feeRatio);
+		BigDecimal feeRatio = this.feeRatioService.getTakerFeeRatio(order.getUserId(), order.getAsset(), order.getSymbol());
+		order.setFeeRatio(feeRatio);
 		
 		OrderRatioData ratioData = orderStrategy.calcOrderAmt(order);
 		order.setOrderMargin(ratioData.getOrderMargin());
-		order.setOpenFee(ratioData.getOpenFee());
+		order.setFee(ratioData.getOpenFee());
 		
 	}
 	

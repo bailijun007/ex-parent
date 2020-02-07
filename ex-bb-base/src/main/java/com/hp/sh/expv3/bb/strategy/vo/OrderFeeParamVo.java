@@ -40,7 +40,7 @@ public class OrderFeeParamVo implements OrderFeeParam {
 		this.price = price;
 	}
 
-	public BigDecimal getOpenFeeRatio() {
+	public BigDecimal getFeeRatio() {
 		return openFeeRatio;
 	}
 

@@ -25,12 +25,23 @@ public class TradeResult {
 	private BigDecimal makerFeeRatio;
 	//此次成交的taker手续费
 	private BigDecimal makerFee;
-	//此次成交的保证金
+	//此次支付的保证金
 	private BigDecimal orderMargin;
 	//此次成交的盈亏（平仓才有）
 	private BigDecimal pnl;
+	
+	/* 以下为订单累计结果 */
+	
+	//订单是否完成(此次成交后，对应订单已全部成交)
+	private boolean isOrderCompleted;
+	//此次成交的成交量
+	private BigDecimal remainVolume;
+	//订单剩余保证金
+	private BigDecimal remainOrderMargin;
+	//订单剩余手续费
+	private BigDecimal remainFee;
 
-	/* 以下为累计结果 */
+	/* 以下为仓位累计结果 */
 	
 	//新仓位价值
 	private BigDecimal newPosBaseValue;
@@ -39,9 +50,6 @@ public class TradeResult {
 	private BigDecimal newPosMeanPrice;
 	//新预估强平价(此次成交后，仓位的强平价)
 	private BigDecimal newPosLiqPrice;
-	
-	//订单完成(此次成交后，对应订单已全部成交)
-	private boolean isOrderCompleted;
 	
 	public TradeResult() {
 		super();
@@ -181,6 +189,30 @@ public class TradeResult {
 
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
+	}
+
+	public BigDecimal getRemainOrderMargin() {
+		return remainOrderMargin;
+	}
+
+	public void setRemainOrderMargin(BigDecimal remainOrderMargin) {
+		this.remainOrderMargin = remainOrderMargin;
+	}
+
+	public BigDecimal getRemainFee() {
+		return remainFee;
+	}
+
+	public void setRemainFee(BigDecimal remainFee) {
+		this.remainFee = remainFee;
+	}
+
+	public BigDecimal getRemainVolume() {
+		return remainVolume;
+	}
+
+	public void setRemainVolume(BigDecimal remainVolume) {
+		this.remainVolume = remainVolume;
 	}
 
 }

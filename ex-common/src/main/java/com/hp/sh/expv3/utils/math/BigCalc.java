@@ -22,6 +22,20 @@ public class BigCalc {
 		}
 		return result;
 	}
+
+	
+	/**
+	 * 求和
+	 * @param values
+	 * @return
+	 */
+	public static final BigDecimal subtract(BigDecimal n, BigDecimal...values){
+		BigDecimal result = n;
+		for(BigDecimal value : values){
+			result = result.subtract(value);
+		}
+		return result;
+	}
 	
 	/**
 	 * 按比例计算amount

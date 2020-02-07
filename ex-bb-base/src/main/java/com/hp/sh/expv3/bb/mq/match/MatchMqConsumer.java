@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
+import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
+import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.mq.match.msg.MatchNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.MatchedOrderCancelledMsg;
 import com.hp.sh.expv3.bb.msg.MatchedMsg;
@@ -26,6 +28,8 @@ public class MatchMqConsumer {
 
 	@Autowired
 	private BBOrderService bBOrderService;
+	@Autowired
+	private BBTradeService tradeService;
 	
 	private BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>(100);
 	
@@ -57,9 +61,9 @@ public class MatchMqConsumer {
 	
 	//撮合成功
 	@MQListener(tags=MqTags.TAGS_MATCHED)  
-	public void handleMatch(MatchedMsg msg){
+	public void handleMatch(BBMatchedTrade msg){
 		logger.info("收到消息:{}", msg);
-		
+		tradeService.handleMatchedResult(msg);
 	}
     
 }

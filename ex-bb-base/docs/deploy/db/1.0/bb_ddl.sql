@@ -82,7 +82,7 @@ UNIQUE INDEX `un_sn` (`sn`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_账户明细'
+COMMENT='币币_账户明细'
 
 ;
 
@@ -110,7 +110,7 @@ UNIQUE INDEX `user_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_账户设置'
+COMMENT='币币_账户设置'
 
 ;
 
@@ -130,7 +130,7 @@ INDEX `idx_symbol` (`symbol`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_活动订单（委托）'
+COMMENT='币币_活动订单（委托）'
 
 ;
 
@@ -150,7 +150,7 @@ INDEX `idx_symbol` (`symbol`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_活动仓位'
+COMMENT='币币_活动仓位'
 
 ;
 
@@ -179,7 +179,7 @@ PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_仓位'
+COMMENT='币币_仓位'
 
 ;
 
@@ -197,7 +197,7 @@ CREATE TABLE `bb_order` (
 `margin_mode`  int(11) NOT NULL COMMENT '保证金模式:1-全仓,2-逐仓' ,
 `leverage`  decimal(10,2) NOT NULL COMMENT '杠杆' ,
 `price`  decimal(50,30) NOT NULL COMMENT '委托价格' ,
-`order_type`  int(11) NOT NULL COMMENT '永续合约委托类型' ,
+`order_type`  int(11) NOT NULL COMMENT '币币委托类型' ,
 `volume`  decimal(50,20) NOT NULL COMMENT '委托数量，初始设置后，后续不会修改' ,
 `face_value`  decimal(50,30) NULL DEFAULT NULL ,
 `status`  int(11) NOT NULL COMMENT '委托状态' ,
@@ -231,7 +231,7 @@ INDEX `idx_created` (`created`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_订单（委托）'
+COMMENT='币币_订单（委托）'
 
 ;
 
@@ -292,7 +292,7 @@ INDEX `idx_posid` (`pos_id`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_用户订单成交记录'
+COMMENT='币币_用户订单成交记录'
 
 ;
 
@@ -335,7 +335,7 @@ INDEX `idx_volume` (`volume`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_仓位'
+COMMENT='币币_仓位'
 
 ;
 
@@ -364,6 +364,6 @@ PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_成交(撮合结果)'
+COMMENT='币币_成交(撮合结果)'
 
 ;

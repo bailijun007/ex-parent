@@ -34,7 +34,7 @@ public class MarkPriceServiceImpl implements MarkPriceService {
 
     @Override
     public BigDecimal getCurrentMarkPrice(String asset, String symbol) {
-        String key = "markPrice:pc:current:";
+        String key = "markPrice:bb:current:";
         String s = templateDB5.opsForValue().get(key + asset + ":" + symbol);
         return new BigDecimal(s);
     }
@@ -43,7 +43,7 @@ public class MarkPriceServiceImpl implements MarkPriceService {
     @Override
     public MarkPriceVo getLastMarkPrice(String asset, String symbol) {
         MarkPriceVo vo = new MarkPriceVo();
-        String key = "markPrice:pc:history:";
+        String key = "markPrice:bb:history:";
         Set<String> set = templateDB5.boundZSetOps(key + asset + ":" + symbol).reverseRange(0, 0);
        if(!CollectionUtils.isEmpty(set)){
            ArrayList<String> list = new ArrayList<>(set);
@@ -56,7 +56,7 @@ public class MarkPriceServiceImpl implements MarkPriceService {
     }
 
     public BigDecimal getLatestPrice(String asset, String symbol){
-        String key = "lastPrice:pc:";
+        String key = "lastPrice:bb:";
         String s = templateDB5.opsForValue().get(key + asset + ":" + symbol);
         return new BigDecimal(s);
     }

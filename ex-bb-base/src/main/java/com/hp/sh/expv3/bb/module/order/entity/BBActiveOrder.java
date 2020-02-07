@@ -5,7 +5,7 @@ import javax.persistence.Table;
 import com.hp.sh.expv3.base.entity.UserData;
 
 /**
- * 永续合约_活动订单（委托）
+ * 币币_活动订单（委托）
  */
 @Table(name="bb_active_order")
 public class BBActiveOrder implements UserData{

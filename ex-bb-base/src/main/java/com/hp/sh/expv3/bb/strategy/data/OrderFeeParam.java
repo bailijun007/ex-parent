@@ -15,7 +15,7 @@ public interface OrderFeeParam {
 
 	BigDecimal getPrice();
 
-	BigDecimal getOpenFeeRatio();
+	BigDecimal getFeeRatio();
 
 	BigDecimal getCloseFeeRatio();
 

@@ -53,7 +53,7 @@ public class MetadataServiceImpl implements MetadataService {
 	public BBContractVO getPcContract(String asset, String symbol) {
         HashOperations hashOperations = templateDB0.opsForHash();
         String hashKey = asset+"__"+symbol;
-        Object o = hashOperations.get(RedisKey.PC_CONTRACT, hashKey);
+        Object o = hashOperations.get(RedisKey.BB_CONTRACT, hashKey);
         String json = o.toString();
         BBContractVO vo = JSON.parseObject(json, BBContractVO.class);
         return vo;
@@ -62,7 +62,7 @@ public class MetadataServiceImpl implements MetadataService {
     @Override
     public List<BBContractVO> getAllPcContract(){
         HashOperations opsForHash = templateDB0.opsForHash();
-        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(RedisKey.PC_CONTRACT, ScanOptions.NONE);
+        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(RedisKey.BB_CONTRACT, ScanOptions.NONE);
 
         List<BBContractVO> list = new ArrayList<>();
         while (curosr.hasNext()) {

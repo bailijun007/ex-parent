@@ -68,4 +68,8 @@ public class SnUtils {
 		return "BTR"+orderTradeId;
 	}
 
+	public static String getRemainSn(Long orderId) {
+		return "R"+orderId;
+	}
+
 }
