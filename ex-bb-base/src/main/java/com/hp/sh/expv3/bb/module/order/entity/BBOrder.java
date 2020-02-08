@@ -131,7 +131,7 @@ public class BBOrder extends UserDataEntity implements OrderData{
 		return this.orderMargin.add(this.fee);
 	}
 	
-	int ____________________________;
+//	int ____________________________;
 	
 	@Override
 	public BigDecimal getFaceValue() {
@@ -148,7 +148,7 @@ public class BBOrder extends UserDataEntity implements OrderData{
 		return BigDecimal.ZERO;
 	}
 	
-	int _____________________________;
+//	int _____________________________;
 
 	public String getAsset() {
 		return asset;

@@ -164,7 +164,9 @@ public class BBOrderService {
 		OrderRatioData ratioData = orderStrategy.calcOrderAmt(order);
 		order.setOrderMargin(ratioData.getOrderMargin());
 		order.setFee(ratioData.getOpenFee());
-		
+
+		BBSymbol bs = new BBSymbol(order.getSymbol(), order.getBidFlag());
+		order.setOrderMarginCurrency(bs.getPayCurrency());
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")

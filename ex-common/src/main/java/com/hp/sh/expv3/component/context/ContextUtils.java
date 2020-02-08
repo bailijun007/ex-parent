@@ -19,7 +19,7 @@ public class ContextUtils implements ApplicationContextAware{
 		this.ctx = ctx;
 	}
 	
-	@Autowired
+	@Autowired(required=false)
 	public void setIdGenerator(ZwIdGenerator idGenerator) {
 		ContextUtils.idGenerator = idGenerator;
 	}
