@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.bb.extension.dao.PcAccountLogDAO">
+
+    <resultMap type="com.hp.sh.expv3.bb.extension.vo.PcAccountLogVo" id="PcAccountLogVo">
+        <result column="type" property="type"/>
+        <result column="user_id" property="userId"/>
+        <result column="asset" property="asset"/>
+        <result column="symbol" property="symbol"/>
+        <result column="ref_id" property="refId"/>
+        <result column="time" property="time"/>
+    </resultMap>
+
+    <sql id="simple_where">
+        <where>
+            <if test="userIdList!=null">and user_id in
+                <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                    #{userIdList[${i}]}
+                </foreach>
+            </if>
+            <if test="assetList!=null">and asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+            <if test="types!=null">and type in
+                <foreach item="item" index="i" collection="types" open="(" separator="," close=")">
+                    #{types[${i}]}
+                </foreach>
+            </if>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="type!=null">and `type`=#{type}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="refId!=null">and ref_id=#{refId}</if>
+            <if test="timeBegin!=null">and `time` &gt;= #{timeBegin}</if>
+            <if test="timeEnd!=null">and `time` &lt;= #{timeEnd}</if>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+		id,`type`,user_id,asset,symbol,ref_id,`time`
+	</sql>
+
+    <insert id="save">
+        insert into pc_account_log
+        (`type`,user_id,asset,ref_id,`time`,symbol)
+        values(#{type},#{userId},#{asset},#{refId},#{time},#{symbol})
+    </insert>
+
+    <select id="queryOne" resultMap="PcAccountLogVo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM pc_account_log
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryList" resultMap="PcAccountLogVo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM pc_account_log
+        <include refid="simple_where"/>
+        order by `time` desc
+    </select>
+
+    <select id="queryCount" resultType="java.lang.Long">
+        SELECT count(0) FROM pc_account_log
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryByLimit" resultMap="PcAccountLogVo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM pc_account_log
+        <include refid="simple_where"/>
+        order by `time` desc
+        <if test="limit!=null and limit!=''">
+            LIMIT 0,${limit}
+        </if>
+    </select>
+
+</mapper>

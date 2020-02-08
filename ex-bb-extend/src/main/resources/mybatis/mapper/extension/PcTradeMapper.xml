@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.bb.extension.dao.PcTradeDAO">
+
+    <resultMap type="com.hp.sh.expv3.bb.extension.vo.PcTradeVo" id="PcTradeVo">
+        <result column="id" property="id"/>
+        <result column="asset" property="asset"/>
+        <result column="symbol" property="symbol"/>
+        <result column="match_tx_id" property="matchTxId"/>
+        <result column="tk_bid_flag" property="tkBidFlag"/>
+        <result column="tk_account_id" property="tkAccountId"/>
+        <result column="tk_order_id" property="tkOrderId"/>
+        <result column="tk_close_flag" property="tkCloseFlag"/>
+        <result column="mk_account_id" property="mkAccountId"/>
+        <result column="mk_order_id" property="mkOrderId"/>
+        <result column="mk_close_flag" property="mkCloseFlag"/>
+        <result column="price" property="price"/>
+        <result column="number" property="number"/>
+        <result column="trade_time" property="tradeTime"/>
+        <result column="created" property="created"/>
+        <result column="modified" property="modified"/>
+    </resultMap>
+
+    <sql id="simple_where">
+        <where>
+            <if test="idList!=null">and id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+            <if test="userIdList!=null">and user_id in
+                <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                    #{userIdList[${i}]}
+                </foreach>
+            </if>
+            <if test="assetList!=null">and asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+
+            <if test="id!=null">and id=#{id}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="matchTxId!=null">and match_tx_id=#{matchTxId}</if>
+            <if test="tkBidFlag!=null">and tk_bid_flag=#{tkBidFlag}</if>
+            <if test="tkAccountId!=null">and tk_account_id=#{tkAccountId}</if>
+            <if test="tkOrderId!=null">and tk_order_id=#{tkOrderId}</if>
+            <if test="tkCloseFlag!=null">and tk_close_flag=#{tkCloseFlag}</if>
+            <if test="mkAccountId!=null">and mk_account_id=#{mkAccountId}</if>
+            <if test="mkOrderId!=null">and mk_order_id=#{mkOrderId}</if>
+            <if test="mkCloseFlag!=null">and mk_close_flag=#{mkCloseFlag}</if>
+            <if test="price!=null">and price=#{price}</if>
+            <if test="number!=null">and number=#{number}</if>
+            <if test="tradeTimeBegin!=null">and trade_time &gt;=#{tradeTimeBegin}</if>
+            <if test="tradeTimeEnd!=null">and trade_time &lt;=#{tradeTimeEnd}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null">and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+		id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,
+		mk_order_id,mk_close_flag,price,`number`,trade_time,created,modified
+	</sql>
+
+
+    <select id="queryOne" resultMap="PcTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_trade
+        <include refid="simple_where"/>
+        <if test="orderBy!=null and orderBy!=''">
+            order by ${orderBy} desc
+        </if>
+        LIMIT 0,1
+    </select>
+
+    <select id="queryList" resultMap="PcTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_trade
+        <include refid="simple_where"/>
+        <if test="orderBy!=null and orderBy!=''">
+            order by ${orderBy} desc
+        </if>
+        <if test="limit!=null and limit!=''">
+            LIMIT 0,${limit}
+        </if>
+    </select>
+
+    <select id="queryTradeByGtTime" resultMap="PcTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_trade
+        <include refid="simple_where"/>
+        <if test="type!=null and type==1">
+            order by price desc
+        </if>
+        <if test="type!=null and type==2">
+            order by price asc
+        </if>
+
+    </select>
+
+    <select id="selectTradeListByTimeInterval" resultMap="PcTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_trade
+        <where>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="tradeTimeBegin!=null">and trade_time &gt;=#{tradeTimeBegin}</if>
+            <if test="tradeTimeEnd!=null">and trade_time &lt;#{tradeTimeEnd}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+        </where>
+        order by trade_time asc
+    </select>
+
+
+    <select id="queryLastTrade" resultMap="PcTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_trade
+        <where>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="tradeTime!=null">and trade_time &lt; #{tradeTime}</if>
+        </where>
+        order by trade_time desc
+        limit 0,1
+    </select>
+
+    <select id="selectTradeListByUserId" resultMap="PcTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_trade p
+       <where>
+           p.asset=#{asset}
+           and p.symbol=#{symbol}
+           and (p.tk_account_id=#{userId} or p.mk_account_id=#{userId})
+           <if test="tradeTimeBegin!=null">
+               and p.trade_time &gt;#{tradeTimeBegin}
+           </if>
+           <if test="tradeTimeEnd!=null">
+               and p.trade_time &lt;=#{tradeTimeEnd}
+           </if>
+       </where>
+        ORDER BY p.id ASC
+    </select>
+
+</mapper>

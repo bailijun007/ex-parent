@@ -32,6 +32,9 @@
 		<module>ex-bb-match</module>
 		<module>ex-bb-base</module>
 		<module>ex-bb-base-def</module>
+
+		<module>ex-bb-extend</module>
+		<module>ex-bb-extend-def</module>
 	</modules>
 
     <dependencies>

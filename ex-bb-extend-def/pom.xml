@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.hp.sh.expv3</groupId>
+	<artifactId>ex-bb-extend-def</artifactId>
+	<packaging>jar</packaging>
+	<version>3.0.0-SNAPSHOT</version>
+    <description>永续合约扩展服务接口定义</description>
+    
+	<properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<springboot.version>2.0.3.RELEASE</springboot.version>
+		<springcloud.version>2.0.0.RELEASE</springcloud.version>
+	</properties>
+
+	<dependencies>
+
+        <!-- spring-cloud -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <version>${springcloud.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+			<groupId>com.gitee.hupadev</groupId>
+			<artifactId>hupa-base</artifactId>
+            <version>1.1.0-SNAPSHOT</version>
+        </dependency>
+        
+		<!-- springfox-swagger2 -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.9.2</version>
+			<scope>provided</scope>
+		</dependency>
+		
+	</dependencies>
+	
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<name>Nexus Snapshot Repository</name>
+			<url>http://192.168.0.46:8081/nexus/content/repositories/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	
+	<distributionManagement>
+	  <repository>
+		<id>releases</id>
+		<name>User Project Release</name>
+		<url>http://192.168.0.46:8081/nexus/content/repositories/releases/</url>
+	  </repository>
+
+	  <snapshotRepository>
+		<id>snapshots</id>
+		<name>User Project SNAPSHOTS</name>
+		<url>http://192.168.0.46:8081/nexus/content/repositories/snapshots/</url>
+	  </snapshotRepository>
+	</distributionManagement>
+	
+	<build>
+		<plugins>
+          <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+		</plugins>
+	</build>
+	
+</project>
