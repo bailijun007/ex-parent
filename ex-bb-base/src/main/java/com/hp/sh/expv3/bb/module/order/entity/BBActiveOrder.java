@@ -22,8 +22,8 @@ public class BBActiveOrder implements UserData{
     //合约交易品种
     private String symbol;
     
-    //多空
-    private Integer longFlag;
+    //买卖
+    private Integer bidFlag;
 
 	public BBActiveOrder() {
 	}
@@ -60,12 +60,12 @@ public class BBActiveOrder implements UserData{
 		this.symbol = symbol;
 	}
 
-	public Integer getLongFlag() {
-		return longFlag;
+	public Integer getBidFlag() {
+		return bidFlag;
 	}
 
-	public void setLongFlag(Integer longFlag) {
-		this.longFlag = longFlag;
+	public void setBidFlag(Integer longFlag) {
+		this.bidFlag = longFlag;
 	}
 
 }

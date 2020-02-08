@@ -115,17 +115,18 @@ public class BBOrderUpdateService {
 		return bBOrderLog;
 	}
 	
-	private void publishOrderEvent(BBOrder order, BBOrderLog bBOrderLog){
-		BBOrderEvent event = new BBOrderEvent(order, bBOrderLog);
+	private void publishOrderEvent(BBOrder order, BBOrderLog orderLog){
+		BBOrderEvent event = new BBOrderEvent(order, orderLog);
 		publisher.publishEvent(event);
 	}
 
-	private void saveActiveOrder(BBOrder bBOrder) {
+	private void saveActiveOrder(BBOrder order) {
 		BBActiveOrder bBActiveOrder = new BBActiveOrder();
-		bBActiveOrder.setId(bBOrder.getId());
-		bBActiveOrder.setUserId(bBOrder.getUserId());
-		bBActiveOrder.setAsset(bBOrder.getAsset());
-		bBActiveOrder.setSymbol(bBOrder.getSymbol());
+		bBActiveOrder.setId(order.getId());
+		bBActiveOrder.setUserId(order.getUserId());
+		bBActiveOrder.setAsset(order.getAsset());
+		bBActiveOrder.setSymbol(order.getSymbol());
+		bBActiveOrder.setBidFlag(order.getBidFlag());
 		this.bBActiveOrderDAO.save(bBActiveOrder);
 	}
 
