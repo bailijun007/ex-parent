@@ -4,13 +4,13 @@ Navicat MySQL Data Transfer
 Source Server         : localhost
 Source Server Version : 50716
 Source Host           : localhost:3306
-Source Database       : expv3-pc
+Source Database       : expv3_bb
 
 Target Server Type    : MYSQL
-Target Server Version : 50716
+Target Server Version : 50599
 File Encoding         : 65001
 
-Date: 2020-02-04 12:10:42
+Date: 2020-02-08 11:40:23
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -54,6 +54,7 @@ ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='账户日志'
 
+
 ;
 
 -- ----------------------------
@@ -82,35 +83,8 @@ UNIQUE INDEX `un_sn` (`sn`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_账户明细'
+COMMENT='永续合约_账户明细'
 
-;
-
--- ----------------------------
--- Table structure for `bb_account_symbol`
--- ----------------------------
-DROP TABLE IF EXISTS `bb_account_symbol`;
-CREATE TABLE `bb_account_symbol` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
-`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
-`symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
-`margin_mode`  int(11) NOT NULL COMMENT '保证金模式,' ,
-`short_leverage`  decimal(10,4) NOT NULL COMMENT '做空杠杆' ,
-`long_leverage`  decimal(10,4) NOT NULL COMMENT '做多杠杆' ,
-`long_max_leverage`  decimal(10,4) NOT NULL COMMENT '最大多仓杠杆' ,
-`short_max_leverage`  decimal(10,4) NOT NULL COMMENT '最大多空杠杆' ,
-`cross_leverage`  decimal(10,4) NOT NULL COMMENT '全仓杠杆' ,
-`cross_max_leverage`  decimal(10,0) NOT NULL COMMENT '最大全仓杠杆' ,
-`version`  bigint(20) NOT NULL COMMENT '版本' ,
-`user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
-`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`),
-UNIQUE INDEX `user_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE 
-)
-ENGINE=InnoDB
-DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_账户设置'
 
 ;
 
@@ -123,63 +97,14 @@ CREATE TABLE `bb_active_order` (
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
-`long_flag`  int(11) NOT NULL COMMENT '多空' ,
+`bid_flag`  int(11) NOT NULL COMMENT '多空' ,
 PRIMARY KEY (`id`),
 INDEX `idx_userid` (`user_id`) USING BTREE ,
 INDEX `idx_symbol` (`symbol`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_活动订单（委托）'
-
-;
-
--- ----------------------------
--- Table structure for `bb_active_position`
--- ----------------------------
-DROP TABLE IF EXISTS `bb_active_position`;
-CREATE TABLE `bb_active_position` (
-`id`  bigint(20) NOT NULL COMMENT '仓位ID' ,
-`user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
-`symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
-`long_flag`  int(11) NOT NULL COMMENT '多空' ,
-PRIMARY KEY (`id`),
-INDEX `idx_userid` (`user_id`) USING BTREE ,
-INDEX `idx_symbol` (`symbol`) USING BTREE 
-)
-ENGINE=InnoDB
-DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_活动仓位'
-
-;
-
--- ----------------------------
--- Table structure for `bb_liq_record`
--- ----------------------------
-DROP TABLE IF EXISTS `bb_liq_record`;
-CREATE TABLE `bb_liq_record` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
-`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
-`symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
-`pos_id`  bigint(20) NOT NULL COMMENT '仓位ID' ,
-`long_flag`  int(11) NOT NULL COMMENT '是否多仓(side)' ,
-`volume`  decimal(50,30) NOT NULL COMMENT '数量（张）' ,
-`pos_margin`  decimal(50,30) NOT NULL COMMENT '保证金' ,
-`bankrupt_price`  decimal(50,30) NOT NULL COMMENT '破产价' ,
-`filled_volume`  decimal(50,30) NOT NULL COMMENT '已成交量' ,
-`liq_price`  decimal(50,30) NOT NULL COMMENT '强平价' ,
-`mean_price`  decimal(50,30) NOT NULL DEFAULT 0.000000000000000000000000000000 COMMENT '仓位均价' ,
-`fee`  decimal(50,30) NOT NULL COMMENT '手续费' ,
-`fee_ratio`  decimal(10,4) NOT NULL COMMENT '手续费率' ,
-`user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
-`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`)
-)
-ENGINE=InnoDB
-DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_仓位'
+COMMENT='永续合约_活动订单（委托）'
 
 ;
 
@@ -192,31 +117,19 @@ CREATE TABLE `bb_order` (
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
-`close_flag`  int(11) NOT NULL COMMENT '是否:1-平仓,0-开' ,
-`long_flag`  int(11) NOT NULL COMMENT '是否：1-多仓，0-空仓' ,
-`margin_mode`  int(11) NOT NULL COMMENT '保证金模式:1-全仓,2-逐仓' ,
-`leverage`  decimal(10,2) NOT NULL COMMENT '杠杆' ,
+`bid_flag`  int(11) NOT NULL COMMENT '买卖:1-买,0-卖' ,
 `price`  decimal(50,30) NOT NULL COMMENT '委托价格' ,
-`order_type`  int(11) NOT NULL COMMENT '币币委托类型' ,
-`volume`  decimal(50,20) NOT NULL COMMENT '委托数量，初始设置后，后续不会修改' ,
-`face_value`  decimal(50,30) NULL DEFAULT NULL ,
+`order_type`  int(11) NOT NULL COMMENT '委托类型' ,
+`volume`  decimal(50,20) NOT NULL COMMENT '委托数量（个）' ,
 `status`  int(11) NOT NULL COMMENT '委托状态' ,
-`margin_ratio`  decimal(50,30) NOT NULL COMMENT '保证金率，初始为 杠杆的倒数' ,
-`open_fee_ratio`  decimal(50,30) NOT NULL COMMENT '开仓手续费率' ,
-`close_fee_ratio`  decimal(50,30) NOT NULL COMMENT '强平手续费率' ,
-`fee_cost`  decimal(50,30) NOT NULL COMMENT '实收手续费,成交后计算(可能部分成交，按比例收取)' ,
-`gross_margin`  decimal(50,30) NOT NULL COMMENT '总押金：保证金+开仓手续费+平仓手续费' ,
-`order_margin`  decimal(50,30) NOT NULL COMMENT '委托保证金' ,
-`open_fee`  decimal(50,30) NOT NULL COMMENT '开仓手续费,成交时修改(可能部分成交，按比例释放)' ,
-`close_fee`  decimal(50,30) NOT NULL COMMENT '平仓手续费，在下委托时提前收取(可能部分成交，按比例释放)' ,
-`filled_volume`  decimal(50,30) NOT NULL COMMENT '已成交量（单位：张）' ,
-`cancel_volume`  decimal(50,30) NULL DEFAULT NULL COMMENT '取消（单位：张）' ,
-`close_pos_id`  bigint(20) NULL DEFAULT NULL COMMENT '平仓委托对应的仓位Id' ,
+`fee_ratio`  decimal(50,30) NOT NULL COMMENT '手续费率' ,
+`fee_cost`  decimal(50,30) NOT NULL COMMENT '实收手续费,成交后累加' ,
+`order_margin`  decimal(50,30) NOT NULL COMMENT '委托押金' ,
+`fee`  decimal(50,30) NOT NULL COMMENT '开仓手续费,成交时减少' ,
+`filled_volume`  decimal(50,30) NOT NULL COMMENT '已成交量（单位：个）' ,
+`cancel_volume`  decimal(50,30) NULL DEFAULT NULL COMMENT '取消（单位：个）' ,
 `time_in_force`  int(11) NULL DEFAULT NULL COMMENT '委托有效时间' ,
-`trigger_flag`  int(11) NULL DEFAULT NULL COMMENT '是否已触发，用于止盈止损等触发式委托' ,
 `cancel_time`  bigint(20) NULL DEFAULT NULL COMMENT '取消时间' ,
-`visible_flag`  int(11) NULL DEFAULT NULL COMMENT '可见性，强平委托，自动减仓委托 都不可见' ,
-`liq_flag`  int(11) NOT NULL COMMENT '是否强平委托' ,
 `active_flag`  int(11) NOT NULL COMMENT '是否活动委托' ,
 `create_operator`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `cancel_operator`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
@@ -232,6 +145,7 @@ INDEX `idx_created` (`created`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='币币_订单（委托）'
+
 
 ;
 
@@ -292,50 +206,8 @@ INDEX `idx_posid` (`pos_id`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_用户订单成交记录'
+COMMENT='永续合约_用户订单成交记录'
 
-;
-
--- ----------------------------
--- Table structure for `bb_position`
--- ----------------------------
-DROP TABLE IF EXISTS `bb_position`;
-CREATE TABLE `bb_position` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
-`user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
-`symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
-`long_flag`  int(11) NOT NULL COMMENT '是否多仓(side)' ,
-`margin_mode`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '保证金模式:1-全仓,2-逐仓' ,
-`volume`  decimal(50,30) NOT NULL COMMENT '仓位 张数posVolume' ,
-`face_value`  decimal(50,8) NOT NULL COMMENT '面值(单位：报价货币)' ,
-`base_value`  decimal(50,30) NOT NULL COMMENT '仓位 基础货币 总价值posBaseValue' ,
-`entry_leverage`  decimal(50,30) NOT NULL COMMENT '开仓杠杆' ,
-`leverage`  decimal(50,30) NOT NULL COMMENT '当前杠杆' ,
-`pos_margin`  decimal(50,30) NOT NULL COMMENT '仓位保证金' ,
-`close_fee`  decimal(50,30) NOT NULL COMMENT '平仓手续费' ,
-`mean_price`  decimal(50,30) NOT NULL COMMENT '均价，仓位为0时，表示最后一次仓位变动时的均价meanPrice' ,
-`accu_base_value`  decimal(50,30) NOT NULL COMMENT '累积总价值' ,
-`accu_volume`  decimal(50,30) NOT NULL COMMENT '累计成交量' ,
-`init_margin`  decimal(50,30) NOT NULL COMMENT '初始保证金，平仓的时候要减去对应的比例，以维持收益率一致' ,
-`hold_margin_ratio`  decimal(50,30) NOT NULL COMMENT '维持保证金比率' ,
-`auto_add_flag`  int(11) NOT NULL COMMENT '是否自动追加保证金标识' ,
-`fee_cost`  decimal(50,30) NOT NULL COMMENT '已扣手续费' ,
-`realised_pnl`  decimal(50,30) NOT NULL COMMENT '已实现盈亏' ,
-`liq_price`  decimal(50,30) NULL DEFAULT NULL COMMENT '强平价，仓位为0时，表示最后一次仓位变动时的强平价' ,
-`liq_mark_price`  decimal(50,30) NULL DEFAULT NULL COMMENT '强平' ,
-`liq_mark_time`  bigint(20) NULL DEFAULT NULL COMMENT '触发强平的标记时间' ,
-`liq_status`  int(11) NULL DEFAULT NULL COMMENT '仓位强平状态，0：未触发平仓，1：仓位被冻结，' ,
-`version`  bigint(20) NOT NULL DEFAULT 0 ,
-`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
-`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`),
-INDEX `idx_userid_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE ,
-INDEX `idx_volume` (`volume`) USING BTREE 
-)
-ENGINE=InnoDB
-DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_仓位'
 
 ;
 
@@ -364,6 +236,6 @@ PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_成交(撮合结果)'
+COMMENT='永续合约_成交(撮合结果)'
 
 ;
