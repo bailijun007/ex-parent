@@ -12,14 +12,16 @@ import java.util.stream.Collectors;
 public enum RmqTagEnum implements EnumDescribe {
 
     // BB_MATCH
+    // book reset
     BB_BOOK_RESET(EventEnum.BB_BOOK_RESET.getCode(), EventEnum.BB_BOOK_RESET.getConstant()),
 
+    // pending new
     BB_ORDER_PENDING_NEW(EventEnum.BB_ORDER_PENDING_NEW.getCode(), EventEnum.BB_ORDER_PENDING_NEW.getConstant()),
 
+    // pending cancel
     BB_ORDER_PENDING_CANCEL(EventEnum.BB_ORDER_PENDING_CANCEL.getCode(), EventEnum.BB_ORDER_PENDING_CANCEL.getConstant()),
 
-    BB_MATCH(EventEnum.BB_MATCH.getCode(), EventEnum.BB_MATCH.getConstant()),
-
+    //
     BB_MATCH_ORDER_MATCHED(EventEnum.BB_MATCH_ORDER_MATCHED.getCode(), EventEnum.BB_MATCH_ORDER_MATCHED.getConstant()),
 
     BB_MATCH_ORDER_NOT_MATCHED(EventEnum.BB_MATCH_ORDER_NOT_MATCHED.getCode(), EventEnum.BB_MATCH_ORDER_NOT_MATCHED.getConstant()),

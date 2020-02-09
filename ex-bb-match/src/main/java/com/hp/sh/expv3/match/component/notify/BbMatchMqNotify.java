@@ -35,26 +35,6 @@ public class BbMatchMqNotify {
     @Autowired
     private BbmatchRocketMqSetting bbmatchRocketMqSetting;
 
-    @Deprecated
-    public boolean sendOrderMatched(String asset, String symbol, List<BbTradeBo> tradeList) {
-        String topic = BbRocketMqUtil.buildBbAccountContractMqTopicName(bbmatchRocketMqSetting.getBbMatchTopicNamePattern(), asset, symbol);
-        if (null != tradeList && !tradeList.isEmpty()) {
-
-            Message message = buildMessage(
-                    topic,// topic
-                    "" + RmqTagEnum.BB_MATCH_ORDER_MATCHED.getConstant(),// tag
-                    "" + tradeList.get(0).getTkOrderId(),
-                    tradeList// body
-            );
-            safeSend2MatchTopic(message, tradeList.get(0).getTkAccountId());
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(tradeList));
-            }
-        }
-        return true;
-    }
-
     public boolean sendOrderNotMatched(String asset, String symbol, long accountId, long orderId) {
         String topic = BbRocketMqUtil.buildBbAccountContractMqTopicName(bbmatchRocketMqSetting.getBbMatchTopicNamePattern(), asset, symbol);
         BbOrderMqMsgDto msg = new BbOrderMqMsgDto();
@@ -109,7 +89,7 @@ public class BbMatchMqNotify {
             for (BbTradeBo bbTradeBo : tradeList) {
                 Message msg = buildMessage(
                         topic,// topic
-                        "" + RmqTagEnum.BB_MATCH.getConstant(),// tag
+                        "" + RmqTagEnum.BB_MATCH_ORDER_MATCHED.getConstant(),// tag
                         "" + bbTradeBo.getTkOrderId(),
                         bbTradeBo// body
                 );

@@ -13,8 +13,6 @@ public class BbSymbolBo implements Serializable {
 
     private String asset;
     private String symbol;
-    // TODO bb
-    private Integer contractGroup;
     private Integer bbGroupId;
 
 
@@ -42,11 +40,4 @@ public class BbSymbolBo implements Serializable {
         this.bbGroupId = bbGroupId;
     }
 
-    public Integer getContractGroup() {
-        return contractGroup;
-    }
-
-    public void setContractGroup(Integer contractGroup) {
-        this.contractGroup = contractGroup;
-    }
 }

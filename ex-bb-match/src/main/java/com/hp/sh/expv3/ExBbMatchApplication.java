@@ -34,9 +34,9 @@ import java.util.concurrent.Executor;
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableScheduling
-public class ExMatchApplication extends Application implements ApplicationContextAware {
+public class ExBbMatchApplication extends Application implements ApplicationContextAware {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExMatchApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExBbMatchApplication.class);
 
     @Autowired
     @Qualifier("threadManagerBbMatchImpl")
@@ -60,11 +60,11 @@ public class ExMatchApplication extends Application implements ApplicationContex
     public static void main(String[] args) {
         Thread.currentThread().setName("BbMatchMain");
 
-        ConfigurableApplicationContext ac = new SpringApplicationBuilder(ExMatchApplication.class)
+        ConfigurableApplicationContext ac = new SpringApplicationBuilder(ExBbMatchApplication.class)
                 .web(WebApplicationType.NONE)
                 .run(args);
 
-        ExMatchApplication main = ac.getBean(ExMatchApplication.class);
+        ExBbMatchApplication main = ac.getBean(ExBbMatchApplication.class);
 
         main.run();
     }
