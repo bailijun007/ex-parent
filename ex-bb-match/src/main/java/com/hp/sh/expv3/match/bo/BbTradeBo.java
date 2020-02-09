@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 /**
  * 现货_成交(撮合结果)
  */
-public class BbTradeBo implements Serializable{
+public class BbTradeBo implements Serializable {
 
     //id
     private Long id;
@@ -30,19 +30,10 @@ public class BbTradeBo implements Serializable{
     //taker订单ID
     private Long tkOrderId;
 
-    // todo bb
-    //taker是否平仓
-    private Integer tkCloseFlag;
-
     //maker账户Id
     private Long mkAccountId;
     //maker订单ID
     private Long mkOrderId;
-
-    // todo bb
-    //maker是否平仓
-    private Integer mkCloseFlag;
-
     //成交价格
     private BigDecimal price;
     //数量
@@ -106,14 +97,6 @@ public class BbTradeBo implements Serializable{
         this.tkOrderId = tkOrderId;
     }
 
-    public Integer getTkCloseFlag() {
-        return tkCloseFlag;
-    }
-
-    public void setTkCloseFlag(Integer tkCloseFlag) {
-        this.tkCloseFlag = tkCloseFlag;
-    }
-
     public Long getMkAccountId() {
         return mkAccountId;
     }
@@ -128,14 +111,6 @@ public class BbTradeBo implements Serializable{
 
     public void setMkOrderId(Long mkOrderId) {
         this.mkOrderId = mkOrderId;
-    }
-
-    public Integer getMkCloseFlag() {
-        return mkCloseFlag;
-    }
-
-    public void setMkCloseFlag(Integer mkCloseFlag) {
-        this.mkCloseFlag = mkCloseFlag;
     }
 
     public BigDecimal getPrice() {

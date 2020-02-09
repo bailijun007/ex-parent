@@ -230,11 +230,9 @@ public abstract class BbOrderHandler implements ApplicationContextAware {
         trade.setTkAccountId(takerOrder.getAccountId());
         trade.setTkOrderId(takerOrder.getOrderId());
         trade.setTkBidFlag(takerOrder.getBidFlag());
-        trade.setTkCloseFlag(takerOrder.getCloseFlag());
 
         trade.setMkAccountId(makerOrder.getAccountId());
         trade.setMkOrderId(makerOrder.getOrderId());
-        trade.setMkCloseFlag(makerOrder.getCloseFlag());
 
         return trade;
     }
