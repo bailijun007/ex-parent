@@ -7,10 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.page.Page;
-import com.hp.sh.expv3.bb.component.MarkPriceService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
-import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.mq.MatchMqSender;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
@@ -18,8 +16,6 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController
 public class BBMaintainAction{
-	@Autowired
-	private BBOrderService bBOrderService;
 	@Autowired
 	private BBOrderQueryService orderQueryService;
 	
@@ -29,9 +25,6 @@ public class BBMaintainAction{
 	@Autowired
 	private BBOrderApiAction bBOrderApiAction;
 
-    @Autowired
-    private MarkPriceService markPriceService;
-	
 	@ApiOperation(value = "version")
 	@GetMapping(value = "/api/bb/maintain/version")
 	public Integer version(){
