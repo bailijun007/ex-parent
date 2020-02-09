@@ -58,7 +58,7 @@ public interface BBOrderApi {
 	void bookReset(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
 
 	@ApiOperation(value = "获取活动委托")
-	@GetMapping(value = "/api/pc/order/queryActiveList")
+	@GetMapping(value = "/api/bb/order/queryActiveList")
 	List<ActiveOrderVo> queryActiveList(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
 
 	@ApiOperation(value = "setCancelled")

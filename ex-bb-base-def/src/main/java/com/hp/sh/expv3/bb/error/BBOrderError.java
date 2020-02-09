@@ -3,8 +3,8 @@ package com.hp.sh.expv3.bb.error;
 import com.gitee.hupadev.base.exceptions.ErrorCode;
 
 /**
- * pc永续合约异常模块
- * -13001 ~ -13999 见： pc_exception
+ * 币币异常模块
+ * -13001 ~ -13999 见： bb_exception
  * 订单：-13001 ~ -13099
  * @author wangjg
  *

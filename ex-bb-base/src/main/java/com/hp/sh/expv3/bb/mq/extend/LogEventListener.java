@@ -2,12 +2,14 @@ package com.hp.sh.expv3.bb.mq.extend;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
 import com.hp.sh.expv3.bb.constant.LogType;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
+import com.hp.sh.expv3.bb.module.account.service.BBAccountLogService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.msg.BBAccountLog;
 
@@ -21,7 +23,7 @@ import com.hp.sh.expv3.bb.msg.BBAccountLog;
 public class LogEventListener {
 	
 	@Autowired
-	private EventSender sender;
+	private BBAccountLogService accountLogService;
 	
 	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
 	public void afterCommit(BBAccountRecord bBAccountRecord) {
@@ -55,19 +57,17 @@ public class LogEventListener {
 
 	private Integer getType(int tradeType) {
 		if(tradeType==BBAccountTradeType.FUND_TO_BB){
-			return LogType.TYPE_ACCOUNT_FUND_TO_PC;
+			return LogType.TYPE_ACCOUNT_FUND_TO_BB;
 		}
 		if(tradeType==BBAccountTradeType.BB_TO_FUND){
-			return LogType.TYPE_ACCOUNT_PC_TO_FUND;
-		}
-		if(tradeType>=BBAccountTradeType.ADD_TO_MARGIN && tradeType<=BBAccountTradeType.LEVERAGE_ADD_MARGIN){
-			return tradeType-1;
+			return LogType.TYPE_ACCOUNT_BB_TO_FUND;
 		}
 		return null;
 	}
 
-	private void sendEventMsg(BBAccountLog logMsg) {
-//		sender.sendEventMsg(logMsg);
+	@Transactional(rollbackFor=Exception.class)
+	public void sendEventMsg(BBAccountLog logMsg) {
+		this.accountLogService.save(logMsg);
 	}
 
 }

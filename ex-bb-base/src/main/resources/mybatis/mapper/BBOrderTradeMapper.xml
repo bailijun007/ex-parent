@@ -4,7 +4,7 @@
 
 <mapper namespace="com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade" id="PcOrderTrade">
+	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade" id="BBOrderTrade">
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
 		<result column="price" property="price" />
@@ -66,15 +66,15 @@
 
 	</sql>
 
-	<select id="pageQuery" resultMap="PcOrderTrade">
+	<select id="pageQuery" resultMap="BBOrderTrade">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryList" resultMap="PcOrderTrade">
+	<select id="queryList" resultMap="BBOrderTrade">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryOne" resultMap="PcOrderTrade">
+	<select id="queryOne" resultMap="BBOrderTrade">
 		<include refid="simple_query" />
 	</select>
 
@@ -92,7 +92,7 @@
 		<include refid="simple_where" />
 	</select>
 
-	<select id="findById" resultMap="PcOrderTrade">
+	<select id="findById" resultMap="BBOrderTrade">
 		select
 			<include refid="Base_Column_List" />
 		from bb_order_trade

@@ -53,7 +53,7 @@ public class MatchMqConsumer {
 	}
 	
 	//成交
-	@MQListener(tags=MqTags.TAGS_PC_TRADE)
+	@MQListener(tags=MqTags.TAGS_TRADE)
 	public void handleTradeMsg(BBTradeMsg msg){
 		logger.info("收到成交消息:{}", msg);
 //		bBTradeService.handleTradeOrder(msg);

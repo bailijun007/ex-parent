@@ -37,7 +37,7 @@ public class FeeRatioServiceImpl implements FeeRatioService {
     /**
      * redis :
      * db: 0
-     * redis key:pc_fee
+     * redis key:bb_fee
      * hash key: t__${userId}
      * 取 value
      *
@@ -52,7 +52,7 @@ public class FeeRatioServiceImpl implements FeeRatioService {
     /**
      * redis :
      * db: 0
-     * redis key:pc_fee
+     * redis key:bb_fee
      * hash key: m__${userId}
      * 取 value
      *
@@ -81,11 +81,11 @@ public class FeeRatioServiceImpl implements FeeRatioService {
 
 	private BigDecimal findFeeRatio(long userId, String key, String prefix,StringRedisTemplate template) {
         HashOperations hashOperations = template.opsForHash();
-        Object pcFee = hashOperations.get(key, prefix + userId);
-        if (pcFee == null) {
+        Object bbFee = hashOperations.get(key, prefix + userId);
+        if (bbFee == null) {
             return BigDecimal.ZERO;
         }
-        return new BigDecimal(pcFee + "");
+        return new BigDecimal(bbFee + "");
     }
 
 }

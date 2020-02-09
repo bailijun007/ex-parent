@@ -1,7 +1,5 @@
 package com.hp.sh.expv3.bb.component.impl;
 
-import java.util.Random;
-
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 

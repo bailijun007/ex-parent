@@ -4,7 +4,7 @@
 
 <mapper namespace="com.hp.sh.expv3.bb.module.order.dao.BBOrderDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBOrder" id="PcOrder">
+	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBOrder" id="BBOrder">
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
 		<result column="close_flag" property="closeFlag" />
@@ -79,15 +79,15 @@
 
 	</sql>
 
-	<select id="pageQuery" resultMap="PcOrder">
+	<select id="pageQuery" resultMap="BBOrder">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryList" resultMap="PcOrder">
+	<select id="queryList" resultMap="BBOrder">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryOne" resultMap="PcOrder">
+	<select id="queryOne" resultMap="BBOrder">
 		<include refid="simple_query" />
 	</select>
 
@@ -105,7 +105,7 @@
 		<include refid="simple_where" />
 	</select>
 
-	<select id="findById" resultMap="PcOrder">
+	<select id="findById" resultMap="BBOrder">
 		select
 			<include refid="Base_Column_List" />
 		from bb_order
@@ -173,7 +173,7 @@
 			and o.close_pos_id=#{posId}
 	</select>
 	
-	<select id="queryActiveOrderList" resultMap="PcOrder">
+	<select id="queryActiveOrderList" resultMap="BBOrder">
 		SELECT
 			o.*
 		FROM

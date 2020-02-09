@@ -28,7 +28,7 @@ public interface BBAccountCoreApi {
 	@GetMapping(value = "/api/bb/account/account/exist")	
 	boolean accountExist(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
-	@ApiOperation(value = "创建永续合约账户")
+	@ApiOperation(value = "创建币币账户")
 	@GetMapping(value = "/api/bb/account/account/create")
 	public int createAccount(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 

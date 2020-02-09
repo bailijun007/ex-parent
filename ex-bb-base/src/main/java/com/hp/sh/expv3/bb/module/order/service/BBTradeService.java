@@ -14,7 +14,7 @@ import com.hp.sh.expv3.bb.component.FeeCollectorSelector;
 import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
 import com.hp.sh.expv3.bb.constant.OrderFlag;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
-import com.hp.sh.expv3.bb.constant.TradingRoles;
+import com.hp.sh.expv3.bb.constant.TradeRoles;
 import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
@@ -213,7 +213,7 @@ public class BBTradeService {
 	public void handleMatchedResult(BBMatchedTrade pcMatchedResult){
 		//taker
 		BBTradeMsg takerTradeVo = new BBTradeMsg();
-		takerTradeVo.setMakerFlag(TradingRoles.TAKER);
+		takerTradeVo.setMakerFlag(TradeRoles.TAKER);
 		takerTradeVo.setAsset(pcMatchedResult.getAsset());
 		takerTradeVo.setSymbol(pcMatchedResult.getSymbol());
 		takerTradeVo.setPrice(pcMatchedResult.getPrice());
@@ -227,7 +227,7 @@ public class BBTradeService {
 		
 		//maker
 		BBTradeMsg makerTradeVo = new BBTradeMsg();
-		makerTradeVo.setMakerFlag(TradingRoles.TAKER);
+		makerTradeVo.setMakerFlag(TradeRoles.TAKER);
 		makerTradeVo.setAsset(pcMatchedResult.getAsset());
 		makerTradeVo.setSymbol(pcMatchedResult.getSymbol());
 		makerTradeVo.setPrice(pcMatchedResult.getPrice());

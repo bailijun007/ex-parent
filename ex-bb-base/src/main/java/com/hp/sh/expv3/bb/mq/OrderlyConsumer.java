@@ -89,7 +89,7 @@ public class OrderlyConsumer {
 	
 //	@PostConstruct
 	public void start123() throws MQClientException{
-		List<BBContractVO> pcList = this.metadataService.getAllPcContract();
+		List<BBContractVO> pcList = this.metadataService.getAllBBContract();
 		for(BBContractVO pc : pcList){
 			if(contractGroup.equals(pc.getContractGroup())){
 				this.buildConsumer(MqTopic.getMatchTopic(pc.getAsset(), pc.getSymbol()));

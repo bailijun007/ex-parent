@@ -43,7 +43,7 @@ public class MatchMqSender extends BaseMqSender{
 	}
 	
 	public void sendPendingNew(OrderPendingNewMsg msg) {
-        this.sendOrderMsg(msg, MqTags.TAGS_PC_ORDER_PENDING_NEW, ""+msg.getOrderId());
+        this.sendOrderMsg(msg, MqTags.TAGS_ORDER_PENDING_NEW, ""+msg.getOrderId());
 	}
 	
 	public void sendPendingCancel(OrderPendingCancelMsg msg) {
@@ -51,7 +51,7 @@ public class MatchMqSender extends BaseMqSender{
 	}
 
 	public void sendBookResetMsg(BookResetMsg msg) {
-	    this.sendOrderMsg(msg, MqTags.TAGS_PC_BOOK_RESET, MqTags.TAGS_PC_BOOK_RESET);
+	    this.sendOrderMsg(msg, MqTags.TAGS_BOOK_RESET, MqTags.TAGS_BOOK_RESET);
 	}
 	
 	public boolean exist(String asset, String symbol, String key, long createdTime) {

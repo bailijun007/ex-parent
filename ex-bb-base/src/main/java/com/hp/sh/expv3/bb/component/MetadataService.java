@@ -14,7 +14,7 @@ public interface MetadataService {
 
 	public BigDecimal getFaceValue(String asset, String symbol);
 
-	BBContractVO getPcContract(String asset, String symbol);
+	BBContractVO getBBContract(String asset, String symbol);
 
-	List<BBContractVO> getAllPcContract();
+	List<BBContractVO> getAllBBContract();
 }

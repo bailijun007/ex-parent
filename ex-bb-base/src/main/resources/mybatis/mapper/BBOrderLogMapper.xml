@@ -4,7 +4,7 @@
 
 <mapper namespace="com.hp.sh.expv3.bb.module.order.dao.BBOrderLogDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBOrderLog" id="PcOrderLog">
+	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBOrderLog" id="BBOrderLog">
 		<result column="order_id" property="orderId" />
 		<result column="type" property="type" />
 		<result column="trigger_type" property="triggerType" />
@@ -44,15 +44,15 @@
 
 	</sql>
 
-	<select id="pageQuery" resultMap="PcOrderLog">
+	<select id="pageQuery" resultMap="BBOrderLog">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryList" resultMap="PcOrderLog">
+	<select id="queryList" resultMap="BBOrderLog">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryOne" resultMap="PcOrderLog">
+	<select id="queryOne" resultMap="BBOrderLog">
 		<include refid="simple_query" />
 	</select>
 
@@ -70,7 +70,7 @@
 		<include refid="simple_where" />
 	</select>
 
-	<select id="findById" resultMap="PcOrderLog">
+	<select id="findById" resultMap="BBOrderLog">
 		select
 			<include refid="Base_Column_List" />
 		from bb_order_log

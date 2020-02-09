@@ -31,7 +31,7 @@ public class DataEventListener {
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void afterCommit(BBAccountRecord bBAccountRecord) {
-		EventMsg msg = new EventMsg(EventType.PC_ACCOUNT, bBAccountRecord.getId(), bBAccountRecord.getCreated(), bBAccountRecord.getUserId(), bBAccountRecord.getAsset(), null);
+		EventMsg msg = new EventMsg(EventType.BB_ACCOUNT, bBAccountRecord.getId(), bBAccountRecord.getCreated(), bBAccountRecord.getUserId(), bBAccountRecord.getAsset(), null);
 		this.sendEventMsg(msg);
 	}
 
@@ -60,17 +60,11 @@ public class DataEventListener {
 	
 	private String getChannel(EventMsg eventMsg){
 		String channel = null;
-		if(eventMsg.getType()==EventType.PC_ACCOUNT){
+		if(eventMsg.getType()==EventType.BB_ACCOUNT){
 			channel = "pc:account:"+eventMsg.getAsset();
 		}
 		if(eventMsg.getType()==EventType.ORDER){
 			channel = "pc:order:"+eventMsg.getAsset()+":"+eventMsg.getSymbol();
-		}
-		if(eventMsg.getType()==EventType.POS){
-			channel = "pc:pos:"+eventMsg.getAsset()+":"+eventMsg.getSymbol();
-		}
-		if(eventMsg.getType()==EventType.ACCOUNT_SYMBOL){
-			channel = "pc:symbol:"+eventMsg.getAsset()+":"+eventMsg.getSymbol();
 		}
 		channel.toString();
 		return channel;

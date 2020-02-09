@@ -3,7 +3,7 @@
 
 <mapper namespace="com.hp.sh.expv3.bb.module.account.dao.BBAccountDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.account.entity.BBAccount" id="PcAccount">
+	<resultMap type="com.hp.sh.expv3.bb.module.account.entity.BBAccount" id="BBAccount">
 		<result column="asset" property="asset" />
 		<result column="balance" property="balance" />
 		<result column="version" property="version" />
@@ -48,15 +48,15 @@
 
 	</sql>
 
-	<select id="pageQuery" resultMap="PcAccount">
+	<select id="pageQuery" resultMap="BBAccount">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryList" resultMap="PcAccount">
+	<select id="queryList" resultMap="BBAccount">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryOne" resultMap="PcAccount">
+	<select id="queryOne" resultMap="BBAccount">
 		<include refid="simple_query" />
 	</select>
 
@@ -74,7 +74,7 @@
 		<include refid="simple_where" />
 	</select>
 
-	<select id="findById" resultMap="PcAccount">
+	<select id="findById" resultMap="BBAccount">
 		select
 			<include refid="Base_Column_List" />
 		from bb_account
@@ -119,14 +119,14 @@
 
 	<!--  -->
 
-	<select id="get" resultMap="PcAccount">
+	<select id="get" resultMap="BBAccount">
 		select
 			<include refid="Base_Column_List" />
 		from bb_account
 			where user_id=#{userId} and asset=#{asset}
 	</select>
 
-	<select id="getAndLock" resultMap="PcAccount">
+	<select id="getAndLock" resultMap="BBAccount">
 		select
 			<include refid="Base_Column_List" />
 		from bb_account

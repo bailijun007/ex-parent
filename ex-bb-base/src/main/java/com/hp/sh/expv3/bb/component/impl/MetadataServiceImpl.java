@@ -36,7 +36,7 @@ public class MetadataServiceImpl implements MetadataService {
     /**
      * redis :
      * db: 0
-     * redis key:pc_contract
+     * redis key:bb_contract
      * hash key: ${asset}__${symbol}
      * 取 faceValue
      *
@@ -50,7 +50,7 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     @Override
-	public BBContractVO getPcContract(String asset, String symbol) {
+	public BBContractVO getBBContract(String asset, String symbol) {
         HashOperations hashOperations = templateDB0.opsForHash();
         String hashKey = asset+"__"+symbol;
         Object o = hashOperations.get(RedisKey.BB_CONTRACT, hashKey);
@@ -60,7 +60,7 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     @Override
-    public List<BBContractVO> getAllPcContract(){
+    public List<BBContractVO> getAllBBContract(){
         HashOperations opsForHash = templateDB0.opsForHash();
         Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(RedisKey.BB_CONTRACT, ScanOptions.NONE);
 

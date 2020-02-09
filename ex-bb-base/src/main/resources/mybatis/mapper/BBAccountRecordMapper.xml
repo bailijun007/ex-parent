@@ -3,7 +3,7 @@
 
 <mapper namespace="com.hp.sh.expv3.bb.module.account.dao.BBAccountRecordDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord" id="PcAccountRecord">
+	<resultMap type="com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord" id="BBAccountRecord">
 		<result column="asset" property="asset" />
 		<result column="sn" property="sn" />
 		<result column="type" property="type" />
@@ -61,15 +61,15 @@
 
 	</sql>
 
-	<select id="pageQuery" resultMap="PcAccountRecord">
+	<select id="pageQuery" resultMap="BBAccountRecord">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryList" resultMap="PcAccountRecord">
+	<select id="queryList" resultMap="BBAccountRecord">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryOne" resultMap="PcAccountRecord">
+	<select id="queryOne" resultMap="BBAccountRecord">
 		<include refid="simple_query" />
 	</select>
 
@@ -87,7 +87,7 @@
 		<include refid="simple_where" />
 	</select>
 
-	<select id="findById" resultMap="PcAccountRecord">
+	<select id="findById" resultMap="BBAccountRecord">
 		select
 			<include refid="Base_Column_List" />
 		from bb_account_record
@@ -98,7 +98,7 @@
 		select 
 			count(1)
 		from 
-			PcAccountRecord
+			BBAccountRecord
 		<include refid="simple_where" />
 		limit 1
 	</select>
@@ -135,7 +135,7 @@
 
 	<!--  -->
 
-	<select id="findByTradeNo" resultMap="PcAccountRecord">
+	<select id="findByTradeNo" resultMap="BBAccountRecord">
 		select
 			<include refid="Base_Column_List" />
 		from bb_account_record

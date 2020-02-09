@@ -4,7 +4,7 @@
 
 <mapper namespace="com.hp.sh.expv3.bb.module.trade.dao.BBTradeDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade" id="PcTrade">
+	<resultMap type="com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade" id="BBTrade">
 		<result column="id" property="id" />
 		<result column="match_tx_id" property="matchTxId" />
 		<result column="symbol" property="symbol" />
@@ -51,15 +51,15 @@
 
 	</sql>
 
-	<select id="pageQuery" resultMap="PcTrade">
+	<select id="pageQuery" resultMap="BBTrade">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryList" resultMap="PcTrade">
+	<select id="queryList" resultMap="BBTrade">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryOne" resultMap="PcTrade">
+	<select id="queryOne" resultMap="BBTrade">
 		<include refid="simple_query" />
 	</select>
 
@@ -77,7 +77,7 @@
 		<include refid="simple_where" />
 	</select>
 
-	<select id="findById" resultMap="PcTrade">
+	<select id="findById" resultMap="BBTrade">
 		select
 			<include refid="Base_Column_List" />
 		from bb_trade

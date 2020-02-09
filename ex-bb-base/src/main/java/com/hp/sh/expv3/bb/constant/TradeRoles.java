@@ -5,7 +5,7 @@ package com.hp.sh.expv3.bb.constant;
  * @author wangjg
  *
  */
-public class TradingRoles {
+public class TradeRoles {
 
 	public static final int MAKER = 1;
 	

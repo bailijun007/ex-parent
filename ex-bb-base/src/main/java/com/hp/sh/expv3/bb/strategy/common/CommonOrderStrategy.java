@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.bb.component.FeeRatioService;
 import com.hp.sh.expv3.bb.component.MetadataService;
 import com.hp.sh.expv3.bb.constant.OrderFlag;
-import com.hp.sh.expv3.bb.constant.TradingRoles;
+import com.hp.sh.expv3.bb.constant.TradeRoles;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.msg.BBTradeMsg;
 import com.hp.sh.expv3.bb.strategy.OrderStrategy;
@@ -212,7 +212,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 		tradeResult.setFee(fee);
 		
 		//maker fee
-		if(tradeVo.getMakerFlag()==TradingRoles.MAKER){
+		if(tradeVo.getMakerFlag()==TradeRoles.MAKER){
 			BigDecimal makerFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
 			tradeResult.setMakerFeeRatio(makerFeeRatio);
 			BigDecimal makerFee = tradeResult.getAmount().multiply(makerFeeRatio);

@@ -2,33 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.hp.sh.expv3.bb.module.order.dao.BBActiveOrderDAO">
+<mapper namespace="com.hp.sh.expv3.bb.module.account.dao.BBAccountLogDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBActiveOrder" id="BBActiveOrder">
-		<result column="id" property="id" />
+	<resultMap type="com.hp.sh.expv3.bb.msg.BBAccountLog" id="BBAccountLog">
+		<result column="type" property="type" />
 		<result column="user_id" property="userId" />
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
-		<result column="long_flag" property="longFlag" />
+		<result column="ref_id" property="refId" />
+		<result column="time" property="time" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,user_id,asset,symbol,long_flag
+		type,user_id,asset,symbol,ref_id,time
 	</sql>
 
 	<sql id="simple_where" >
 		<where>
+			<if test="type!=null"> and type=#{type}</if>
 			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="refId!=null"> and ref_id=#{refId}</if>
+			<if test="time!=null"> and time=#{time}</if>
 			<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
 			<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
-			<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
 		</where>
 	</sql>
 
 	<sql id="simple_query" >
 		select
 			<include refid="Base_Column_List" />
-		from bb_active_order
+		from bb_account_log
 			<include refid="simple_where" />
 		<if test="orderBy!=null and orderBy!=''">
 			order by ${orderBy} <if test="!asc">desc</if>
@@ -36,15 +39,15 @@
 
 	</sql>
 
-	<select id="pageQuery" resultMap="BBActiveOrder">
+	<select id="pageQuery" resultMap="BBAccountLog">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryList" resultMap="BBActiveOrder">
+	<select id="queryList" resultMap="BBAccountLog">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryOne" resultMap="BBActiveOrder">
+	<select id="queryOne" resultMap="BBAccountLog">
 		<include refid="simple_query" />
 	</select>
 
@@ -58,66 +61,56 @@
 				count(1)
 			</otherwise>
 		</choose>
-		from bb_active_order
+		from bb_account_log
 		<include refid="simple_where" />
 	</select>
 
-	<select id="findById" resultMap="BBActiveOrder">
+	<select id="findById" resultMap="BBAccountLog">
 		select
 			<include refid="Base_Column_List" />
-		from bb_active_order
-			where id=#{id} and user_id=#{userId}
+		from bb_account_log
+			where id=#{id}
 	</select>
 
-	<select id="exist" resultType="long">
-		select EXISTS(
-			select 
-				1
-			from 
-				bb_active_order
-			<include refid="simple_where" />
-			limit 1
-		)
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			bb_account_log
+		<include refid="simple_where" />
+		limit 1
 	</select>
+
 
 	<insert id="save">
-		insert into bb_active_order (
-			id,user_id,asset,symbol,long_flag
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into bb_account_log (
+			type,user_id,asset,symbol,ref_id,time
 		)values(
-			#{id},#{userId},#{asset},#{symbol},#{longFlag}
+			#{type},#{userId},#{asset},#{symbol},#{refId},#{time}
 		)
 	</insert>
 	
 	<update id="update">
 		update 
-			bb_active_order
+			bb_account_log
 		set 
-			id=#{id},user_id=#{userId},asset=#{asset},symbol=#{symbol},long_flag=#{longFlag}
+			type=#{type},user_id=#{userId},asset=#{asset},symbol=#{symbol},ref_id=#{refId},time=#{time}
 		where 
-			id=#{id} and user_id=#{userId}
+			id=#{id}
 	</update>
 
 	<delete id="delete">
-        delete from bb_active_order where id=#{id} and user_id=#{userId}
+        delete from bb_account_log where id=#{id}
     </delete>
 
     <delete id="condDelete">
-        delete from bb_active_order
+        delete from bb_account_log
 		<include refid="simple_where" />
     </delete>
 
 	<!--  -->
-	
-	<select id="queryActiveOrderIds" resultType="long">
-		select 
-			id 
-		from 
-			bb_active_order
-		where 
-			user_id=#{userId}
-			and asset=#{asset}
-			and symbol=#{symbol}
-			<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
-	</select>
 	
 </mapper>
