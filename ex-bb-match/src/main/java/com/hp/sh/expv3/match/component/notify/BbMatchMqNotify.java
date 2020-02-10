@@ -11,12 +11,14 @@ import com.hp.sh.expv3.match.config.setting.BbmatchRocketMqSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
 import com.hp.sh.expv3.match.mqmsg.BbOrderCancelMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.BbOrderMqMsgDto;
+import com.hp.sh.expv3.match.mqmsg.BbTradeMqMsgDto;
 import com.hp.sh.expv3.match.util.BbRocketMqUtil;
 import com.hp.sh.expv3.match.util.JsonUtil;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.common.RemotingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -87,13 +89,17 @@ public class BbMatchMqNotify {
             String topic = BbRocketMqUtil.buildBbAccountContractMqTopicName(bbmatchRocketMqSetting.getBbMatchTopicNamePattern(), asset, symbol);
 
             for (BbTradeBo bbTradeBo : tradeList) {
+
+                BbTradeMqMsgDto msgDto = new BbTradeMqMsgDto();
+                BeanUtils.copyProperties(bbTradeBo, msgDto);
+
                 Message msg = buildMessage(
                         topic,// topic
                         "" + RmqTagEnum.BB_MATCH_ORDER_MATCHED.getConstant(),// tag
-                        "" + bbTradeBo.getTkOrderId(),
-                        bbTradeBo// body
+                        "" + msgDto.getTkOrderId(),
+                        msgDto// body
                 );
-                safeSend2MatchTopic(msg, bbTradeBo.getTkAccountId());
+                safeSend2MatchTopic(msg, msgDto.getTkAccountId());
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, msg.getTopic(), msg.getTags(), msg.getKeys(), JsonUtil.toJsonString(msg));
