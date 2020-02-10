@@ -16,7 +16,7 @@ import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.mq.match.msg.MatchNotMatchMsg;
-import com.hp.sh.expv3.bb.mq.match.msg.MatchedOrderCancelledMsg;
+import com.hp.sh.expv3.bb.mq.match.msg.BbOrderCancelMqMsg;
 import com.hp.sh.expv3.bb.msg.MatchedMsg;
 import com.hp.sh.expv3.bb.msg.BBTradeMsg;
 import com.hp.sh.rocketmq.annotation.MQListener;
@@ -47,7 +47,7 @@ public class MatchMqConsumer {
 	
 	//取消订单
 	@MQListener(tags=MqTags.TAGS_CANCELLED)
-	public void handleCancelledMsg(MatchedOrderCancelledMsg msg){
+	public void handleCancelledMsg(BbOrderCancelMqMsg msg){
 		logger.info("收到取消订单消息:{}", msg);
 		this.bBOrderService.setCancelled(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
 	}

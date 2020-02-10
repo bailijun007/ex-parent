@@ -9,12 +9,12 @@ import com.hp.sh.expv3.bb.msg.BaseSymbolMsg;
  * @author lw
  *
  */
-public class MatchedOrderCancelledMsg extends BaseSymbolMsg{
-	private Long accountId;
-	private Long orderId;
-	private BigDecimal cancelNumber;
+public class BbOrderCancelMqMsg extends BaseSymbolMsg{
+    private Long accountId;
+    private Long orderId;
+    private BigDecimal cancelNumber;
 	
-	public MatchedOrderCancelledMsg() {
+	public BbOrderCancelMqMsg() {
 	}
 
 	public Long getAccountId() {
@@ -43,7 +43,7 @@ public class MatchedOrderCancelledMsg extends BaseSymbolMsg{
 
 	@Override
 	public String toString() {
-		return "MatchedOrderCancelledMsg [accountId=" + accountId + ", orderId=" + orderId + ", cancelNumber="
+		return "BbOrderCancelMqMsg [accountId=" + accountId + ", orderId=" + orderId + ", cancelNumber="
 				+ cancelNumber + ", asset=" + asset + ", symbol=" + symbol + "]";
 	}
 
