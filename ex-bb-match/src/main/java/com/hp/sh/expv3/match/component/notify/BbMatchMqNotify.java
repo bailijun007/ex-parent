@@ -11,6 +11,7 @@ import com.hp.sh.expv3.match.config.setting.BbmatchRocketMqSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
 import com.hp.sh.expv3.match.mqmsg.BbOrderCancelMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.BbOrderMqMsgDto;
+import com.hp.sh.expv3.match.mqmsg.BbOrderNotMatchedMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.BbTradeMqMsgDto;
 import com.hp.sh.expv3.match.util.BbRocketMqUtil;
 import com.hp.sh.expv3.match.util.JsonUtil;
@@ -39,7 +40,7 @@ public class BbMatchMqNotify {
 
     public boolean sendOrderNotMatched(String asset, String symbol, long accountId, long orderId) {
         String topic = BbRocketMqUtil.buildBbAccountContractMqTopicName(bbmatchRocketMqSetting.getBbMatchTopicNamePattern(), asset, symbol);
-        BbOrderMqMsgDto msg = new BbOrderMqMsgDto();
+        BbOrderNotMatchedMqMsgDto msg = new BbOrderNotMatchedMqMsgDto();
         msg.setAccountId(accountId);
         msg.setOrderId(orderId);
         msg.setAsset(asset);
