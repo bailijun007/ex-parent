@@ -30,7 +30,6 @@ public class MatchMqSender extends BaseMqSender{
 		msg.setAccountId(order.getUserId());
 		msg.setAsset(order.getAsset());
 		msg.setBidFlag(order.getBidFlag());
-		msg.setCloseFlag(order.getBidFlag());
 		msg.setDisplayNumber(order.getVolume());
 		msg.setNumber(order.getVolume());
 		msg.setOrderId(order.getId());

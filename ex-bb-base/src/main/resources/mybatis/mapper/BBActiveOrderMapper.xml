@@ -9,11 +9,11 @@
 		<result column="user_id" property="userId" />
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
-		<result column="long_flag" property="longFlag" />
+		<result column="bid_flag" property="bidFlag" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,user_id,asset,symbol,long_flag
+		id,user_id,asset,symbol,bid_flag
 	</sql>
 
 	<sql id="simple_where" >
@@ -21,7 +21,7 @@
 			<if test="userId!=null"> and user_id=#{userId}</if>
 			<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
 			<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
-			<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
+			<if test="bidFlag!=null"> and bid_flag=#{bidFlag}</if>
 		</where>
 	</sql>
 
@@ -82,9 +82,9 @@
 
 	<insert id="save">
 		insert into bb_active_order (
-			id,user_id,asset,symbol,long_flag
+			id,user_id,asset,symbol,bid_flag
 		)values(
-			#{id},#{userId},#{asset},#{symbol},#{longFlag}
+			#{id},#{userId},#{asset},#{symbol},#{bidFlag}
 		)
 	</insert>
 	
@@ -92,7 +92,7 @@
 		update 
 			bb_active_order
 		set 
-			id=#{id},user_id=#{userId},asset=#{asset},symbol=#{symbol},long_flag=#{longFlag}
+			id=#{id},user_id=#{userId},asset=#{asset},symbol=#{symbol},bid_flag=#{bidFlag}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>
@@ -117,7 +117,7 @@
 			user_id=#{userId}
 			and asset=#{asset}
 			and symbol=#{symbol}
-			<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
+			<if test="bidFlag!=null"> and bid_flag=#{bidFlag}</if>
 	</select>
 	
 </mapper>

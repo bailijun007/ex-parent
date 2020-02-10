@@ -26,7 +26,6 @@ public interface BBOrderApi {
 	 * @param asset 资产
 	 * @param symbol 合约品种
 	 * @param bidFlag 买卖
-	 * @param longFlag 多/空
 	 * @param timeInForce 生效机制
 	 * @param price 委托价格
 	 * @param amt 委托金额
@@ -37,10 +36,10 @@ public interface BBOrderApi {
         @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
         @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
         @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = true),
-        @ApiImplicitParam(name = "bidFlag", value = "开/平", example = "0", required = true),
+        @ApiImplicitParam(name = "bidFlag", value = "买卖", example = "0", required = true),
         @ApiImplicitParam(name = "timeInForce", value = "成交有效时间", example = "0", required = true),
         @ApiImplicitParam(name = "price", value = "价格", example = "8000", required = true),
-        @ApiImplicitParam(name = "number", value = "数量（张）", example = "10", required = true),
+        @ApiImplicitParam(name = "number", value = "数量", example = "10", required = true),
         @ApiImplicitParam(name = "cliOrderId", value = "客户端订单ID", example = "12345", required = true)
     })
 	@GetMapping(value = "/api/bb/order/create")

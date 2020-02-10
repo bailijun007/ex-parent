@@ -64,8 +64,8 @@ public class BBActiveOrder implements UserData{
 		return bidFlag;
 	}
 
-	public void setBidFlag(Integer longFlag) {
-		this.bidFlag = longFlag;
+	public void setBidFlag(Integer bidFlag) {
+		this.bidFlag = bidFlag;
 	}
 
 }

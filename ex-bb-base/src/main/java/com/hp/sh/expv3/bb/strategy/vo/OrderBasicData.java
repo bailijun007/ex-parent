@@ -13,10 +13,6 @@ public interface OrderBasicData {
 
 	public String getSymbol();
 
-	public Integer getCloseFlag();
-
-	public Integer getLongFlag();
-
 	public BigDecimal getLeverage();
 
 	public BigDecimal getVolume();
@@ -30,10 +26,6 @@ public interface OrderBasicData {
 //	public void setAsset(String asset);
 //
 //	public void setSymbol(String symbol);
-//
-//	public void setCloseFlag(Integer closeFlag);
-//
-//	public void setLongFlag(Integer longFlag);
 //
 //	public void setLeverage(BigDecimal leverage);
 //

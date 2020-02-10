@@ -4,7 +4,7 @@
 
 <mapper namespace="com.hp.sh.expv3.bb.module.trade.dao.BBMatchedTradeDAO">
 
-	<resultMap type="com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade" id="BBTrade">
+	<resultMap type="com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade" id="BBMatchedTrade">
 		<result column="id" property="id" />
 		<result column="match_tx_id" property="matchTxId" />
 		<result column="symbol" property="symbol" />
@@ -12,17 +12,17 @@
 		<result column="tk_bid_flag" property="tkBidFlag" />
 		<result column="tk_account_id" property="tkAccountId" />
 		<result column="tk_order_id" property="tkOrderId" />
-		<result column="tk_close_flag" property="tkCloseFlag" />
 		<result column="mk_account_id" property="mkAccountId" />
 		<result column="mk_order_id" property="mkOrderId" />
-		<result column="mk_close_flag" property="mkCloseFlag" />
 		<result column="price" property="price" />
 		<result column="number" property="number" />
 		<result column="trade_time" property="tradeTime" />
+		<result column="maker_handle_status" property="makerHandleStatus" />
+		<result column="taker_handle_status" property="takerHandleStatus" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,number,trade_time
+		id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,number,trade_time,maker_handle_status,taker_handle_status
 	</sql>
 
 	<sql id="simple_where" >
@@ -32,11 +32,11 @@
 		<if test="tkBidFlag!=null"> and tk_bid_flag=#{tkBidFlag}</if>
 		<if test="tkAccountId!=null"> and tk_account_id=#{tkAccountId}</if>
 		<if test="tkOrderId!=null"> and tk_order_id=#{tkOrderId}</if>
-		<if test="tkCloseFlag!=null"> and tk_close_flag=#{tkCloseFlag}</if>
 		<if test="mkAccountId!=null"> and mk_account_id=#{mkAccountId}</if>
 		<if test="mkOrderId!=null"> and mk_order_id=#{mkOrderId}</if>
-		<if test="mkCloseFlag!=null"> and mk_close_flag=#{mkCloseFlag}</if>
 		<if test="tradeTime!=null"> and trade_time=#{tradeTime}</if>
+		<if test="makerHandleStatus!=null"> and maker_handle_status=#{makerHandleStatus}</if>
+		<if test="takerHandleStatus!=null"> and taker_handle_status=#{takerHandleStatus}</if>
 		</where>
 	</sql>
 
@@ -51,15 +51,15 @@
 
 	</sql>
 
-	<select id="pageQuery" resultMap="BBTrade">
+	<select id="pageQuery" resultMap="BBMatchedTrade">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryList" resultMap="BBTrade">
+	<select id="queryList" resultMap="BBMatchedTrade">
 		<include refid="simple_query" />
 	</select>
 
-	<select id="queryOne" resultMap="BBTrade">
+	<select id="queryOne" resultMap="BBMatchedTrade">
 		<include refid="simple_query" />
 	</select>
 
@@ -77,7 +77,7 @@
 		<include refid="simple_where" />
 	</select>
 
-	<select id="findById" resultMap="BBTrade">
+	<select id="findById" resultMap="BBMatchedTrade">
 		select
 			<include refid="Base_Column_List" />
 		from bb_trade
@@ -99,9 +99,9 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into bb_trade (
-			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,mk_order_id,mk_close_flag,price,number,trade_time
+			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,number,trade_time,maker_handle_status,taker_handle_status
 		)values(
-			#{id},#{matchTxId},#{symbol},#{asset},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{tkCloseFlag},#{mkAccountId},#{mkOrderId},#{mkCloseFlag},#{price},#{number},#{tradeTime}
+			#{id},#{matchTxId},#{symbol},#{asset},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{mkAccountId},#{mkOrderId},#{price},#{number},#{tradeTime},#{makerHandleStatus},#{takerHandleStatus}
 		)
 	</insert>
 	
@@ -109,7 +109,7 @@
 		update 
 			bb_trade
 		set 
-			id=#{id},match_tx_id=#{matchTxId},symbol=#{symbol},asset=#{asset},tk_bid_flag=#{tkBidFlag},tk_account_id=#{tkAccountId},tk_order_id=#{tkOrderId},tk_close_flag=#{tkCloseFlag},mk_account_id=#{mkAccountId},mk_order_id=#{mkOrderId},mk_close_flag=#{mkCloseFlag},price=#{price},number=#{number},trade_time=#{tradeTime}
+			id=#{id},match_tx_id=#{matchTxId},symbol=#{symbol},asset=#{asset},tk_bid_flag=#{tkBidFlag},tk_account_id=#{tkAccountId},tk_order_id=#{tkOrderId},mk_account_id=#{mkAccountId},mk_order_id=#{mkOrderId},price=#{price},number=#{number},trade_time=#{tradeTime},maker_handle_status=#{makerHandleStatus},taker_handle_status=#{takerHandleStatus}
 		where 
 			id=#{id}
 	</update>

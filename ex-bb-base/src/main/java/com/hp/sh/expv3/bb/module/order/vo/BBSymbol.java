@@ -65,7 +65,7 @@ public class BBSymbol {
 	}
 
 	public String getIncomeCurrency() {
-		if(this.bidFlag==OrderFlag.BID_BUY){
+		if(this.bidFlag!=OrderFlag.BID_BUY){
 			return this.settleCurrency;
 		}else{
 			return this.baseCurrency;
@@ -73,7 +73,7 @@ public class BBSymbol {
 	}
 
 	public String getPayCurrency() {
-		if(this.bidFlag!=OrderFlag.BID_BUY){
+		if(this.bidFlag==OrderFlag.BID_BUY){
 			return this.settleCurrency;
 		}else{
 			return this.baseCurrency;

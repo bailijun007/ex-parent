@@ -60,8 +60,7 @@ public class BBOrderService {
 	 * @param cliOrderId 客户端订单ID
 	 * @param asset 资产
 	 * @param symbol 合约品种
-	 * @param closeFlag 是否平仓：开/平
-	 * @param longFlag 多/空
+	 * @param bidFlag 买卖
 	 * @param timeInForce 生效机制
 	 * @param price 委托价格
 	 * @param amt 委托金额
@@ -103,7 +102,11 @@ public class BBOrderService {
 		
 		//押金
 		BBSymbol bs = new BBSymbol(symbol, bidFlag);
-		this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getGrossMargin());
+		if(order.getBidFlag()==OrderFlag.BID_BUY){
+			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getGrossMargin());
+		}else{
+			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getVolume());
+		}
 		
 		return order;
 	}

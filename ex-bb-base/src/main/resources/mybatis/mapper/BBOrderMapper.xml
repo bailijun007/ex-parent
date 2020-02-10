@@ -7,17 +7,17 @@
 	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBOrder" id="BBOrder">
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
-		<result column="close_flag" property="closeFlag" />
-		<result column="long_flag" property="longFlag" />
+		<result column="bid_flag" property="bidFlag" />
 		<result column="leverage" property="leverage" />
 		<result column="volume" property="volume" />
 		<result column="price" property="price" />
 		<result column="order_type" property="orderType" />
 		<result column="time_in_force" property="timeInForce" />
-		<result column="open_fee_ratio" property="openFeeRatio" />
+		<result column="fee_ratio" property="feeRatio" />
 		<result column="client_order_id" property="clientOrderId" />
-		<result column="open_fee" property="openFee" />
+		<result column="fee" property="fee" />
 		<result column="order_margin" property="orderMargin" />
+		<result column="order_margin_currency" property="orderMarginCurrency" />
 		<result column="status" property="status" />
 		<result column="active_flag" property="activeFlag" />
 		<result column="remark" property="remark" />
@@ -35,7 +35,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		asset,symbol,close_flag,long_flag,leverage,volume,price,order_type,time_in_force,open_fee_ratio,client_order_id,open_fee,order_margin,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,version,create_operator,cancel_operator,user_id,id,created,modified
+		asset,symbol,bid_flag,leverage,volume,price,order_type,time_in_force,fee_ratio,client_order_id,fee,order_margin,order_margin_currency,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,version,create_operator,cancel_operator,user_id,id,created,modified
 	</sql>
 
 	<sql id="simple_where">
@@ -53,8 +53,7 @@
 			<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
 			
 			<if test="clientOrderId!=null and clientOrderId!=''">and client_order_id=#{clientOrderId}</if>
-			<if test="closeFlag!=null"> and close_flag=#{closeFlag}</if>
-			<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
+			<if test="bidFlag!=null"> and bid_flag=#{bidFlag}</if>
 			<if test="orderType!=null"> and order_type=#{orderType}</if>
 			<if test="timeInForce!=null"> and time_in_force=#{timeInForce}</if>
 			<if test="status!=null"> and status=#{status}</if>
@@ -123,9 +122,9 @@
 
 	<insert id="save">
 		insert into bb_order (
-			asset,symbol,close_flag,long_flag,leverage,volume,price,order_type,time_in_force,open_fee_ratio,client_order_id,open_fee,order_margin,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,version,create_operator,cancel_operator,user_id,id,created,modified
+			asset,symbol,bid_flag,leverage,volume,price,order_type,time_in_force,fee_ratio,client_order_id,fee,order_margin,order_margin_currency,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,version,create_operator,cancel_operator,user_id,id,created,modified
 		)values(
-			#{asset},#{symbol},#{closeFlag},#{longFlag},#{leverage},#{volume},#{price},#{orderType},#{timeInForce},#{openFeeRatio},#{clientOrderId},#{openFee},#{orderMargin},#{status},#{activeFlag},#{remark},#{cancelTime},#{cancelVolume},#{feeCost},#{filledVolume},#{version},#{createOperator},#{cancelOperator},#{userId},#{id},#{created},#{modified}
+			#{asset},#{symbol},#{bidFlag},#{leverage},#{volume},#{price},#{orderType},#{timeInForce},#{feeRatio},#{clientOrderId},#{fee},#{orderMargin},#{orderMarginCurrency},#{status},#{activeFlag},#{remark},#{cancelTime},#{cancelVolume},#{feeCost},#{filledVolume},#{version},#{createOperator},#{cancelOperator},#{userId},#{id},#{created},#{modified}
 		)
 	</insert>
 	
@@ -133,7 +132,7 @@
 		update 
 			bb_order
 		set 
-			asset=#{asset},symbol=#{symbol},close_flag=#{closeFlag},long_flag=#{longFlag},leverage=#{leverage},volume=#{volume},price=#{price},order_type=#{orderType},time_in_force=#{timeInForce},open_fee_ratio=#{openFeeRatio},client_order_id=#{clientOrderId},open_fee=#{openFee},order_margin=#{orderMargin},status=#{status},active_flag=#{activeFlag},remark=#{remark},cancel_time=#{cancelTime},cancel_volume=#{cancelVolume},fee_cost=#{feeCost},filled_volume=#{filledVolume},version=${version}+1,create_operator=#{createOperator},cancel_operator=#{cancelOperator},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},bid_flag=#{bidFlag},leverage=#{leverage},volume=#{volume},price=#{price},order_type=#{orderType},time_in_force=#{timeInForce},fee_ratio=#{feeRatio},client_order_id=#{clientOrderId},fee=#{fee},order_margin=#{orderMargin},order_margin_currency=#{orderMarginCurrency},status=#{status},active_flag=#{activeFlag},remark=#{remark},cancel_time=#{cancelTime},cancel_volume=#{cancelVolume},fee_cost=#{feeCost},filled_volume=#{filledVolume},version=${version}+1,create_operator=#{createOperator},cancel_operator=#{cancelOperator},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId} and version=#{version}
 	</update>

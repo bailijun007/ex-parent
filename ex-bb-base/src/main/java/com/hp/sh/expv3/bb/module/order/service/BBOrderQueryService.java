@@ -52,8 +52,8 @@ public class BBOrderQueryService {
 		return this.bBOrderDAO.queryList(params);
 	}
 	
-	public boolean hasActiveOrder(long userId, String asset, String symbol, Integer longFlag) {
-		long count = this.bBActiveOrderDAO.exist(userId, asset, symbol, longFlag);
+	public boolean hasActiveOrder(long userId, String asset, String symbol, Integer bidFlag) {
+		long count = this.bBActiveOrderDAO.exist(userId, asset, symbol, bidFlag);
 		return count>0;
 	}
 	

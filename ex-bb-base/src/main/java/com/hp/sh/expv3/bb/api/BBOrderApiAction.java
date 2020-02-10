@@ -38,7 +38,6 @@ public class BBOrderApiAction implements BBOrderApi {
 	 * @param asset 资产
 	 * @param symbol 币币交易品种
 	 * @param bidFlag 是否平仓：开/平
-	 * @param longFlag 多/空
 	 * @param timeInForce 生效机制
 	 * @param price 委托价格
 	 * @param amt 委托金额
@@ -99,7 +98,6 @@ public class BBOrderApiAction implements BBOrderApi {
 		msg.setAccountId(order.getUserId());
 		msg.setAsset(order.getAsset());
 		msg.setBidFlag(order.getBidFlag());
-		msg.setCloseFlag(order.getBidFlag());
 		msg.setDisplayNumber(order.getVolume());
 		msg.setNumber(order.getVolume().subtract(order.getFilledVolume()));
 		msg.setOrderId(order.getId());

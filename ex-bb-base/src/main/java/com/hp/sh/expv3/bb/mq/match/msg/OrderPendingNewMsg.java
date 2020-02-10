@@ -13,7 +13,6 @@ public class OrderPendingNewMsg extends BaseSymbolMsg{
 
 	private Long orderId;
 	private Long accountId;
-	private Integer closeFlag;
 	private Integer bidFlag;
 
 	private BigDecimal number;
@@ -42,14 +41,6 @@ public class OrderPendingNewMsg extends BaseSymbolMsg{
 
 	public void setAccountId(Long accountId) {
 		this.accountId = accountId;
-	}
-
-	public Integer getCloseFlag() {
-		return closeFlag;
-	}
-
-	public void setCloseFlag(Integer closeFlag) {
-		this.closeFlag = closeFlag;
 	}
 
 	public Integer getBidFlag() {
@@ -110,10 +101,9 @@ public class OrderPendingNewMsg extends BaseSymbolMsg{
 
 	@Override
 	public String toString() {
-		return "OrderPendingNewMsg [orderId=" + orderId + ", accountId=" + accountId + ", closeFlag=" + closeFlag
-				+ ", bidFlag=" + bidFlag + ", number=" + number + ", displayNumber=" + displayNumber + ", price="
-				+ price + ", orderType=" + orderType + ", orderTime=" + orderTime + ", asset=" + asset + ", symbol="
-				+ symbol + "]";
+		return "OrderPendingNewMsg [orderId=" + orderId + ", accountId=" + accountId + ", bidFlag=" + bidFlag
+				+ ", number=" + number + ", displayNumber=" + displayNumber + ", price=" + price + ", orderType="
+				+ orderType + ", orderTime=" + orderTime + ", timeInForce=" + timeInForce + "]";
 	}
 	
 }
