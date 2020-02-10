@@ -6,19 +6,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hp.sh.expv3.bb.module.trade.dao.BBTradeDAO;
+import com.hp.sh.expv3.bb.module.trade.dao.BBMatchedTradeDAO;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
-public class BBTradeService2 {
+public class BBMatchedTradeService {
 	@Autowired
-	private BBTradeDAO bBTradeDAO;
+	private BBMatchedTradeDAO matchedTradeDAO;
 
-	public void batchSave(List<BBMatchedTrade> list) {
-		for(BBMatchedTrade pt:list){
-			this.bBTradeDAO.save(pt);
-		}
+	public List<BBMatchedTrade> queryPending(Long userId) {
+		
+		return null;
+	}
+
+	public void setFinishStatus(Long id, Long userId) {
+		
 	}
 	
 }

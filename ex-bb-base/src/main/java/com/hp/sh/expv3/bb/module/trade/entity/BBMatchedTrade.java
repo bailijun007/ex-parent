@@ -15,35 +15,27 @@ import javax.persistence.Table;
 @Table(name="bb_trade")
 public class BBMatchedTrade {
 
-	//id
-	private Long id;
-	//事务Id
+    //id
+    private Long id;
+    //事务Id
     private Long matchTxId;
     //交易对
     private String symbol;
     //资产
     private String asset;
 
-    //taker是否买：1-是，0-否
+    //买卖标志
     private Integer tkBidFlag;
 
-    /*** taker ***/
     //taker账户ID
     private Long tkAccountId;
     //taker订单ID
     private Long tkOrderId;
-    //taker是否平仓
-    private Integer tkCloseFlag;
 
-    /*** maker ***/
     //maker账户Id
     private Long mkAccountId;
     //maker订单ID
     private Long mkOrderId;
-    //maker是否平仓
-    private Integer mkCloseFlag;
-
-    /*** data ***/
     //成交价格
     private BigDecimal price;
     //数量
@@ -116,14 +108,6 @@ public class BBMatchedTrade {
 		this.tkOrderId = tkOrderId;
 	}
 
-	public Integer getTkCloseFlag() {
-		return tkCloseFlag;
-	}
-
-	public void setTkCloseFlag(Integer tkCloseFlag) {
-		this.tkCloseFlag = tkCloseFlag;
-	}
-
 	public Long getMkAccountId() {
 		return mkAccountId;
 	}
@@ -138,14 +122,6 @@ public class BBMatchedTrade {
 
 	public void setMkOrderId(Long mkOrderId) {
 		this.mkOrderId = mkOrderId;
-	}
-
-	public Integer getMkCloseFlag() {
-		return mkCloseFlag;
-	}
-
-	public void setMkCloseFlag(Integer mkCloseFlag) {
-		this.mkCloseFlag = mkCloseFlag;
 	}
 
 	public BigDecimal getPrice() {
@@ -187,4 +163,5 @@ public class BBMatchedTrade {
 	public void setTakerHandleStatus(Integer takerHandleStatus) {
 		this.takerHandleStatus = takerHandleStatus;
 	}
+
 }

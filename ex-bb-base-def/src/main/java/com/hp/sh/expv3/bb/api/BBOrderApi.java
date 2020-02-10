@@ -25,7 +25,7 @@ public interface BBOrderApi {
 	 * @param cliOrderId 客户端订单ID
 	 * @param asset 资产
 	 * @param symbol 合约品种
-	 * @param closeFlag 是否平仓：开/平
+	 * @param bidFlag 买卖
 	 * @param longFlag 多/空
 	 * @param timeInForce 生效机制
 	 * @param price 委托价格
@@ -37,7 +37,7 @@ public interface BBOrderApi {
         @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
         @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
         @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = true),
-        @ApiImplicitParam(name = "closeFlag", value = "开/平", example = "0", required = true),
+        @ApiImplicitParam(name = "bidFlag", value = "开/平", example = "0", required = true),
         @ApiImplicitParam(name = "timeInForce", value = "成交有效时间", example = "0", required = true),
         @ApiImplicitParam(name = "price", value = "价格", example = "8000", required = true),
         @ApiImplicitParam(name = "number", value = "数量（张）", example = "10", required = true),
@@ -45,7 +45,7 @@ public interface BBOrderApi {
     })
 	@GetMapping(value = "/api/bb/order/create")
 	Long create(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol
-			, @RequestParam("closeFlag") Integer closeFlag
+			, @RequestParam("bidFlag") Integer bidFlag
 			, @RequestParam("timeInForce") Integer timeInForce,
 			@RequestParam("price") BigDecimal price, @RequestParam("number") BigDecimal number, @RequestParam("cliOrderId") String cliOrderId);
 

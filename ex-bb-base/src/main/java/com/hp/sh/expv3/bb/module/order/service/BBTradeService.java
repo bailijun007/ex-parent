@@ -210,34 +210,34 @@ public class BBTradeService {
 	/**
 	 * 处理成交
 	 */
-	public void handleMatchedResult(BBMatchedTrade pcMatchedResult){
+	public void handleMatchedResult(BBMatchedTrade matchedTrade){
 		//taker
 		BBTradeMsg takerTradeVo = new BBTradeMsg();
 		takerTradeVo.setMakerFlag(TradeRoles.TAKER);
-		takerTradeVo.setAsset(pcMatchedResult.getAsset());
-		takerTradeVo.setSymbol(pcMatchedResult.getSymbol());
-		takerTradeVo.setPrice(pcMatchedResult.getPrice());
-		takerTradeVo.setNumber(pcMatchedResult.getNumber());
-		takerTradeVo.setTradeId(pcMatchedResult.getId());
-		takerTradeVo.setTradeTime(pcMatchedResult.getTradeTime());
+		takerTradeVo.setAsset(matchedTrade.getAsset());
+		takerTradeVo.setSymbol(matchedTrade.getSymbol());
+		takerTradeVo.setPrice(matchedTrade.getPrice());
+		takerTradeVo.setNumber(matchedTrade.getNumber());
+		takerTradeVo.setTradeId(matchedTrade.getId());
+		takerTradeVo.setTradeTime(matchedTrade.getTradeTime());
 		
-		takerTradeVo.setAccountId(pcMatchedResult.getTkAccountId());
-		takerTradeVo.setMatchTxId(pcMatchedResult.getMatchTxId());
-		takerTradeVo.setOrderId(pcMatchedResult.getTkOrderId());
+		takerTradeVo.setAccountId(matchedTrade.getTkAccountId());
+		takerTradeVo.setMatchTxId(matchedTrade.getMatchTxId());
+		takerTradeVo.setOrderId(matchedTrade.getTkOrderId());
 		
 		//maker
 		BBTradeMsg makerTradeVo = new BBTradeMsg();
-		makerTradeVo.setMakerFlag(TradeRoles.TAKER);
-		makerTradeVo.setAsset(pcMatchedResult.getAsset());
-		makerTradeVo.setSymbol(pcMatchedResult.getSymbol());
-		makerTradeVo.setPrice(pcMatchedResult.getPrice());
-		makerTradeVo.setNumber(pcMatchedResult.getNumber());
-		makerTradeVo.setTradeId(pcMatchedResult.getId());
-		makerTradeVo.setTradeTime(pcMatchedResult.getTradeTime());
+		makerTradeVo.setMakerFlag(TradeRoles.MAKER);
+		makerTradeVo.setAsset(matchedTrade.getAsset());
+		makerTradeVo.setSymbol(matchedTrade.getSymbol());
+		makerTradeVo.setPrice(matchedTrade.getPrice());
+		makerTradeVo.setNumber(matchedTrade.getNumber());
+		makerTradeVo.setTradeId(matchedTrade.getId());
+		makerTradeVo.setTradeTime(matchedTrade.getTradeTime());
 		
-		makerTradeVo.setAccountId(pcMatchedResult.getMkAccountId());
-		makerTradeVo.setMatchTxId(pcMatchedResult.getMatchTxId());
-		makerTradeVo.setOrderId(pcMatchedResult.getMkOrderId());
+		makerTradeVo.setAccountId(matchedTrade.getMkAccountId());
+		makerTradeVo.setMatchTxId(matchedTrade.getMatchTxId());
+		makerTradeVo.setOrderId(matchedTrade.getMkOrderId());
 	
 		//taker
 		this.handleTrade(takerTradeVo);
