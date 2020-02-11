@@ -207,44 +207,4 @@ public class BBTradeService {
 		
 	}
 
-	/**
-	 * 处理成交
-	 */
-	public void handleMatchedResult(BBMatchedTrade matchedTrade){
-		//taker
-		BBTradeMsg takerTradeVo = new BBTradeMsg();
-		takerTradeVo.setMakerFlag(TradeRoles.TAKER);
-		takerTradeVo.setAsset(matchedTrade.getAsset());
-		takerTradeVo.setSymbol(matchedTrade.getSymbol());
-		takerTradeVo.setPrice(matchedTrade.getPrice());
-		takerTradeVo.setNumber(matchedTrade.getNumber());
-		takerTradeVo.setTradeId(matchedTrade.getId());
-		takerTradeVo.setTradeTime(matchedTrade.getTradeTime());
-		
-		takerTradeVo.setAccountId(matchedTrade.getTkAccountId());
-		takerTradeVo.setMatchTxId(matchedTrade.getMatchTxId());
-		takerTradeVo.setOrderId(matchedTrade.getTkOrderId());
-		
-		//maker
-		BBTradeMsg makerTradeVo = new BBTradeMsg();
-		makerTradeVo.setMakerFlag(TradeRoles.MAKER);
-		makerTradeVo.setAsset(matchedTrade.getAsset());
-		makerTradeVo.setSymbol(matchedTrade.getSymbol());
-		makerTradeVo.setPrice(matchedTrade.getPrice());
-		makerTradeVo.setNumber(matchedTrade.getNumber());
-		makerTradeVo.setTradeId(matchedTrade.getId());
-		makerTradeVo.setTradeTime(matchedTrade.getTradeTime());
-		
-		makerTradeVo.setAccountId(matchedTrade.getMkAccountId());
-		makerTradeVo.setMatchTxId(matchedTrade.getMatchTxId());
-		makerTradeVo.setOrderId(matchedTrade.getMkOrderId());
-	
-		//taker
-		this.handleTrade(takerTradeVo);
-		
-		//maker
-		this.handleTrade(makerTradeVo);
-		
-	}
-	
 }

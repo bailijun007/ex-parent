@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-
 <mapper namespace="com.hp.sh.expv3.bb.module.trade.dao.BBMatchedTradeDAO">
 
 	<resultMap type="com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade" id="BBMatchedTrade">
-		<result column="id" property="id" />
 		<result column="match_tx_id" property="matchTxId" />
 		<result column="symbol" property="symbol" />
 		<result column="asset" property="asset" />
@@ -19,15 +17,18 @@
 		<result column="trade_time" property="tradeTime" />
 		<result column="maker_handle_status" property="makerHandleStatus" />
 		<result column="taker_handle_status" property="takerHandleStatus" />
+		<result column="version" property="version" />
+		<result column="id" property="id" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,number,trade_time,maker_handle_status,taker_handle_status
+		match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,number,trade_time,maker_handle_status,taker_handle_status,version,id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
 		<where>
-		<if test="id!=null"> and id=#{id}</if>
 		<if test="matchTxId!=null"> and match_tx_id=#{matchTxId}</if>
 		<if test="tkBidFlag!=null"> and tk_bid_flag=#{tkBidFlag}</if>
 		<if test="tkAccountId!=null"> and tk_account_id=#{tkAccountId}</if>
@@ -37,7 +38,11 @@
 		<if test="tradeTime!=null"> and trade_time=#{tradeTime}</if>
 		<if test="makerHandleStatus!=null"> and maker_handle_status=#{makerHandleStatus}</if>
 		<if test="takerHandleStatus!=null"> and taker_handle_status=#{takerHandleStatus}</if>
-		</where>
+		<if test="version!=null"> and version=#{version}</if>
+		<if test="id!=null"> and id=#{id}</if>
+		<if test="created!=null"> and created=#{created}</if>
+		<if test="modified!=null"> and modified=#{modified}</if>
+		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(symbol,''),IFNULL(asset,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
 	</sql>
 
 	<sql id="simple_query" >
@@ -95,13 +100,10 @@
 
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into bb_trade (
-			id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,number,trade_time,maker_handle_status,taker_handle_status
+			match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,number,trade_time,maker_handle_status,taker_handle_status,version,id,created,modified
 		)values(
-			#{id},#{matchTxId},#{symbol},#{asset},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{mkAccountId},#{mkOrderId},#{price},#{number},#{tradeTime},#{makerHandleStatus},#{takerHandleStatus}
+			#{matchTxId},#{symbol},#{asset},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{mkAccountId},#{mkOrderId},#{price},#{number},#{tradeTime},#{makerHandleStatus},#{takerHandleStatus},#{version},#{id},#{created},#{modified}
 		)
 	</insert>
 	
@@ -109,7 +111,7 @@
 		update 
 			bb_trade
 		set 
-			id=#{id},match_tx_id=#{matchTxId},symbol=#{symbol},asset=#{asset},tk_bid_flag=#{tkBidFlag},tk_account_id=#{tkAccountId},tk_order_id=#{tkOrderId},mk_account_id=#{mkAccountId},mk_order_id=#{mkOrderId},price=#{price},number=#{number},trade_time=#{tradeTime},maker_handle_status=#{makerHandleStatus},taker_handle_status=#{takerHandleStatus}
+			match_tx_id=#{matchTxId},symbol=#{symbol},asset=#{asset},tk_bid_flag=#{tkBidFlag},tk_account_id=#{tkAccountId},tk_order_id=#{tkOrderId},mk_account_id=#{mkAccountId},mk_order_id=#{mkOrderId},price=#{price},number=#{number},trade_time=#{tradeTime},maker_handle_status=#{makerHandleStatus},taker_handle_status=#{takerHandleStatus},version=${version}+1,id=#{id},created=#{created},modified=#{modified}
 		where 
 			id=#{id}
 	</update>
@@ -125,4 +127,17 @@
 
 	<!--  -->
 	
+	<select id="queryPending" resultMap="BBMatchedTrade">
+		select
+			<include refid="Base_Column_List" />
+		from 
+			bb_trade 
+		where 
+			created &gt;= #{startTime}
+			<if test="userId!=null"> and (tk_account_id=#{userId} or mk_account_id=#{userId})</if>
+			<if test="startId!=null"> and id &gt;= {startId} </if>
+			and (maker_handle_status=0 or taker_handle_status=0)
+			order by id asc
+	</select>
+
 </mapper>

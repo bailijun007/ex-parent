@@ -7,12 +7,12 @@ import com.hp.sh.expv3.bb.msg.BaseSymbolMsg;
  * @author lw
  *
  */
-public class MatchNotMatchMsg extends BaseSymbolMsg{
+public class BBMatchNotMatchMsg extends BaseSymbolMsg{
 
 	private Long accountId;
 	private Long orderId;
 	
-	public MatchNotMatchMsg() {
+	public BBMatchNotMatchMsg() {
 	}
 
 	public Long getAccountId() {
@@ -33,7 +33,7 @@ public class MatchNotMatchMsg extends BaseSymbolMsg{
 
 	@Override
 	public String toString() {
-		return "MatchNotMatchMsg [accountId=" + accountId + ", orderId=" + orderId + ", asset=" + asset + ", symbol="
+		return "BBMatchNotMatchMsg [accountId=" + accountId + ", orderId=" + orderId + ", asset=" + asset + ", symbol="
 				+ symbol + "]";
 	}
 

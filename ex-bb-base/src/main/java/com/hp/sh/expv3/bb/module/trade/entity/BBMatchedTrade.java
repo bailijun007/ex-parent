@@ -7,16 +7,19 @@ package com.hp.sh.expv3.bb.module.trade.entity;
 import java.math.BigDecimal;
 
 import javax.persistence.Table;
+import javax.persistence.Version;
+
+import com.hp.sh.expv3.base.entity.BaseBizEntity;
 
 /**
  * 撮合结果
  *
  */
 @Table(name="bb_trade")
-public class BBMatchedTrade {
+public class BBMatchedTrade extends BaseBizEntity{
 
-    //id
-    private Long id;
+	private static final long serialVersionUID = 1L;
+	
     //事务Id
     private Long matchTxId;
     //交易对
@@ -49,15 +52,10 @@ public class BBMatchedTrade {
     
     private Integer takerHandleStatus;
     
+    @Version
+    private Long version;
+    
 	public BBMatchedTrade() {
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public Long getMatchTxId() {
@@ -162,6 +160,14 @@ public class BBMatchedTrade {
 
 	public void setTakerHandleStatus(Integer takerHandleStatus) {
 		this.takerHandleStatus = takerHandleStatus;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 }
