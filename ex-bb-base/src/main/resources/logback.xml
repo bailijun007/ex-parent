@@ -3,7 +3,7 @@
 <configuration scan="false">
     <property name="maxHistory" value="60"/>
     
-    <property name="log_dir" value="/data/hupa/logs/pc"></property>
+    <property name="log_dir" value="/data/hupa/logs/bb"></property>
 
     <!-- ConsoleAppender 控制台输出日志 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -127,6 +127,7 @@
 		</encoder>
     </appender>
     
+    <!-- 
     <logger name="com.hp.sh.expv3.bb.mq" level="info" additivity="false">
         <appender-ref ref="mq"/>
     </logger>
@@ -134,7 +135,8 @@
     <logger name="com.hp.sh.rocketmq" level="info" additivity="false">
         <appender-ref ref="mq"/>
     </logger>
-
+ 	-->
+ 
 	<root level="info">
 		<appender-ref ref="STDOUT" />
 	</root>
