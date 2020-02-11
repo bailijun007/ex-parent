@@ -60,8 +60,4 @@ public interface BBOrderApi {
 	@GetMapping(value = "/api/bb/order/queryActiveList")
 	List<ActiveOrderVo> queryActiveList(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
 
-	@ApiOperation(value = "setCancelled")
-	@GetMapping(value = "/api/bb/order/setCancelled")
-	void setCancelled(Long userId, String asset, String symbol, Long orderId);
-
 }

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
@@ -15,6 +16,8 @@ import com.hp.sh.expv3.bb.mq.match.msg.BookResetMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
+
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 public class BBOrderApiAction implements BBOrderApi {
@@ -71,7 +74,8 @@ public class BBOrderApiAction implements BBOrderApi {
 		
 	}
 	
-	@Override
+	@ApiOperation(value = "测试撮合取消")
+	@GetMapping(value = "/api/bb/order/setCancelled")
 	public void setCancelled(Long userId, String asset, String symbol, Long orderId) {
 
 		this.bBOrderService.setCancelled(userId, asset, symbol, orderId);
