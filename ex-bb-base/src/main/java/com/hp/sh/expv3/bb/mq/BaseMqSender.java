@@ -33,7 +33,7 @@ public class BaseMqSender {
 		String topic = this.getTopic(msg);
 		Message mqMsg = new Message(topic, tags, encodeMsg2(msg));
 		mqMsg.setKeys(keys);
-//	    this.send(mqMsg);
+	    this.send(mqMsg);
 	}
 	
 	private byte[] encodeMsg(Object msg){
