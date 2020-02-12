@@ -12,18 +12,10 @@ public class OrderRatioData {
 	//交易金额 张数*面值
 	private BigDecimal amount;
 	
-	//基础货币价值 张数*面值/price
-	private BigDecimal baseValue;
-
 	/**
 	 * 开仓手续费,成交时修改(可能部分成交，按比例收取)
 	 */
-	private BigDecimal openFee;
-
-	/**
-	 * 平仓手续费，在下委托时提前收取(可能部分成交，按比例收取)
-	 */
-	private BigDecimal closeFee;
+	private BigDecimal fee;
 
 	/**
 	 * 委托保证金
@@ -31,7 +23,7 @@ public class OrderRatioData {
 	private BigDecimal orderMargin;
 	
 	/**
-	 * 总押金：委托保证金 + 开仓手续费 + 强平手续费  (以上三个字段的和：openFee+closeFee+orderMargin)
+	 * 总押金：委托保证金 + 开仓手续费 + 强平手续费  (以上三个字段的和：fee+closeFee+orderMargin)
 	 */
 	private BigDecimal grossMargin;
 
@@ -47,30 +39,14 @@ public class OrderRatioData {
 		this.amount = amount;
 	}
 
-	public BigDecimal getBaseValue() {
-		return baseValue;
+	public BigDecimal getFee() {
+		return fee;
 	}
 
-	public void setBaseValue(BigDecimal baseValue) {
-		this.baseValue = baseValue;
+	public void setFee(BigDecimal openFee) {
+		this.fee = openFee;
 	}
-
-	public BigDecimal getOpenFee() {
-		return openFee;
-	}
-
-	public void setOpenFee(BigDecimal openFee) {
-		this.openFee = openFee;
-	}
-
-	public BigDecimal getCloseFee() {
-		return closeFee;
-	}
-
-	public void setCloseFee(BigDecimal closeFee) {
-		this.closeFee = closeFee;
-	}
-
+	
 	public BigDecimal getOrderMargin() {
 		return orderMargin;
 	}

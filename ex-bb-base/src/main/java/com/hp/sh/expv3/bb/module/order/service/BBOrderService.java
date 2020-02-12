@@ -103,9 +103,11 @@ public class BBOrderService {
 		//押金
 		BBSymbol bs = new BBSymbol(symbol, bidFlag);
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
-			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getGrossMargin());
+			String remark = "买"+bs.getPayCurrency()+",押金="+order.getOrderMargin()+"，手续费="+order.getFee();
+			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getGrossMargin(), remark);
 		}else{
-			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getVolume());
+			String remark = "买"+bs.getPayCurrency()+",押金="+order.getVolume()+"，手续费无";
+			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getVolume(), remark);
 		}
 		
 		return order;
@@ -134,11 +136,11 @@ public class BBOrderService {
 		bBOrder.setCancelVolume(BigDecimal.ZERO);
 	}
 	
-	private void cutMargin(Long userId, String asset, Long orderId, BigDecimal amount){
+	private void cutMargin(Long userId, String asset, Long orderId, BigDecimal amount, String remark){
 		BBCutRequest request = new BBCutRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
-		request.setRemark("BB委托");
+		request.setRemark("币币委托:"+remark);
 		request.setTradeNo(SnUtils.getOrderPaySn(""+orderId));
 		request.setTradeType(BBAccountTradeType.ORDER);
 		request.setUserId(userId);
@@ -165,8 +167,14 @@ public class BBOrderService {
 		order.setFeeRatio(feeRatio);
 		
 		OrderRatioData ratioData = orderStrategy.calcOrderAmt(order);
-		order.setOrderMargin(ratioData.getOrderMargin());
-		order.setFee(ratioData.getOpenFee());
+		//押金
+		if(order.getBidFlag()==OrderFlag.BID_BUY){
+			order.setOrderMargin(ratioData.getOrderMargin());
+		}else{
+			order.setOrderMargin(order.getVolume());
+		}
+		//手续费
+		order.setFee(ratioData.getFee());
 
 		BBSymbol bs = new BBSymbol(order.getSymbol(), order.getBidFlag());
 		order.setOrderMarginCurrency(bs.getPayCurrency());

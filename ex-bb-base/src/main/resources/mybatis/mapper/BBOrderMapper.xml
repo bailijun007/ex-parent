@@ -157,20 +157,6 @@
 			id=#{orderId} and user_id=#{userId}
 			and status != #{status1} and status != #{status2} and active_flag=#{activeFlag}
 	</update>
-
-	<select id="getClosingVolume" resultType="java.math.BigDecimal">
-		SELECT
-			sum(o.volume - o.cancel_volume - o.filled_volume)
-		FROM
-			bb_active_order ao
-		LEFT JOIN 
-			bb_order o ON o.id = ao.id
-		where 
-			ao.user_id=#{userId}
-			and ao.asset=#{asset}
-			and ao.symbol=#{symbol}
-			and o.close_pos_id=#{posId}
-	</select>
 	
 	<select id="queryActiveOrderList" resultMap="BBOrder">
 		SELECT

@@ -52,7 +52,11 @@ public class TradeJob {
 			for(BBMatchedTrade matchedTrade : list){
 				pool.submit(new Runnable(){
 					public void run() {
-						handleMatchedTrade(matchedTrade);
+						try{
+							handleMatchedTrade(matchedTrade);
+						}catch(Exception e){
+							logger.error(e.getMessage(), e);
+						}
 					}
 					
 				});

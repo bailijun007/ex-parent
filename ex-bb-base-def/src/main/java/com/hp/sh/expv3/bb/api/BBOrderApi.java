@@ -34,12 +34,12 @@ public interface BBOrderApi {
 	@ApiOperation(value = "创建订单")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
-        @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+        @ApiImplicitParam(name = "asset", value = "资产类型", example = "USD", required = true),
         @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = true),
         @ApiImplicitParam(name = "bidFlag", value = "买卖", example = "0", required = true),
         @ApiImplicitParam(name = "timeInForce", value = "成交有效时间", example = "0", required = true),
         @ApiImplicitParam(name = "price", value = "价格", example = "8000", required = true),
-        @ApiImplicitParam(name = "number", value = "数量", example = "10", required = true),
+        @ApiImplicitParam(name = "number", value = "数量", example = "0.1", required = true),
         @ApiImplicitParam(name = "cliOrderId", value = "客户端订单ID", example = "12345", required = true)
     })
 	@GetMapping(value = "/api/bb/order/create")

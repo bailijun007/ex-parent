@@ -43,8 +43,6 @@ public interface BBOrderDAO extends BaseAccountDataMapper<BBOrder, Long> {
 		@Param("activeFlag") Integer activeFlag
 	);
 
-	public BigDecimal getClosingVolume(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol, @Param("posId") Long posId);
-	
 	public List<BBOrder> queryActiveOrderList(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol);
 
 }

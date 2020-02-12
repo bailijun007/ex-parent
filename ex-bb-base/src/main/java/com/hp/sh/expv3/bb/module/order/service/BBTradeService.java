@@ -69,6 +69,7 @@ public class BBTradeService {
 		
 		Long now = DbDateUtils.now();
 		
+		//计算
 		TradeResult tradeResult = orderStrategy.calcTradeResult(trade, order);
 		
 		////////// 成交记录  ///////////
@@ -133,14 +134,21 @@ public class BBTradeService {
         	order.setOrderMargin(BigDecimal.ZERO);
         	order.setFee(BigDecimal.ZERO);
         }else{
+        	//扣除押金
             order.setOrderMargin(tradeResult.getRemainOrderMargin());
+        	//扣除手续费
         	order.setFee(tradeResult.getRemainFee());
         }
         
+        //增加已扣手续费
 		order.setFeeCost(order.getFeeCost().add(tradeResult.getReceivableFee()));
+		//增加已成交金额
 		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getVolume()));
+		//全部成交/部分成交
         order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
+        //活动状态
         order.setActiveFlag(tradeResult.getOrderCompleted()?BBOrder.NO:BBOrder.YES);
+        //修改时间
 		order.setModified(now);
 		this.orderUpdateService.updateOrder4Trad(order);
 	}
