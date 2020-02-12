@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.bb.module.trade.dao.BBMatchedTradeDAO;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 
 @Service
@@ -19,8 +20,8 @@ public class BBMatchedTradeService {
 	@Autowired
 	private BBMatchedTradeDAO matchedTradeDAO;
 
-	public List<BBMatchedTrade> queryPending(Page page, Long startTime, Long userId, Long startId) {
-		List<BBMatchedTrade> list = this.matchedTradeDAO.queryPending(page, startTime, userId, startId);
+	public List<BBMatchedTrade> queryPending(Page page, Long userId, Long startTime, Long startId) {
+		List<BBMatchedTrade> list = this.matchedTradeDAO.queryPending(page, userId, startTime, startId);
 		return list;
 	}
 
@@ -37,6 +38,10 @@ public class BBMatchedTradeService {
 	}
 
 	public void save(BBMatchedTrade matchedTrade) {
+		Long now = DbDateUtils.now();
+		matchedTrade.setVersion(0L);
+		matchedTrade.setCreated(now);
+		matchedTrade.setModified(now);
 		this.matchedTradeDAO.save(matchedTrade);
 	}
 	

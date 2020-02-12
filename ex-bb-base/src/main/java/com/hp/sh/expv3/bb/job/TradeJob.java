@@ -43,7 +43,7 @@ public class TradeJob {
 		Page page = new Page(1, 100, 1000L);
 		Long startId = null;
 		while(true){
-			List<BBMatchedTrade> list = this.matchedTradeService.queryPending(page, startTime, null, startId);
+			List<BBMatchedTrade> list = this.matchedTradeService.queryPending(page, null, startTime, startId);
 			
 			if(list==null || list.isEmpty()){
 				break;
@@ -63,7 +63,7 @@ public class TradeJob {
 		}
 	}
 
-	void handleMatchedTrade(BBMatchedTrade matchedTrade){
+	public void handleMatchedTrade(BBMatchedTrade matchedTrade){
 		// MAKER
 		BBTradeMsg makerTradeVo = new BBTradeMsg();
 		makerTradeVo.setTradeId(matchedTrade.getId());

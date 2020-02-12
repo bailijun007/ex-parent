@@ -4,11 +4,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.annotation.Resource;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ScanOptions;
@@ -17,13 +15,12 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.component.MetadataService;
-import com.hp.sh.expv3.bb.component.vo.BBContractVO;
+import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 import com.hp.sh.expv3.bb.constant.RedisKey;
 
 /**
  * @author BaiLiJun  on 2019/12/18
  */
-@Primary
 @Component
 public class MetadataServiceImpl implements MetadataService {
 
@@ -50,26 +47,26 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     @Override
-	public BBContractVO getBBContract(String asset, String symbol) {
+	public BBSymbolVO getBBContract(String asset, String symbol) {
         HashOperations hashOperations = templateDB0.opsForHash();
         String hashKey = asset+"__"+symbol;
         Object o = hashOperations.get(RedisKey.BB_CONTRACT, hashKey);
         String json = o.toString();
-        BBContractVO vo = JSON.parseObject(json, BBContractVO.class);
+        BBSymbolVO vo = JSON.parseObject(json, BBSymbolVO.class);
         return vo;
     }
 
     @Override
-    public List<BBContractVO> getAllBBContract(){
+    public List<BBSymbolVO> getAllBBContract(){
         HashOperations opsForHash = templateDB0.opsForHash();
         Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(RedisKey.BB_CONTRACT, ScanOptions.NONE);
 
-        List<BBContractVO> list = new ArrayList<>();
+        List<BBSymbolVO> list = new ArrayList<>();
         while (curosr.hasNext()) {
             Map.Entry<String, Object> entry = curosr.next();
             Object o = entry.getValue();
-            BBContractVO bBContractVO = JSON.parseObject(o.toString(), BBContractVO.class);
-            list.add(bBContractVO);
+            BBSymbolVO bBSymbolVO = JSON.parseObject(o.toString(), BBSymbolVO.class);
+            list.add(bBSymbolVO);
         }
 
 

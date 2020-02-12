@@ -12,6 +12,7 @@ import com.hp.sh.expv3.bb.module.order.entity.BBActiveOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
+import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.msg.BBAccountLog;
 import com.hp.sh.expv3.component.id.config.SequencConfig;
 import com.hp.sh.expv3.component.id.config.WorkerConfig;
@@ -42,6 +43,9 @@ public class WorkerConfigBuilder {
 
 	private static final String BB_ACTIVE_ORDER = BBActiveOrder.class.getName();
 	private static final int BB_ACTIVE_ORDER_ID = 10;
+
+	private static final String BB_MATCHED_TRADE = BBMatchedTrade.class.getName();
+	private static final int BB_MATCHED_TRADE_ID = 11;
 	
 	
 	@Value("${id.generator.dataCenterId}")
@@ -69,6 +73,7 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, BB_ORDER_LOG_ID, BB_ORDER_LOG);
 		this.set(workerConfig, BB_ORDER_TRADE_ID, BB_ORDER_TRADE);
 		this.set(workerConfig, BB_ACTIVE_ORDER_ID, BB_ACTIVE_ORDER);
+		this.set(workerConfig, BB_MATCHED_TRADE_ID, BB_MATCHED_TRADE);
 	}
 	
 	private void set(WorkerConfig workerConfig, int seqId, String tableUUID){
