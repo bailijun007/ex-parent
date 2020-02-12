@@ -68,7 +68,7 @@ public class LockAdvice {
 				try{
 					this.unlock(realKey);
 					time = System.currentTimeMillis()-time;
-					logger.debug("unlock：{},{},{}", realKey, time, (time/1000));
+					logger.debug("unlock：{},{},{},{}", realKey, time, (time/1000), joinPoint);
 				}catch(Exception e){
 					logger.error("解锁失败：{}", realKey, e);
 					throw e;

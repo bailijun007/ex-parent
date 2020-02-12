@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 /**
  * @author BaiLiJun  on 2019/12/19
  */
-public class BBContractVO {
+public class BBSymbolVO {
 
     private String asset;
     private String baseCurrency;
@@ -233,12 +233,12 @@ public class BBContractVO {
         this.symbolType = symbolType;
     }
 
-    public BBContractVO() {
+    public BBSymbolVO() {
     }
 
 	@Override
 	public String toString() {
-		return "BBContractVO [asset=" + asset + ", baseCurrency=" + baseCurrency + ", contractGroup=" + contractGroup
+		return "BBSymbolVO [asset=" + asset + ", baseCurrency=" + baseCurrency + ", contractGroup=" + contractGroup
 				+ ", contractName=" + contractName + ", contractNameSplit=" + contractNameSplit + ", contractType="
 				+ contractType + ", ctime=" + ctime + ", defaultPrice=" + defaultPrice + ", displayName=" + displayName
 				+ ", displayNameSplit=" + displayNameSplit + ", faceCurrency=" + faceCurrency + ", faceValue="

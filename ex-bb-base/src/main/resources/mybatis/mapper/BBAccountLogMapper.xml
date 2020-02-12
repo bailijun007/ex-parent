@@ -83,9 +83,6 @@
 
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into bb_account_log (
 			type,user_id,asset,symbol,ref_id,time
 		)values(
@@ -99,7 +96,7 @@
 		set 
 			type=#{type},user_id=#{userId},asset=#{asset},symbol=#{symbol},ref_id=#{refId},time=#{time}
 		where 
-			id=#{id}
+			id=#{id} and user_id=#{userId}
 	</update>
 
 	<delete id="delete">

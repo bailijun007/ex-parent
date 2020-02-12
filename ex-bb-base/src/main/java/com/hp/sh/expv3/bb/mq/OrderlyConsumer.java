@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import com.hp.sh.expv3.bb.component.MetadataService;
-import com.hp.sh.expv3.bb.component.vo.BBContractVO;
+import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 import com.hp.sh.expv3.bb.constant.MqTopic;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.rocketmq.config.RocketmqServerSetting;
@@ -87,14 +87,14 @@ public class OrderlyConsumer {
         return consumer;
 	}
 	
-//	@PostConstruct
+	@PostConstruct
 	public void start123() throws MQClientException{
-		List<BBContractVO> pcList = this.metadataService.getAllBBContract();
-		for(BBContractVO pc : pcList){
-			if(contractGroup.equals(pc.getContractGroup())){
-				this.buildConsumer(MqTopic.getMatchTopic(pc.getAsset(), pc.getSymbol()));
+		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
+		for(BBSymbolVO bbvo : pcList){
+			if(contractGroup.equals(bbvo.getContractGroup())){
+				this.buildConsumer(MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol()));
 			}
-	        logger.info("Consumer Started. asset={}, symbol={}", pc.getAsset(), pc.getSymbol());
+	        logger.info("Consumer Started. asset={}, symbol={}", bbvo.getAsset(), bbvo.getSymbol());
 		}
 	}
 	

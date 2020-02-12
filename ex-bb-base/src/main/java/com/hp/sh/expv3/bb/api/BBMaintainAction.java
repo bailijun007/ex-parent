@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.bb.job.TradeJob;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.mq.MatchMqSender;
@@ -24,6 +25,9 @@ public class BBMaintainAction{
 	
 	@Autowired
 	private BBOrderApiAction bBOrderApiAction;
+	
+	@Autowired
+	private TradeJob tradeJob;
 
 	@ApiOperation(value = "version")
 	@GetMapping(value = "/api/bb/maintain/version")
@@ -98,4 +102,16 @@ public class BBMaintainAction{
 		return n;
 	}
 	
+	
+	@ApiOperation(value = "time")
+	@GetMapping(value = "/api/bb/maintain/sys/time")	
+	public Long sysTime(){
+		return System.currentTimeMillis();
+	}
+
+	@ApiOperation(value = "job")
+	@GetMapping(value = "/api/bb/maintain/job/handle")	
+	public void jobHandle(){
+		tradeJob.handle();
+	}
 }

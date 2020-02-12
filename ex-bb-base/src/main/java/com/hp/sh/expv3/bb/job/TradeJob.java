@@ -43,7 +43,7 @@ public class TradeJob {
 		Page page = new Page(1, 100, 1000L);
 		Long startId = null;
 		while(true){
-			List<BBMatchedTrade> list = this.matchedTradeService.queryPending(page, startTime, null, startId);
+			List<BBMatchedTrade> list = this.matchedTradeService.queryPending(page, null, startTime, startId);
 			
 			if(list==null || list.isEmpty()){
 				break;
@@ -52,7 +52,11 @@ public class TradeJob {
 			for(BBMatchedTrade matchedTrade : list){
 				pool.submit(new Runnable(){
 					public void run() {
-						handleMatchedTrade(matchedTrade);
+						try{
+							handleMatchedTrade(matchedTrade);
+						}catch(Exception e){
+							logger.error(e.getMessage(), e);
+						}
 					}
 					
 				});
@@ -63,7 +67,7 @@ public class TradeJob {
 		}
 	}
 
-	void handleMatchedTrade(BBMatchedTrade matchedTrade){
+	public void handleMatchedTrade(BBMatchedTrade matchedTrade){
 		// MAKER
 		BBTradeMsg makerTradeVo = new BBTradeMsg();
 		makerTradeVo.setTradeId(matchedTrade.getId());

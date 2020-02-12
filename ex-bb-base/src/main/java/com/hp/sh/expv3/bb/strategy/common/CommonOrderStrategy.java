@@ -41,29 +41,20 @@ public class CommonOrderStrategy implements OrderStrategy {
 	public OrderRatioData calcOrderAmt(OrderFeeParam orderParam){
 		BigDecimal amount = calcAmount(orderParam.getVolume(), orderParam.getPrice());
 		
-		//基础货币价值
-		BigDecimal baseValue = orderParam.getVolume();
-		
 		//开仓手续费
-		BigDecimal openFee = calcFee(baseValue, orderParam.getFeeRatio());
-		
-		//平仓手续费
-		BigDecimal closeFee = calcFee(baseValue, orderParam.getCloseFeeRatio());
+		BigDecimal fee = calcFee(amount, orderParam.getFeeRatio());
 		
 		//保证金
 		BigDecimal orderMargin = calMargin(amount, orderParam.getMarginRatio());
 		
 		//总押金
-		BigDecimal grossMargin = BigCalc.sum(closeFee, openFee, orderMargin);
+		BigDecimal grossMargin = BigCalc.sum(fee, orderMargin);
 
 		OrderRatioData orderAmount = new OrderRatioData();
 		orderAmount.setAmount(amount);
-		orderAmount.setBaseValue(baseValue);
 		
 		orderAmount.setOrderMargin(orderMargin);
-		orderAmount.setOpenFee(openFee);
-		orderAmount.setCloseFee(closeFee);
-		orderAmount.setOrderMargin(orderMargin);
+		orderAmount.setFee(fee);
 		orderAmount.setGrossMargin(grossMargin);
 		
 		return orderAmount;
@@ -77,33 +68,6 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 */
 	public OrderRatioData calcRaitoAmt(BBOrder order, BigDecimal number){
 		OrderRatioData orderAmount = new OrderRatioData();
-		if(order.getBidFlag() == OrderFlag.BID_BUY){
-			this.calcOpenRaitoAmt(order, number, orderAmount);
-		}else{
-			this.calcCloseRaitoAmt(order, number, orderAmount);
-		}
-		return orderAmount;
-	}
-	
-	protected void calcCloseRaitoAmt(BBOrder order, BigDecimal number, OrderRatioData orderAmount) {
-		orderAmount.setOpenFee(BigDecimal.ZERO);
-		orderAmount.setCloseFee(BigDecimal.ZERO);
-		orderAmount.setOrderMargin(BigDecimal.ZERO);
-		orderAmount.setGrossMargin(BigDecimal.ZERO);
-		
-		BigDecimal amount = number.multiply(order.getFaceValue());
-
-		orderAmount.setAmount(amount);
-		orderAmount.setBaseValue(number);
-	}
-
-	/**
-	 * 按比例计算开仓订单费用
-	 * @param order
-	 * @param number
-	 * @return
-	 */
-	protected void calcOpenRaitoAmt(BBOrder order, BigDecimal number, OrderRatioData orderAmount){
 		
 		BigDecimal openFee; 
 		BigDecimal closeFee; 
@@ -128,17 +92,15 @@ public class CommonOrderStrategy implements OrderStrategy {
 		}
 		
 		orderAmount.setOrderMargin(orderMargin);
-		orderAmount.setOpenFee(openFee);
-		orderAmount.setCloseFee(closeFee);
+		orderAmount.setFee(openFee);
 		orderAmount.setOrderMargin(orderMargin);
 		orderAmount.setGrossMargin(grossMargin);
 
 		
 		BigDecimal amount = number.multiply(order.getFaceValue());
-		BigDecimal baseValue = number;
 
 		orderAmount.setAmount(amount);
-		orderAmount.setBaseValue(baseValue);
+		return orderAmount;
 	}
 	
 	int ____________________________;
@@ -195,17 +157,6 @@ public class CommonOrderStrategy implements OrderStrategy {
 		tradeResult.setBaseValue(tradeVo.getNumber());
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeVo.getNumber())));
 		
-		//剩余数量
-		tradeResult.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getVolume()));
-		//押金
-		if(bidFlag==OrderFlag.BID_BUY){
-			tradeResult.setOrderMargin(tradeResult.getAmount());
-			tradeResult.setRemainOrderMargin(order.getOrderMargin().subtract(tradeResult.getAmount()));
-		}else{
-			tradeResult.setOrderMargin(tradeResult.getVolume());
-			tradeResult.setRemainOrderMargin(tradeResult.getRemainVolume());
-		}
-		
 		//手续费&率
 		tradeResult.setFeeRatio(order.getFeeRatio());
 		BigDecimal fee = tradeResult.getAmount().multiply(tradeResult.getFeeRatio());
@@ -219,7 +170,17 @@ public class CommonOrderStrategy implements OrderStrategy {
 			tradeResult.setMakerFee(makerFee);
 		}
 		
-		/* **************** 仓位累计数据 **************** */
+		//剩余数量
+		tradeResult.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getVolume()));
+		tradeResult.setRemainFee(order.getFee().subtract(tradeResult.getReceivableFee()));
+		//押金
+		if(bidFlag==OrderFlag.BID_BUY){
+			tradeResult.setOrderMargin(tradeResult.getAmount());
+			tradeResult.setRemainOrderMargin(order.getOrderMargin().subtract(tradeResult.getAmount()));
+		}else{
+			tradeResult.setOrderMargin(tradeResult.getVolume());
+			tradeResult.setRemainOrderMargin(tradeResult.getRemainVolume());
+		}
 		
 		return tradeResult;
 	}
