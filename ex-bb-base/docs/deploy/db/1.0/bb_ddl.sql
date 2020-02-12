@@ -53,7 +53,6 @@ INDEX `idx_user_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='账户日志'
-AUTO_INCREMENT=12
 
 ;
 
@@ -84,7 +83,6 @@ UNIQUE INDEX `un_sn` (`sn`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_账户明细'
-AUTO_INCREMENT=147710969034866689
 
 ;
 
@@ -147,7 +145,6 @@ INDEX `idx_created` (`created`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='币币_订单（委托）'
-AUTO_INCREMENT=147710968724488193
 
 ;
 
@@ -207,7 +204,6 @@ INDEX `idx_orderid` (`order_id`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_用户订单成交记录'
-AUTO_INCREMENT=147709705324625921
 
 ;
 
@@ -242,8 +238,3 @@ DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_成交(撮合结果)'
 
 ;
-
--- ----------------------------
--- Auto increment value for `bb_account_log`
--- ----------------------------
-ALTER TABLE `bb_account_log` AUTO_INCREMENT=12;
