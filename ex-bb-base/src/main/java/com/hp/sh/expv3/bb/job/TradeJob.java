@@ -37,7 +37,7 @@ public class TradeJob {
 	private boolean running = false;
 	
 	@Scheduled(cron = "0 0/10 * * * ?")
-	public synchronized void handle() {
+	public void handle() {
 		Long now = DbDateUtils.now();
 		Long startTime = now-1000*3600;
 		Page page = new Page(1, 100, 1000L);

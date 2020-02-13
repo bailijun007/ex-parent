@@ -97,7 +97,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 		orderAmount.setGrossMargin(grossMargin);
 
 		
-		BigDecimal amount = number.multiply(order.getFaceValue());
+		BigDecimal amount = order.getPrice().multiply(number);
 
 		orderAmount.setAmount(amount);
 		return orderAmount;

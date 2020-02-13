@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.bb.component.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,22 +28,6 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Resource(name = "templateDB5")
     private StringRedisTemplate templateDB5;
-
-    /**
-     * redis :
-     * db: 0
-     * redis key:bb_contract
-     * hash key: ${asset}__${symbol}
-     * 取 faceValue
-     *
-     * @param asset
-     * @param symbol
-     * @return
-     */
-    @Override
-    public BigDecimal getFaceValue(String asset, String symbol) {
-        return BigDecimal.ONE;
-    }
 
     @Override
 	public BBSymbolVO getBBContract(String asset, String symbol) {

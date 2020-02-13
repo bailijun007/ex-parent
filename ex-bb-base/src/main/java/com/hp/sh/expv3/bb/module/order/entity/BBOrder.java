@@ -132,20 +132,10 @@ public class BBOrder extends UserDataEntity implements OrderData{
 	}
 	
 //	int ____________________________;
-	
-	@Override
-	public BigDecimal getFaceValue() {
-		return BigDecimal.ONE;
-	}
 
 	@Override
 	public BigDecimal getMarginRatio() {
 		return BigDecimal.ONE;
-	}
-
-	@Override
-	public BigDecimal getCloseFeeRatio() {
-		return BigDecimal.ZERO;
 	}
 	
 //	int _____________________________;

@@ -24,11 +24,6 @@ import com.hp.sh.expv3.bb.constant.RedisKey;
 public class MetadataServiceMock implements MetadataService {
 
     @Override
-    public BigDecimal getFaceValue(String asset, String symbol) {
-        return BigDecimal.ONE;
-    }
-
-    @Override
 	public BBSymbolVO getBBContract(String asset, String symbol) {
         BBSymbolVO vo = new BBSymbolVO();
         vo.setAsset(asset);
