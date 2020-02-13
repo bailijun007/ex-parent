@@ -15,13 +15,13 @@ import io.swagger.annotations.ApiOperation;
 /**
  * @author bailj
  */
-@Api(tags = "用户资金账户扩展接口")
-@FeignClient(value = "ex-pc-extend")
-public interface PcAccountExtendApi {
+@Api(tags = "用户bb资金账户扩展接口")
+@FeignClient(value = "ex-bb-extend")
+public interface BbAccountExtendApi {
 
-    @ApiOperation(value = "获取账户余额")
-    @GetMapping(value = "/api/pc_extend/pc_account/balance")
-    BigDecimal getBalance(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
+    @ApiOperation(value = "创建BB账号")
+    @GetMapping(value = "/api/bb/account/createBBAccount")
+    int createBBAccount(@RequestParam("userId") Long userId, @RequestParam("asset") String asset);
 
 
 }
