@@ -8,7 +8,6 @@ import java.util.Map;
 import com.hp.sh.expv3.bb.extension.dao.BbAccountExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbAccountExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountVo;
-import com.sun.xml.internal.bind.v2.model.core.Ref;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
