@@ -52,9 +52,6 @@ public class BBMatchedTrade extends BaseBizEntity{
     
     private Integer takerHandleStatus;
     
-    @Version
-    private Long version;
-    
 	public BBMatchedTrade() {
 	}
 
@@ -160,14 +157,6 @@ public class BBMatchedTrade extends BaseBizEntity{
 
 	public void setTakerHandleStatus(Integer takerHandleStatus) {
 		this.takerHandleStatus = takerHandleStatus;
-	}
-
-	public Long getVersion() {
-		return version;
-	}
-
-	public void setVersion(Long version) {
-		this.version = version;
 	}
 
 }

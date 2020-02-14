@@ -91,7 +91,7 @@ public class OrderlyConsumer {
 	public void start123() throws MQClientException{
 		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
 		for(BBSymbolVO bbvo : pcList){
-			if(contractGroup.equals(bbvo.getContractGroup())){
+			if(contractGroup.equals(bbvo.getBbSymbolGroup())){
 				this.buildConsumer(MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol()));
 			}
 	        logger.info("Consumer Started. asset={}, symbol={}", bbvo.getAsset(), bbvo.getSymbol());
