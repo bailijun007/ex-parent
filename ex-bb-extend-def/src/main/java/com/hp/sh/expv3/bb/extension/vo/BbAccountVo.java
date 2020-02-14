@@ -2,12 +2,13 @@ package com.hp.sh.expv3.bb.extension.vo;
 
 import io.swagger.annotations.ApiModelProperty;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * @author BaiLiJun  on 2020/2/13
  */
-public class BbAccountVo {
+public class BbAccountVo implements Serializable {
     @ApiModelProperty("用户Id")
     private Long userId;
 

@@ -1,7 +1,9 @@
 package com.hp.sh.expv3.bb.extension.api;
 
+import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbAccountExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountVo;
+import com.hp.sh.expv3.commons.exception.ExException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,9 +36,9 @@ public class BbAccountExtendApiAction implements BbAccountExtendApi {
     @Override
     public BigDecimal getBalance(Long userId, String asset) {
         BbAccountVo bbAccount = bbAccountExtService.getBBAccount(userId, asset);
-        if (bbAccount != null) {
-            return bbAccount.getBalance();
+        if (bbAccount == null) {
+            throw new ExException(BbExtCommonErrorCode.ACCOUNT_DOES_NOT_EXIST);
         }
-        return null;
+        return bbAccount.getBalance();
     }
 }

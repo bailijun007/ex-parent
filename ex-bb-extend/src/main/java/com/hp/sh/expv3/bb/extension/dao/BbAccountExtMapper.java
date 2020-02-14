@@ -2,6 +2,7 @@ package com.hp.sh.expv3.bb.extension.dao;
 
 import com.hp.sh.expv3.bb.extension.vo.BbAccountVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,6 +14,6 @@ public interface BbAccountExtMapper {
 
     BbAccountVo queryOne(Map<String,Object> map);
 
-    BbAccountVo queryList(Map<String,Object> map);
+    List<BbAccountVo> queryList(Map<String,Object> map);
 
 }

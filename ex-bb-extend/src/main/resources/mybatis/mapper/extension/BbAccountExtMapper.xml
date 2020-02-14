@@ -28,8 +28,10 @@
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
             <if test="balance!=null">and balance=#{balance}</if>
             <if test="version!=null">and version=#{version}</if>
-            <if test="modified!=null">and modified=#{modified}</if>
-            <if test="created!=null">and created=#{created}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null">and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
         </where>
     </sql>
 
