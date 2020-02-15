@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.extension.dao.BbOrderTradeExtMapper">
+
+    <resultMap type="com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo" id="BBOrderTrade">
+        <result column="asset" property="asset" />
+        <result column="symbol" property="symbol" />
+        <result column="price" property="price" />
+        <result column="volume" property="volume" />
+        <result column="bid_flag" property="bidFlag" />
+        <result column="trade_sn" property="tradeSn" />
+        <result column="trade_id" property="tradeId" />
+        <result column="order_id" property="orderId" />
+        <result column="maker_flag" property="makerFlag" />
+        <result column="trade_time" property="tradeTime" />
+        <result column="fee_collector_id" property="feeCollectorId" />
+        <result column="fee_ratio" property="feeRatio" />
+        <result column="fee" property="fee" />
+        <result column="remain_volume" property="remainVolume" />
+        <result column="match_tx_id" property="matchTxId" />
+        <result column="tx_id" property="txId" />
+        <result column="user_id" property="userId" />
+        <result column="id" property="id" />
+        <result column="created" property="created" />
+        <result column="modified" property="modified" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+		asset,symbol,price,volume,bid_flag,trade_sn,trade_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,remain_volume,match_tx_id,tx_id,user_id,id,created,modified
+	</sql>
+
+    <sql id="simple_where" >
+        <where>
+            <if test="idList!=null">
+                and id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+            <if test="userId!=null"> and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
+            <if test="orderId!=null"> and order_id=#{orderId}</if>
+            <if test="tradeSn!=null and tradeSn!=''"> and trade_sn=#{tradeSn}</if>
+            <if test="makerFlag!=null"> and maker_flag=#{makerFlag}</if>
+            <if test="tradeTime!=null"> and trade_time=#{tradeTime}</if>
+            <if test="feeCollectorId!=null"> and fee_collector_id=#{feeCollectorId}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null">and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
+
+    </sql>
+
+    <sql id="simple_query" >
+        select
+        <include refid="Base_Column_List" />
+        from bb_order_trade
+        <include refid="simple_where" />
+
+    </sql>
+
+
+
+    <select id="queryList" resultMap="BBOrderTrade">
+        <include refid="simple_query" />
+    </select>
+
+    <select id="queryOne" resultMap="BBOrderTrade">
+        <include refid="simple_query" />
+    </select>
+
+    <select id="queryCount" resultType="long">
+        select
+        <choose>
+            <when test="SUM!=null">
+                sum(${SUM})
+            </when>
+            <otherwise>
+                count(1)
+            </otherwise>
+        </choose>
+        from bb_order_trade
+        <include refid="simple_where" />
+    </select>
+
+
+</mapper>
