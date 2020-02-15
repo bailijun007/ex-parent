@@ -18,7 +18,7 @@ import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
 import com.hp.sh.expv3.bb.mq.match.msg.BBMatchNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.BbOrderCancelMqMsg;
-import com.hp.sh.expv3.bb.msg.BBTradeMsg;
+import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
@@ -52,19 +52,18 @@ public class MatchMqConsumer {
 		this.orderService.setCancelled(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
 	}
 	
-	//成交
-	@MQListener(tags=MqTags.TAGS_TRADE)
-	public void handleTradeMsg(BBTradeMsg msg){
-		logger.info("收到成交消息:{}", msg);
-//		bBTradeService.handleTradeOrder(msg);
-	}
-	
 	/**
 	 * 撮合成功
 	 */
 	@MQListener(tags=MqTags.TAGS_MATCHED)
 	public void handleMatchedTrade(BBMatchedTrade matchedTrade){
 		logger.info("收到消息:{}", matchedTrade);
+		
+		boolean exist = this.matchedTradeService.exist(matchedTrade.getMkOrderId(), matchedTrade.getTkOrderId());
+		if(exist){
+			logger.warn("撮合已存在:{}", matchedTrade);
+			return;
+		}
 		
 		//保存
 		matchedTrade.setTakerHandleStatus(IntBool.NO);

@@ -18,7 +18,9 @@ import com.hp.sh.expv3.bb.constant.TradeRoles;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
-import com.hp.sh.expv3.bb.msg.BBTradeMsg;
+import com.hp.sh.expv3.bb.strategy.vo.BBTradePair;
+import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.component.executor.OrderlyExecutors;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Component
@@ -34,7 +36,7 @@ public class TradeJob {
 	private BlockingQueue<Runnable> _queue = new LinkedBlockingQueue<Runnable>(100);
 	private ExecutorService pool = new ThreadPoolExecutor(1, 20, 300L, TimeUnit.SECONDS, _queue);
 	
-	private boolean running = false;
+	private OrderlyExecutors orderlyExecutors = new OrderlyExecutors(10);
 	
 	@Scheduled(cron = "0 0/10 * * * ?")
 	public void handle() {
@@ -50,16 +52,7 @@ public class TradeJob {
 			}
 			
 			for(BBMatchedTrade matchedTrade : list){
-				pool.submit(new Runnable(){
-					public void run() {
-						try{
-							handleMatchedTrade(matchedTrade);
-						}catch(Exception e){
-							logger.error(e.getMessage(), e);
-						}
-					}
-					
-				});
+				handleMatchedTrade(matchedTrade);
 				startId = matchedTrade.getId();
 			}
 			
@@ -67,9 +60,22 @@ public class TradeJob {
 		}
 	}
 
-	public void handleMatchedTrade(BBMatchedTrade matchedTrade){
+	public void handleMatchedTrade(BBMatchedTrade matchedVo){
+		BBTradePair tradePair = this.getTradePair(matchedVo);
+		
 		// MAKER
-		BBTradeMsg makerTradeVo = new BBTradeMsg();
+		BBTradeVo makerTradeVo = tradePair.getMakerTradeVo();
+		this.pool.submit(new TradeTask(makerTradeVo));
+		
+		// TAKER
+		BBTradeVo takerTradeVo = tradePair.getTakerTradeVo();
+		this.pool.submit(new TradeTask(takerTradeVo));
+		
+	}
+	
+	private BBTradePair getTradePair(BBMatchedTrade matchedTrade){
+		// MAKER
+		BBTradeVo makerTradeVo = new BBTradeVo();
 		makerTradeVo.setTradeId(matchedTrade.getId());
 		makerTradeVo.setMakerFlag(TradeRoles.MAKER);
 		makerTradeVo.setAsset(matchedTrade.getAsset());
@@ -84,14 +90,8 @@ public class TradeJob {
 		
 		makerTradeVo.setOpponentOrderId(matchedTrade.getTkOrderId());
 
-		//成交
-		tradeService.handleTrade(makerTradeVo);
-		
-		//修改态
-		matchedTradeService.setMakerHandleStatus(matchedTrade.getId());
-		
 		// TAKER
-		BBTradeMsg takerTradeVo = new BBTradeMsg();
+		BBTradeVo takerTradeVo = new BBTradeVo();
 		takerTradeVo.setTradeId(matchedTrade.getId());
 		takerTradeVo.setMakerFlag(TradeRoles.TAKER);
 		takerTradeVo.setAsset(matchedTrade.getAsset());
@@ -102,16 +102,29 @@ public class TradeJob {
 		
 		takerTradeVo.setAccountId(matchedTrade.getTkAccountId());
 		takerTradeVo.setMatchTxId(matchedTrade.getMatchTxId());
-		takerTradeVo.setOrderId(matchedTrade.getTkOrderId());
+		makerTradeVo.setOrderId(matchedTrade.getTkOrderId());
 		
 		takerTradeVo.setOpponentOrderId(matchedTrade.getMkOrderId());
 
-		//成交
-		tradeService.handleTrade(takerTradeVo);
-		
-		//修改态
-		matchedTradeService.setTakerHandleStatus(matchedTrade.getId());
-		
+		return new BBTradePair(makerTradeVo, makerTradeVo);
 	}
 
+	class TradeTask implements Runnable{
+
+		private BBTradeVo tradeVo;
+		
+		public TradeTask(BBTradeVo tradeVo) {
+			this.tradeVo = tradeVo;
+		}
+
+		@Override
+		public void run() {
+			//成交
+			tradeService.handleTrade(tradeVo);
+			//修改态
+			matchedTradeService.setMakerHandleStatus(tradeVo.getTradeId());
+		}
+
+	}
+	
 }

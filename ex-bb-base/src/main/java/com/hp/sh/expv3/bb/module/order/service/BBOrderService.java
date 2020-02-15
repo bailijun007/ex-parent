@@ -103,7 +103,7 @@ public class BBOrderService {
 		//押金
 		BBSymbol bs = new BBSymbol(symbol, bidFlag);
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
-			String remark = "买"+bs.getPayCurrency()+",押金="+order.getOrderMargin()+"，手续费="+order.getFee();
+			String remark = "买"+bs.getPayCurrency()+",押金="+order.getOrderMargin()+"，手续费="+order.getFee().stripTrailingZeros();
 			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getGrossMargin(), remark);
 		}else{
 			String remark = "买"+bs.getPayCurrency()+",押金="+order.getVolume()+"，手续费无";
@@ -148,11 +148,11 @@ public class BBOrderService {
 		this.bBAccountCoreService.cut(request);
 	}
 	
-	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal amount){
+	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal orderMargin, BigDecimal fee){
 		BBAddRequest request = new BBAddRequest();
-		request.setAmount(amount);
+		request.setAmount(orderMargin.add(fee));
 		request.setAsset(asset);
-		request.setRemark("撤单还余额");
+		request.setRemark("撤单还余额:押金="+orderMargin+",手续费="+fee);
 		request.setTradeNo(SnUtils.getCancelOrderReturnSn(""+orderId));
 		SnUtils.getSynchReturnSn(""+orderId);
 		request.setTradeType(BBAccountTradeType.ORDER_CANCEL);
@@ -249,7 +249,7 @@ public class BBOrderService {
 //			
 			OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, remaining);
 			
-			int result = this.returnCancelAmt(userId, asset, orderId, ratioData.getGrossMargin());
+			int result = this.returnCancelAmt(userId, asset, orderId, ratioData.getOrderMargin(), ratioData.getFee());
 			if(result==InvokeResult.NOCHANGE){
 				//利用合约账户的幂等性实现本方法的幂等性
 				logger.warn("已经执行过了");

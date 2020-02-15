@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.msg;
+package com.hp.sh.expv3.bb.strategy.vo;
 
 import java.math.BigDecimal;
 
@@ -7,7 +7,13 @@ import java.math.BigDecimal;
  * @author wangjg
  *
  */
-public class BBTradeMsg extends BaseSymbolMsg {
+public class BBTradeVo {
+	
+	//资产
+	protected String asset;
+	
+	//交易对（合约品种）
+	protected String symbol;
 	
 	//用户ID
 	private Long accountId;
@@ -36,15 +42,31 @@ public class BBTradeMsg extends BaseSymbolMsg {
 	//对手订单ID
 	private Long opponentOrderId;
 
-	public BBTradeMsg() {
+	public BBTradeVo() {
 	}
 
-	public BBTradeMsg(String asset, String symbol, Long tradeId) {
+	public BBTradeVo(String asset, String symbol, Long tradeId) {
 		this.tradeId = tradeId;
 	}
 	
 	public String uniqueKey(){
 		return "TRADE-"+this.tradeId+"-"+opponentOrderId;
+	}
+
+	public String getAsset() {
+		return asset;
+	}
+
+	public void setAsset(String asset) {
+		this.asset = asset;
+	}
+
+	public String getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
 	}
 
 	public Long getAccountId() {
@@ -121,7 +143,7 @@ public class BBTradeMsg extends BaseSymbolMsg {
 
 	@Override
 	public String toString() {
-		return "BBTradeMsg [accountId=" + accountId + ", price=" + price + ", number=" + number + ", orderId=" + orderId
+		return "BBTradeVo [accountId=" + accountId + ", price=" + price + ", number=" + number + ", orderId=" + orderId
 				+ ", tradeId=" + tradeId + ", tradeTime=" + tradeTime + ", makerFlag=" + makerFlag + ", matchTxId="
 				+ matchTxId + ", asset=" + asset + ", symbol=" + symbol + "]";
 	}

@@ -32,6 +32,11 @@ public class BBMatchedTradeService {
 		Long now = DbDateUtils.now();
 		this.matchedTradeDAO.setTakerHandleStatus(id, IntBool.YES, now);
 	}
+	
+	public boolean exist(Long mkOrderId, Long tkOrderId){
+		long c = this.matchedTradeDAO.exist(mkOrderId, tkOrderId);
+		return c > 0;
+	}
 
 	public void save(BBMatchedTrade matchedTrade) {
 		Long now = DbDateUtils.now();

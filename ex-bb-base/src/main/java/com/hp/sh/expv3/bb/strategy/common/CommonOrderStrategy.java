@@ -11,10 +11,10 @@ import com.hp.sh.expv3.bb.component.MetadataService;
 import com.hp.sh.expv3.bb.constant.OrderFlag;
 import com.hp.sh.expv3.bb.constant.TradeRoles;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
-import com.hp.sh.expv3.bb.msg.BBTradeMsg;
 import com.hp.sh.expv3.bb.strategy.OrderStrategy;
 import com.hp.sh.expv3.bb.strategy.data.OrderFeeParam;
 import com.hp.sh.expv3.bb.strategy.data.OrderTrade;
+import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.bb.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.bb.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.math.BigCalc;
@@ -143,7 +143,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * @param pcPosition
 	 * @return
 	 */
-	public TradeResult calcTradeResult(BBTradeMsg tradeVo, BBOrder order){
+	public TradeResult calcTradeResult(BBTradeVo tradeVo, BBOrder order){
 		long userId = order.getUserId();
 		String asset = order.getAsset();
 		String symbol = order.getSymbol();
@@ -151,34 +151,34 @@ public class CommonOrderStrategy implements OrderStrategy {
 		
 		TradeResult tradeResult = new TradeResult();
 	
-		tradeResult.setVolume(tradeVo.getNumber());
-		tradeResult.setPrice(tradeVo.getPrice());
-		tradeResult.setAmount(tradeVo.getPrice().multiply(tradeVo.getNumber()));
-		tradeResult.setBaseValue(tradeVo.getNumber());
+		tradeResult.setTradeVolume(tradeVo.getNumber());
+		tradeResult.setTradePrice(tradeVo.getPrice());
+		tradeResult.setTradeAmount(tradeVo.getPrice().multiply(tradeVo.getNumber()));
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeVo.getNumber())));
 		
-		//手续费&率
-		tradeResult.setFeeRatio(order.getFeeRatio());
-		BigDecimal fee = tradeResult.getAmount().multiply(tradeResult.getFeeRatio());
-		tradeResult.setFee(fee);
+		//手续费率
+		tradeResult.setTradeFeeRatio(order.getFeeRatio());
+		//手续费
+		BigDecimal fee = tradeResult.getTradeAmount().multiply(tradeResult.getTradeFeeRatio());
+		tradeResult.setTradeFee(fee);
 		
 		//maker fee
 		if(tradeVo.getMakerFlag()==TradeRoles.MAKER){
 			BigDecimal makerFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
 			tradeResult.setMakerFeeRatio(makerFeeRatio);
-			BigDecimal makerFee = tradeResult.getAmount().multiply(makerFeeRatio);
+			BigDecimal makerFee = tradeResult.getTradeAmount().multiply(makerFeeRatio);
 			tradeResult.setMakerFee(makerFee);
 		}
 		
 		//剩余数量
-		tradeResult.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getVolume()));
+		tradeResult.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getTradeVolume()));
 		tradeResult.setRemainFee(order.getFee().subtract(tradeResult.getReceivableFee()));
 		//押金
 		if(bidFlag==OrderFlag.BID_BUY){
-			tradeResult.setOrderMargin(tradeResult.getAmount());
-			tradeResult.setRemainOrderMargin(order.getOrderMargin().subtract(tradeResult.getAmount()));
+			tradeResult.setTradeOrderMargin(tradeResult.getTradeAmount());
+			tradeResult.setRemainOrderMargin(order.getOrderMargin().subtract(tradeResult.getTradeAmount()));
 		}else{
-			tradeResult.setOrderMargin(tradeResult.getVolume());
+			tradeResult.setTradeOrderMargin(tradeResult.getTradeVolume());
 			tradeResult.setRemainOrderMargin(tradeResult.getRemainVolume());
 		}
 		

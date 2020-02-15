@@ -7,7 +7,6 @@ package com.hp.sh.expv3.bb.module.trade.entity;
 import java.math.BigDecimal;
 
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import com.hp.sh.expv3.base.entity.BaseBizEntity;
 

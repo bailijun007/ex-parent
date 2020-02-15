@@ -27,4 +27,6 @@ public interface BBMatchedTradeDAO extends BaseMapper<BBMatchedTrade, Long> {
 	
 	public void setTakerHandleStatus(@Param("id") Long id, @Param("takerHandleStatus") Integer takerHandleStatus, @Param("modified") Long modified);
 
+	public long exist(@Param("mkOrderId") Long mkOrderId, @Param("tkOrderId") Long tkOrderId);
+
 }

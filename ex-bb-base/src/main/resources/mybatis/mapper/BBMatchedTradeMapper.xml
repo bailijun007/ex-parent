@@ -87,15 +87,17 @@
 			where id=#{id}
 	</select>
 
-	<select id="exist" resultType="boolean">
-		select 
-			count(1)
-		from 
-			bb_trade
-		<include refid="simple_where" />
-		limit 1
+	<select id="exist" resultType="long">
+		select EXISTS(
+			select 
+				1
+			from 
+				bb_trade
+			where
+				mk_order_id=#{mkOrderId} and tk_order_id=#{tkOrderId}
+			limit 1
+		)
 	</select>
-
 
 	<insert id="save">
 		insert into bb_trade (

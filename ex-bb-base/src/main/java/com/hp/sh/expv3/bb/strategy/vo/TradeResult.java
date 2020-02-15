@@ -10,25 +10,22 @@ import java.math.BigDecimal;
 public class TradeResult {
 	
 	//此次成交的成交量
-	private BigDecimal volume;
+	private BigDecimal tradeVolume;
 	//此次成交的成交价
-	private BigDecimal price;
+	private BigDecimal tradePrice;
 	//此次成交的成交金额
-	private BigDecimal amount;
-	//此次成交的成交合约价值
-	private BigDecimal baseValue;
+	private BigDecimal tradeAmount;
 	//此次成交的手续费率
-	private BigDecimal feeRatio ;
+	private BigDecimal tradeFeeRatio ;
 	//此次成交的手续费
-	private BigDecimal fee;
+	private BigDecimal tradeFee;
+	//此次成交扣除的保证金
+	private BigDecimal tradeOrderMargin;
 	//此次成交的maker手续费率
 	private BigDecimal makerFeeRatio;
 	//此次成交的taker手续费
 	private BigDecimal makerFee;
-	//此次支付的保证金
-	private BigDecimal orderMargin;
-	//此次成交的盈亏（平仓才有）
-	private BigDecimal pnl;
+	
 	
 	/* 以下为订单累计结果 */
 	
@@ -40,16 +37,6 @@ public class TradeResult {
 	private BigDecimal remainOrderMargin;
 	//订单剩余手续费
 	private BigDecimal remainFee;
-
-	/* 以下为仓位累计结果 */
-	
-	//新仓位价值
-	private BigDecimal newPosBaseValue;
-	
-	//新仓位均价(此次成交后，仓位的均价)
-	private BigDecimal newPosMeanPrice;
-	//新预估强平价(此次成交后，仓位的强平价)
-	private BigDecimal newPosLiqPrice;
 	
 	public TradeResult() {
 		super();
@@ -60,7 +47,7 @@ public class TradeResult {
 		if(makerFee==null){
 			return BigDecimal.ZERO;
 		}
-		return fee.subtract(makerFee);
+		return tradeFee.subtract(makerFee);
 	}
 	
 	//应收手续费（考虑到maker收费优惠）
@@ -68,7 +55,7 @@ public class TradeResult {
 		if(makerFee!=null){
 			return makerFee;
 		}
-		return fee;
+		return tradeFee;
 	}
 	
 	//应收手续费率（考虑到maker收费优惠）
@@ -76,82 +63,50 @@ public class TradeResult {
 		if(makerFeeRatio!=null){
 			return makerFeeRatio;
 		}
-		return feeRatio;
+		return tradeFeeRatio;
 	}
 
-	public BigDecimal getPrice() {
-		return price;
+	public BigDecimal getTradePrice() {
+		return tradePrice;
 	}
 
-	public void setPrice(BigDecimal price) {
-		this.price = price;
+	public void setTradePrice(BigDecimal price) {
+		this.tradePrice = price;
 	}
 
-	public BigDecimal getFeeRatio() {
-		return feeRatio;
+	public BigDecimal getTradeFeeRatio() {
+		return tradeFeeRatio;
 	}
 
-	public void setFeeRatio(BigDecimal feeRatio) {
-		this.feeRatio = feeRatio;
+	public void setTradeFeeRatio(BigDecimal feeRatio) {
+		this.tradeFeeRatio = feeRatio;
 	}
 
-	public BigDecimal getFee() {
-		return fee;
+	public BigDecimal getTradeFee() {
+		return tradeFee;
 	}
 
-	public void setFee(BigDecimal fee) {
-		this.fee = fee;
+	public void setTradeFee(BigDecimal fee) {
+		this.tradeFee = fee;
 	}
 
-	public BigDecimal getOrderMargin() {
-		return orderMargin;
+	public BigDecimal getTradeOrderMargin() {
+		return tradeOrderMargin;
 	}
 
-	public void setOrderMargin(BigDecimal margin) {
-		this.orderMargin = margin;
+	public void setTradeOrderMargin(BigDecimal margin) {
+		this.tradeOrderMargin = margin;
 	}
 
-	public BigDecimal getPnl() {
-		return pnl;
+	public BigDecimal getTradeVolume() {
+		return tradeVolume;
 	}
 
-	public void setPnl(BigDecimal pnl) {
-		this.pnl = pnl;
+	public void setTradeVolume(BigDecimal volume) {
+		this.tradeVolume = volume;
 	}
 
-	public BigDecimal getVolume() {
-		return volume;
-	}
-
-	public void setVolume(BigDecimal volume) {
-		this.volume = volume;
-	}
-
-	public BigDecimal getBaseValue() {
-		return baseValue;
-	}
-
-	public void setBaseValue(BigDecimal baseValue) {
-		this.baseValue = baseValue;
-	}
-
-	public BigDecimal getNewPosMeanPrice() {
-		return newPosMeanPrice;
-	}
-
-	public void setNewPosMeanPrice(BigDecimal newMeanPrice) {
-		this.newPosMeanPrice = newMeanPrice;
-	}
-
-	public BigDecimal getNewPosLiqPrice() {
-		return newPosLiqPrice;
-	}
-
-	public void setNewPosLiqPrice(BigDecimal liqPrice) {
-		this.newPosLiqPrice = liqPrice;
-	}
-
-	public boolean getOrderCompleted() {
+	public boolean isOrderCompleted() {
 		return isOrderCompleted;
 	}
 
@@ -175,20 +130,12 @@ public class TradeResult {
 		this.makerFeeRatio = makerFeeRatio;
 	}
 
-	public BigDecimal getNewPosBaseValue() {
-		return newPosBaseValue;
+	public BigDecimal getTradeAmount() {
+		return tradeAmount;
 	}
 
-	public void setNewPosBaseValue(BigDecimal newPosBaseValue) {
-		this.newPosBaseValue = newPosBaseValue;
-	}
-
-	public BigDecimal getAmount() {
-		return amount;
-	}
-
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
+	public void setTradeAmount(BigDecimal amount) {
+		this.tradeAmount = amount;
 	}
 
 	public BigDecimal getRemainOrderMargin() {
