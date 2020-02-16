@@ -106,7 +106,7 @@ public class BBOrderService {
 			String remark = "买"+bs.getPayCurrency()+",押金="+order.getOrderMargin()+"，手续费="+order.getFee().stripTrailingZeros();
 			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getGrossMargin(), remark);
 		}else{
-			String remark = "买"+bs.getPayCurrency()+",押金="+order.getVolume()+"，手续费无";
+			String remark = "卖"+bs.getPayCurrency()+",押金="+order.getVolume()+"，手续费无";
 			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getVolume(), remark);
 		}
 		
@@ -245,16 +245,13 @@ public class BBOrderService {
 		BigDecimal remaining = order.getVolume().subtract(order.getFilledVolume());
 		
 		//退押金
-		if(order.getBidFlag()==OrderFlag.BID_BUY){
-//			
-			OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, remaining);
-			
-			int result = this.returnCancelAmt(userId, asset, orderId, ratioData.getOrderMargin(), ratioData.getFee());
-			if(result==InvokeResult.NOCHANGE){
-				//利用合约账户的幂等性实现本方法的幂等性
-				logger.warn("已经执行过了");
-				return;
-			}
+		BBSymbol bs = new BBSymbol(symbol, order.getBidFlag());
+		OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, remaining);
+		int result = this.returnCancelAmt(userId, bs.getPayCurrency(), orderId, ratioData.getOrderMargin(), ratioData.getFee());
+		if(result==InvokeResult.NOCHANGE){
+			//利用合约账户的幂等性实现本方法的幂等性
+			logger.warn("已经执行过了");
+			return;
 		}
 		
 		//修改订单状态（撤销）

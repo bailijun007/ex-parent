@@ -12,13 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.constant.MqTags;
-import com.hp.sh.expv3.bb.job.TradeJob;
+import com.hp.sh.expv3.bb.job.BBMatchedHandler;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
 import com.hp.sh.expv3.bb.mq.match.msg.BBMatchNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.BbOrderCancelMqMsg;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
@@ -70,11 +69,11 @@ public class MatchMqConsumer {
 		matchedTrade.setMakerHandleStatus(IntBool.NO);
 		this.matchedTradeService.save(matchedTrade);
 		
-		tradeJob.handleMatchedTrade(matchedTrade);
+		matchedHandler.handleMatchedTrade(matchedTrade);
 		
 	}
 	
 	@Autowired
-	private TradeJob tradeJob;
+	private BBMatchedHandler matchedHandler;
     
 }

@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.page.Page;
-import com.hp.sh.expv3.bb.job.TradeJob;
+import com.hp.sh.expv3.bb.job.BBMatchedHandler;
+import com.hp.sh.expv3.bb.job.BBMatchedJob;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.mq.MatchMqSender;
@@ -27,7 +28,7 @@ public class BBMaintainAction{
 	private BBOrderApiAction bBOrderApiAction;
 	
 	@Autowired
-	private TradeJob tradeJob;
+	private BBMatchedHandler tradeJob;
 
 	@ApiOperation(value = "version")
 	@GetMapping(value = "/api/bb/maintain/version")
@@ -112,6 +113,6 @@ public class BBMaintainAction{
 	@ApiOperation(value = "job")
 	@GetMapping(value = "/api/bb/maintain/job/handle")	
 	public void jobHandle(){
-		tradeJob.handle();
+		tradeJob.handlePending();
 	}
 }

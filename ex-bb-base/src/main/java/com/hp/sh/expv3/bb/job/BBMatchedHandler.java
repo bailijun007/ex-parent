@@ -1,16 +1,10 @@
 package com.hp.sh.expv3.bb.job;
 
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.page.Page;
@@ -24,8 +18,8 @@ import com.hp.sh.expv3.component.executor.OrderlyExecutors;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Component
-public class TradeJob {
-    private static final Logger logger = LoggerFactory.getLogger(TradeJob.class);
+public class BBMatchedHandler {
+    private static final Logger logger = LoggerFactory.getLogger(BBMatchedHandler.class);
 
     @Autowired
     private BBMatchedTradeService matchedTradeService;
@@ -33,13 +27,9 @@ public class TradeJob {
 	@Autowired
 	private BBTradeService tradeService;
 
-	private BlockingQueue<Runnable> _queue = new LinkedBlockingQueue<Runnable>(100);
-	private ExecutorService pool = new ThreadPoolExecutor(1, 20, 300L, TimeUnit.SECONDS, _queue);
-	
 	private OrderlyExecutors orderlyExecutors = new OrderlyExecutors(10);
 	
-	@Scheduled(cron = "0 0/10 * * * ?")
-	public void handle() {
+	public void handlePending() {
 		Long now = DbDateUtils.now();
 		Long startTime = now-1000*3600;
 		Page page = new Page(1, 100, 1000L);
@@ -56,7 +46,6 @@ public class TradeJob {
 				startId = matchedTrade.getId();
 			}
 			
-			page.setPageNo(page.getPageNo()+1);
 		}
 	}
 
@@ -65,11 +54,11 @@ public class TradeJob {
 		
 		// MAKER
 		BBTradeVo makerTradeVo = tradePair.getMakerTradeVo();
-		this.pool.submit(new TradeTask(makerTradeVo));
+		this.orderlyExecutors.submit(makerTradeVo.getAccountId(), new TradeTask(makerTradeVo));
 		
 		// TAKER
 		BBTradeVo takerTradeVo = tradePair.getTakerTradeVo();
-		this.pool.submit(new TradeTask(takerTradeVo));
+		this.orderlyExecutors.submit(takerTradeVo.getAccountId(), new TradeTask(takerTradeVo));
 		
 	}
 	
