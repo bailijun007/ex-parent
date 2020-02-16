@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.extension.dao.BbTradeExtMapper">
+
+    <resultMap type="com.hp.sh.expv3.bb.extension.vo.BbTradeVo" id="BbTradeVo">
+        <result column="user_id" property="userId" />
+        <result column="id" property="id" />
+        <result column="asset" property="asset" />
+        <result column="symbol" property="symbol" />
+        <result column="match_tx_id" property="matchTxId" />
+        <result column="tk_bid_flag" property="tkBidFlag" />
+        <result column="tk_account_id" property="tkAccountId" />
+        <result column="tk_order_id" property="tkOrderId" />
+        <result column="tk_close_flag" property="tkCloseFlag" />
+        <result column="mk_account_id" property="mkAccountId" />
+        <result column="mk_order_id" property="mkOrderId" />
+        <result column="mk_order_id" property="mkOrderId" />
+        <result column="mk_close_flag" property="mkCloseFlag" />
+        <result column="price" property="price" />
+        <result column="number" property="number" />
+        <result column="trade_time" property="tradeTime" />
+        <result column="maker_handle_status" property="makerHandleStatus" />
+        <result column="taker_handle_status" property="takerHandleStatus" />
+        <result column="created" property="created" />
+        <result column="modified" property="modified" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+		id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,
+		mk_order_id,mk_close_flag,price,`number`,trade_time,maker_handle_status,taker_handle_status,version,created,modified
+
+    </sql>
+
+
+    <sql id="simple_where" >
+        <where>
+        <if test="idList!=null">
+            and id in
+            <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                #{idList[${i}]}
+            </foreach>
+        </if>
+        <if test="userId!=null"> and user_id=#{userId}</if>
+        <if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+        <if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
+        <if test="orderId!=null"> and order_id=#{orderId}</if>
+        <if test="tradeSn!=null and tradeSn!=''"> and trade_sn=#{tradeSn}</if>
+        <if test="makerFlag!=null"> and maker_flag=#{makerFlag}</if>
+        <if test="tradeTime!=null"> and trade_time=#{tradeTime}</if>
+        <if test="feeCollectorId!=null"> and fee_collector_id=#{feeCollectorId}</if>
+        <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+        <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+        <if test="modifiedBegin!=null">and modified &gt;= #{modifiedBegin}</if>
+        <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
+        </where>
+    </sql>
+
+    <sql id="simple_query" >
+        select
+        <include refid="Base_Column_List" />
+        from bb_trade
+        <include refid="simple_where" />
+
+    </sql>
+
+
+
+    <select id="queryList" resultMap="BbTradeVo">
+        <include refid="simple_query" />
+    </select>
+
+    <select id="queryOne" resultMap="BbTradeVo">
+        <include refid="simple_query" />
+    </select>
+
+
+
+
+</mapper>
