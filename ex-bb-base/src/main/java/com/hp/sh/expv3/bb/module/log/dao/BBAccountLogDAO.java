@@ -1,11 +1,11 @@
 
-package com.hp.sh.expv3.bb.module.collector.dao;
+package com.hp.sh.expv3.bb.module.log.dao;
 
 import java.util.List;
 import java.util.Map;
 
 import com.hp.sh.expv3.base.mapper.BaseMapper;
-import com.hp.sh.expv3.bb.module.collector.entity.BBAccountLog;
+import com.hp.sh.expv3.bb.module.log.entity.BBAccountLog;
 
 /**
  * 

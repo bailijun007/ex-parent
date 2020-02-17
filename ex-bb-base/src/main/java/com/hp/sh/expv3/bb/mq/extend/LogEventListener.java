@@ -9,8 +9,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
 import com.hp.sh.expv3.bb.constant.LogType;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
-import com.hp.sh.expv3.bb.module.collector.entity.BBAccountLog;
-import com.hp.sh.expv3.bb.module.collector.service.BBAccountLogService;
+import com.hp.sh.expv3.bb.module.log.entity.BBAccountLog;
+import com.hp.sh.expv3.bb.module.log.service.BBAccountLogService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 
 /**

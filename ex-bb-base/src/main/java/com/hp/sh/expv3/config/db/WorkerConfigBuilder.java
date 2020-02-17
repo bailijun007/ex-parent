@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.module.account.entity.BBAccount;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
-import com.hp.sh.expv3.bb.module.collector.entity.BBAccountLog;
+import com.hp.sh.expv3.bb.module.log.entity.BBAccountLog;
 import com.hp.sh.expv3.bb.module.order.entity.BBActiveOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;
