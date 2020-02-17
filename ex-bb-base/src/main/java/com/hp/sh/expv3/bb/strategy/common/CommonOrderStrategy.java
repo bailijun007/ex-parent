@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.component.FeeRatioService;
-import com.hp.sh.expv3.bb.component.MetadataService;
 import com.hp.sh.expv3.bb.constant.OrderFlag;
 import com.hp.sh.expv3.bb.constant.TradeRoles;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;

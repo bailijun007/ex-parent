@@ -28,6 +28,7 @@ import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.utils.DbDateUtils;
+import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.SnUtils;
 import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigUtils;
@@ -100,6 +101,11 @@ public class BBTradeService {
 				}
 			}
 		}
+		
+		//同步手续费
+		
+		//补充手续费
+		
 		
 	}
 
@@ -187,6 +193,7 @@ public class BBTradeService {
 		orderTrade.setRemainFee(BigCalc.subtract(order.getFee(), tradeResult.getReceivableFeeRatio()));
 		
 		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
+		orderTrade.setFeeSynchStatus(IntBool.NO);
 		
 		this.pcOrderTradeDAO.save(orderTrade);
 		
@@ -216,7 +223,7 @@ public class BBTradeService {
 		return true;
 	}
 	
-	private void synchCollector(Long tradeOrderId, Long feeCollectorId, BigDecimal fee){
+	public void synchCollector(Long userId, Long tradeOrderId, Long feeCollectorId, BigDecimal fee){
 		
 	}
 

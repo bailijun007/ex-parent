@@ -18,6 +18,7 @@ import com.hp.sh.expv3.bb.module.order.dao.BBOrderDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderLogDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
+import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.strategy.common.CommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
@@ -115,6 +116,17 @@ public class BBOrderQueryService {
 		params.put("status", status);
 		params.put("modifiedEnd", modified);
 		List<BBOrder> list = this.bBOrderDAO.queryList(params);
+		return list;
+	}
+	
+	@CrossDB
+	public List<BBOrderTrade> querySynchFee(Page page, Long created){
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("page", page);
+		params.put("feeSynchStatus", IntBool.NO);
+		params.put("createdEnd", created);
+		params.put("orderBy", "created");
+		List<BBOrderTrade> list = this.bBOrderTradeDAO.queryList(params);
 		return list;
 	}
 }

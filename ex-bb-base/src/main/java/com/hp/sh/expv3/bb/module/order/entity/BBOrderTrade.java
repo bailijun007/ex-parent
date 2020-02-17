@@ -68,9 +68,12 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 	
 	//撮合事务Id
 	private Long matchTxId;
-	
+
 	//事务ID
 	private Long txId;
+	
+	//手续费同步状态
+	private Integer feeSynchStatus;
 	
 	@Transient
 	private Integer logType;
@@ -230,6 +233,14 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 
 	public void setRemainFee(BigDecimal remainFee) {
 		this.remainFee = remainFee;
+	}
+
+	public Integer getFeeSynchStatus() {
+		return feeSynchStatus;
+	}
+
+	public void setFeeSynchStatus(Integer feeSynchStatus) {
+		this.feeSynchStatus = feeSynchStatus;
 	}
 
 	@Override

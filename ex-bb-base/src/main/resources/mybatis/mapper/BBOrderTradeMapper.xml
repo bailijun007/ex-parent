@@ -51,6 +51,7 @@
 		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
 		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+		<if test="feeSynchStatus!=null"> and fee_synch_status=#{feeSynchStatus}</if>
 		<if test="keyword!=null and keyword!=''"> and symbol like CONCAT('%',#{keyword},'%')</if>	</where>
 	</sql>
 
