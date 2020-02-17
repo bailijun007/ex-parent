@@ -4,7 +4,7 @@ server:
 
 spring:
   application:
-    name: ex-pc-extend
+    name: ex-bb-extend
   messages:
     fallbackToSystemLocale: false
     basename: i18n/errors, i18n/messages
