@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.msg;
+package com.hp.sh.expv3.bb.module.collector.entity;
 
 import javax.persistence.Table;
 
