@@ -136,6 +136,7 @@
             </if>
         </where>
         order by id asc
+        LIMIT 0,999
     </select>
 
     <select id="selectTradeListByTimeInterval" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
