@@ -9,4 +9,7 @@ import java.util.List;
  */
 public interface BbTradeExtService {
     List<BbTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long startTime, Long endTime);
+
+    List<BbTradeVo> selectTradeListByUser(Long userId, String asset, String symbol, Long startTime, Long endTime);
+
 }

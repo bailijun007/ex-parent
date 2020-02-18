@@ -86,5 +86,21 @@
         order by trade_time asc
     </select>
 
+    <select id="selectTradeListByUser">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_trade
+        where
+        user_id=#{userId}
+        and asset=#{asset}
+        and symbol=#{symbol}
+        <if test="tradeTimeBegin!=null">
+            and trade_time &gt;=#{tradeTimeBegin}
+        </if>
+        <if test="tradeTimeEnd!=null">
+            and trade_time &lt;#{tradeTimeEnd}
+        </if>
+        order by trade_time asc
+    </select>
 
 </mapper>

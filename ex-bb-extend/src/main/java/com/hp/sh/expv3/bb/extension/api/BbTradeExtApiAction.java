@@ -8,7 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * @author BaiLiJun  on 2020/2/15
@@ -24,5 +26,18 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
         return bbTradeExtService.selectTradeListByTimeInterval(asset,symbol,startTime,endTime);
+    }
+
+    @Override
+    public List<BbTradeVo> selectTradeListByUser(String asset, String symbol, Long userId, Long startTime, Long endTime) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+
+        if (startTime == null && endTime == null) {
+            endTime = Instant.now().toEpochMilli();
+            startTime = endTime - ((endTime + TimeZone.getDefault().getRawOffset()) % (24 * 60 * 60 * 1000L));
+        }
+        return bbTradeExtService.selectTradeListByUser(userId,asset, symbol, startTime, endTime);
     }
 }

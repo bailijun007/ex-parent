@@ -22,4 +22,9 @@ public class BbTradeExtServiceImpl implements BbTradeExtService {
     public List<BbTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long startTime, Long endTime) {
         return bbTradeExtMapper.selectTradeListByTimeInterval(asset,symbol,startTime,endTime);
     }
+
+    @Override
+    public List<BbTradeVo> selectTradeListByUser(Long userId, String asset, String symbol, Long startTime, Long endTime) {
+        return bbTradeExtMapper.selectTradeListByUser(userId,asset,symbol,startTime,endTime);
+    }
 }
