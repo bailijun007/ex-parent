@@ -165,9 +165,8 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
             Long startSnapshotOffset = snapshotOffset.floor(sentMqOffset);
 
             if (null == startSnapshotOffset) {
-                context.setLastPrice(null);
-                this.setCurrentMsgOffset(0L);
-                return;
+                logger.error("lastSentOffset:{},snapshot is null,please check.");
+                System.exit(-1);
             }
 
             String s = pcRedisUtil.hget(snapshotRedisKey, startSnapshotOffset + "");
@@ -214,7 +213,7 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
 
         } else {
             context.setLastPrice(null);
-            this.setCurrentMsgOffset(0L);
+            this.setCurrentMsgOffset(sentMqOffset);
         }
 
         /**

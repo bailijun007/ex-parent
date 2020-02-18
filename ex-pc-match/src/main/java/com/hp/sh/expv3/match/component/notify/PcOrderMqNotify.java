@@ -124,7 +124,7 @@ public class PcOrderMqNotify {
                 }
             }
             try {
-                Thread.sleep(1L);
+                Thread.sleep(200L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
