@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.bb.extension.dao;
 
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -14,4 +15,6 @@ public interface BbOrderTradeExtMapper {
     List<BbOrderTradeVo> queryList(Map<String,Object> map);
 
     Long queryCount();
+
+    BbOrderTradeVo selectLessTimeTrade(@Param("asset") String asset,@Param("symbol") String symbol,@Param("tradeTime") Long tradeTime);
 }

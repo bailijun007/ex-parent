@@ -72,6 +72,7 @@
         <include refid="simple_query" />
     </select>
 
+
     <select id="queryCount" resultType="long">
         select
         <choose>
@@ -84,6 +85,17 @@
         </choose>
         from bb_order_trade
         <include refid="simple_where" />
+    </select>
+
+    <select id="selectLessTimeTrade" resultMap="BBOrderTrade">
+        select
+        <include refid="Base_Column_List" />
+        from bb_order_trade
+        where asset=#{asset}
+        and symbol=#{symbol}
+        and tradeTime &lt;#{tradeTime}
+        order by trade_time desc
+        limit 0,1
     </select>
 
 
