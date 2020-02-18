@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author BaiLiJun  on 2020/2/15
  */
@@ -19,5 +21,10 @@ public class BbOrderTradeExtServiceImpl implements BbOrderTradeExtService {
     @Override
     public BbOrderTradeVo selectLessTimeTrade(String asset, String symbol, Long statTime) {
         return bbOrderTradeExtMapper.selectLessTimeTrade(asset,symbol,statTime);
+    }
+
+    @Override
+    public List<BbOrderTradeVo> selectAllTradeListByUser(String asset, String symbol, Long userId) {
+        return bbOrderTradeExtMapper.selectAllTradeListByUser(asset,symbol,userId);
     }
 }

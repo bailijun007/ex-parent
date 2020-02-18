@@ -9,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * @author BaiLiJun  on 2020/2/15
  */
@@ -32,5 +34,13 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
         return bbOrderTradeExtService.selectLessTimeTrade(asset,symbol,statTime);
+    }
+
+    @Override
+    public List<BbOrderTradeVo> selectAllTradeListByUser(String asset, String symbol, Long userId) {
+        if (userId == null) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+        return bbOrderTradeExtService.selectAllTradeListByUser(asset,symbol,userId);
     }
 }
