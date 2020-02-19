@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class BBMatchedHandleThread extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(BBMatchedHandleThread.class);
 
@@ -46,7 +46,7 @@ public class BBMatchedHandleThread extends Thread {
         }
 	}
 	
-//	@PostConstruct
+	@PostConstruct
 	void begin(){
 		this.start();
 	}

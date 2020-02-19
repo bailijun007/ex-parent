@@ -16,6 +16,7 @@ import com.hp.sh.expv3.bb.constant.OrderFlag;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.constant.TradeRoles;
 import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
+import com.hp.sh.expv3.bb.module.collector.service.BBCollectorCoreService;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
@@ -223,8 +224,19 @@ public class BBTradeService {
 		return true;
 	}
 	
-	public void synchCollector(Long userId, Long tradeOrderId, Long feeCollectorId, BigDecimal fee){
-		
+	@Autowired
+	private BBCollectorCoreService collectorCoreService;
+	
+	public void synchCollector(BBOrderTrade orderTrade){
+		BBAddRequest request = new BBAddRequest();
+		request.setAmount(orderTrade.getFee());
+		request.setAsset(orderTrade.getAsset());
+		request.setAssociatedId(orderTrade.getOrderId());
+		request.setRemark("手续费");
+		request.setTradeNo(""+orderTrade.getId());
+		request.setTradeType(0);
+		request.setUserId(orderTrade.getUserId());
+		collectorCoreService.add(request);
 	}
 
 }

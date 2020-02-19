@@ -46,7 +46,7 @@ public class BBOrderTradeFeeJob {
 	}
 
 	private void handleOrderTrade(BBOrderTrade orderTrade) {
-		tradeService.synchCollector(orderTrade.getUserId(), orderTrade.getId(), orderTrade.getFeeCollectorId(), orderTrade.getFee());
+		tradeService.synchCollector(orderTrade);
 		
 	}
 	

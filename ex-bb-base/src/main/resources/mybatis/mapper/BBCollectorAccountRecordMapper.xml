@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.bb.module.log.dao.BBCollectorAccountRecordDAO">
+
+	<resultMap type="com.hp.sh.expv3.bb.module.log.entity.BBCollectorAccountRecord" id="BBCollectorAccountRecord">
+		<result column="asset" property="asset" />
+		<result column="sn" property="sn" />
+		<result column="type" property="type" />
+		<result column="amount" property="amount" />
+		<result column="remark" property="remark" />
+		<result column="balance" property="balance" />
+		<result column="trade_no" property="tradeNo" />
+		<result column="trade_type" property="tradeType" />
+		<result column="serial_no" property="serialNo" />
+		<result column="associated_id" property="associatedId" />
+		<result column="tx_id" property="txId" />
+		<result column="request_id" property="requestId" />
+		<result column="user_id" property="userId" />
+		<result column="id" property="id" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		asset,sn,type,amount,remark,balance,trade_no,trade_type,serial_no,associated_id,tx_id,request_id,user_id,id,created,modified
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="idList!=null">
+		and id in
+		<foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+		#{idList[${i}]}
+		</foreach>
+		</if>
+		<if test="userId!=null"> and user_id=#{userId}</if>
+		<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+		<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
+		<if test="type!=null"> and type=#{type}</if>
+		<if test="tradeType!=null"> and trade_type=#{tradeType}</if>
+		<if test="serialNo!=null"> and serial_no=#{serialNo}</if>
+		<if test="associatedId!=null"> and associated_id=#{associatedId}</if>
+		<if test="requestId!=null and requestId!=''"> and request_id=#{requestId}</if>
+		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
+		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+		<if test="keyword!=null and keyword!=''"> and xxxxx like CONCAT('%',#{keyword},'%')</if>	
+		</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from bb_account_record
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="BBCollectorAccountRecord">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="BBCollectorAccountRecord">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="BBCollectorAccountRecord">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from bb_account_record
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="BBCollectorAccountRecord">
+		select
+			<include refid="Base_Column_List" />
+		from bb_account_record
+			where id=#{id}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			BBCollectorAccountRecord
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into bb_account_record (
+			asset,sn,type,amount,remark,balance,trade_no,trade_type,serial_no,associated_id,tx_id,request_id,user_id,id,created,modified
+		)values(
+			#{asset},#{sn},#{type},#{amount},#{remark},#{balance},#{tradeNo},#{tradeType},#{serialNo},#{associatedId},#{txId},#{requestId},#{userId},#{id},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			bb_account_record
+		set 
+			asset=#{asset},sn=#{sn},type=#{type},amount=#{amount},remark=#{remark},balance=#{balance},trade_no=#{tradeNo},trade_type=#{tradeType},serial_no=#{serialNo},associated_id=#{associatedId},tx_id=#{txId},request_id=#{requestId},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+		where 
+			id=#{id} and user_id=#{userId}
+	</update>
+
+	<delete id="delete">
+        delete from bb_account_record where where id=#{id} and user_id=#{userId}
+    </delete>
+
+    <delete id="condDelete">
+        delete from bb_account_record
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+
+	<select id="findByTradeNo" resultMap="BBCollectorAccountRecord">
+		select
+			<include refid="Base_Column_List" />
+		from bb_account_record
+			where user_id=#{userId} and trade_no=#{tradeNo}
+	</select>
+	
+</mapper>
