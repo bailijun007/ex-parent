@@ -68,25 +68,25 @@ public class BBOrderQueryService {
 		
 		for(BBOrder order : list){
 			ActiveOrderVo activeOrderVo = new ActiveOrderVo();
-			activeOrderVo.setId(order.getId());
-			activeOrderVo.setUserId(order.getUserId());
-			activeOrderVo.setAsset(order.getAsset());
-			activeOrderVo.setSymbol(order.getSymbol());
-			activeOrderVo.setCreated(order.getCreated());
-			activeOrderVo.setBidFlag(order.getBidFlag());
-			activeOrderVo.setLeverage(order.getLeverage());
-			activeOrderVo.setFilledVolume(order.getFilledVolume());
-			activeOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
-			
-			List<OrderTradeVo> orderTradeList = _tradeListMap.get(order.getId());
-			BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
-			
-			activeOrderVo.setMeanPrice(meanPrice);
-			activeOrderVo.setPrice(order.getPrice());
-			activeOrderVo.setFeeCost(order.getFeeCost());
-			activeOrderVo.setStatus(order.getStatus());
-			
-			result.add(activeOrderVo);
+            activeOrderVo.setId(order.getId());
+            activeOrderVo.setUserId(order.getUserId());
+            activeOrderVo.setAsset(order.getAsset());
+            activeOrderVo.setSymbol(order.getSymbol());
+            activeOrderVo.setCreated(order.getCreated());
+            activeOrderVo.setBidFlag(order.getBidFlag());
+            activeOrderVo.setLeverage(order.getLeverage());
+            activeOrderVo.setFilledVolume(order.getFilledVolume());
+            activeOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
+
+            List<OrderTradeVo> orderTradeList = _tradeListMap.get(order.getId());
+            BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
+
+            activeOrderVo.setMeanPrice(meanPrice);
+            activeOrderVo.setPrice(order.getPrice());
+            activeOrderVo.setFeeCost(order.getFeeCost());
+            activeOrderVo.setStatus(order.getStatus());
+
+            result.add(activeOrderVo);
 		}
 		return result;
 	}
