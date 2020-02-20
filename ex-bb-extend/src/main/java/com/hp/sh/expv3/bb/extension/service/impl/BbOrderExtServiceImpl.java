@@ -8,7 +8,7 @@ import com.hp.sh.expv3.bb.extension.dao.BbOrderExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
 import com.hp.sh.expv3.bb.extension.vo.HistoryOrderVo;
-import com.hp.sh.expv3.bb.strategy.common.BbCommonOrderStrategy;
+//import com.hp.sh.expv3.bb.strategy.common.BbCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
@@ -29,8 +29,8 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
 
     @Autowired
     private BbOrderExtMapper bbOrderExtMapper;
-    @Autowired
-    private BbCommonOrderStrategy orderStrategy;
+//    @Autowired
+//    private BbCommonOrderStrategy orderStrategy;
 
     @Override
     public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
@@ -72,9 +72,9 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
             historyOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
 
             List<OrderTradeVo> orderTradeList = tradeListMap.get(order.getId());
-            BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
+//            BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
 
-            historyOrderVo.setMeanPrice(meanPrice);
+//            historyOrderVo.setMeanPrice(meanPrice);
             historyOrderVo.setPrice(order.getPrice());
             historyOrderVo.setFeeCost(order.getFeeCost());
             historyOrderVo.setStatus(order.getStatus());
