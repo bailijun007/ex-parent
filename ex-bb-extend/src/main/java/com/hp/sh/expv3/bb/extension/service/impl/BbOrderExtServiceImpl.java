@@ -8,10 +8,8 @@ import com.hp.sh.expv3.bb.extension.dao.BbOrderExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
 import com.hp.sh.expv3.bb.extension.vo.HistoryOrderVo;
-import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
-import com.hp.sh.expv3.bb.strategy.common.CommonOrderStrategy;
+import com.hp.sh.expv3.bb.strategy.common.BbCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
-import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
 import org.springframework.beans.BeanUtils;
@@ -21,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2020/2/14
@@ -33,7 +30,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     @Autowired
     private BbOrderExtMapper bbOrderExtMapper;
     @Autowired
-    private CommonOrderStrategy orderStrategy;
+    private BbCommonOrderStrategy orderStrategy;
 
     @Override
     public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {

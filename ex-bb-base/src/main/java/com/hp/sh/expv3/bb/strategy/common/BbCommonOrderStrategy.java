@@ -27,7 +27,7 @@ import com.hp.sh.expv3.utils.math.Precision;
  *
  */
 @Component
-public class CommonOrderStrategy implements OrderStrategy {
+public class BbCommonOrderStrategy implements OrderStrategy {
 
 	
 	@Autowired

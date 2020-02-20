@@ -14,15 +14,13 @@ import com.hp.sh.expv3.bb.component.FeeCollectorSelector;
 import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
 import com.hp.sh.expv3.bb.constant.OrderFlag;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
-import com.hp.sh.expv3.bb.constant.TradeRoles;
 import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
 import com.hp.sh.expv3.bb.module.collector.service.BBCollectorCoreService;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.vo.BBSymbol;
-import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
-import com.hp.sh.expv3.bb.strategy.common.CommonOrderStrategy;
+import com.hp.sh.expv3.bb.strategy.common.BbCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.bb.strategy.vo.TradeResult;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
@@ -52,7 +50,7 @@ public class BBTradeService {
 	private BBAccountCoreService pcAccountCoreService;
 	
 	@Autowired
-	private CommonOrderStrategy orderStrategy;
+	private BbCommonOrderStrategy orderStrategy;
 	
 	@Autowired
 	private FeeCollectorSelector feeCollectorSelector;
