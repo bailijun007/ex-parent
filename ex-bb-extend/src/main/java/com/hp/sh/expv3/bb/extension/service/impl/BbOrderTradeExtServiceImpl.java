@@ -27,4 +27,9 @@ public class BbOrderTradeExtServiceImpl implements BbOrderTradeExtService {
     public List<BbOrderTradeVo> selectAllTradeListByUser(String asset, String symbol, Long userId) {
         return bbOrderTradeExtMapper.selectAllTradeListByUser(asset,symbol,userId);
     }
+
+    @Override
+    public List<BbOrderTradeVo> queryOrderTrade(Long userId, List<Long> orderIdList) {
+        return bbOrderTradeExtMapper.queryOrderTrade(userId,orderIdList);
+    }
 }

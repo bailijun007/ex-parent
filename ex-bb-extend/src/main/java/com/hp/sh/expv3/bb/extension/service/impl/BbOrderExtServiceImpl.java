@@ -6,6 +6,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.bb.extension.dao.BbOrderExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
+import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
+import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
 import com.hp.sh.expv3.bb.extension.vo.HistoryOrderVo;
 import com.hp.sh.expv3.utils.IntBool;
@@ -27,6 +29,10 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
 
     @Autowired
     private BbOrderExtMapper bbOrderExtMapper;
+
+    @Autowired
+    private BbOrderTradeExtService bbOrderTradeExtService;
+
 //    @Autowired
 //    private BbCommonOrderStrategy orderStrategy;
 
@@ -58,9 +64,9 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         if (list == null || list.isEmpty()) {
             return result;
         }
-//        List<Long> orderIdList = BeanHelper.getDistinctPropertyList(list, "id");
-//        List<OrderTradeVo> _tradeList = bbOrderExtMapper.queryOrderTrade(userId, orderIdList);
-//        Map<Long, List<OrderTradeVo>> tradeListMap = BeanHelper.groupByProperty(_tradeList, "orderId");
+        List<Long> orderIdList = BeanHelper.getDistinctPropertyList(list, "id");
+        final List<BbOrderTradeVo> _tradeList = bbOrderTradeExtService.queryOrderTrade(userId, orderIdList);
+        Map<Long, List<BbOrderTradeVo>> tradeListMap = BeanHelper.groupByProperty(_tradeList, "orderId");
 
         for (BbOrderVo order : list) {
             HistoryOrderVo historyOrderVo = new HistoryOrderVo();
