@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 /**
  * @author BaiLiJun  on 2020/2/19
  */
-public class HistoryOrderVo implements Serializable {
+public class BbHistoryOrderVo implements Serializable {
     //订单ID
     @ApiModelProperty("自增主键")
     private Long id;
@@ -65,12 +65,12 @@ public class HistoryOrderVo implements Serializable {
     @ApiModelProperty("委托类型")
     private Integer  orderType;
 
-    public HistoryOrderVo() {
+    public BbHistoryOrderVo() {
     }
 
     @Override
     public String toString() {
-        return "HistoryOrderVo{" +
+        return "BbHistoryOrderVo{" +
                 "id=" + id +
                 ", userId=" + userId +
                 ", asset='" + asset + '\'' +

@@ -4,7 +4,7 @@ import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
-import com.hp.sh.expv3.bb.extension.vo.HistoryOrderVo;
+import com.hp.sh.expv3.bb.extension.vo.BbHistoryOrderVo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -32,10 +32,22 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
 
 
     @Override
-    public List<HistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
-        if (userId==null||StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)||pageSize==null||nextPage==null) {
+    public List<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
+        checkParam(userId, asset, symbol, pageSize, nextPage);
+        return bbOrderExtService.queryHistoryOrderList(userId,asset,symbol,bidFlag,pageSize,lastOrderId,nextPage);
+    }
+
+
+    @Override
+    public List<BbHistoryOrderVo> queryBbActiveOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
+        checkParam(userId, asset, symbol, pageSize, nextPage);
+        return bbOrderExtService.queryBbActiveOrderList(userId,asset,symbol,bidFlag,pageSize,lastOrderId,nextPage);
+    }
+
+
+    private void checkParam(Long userId, String asset, String symbol, Integer pageSize, Integer nextPage) {
+        if (userId==null|| StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)||pageSize==null||nextPage==null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        return bbOrderExtService.queryHistoryOrderList(userId,asset,symbol,bidFlag,pageSize,lastOrderId,nextPage);
     }
 }

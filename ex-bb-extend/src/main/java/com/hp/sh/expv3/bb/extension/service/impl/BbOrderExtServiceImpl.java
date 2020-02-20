@@ -7,9 +7,9 @@ import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.bb.extension.dao.BbOrderExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
+import com.hp.sh.expv3.bb.extension.vo.BbHistoryOrderVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
-import com.hp.sh.expv3.bb.extension.vo.HistoryOrderVo;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
 import org.springframework.beans.BeanUtils;
@@ -53,8 +53,8 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     }
 
     @Override
-    public List<HistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
-        List<HistoryOrderVo> result = new ArrayList<>();
+    public List<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
+        List<BbHistoryOrderVo> result = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
@@ -79,7 +79,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         Map<Long, List<BbOrderTradeVo>> tradeListMap = BeanHelper.groupByProperty(_tradeList, "orderId");
 
         for (BbOrderVo order : list) {
-            HistoryOrderVo historyOrderVo = new HistoryOrderVo();
+            BbHistoryOrderVo historyOrderVo = new BbHistoryOrderVo();
             BeanUtils.copyProperties(order, historyOrderVo);
             historyOrderVo.setOrderType(order.getOrderType());
             historyOrderVo.setLeverage(order.getLeverage());
@@ -104,5 +104,51 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     public BigDecimal getLockAsset(Long userId, String asset) {
         BigDecimal lock=  bbOrderExtMapper.getLockAsset(userId,asset);
         return lock;
+    }
+
+    @Override
+    public List<BbHistoryOrderVo> queryBbActiveOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
+        List<BbHistoryOrderVo> result = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("bidFlag", bidFlag);
+        map.put("activeFlag", IntBool.YES);
+        map.put("lastOrderId", lastOrderId);
+        map.put("limit", pageSize);
+        List<BbOrderVo> list =null;
+        if(lastOrderId==null){
+            list = bbOrderExtMapper.queryBbActiveOrderList(map);
+        }else {
+            map.put("nextPage", nextPage);
+            list = bbOrderExtMapper.queryBbActiveOrdersByIsNextPage(map);
+        }
+
+        if (list == null || list.isEmpty()) {
+            return result;
+        }
+        List<Long> orderIdList = BeanHelper.getDistinctPropertyList(list, "id");
+        List<BbOrderTradeVo> _tradeList = bbOrderTradeExtService.queryOrderTrade(userId, orderIdList);
+        Map<Long, List<BbOrderTradeVo>> tradeListMap = BeanHelper.groupByProperty(_tradeList, "orderId");
+
+        for (BbOrderVo order : list) {
+            BbHistoryOrderVo historyOrderVo = new BbHistoryOrderVo();
+            BeanUtils.copyProperties(order, historyOrderVo);
+            historyOrderVo.setLeverage(order.getLeverage());
+            historyOrderVo.setFilledVolume(order.getFilledVolume());
+            historyOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
+
+//            List<OrderTradeVo> orderTradeList = tradeListMap.get(order.getId());
+//            BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
+
+//            historyOrderVo.setMeanPrice(meanPrice);
+
+            historyOrderVo.setPrice(order.getPrice());
+            historyOrderVo.setFeeCost(order.getFeeCost());
+            historyOrderVo.setStatus(order.getStatus());
+            result.add(historyOrderVo);
+        }
+        return result;
     }
 }
