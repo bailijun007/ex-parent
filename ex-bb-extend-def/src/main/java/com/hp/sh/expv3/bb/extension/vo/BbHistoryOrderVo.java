@@ -29,6 +29,9 @@ public class BbHistoryOrderVo implements Serializable {
     @ApiModelProperty("创建时间")
     private Long created;
 
+    @ApiModelProperty("委托数量，初始设置后，后续不会修改")
+    private BigDecimal  volume;
+
     //是否:1-平仓,0-开
     @ApiModelProperty("是否:1-平仓,0-开")
     private Integer bidFlag;
@@ -66,6 +69,14 @@ public class BbHistoryOrderVo implements Serializable {
     private Integer  orderType;
 
     public BbHistoryOrderVo() {
+    }
+
+    public BigDecimal getVolume() {
+        return volume;
+    }
+
+    public void setVolume(BigDecimal volume) {
+        this.volume = volume;
     }
 
     @Override

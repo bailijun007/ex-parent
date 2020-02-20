@@ -135,6 +135,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         for (BbOrderVo order : list) {
             BbHistoryOrderVo historyOrderVo = new BbHistoryOrderVo();
             BeanUtils.copyProperties(order, historyOrderVo);
+            historyOrderVo.setVolume(order.getVolume());
             historyOrderVo.setLeverage(order.getLeverage());
             historyOrderVo.setFilledVolume(order.getFilledVolume());
             historyOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
