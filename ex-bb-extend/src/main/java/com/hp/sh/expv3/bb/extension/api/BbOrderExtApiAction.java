@@ -29,8 +29,10 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         return bbOrderExtService.queryAllBbOrederHistory(userId,asset,pageNo,pageSize);
     }
 
+
+
     @Override
-    public List<HistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol) {
+    public List<HistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
         if (userId==null||StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }

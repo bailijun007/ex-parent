@@ -61,6 +61,10 @@ public class HistoryOrderVo implements Serializable {
     @ApiModelProperty("委托状态")
     private Integer status;
 
+
+    @ApiModelProperty("委托类型")
+    private Integer  orderType;
+
     public HistoryOrderVo() {
     }
 
@@ -80,7 +84,16 @@ public class HistoryOrderVo implements Serializable {
                 ", price=" + price +
                 ", feeCost=" + feeCost +
                 ", status=" + status +
+                ", orderType=" + orderType +
                 '}';
+    }
+
+    public Integer getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(Integer orderType) {
+        this.orderType = orderType;
     }
 
     public Long getId() {

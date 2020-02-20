@@ -65,12 +65,13 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
             return result;
         }
         List<Long> orderIdList = BeanHelper.getDistinctPropertyList(list, "id");
-        final List<BbOrderTradeVo> _tradeList = bbOrderTradeExtService.queryOrderTrade(userId, orderIdList);
+         List<BbOrderTradeVo> _tradeList = bbOrderTradeExtService.queryOrderTrade(userId, orderIdList);
         Map<Long, List<BbOrderTradeVo>> tradeListMap = BeanHelper.groupByProperty(_tradeList, "orderId");
 
         for (BbOrderVo order : list) {
             HistoryOrderVo historyOrderVo = new HistoryOrderVo();
             BeanUtils.copyProperties(order, historyOrderVo);
+            historyOrderVo.setOrderType(order.getOrderType());
             historyOrderVo.setLeverage(order.getLeverage());
             historyOrderVo.setFilledVolume(order.getFilledVolume());
             historyOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));

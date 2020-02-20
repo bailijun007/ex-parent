@@ -41,11 +41,19 @@ public interface BbOrderExtApi {
             {
                     @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
                     @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
-                    @ApiImplicitParam(name = "symbol", value = "交易对", required = true)
+                    @ApiImplicitParam(name = "symbol", value = "交易对", required = false),
+                    @ApiImplicitParam(name = "bidFlag", value = " 1.买入,0.卖出,非必填", required = false),
+                    @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "10", required = true),
+                    @ApiImplicitParam(name = "lastOrderId ", value = "当前页最后一张委托的id", example = "10", required = false),
+                    @ApiImplicitParam(name = "nextPage ", value = " 翻页标记,-1 上一页,1.下一页 ", example = "1", required = true)
             }
     )
     @GetMapping(value = "/api/bb/order/ext/queryHistoryOrderList")
-    List<HistoryOrderVo> queryHistoryOrderList(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
+    List<HistoryOrderVo> queryHistoryOrderList(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam(value = "symbol",required = false) String symbol,
+                                               @RequestParam(value = "bidFlag",required = false) Integer bidFlag,
+                                               @RequestParam(value = "pageSize") Integer pageSize,
+                                               @RequestParam(value = "lastOrderId",required = false) Long lastOrderId,
+                                               @RequestParam(value = "nextPage") Integer nextPage);
 
 
 }
