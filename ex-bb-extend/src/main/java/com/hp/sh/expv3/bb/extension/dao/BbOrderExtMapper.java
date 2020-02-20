@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.bb.extension.dao;
 
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
-import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -17,7 +16,6 @@ public interface BbOrderExtMapper {
 
     List<BbOrderVo> queryList(Map<String,Object> map);
 
-    List<OrderTradeVo> queryOrderTrade(@Param("userId") Long userId, @Param("orderIdList") List<Long> orderIdList);
 
     BigDecimal getLockAsset(@Param("userId") Long userId,@Param("asset") String asset);
 }

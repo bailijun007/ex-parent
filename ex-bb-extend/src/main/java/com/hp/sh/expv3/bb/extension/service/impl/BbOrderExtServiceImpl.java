@@ -8,8 +8,6 @@ import com.hp.sh.expv3.bb.extension.dao.BbOrderExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
 import com.hp.sh.expv3.bb.extension.vo.HistoryOrderVo;
-//import com.hp.sh.expv3.bb.strategy.common.BbCommonOrderStrategy;
-import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
 import org.springframework.beans.BeanUtils;
@@ -60,9 +58,9 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         if (list == null || list.isEmpty()) {
             return result;
         }
-        List<Long> orderIdList = BeanHelper.getDistinctPropertyList(list, "id");
-        List<OrderTradeVo> _tradeList = bbOrderExtMapper.queryOrderTrade(userId, orderIdList);
-        Map<Long, List<OrderTradeVo>> tradeListMap = BeanHelper.groupByProperty(_tradeList, "orderId");
+//        List<Long> orderIdList = BeanHelper.getDistinctPropertyList(list, "id");
+//        List<OrderTradeVo> _tradeList = bbOrderExtMapper.queryOrderTrade(userId, orderIdList);
+//        Map<Long, List<OrderTradeVo>> tradeListMap = BeanHelper.groupByProperty(_tradeList, "orderId");
 
         for (BbOrderVo order : list) {
             HistoryOrderVo historyOrderVo = new HistoryOrderVo();
@@ -71,7 +69,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
             historyOrderVo.setFilledVolume(order.getFilledVolume());
             historyOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
 
-            List<OrderTradeVo> orderTradeList = tradeListMap.get(order.getId());
+//            List<OrderTradeVo> orderTradeList = tradeListMap.get(order.getId());
 //            BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
 
 //            historyOrderVo.setMeanPrice(meanPrice);

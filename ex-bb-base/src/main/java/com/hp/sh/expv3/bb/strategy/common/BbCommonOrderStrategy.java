@@ -22,43 +22,43 @@ import com.hp.sh.expv3.utils.math.DecimalUtil;
 import com.hp.sh.expv3.utils.math.Precision;
 
 /**
- * 
+ *
  * @author wangjg
  *
  */
 @Component
 public class BbCommonOrderStrategy implements OrderStrategy {
 
-	
+
 	@Autowired
 	private FeeRatioService feeRatioService;
-    
+
 	/**
 	 * 计算新订单费用
 	 */
 		//交易金额
 	public OrderRatioData calcOrderAmt(OrderFeeParam orderParam){
 		BigDecimal amount = calcAmount(orderParam.getVolume(), orderParam.getPrice());
-		
+
 		//开仓手续费
 		BigDecimal fee = calcFee(amount, orderParam.getFeeRatio());
-		
+
 		//保证金
 		BigDecimal orderMargin = calMargin(amount, orderParam.getMarginRatio());
-		
+
 		//总押金
 		BigDecimal grossMargin = BigCalc.sum(fee, orderMargin);
 
 		OrderRatioData orderAmount = new OrderRatioData();
 		orderAmount.setAmount(amount);
-		
+
 		orderAmount.setOrderMargin(orderMargin);
 		orderAmount.setFee(fee);
 		orderAmount.setGrossMargin(grossMargin);
-		
+
 		return orderAmount;
 	}
-	
+
 	/**
 	 * 按比例计算费用
 	 * @param order 订单数据
@@ -67,9 +67,9 @@ public class BbCommonOrderStrategy implements OrderStrategy {
 	 */
 	public OrderRatioData calcRaitoAmt(BBOrder order, BigDecimal number){
 		OrderRatioData orderAmount = new OrderRatioData();
-		
-		BigDecimal openFee; 
-		BigDecimal closeFee; 
+
+		BigDecimal openFee;
+		BigDecimal closeFee;
 		BigDecimal orderMargin;
 		BigDecimal grossMargin;
 
@@ -89,19 +89,19 @@ public class BbCommonOrderStrategy implements OrderStrategy {
 			orderMargin = slope(number, order.getVolume(), order.getOrderMargin());
 			grossMargin = BigCalc.sum(openFee, closeFee, orderMargin);
 		}
-		
+
 		orderAmount.setOrderMargin(orderMargin);
 		orderAmount.setFee(openFee);
 		orderAmount.setOrderMargin(orderMargin);
 		orderAmount.setGrossMargin(grossMargin);
 
-		
+
 		BigDecimal amount = order.getPrice().multiply(number);
 
 		orderAmount.setAmount(amount);
 		return orderAmount;
 	}
-	
+
 	int ____________________________;
 
 	public BigDecimal calcOrderMeanPrice(String asset, String symbol, List<? extends OrderTrade> tradeList){
@@ -120,7 +120,7 @@ public class BbCommonOrderStrategy implements OrderStrategy {
 		BigDecimal meanPrice = calcEntryPrice(vols, amount);
 		return meanPrice;
 	}
-	
+
     /**
      * 计算成交均价
      *
@@ -134,7 +134,7 @@ public class BbCommonOrderStrategy implements OrderStrategy {
     }
 
 	int ___________________________;
-	
+
 	/**
 	 * 计算本单的各项数据
 	 * @param order
@@ -147,20 +147,20 @@ public class BbCommonOrderStrategy implements OrderStrategy {
 		String asset = order.getAsset();
 		String symbol = order.getSymbol();
 		int bidFlag = order.getBidFlag();
-		
+
 		TradeResult tradeResult = new TradeResult();
-	
+
 		tradeResult.setTradeVolume(tradeVo.getNumber());
 		tradeResult.setTradePrice(tradeVo.getPrice());
 		tradeResult.setTradeAmount(tradeVo.getPrice().multiply(tradeVo.getNumber()));
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeVo.getNumber())));
-		
+
 		//手续费率
 		tradeResult.setTradeFeeRatio(order.getFeeRatio());
 		//手续费
 		BigDecimal fee = tradeResult.getTradeAmount().multiply(tradeResult.getTradeFeeRatio());
 		tradeResult.setTradeFee(fee);
-		
+
 		//maker fee
 		if(tradeVo.getMakerFlag()==TradeRoles.MAKER){
 			BigDecimal makerFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
@@ -168,7 +168,7 @@ public class BbCommonOrderStrategy implements OrderStrategy {
 			BigDecimal makerFee = tradeResult.getTradeAmount().multiply(makerFeeRatio);
 			tradeResult.setMakerFee(makerFee);
 		}
-		
+
 		//剩余数量
 		tradeResult.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getTradeVolume()));
 		tradeResult.setRemainFee(order.getFee().subtract(tradeResult.getReceivableFee()));
@@ -180,7 +180,7 @@ public class BbCommonOrderStrategy implements OrderStrategy {
 			tradeResult.setTradeOrderMargin(tradeResult.getTradeVolume());
 			tradeResult.setRemainOrderMargin(tradeResult.getRemainVolume());
 		}
-		
+
 		return tradeResult;
 	}
 
@@ -196,7 +196,7 @@ public class BbCommonOrderStrategy implements OrderStrategy {
 	public static final BigDecimal slope(BigDecimal number, BigDecimal volume, BigDecimal amount){
 		return number.multiply(amount).divide(volume, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
 	}
-	
+
 	public static BigDecimal calcAmount(BigDecimal volume, BigDecimal price){
 		return volume.multiply(price);
 	}
@@ -205,7 +205,7 @@ public class BbCommonOrderStrategy implements OrderStrategy {
 		BigDecimal fee = amount.multiply(feeRatio);
 		return fee.stripTrailingZeros();
 	}
-	
+
 	/**
 	 * 计算保证金
 	 * @param baseValue 基础货币价值
