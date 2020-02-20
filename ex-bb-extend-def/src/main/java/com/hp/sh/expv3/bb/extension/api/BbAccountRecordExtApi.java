@@ -26,7 +26,7 @@ public interface BbAccountRecordExtApi {
                     @ApiImplicitParam(name = "pageSize", value = "页大小", example = "10", required = true)
             }
     )
-    @GetMapping(value = "/api/bbAccountRecord/ext/queryHistory")
+    @GetMapping(value = "/api/bb/trade/ext/queryHistory")
     PageResult<BbAccountRecordVo> queryHistory(@RequestParam(value = "userId",required = false) Long userId, @RequestParam(value = "asset",required = false) String asset,
                                                @RequestParam(value = "pageSize")  Integer pageSize,  @RequestParam(value = "pageNo") Integer pageNo);
 

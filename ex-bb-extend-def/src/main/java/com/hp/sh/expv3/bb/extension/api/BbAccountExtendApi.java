@@ -21,19 +21,19 @@ import io.swagger.annotations.ApiOperation;
 public interface BbAccountExtendApi {
 
     @ApiOperation(value = "创建BB账号")
-    @GetMapping(value = "/api/bbAccount/ext/createBBAccount")
+    @GetMapping(value = "/api/bb/trade/ext/createBBAccount")
     void createBBAccount(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset);
 
     @ApiOperation(value = "判断BB账号是否存在")
-    @GetMapping(value = "/api/bbAccount/ext/bbAccountExist")
+    @GetMapping(value = "/api/bb/trade/ext/bbAccountExist")
     public Boolean bbAccountExist(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset);
 
     @ApiOperation(value = "获取BB账户")
-    @GetMapping(value = "/api/bbAccount/ext/getBBAccount")
+    @GetMapping(value = "/api/bb/trade/ext/getBBAccount")
     public BbAccountVo getBBAccount(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset);
 
     @ApiOperation(value = "获取BB账户余额")
-    @GetMapping(value = "/api/bbAccount/ext/getBalance")
+    @GetMapping(value = "/api/bb/trade/ext/getBalance")
     BigDecimal getBalance(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset);
 
 

@@ -27,11 +27,11 @@ public interface BbOrderTradeExtApi {
                     @ApiImplicitParam(name = "pageSize", value = "页大小", example = "10", required = true)
             }
     )
-    @GetMapping(value = "/api/bbOrderTrade/ext/selectLessTimeTrade")
+    @GetMapping(value = "/api/bb/trade/ext/selectLessTimeTrade")
     public BbOrderTradeVo selectLessTimeTrade(@RequestParam(value = "asset") String asset, @RequestParam(value = "symbol") String symbol,  @RequestParam(value = "statTime")Long statTime);
 
     @ApiOperation(value = "查某个用户的所有成交记录")
-    @GetMapping(value = "/api/bbOrderTrade/ext/selectAllTradeListByUser")
+    @GetMapping(value = "/api/bb/trade/ext/selectAllTradeListByUser")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),

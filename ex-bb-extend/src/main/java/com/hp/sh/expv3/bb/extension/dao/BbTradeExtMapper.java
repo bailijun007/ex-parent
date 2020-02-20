@@ -17,4 +17,6 @@ public interface BbTradeExtMapper {
     List<BbTradeVo> selectTradeListByTimeInterval(@Param("asset") String asset, @Param("symbol") String symbol, @Param("tradeTimeBegin")  Long tradeTimeBegin, @Param("tradeTimeEnd") Long tradeTimeEnd);
 
     List<BbTradeVo> selectTradeListByUser(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol,  @Param("tradeTimeBegin")  Long tradeTimeBegin, @Param("tradeTimeEnd") Long tradeTimeEnd);
+
+    List<BbTradeVo> queryTradeList(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol, @Param("limit") Integer limit);
 }

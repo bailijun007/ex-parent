@@ -21,6 +21,17 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
     private BbTradeExtService bbTradeExtService;
 
     @Override
+    public List<BbTradeVo> queryTradeList(String asset, String symbol, Long userId,Integer count) {
+        if (userId == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+        if (count > 100) {
+            throw new ExException(BbExtCommonErrorCode.MORE_THAN_MAX_ROW);
+        }
+        return bbTradeExtService.queryTradeList(userId,asset,symbol,count);
+    }
+
+    @Override
     public List<BbTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long startTime, Long endTime) {
         if (null == startTime || endTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
