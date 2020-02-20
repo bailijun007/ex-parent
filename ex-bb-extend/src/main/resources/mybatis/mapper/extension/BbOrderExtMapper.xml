@@ -103,7 +103,66 @@
         <include refid="simple_where"/>
     </select>
 
+    <select id="queryHistoryOrderList"  resultMap="BbOrderVo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        bb_active_order ao
+        LEFT JOIN
+        bb_order o ON o.id = ao.id
+        <where>
+            <if test="userId!=null">and ao.user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
+            <if test="activeFlag!=null">and ao.active_flag=#{activeFlag}</if>
+            <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
+        </where>
+        ORDER BY ao.id desc
+        <if test="limit!=null">
+            LIMIT 0,${limit}
+        </if>
 
+    </select>
+
+<select id="queryHistoryByIsNextPage"  resultMap="BbOrderVo">
+    select
+    <include refid="Base_Column_List"/>
+    from bb_order
+    <where>
+
+        <if test="activeFlag!=null">
+             active_flag=#{activeFlag}
+        </if>
+        <if test="userId!=null">
+            and user_id=#{userId}
+        </if>
+        <if test="asset!=null and asset!=''">
+            and asset=#{asset}
+        </if>
+        <if test="symbol!=null and symbol!=''">
+            and symbol=#{symbol}
+        </if>
+
+        <choose>
+            <when test="nextPage==1 and limit!=null and lastOrderId!=null">
+                and id &lt; #{lastOrderId}
+                ORDER BY id desc
+                LIMIT 0,${limit}
+            </when>
+            <when test="nextPage==-1 and limit!=null and lastOrderId!=null">
+                and id &gt;= #{lastOrderId}
+                ORDER BY id asc
+                LIMIT 0,${limit}
+            </when>
+            <otherwise>
+                ORDER BY id desc
+                LIMIT 0,${limit}
+            </otherwise>
+
+        </choose>
+    </where>
+
+</select>
 
     <select id="getLockAsset" resultType="java.math.BigDecimal">
      SELECT

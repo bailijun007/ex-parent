@@ -18,4 +18,8 @@ public interface BbOrderExtMapper {
 
 
     BigDecimal getLockAsset(@Param("userId") Long userId,@Param("asset") String asset);
+
+    List<BbOrderVo> queryHistoryOrderList(Map<String, Object> map);
+
+    List<BbOrderVo> queryHistoryByIsNextPage(Map<String, Object> map);
 }
