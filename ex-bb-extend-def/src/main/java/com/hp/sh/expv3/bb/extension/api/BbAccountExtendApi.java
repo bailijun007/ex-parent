@@ -5,6 +5,7 @@ package com.hp.sh.expv3.bb.extension.api;
 
 import java.math.BigDecimal;
 
+import com.hp.sh.expv3.bb.extension.vo.BbAccountExtVo;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public interface BbAccountExtendApi {
 
     @ApiOperation(value = "获取BB账户")
     @GetMapping(value = "/api/bb/trade/ext/getBBAccount")
-    public BbAccountVo getBBAccount(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset);
+    public BbAccountExtVo getBBAccount(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset);
 
     @ApiOperation(value = "获取BB账户余额")
     @GetMapping(value = "/api/bb/trade/ext/getBalance")

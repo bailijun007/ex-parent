@@ -2,6 +2,8 @@ package com.hp.sh.expv3.bb.extension.api;
 
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbAccountExtService;
+import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
+import com.hp.sh.expv3.bb.extension.vo.BbAccountExtVo;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountVo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ public class BbAccountExtendApiAction implements BbAccountExtendApi {
 
     @Autowired
     private BbAccountExtService bbAccountExtService;
+
+    @Autowired
+    private BbOrderExtService bbOrderExtService;
 
     @Override
     public void createBBAccount(Long userId, String asset) {
@@ -38,9 +43,19 @@ public class BbAccountExtendApiAction implements BbAccountExtendApi {
     }
 
     @Override
-    public BbAccountVo getBBAccount(Long userId, String asset) {
+    public BbAccountExtVo getBBAccount(Long userId, String asset) {
         checkParam(userId, asset);
-        return bbAccountExtService.getBBAccount(userId, asset);
+        BbAccountExtVo bbAccount = bbAccountExtService.getBBAccount(userId, asset);
+        //bb冻结资产
+        BigDecimal lock = bbOrderExtService.getLockAsset(userId, asset);
+        bbAccount.setLock(lock);
+        //总额=bb冻结资产+可用余额
+        if (bbAccount != null) {
+            BigDecimal total = bbAccount.getAvailable().add(lock);
+            bbAccount.setTotal(total);
+        }
+
+        return bbAccount;
     }
 
     @Override

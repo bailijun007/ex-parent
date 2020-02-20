@@ -116,4 +116,17 @@
         </foreach>
     </select>
 
+    <select id="getLockAsset" resultType="java.math.BigDecimal">
+     SELECT
+		sum(o.fee+o.order_margin)
+		FROM
+			bb_active_order ao
+		LEFT JOIN
+			bb_order o ON o.id = ao.id
+		where
+			ao.user_id=#{userId}
+			and ao.asset=#{asset}
+            and o.order_margin_currency=#{asset}
+    </select>
+
 </mapper>

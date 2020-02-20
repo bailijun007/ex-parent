@@ -87,4 +87,10 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         return result;
 
     }
+
+    @Override
+    public BigDecimal getLockAsset(Long userId, String asset) {
+        BigDecimal lock=  bbOrderExtMapper.getLockAsset(userId,asset);
+        return lock;
+    }
 }
