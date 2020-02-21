@@ -49,7 +49,7 @@ public class PcTradeService {
 	private PcPositionDataService positionDataService;
 	
 	@Autowired
-	private PcOrderTradeDAO pcOrderTradeDAO;
+	private PcOrderTradeDAO orderTradeDAO;
 	
 	@Autowired
 	private PcOrderUpdateService orderUpdateService;
@@ -58,13 +58,13 @@ public class PcTradeService {
 	private PcOrderQueryService orderQueryService;
 	
 	@Autowired
-	private PcAccountSymbolDAO pcAccountSymbolDAO;
+	private PcAccountSymbolDAO accountSymbolDAO;
 
 	@Autowired
 	private FeeRatioService feeRatioService;
 	
 	@Autowired
-	private PcAccountCoreService pcAccountCoreService;
+	private PcAccountCoreService accountCoreService;
 	
 	@Autowired
 	private FeeCollectorSelector feeCollectorSelector;
@@ -91,7 +91,7 @@ public class PcTradeService {
 		Long now = DbDateUtils.now();
 		
 		PcPosition pcPosition = this.positionDataService.getCurrentPosition(trade.getAccountId(), trade.getAsset(), trade.getSymbol(), order.getLongFlag());
-		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
+		PcAccountSymbol as = accountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
 		TradeResult tradeResult = this.positionStrategy.calcTradeResult(trade, order, pcPosition);
 		
@@ -178,7 +178,7 @@ public class PcTradeService {
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_CLOSE_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setAssociatedId(orderTradeId);
-		this.pcAccountCoreService.add(request);
+		this.accountCoreService.add(request);
 	}
 	
 	private void openFeeDiffToPcAccount(Long userId, Long orderTradeId, String asset, BigDecimal makerFeeDiff) {
@@ -190,7 +190,7 @@ public class PcTradeService {
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(PcAccountTradeType.RETURN_FEE_DIFF);
 		request.setAssociatedId(orderTradeId);
-		this.pcAccountCoreService.add(request);
+		this.accountCoreService.add(request);
 	}
 
 	private void updateOrder4Trade(PcOrder order, TradeResult tradeResult, Long now){
@@ -239,7 +239,7 @@ public class PcTradeService {
 		
 		orderTrade.setFeeSynchStatus(IntBool.NO);
 		
-		this.pcOrderTradeDAO.save(orderTrade);
+		this.orderTradeDAO.save(orderTrade);
 		
 		orderTrade.setLogType(this.getLogType(order.getCloseFlag(), order.getLongFlag()));
 		
@@ -334,7 +334,7 @@ public class PcTradeService {
 		}
 		
 		//检查重复请求
-		Long count = this.pcOrderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
+		Long count = this.orderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
 		if(count>0){
 			return false;
 		}
@@ -412,8 +412,8 @@ public class PcTradeService {
 	}
 
 	public void setSynchStatus(PcOrderTrade orderTrade){
-		orderTrade.setFeeSynchStatus(IntBool.YES);
-		this.pcOrderTradeDAO.update(orderTrade);
+		Long now = DbDateUtils.now();
+		this.orderTradeDAO.setSynchStatus(orderTrade.getUserId(), orderTrade.getId(), IntBool.YES, now);
 	}
 	
 }

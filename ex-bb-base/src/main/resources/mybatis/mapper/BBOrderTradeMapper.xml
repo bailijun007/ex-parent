@@ -146,5 +146,14 @@
 			#{orderIdList[${i}]}
 			</foreach>
 	</select>
+	
+	<update id="setSynchStatus">
+		update 
+			bb_order_trade
+		set 
+			fee_synch_status=#{feeSynchStatus},modified=#{modified}
+		where 
+			id=#{id} and user_id=#{userId}
+	</update>
 
 </mapper>

@@ -255,8 +255,8 @@ public class BBTradeService {
 	}
 	
 	public void setSynchStatus(BBOrderTrade orderTrade){
-		orderTrade.setFeeSynchStatus(IntBool.YES);
-		this.orderTradeDAO.update(orderTrade);
+		Long now = DbDateUtils.now();
+		this.orderTradeDAO.setSynchStatus(orderTrade.getUserId(), orderTrade.getId(), IntBool.YES, now);
 	}
 
 }

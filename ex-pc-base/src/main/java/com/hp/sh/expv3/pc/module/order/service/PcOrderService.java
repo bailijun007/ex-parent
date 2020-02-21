@@ -260,7 +260,7 @@ public class PcOrderService {
 		pcOrder.setOpenFeeRatio(feeRatioService.getOpenFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
 		pcOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
 		
-		OrderRatioData ratioData = orderStrategy.calcOrderAmt(pcOrder);
+		OrderRatioData ratioData = orderStrategy.calcNewOrderAmt(pcOrder);
 		
 		pcOrder.setOpenFee(ratioData.getOpenFee());
 		pcOrder.setCloseFee(ratioData.getCloseFee());

@@ -26,5 +26,7 @@ public interface BBOrderTradeDAO extends BaseUserDataMapper<BBOrderTrade,Long> {
 	public Long exist(@Param("userId") Long userId, @Param("tradeSn") String tradeSn);
 
 	public List<OrderTradeVo> queryOrderTrade(@Param("userId") Long userId, @Param("orderIdList") List<Long> orderIdList);
+	
+	public void setSynchStatus(@Param("userId") Long userId, @Param("id") Long id, @Param("feeSynchStatus") Integer feeSynchStatus, @Param("modified") Long modified);
 
 }
