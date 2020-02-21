@@ -20,6 +20,7 @@ import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
+import com.hp.sh.expv3.pc.module.collector.service.PcCollectorCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
@@ -32,6 +33,8 @@ import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
+import com.hp.sh.expv3.pc.vo.request.CollectorAddRequest;
+import com.hp.sh.expv3.pc.vo.request.CollectorCutRequest;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
@@ -46,7 +49,7 @@ public class PcTradeService {
 	private PcPositionDataService positionDataService;
 	
 	@Autowired
-	private PcOrderTradeDAO pcOrderTradeDAO;
+	private PcOrderTradeDAO orderTradeDAO;
 	
 	@Autowired
 	private PcOrderUpdateService orderUpdateService;
@@ -55,13 +58,13 @@ public class PcTradeService {
 	private PcOrderQueryService orderQueryService;
 	
 	@Autowired
-	private PcAccountSymbolDAO pcAccountSymbolDAO;
+	private PcAccountSymbolDAO accountSymbolDAO;
 
 	@Autowired
 	private FeeRatioService feeRatioService;
 	
 	@Autowired
-	private PcAccountCoreService pcAccountCoreService;
+	private PcAccountCoreService accountCoreService;
 	
 	@Autowired
 	private FeeCollectorSelector feeCollectorSelector;
@@ -88,7 +91,7 @@ public class PcTradeService {
 		Long now = DbDateUtils.now();
 		
 		PcPosition pcPosition = this.positionDataService.getCurrentPosition(trade.getAccountId(), trade.getAsset(), trade.getSymbol(), order.getLongFlag());
-		PcAccountSymbol as = pcAccountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
+		PcAccountSymbol as = accountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
 		TradeResult tradeResult = this.positionStrategy.calcTradeResult(trade, order, pcPosition);
 		
@@ -175,7 +178,7 @@ public class PcTradeService {
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_CLOSE_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setAssociatedId(orderTradeId);
-		this.pcAccountCoreService.add(request);
+		this.accountCoreService.add(request);
 	}
 	
 	private void openFeeDiffToPcAccount(Long userId, Long orderTradeId, String asset, BigDecimal makerFeeDiff) {
@@ -187,7 +190,7 @@ public class PcTradeService {
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(PcAccountTradeType.RETURN_FEE_DIFF);
 		request.setAssociatedId(orderTradeId);
-		this.pcAccountCoreService.add(request);
+		this.accountCoreService.add(request);
 	}
 
 	private void updateOrder4Trade(PcOrder order, TradeResult tradeResult, Long now){
@@ -234,7 +237,9 @@ public class PcTradeService {
 		
 		orderTrade.setMatchTxId(tradeMsg.getMatchTxId());
 		
-		this.pcOrderTradeDAO.save(orderTrade);
+		orderTrade.setFeeSynchStatus(IntBool.NO);
+		
+		this.orderTradeDAO.save(orderTrade);
 		
 		orderTrade.setLogType(this.getLogType(order.getCloseFlag(), order.getLongFlag()));
 		
@@ -329,17 +334,13 @@ public class PcTradeService {
 		}
 		
 		//检查重复请求
-		Long count = this.pcOrderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
+		Long count = this.orderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
 		if(count>0){
 			return false;
 		}
 		return true;
 	}
 	
-	private void synchCollector(Long tradeOrderId, Long feeCollectorId, BigDecimal fee){
-		
-	}
-
 	/**
 	 * 处理成交
 	 */
@@ -378,6 +379,41 @@ public class PcTradeService {
 		//maker
 		this.handleTradeOrder(makerTradeVo);
 		
+	}
+	
+
+	@Autowired
+	private PcCollectorCoreService collectorCoreService;
+
+	public void synchCollector(PcOrderTrade orderTrade){
+		if(BigUtils.gtZero(orderTrade.getFee())){
+			CollectorAddRequest request = new CollectorAddRequest();
+			request.setAmount(orderTrade.getFee());
+			request.setAsset(orderTrade.getAsset());
+			request.setAssociatedId(orderTrade.getOrderId());
+			request.setRemark("手续费");
+			request.setTradeNo(""+orderTrade.getId());
+			request.setTradeType(0);
+			request.setUserId(orderTrade.getUserId());
+			request.setCollectorId(orderTrade.getFeeCollectorId());
+			collectorCoreService.add(request);
+		}else{
+			CollectorCutRequest request = new CollectorCutRequest();
+			request.setAmount(orderTrade.getFee());
+			request.setAsset(orderTrade.getAsset());
+			request.setAssociatedId(orderTrade.getOrderId());
+			request.setRemark("倒贴手续费");
+			request.setTradeNo(""+orderTrade.getId());
+			request.setTradeType(0);
+			request.setUserId(orderTrade.getUserId());
+			request.setCollectorId(orderTrade.getFeeCollectorId());
+			collectorCoreService.cut(request);
+		}
+	}
+
+	public void setSynchStatus(PcOrderTrade orderTrade){
+		Long now = DbDateUtils.now();
+		this.orderTradeDAO.setSynchStatus(orderTrade.getUserId(), orderTrade.getId(), IntBool.YES, now);
 	}
 	
 }

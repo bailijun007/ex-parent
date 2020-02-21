@@ -71,6 +71,9 @@ public class PcOrderTrade extends UserDataEntity implements OrderTrade {
 	//事务ID
 	private Long txId;
 	
+	//手续费同步状态
+	private Integer feeSynchStatus;
+	
 	@Transient
 	private Integer logType;
 
@@ -230,6 +233,14 @@ public class PcOrderTrade extends UserDataEntity implements OrderTrade {
 
 	public void setLogType(Integer tradType) {
 		this.logType = tradType;
+	}
+
+	public Integer getFeeSynchStatus() {
+		return feeSynchStatus;
+	}
+
+	public void setFeeSynchStatus(Integer feeSynchStatus) {
+		this.feeSynchStatus = feeSynchStatus;
 	}
 
 }

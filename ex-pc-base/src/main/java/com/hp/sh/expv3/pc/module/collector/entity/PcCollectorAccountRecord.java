@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.module.collector.entity;
+package com.hp.sh.expv3.pc.module.collector.entity;
 
 import java.math.BigDecimal;
 
@@ -14,7 +14,7 @@ import com.hp.sh.expv3.commons.mybatis.TxId;
  *
  */
 @Table(name="bb_collector_account_record")
-public class BBCollectorAccountRecord extends BaseRecordEntity	 {
+public class PcCollectorAccountRecord extends BaseRecordEntity	 {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -40,12 +40,12 @@ public class BBCollectorAccountRecord extends BaseRecordEntity	 {
 	private String tradeNo;
 	
 	/*
-	 * @see BBAccountTradeType#*
+	 * @see PcAccountTradeType#*
 	 * 交易类型：1-资金转入，2-资金转出，3-下订单，4-撤单，4-追加保证金，5-平仓收益
 	 */
 	private Integer tradeType;
 
-	//序号 @see BBCollectorAccount#version
+	//序号 @see PcCollectorAccount#version
 	private Long serialNo;
 
 	//关联对象的ID
@@ -56,7 +56,7 @@ public class BBCollectorAccountRecord extends BaseRecordEntity	 {
 	
 	private Long collectorId;
 
-	public BBCollectorAccountRecord() {
+	public PcCollectorAccountRecord() {
 	}
 
 	public String getAsset() {

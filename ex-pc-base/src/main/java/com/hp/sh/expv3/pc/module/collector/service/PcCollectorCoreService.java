@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hp.sh.expv3.bb.module.collector.service;
+package com.hp.sh.expv3.pc.module.collector.service;
 
 import java.math.BigDecimal;
 
@@ -12,19 +12,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.hp.sh.expv3.bb.error.BBCollectorAccountError;
-import com.hp.sh.expv3.bb.module.collector.dao.BBCollectorAccountDAO;
-import com.hp.sh.expv3.bb.module.collector.dao.BBCollectorAccountRecordDAO;
-import com.hp.sh.expv3.bb.module.collector.entity.BBCollectorAccount;
-import com.hp.sh.expv3.bb.module.collector.entity.BBCollectorAccountRecord;
-import com.hp.sh.expv3.bb.vo.request.CollectorAddRequest;
-import com.hp.sh.expv3.bb.vo.request.CollectorCutRequest;
-import com.hp.sh.expv3.bb.vo.request.CollectorFundRequest;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.constant.FundFlowDirection;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
+import com.hp.sh.expv3.pc.error.PcCollectorAccountError;
+import com.hp.sh.expv3.pc.module.collector.dao.PcCollectorAccountDAO;
+import com.hp.sh.expv3.pc.module.collector.dao.PcCollectorAccountRecordDAO;
+import com.hp.sh.expv3.pc.module.collector.entity.PcCollectorAccount;
+import com.hp.sh.expv3.pc.module.collector.entity.PcCollectorAccountRecord;
+import com.hp.sh.expv3.pc.vo.request.CollectorAddRequest;
+import com.hp.sh.expv3.pc.vo.request.CollectorCutRequest;
+import com.hp.sh.expv3.pc.vo.request.CollectorFundRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.SnUtils;
 
@@ -33,20 +33,20 @@ import com.hp.sh.expv3.utils.SnUtils;
  */
 @Service
 @Transactional(rollbackFor=Exception.class)
-public class BBCollectorCoreService{
-	private static final Logger logger = LoggerFactory.getLogger(BBCollectorCoreService.class);
+public class PcCollectorCoreService{
+	private static final Logger logger = LoggerFactory.getLogger(PcCollectorCoreService.class);
 
 	@Autowired
-	private BBCollectorAccountDAO collectorAccountDAO;
+	private PcCollectorAccountDAO collectorAccountDAO;
 
 	@Autowired
-	private BBCollectorAccountRecordDAO fundAccountRecordDAO;
+	private PcCollectorAccountRecordDAO fundAccountRecordDAO;
 	
 	/**
 	 * 加钱
 	 */
 	public Integer add(@RequestBody CollectorAddRequest request){
-		BBCollectorAccountRecord record = this.req2record(request);
+		PcCollectorAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.INCOME);
 		record.setSn(SnUtils.newRecordSn());
@@ -58,7 +58,7 @@ public class BBCollectorCoreService{
 	 * 减钱
 	 */
 	public Integer cut(@RequestBody CollectorCutRequest request){
-		BBCollectorAccountRecord record = this.req2record(request);
+		PcCollectorAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.EXPENSES);
 		record.setSn(SnUtils.newRecordSn());
@@ -66,7 +66,7 @@ public class BBCollectorCoreService{
 		return this.newRecord(record);
 	}
 	
-	protected int newRecord(BBCollectorAccountRecord record){
+	protected int newRecord(PcCollectorAccountRecord record){
 		Long now = DbDateUtils.now();
 		
 		//金额必须是正数
@@ -79,7 +79,7 @@ public class BBCollectorCoreService{
 			return InvokeResult.NOCHANGE;
 		}
 		
-		BBCollectorAccount bBCollectorAccount = this.collectorAccountDAO.getAndLock(record.getCollectorId(), record.getAsset());
+		PcCollectorAccount bBCollectorAccount = this.collectorAccountDAO.getAndLock(record.getCollectorId(), record.getAsset());
 		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
 		if(bBCollectorAccount==null){
 			//检查余额
@@ -108,24 +108,24 @@ public class BBCollectorCoreService{
 		return InvokeResult.SUCCESS;
 	}
 	
-	private void updateAccount(BBCollectorAccount bBCollectorAccount){
+	private void updateAccount(PcCollectorAccount bBCollectorAccount){
 		int updatedRows = this.collectorAccountDAO.update(bBCollectorAccount);
 		if(updatedRows==0){
 			throw new RuntimeException("更新失败");
 		}
 	}
 	
-	private void checkBalance(BBCollectorAccountRecord record, BigDecimal newBalance){
+	private void checkBalance(PcCollectorAccountRecord record, BigDecimal newBalance){
 		//检查余额
 		if(FundFlowDirection.EXPENSES==record.getType()){
 			if(newBalance.compareTo(BigDecimal.ZERO) < 0){
-				throw new ExException(BBCollectorAccountError.BALANCE_NOT_ENOUGH);
+				throw new ExException(PcCollectorAccountError.BALANCE_NOT_ENOUGH);
 			}
 		}
 	}
 	
-	private BBCollectorAccount newAccount(Long collectorId, String asset, BigDecimal balance, Long now){
-		BBCollectorAccount account = new BBCollectorAccount();
+	private PcCollectorAccount newAccount(Long collectorId, String asset, BigDecimal balance, Long now){
+		PcCollectorAccount account = new PcCollectorAccount();
 		account.setAsset(asset);
 		account.setBalance(balance);
 		account.setCollectorId(collectorId);
@@ -136,8 +136,8 @@ public class BBCollectorCoreService{
 		return account;
 	}
 
-	private boolean checkExist(BBCollectorAccountRecord record) {
-		BBCollectorAccountRecord oldRcd = this.fundAccountRecordDAO.findByTradeNo(record.getCollectorId(), record.getTradeNo());
+	private boolean checkExist(PcCollectorAccountRecord record) {
+		PcCollectorAccountRecord oldRcd = this.fundAccountRecordDAO.findByTradeNo(record.getCollectorId(), record.getTradeNo());
 		if(oldRcd == null){
 			return false;
 		}
@@ -146,18 +146,18 @@ public class BBCollectorCoreService{
 			String ov = oldRcd.toValueString();
 			String nv = record.toValueString();
 			if(!ov.equals(nv)){
-				throw new ExSysException(BBCollectorAccountError.INCONSISTENT_REQUESTS, ov, nv);
+				throw new ExSysException(PcCollectorAccountError.INCONSISTENT_REQUESTS, ov, nv);
 			}
 		}
 		
 		return true;
 	}
 
-	private BBCollectorAccountRecord req2record(CollectorFundRequest request){
+	private PcCollectorAccountRecord req2record(CollectorFundRequest request){
 		if(request.getAmount()==null){
 			throw new ExSysException(ExCommonError.PARAM_EMPTY);
 		}
-		BBCollectorAccountRecord record = new BBCollectorAccountRecord();
+		PcCollectorAccountRecord record = new PcCollectorAccountRecord();
 		record.setAmount(request.getAmount());
 		record.setAsset(request.getAsset());
 		record.setRemark(request.getRemark());

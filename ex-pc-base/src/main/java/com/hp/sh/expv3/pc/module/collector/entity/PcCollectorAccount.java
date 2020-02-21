@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.module.collector.entity;
+package com.hp.sh.expv3.pc.module.collector.entity;
 
 import java.math.BigDecimal;
 
@@ -13,7 +13,7 @@ import com.hp.sh.expv3.base.entity.BaseBizEntity;
  *
  */
 @Table(name="bb_collector_account")
-public class BBCollectorAccount extends BaseBizEntity {
+public class PcCollectorAccount extends BaseBizEntity {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -29,7 +29,7 @@ public class BBCollectorAccount extends BaseBizEntity {
 	//版本
 	private Long version;
 
-	public BBCollectorAccount() {
+	public PcCollectorAccount() {
 	}
 
 	public Long getCollectorId() {
@@ -67,7 +67,7 @@ public class BBCollectorAccount extends BaseBizEntity {
 
 	@Override
 	public String toString() {
-		return "BBCollectorAccount [asset=" + asset + ", balance=" + balance + ", version=" + version + "]";
+		return "PcCollectorAccount [asset=" + asset + ", balance=" + balance + ", version=" + version + "]";
 	}
 
 }

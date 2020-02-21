@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.calc.CompFieldCalc;
-import com.hp.sh.expv3.pc.calc.OrderFeeCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.component.MetadataService;
@@ -102,7 +101,7 @@ public class PositionStrategyContext {
 			tradeResult.setOrderMargin(tradeRatioData.getOrderMargin());//保证金
 		}else{
 			BigDecimal closeFeeRatio = this.feeRatioService.getCloseFeeRatio(userId, asset, symbol);
-			BigDecimal closeFee = OrderFeeCalc.calcFee(tradeResult.getBaseValue(), closeFeeRatio);
+			BigDecimal closeFee = orderStrategy.calcFee(tradeResult.getBaseValue(), closeFeeRatio);
 
 			tradeResult.setFeeRatio(closeFeeRatio);
 			tradeResult.setFee(closeFee);
@@ -183,7 +182,7 @@ public class PositionStrategyContext {
 		orderParam.setMarginRatio(initedMarginRatio);
 		orderParam.setPrice(latestPrice);
 
-		OrderRatioData ratioData = orderStrategy.calcOrderAmt(orderParam);
+		OrderRatioData ratioData = orderStrategy.calcNewOrderAmt(orderParam);
 		BigDecimal singleCost = ratioData.getGrossMargin();
 		
 		BigDecimal vol = balance.divide(singleCost, Precision.INTEGER_PRECISION, Precision.LESS);

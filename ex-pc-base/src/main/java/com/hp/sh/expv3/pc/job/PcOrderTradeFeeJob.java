@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.job;
+package com.hp.sh.expv3.pc.job;
 
 import java.util.List;
 
@@ -9,33 +9,33 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.page.Page;
-import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
-import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
-import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
+import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
+import com.hp.sh.expv3.pc.module.position.service.PcTradeService;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Component
-public class BBOrderTradeFeeJob {
-    private static final Logger logger = LoggerFactory.getLogger(BBOrderTradeFeeJob.class);
+public class PcOrderTradeFeeJob {
+    private static final Logger logger = LoggerFactory.getLogger(PcOrderTradeFeeJob.class);
 
 	@Autowired
-	private BBOrderQueryService orderQueryService;
+	private PcOrderQueryService orderQueryService;
 	@Autowired
-	private BBTradeService tradeService;
+	private PcTradeService tradeService;
 	
-	@Scheduled(cron = "0 0/1 * * * ?")
+	@Scheduled(cron = "0 0/10 * * * ?")
 	public void handleJob() {
 		Long now = DbDateUtils.now();
 		Long startTime = now-1000*3600*20000;
 		Page page = new Page(1, 100, 1000L);
 		while(true){
-			List<BBOrderTrade> list = orderQueryService.querySynchFee(page, startTime);
+			List<PcOrderTrade> list = orderQueryService.querySynchFee(page, startTime);
 			
 			if(list==null || list.isEmpty()){
 				break;
 			}
 			
-			for(BBOrderTrade orderTrade : list){
+			for(PcOrderTrade orderTrade : list){
 				handleOrderTrade(orderTrade);
 				
 			}
@@ -43,7 +43,7 @@ public class BBOrderTradeFeeJob {
 		}
 	}
 
-	private void handleOrderTrade(BBOrderTrade orderTrade) {
+	private void handleOrderTrade(PcOrderTrade orderTrade) {
 		tradeService.synchCollector(orderTrade);
 		tradeService.setSynchStatus(orderTrade);
 	}

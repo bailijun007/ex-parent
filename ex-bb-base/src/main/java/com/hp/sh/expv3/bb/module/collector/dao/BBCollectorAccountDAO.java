@@ -12,9 +12,9 @@ import com.hp.sh.expv3.bb.module.collector.entity.BBCollectorAccount;
  */
 public interface BBCollectorAccountDAO {
 	
-	public BBCollectorAccount get(@Param("userId") Long userId, @Param("asset") String asset);
+	public BBCollectorAccount get(@Param("collectorId") Long collectorId, @Param("asset") String asset);
 	
-	public BBCollectorAccount getAndLock(@Param("userId") Long userId, @Param("asset") String asset);
+	public BBCollectorAccount getAndLock(@Param("collectorId") Long collectorId, @Param("asset") String asset);
 	
 	void save(BBCollectorAccount entity);
 

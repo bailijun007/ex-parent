@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
 
-public class PnlCalc {
+class PnlCalc {
 
 	public static BigDecimal calcPnl(int longFlag, BigDecimal amt, BigDecimal entryPrice, BigDecimal closePrice) {
         return calcPnl(IntBool.isTrue(longFlag), amt, entryPrice, calcVolume(amt, closePrice, Precision.COMMON_PRECISION), Precision.COMMON_PRECISION);
