@@ -86,7 +86,7 @@
         order by trade_time asc
     </select>
 
-    <select id="selectTradeListByUser">
+    <select id="selectTradeListByUser" resultMap="BbTradeVo">
         select
         <include refid="Base_Column_List"/>
         from bb_trade
@@ -101,6 +101,18 @@
             and trade_time &lt;#{tradeTimeEnd}
         </if>
         order by trade_time asc
+    </select>
+
+    <select id="queryTradeList" resultMap="BbTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_trade
+        where
+        user_id=#{userId}
+        and asset=#{asset}
+        and symbol=#{symbol}
+        order by trade_time desc
+        LIMIT 0,${limit}
     </select>
 
 </mapper>

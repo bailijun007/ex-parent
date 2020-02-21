@@ -52,7 +52,7 @@ public class BBTradeService {
 	private BBAccountCoreService accountCoreService;
 	
 	@Autowired
-	private CommonOrderStrategy orderStrategy;
+	private BbCommonOrderStrategy orderStrategy;
 	
 	@Autowired
 	private FeeCollectorSelector feeCollectorSelector;

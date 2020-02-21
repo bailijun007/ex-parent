@@ -7,7 +7,9 @@ import java.util.Map;
 
 import com.hp.sh.expv3.bb.extension.dao.BbAccountExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbAccountExtService;
+import com.hp.sh.expv3.bb.extension.vo.BbAccountExtVo;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,11 +54,16 @@ public class BbAccountExtServiceImpl implements BbAccountExtService {
     }
 
     @Override
-    public BbAccountVo getBBAccount(Long userId, String asset) {
+    public BbAccountExtVo getBBAccount(Long userId, String asset) {
+        BbAccountExtVo vo = new BbAccountExtVo();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
         BbAccountVo bbAccountVo = bbAccountExtMapper.queryOne(map);
-        return bbAccountVo;
+        if (bbAccountVo != null) {
+            BeanUtils.copyProperties(bbAccountVo, vo);
+            vo.setAvailable(bbAccountVo.getBalance());
+        }
+        return vo;
     }
 }

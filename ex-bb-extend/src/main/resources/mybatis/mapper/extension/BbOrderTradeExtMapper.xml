@@ -114,4 +114,17 @@
         limit 0,999
     </select>
 
+
+    <select id="queryOrderTrade" resultMap="BBOrderTrade">
+        select
+        volume, price, order_id, id
+        from
+        bb_order_trade
+        where
+        user_id=#{userId}
+        and order_id in
+        <foreach item="item" index="i" collection="orderIdList" open="(" separator="," close=")">
+            #{orderIdList[${i}]}
+        </foreach>
+    </select>
 </mapper>

@@ -11,4 +11,7 @@ public interface BbOrderTradeExtService {
     BbOrderTradeVo selectLessTimeTrade(String asset, String symbol, Long statTime);
 
     List<BbOrderTradeVo> selectAllTradeListByUser(String asset, String symbol, Long userId);
+
+    List<BbOrderTradeVo> queryOrderTrade(Long userId, List<Long> orderIdList);
 }
+

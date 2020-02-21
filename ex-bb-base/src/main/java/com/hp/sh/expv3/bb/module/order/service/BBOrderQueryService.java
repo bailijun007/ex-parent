@@ -19,7 +19,7 @@ import com.hp.sh.expv3.bb.module.order.dao.BBOrderLogDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
-import com.hp.sh.expv3.bb.strategy.common.CommonOrderStrategy;
+import com.hp.sh.expv3.bb.strategy.common.BbCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
 import com.hp.sh.expv3.dev.CrossDB;
@@ -43,7 +43,7 @@ public class BBOrderQueryService {
 	private BBOrderTradeDAO bBOrderTradeDAO;
 
 	@Autowired
-	private CommonOrderStrategy orderStrategy;
+	private BbCommonOrderStrategy orderStrategy;
 
 	public Long queryCount(Map<String, Object> params) {
 		return this.bBOrderDAO.queryCount(params);
@@ -68,25 +68,25 @@ public class BBOrderQueryService {
 		
 		for(BBOrder order : list){
 			ActiveOrderVo activeOrderVo = new ActiveOrderVo();
-			activeOrderVo.setId(order.getId());
-			activeOrderVo.setUserId(order.getUserId());
-			activeOrderVo.setAsset(order.getAsset());
-			activeOrderVo.setSymbol(order.getSymbol());
-			activeOrderVo.setCreated(order.getCreated());
-			activeOrderVo.setBidFlag(order.getBidFlag());
-			activeOrderVo.setLeverage(order.getLeverage());
-			activeOrderVo.setFilledVolume(order.getFilledVolume());
-			activeOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
-			
-			List<OrderTradeVo> orderTradeList = _tradeListMap.get(order.getId());
-			BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
-			
-			activeOrderVo.setMeanPrice(meanPrice);
-			activeOrderVo.setPrice(order.getPrice());
-			activeOrderVo.setFeeCost(order.getFeeCost());
-			activeOrderVo.setStatus(order.getStatus());
-			
-			result.add(activeOrderVo);
+            activeOrderVo.setId(order.getId());
+            activeOrderVo.setUserId(order.getUserId());
+            activeOrderVo.setAsset(order.getAsset());
+            activeOrderVo.setSymbol(order.getSymbol());
+            activeOrderVo.setCreated(order.getCreated());
+            activeOrderVo.setBidFlag(order.getBidFlag());
+            activeOrderVo.setLeverage(order.getLeverage());
+            activeOrderVo.setFilledVolume(order.getFilledVolume());
+            activeOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
+
+            List<OrderTradeVo> orderTradeList = _tradeListMap.get(order.getId());
+            BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
+
+            activeOrderVo.setMeanPrice(meanPrice);
+            activeOrderVo.setPrice(order.getPrice());
+            activeOrderVo.setFeeCost(order.getFeeCost());
+            activeOrderVo.setStatus(order.getStatus());
+
+            result.add(activeOrderVo);
 		}
 		return result;
 	}

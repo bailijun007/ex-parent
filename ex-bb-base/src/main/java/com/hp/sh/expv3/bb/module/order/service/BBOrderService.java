@@ -18,7 +18,7 @@ import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.vo.BBSymbol;
-import com.hp.sh.expv3.bb.strategy.common.CommonOrderStrategy;
+import com.hp.sh.expv3.bb.strategy.common.BbCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.BBCutRequest;
@@ -52,7 +52,7 @@ public class BBOrderService {
 	private BBAccountCoreService bBAccountCoreService;
 	
 	@Autowired
-	private CommonOrderStrategy orderStrategy;	
+	private BbCommonOrderStrategy orderStrategy;
 	
 	/**
 	 * 创建订单
