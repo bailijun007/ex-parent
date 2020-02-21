@@ -20,7 +20,7 @@ import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.vo.BBSymbol;
-import com.hp.sh.expv3.bb.strategy.common.CommonOrderStrategy;
+import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.bb.strategy.vo.TradeResult;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
@@ -52,7 +52,7 @@ public class BBTradeService {
 	private BBAccountCoreService accountCoreService;
 	
 	@Autowired
-	private BbCommonOrderStrategy orderStrategy;
+	private BBCommonOrderStrategy orderStrategy;
 	
 	@Autowired
 	private FeeCollectorSelector feeCollectorSelector;

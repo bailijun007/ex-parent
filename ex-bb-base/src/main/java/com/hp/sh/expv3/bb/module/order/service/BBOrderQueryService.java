@@ -19,7 +19,7 @@ import com.hp.sh.expv3.bb.module.order.dao.BBOrderLogDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
-import com.hp.sh.expv3.bb.strategy.common.BbCommonOrderStrategy;
+import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
 import com.hp.sh.expv3.dev.CrossDB;
@@ -43,7 +43,7 @@ public class BBOrderQueryService {
 	private BBOrderTradeDAO bBOrderTradeDAO;
 
 	@Autowired
-	private BbCommonOrderStrategy orderStrategy;
+	private BBCommonOrderStrategy orderStrategy;
 
 	public Long queryCount(Map<String, Object> params) {
 		return this.bBOrderDAO.queryCount(params);
