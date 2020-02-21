@@ -19,6 +19,7 @@ import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderLogDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.vo.OrderTradeVo;
@@ -131,6 +132,16 @@ public class PcOrderQueryService {
 		params.put("status", status);
 		params.put("modifiedEnd", modified);
 		List<PcOrder> list = this.pcOrderDAO.queryList(params);
+		return list;
+	}
+
+	public List<PcOrderTrade> querySynchFee(Page page, Long startTime) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("page", page);
+		params.put("feeSynchStatus", IntBool.NO);
+		params.put("createdEnd", startTime);
+		params.put("orderBy", "created");
+		List<PcOrderTrade> list = this.pcOrderTradeDAO.queryList(params);
 		return list;
 	}
 }

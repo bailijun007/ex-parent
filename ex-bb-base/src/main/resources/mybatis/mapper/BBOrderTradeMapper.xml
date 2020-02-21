@@ -19,8 +19,11 @@
 		<result column="fee_ratio" property="feeRatio" />
 		<result column="fee" property="fee" />
 		<result column="remain_volume" property="remainVolume" />
+		<result column="remain_order_margin" property="remainOrderMargin" />
+		<result column="remain_fee" property="remainFee" />
 		<result column="match_tx_id" property="matchTxId" />
 		<result column="tx_id" property="txId" />
+		<result column="fee_synch_status" property="feeSynchStatus" />
 		<result column="user_id" property="userId" />
 		<result column="id" property="id" />
 		<result column="created" property="created" />
@@ -28,31 +31,25 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		asset,symbol,price,volume,bid_flag,trade_sn,trade_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,remain_volume,match_tx_id,tx_id,user_id,id,created,modified
+		asset,symbol,price,volume,bid_flag,trade_sn,trade_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,remain_volume,remain_order_margin,remain_fee,match_tx_id,tx_id,fee_synch_status,user_id,id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
 		<where>
-		<if test="idList!=null">
-		and id in
-		<foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
-		#{idList[${i}]}
-		</foreach>
-		</if>
-		<if test="userId!=null"> and user_id=#{userId}</if>
-		<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
-		<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
+		<if test="bidFlag!=null"> and bid_flag=#{bidFlag}</if>
+		<if test="tradeId!=null"> and trade_id=#{tradeId}</if>
 		<if test="orderId!=null"> and order_id=#{orderId}</if>
-		<if test="tradeSn!=null and tradeSn!=''"> and trade_sn=#{tradeSn}</if>
 		<if test="makerFlag!=null"> and maker_flag=#{makerFlag}</if>
 		<if test="tradeTime!=null"> and trade_time=#{tradeTime}</if>
 		<if test="feeCollectorId!=null"> and fee_collector_id=#{feeCollectorId}</if>
-		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
-		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
-		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
-		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
+		<if test="matchTxId!=null"> and match_tx_id=#{matchTxId}</if>
+		<if test="txId!=null"> and tx_id=#{txId}</if>
 		<if test="feeSynchStatus!=null"> and fee_synch_status=#{feeSynchStatus}</if>
-		<if test="keyword!=null and keyword!=''"> and symbol like CONCAT('%',#{keyword},'%')</if>	</where>
+		<if test="userId!=null"> and user_id=#{userId}</if>
+		<if test="id!=null"> and id=#{id}</if>
+		<if test="created!=null"> and created=#{created}</if>
+		<if test="modified!=null"> and modified=#{modified}</if>
+		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(asset,''),IFNULL(symbol,''),IFNULL(trade_sn,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
 	</sql>
 
 	<sql id="simple_query" >
@@ -99,24 +96,21 @@
 			where id=#{id} and user_id=#{userId}
 	</select>
 
-	<select id="exist" resultType="long">
-	select EXISTS(
+	<select id="exist" resultType="boolean">
 		select 
-			1
+			count(1)
 		from 
 			bb_order_trade
-		where 
-			user_id=#{userId} and trade_sn=#{tradeSn}
+		<include refid="simple_where" />
 		limit 1
-	)
 	</select>
 
 
 	<insert id="save">
 		insert into bb_order_trade (
-			asset,symbol,price,volume,bid_flag,trade_sn,trade_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,remain_volume,match_tx_id,tx_id,user_id,id,created,modified
+			asset,symbol,price,volume,bid_flag,trade_sn,trade_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,remain_volume,remain_order_margin,remain_fee,match_tx_id,tx_id,fee_synch_status,user_id,id,created,modified
 		)values(
-			#{asset},#{symbol},#{price},#{volume},#{bidFlag},#{tradeSn},#{tradeId},#{orderId},#{makerFlag},#{tradeTime},#{feeCollectorId},#{feeRatio},#{fee},#{remainVolume},#{matchTxId},#{txId},#{userId},#{id},#{created},#{modified}
+			#{asset},#{symbol},#{price},#{volume},#{bidFlag},#{tradeSn},#{tradeId},#{orderId},#{makerFlag},#{tradeTime},#{feeCollectorId},#{feeRatio},#{fee},#{remainVolume},#{remainOrderMargin},#{remainFee},#{matchTxId},#{txId},#{feeSynchStatus},#{userId},#{id},#{created},#{modified}
 		)
 	</insert>
 	
@@ -124,10 +118,19 @@
 		update 
 			bb_order_trade
 		set 
-			asset=#{asset},symbol=#{symbol},price=#{price},volume=#{volume},bid_flag=#{bidFlag},trade_sn=#{tradeSn},trade_id=#{tradeId},order_id=#{orderId},maker_flag=#{makerFlag},trade_time=#{tradeTime},fee_collector_id=#{feeCollectorId},fee_ratio=#{feeRatio},fee=#{fee},remain_volume=#{remainVolume},match_tx_id=#{matchTxId},tx_id=#{txId},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},price=#{price},volume=#{volume},bid_flag=#{bidFlag},trade_sn=#{tradeSn},trade_id=#{tradeId},order_id=#{orderId},maker_flag=#{makerFlag},trade_time=#{tradeTime},fee_collector_id=#{feeCollectorId},fee_ratio=#{feeRatio},fee=#{fee},remain_volume=#{remainVolume},remain_order_margin=#{remainOrderMargin},remain_fee=#{remainFee},match_tx_id=#{matchTxId},tx_id=#{txId},fee_synch_status=#{feeSynchStatus},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>
+
+	<delete id="delete">
+        delete from bb_order_trade where id=#{id} and user_id=#{userId}
+    </delete>
+
+    <delete id="condDelete">
+        delete from bb_order_trade
+		<include refid="simple_where" />
+    </delete>
 
 	<!--  -->
 	
@@ -143,5 +146,5 @@
 			#{orderIdList[${i}]}
 			</foreach>
 	</select>
-	
+
 </mapper>

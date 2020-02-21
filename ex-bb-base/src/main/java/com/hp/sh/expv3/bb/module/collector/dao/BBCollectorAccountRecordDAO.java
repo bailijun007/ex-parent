@@ -20,8 +20,6 @@ public interface BBCollectorAccountRecordDAO extends BaseAccountDataMapper<BBCol
 	
 	public BBCollectorAccountRecord queryOne(Map<String,Object> params);
 
-	public Double queryCount(Map<String,Object> params);
-
-	public BBCollectorAccountRecord findByTradeNo(@Param("userId") Long userId, @Param("tradeNo") String tradeNo);
+	public BBCollectorAccountRecord findByTradeNo(@Param("collectorId") Long collectorId, @Param("tradeNo") String tradeNo);
 
 }

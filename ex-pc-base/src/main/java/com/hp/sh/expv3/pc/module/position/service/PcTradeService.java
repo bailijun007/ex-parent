@@ -20,6 +20,7 @@ import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
+import com.hp.sh.expv3.pc.module.collector.service.PcCollectorCoreService;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
@@ -32,6 +33,8 @@ import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
+import com.hp.sh.expv3.pc.vo.request.CollectorAddRequest;
+import com.hp.sh.expv3.pc.vo.request.CollectorCutRequest;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
@@ -234,6 +237,8 @@ public class PcTradeService {
 		
 		orderTrade.setMatchTxId(tradeMsg.getMatchTxId());
 		
+		orderTrade.setFeeSynchStatus(IntBool.NO);
+		
 		this.pcOrderTradeDAO.save(orderTrade);
 		
 		orderTrade.setLogType(this.getLogType(order.getCloseFlag(), order.getLongFlag()));
@@ -336,10 +341,6 @@ public class PcTradeService {
 		return true;
 	}
 	
-	private void synchCollector(Long tradeOrderId, Long feeCollectorId, BigDecimal fee){
-		
-	}
-
 	/**
 	 * 处理成交
 	 */
@@ -378,6 +379,41 @@ public class PcTradeService {
 		//maker
 		this.handleTradeOrder(makerTradeVo);
 		
+	}
+	
+
+	@Autowired
+	private PcCollectorCoreService collectorCoreService;
+
+	public void synchCollector(PcOrderTrade orderTrade){
+		if(BigUtils.gtZero(orderTrade.getFee())){
+			CollectorAddRequest request = new CollectorAddRequest();
+			request.setAmount(orderTrade.getFee());
+			request.setAsset(orderTrade.getAsset());
+			request.setAssociatedId(orderTrade.getOrderId());
+			request.setRemark("手续费");
+			request.setTradeNo(""+orderTrade.getId());
+			request.setTradeType(0);
+			request.setUserId(orderTrade.getUserId());
+			request.setCollectorId(orderTrade.getFeeCollectorId());
+			collectorCoreService.add(request);
+		}else{
+			CollectorCutRequest request = new CollectorCutRequest();
+			request.setAmount(orderTrade.getFee());
+			request.setAsset(orderTrade.getAsset());
+			request.setAssociatedId(orderTrade.getOrderId());
+			request.setRemark("倒贴手续费");
+			request.setTradeNo(""+orderTrade.getId());
+			request.setTradeType(0);
+			request.setUserId(orderTrade.getUserId());
+			request.setCollectorId(orderTrade.getFeeCollectorId());
+			collectorCoreService.cut(request);
+		}
+	}
+
+	public void setSynchStatus(PcOrderTrade orderTrade){
+		orderTrade.setFeeSynchStatus(IntBool.YES);
+		this.pcOrderTradeDAO.update(orderTrade);
 	}
 	
 }
