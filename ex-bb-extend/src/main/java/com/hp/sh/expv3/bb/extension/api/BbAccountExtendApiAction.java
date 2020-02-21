@@ -27,6 +27,12 @@ public class BbAccountExtendApiAction implements BbAccountExtendApi {
     @Override
     public void createBBAccount(Long userId, String asset) {
         checkParam(userId, asset);
+        //查询账户是否存在
+         Boolean exist = this.bbAccountExist(userId, asset);
+         if(exist){
+             throw new ExException(BbExtCommonErrorCode.ACCOUNT_ALREADY_EXISTS);
+         }
+        //创建bb账户
         bbAccountExtService.createBBAccount(userId, asset);
     }
 
