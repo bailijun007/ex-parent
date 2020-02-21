@@ -226,7 +226,7 @@ public class PcLiqService {
 	
 	private void createLiqOrder(PcLiqRecord record){
 		PcPosition pos = positionDataService.getPosition(record.getUserId(), record.getAsset(), record.getSymbol(), record.getPosId());
-		this.pcOrderService.create(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), OrderFlag.ACTION_CLOSE, record.getLongFlag(), TimeInForce.IMMEDIATE_OR_CANCEL, record.getBankruptPrice(), record.getVolume(), pos, IntBool.NO, IntBool.YES);
+		this.pcOrderService.createLiqOrder(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), record.getLongFlag(), record.getBankruptPrice(), record.getVolume(), pos);
 	}
 
 }
