@@ -115,4 +115,17 @@
         LIMIT 0,${limit}
     </select>
 
+    <select id="queryLastTradeByLtTime" resultMap="BbTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_trade
+        <where>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="tradeTime!=null">and trade_time &lt; #{tradeTime}</if>
+        </where>
+        order by trade_time desc
+        limit 0,1
+    </select>
+
 </mapper>
