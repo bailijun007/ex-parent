@@ -15,6 +15,9 @@ public class BbExtCommonErrorCode extends ErrorCode {
     public static final BbExtCommonErrorCode ACCOUNT_DOES_NOT_EXIST = new BbExtCommonErrorCode(-13302, "账户不存在!");
 
     public static final BbExtCommonErrorCode MORE_THAN_MAX_ROW= new BbExtCommonErrorCode(-13303, "超过最大条数");
+
+    public static final BbExtCommonErrorCode ACCOUNT_ALREADY_EXISTS= new BbExtCommonErrorCode(-13304, "账户已存在，请重新创建");
+
     private BbExtCommonErrorCode(int code, String message) {
         super(code, message);
     }

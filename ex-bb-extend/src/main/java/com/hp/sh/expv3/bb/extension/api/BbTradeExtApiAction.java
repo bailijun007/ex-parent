@@ -51,4 +51,12 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
         }
         return bbTradeExtService.selectTradeListByUser(userId,asset, symbol, startTime, endTime);
     }
+
+    @Override
+    public BbTradeVo queryLastTradeByLtTime(String asset, String symbol, Long startTime) {
+        if (null == startTime || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+        return bbTradeExtService.queryLastTradeByLtTime(asset,symbol,startTime);
+    }
 }

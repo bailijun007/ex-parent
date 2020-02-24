@@ -63,4 +63,16 @@ public interface BbTradeExtApi {
             @RequestParam(value = "endTime", required = false) Long endTime
     );
 
+
+    @ApiOperation(value = "小于当前时间点的最大的一条数据")
+    @GetMapping(value = "/api/bb/trade/ext/queryLastTradeByLtTime")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true)
+    })
+    BbTradeVo queryLastTradeByLtTime(@RequestParam(value = "asset", required = true) String asset,
+                                     @RequestParam(value = "symbol", required = true) String symbol,
+                                     @RequestParam(value = "startTime") Long startTime);
+
 }

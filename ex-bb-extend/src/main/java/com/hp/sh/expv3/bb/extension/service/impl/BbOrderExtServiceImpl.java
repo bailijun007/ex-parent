@@ -100,12 +100,15 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
 
     }
 
+
     @Override
     public BigDecimal getLockAsset(Long userId, String asset) {
         BigDecimal lock=  bbOrderExtMapper.getLockAsset(userId,asset);
+        if(null==lock){
+            return BigDecimal.ZERO;
+        }
         return lock;
     }
-
     @Override
     public List<BbHistoryOrderVo> queryBbActiveOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
         List<BbHistoryOrderVo> result = new ArrayList<>();
