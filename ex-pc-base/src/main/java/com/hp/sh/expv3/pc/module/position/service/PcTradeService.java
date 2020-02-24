@@ -91,19 +91,45 @@ public class PcTradeService {
 		Long now = DbDateUtils.now();
 		
 		PcPosition pcPosition = this.positionDataService.getCurrentPosition(trade.getAccountId(), trade.getAsset(), trade.getSymbol(), order.getLongFlag());
-		PcAccountSymbol as = accountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		
 		TradeResult tradeResult = this.positionStrategy.calcTradeResult(trade, order, pcPosition);
 		
+		/*  1、修改仓位数据  */
+		this.modPositon(pcPosition, order, tradeResult, now);
+		
+		/*  2、修改订单数据和订单状态  */
+		this.updateOrder4Trade(order, tradeResult, now);
+		
+		/* 3、生成成交流水 */
+		PcOrderTrade pcOrderTrade = this.saveOrderTrade(trade, order, tradeResult, pcPosition.getId(), now);
+		
+		//////////pc_account ///////////
+		if(order.getLiqFlag()==IntBool.YES){//强平委托
+			return ;
+		}
+		
+		/*  4、返还保证金和手续费  */
+		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
+			this.closeFeeToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult, order.getLongFlag());
+		}else{
+			if(BigUtils.ltZero(tradeResult.getReceivableFee())){
+				this.openFeeDiffToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult.getMakerFeeDiff());
+			}
+		}
+		
+	}
+    
+    private void modPositon(PcPosition pcPosition, PcOrder order, TradeResult tradeResult, Long now){
 		////////// 仓位 ///////////
 		//如果仓位不存在则创建新仓位
 		boolean isNewPos = false;
 		if(pcPosition==null){
+			PcAccountSymbol as = accountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 			pcPosition = this.newEmptyPostion(as.getUserId(), as.getAsset(), as.getSymbol(), order.getLongFlag(), order.getLeverage(), as.getMarginMode(), order.getFaceValue());
 			isNewPos = true;
 		}
 		
-		//仓位数量加减
+		/*  1、修改仓位数据  */
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 			this.addPositon(pcPosition, tradeResult);
 		}else{
@@ -129,29 +155,7 @@ public class PcTradeService {
 			pcPosition.setModified(now);
 			this.positionDataService.update(pcPosition);
 		}
-		
-		////////// 成交记录  ///////////
-		PcOrderTrade pcOrderTrade = this.saveOrderTrade(trade, order, tradeResult, pcPosition.getId(), now);
-		
-		////////// 订单 ///////////
-		
-		//修改订单状态
-		this.updateOrder4Trade(order, tradeResult, now);
-		
-		//////////pc_account ///////////
-		if(order.getLiqFlag()==IntBool.YES){//强平委托
-			return ;
-		}
-		
-		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
-			this.closeFeeToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult, order.getLongFlag());
-		}else{
-			if(BigUtils.ltZero(tradeResult.getReceivableFee())){
-				this.openFeeDiffToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult.getMakerFeeDiff());
-			}
-		}
-		
-	}
+    }
 	
 	private int getLogType(int closeFlag, int longFlag){
 		if(IntBool.isFalse(closeFlag)){
@@ -233,7 +237,7 @@ public class PcTradeService {
 		
 		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
 		
-		orderTrade.setRemainVolume(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeResult.getVolume()));
+		orderTrade.setRemainVolume(order.getVolume().subtract(order.getFilledVolume()));
 		
 		orderTrade.setMatchTxId(tradeMsg.getMatchTxId());
 		
