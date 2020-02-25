@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.bb.extension.dao;
 
+import com.hp.sh.expv3.bb.extension.vo.BbHistoryOrderVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -26,4 +27,6 @@ public interface BbOrderExtMapper {
     List<BbOrderVo> queryBbActiveOrderList(Map<String, Object> map);
 
     List<BbOrderVo> queryBbActiveOrdersByIsNextPage(Map<String, Object> map);
+
+    List<BbOrderVo> queryOrderList(Map<String, Object> map);
 }
