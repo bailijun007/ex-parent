@@ -15,11 +15,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableDiscoveryClient
 @ComponentScan("com.hp.sh.expv3")
 @SpringBootApplication
-public class ExBbBaseApplication {
-	private static final Logger logger = LoggerFactory.getLogger(ExBbBaseApplication.class);
+public class ExBBBaseApplication {
+	private static final Logger logger = LoggerFactory.getLogger(ExBBBaseApplication.class);
 
 	public static void main(String[] args) throws Exception {
-		SpringApplication.run(ExBbBaseApplication.class, args);
+		SpringApplication.run(ExBBBaseApplication.class, args);
 	}
 	
 	@Value("${spring.profiles.active:}")
