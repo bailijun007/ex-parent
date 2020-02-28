@@ -54,9 +54,9 @@ public class PcStrategyContext {
 		return os.calcBaseValue(volume, faceValue, price);
 	}
 	
-	public OrderFeeData calcNewOrderAmt(String asset, String symbol, OrderFeeParam pcOrder){
+	public OrderFeeData calcNewOrderFee(String asset, String symbol, OrderFeeParam pcOrder){
 		OrderStrategy os = this.getOrderStrategy(asset, symbol);
-		return os.calcNewOrderAmt(pcOrder);
+		return os.calcNewOrderFee(pcOrder);
 	}
 	
 	/**
@@ -119,7 +119,7 @@ public class PcStrategyContext {
 		
 		OrderStrategy orderStrategy = this.getOrderStrategy(asset, symbol);
         HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(asset, symbol);
-		OrderFeeData tradeRatioData = orderStrategy.calcRaitoAmt(order, matchedVo.getNumber());
+		OrderFeeData tradeRatioData = orderStrategy.calcRaitoOrderFee(order, matchedVo.getNumber());
 		
 		BigDecimal faceValue = this.metadataService.getFaceValue(asset, symbol);
 		
@@ -221,8 +221,8 @@ public class PcStrategyContext {
 		orderParam.setPrice(latestPrice);
 
 		OrderStrategy orderStrategy = this.getOrderStrategy(asset, symbol);
-		OrderFeeData ratioData = orderStrategy.calcNewOrderAmt(orderParam);
-		BigDecimal singleCost = ratioData.getGrossMargin();
+		OrderFeeData orderFee = orderStrategy.calcNewOrderFee(orderParam);
+		BigDecimal singleCost = orderFee.getGrossMargin();
 		
 		BigDecimal vol = balance.divide(singleCost, Precision.INTEGER_PRECISION, Precision.LESS);
 		return vol;

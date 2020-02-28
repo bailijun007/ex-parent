@@ -43,7 +43,7 @@ public class AABBOrderStrategy implements OrderStrategy {
 	 * 计算新订单费用
 	 */
 	@Override
-	public OrderFeeData calcNewOrderAmt(OrderFeeParam pcOrder){
+	public OrderFeeData calcNewOrderFee(OrderFeeParam pcOrder){
 		//交易金额
 		BigDecimal _amount = AABBCompFieldCalc.calcAmount(pcOrder.getVolume(), pcOrder.getFaceValue());
 		
@@ -79,7 +79,7 @@ public class AABBOrderStrategy implements OrderStrategy {
 	 * @return
 	 */
 	@Override
-	public OrderFeeData calcRaitoAmt(PcOrder order, BigDecimal number){
+	public OrderFeeData calcRaitoOrderFee(PcOrder order, BigDecimal number){
 		OrderFeeData orderAmount = new OrderFeeData();
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 			this.calcOpenRaitoAmt(order, number, orderAmount);

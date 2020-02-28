@@ -37,18 +37,18 @@ public class AAABOrderStrategy implements OrderStrategy {
 	/**
 	 * 计算新订单费用
 	 */
-	public OrderFeeData calcNewOrderAmt(OrderFeeParam pcOrder){
+	public OrderFeeData calcNewOrderFee(OrderFeeParam order){
 		//交易金额
-		BigDecimal _amount = pcOrder.getVolume().multiply(pcOrder.getPrice());
+		BigDecimal _amount = this.calcAmount(order.getVolume(), order.getFaceValue(), order.getPrice());
 		
 		//开仓手续费
-		BigDecimal openFee = BigCalc.multiply(_amount, pcOrder.getOpenFeeRatio());
+		BigDecimal openFee = BigCalc.multiply(_amount, order.getOpenFeeRatio());
 		
 		//平仓手续费
-		BigDecimal closeFee = BigCalc.multiply(_amount, pcOrder.getCloseFeeRatio());
+		BigDecimal closeFee = BigCalc.multiply(_amount, order.getCloseFeeRatio());
 		
 		//保证金
-		BigDecimal orderMargin = this.calMargin(_amount, pcOrder.getMarginRatio());
+		BigDecimal orderMargin = this.calMargin(_amount, order.getMarginRatio());
 		
 		//总押金
 		BigDecimal grossMargin = BigCalc.sum(closeFee, openFee, orderMargin);
@@ -70,7 +70,7 @@ public class AAABOrderStrategy implements OrderStrategy {
 	 * @param volume 分量
 	 * @return
 	 */
-	public OrderFeeData calcRaitoAmt(PcOrder order, BigDecimal number){
+	public OrderFeeData calcRaitoOrderFee(PcOrder order, BigDecimal number){
 		OrderFeeData orderAmount = new OrderFeeData();
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 			this.calcOpenRaitoAmt(order, number, orderAmount);

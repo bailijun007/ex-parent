@@ -17,9 +17,9 @@ public interface OrderStrategy {
 	
 	BigDecimal calcBaseValue(BigDecimal volume, BigDecimal faceValue, BigDecimal price);
 
-	OrderFeeData calcRaitoAmt(PcOrder order, BigDecimal number);
+	OrderFeeData calcNewOrderFee(OrderFeeParam pcOrder);
 
-	OrderFeeData calcNewOrderAmt(OrderFeeParam pcOrder);
+	OrderFeeData calcRaitoOrderFee(PcOrder order, BigDecimal number);
 
 	BigDecimal calMargin(BigDecimal volume, BigDecimal faceValue, BigDecimal price, BigDecimal marginRatio);
 	
