@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.commons.lock.LockIt;
-import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -31,7 +30,8 @@ import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
-import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
+import com.hp.sh.expv3.pc.strategy.aabb.AABBCompFieldCalc;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.pc.vo.request.CollectorAddRequest;
 import com.hp.sh.expv3.pc.vo.request.CollectorCutRequest;
@@ -70,7 +70,7 @@ public class PcTradeService {
 	private FeeCollectorSelector feeCollectorSelector;
 	
 	@Autowired
-	private PositionStrategyContext positionStrategy;
+	private PcStrategyContext positionStrategy;
     
 	@Autowired
 	private PcPositionMarginService positionMarginService;
@@ -296,13 +296,13 @@ public class PcTradeService {
 		
 		pcPosition.setMeanPrice(tradeResult.getNewPosMeanPrice());
 		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeResult.getOrderMargin()));
-		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeResult.getReceivableFee()));
+		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeResult.getReceivableFee())); //TODO 这个地方好像错了?
 		
 		pcPosition.setAccuVolume(pcPosition.getAccuVolume().add(tradeResult.getVolume()));
 		
 		pcPosition.setAccuBaseValue(pcPosition.getAccuBaseValue().add(tradeResult.getBaseValue()));
 
-		pcPosition.setBaseValue(CompFieldCalc.calcBaseValue(pcPosition.getVolume(), pcPosition.getFaceValue(), pcPosition.getMeanPrice()));
+		pcPosition.setBaseValue(positionStrategy.calcBaseValue(pcPosition.getAsset(), pcPosition.getSymbol(), pcPosition.getVolume(), pcPosition.getFaceValue(), pcPosition.getMeanPrice()));
 		pcPosition.setLiqPrice(tradeResult.getNewPosLiqPrice());
 		
 	}
@@ -313,12 +313,12 @@ public class PcTradeService {
 		pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(tradeResult.getReceivableFee()));
 		
 		pcPosition.setInitMargin(pcPosition.getInitMargin().subtract(tradeResult.getOrderMargin()));
-		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeResult.getReceivableFee()));
+		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeResult.getReceivableFee())); //TODO 这个地方好像错了?
 		
 		pcPosition.setRealisedPnl(pcPosition.getRealisedPnl().add(tradeResult.getPnl()));
 
 		pcPosition.setLiqPrice(tradeResult.getNewPosLiqPrice());
-		pcPosition.setBaseValue(CompFieldCalc.calcBaseValue(pcPosition.getVolume(), pcPosition.getFaceValue(), pcPosition.getMeanPrice()));
+		pcPosition.setBaseValue(positionStrategy.calcBaseValue(pcPosition.getAsset(), pcPosition.getSymbol(), pcPosition.getVolume(), pcPosition.getFaceValue(), pcPosition.getMeanPrice()));
 		pcPosition.setMeanPrice(tradeResult.getNewPosMeanPrice());
 
 	}

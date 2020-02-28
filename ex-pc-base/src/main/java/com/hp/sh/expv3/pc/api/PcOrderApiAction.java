@@ -14,7 +14,7 @@ import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.match.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingNewMsg;
-import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.vo.response.ActiveOrderVo;
 import com.hp.sh.expv3.utils.BidUtils;
 
@@ -34,7 +34,7 @@ public class PcOrderApiAction implements PcOrderApi {
 	private MatchMqSender matchMqSender;
 	
 	@Autowired
-	private PositionStrategyContext strategyContext;
+	private PcStrategyContext strategyContext;
 	
 	/**
 	 * 创建订单

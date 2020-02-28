@@ -14,7 +14,6 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
-import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -31,9 +30,8 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
-import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
-import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
-import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
+import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
+import com.hp.sh.expv3.pc.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -52,7 +50,7 @@ public class PcOrderService {
 	private static final Logger logger = LoggerFactory.getLogger(PcOrderService.class);
 	
 	@Autowired
-	private PcAccountSymbolService pcSymbolService;
+	private PcAccountSymbolService symbolService;
 
 	@Autowired
 	private PcOrderUpdateService orderUpdateService;
@@ -64,19 +62,16 @@ public class PcOrderService {
 	private FeeRatioService feeRatioService;
 	
 	@Autowired
-	private PcAccountCoreService pcAccountCoreService;
+	private PcAccountCoreService accountCoreService;
 	
 	@Autowired
 	private MetadataService metadataService;
 	
 	@Autowired
-	private CommonOrderStrategy orderStrategy;	
-	
-	@Autowired
 	private PcPositionDataService positionDataService;
 	
     @Autowired
-    private HoldPosStrategy holdPosStrategy;
+    private PcStrategyContext strategyContext;
 	
 	/**
 	 * 创建订单
@@ -118,7 +113,7 @@ public class PcOrderService {
 		pcOrder.setSymbol(symbol);
 		pcOrder.setCloseFlag(OrderFlag.ACTION_OPEN);
 		pcOrder.setLongFlag(longFlag);
-		pcOrder.setLeverage(pcSymbolService.getLeverage(userId, asset, symbol, longFlag));
+		pcOrder.setLeverage(symbolService.getLeverage(userId, asset, symbol, longFlag));
 		pcOrder.setVolume(number);
 		pcOrder.setFaceValue(metadataService.getFaceValue(asset, symbol));
 		pcOrder.setPrice(price);
@@ -175,7 +170,7 @@ public class PcOrderService {
 		pcOrder.setSymbol(symbol);
 		pcOrder.setCloseFlag(OrderFlag.ACTION_CLOSE);
 		pcOrder.setLongFlag(longFlag);
-		pcOrder.setLeverage(pcSymbolService.getLeverage(userId, asset, symbol, longFlag));
+		pcOrder.setLeverage(symbolService.getLeverage(userId, asset, symbol, longFlag));
 		pcOrder.setVolume(number);
 		pcOrder.setFaceValue(metadataService.getFaceValue(asset, symbol));
 		pcOrder.setPrice(price);
@@ -218,8 +213,7 @@ public class PcOrderService {
 	}
 
 	private void checkPrice(PcPosition pos, BigDecimal price) {
-		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal bankruptPrice = this.holdPosStrategy.calcBankruptPrice(pos.getLongFlag(), pos.getMeanPrice(), _amount, pos.getPosMargin());
+		BigDecimal bankruptPrice = this.strategyContext.calcBankruptPrice(pos);
 		if(IntBool.isTrue(pos.getLongFlag())){
 			if(BigUtils.lt(price, bankruptPrice)){
 				throw new ExException(PcOrderError.BANKRUPT_PRICE);
@@ -274,12 +268,12 @@ public class PcOrderService {
 		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_OPEN_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
-		this.pcAccountCoreService.cut(request);
+		this.accountCoreService.cut(request);
 	}
 	
-	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal amount){
+	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal orderMargin, BigDecimal openFee, BigDecimal closeFee){
 		PcAddRequest request = new PcAddRequest();
-		request.setAmount(amount);
+		request.setAmount(orderMargin.add(openFee).add(closeFee));
 		request.setAsset(asset);
 		request.setRemark("撤单还余额");
 		request.setTradeNo(SnUtils.getCancelOrderReturnSn(""+orderId));
@@ -287,7 +281,7 @@ public class PcOrderService {
 		request.setTradeType(PcAccountTradeType.ORDER_CANCEL);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
-		return this.pcAccountCoreService.add(request);
+		return this.accountCoreService.add(request);
 	}
 
 	//设置平仓订单的各种费率，平仓订单
@@ -308,12 +302,12 @@ public class PcOrderService {
 		pcOrder.setOpenFeeRatio(feeRatioService.getOpenFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
 		pcOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
 		
-		OrderRatioData ratioData = orderStrategy.calcNewOrderAmt(pcOrder);
+		OrderFeeData feeData = strategyContext.calcNewOrderAmt(pcOrder.getAsset(), pcOrder.getSymbol(), pcOrder);
 		
-		pcOrder.setOpenFee(ratioData.getOpenFee());
-		pcOrder.setCloseFee(ratioData.getCloseFee());
-		pcOrder.setOrderMargin(ratioData.getGrossMargin());
-		pcOrder.setGrossMargin(ratioData.getGrossMargin());
+		pcOrder.setOpenFee(feeData.getOpenFee());
+		pcOrder.setCloseFee(feeData.getCloseFee());
+		pcOrder.setOrderMargin(feeData.getGrossMargin());
+		pcOrder.setGrossMargin(feeData.getGrossMargin());
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
@@ -395,11 +389,7 @@ public class PcOrderService {
 				logger.warn("取消数量不一致：{},{}", remaining, number);
 			}
 			
-			OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, remaining);
-			
-			BigDecimal cancelledGrossFee = ratioData.getGrossMargin();
-			
-			int result = this.returnCancelAmt(userId, asset, orderId, cancelledGrossFee);
+			int result = this.returnCancelAmt(userId, asset, orderId, order.getOrderMargin(), order.getOpenFee(), order.getCloseFee());
 			if(result==InvokeResult.NOCHANGE){
 				//利用合约账户的幂等性实现本方法的幂等性
 				logger.warn("已经执行过了");

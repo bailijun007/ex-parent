@@ -13,7 +13,7 @@ import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
-import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.vo.response.ChangeMarginVo;
 import com.hp.sh.expv3.pc.vo.response.CurPositionVo;
 import com.hp.sh.expv3.utils.math.Precision;
@@ -34,7 +34,7 @@ public class PcPostionApiAction implements PcPostionApi {
 	private PcOrderQueryService orderQueryService;
 	
 	@Autowired
-	private PositionStrategyContext strategyContext;
+	private PcStrategyContext strategyContext;
 	
 	public ChangeMarginVo showChangeMargin(Long userId, String asset, String symbol, Integer longFlag){
 		PcPosition pos = this.posDataService.getCurrentPosition(userId, asset, symbol, longFlag);

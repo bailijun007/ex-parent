@@ -7,14 +7,8 @@ import java.math.BigDecimal;
  * @author wangjg
  *
  */
-public class OrderRatioData {
+public class OrderFeeData {
 	
-	//交易金额 张数*面值
-	private BigDecimal amount;
-	
-	//基础货币价值 张数*面值/price
-	private BigDecimal baseValue;
-
 	/**
 	 * 开仓手续费,成交时修改(可能部分成交，按比例收取)
 	 */
@@ -35,24 +29,8 @@ public class OrderRatioData {
 	 */
 	private BigDecimal grossMargin;
 
-	public OrderRatioData() {
+	public OrderFeeData() {
 		super();
-	}
-
-	public BigDecimal getAmount() {
-		return amount;
-	}
-
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
-	}
-
-	public BigDecimal getBaseValue() {
-		return baseValue;
-	}
-
-	public void setBaseValue(BigDecimal baseValue) {
-		this.baseValue = baseValue;
 	}
 
 	public BigDecimal getOpenFee() {

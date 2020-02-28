@@ -246,8 +246,7 @@ public class BBOrderService {
 		
 		//退押金
 		BBSymbol bs = new BBSymbol(symbol, order.getBidFlag());
-		OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, remaining);
-		int result = this.returnCancelAmt(userId, bs.getPayCurrency(), orderId, ratioData.getOrderMargin(), ratioData.getFee());
+		int result = this.returnCancelAmt(userId, bs.getPayCurrency(), orderId, order.getOrderMargin(), order.getFee());
 		if(result==InvokeResult.NOCHANGE){
 			//利用合约账户的幂等性实现本方法的幂等性
 			logger.warn("已经执行过了");

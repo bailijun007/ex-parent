@@ -2,6 +2,8 @@ package com.hp.sh.expv3.pc.strategy;
 
 import java.math.BigDecimal;
 
+import com.hp.sh.expv3.pc.strategy.data.PosData;
+
 /**
  * 持仓计算策略(仓位相关实时变化数据)
  * 
@@ -9,6 +11,7 @@ import java.math.BigDecimal;
  *
  */
 public interface HoldPosStrategy {
+	
 	/**
 	 * 成交均价
 	 * @param isLong
@@ -17,6 +20,8 @@ public interface HoldPosStrategy {
 	 * @return
 	 */
     public BigDecimal calcMeanPrice(int longFlag, BigDecimal baseValue, BigDecimal amt) ;
+
+	public BigDecimal calcLiqPrice(PosData pos);
 
 	/**
 	 * 计算仓位预估强评价
@@ -39,7 +44,7 @@ public interface HoldPosStrategy {
 	 * @param closePrice 平仓价
 	 * @return
 	 */
-	public BigDecimal calcPnl(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal closePrice) ;
+	public BigDecimal calcPnl(int longFlag, BigDecimal volume, BigDecimal faceValue, BigDecimal openPrice, BigDecimal closePrice) ;
 
 	/**
 	 * 用 均价 标记价格 未实现盈亏 计算 仓位保证金
@@ -51,7 +56,7 @@ public interface HoldPosStrategy {
 	 * @param markPrice
 	 * @return
 	 */
-	public BigDecimal calcInitMargin(Integer longFlag, BigDecimal initMarginRatio, BigDecimal amount, BigDecimal meanPrice, BigDecimal markPrice) ;
+	public BigDecimal calcInitMargin(Integer longFlag, BigDecimal initMarginRatio, BigDecimal volume, BigDecimal faceValue, BigDecimal meanPrice, BigDecimal markPrice) ;
 
 	/**
 	 * 计算破产价
@@ -61,6 +66,6 @@ public interface HoldPosStrategy {
 	 * @param margin
 	 * @return
 	 */
-	public BigDecimal calcBankruptPrice(Integer longFlag, BigDecimal openPrice, BigDecimal amt, BigDecimal margin) ;
+	BigDecimal calcBankruptPrice(Integer longFlag, BigDecimal volume, BigDecimal faceValue, BigDecimal margin, BigDecimal openPrice);
 
 }

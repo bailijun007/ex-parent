@@ -21,7 +21,7 @@ import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
-import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.pc.vo.response.ActiveOrderVo;
 import com.hp.sh.expv3.utils.IntBool;
@@ -44,7 +44,7 @@ public class PcOrderQueryService {
 	private PcOrderTradeDAO pcOrderTradeDAO;
 
     @Autowired
-    private PositionStrategyContext positionStrategyContext;
+    private PcStrategyContext pcStrategyContext;
     
 	public Long queryCount(Map<String, Object> params) {
 		return this.pcOrderDAO.queryCount(params);
@@ -94,7 +94,7 @@ public class PcOrderQueryService {
 			activeOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
 			
 			List<OrderTradeVo> orderTradeList = _tradeListMap.get(order.getId());
-			BigDecimal meanPrice = positionStrategyContext.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), order.getLongFlag(), orderTradeList);
+			BigDecimal meanPrice = pcStrategyContext.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), order.getLongFlag(), orderTradeList);
 			
 			activeOrderVo.setMeanPrice(meanPrice);
 			activeOrderVo.setPrice(order.getPrice());

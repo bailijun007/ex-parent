@@ -5,10 +5,13 @@ public class StrategyBundle {
 	private final Integer strategyId;
 	
 	private final HoldPosStrategy holdPosStrategy;
+	
+	private final OrderStrategy orderStrategy;
 
-	public StrategyBundle(int strategyId, HoldPosStrategy holdPosStrategy) {
+	public StrategyBundle(int strategyId, HoldPosStrategy holdPosStrategy, OrderStrategy orderStrategy) {
 		this.strategyId = strategyId;
 		this.holdPosStrategy = holdPosStrategy;
+		this.orderStrategy = orderStrategy;
 	}
 
 	public Integer strategyId() {
@@ -17,6 +20,10 @@ public class StrategyBundle {
 
 	public HoldPosStrategy getHoldPosStrategy() {
 		return holdPosStrategy;
+	}
+
+	public OrderStrategy getOrderStrategy() {
+		return orderStrategy;
 	}
 
 }

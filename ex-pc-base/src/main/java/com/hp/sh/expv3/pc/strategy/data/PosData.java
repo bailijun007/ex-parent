@@ -7,8 +7,10 @@ import java.math.BigDecimal;
  * @author wangjg
  *
  */
-public interface PosData extends PosBaseData{
+public interface PosData extends PosBaseData, PosCalcBankruptPriceParam{
 
 	public BigDecimal getMeanPrice();
+
+	public BigDecimal getHoldMarginRatio();
 
 }

@@ -8,7 +8,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.component.MetadataService;
@@ -18,17 +17,21 @@ import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
-import com.hp.sh.expv3.pc.strategy.common.CommonOrderStrategy;
+import com.hp.sh.expv3.pc.strategy.aabb.AABBCompFieldCalc;
+import com.hp.sh.expv3.pc.strategy.data.OrderFeeParam;
 import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
+import com.hp.sh.expv3.pc.strategy.data.PosCalcBankruptPriceParam;
+import com.hp.sh.expv3.pc.strategy.data.PosData;
+import com.hp.sh.expv3.pc.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeParamVo;
-import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.IntBool;
+import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.Precision;
 
 @Component
-public class PositionStrategyContext {
+public class PcStrategyContext {
 	
 	@Autowired
 	private MetadataService metadataService;
@@ -39,31 +42,63 @@ public class PositionStrategyContext {
 	@Autowired
 	private FeeRatioService feeRatioService;
 
-	@Autowired
-	private CommonOrderStrategy orderStrategy;
-
-	@Autowired
-	private HoldPosStrategy _holdPosStrategy;
-
 	private Map<Integer, StrategyBundle> strategyBundleMap = new HashMap<Integer, StrategyBundle>();
+	
+	int _____________order_________________;
+	
+	/**
+	 * 计算交易合约 基础货币总价值
+	 */
+	public BigDecimal calcBaseValue(String asset, String symbol, BigDecimal volume, BigDecimal faceValue, BigDecimal price){
+		OrderStrategy os = this.getOrderStrategy(asset, symbol);
+		return os.calcBaseValue(volume, faceValue, price);
+	}
+	
+	public OrderFeeData calcNewOrderAmt(String asset, String symbol, OrderFeeParam pcOrder){
+		OrderStrategy os = this.getOrderStrategy(asset, symbol);
+		return os.calcNewOrderAmt(pcOrder);
+	}
+	
+	/**
+	 * 计算仓位维持保证金
+	 * @param pos
+	 * @return
+	 */
+	public BigDecimal calHoldMargin(PosData pos){
+		OrderStrategy os = this.getOrderStrategy(pos.getAsset(), pos.getSymbol());
+		return os.calMargin(pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice(), pos.getHoldMarginRatio());
+	}
+	
+	int ______________pos_______________;
 	
 	/**
 	 * 仓位所需初始保证金
 	 * @param pos
 	 * @return
 	 */
-	public BigDecimal calcInitMargin (PcPosition pos){
-		long userId = pos.getUserId();
+	public BigDecimal calcInitMargin (PosData pos){
+		BigDecimal leverage = pos.getLeverage();
+		return this.calcInitMargin(pos, leverage);
+	}
+	
+	/**
+	 * 仓位使用指定杠杆所需的初始保证金
+	 * @param pos
+	 * @return
+	 */
+	public BigDecimal calcInitMargin (PosData pos, BigDecimal leverage){
 		String asset = pos.getAsset();
 		String symbol = pos.getSymbol();
 		Integer longFlag = pos.getLongFlag();
-		BigDecimal leverage = pos.getLeverage();
-        BigDecimal amount = pos.getVolume().multiply(metadataService.getFaceValue(asset, symbol));
+		
+		//标记价格
         BigDecimal markPrice = markPriceService.getCurrentMarkPrice(asset, symbol);
         
         //新的仓位保证金
         BigDecimal initMarginRatio = feeRatioService.getInitedMarginRatio(leverage); 
-        BigDecimal initMargin = _holdPosStrategy.calcInitMargin(longFlag, initMarginRatio, amount, pos.getMeanPrice(), markPrice);
+        
+        HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(asset, symbol);
+        BigDecimal initMargin = holdPosStrategy.calcInitMargin(longFlag, initMarginRatio, pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice(), markPrice);
         
         return initMargin;
 	}
@@ -82,7 +117,9 @@ public class PositionStrategyContext {
 		int closeFlag = order.getCloseFlag();
 		int longFlag = order.getLongFlag();
 		
-		OrderRatioData tradeRatioData = orderStrategy.calcRaitoAmt(order, matchedVo.getNumber());
+		OrderStrategy orderStrategy = this.getOrderStrategy(asset, symbol);
+        HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(asset, symbol);
+		OrderFeeData tradeRatioData = orderStrategy.calcRaitoAmt(order, matchedVo.getNumber());
 		
 		BigDecimal faceValue = this.metadataService.getFaceValue(asset, symbol);
 		
@@ -90,8 +127,8 @@ public class PositionStrategyContext {
   
 		tradeResult.setVolume(matchedVo.getNumber());
 		tradeResult.setPrice(matchedVo.getPrice());
-		tradeResult.setAmount(CompFieldCalc.calcAmount(tradeResult.getVolume(), faceValue));
-		tradeResult.setBaseValue(CompFieldCalc.calcBaseValue(tradeResult.getVolume(), faceValue, tradeResult.getPrice()));
+		tradeResult.setAmount(orderStrategy.calcAmount(tradeResult.getVolume(), faceValue, tradeResult.getPrice()));
+		tradeResult.setBaseValue(orderStrategy.calcBaseValue(tradeResult.getVolume(), faceValue, tradeResult.getPrice()));
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		
 		//手续费&率
@@ -101,12 +138,12 @@ public class PositionStrategyContext {
 			tradeResult.setOrderMargin(tradeRatioData.getOrderMargin());//保证金
 		}else{
 			BigDecimal closeFeeRatio = this.feeRatioService.getCloseFeeRatio(userId, asset, symbol);
-			BigDecimal closeFee = orderStrategy.calcFee(tradeResult.getBaseValue(), closeFeeRatio);
+			BigDecimal closeFee = BigCalc.multiply(tradeResult.getBaseValue(), closeFeeRatio);
 
 			tradeResult.setFeeRatio(closeFeeRatio);
 			tradeResult.setFee(closeFee);
 			
-			BigDecimal orderMargin = CommonOrderStrategy.slope(tradeResult.getVolume(), pcPosition.getVolume(), pcPosition.getPosMargin());
+			BigDecimal orderMargin = BigCalc.slope(tradeResult.getVolume(), pcPosition.getVolume(), pcPosition.getPosMargin());
 			tradeResult.setOrderMargin(orderMargin);
 		}
 		
@@ -115,23 +152,24 @@ public class PositionStrategyContext {
 			if(closeFlag==OrderFlag.ACTION_OPEN){
 				BigDecimal makerFeeRatio = feeRatioService.getMakerOpenFeeRatio(userId, asset, symbol);
 				tradeResult.setMakerFeeRatio(makerFeeRatio);
-				tradeResult.setMakerFee(orderStrategy.calcFee(tradeResult.getBaseValue(), makerFeeRatio));
+				tradeResult.setMakerFee(BigCalc.multiply(tradeResult.getBaseValue(), makerFeeRatio));
 			}else{
 				BigDecimal makerFeeRatio = feeRatioService.getMakerCloseFeeRatio(userId, asset, symbol);
 				tradeResult.setMakerFeeRatio(makerFeeRatio);
-				tradeResult.setMakerFee(orderStrategy.calcFee(tradeResult.getBaseValue(), makerFeeRatio));
+				tradeResult.setMakerFee(BigCalc.multiply(tradeResult.getBaseValue(), makerFeeRatio));
 			}
 		}
 		
 		/* **************** 仓位累计数据 **************** */
-
+        
 		//仓位均价
 		if(pcPosition!=null){
 			if((closeFlag == OrderFlag.ACTION_OPEN)){
 				BigDecimal _newBaseValue = pcPosition.getBaseValue().add(tradeResult.getBaseValue());//一共几个基础货币
 				BigDecimal _newVolume = pcPosition.getVolume().add(tradeResult.getVolume());//当前张数
-				BigDecimal _newAmount = CompFieldCalc.calcAmount(_newVolume, faceValue); //当前金额
-				BigDecimal newMeanPrice = _holdPosStrategy.calcMeanPrice(longFlag, _newBaseValue, _newAmount);
+				BigDecimal _newAmount = orderStrategy.calcAmount(_newVolume, faceValue, tradeResult.getPrice()); //当前金额
+
+				BigDecimal newMeanPrice = holdPosStrategy.calcMeanPrice(longFlag, _newBaseValue, _newAmount);
 				tradeResult.setNewPosMeanPrice(newMeanPrice);
 			}else{
 				tradeResult.setNewPosMeanPrice(pcPosition.getMeanPrice());
@@ -142,7 +180,7 @@ public class PositionStrategyContext {
 
 		//此笔成交收益
 		if(IntBool.isTrue(closeFlag) && pcPosition!=null && BigUtils.gt(pcPosition.getMeanPrice(), BigDecimal.ZERO)){
-			BigDecimal pnl = _holdPosStrategy.calcPnl(longFlag, tradeRatioData.getAmount(), pcPosition.getMeanPrice(), tradeResult.getPrice());
+			BigDecimal pnl = holdPosStrategy.calcPnl(longFlag, matchedVo.getNumber(), faceValue, pcPosition.getMeanPrice(), tradeResult.getPrice());
 			tradeResult.setPnl(pnl);	
 		}else{
 			tradeResult.setPnl(BigDecimal.ZERO);
@@ -154,12 +192,12 @@ public class PositionStrategyContext {
 			BigDecimal _amount = _newVolume.multiply(order.getFaceValue());
 			BigDecimal _newPosMargin = IntBool.isTrue(closeFlag)?pcPosition.getPosMargin().subtract(tradeResult.getOrderMargin()):pcPosition.getPosMargin().add(tradeResult.getOrderMargin());
 			tradeResult.setNewPosLiqPrice(
-				_holdPosStrategy.calcLiqPrice(longFlag, _amount, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), _newPosMargin)
+				holdPosStrategy.calcLiqPrice(longFlag, _amount, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), _newPosMargin)
 			);
 		}else{
 			BigDecimal holdRatio = feeRatioService.getHoldRatio(userId, asset, symbol, tradeResult.getVolume());
 			tradeResult.setNewPosLiqPrice(
-				_holdPosStrategy.calcLiqPrice(longFlag, tradeResult.getAmount(), tradeResult.getNewPosMeanPrice(), holdRatio, tradeResult.getOrderMargin())
+				holdPosStrategy.calcLiqPrice(longFlag, tradeResult.getAmount(), tradeResult.getNewPosMeanPrice(), holdRatio, tradeResult.getOrderMargin())
 			);
 		}
 		
@@ -182,7 +220,8 @@ public class PositionStrategyContext {
 		orderParam.setMarginRatio(initedMarginRatio);
 		orderParam.setPrice(latestPrice);
 
-		OrderRatioData ratioData = orderStrategy.calcNewOrderAmt(orderParam);
+		OrderStrategy orderStrategy = this.getOrderStrategy(asset, symbol);
+		OrderFeeData ratioData = orderStrategy.calcNewOrderAmt(orderParam);
 		BigDecimal singleCost = ratioData.getGrossMargin();
 		
 		BigDecimal vol = balance.divide(singleCost, Precision.INTEGER_PRECISION, Precision.LESS);
@@ -216,50 +255,66 @@ public class PositionStrategyContext {
 		BigDecimal faceValue = BigDecimal.ONE;
 		BigDecimal amount = BigDecimal.ZERO;
 		BigDecimal baseValue = BigDecimal.ZERO;
-		HoldPosStrategy strategy = this.getHoldPosStrategy(asset, symbol);
+		HoldPosStrategy hps = this.getHoldPosStrategy(asset, symbol);
+		OrderStrategy ops = this.getOrderStrategy(asset, symbol);
 		for(OrderTrade trade : tradeList){
-			amount = amount.add(CompFieldCalc.calcAmount(trade.getVolume(), faceValue));
-			baseValue = baseValue.add(CompFieldCalc.calcBaseValue(trade.getVolume(), faceValue, trade.getPrice()));
+			amount = amount.add(ops.calcAmount(trade.getVolume(), faceValue, trade.getPrice()));
+			baseValue = baseValue.add(ops.calcBaseValue(trade.getVolume(), faceValue, trade.getPrice()));
 		}
 		if(BigUtils.isZero(baseValue)){
 			return BigDecimal.ZERO;
 		}
-		BigDecimal meanPrice = strategy.calcMeanPrice(longFlag, baseValue, amount);
+		BigDecimal meanPrice = hps.calcMeanPrice(longFlag, baseValue, amount);
 		return meanPrice;
 	}
 	
-	public BigDecimal calcLiqPrice(PcPosition pos) {
-		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
+	public BigDecimal calcLiqPrice(PosData pos) {
 		HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
-		BigDecimal liqPrice = holdPosStrategy.calcLiqPrice(pos.getLongFlag(), _amount, pos.getMeanPrice(), pos.getHoldMarginRatio(), pos.getPosMargin());
+		BigDecimal liqPrice = holdPosStrategy.calcLiqPrice(pos);
 		return liqPrice;
 	}
 	
 	/**
 	 * 计算仓位浮动收益
 	 */
-	public BigDecimal calcFloatingPnl(PcPosition pos){
-		HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
-		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
-		return holdPosStrategy.calcPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
+	public BigDecimal calcFloatingPnl(PosData pos) {
+		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
+		 HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
+		 return holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice(), markPrice);
 	}
-	
+
 	/**
 	 * 计算仓位保证金率
 	 */
-	public BigDecimal calPosMarginRatio(PcPosition pos, BigDecimal floatingPnl){
+	public BigDecimal calPosMarginRatio(PosData pos, BigDecimal floatingPnl){
 		HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
 		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
-		return holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), floatingPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
+		return holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), pos.getFaceValue(), pos.getVolume(), floatingPnl, markPrice);
 	}
 	
+	public BigDecimal calcBankruptPrice(PosCalcBankruptPriceParam calcParam){
+		HoldPosStrategy hs = this.getHoldPosStrategy(calcParam.getAsset(), calcParam.getSymbol());
+		return hs.calcBankruptPrice(calcParam.getLongFlag(), calcParam.getVolume(), calcParam.getFaceValue(), calcParam.getPosMargin(), calcParam.getMeanPrice());
+	}
+	
+	public BigDecimal calPosMarginRatio(PosData pos, BigDecimal posPnl, BigDecimal markPrice) {
+		 HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
+		 holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), pos.getFaceValue(), pos.getVolume(), posPnl, markPrice);
+		return null;
+	}
+
 	int ____________________________;
 	
-	public HoldPosStrategy getHoldPosStrategy(String asset, String symbol){
+	private HoldPosStrategy getHoldPosStrategy(String asset, String symbol){
 		Integer strategyId = this.genStrategyId(asset, symbol);
 		StrategyBundle sb = strategyBundleMap.get(strategyId);
 		return sb.getHoldPosStrategy();
+	}
+	
+	private OrderStrategy getOrderStrategy(String asset, String symbol){
+		Integer strategyId = this.genStrategyId(asset, symbol);
+		StrategyBundle sb = strategyBundleMap.get(strategyId);
+		return sb.getOrderStrategy();
 	}
 	
 	private Integer genStrategyId(String asset, String symbol){

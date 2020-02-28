@@ -59,49 +59,6 @@ public class BBCommonOrderStrategy implements OrderStrategy {
 		return orderAmount;
 	}
 
-	/**
-	 * 按比例计算费用
-	 * @param order 订单数据
-	 * @param volume 分量
-	 * @return
-	 */
-	public OrderRatioData calcRaitoAmt(BBOrder order, BigDecimal number){
-		OrderRatioData orderAmount = new OrderRatioData();
-
-		BigDecimal openFee;
-		BigDecimal closeFee;
-		BigDecimal orderMargin;
-		BigDecimal grossMargin;
-
-		if(BigUtils.eq(number, BigDecimal.ZERO)){
-			openFee = BigDecimal.ZERO;
-			closeFee = BigDecimal.ZERO;
-			orderMargin = BigDecimal.ZERO;
-			grossMargin = BigDecimal.ZERO;
-		}else if(BigUtils.eq(number, order.getVolume().subtract(order.getFilledVolume()))){
-			openFee = order.getFee();
-			closeFee = BigDecimal.ZERO;
-			orderMargin = order.getOrderMargin();
-			grossMargin = order.getGrossMargin();
-		}else{
-			openFee = slope(number, order.getVolume(), order.getFee());
-			closeFee = BigDecimal.ZERO;
-			orderMargin = slope(number, order.getVolume(), order.getOrderMargin());
-			grossMargin = BigCalc.sum(openFee, closeFee, orderMargin);
-		}
-
-		orderAmount.setOrderMargin(orderMargin);
-		orderAmount.setFee(openFee);
-		orderAmount.setOrderMargin(orderMargin);
-		orderAmount.setGrossMargin(grossMargin);
-
-
-		BigDecimal amount = order.getPrice().multiply(number);
-
-		orderAmount.setAmount(amount);
-		return orderAmount;
-	}
-
 	int ____________________________;
 
 	public BigDecimal calcOrderMeanPrice(String asset, String symbol, List<? extends OrderTrade> tradeList){

@@ -1,8 +1,9 @@
-package com.hp.sh.expv3.pc.strategy.aabb;
+package com.hp.sh.expv3.pc.strategy.aaab;
 
 import java.math.BigDecimal;
 
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
+import com.hp.sh.expv3.pc.strategy.aabb.AABBCompFieldCalc;
 import com.hp.sh.expv3.pc.strategy.data.PosData;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.DecimalUtil;
@@ -13,7 +14,7 @@ import com.hp.sh.expv3.utils.math.Precision;
  * @author wangjg
  *
  */
-public class AABBHoldPosStrategy implements HoldPosStrategy{
+public class AAABHoldPosStrategy implements HoldPosStrategy{
 	
 	/**
 	 * 计算收益
@@ -46,7 +47,7 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 		BigDecimal amount = AABBCompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
 		return PcPriceCalc.calcLiqPrice( pos.getHoldMarginRatio(), IntBool.isTrue(pos.getLongFlag()), pos.getMeanPrice(), amount, pos.getPosMargin(), Precision.COMMON_PRECISION );
 	}
-
+	
 	/**
 	 * 计算仓位的强平价(预估强平价)
 	 * @param longFlag 多/空
@@ -67,7 +68,7 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 	 * @return
 	 */
 	@Override
-	public BigDecimal calPosMarginRatio(BigDecimal posMargin, BigDecimal faceValue, BigDecimal volume, BigDecimal posPnl, BigDecimal markPrice){
+	public BigDecimal calPosMarginRatio(BigDecimal posMargin, BigDecimal posPnl, BigDecimal faceValue, BigDecimal volume, BigDecimal markPrice){
 //		BigDecimal marginRatio = posMargin.add(posPnl).divide((faceValue.multiply(volume).divide(markPrice)));
 		BigDecimal marginRatio = posMargin.add(posPnl).multiply(markPrice).divide(faceValue.multiply(volume), Precision.COMMON_PRECISION, DecimalUtil.LESS);
 		
@@ -76,11 +77,17 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 
 	/**
 	 * 用 均价 标记价格 未实现盈亏 计算 仓位保证金
+	 * @param longFlag
+	 * @param initMarginRatio
+	 * @param amount
+	 * @param meanPrice
+	 * @param markPrice
+	 * @return
 	 */
 	@Override
 	public BigDecimal calcInitMargin(Integer longFlag, BigDecimal initMarginRatio, BigDecimal volume, BigDecimal faceValue, BigDecimal meanPrice, BigDecimal markPrice) {
         // ( 1 / leverage ) * volume = volume / leverage
-		BigDecimal amount = AABBCompFieldCalc.calcAmount(volume, faceValue);
+		BigDecimal amount = volume.multiply(faceValue).multiply(meanPrice);
         BigDecimal pnl = PnlCalc.calcPnl(longFlag, amount, meanPrice, markPrice);
         BigDecimal baseValue = AABBCompFieldCalc.calcBaseValue(amount, meanPrice);
         return baseValue.multiply(initMarginRatio).subtract(pnl.min(BigDecimal.ZERO)).stripTrailingZeros();
@@ -99,5 +106,4 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 		BigDecimal _amount = AABBCompFieldCalc.calcAmount(faceValue, volume);
 		return PcPriceCalc.calcBankruptPrice(IntBool.isTrue(longFlag), openPrice, _amount, margin, Precision.COMMON_PRECISION );
 	}
-	
 }

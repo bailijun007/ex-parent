@@ -11,12 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.commons.lock.LockIt;
-import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
-import com.hp.sh.expv3.pc.constant.OrderFlag;
-import com.hp.sh.expv3.pc.constant.TimeInForce;
 import com.hp.sh.expv3.pc.job.LiqHandleResult;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcLiqRecordDAO;
@@ -25,6 +22,7 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.vo.PosUID;
 import com.hp.sh.expv3.pc.mq.liq.msg.CancelOrder;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
+import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
@@ -52,7 +50,7 @@ public class PcLiqService {
     private PcPositionMarginService pcPositionMarginService;
     
     @Autowired
-    private HoldPosStrategy holdPosStrategy;
+    private PcStrategyContext strategyContext;
     
     @Autowired
     private MarkPriceService markPriceService;
@@ -121,9 +119,8 @@ public class PcLiqService {
 	 * @return 是否触发强平
 	 */
 	public boolean checkLiqStatus(PcPosition pos, BigDecimal markPrice) {
-		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal posPnl = holdPosStrategy.calcPnl(pos.getLongFlag(), _amount, pos.getMeanPrice(), markPrice);
-		BigDecimal posMarginRatio = holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), posPnl, pos.getFaceValue(), pos.getVolume(), markPrice);
+		BigDecimal posPnl = strategyContext.calcFloatingPnl(pos);
+		BigDecimal posMarginRatio = strategyContext.calPosMarginRatio(pos, posPnl, markPrice);
 		//保留两位小数
 		posMarginRatio = posMarginRatio.setScale(Precision.LIQ_MARGIN_RATIO, Precision.LESS);
 		//维持保证金率
@@ -206,8 +203,7 @@ public class PcLiqService {
 		record.setVolume(pos.getVolume());
 		record.setFilledVolume(BigDecimal.ZERO);
 		record.setPosMargin(pos.getPosMargin());
-		BigDecimal _amount = CompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		BigDecimal bankruptPrice = this.holdPosStrategy.calcBankruptPrice(pos.getLongFlag(), pos.getMeanPrice(), _amount, pos.getPosMargin());
+		BigDecimal bankruptPrice = this.strategyContext.calcBankruptPrice(pos);
 		record.setBankruptPrice(bankruptPrice);
 		record.setCreated(now);
 		record.setModified(now);

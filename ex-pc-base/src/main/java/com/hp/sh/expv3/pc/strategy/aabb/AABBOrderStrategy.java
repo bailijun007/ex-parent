@@ -1,41 +1,59 @@
-package com.hp.sh.expv3.pc.strategy.common;
+package com.hp.sh.expv3.pc.strategy.aabb;
 
 import java.math.BigDecimal;
 
-import org.springframework.stereotype.Component;
-
-import com.hp.sh.expv3.pc.calc.CompFieldCalc;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
 import com.hp.sh.expv3.pc.strategy.data.OrderFeeParam;
-import com.hp.sh.expv3.pc.strategy.vo.OrderRatioData;
+import com.hp.sh.expv3.pc.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigUtils;
-import com.hp.sh.expv3.utils.math.Precision;
 
 /**
  * 
  * @author wangjg
  *
  */
-@Component
-public class CommonOrderStrategy implements OrderStrategy {
+public class AABBOrderStrategy implements OrderStrategy {
+	
+	/**
+	 * 计算交易合约 基础货币总价值
+	 * @param volume 合约张数
+	 * @param faceValue 面值
+	 * @param price 成交价格
+	 * @return
+	 */
+	public BigDecimal calcAmount(BigDecimal volume, BigDecimal faceValue, BigDecimal price){
+		return AABBCompFieldCalc.calcAmount(volume, faceValue);
+	}
+	
+	/**
+	 * 计算交易合约 基础货币总价值
+	 * @param volume 合约张数
+	 * @param faceValue 面值
+	 * @param price 成交价格
+	 * @return
+	 */
+	public BigDecimal calcBaseValue(BigDecimal volume, BigDecimal faceValue, BigDecimal price){
+		return AABBCompFieldCalc.calcBaseValue(volume, faceValue, price);
+	}
 	
 	/**
 	 * 计算新订单费用
 	 */
+	@Override
+	public OrderFeeData calcNewOrderAmt(OrderFeeParam pcOrder){
 		//交易金额
-	public OrderRatioData calcNewOrderAmt(OrderFeeParam pcOrder){
-		BigDecimal amount = CompFieldCalc.calcAmount(pcOrder.getVolume(), pcOrder.getFaceValue());
-		//基础货币价值
-		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, pcOrder.getPrice());
+		BigDecimal _amount = AABBCompFieldCalc.calcAmount(pcOrder.getVolume(), pcOrder.getFaceValue());
+		
+		BigDecimal baseValue = AABBCompFieldCalc.calcBaseValue(_amount, pcOrder.getPrice());
 		
 		//开仓手续费
-		BigDecimal openFee = this.calcFee(baseValue, pcOrder.getOpenFeeRatio());
+		BigDecimal openFee = BigCalc.multiply(baseValue, pcOrder.getOpenFeeRatio());
 		
 		//平仓手续费
-		BigDecimal closeFee = this.calcFee(baseValue, pcOrder.getCloseFeeRatio());
+		BigDecimal closeFee = BigCalc.multiply(baseValue, pcOrder.getCloseFeeRatio());
 		
 		//保证金
 		BigDecimal orderMargin = this.calMargin(baseValue, pcOrder.getMarginRatio());
@@ -43,9 +61,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 		//总押金
 		BigDecimal grossMargin = BigCalc.sum(closeFee, openFee, orderMargin);
 
-		OrderRatioData orderAmount = new OrderRatioData();
-		orderAmount.setAmount(amount);
-		orderAmount.setBaseValue(baseValue);
+		OrderFeeData orderAmount = new OrderFeeData();
 		
 		orderAmount.setOrderMargin(orderMargin);
 		orderAmount.setOpenFee(openFee);
@@ -62,8 +78,9 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * @param volume 分量
 	 * @return
 	 */
-	public OrderRatioData calcRaitoAmt(PcOrder order, BigDecimal number){
-		OrderRatioData orderAmount = new OrderRatioData();
+	@Override
+	public OrderFeeData calcRaitoAmt(PcOrder order, BigDecimal number){
+		OrderFeeData orderAmount = new OrderFeeData();
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 			this.calcOpenRaitoAmt(order, number, orderAmount);
 		}else{
@@ -72,17 +89,11 @@ public class CommonOrderStrategy implements OrderStrategy {
 		return orderAmount;
 	}
 	
-	protected void calcCloseRaitoAmt(PcOrder order, BigDecimal number, OrderRatioData orderAmount) {
+	protected void calcCloseRaitoAmt(PcOrder order, BigDecimal number, OrderFeeData orderAmount) {
 		orderAmount.setOpenFee(BigDecimal.ZERO);
 		orderAmount.setCloseFee(BigDecimal.ZERO);
 		orderAmount.setOrderMargin(BigDecimal.ZERO);
 		orderAmount.setGrossMargin(BigDecimal.ZERO);
-		
-		BigDecimal amount = number.multiply(order.getFaceValue());
-		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, order.getPrice());
-
-		orderAmount.setAmount(amount);
-		orderAmount.setBaseValue(baseValue);
 	}
 
 	/**
@@ -91,7 +102,7 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * @param number
 	 * @return
 	 */
-	protected void calcOpenRaitoAmt(PcOrder order, BigDecimal number, OrderRatioData orderAmount){
+	protected void calcOpenRaitoAmt(PcOrder order, BigDecimal number, OrderFeeData orderAmount){
 		
 		BigDecimal openFee; 
 		BigDecimal closeFee; 
@@ -109,9 +120,9 @@ public class CommonOrderStrategy implements OrderStrategy {
 			orderMargin = order.getOrderMargin();
 			grossMargin = order.getGrossMargin();
 		}else{
-			openFee = slope(number, order.getVolume(), order.getOpenFee());
-			closeFee = slope(number, order.getVolume(), order.getCloseFee());
-			orderMargin = slope(number, order.getVolume(), order.getOrderMargin());
+			openFee = BigCalc.slope(number, order.getVolume(), order.getOpenFee());
+			closeFee = BigCalc.slope(number, order.getVolume(), order.getCloseFee());
+			orderMargin = BigCalc.slope(number, order.getVolume(), order.getOrderMargin());
 			grossMargin = BigCalc.sum(openFee, closeFee, orderMargin);
 		}
 		
@@ -120,24 +131,12 @@ public class CommonOrderStrategy implements OrderStrategy {
 		orderAmount.setCloseFee(closeFee);
 		orderAmount.setOrderMargin(orderMargin);
 		orderAmount.setGrossMargin(grossMargin);
-
-		
-		BigDecimal amount = number.multiply(order.getFaceValue());
-		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, order.getPrice());
-
-		orderAmount.setAmount(amount);
-		orderAmount.setBaseValue(baseValue);
-	}
-	
-	public final BigDecimal calcFee(BigDecimal baseValue, BigDecimal ratio){
-		BigDecimal fee =  ratio.multiply(baseValue);
-		return fee.stripTrailingZeros();
 	}
 
 	public final BigDecimal calMargin(BigDecimal volume, BigDecimal faceValue, BigDecimal price, BigDecimal marginRatio){
-		BigDecimal amount = CompFieldCalc.calcAmount(volume, faceValue);
+		BigDecimal amount = AABBCompFieldCalc.calcAmount(volume, faceValue);
 		//基础货币价值
-		BigDecimal baseValue = CompFieldCalc.calcBaseValue(amount, price);
+		BigDecimal baseValue = AABBCompFieldCalc.calcBaseValue(amount, price);
 		
 		//保证金
 		BigDecimal orderMargin = this.calMargin(baseValue, marginRatio);
@@ -150,19 +149,8 @@ public class CommonOrderStrategy implements OrderStrategy {
 	 * @param ratio
 	 * @return
 	 */
-	public final BigDecimal calMargin(BigDecimal baseValue, BigDecimal ratio){
+	private final BigDecimal calMargin(BigDecimal baseValue, BigDecimal ratio){
 		return ratio.multiply(baseValue);
 	}
 
-	/**
-	 * 按比例计算amount
-	 * @param number 比例分子
-	 * @param volume 比例分母
-	 * @param amount 求值对象
-	 * @return
-	 */
-	public static final BigDecimal slope(BigDecimal number, BigDecimal volume, BigDecimal amount){
-		return number.multiply(amount).divide(volume, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
-	}
-	
 }

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  * @author wangjg
  *
  */
-public interface PosBaseData {
+public interface PosCalcBankruptPriceParam {
 
 	public String getAsset();
 
@@ -15,8 +15,12 @@ public interface PosBaseData {
 
 	public Integer getLongFlag();
 
-	public BigDecimal getLeverage();
-
 	public BigDecimal getVolume();
 
+	public BigDecimal getFaceValue();
+
+	public BigDecimal getPosMargin();
+
+	public BigDecimal getMeanPrice();
+	
 }

@@ -9,13 +9,17 @@ import java.math.BigDecimal;
  */
 public class BigCalc {
 
+	public static BigDecimal multiply(BigDecimal v1, BigDecimal v2){
+		BigDecimal result =  v2.multiply(v1);
+		return result.stripTrailingZeros();
+	}
 	
 	/**
 	 * 求和
 	 * @param values
 	 * @return
 	 */
-	public static final BigDecimal sum(BigDecimal...values){
+	public static BigDecimal sum(BigDecimal...values){
 		BigDecimal result = BigDecimal.ZERO;
 		for(BigDecimal value : values){
 			result = result.add(value);
@@ -29,7 +33,7 @@ public class BigCalc {
 	 * @param values
 	 * @return
 	 */
-	public static final BigDecimal subtract(BigDecimal n, BigDecimal...values){
+	public static BigDecimal subtract(BigDecimal n, BigDecimal...values){
 		BigDecimal result = n;
 		for(BigDecimal value : values){
 			result = result.subtract(value);
@@ -44,7 +48,7 @@ public class BigCalc {
 	 * @param amount 求值对象
 	 * @return
 	 */
-	public static final BigDecimal slope(BigDecimal number, BigDecimal volume, BigDecimal amount){
+	public static BigDecimal slope(BigDecimal number, BigDecimal volume, BigDecimal amount){
 		return number.multiply(amount).divide(volume, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
 	}
 	

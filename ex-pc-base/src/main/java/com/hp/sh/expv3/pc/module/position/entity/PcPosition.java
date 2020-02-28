@@ -6,13 +6,14 @@ import javax.persistence.Version;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.dev.Redundant;
+import com.hp.sh.expv3.pc.strategy.data.PosData;
 
 /**
  * 永续合约_仓位
  * @author wangjg
  *
  */
-public class PcPosition extends UserDataEntity {
+public class PcPosition extends UserDataEntity implements PosData {
 
 	private static final long serialVersionUID = 1L;
 

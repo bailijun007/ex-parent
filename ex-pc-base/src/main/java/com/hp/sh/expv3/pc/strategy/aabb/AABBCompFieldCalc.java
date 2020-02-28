@@ -1,15 +1,18 @@
-package com.hp.sh.expv3.pc.calc;
+package com.hp.sh.expv3.pc.strategy.aabb;
 
 import java.math.BigDecimal;
 
 import com.hp.sh.expv3.utils.math.Precision;
 
 /**
- * 计算合成字段
+ * AABB计算合成字段
+ * 计价货币
+ * 基础货币
+ * 手续费、押金、收入  -- 基础货币
  * @author wangjg
  *
  */
-public class CompFieldCalc {
+public class AABBCompFieldCalc {
 	
 	/**
 	 * 计算交易合约总金额
@@ -18,7 +21,8 @@ public class CompFieldCalc {
 	 * @return`
 	 */
 	public static BigDecimal calcAmount(BigDecimal volume, BigDecimal faceValue){
-		return volume.multiply(faceValue);
+		BigDecimal fv = faceValue.multiply(volume);
+		return fv;
 	}
 
 	/**
