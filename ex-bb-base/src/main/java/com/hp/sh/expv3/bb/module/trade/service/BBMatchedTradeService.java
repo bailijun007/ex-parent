@@ -1,8 +1,6 @@
 package com.hp.sh.expv3.bb.module.trade.service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,20 +24,22 @@ public class BBMatchedTradeService {
 	}
 
 	public void setMakerHandleStatus(Long id) {
-		BBMatchedTrade matchedTrade = matchedTradeDAO.findById(id);
-		matchedTrade.setMakerHandleStatus(IntBool.YES);
-		this.matchedTradeDAO.update(matchedTrade);
+		Long now = DbDateUtils.now();
+		this.matchedTradeDAO.setMakerHandleStatus(id, IntBool.YES, now);
 	}
 
 	public void setTakerHandleStatus(Long id) {
-		BBMatchedTrade matchedTrade = matchedTradeDAO.findById(id);
-		matchedTrade.setTakerHandleStatus(IntBool.YES);
-		this.matchedTradeDAO.update(matchedTrade);
+		Long now = DbDateUtils.now();
+		this.matchedTradeDAO.setTakerHandleStatus(id, IntBool.YES, now);
+	}
+	
+	public boolean exist(Long mkOrderId, Long tkOrderId){
+		long c = this.matchedTradeDAO.exist(mkOrderId, tkOrderId);
+		return c > 0;
 	}
 
 	public void save(BBMatchedTrade matchedTrade) {
 		Long now = DbDateUtils.now();
-		matchedTrade.setVersion(0L);
 		matchedTrade.setCreated(now);
 		matchedTrade.setModified(now);
 		this.matchedTradeDAO.save(matchedTrade);

@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.bb.extension.dao.BbOrderExtMapper">
+
+    <resultMap type="com.hp.sh.expv3.bb.extension.vo.BbOrderVo" id="BbOrderVo">
+        <result column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="asset" property="asset"/>
+        <result column="symbol" property="symbol"/>
+        <result column="bid_flag" property="bidFlag"/>
+        <result column="price" property="price"/>
+        <result column="order_type" property="orderType"/>
+        <result column="volume" property="volume"/>
+        <result column="status" property="status"/>
+        <result column="fee_ratio" property="feeRatio"/>
+        <result column="fee_cost" property="feeCost"/>
+        <result column="order_margin" property="orderMargin"/>
+        <result column="fee" property="fee"/>
+        <result column="filled_volume" property="filledVolume"/>
+        <result column="cancel_volume" property="cancelVolume"/>
+        <result column="time_in_force" property="timeInForce"/>
+        <result column="cancel_time" property="cancelTime"/>
+        <result column="active_flag" property="activeFlag"/>
+        <result column="create_operator" property="createOperator"/>
+        <result column="cancel_operator" property="cancelOperator"/>
+        <result column="client_order_id" property="clientOrderId"/>
+        <result column="remark" property="remark"/>
+        <result column="version" property="version"/>
+        <result column="leverage" property="leverage"/>
+        <result column="order_margin_currency" property="orderMarginCurrency"/>
+        <result column="modified" property="modified"/>
+        <result column="created" property="created"/>
+    </resultMap>
+
+    <sql id="simple_where">
+        <where>
+            <if test="idList!=null">and id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+            <if test="userIdList!=null">and user_id in
+                <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                    #{userIdList[${i}]}
+                </foreach>
+            </if>
+            <if test="assetList!=null">and asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null  and symbol!=''">and symbol=#{symbol}</if>
+            <if test="bidFlag!=null">and bid_flag=#{bidFlag}</if>
+            <if test="price!=null">and price=#{price}</if>
+            <if test="orderType!=null">and order_type=#{orderType}</if>
+            <if test="volume!=null">and volume=#{volume}</if>
+            <if test="status!=null">and status=#{status}</if>
+            <if test="feeRatio!=null">and fee_ratio=#{feeRatio}</if>
+            <if test="feeCost!=null">and fee_cost=#{feeCost}</if>
+            <if test="orderMargin!=null">and order_margin=#{orderMargin}</if>
+            <if test="fee!=null">and fee=#{fee}</if>
+            <if test="filledVolume!=null">and filled_volume=#{filledVolume}</if>
+            <if test="cancelVolume!=null">and cancel_volume=#{cancelVolume}</if>
+            <if test="timeInForce!=null">and time_in_force=#{timeInForce}</if>
+            <if test="cancelTime!=null">and cancel_time=#{cancelTime}</if>
+            <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
+            <if test="createOperator!=null and createOperator!=''">and create_operator=#{createOperator}</if>
+            <if test="cancelOperator!=null and cancelOperator!=''">and cancel_operator=#{cancelOperator}</if>
+            <if test="clientOrderId!=null and clientOrderId!=''">and client_order_id=#{clientOrderId}</if>
+            <if test="version!=null">and version=#{version}</if>
+            <if test="leverage!=null">and leverage=#{leverage}</if>
+            <if test="orderMarginCurrency!=null">and order_margin_currency=#{orderMarginCurrency}</if>
+            <if test="remark!=null  and remark!=''">and remark=#{remark}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null">and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+		id,user_id,asset,symbol,bid_flag,price,order_type,volume,status,fee_ratio,fee_cost,order_margin,fee,filled_volume,cancel_volume,
+		time_in_force,cancel_time,active_flag,create_operator,cancel_operator,client_order_id,version,leverage,order_margin_currency,remark,modified,created
+	</sql>
+
+
+
+    <select id="queryOne" resultMap="BbOrderVo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM bb_order
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryList" resultMap="BbOrderVo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM bb_order
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryBbActiveOrdersByIsNextPage" resultMap="BbOrderVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_order
+        <where>
+
+            <if test="activeFlag!=null">
+                 active_flag=#{activeFlag}
+            </if>
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+            <if test="symbol!=null and symbol!=''">
+                and symbol=#{symbol}
+            </if>
+            <if test="bidFlag!=null">
+                and bid_flag=#{bidFlag}
+            </if>
+
+            <choose>
+                <when test="nextPage==1 and limit!=null and lastOrderId!=null">
+                    and id &lt; #{lastOrderId}
+                    ORDER BY id desc
+                    LIMIT 0,${limit}
+                </when>
+                <when test="nextPage==-1 and limit!=null and lastOrderId!=null">
+                    and id &gt;= #{lastOrderId}
+                    ORDER BY id asc
+                    LIMIT 0,${limit}
+                </when>
+
+                <otherwise>
+                    ORDER BY id desc
+                    LIMIT 0,${limit}
+                </otherwise>
+
+            </choose>
+        </where>
+    </select>
+
+
+    <select id="queryOrderList" resultMap="BbOrderVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_order
+        <where>
+            <if test="assetList!=null">and asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+            <if test="statusList!=null">and status in
+                <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
+                    #{statusList[${i}]}
+                </foreach>
+            </if>
+            <if test="symbolList!=null">and symbol in
+                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
+                    #{symbolList[${i}]}
+                </foreach>
+            </if>
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
+            <if test="gtOrderId!=null">
+                and id &gt;#{gtOrderId}
+                ORDER BY id asc
+            </if>
+
+            <if test="ltOrderId!=null">
+                and id &lt;#{ltOrderId}
+                ORDER BY id desc
+            </if>
+        </where>
+        LIMIT 0,${limit}
+    </select>
+
+    <select id="queryBbActiveOrderList" resultMap="BbOrderVo">
+        SELECT
+        o.*
+        FROM
+        bb_active_order ao
+        LEFT JOIN
+        bb_order o ON o.id = ao.id
+        <where>
+            <if test="userId!=null"> ao.user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
+            <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
+            <if test="activeFlag!=null">and o.active_flag=#{activeFlag}</if>
+            <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
+        </where>
+        ORDER BY ao.id desc
+        <if test="limit!=null">
+            LIMIT 0,${limit}
+        </if>
+    </select>
+
+    <select id="queryHistoryOrderList"  resultMap="BbOrderVo">
+        SELECT
+        o.*
+        FROM
+        bb_active_order ao
+        LEFT JOIN
+        bb_order o ON o.id = ao.id
+        <where>
+            <if test="userId!=null">and ao.user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
+            <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
+            <if test="activeFlag!=null">and ao.active_flag=#{activeFlag}</if>
+            <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
+        </where>
+        ORDER BY ao.id desc
+        <if test="limit!=null">
+            LIMIT 0,${limit}
+        </if>
+
+    </select>
+
+<select id="queryHistoryByIsNextPage"  resultMap="BbOrderVo">
+    select
+    <include refid="Base_Column_List"/>
+    from bb_order
+    <where>
+
+        <if test="activeFlag!=null">
+             active_flag=#{activeFlag}
+        </if>
+        <if test="userId!=null">
+            and user_id=#{userId}
+        </if>
+        <if test="asset!=null and asset!=''">
+            and asset=#{asset}
+        </if>
+        <if test="symbol!=null and symbol!=''">
+            and symbol=#{symbol}
+        </if>
+
+        <choose>
+            <when test="nextPage==1 and limit!=null and lastOrderId!=null">
+                and id &lt; #{lastOrderId}
+                ORDER BY id desc
+                LIMIT 0,${limit}
+            </when>
+            <when test="nextPage==-1 and limit!=null and lastOrderId!=null">
+                and id &gt;= #{lastOrderId}
+                ORDER BY id asc
+                LIMIT 0,${limit}
+            </when>
+            <otherwise>
+                ORDER BY id desc
+                LIMIT 0,${limit}
+            </otherwise>
+
+        </choose>
+    </where>
+
+</select>
+
+    <select id="getLockAsset" resultType="java.math.BigDecimal">
+     SELECT
+		sum(o.fee+o.order_margin)
+		FROM
+			bb_active_order ao
+		LEFT JOIN
+			bb_order o ON o.id = ao.id
+		where
+			ao.user_id=#{userId}
+			and ao.asset=#{asset}
+            and o.order_margin_currency=#{asset}
+    </select>
+
+</mapper>

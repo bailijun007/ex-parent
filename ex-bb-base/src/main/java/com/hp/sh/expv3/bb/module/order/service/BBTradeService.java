@@ -14,21 +14,24 @@ import com.hp.sh.expv3.bb.component.FeeCollectorSelector;
 import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
 import com.hp.sh.expv3.bb.constant.OrderFlag;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
-import com.hp.sh.expv3.bb.constant.TradeRoles;
 import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
+import com.hp.sh.expv3.bb.module.collector.service.BBCollectorCoreService;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.vo.BBSymbol;
-import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
-import com.hp.sh.expv3.bb.msg.BBTradeMsg;
-import com.hp.sh.expv3.bb.strategy.common.CommonOrderStrategy;
+import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
+import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.bb.strategy.vo.TradeResult;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
+import com.hp.sh.expv3.bb.vo.request.CollectorAddRequest;
+import com.hp.sh.expv3.bb.vo.request.CollectorCutRequest;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.utils.DbDateUtils;
+import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.SnUtils;
+import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 @Service
@@ -37,7 +40,7 @@ public class BBTradeService {
 	private static final Logger logger = LoggerFactory.getLogger(BBTradeService.class);
 
 	@Autowired
-	private BBOrderTradeDAO pcOrderTradeDAO;
+	private BBOrderTradeDAO orderTradeDAO;
 	
 	@Autowired
 	private BBOrderUpdateService orderUpdateService;
@@ -46,10 +49,10 @@ public class BBTradeService {
 	private BBOrderQueryService orderQueryService;
 	
 	@Autowired
-	private BBAccountCoreService pcAccountCoreService;
+	private BBAccountCoreService accountCoreService;
 	
 	@Autowired
-	private CommonOrderStrategy orderStrategy;
+	private BBCommonOrderStrategy orderStrategy;
 	
 	@Autowired
 	private FeeCollectorSelector feeCollectorSelector;
@@ -59,7 +62,7 @@ public class BBTradeService {
 	
 	//处理成交订单
     @LockIt(key="${trade.accountId}-${trade.asset}-${trade.symbol}")
-	public void handleTrade(BBTradeMsg trade){
+	public void handleTrade(BBTradeVo trade){
 		BBOrder order = this.orderQueryService.getOrder(trade.getAccountId(), trade.getOrderId());
 		boolean yes = this.canTrade(order, trade);
 		if(!yes){
@@ -73,30 +76,37 @@ public class BBTradeService {
 		TradeResult tradeResult = orderStrategy.calcTradeResult(trade, order);
 		
 		////////// 成交记录  ///////////
-		BBOrderTrade pcOrderTrade = this.saveOrderTrade(trade, order, tradeResult, now);
+		BBOrderTrade orderTrade = this.saveOrderTrade(trade, order, tradeResult, now);
 		
 		// 转账
-		BBSymbol bs = new BBSymbol(pcOrderTrade.getSymbol(), pcOrderTrade.getBidFlag());
+		BBSymbol bs = new BBSymbol(orderTrade.getSymbol(), orderTrade.getBidFlag());
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
-			BigDecimal income = pcOrderTrade.getVolume();
-			this.addBalance(pcOrderTrade.getUserId(), pcOrderTrade.getId(), bs.getIncomeCurrency(), income);
+			BigDecimal income = orderTrade.getVolume();
+			String remark = String.format("购买成交：%s", income);
+			this.addBalance(orderTrade.getUserId(), orderTrade.getId(), bs.getIncomeCurrency(), income, remark);
 		}else{
-			BigDecimal amount = pcOrderTrade.getVolume().multiply(pcOrderTrade.getPrice());
-			BigDecimal income = amount.subtract(pcOrderTrade.getFee());
-			this.addBalance(pcOrderTrade.getUserId(), pcOrderTrade.getId(), bs.getIncomeCurrency(), income);
+			BigDecimal amount = orderTrade.getVolume().multiply(orderTrade.getPrice());
+			BigDecimal income = amount.subtract(orderTrade.getFee());
+			String remark = String.format("销售成交：%s", amount);
+			this.addBalance(orderTrade.getUserId(), orderTrade.getId(), bs.getIncomeCurrency(), income, remark);
 		}
 		
 		//修改订单状态
-		this.updateOrder4Trade(order, tradeResult, now);
+		this.updateOrder4Trade(order, orderTrade, now);
 		
 		//退还剩余押金和手续费
-		if(tradeResult.getOrderCompleted()){
+		if(orderTrade.isOrderCompleted()){
 			if(order.getBidFlag()==OrderFlag.BID_BUY){
-				if(BigUtils.gtZero(tradeResult.getRemainFee()) || BigUtils.gtZero(tradeResult.getRemainOrderMargin())){
-					this.returnRemaining(order.getUserId(), order.getAsset(), order.getId(), tradeResult.getRemainFee(), tradeResult.getRemainOrderMargin());
+				if(BigUtils.gtZero(orderTrade.getRemainFee()) || BigUtils.gtZero(orderTrade.getRemainOrderMargin())){
+					this.returnRemaining(order.getUserId(), order.getAsset(), order.getId(), orderTrade.getRemainFee(), orderTrade.getRemainOrderMargin());
 				}
 			}
 		}
+		
+		//同步手续费
+		
+		//补充手续费
+		
 		
 	}
 
@@ -110,27 +120,27 @@ public class BBTradeService {
 		request.setTradeNo(SnUtils.getRemainSn(orderId));
 		request.setTradeType(BBAccountTradeType.INCOME);
 		request.setAssociatedId(orderId);
-		this.pcAccountCoreService.add(request);
+		this.accountCoreService.add(request);
 	}
 
 	private int getLogType(int bidFlag){
 		return bidFlag;
 	}
 	
-	private void addBalance(Long userId, Long orderTradeId, String asset, BigDecimal amount) {
+	private void addBalance(Long userId, Long orderTradeId, String asset, BigDecimal amount, String remark) {
 		BBAddRequest request = new BBAddRequest();
 		request.setAmount(amount);
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("销售收入：%s", amount));
+		request.setRemark(remark);
 		request.setTradeNo(SnUtils.getIncomeSn(orderTradeId));
 		request.setTradeType(BBAccountTradeType.INCOME);
 		request.setAssociatedId(orderTradeId);
-		this.pcAccountCoreService.add(request);
+		this.accountCoreService.add(request);
 	}
 
-	private void updateOrder4Trade(BBOrder order, TradeResult tradeResult, Long now){
-        if(tradeResult.getOrderCompleted()){
+	private void updateOrder4Trade(BBOrder order, BBOrderTrade tradeResult, Long now){
+        if(tradeResult.isOrderCompleted()){
         	order.setOrderMargin(BigDecimal.ZERO);
         	order.setFee(BigDecimal.ZERO);
         }else{
@@ -141,26 +151,26 @@ public class BBTradeService {
         }
         
         //增加已扣手续费
-		order.setFeeCost(order.getFeeCost().add(tradeResult.getReceivableFee()));
+		order.setFeeCost(order.getFeeCost().add(tradeResult.getFee()));
 		//增加已成交金额
 		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getVolume()));
 		//全部成交/部分成交
-        order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
+        order.setStatus(tradeResult.isOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         //活动状态
-        order.setActiveFlag(tradeResult.getOrderCompleted()?BBOrder.NO:BBOrder.YES);
+        order.setActiveFlag(tradeResult.isOrderCompleted()?BBOrder.NO:BBOrder.YES);
         //修改时间
 		order.setModified(now);
 		this.orderUpdateService.updateOrder4Trad(order);
 	}
 
-	private BBOrderTrade saveOrderTrade(BBTradeMsg tradeMsg, BBOrder order, TradeResult tradeResult, Long now) {
+	private BBOrderTrade saveOrderTrade(BBTradeVo tradeMsg, BBOrder order, TradeResult tradeResult, Long now) {
 		BBOrderTrade orderTrade = new BBOrderTrade();
 
 		orderTrade.setId(null);
-		orderTrade.setAsset(tradeMsg.getAsset());
-		orderTrade.setSymbol(tradeMsg.getSymbol());
-		orderTrade.setVolume(tradeMsg.getNumber());
-		orderTrade.setPrice(tradeMsg.getPrice());
+		orderTrade.setAsset(order.getAsset());
+		orderTrade.setSymbol(order.getSymbol());
+		orderTrade.setVolume(tradeResult.getTradeVolume());
+		orderTrade.setPrice(tradeResult.getTradePrice());
 		orderTrade.setMakerFlag(tradeMsg.getMakerFlag());
 		orderTrade.setBidFlag(order.getBidFlag());
 
@@ -177,13 +187,16 @@ public class BBTradeService {
 		
 		orderTrade.setOrderId(order.getId());
 		
-		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
-		
-		orderTrade.setRemainVolume(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeResult.getVolume()));
-		
 		orderTrade.setMatchTxId(tradeMsg.getMatchTxId());
 		
-		this.pcOrderTradeDAO.save(orderTrade);
+		orderTrade.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getTradeVolume()));
+		orderTrade.setRemainOrderMargin(BigCalc.subtract(order.getOrderMargin(), tradeResult.getTradeOrderMargin()));
+		orderTrade.setRemainFee(BigCalc.subtract(order.getFee(), tradeResult.getReceivableFeeRatio()));
+		
+		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
+		orderTrade.setFeeSynchStatus(IntBool.NO);
+		
+		this.orderTradeDAO.save(orderTrade);
 		
 		orderTrade.setLogType(this.getLogType(order.getBidFlag()));
 		
@@ -193,7 +206,7 @@ public class BBTradeService {
 	}
 
 	//检查订单状态
-	private boolean canTrade(BBOrder order, BBTradeMsg tradeMsg) {
+	private boolean canTrade(BBOrder order, BBTradeVo tradeMsg) {
 		if(order==null){
 			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
 		}
@@ -204,15 +217,46 @@ public class BBTradeService {
 		}
 		
 		//检查重复请求
-		Long count = this.pcOrderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
+		Long count = this.orderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
 		if(count>0){
 			return false;
 		}
 		return true;
 	}
 	
-	private void synchCollector(Long tradeOrderId, Long feeCollectorId, BigDecimal fee){
+	@Autowired
+	private BBCollectorCoreService collectorCoreService;
+	
+	public void synchCollector(BBOrderTrade orderTrade){
+		if(BigUtils.gtZero(orderTrade.getFee())){
+			CollectorAddRequest request = new CollectorAddRequest();
+			request.setAmount(orderTrade.getFee());
+			request.setAsset(orderTrade.getAsset());
+			request.setAssociatedId(orderTrade.getOrderId());
+			request.setRemark("手续费");
+			request.setTradeNo(""+orderTrade.getId());
+			request.setTradeType(0);
+			request.setUserId(orderTrade.getUserId());
+			request.setCollectorId(orderTrade.getFeeCollectorId());
+			collectorCoreService.add(request);
+		}else{
+			CollectorCutRequest request = new CollectorCutRequest();
+			request.setAmount(orderTrade.getFee());
+			request.setAsset(orderTrade.getAsset());
+			request.setAssociatedId(orderTrade.getOrderId());
+			request.setRemark("倒贴手续费");
+			request.setTradeNo(""+orderTrade.getId());
+			request.setTradeType(0);
+			request.setUserId(orderTrade.getUserId());
+			request.setCollectorId(orderTrade.getFeeCollectorId());
+			collectorCoreService.cut(request);
+		}
 		
+	}
+	
+	public void setSynchStatus(BBOrderTrade orderTrade){
+		Long now = DbDateUtils.now();
+		this.orderTradeDAO.setSynchStatus(orderTrade.getUserId(), orderTrade.getId(), IntBool.YES, now);
 	}
 
 }

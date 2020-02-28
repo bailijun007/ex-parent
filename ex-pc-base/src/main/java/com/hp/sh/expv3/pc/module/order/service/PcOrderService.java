@@ -23,6 +23,7 @@ import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.constant.PcOrderType;
+import com.hp.sh.expv3.pc.constant.TimeInForce;
 import com.hp.sh.expv3.pc.error.PcOrderError;
 import com.hp.sh.expv3.pc.error.PcPositonError;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
@@ -77,9 +78,6 @@ public class PcOrderService {
     @Autowired
     private HoldPosStrategy holdPosStrategy;
 	
-	@Autowired
-	private PcOrderService self;
-    
 	/**
 	 * 创建订单
 	 * @param userId 用户ID
@@ -93,37 +91,32 @@ public class PcOrderService {
 	 * @param amt 委托金额
 	 */
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
+	public PcOrder create(long userId, String clientOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
-		return self.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number, pos, IntBool.YES, IntBool.NO);
+		if(closeFlag==OrderFlag.ACTION_OPEN){
+			return this.createOpenOrder(userId, clientOrderId, asset, symbol, longFlag, timeInForce, price, number, pos, IntBool.YES);
+		}else{
+			return this.createCloseOrder(userId, clientOrderId, asset, symbol, longFlag, timeInForce, price, number, pos, IntBool.YES, IntBool.NO);
+		}
 	}
 	
-	public PcOrder create(long userId, String cliOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag, int liqFlag){
-		
-//		if(this.existClientOrderId(userId, cliOrderId)){
-//			throw new ExException(PcOrderError.CREATED);
-//		}
-		
-		//非强平委托
-		if(IntBool.isFalse(liqFlag)){
-			if(closeFlag==OrderFlag.ACTION_CLOSE){
-				this.checkLiqStatus(pos);
-				// 检查可平仓位
-				this.checkClosablePosition(pos, number);
-				// 检查价格
-				this.checkPrice(pos, price);
-			}
-		}
+	public PcOrder createLiqOrder(long userId, String clientOrderId, String asset, String symbol, int longFlag, BigDecimal price, BigDecimal number, PcPosition pos){
+		return this.createCloseOrder(userId, clientOrderId, asset, symbol, longFlag, TimeInForce.IMMEDIATE_OR_CANCEL, price, number, pos, IntBool.NO, IntBool.YES);
+	}
+	
+	//创建开仓委托
+	protected PcOrder createOpenOrder(long userId, String clientOrderId, String asset, String symbol, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag){
+
+		this.checkClientOrderId(userId, clientOrderId);
 		
 		Long now = DbDateUtils.now();
-		
 		
 		//订单基本数据
 		PcOrder pcOrder = new PcOrder();
 		
 		pcOrder.setAsset(asset);
 		pcOrder.setSymbol(symbol);
-		pcOrder.setCloseFlag(closeFlag);
+		pcOrder.setCloseFlag(OrderFlag.ACTION_OPEN);
 		pcOrder.setLongFlag(longFlag);
 		pcOrder.setLeverage(pcSymbolService.getLeverage(userId, asset, symbol, longFlag));
 		pcOrder.setVolume(number);
@@ -137,17 +130,13 @@ public class PcOrderService {
 		pcOrder.setCreated(now);
 		pcOrder.setModified(now);
 		pcOrder.setStatus(OrderStatus.PENDING_NEW);
-		pcOrder.setClientOrderId(cliOrderId);
+		pcOrder.setClientOrderId(clientOrderId);
 		pcOrder.setActiveFlag(IntBool.YES);
-		pcOrder.setLiqFlag(liqFlag);
+		pcOrder.setLiqFlag(IntBool.NO);
 		
 		/////////押金数据/////////
 		
-		if (IntBool.isTrue(closeFlag)) {
-			this.setCloseOrderFee(pcOrder);
-		}else{
-			this.setOpenOrderFee(pcOrder);
-		}
+		this.setOpenOrderFee(pcOrder);
 		
 		////////其他字段，后面随状态修改////////
 		this.setOther(pcOrder, pos);
@@ -157,9 +146,61 @@ public class PcOrderService {
 		this.orderUpdateService.saveOrder(pcOrder);
 
 		//开仓押金扣除
-		if(closeFlag==OrderFlag.ACTION_OPEN){
-			this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin(), longFlag);
+		this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin(), longFlag);
+		
+		return pcOrder;
+	}
+	
+	//平仓委托
+	protected PcOrder createCloseOrder(long userId, String clientOrderId, String asset, String symbol, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag, int liqFlag){
+		
+		this.checkClientOrderId(userId, clientOrderId);
+		
+		//非强平委托
+		if(IntBool.isFalse(liqFlag)){
+			this.checkLiqStatus(pos);
+			// 检查可平仓位
+			this.checkClosablePosition(pos, number);
+			// 检查价格
+			this.checkPrice(pos, price);
 		}
+		
+		Long now = DbDateUtils.now();
+		
+		
+		//订单基本数据
+		PcOrder pcOrder = new PcOrder();
+		
+		pcOrder.setAsset(asset);
+		pcOrder.setSymbol(symbol);
+		pcOrder.setCloseFlag(OrderFlag.ACTION_CLOSE);
+		pcOrder.setLongFlag(longFlag);
+		pcOrder.setLeverage(pcSymbolService.getLeverage(userId, asset, symbol, longFlag));
+		pcOrder.setVolume(number);
+		pcOrder.setFaceValue(metadataService.getFaceValue(asset, symbol));
+		pcOrder.setPrice(price);
+		
+		pcOrder.setOrderType(PcOrderType.LIMIT);
+		pcOrder.setMarginMode(MarginMode.FIXED);
+		pcOrder.setTimeInForce(timeInForce);
+		pcOrder.setUserId(userId);
+		pcOrder.setCreated(now);
+		pcOrder.setModified(now);
+		pcOrder.setStatus(OrderStatus.PENDING_NEW);
+		pcOrder.setClientOrderId(clientOrderId);
+		pcOrder.setActiveFlag(IntBool.YES);
+		pcOrder.setLiqFlag(liqFlag);
+		
+		/////////押金数据/////////
+		
+		this.setCloseOrderFee(pcOrder);
+		
+		////////其他字段，后面随状态修改////////
+		this.setOther(pcOrder, pos);
+		
+		pcOrder.setVisibleFlag(visibleFlag);
+		
+		this.orderUpdateService.saveOrder(pcOrder);
 		
 		return pcOrder;
 	}
@@ -187,6 +228,13 @@ public class PcOrderService {
 			if(BigUtils.gt(price, bankruptPrice)){
 				throw new ExException(PcOrderError.BANKRUPT_PRICE);
 			}
+		}
+	}
+	
+
+	private void checkClientOrderId(long userId, String clientOrderId) {
+		if(this.existClientOrderId(userId, clientOrderId)){
+			//throw new ExException(PcOrderError.CREATED);
 		}
 	}
 
@@ -260,7 +308,7 @@ public class PcOrderService {
 		pcOrder.setOpenFeeRatio(feeRatioService.getOpenFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
 		pcOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
 		
-		OrderRatioData ratioData = orderStrategy.calcOrderAmt(pcOrder);
+		OrderRatioData ratioData = orderStrategy.calcNewOrderAmt(pcOrder);
 		
 		pcOrder.setOpenFee(ratioData.getOpenFee());
 		pcOrder.setCloseFee(ratioData.getCloseFee());

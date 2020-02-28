@@ -18,7 +18,7 @@ import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.vo.BBSymbol;
-import com.hp.sh.expv3.bb.strategy.common.CommonOrderStrategy;
+import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderRatioData;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.BBCutRequest;
@@ -52,7 +52,7 @@ public class BBOrderService {
 	private BBAccountCoreService bBAccountCoreService;
 	
 	@Autowired
-	private CommonOrderStrategy orderStrategy;	
+	private BBCommonOrderStrategy orderStrategy;
 	
 	/**
 	 * 创建订单
@@ -103,10 +103,10 @@ public class BBOrderService {
 		//押金
 		BBSymbol bs = new BBSymbol(symbol, bidFlag);
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
-			String remark = "买"+bs.getPayCurrency()+",押金="+order.getOrderMargin()+"，手续费="+order.getFee();
+			String remark = "买"+bs.getPayCurrency()+",押金="+order.getOrderMargin()+"，手续费="+order.getFee().stripTrailingZeros();
 			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getGrossMargin(), remark);
 		}else{
-			String remark = "买"+bs.getPayCurrency()+",押金="+order.getVolume()+"，手续费无";
+			String remark = "卖"+bs.getPayCurrency()+",押金="+order.getVolume()+"，手续费无";
 			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getVolume(), remark);
 		}
 		
@@ -148,11 +148,11 @@ public class BBOrderService {
 		this.bBAccountCoreService.cut(request);
 	}
 	
-	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal amount){
+	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal orderMargin, BigDecimal fee){
 		BBAddRequest request = new BBAddRequest();
-		request.setAmount(amount);
+		request.setAmount(orderMargin.add(fee));
 		request.setAsset(asset);
-		request.setRemark("撤单还余额");
+		request.setRemark("撤单还余额:押金="+orderMargin+",手续费="+fee);
 		request.setTradeNo(SnUtils.getCancelOrderReturnSn(""+orderId));
 		SnUtils.getSynchReturnSn(""+orderId);
 		request.setTradeType(BBAccountTradeType.ORDER_CANCEL);
@@ -245,16 +245,13 @@ public class BBOrderService {
 		BigDecimal remaining = order.getVolume().subtract(order.getFilledVolume());
 		
 		//退押金
-		if(order.getBidFlag()==OrderFlag.BID_BUY){
-//			
-			OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, remaining);
-			
-			int result = this.returnCancelAmt(userId, asset, orderId, ratioData.getGrossMargin());
-			if(result==InvokeResult.NOCHANGE){
-				//利用合约账户的幂等性实现本方法的幂等性
-				logger.warn("已经执行过了");
-				return;
-			}
+		BBSymbol bs = new BBSymbol(symbol, order.getBidFlag());
+		OrderRatioData ratioData = orderStrategy.calcRaitoAmt(order, remaining);
+		int result = this.returnCancelAmt(userId, bs.getPayCurrency(), orderId, ratioData.getOrderMargin(), ratioData.getFee());
+		if(result==InvokeResult.NOCHANGE){
+			//利用合约账户的幂等性实现本方法的幂等性
+			logger.warn("已经执行过了");
+			return;
 		}
 		
 		//修改订单状态（撤销）

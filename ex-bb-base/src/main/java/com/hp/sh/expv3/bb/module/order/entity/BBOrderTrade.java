@@ -8,6 +8,7 @@ import javax.persistence.Transient;
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.bb.strategy.data.OrderTrade;
 import com.hp.sh.expv3.commons.mybatis.TxId;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
  * 币币_用户订单成交记录
@@ -58,14 +59,21 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 	//手续费
 	private BigDecimal fee;
 	
-	//未成交（张数）
+	//未成交数量
 	private BigDecimal remainVolume;
+	//订单剩余保证金
+	private BigDecimal remainOrderMargin;
+	//订单剩余手续费
+	private BigDecimal remainFee;
 	
 	//撮合事务Id
 	private Long matchTxId;
-	
+
 	//事务ID
 	private Long txId;
+	
+	//手续费同步状态
+	private Integer feeSynchStatus;
 	
 	@Transient
 	private Integer logType;
@@ -211,6 +219,30 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 		this.bidFlag = bidFlag;
 	}
 
+	public BigDecimal getRemainOrderMargin() {
+		return remainOrderMargin;
+	}
+
+	public void setRemainOrderMargin(BigDecimal remainOrderMargin) {
+		this.remainOrderMargin = remainOrderMargin;
+	}
+
+	public BigDecimal getRemainFee() {
+		return remainFee;
+	}
+
+	public void setRemainFee(BigDecimal remainFee) {
+		this.remainFee = remainFee;
+	}
+
+	public Integer getFeeSynchStatus() {
+		return feeSynchStatus;
+	}
+
+	public void setFeeSynchStatus(Integer feeSynchStatus) {
+		this.feeSynchStatus = feeSynchStatus;
+	}
+
 	@Override
 	public String toString() {
 		return "BBOrderTrade [asset=" + asset + ", symbol=" + symbol + ", price=" + price + ", volume=" + volume
@@ -218,6 +250,10 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 				+ ", tradeTime=" + tradeTime + ", feeCollectorId=" + feeCollectorId + ", feeRatio=" + feeRatio
 				+ ", fee=" + fee + ", remainVolume=" + remainVolume + ", matchTxId=" + matchTxId + ", txId=" + txId
 				+ ", logType=" + logType + "]";
+	}
+
+	public boolean isOrderCompleted() {
+		return BigUtils.isZero(this.remainVolume);
 	}
 
 }

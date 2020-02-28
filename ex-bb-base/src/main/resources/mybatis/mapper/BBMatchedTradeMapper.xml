@@ -17,14 +17,13 @@
 		<result column="trade_time" property="tradeTime" />
 		<result column="maker_handle_status" property="makerHandleStatus" />
 		<result column="taker_handle_status" property="takerHandleStatus" />
-		<result column="version" property="version" />
 		<result column="id" property="id" />
 		<result column="created" property="created" />
 		<result column="modified" property="modified" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,number,trade_time,maker_handle_status,taker_handle_status,version,id,created,modified
+		match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,number,trade_time,maker_handle_status,taker_handle_status,id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -38,7 +37,6 @@
 		<if test="tradeTime!=null"> and trade_time=#{tradeTime}</if>
 		<if test="makerHandleStatus!=null"> and maker_handle_status=#{makerHandleStatus}</if>
 		<if test="takerHandleStatus!=null"> and taker_handle_status=#{takerHandleStatus}</if>
-		<if test="version!=null"> and version=#{version}</if>
 		<if test="id!=null"> and id=#{id}</if>
 		<if test="created!=null"> and created=#{created}</if>
 		<if test="modified!=null"> and modified=#{modified}</if>
@@ -89,21 +87,23 @@
 			where id=#{id}
 	</select>
 
-	<select id="exist" resultType="boolean">
-		select 
-			count(1)
-		from 
-			bb_trade
-		<include refid="simple_where" />
-		limit 1
+	<select id="exist" resultType="long">
+		select EXISTS(
+			select 
+				1
+			from 
+				bb_trade
+			where
+				mk_order_id=#{mkOrderId} and tk_order_id=#{tkOrderId}
+			limit 1
+		)
 	</select>
-
 
 	<insert id="save">
 		insert into bb_trade (
-			match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,number,trade_time,maker_handle_status,taker_handle_status,version,id,created,modified
+			match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,number,trade_time,maker_handle_status,taker_handle_status,id,created,modified
 		)values(
-			#{matchTxId},#{symbol},#{asset},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{mkAccountId},#{mkOrderId},#{price},#{number},#{tradeTime},#{makerHandleStatus},#{takerHandleStatus},#{version},#{id},#{created},#{modified}
+			#{matchTxId},#{symbol},#{asset},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{mkAccountId},#{mkOrderId},#{price},#{number},#{tradeTime},#{makerHandleStatus},#{takerHandleStatus},#{id},#{created},#{modified}
 		)
 	</insert>
 	
@@ -111,7 +111,7 @@
 		update 
 			bb_trade
 		set 
-			match_tx_id=#{matchTxId},symbol=#{symbol},asset=#{asset},tk_bid_flag=#{tkBidFlag},tk_account_id=#{tkAccountId},tk_order_id=#{tkOrderId},mk_account_id=#{mkAccountId},mk_order_id=#{mkOrderId},price=#{price},number=#{number},trade_time=#{tradeTime},maker_handle_status=#{makerHandleStatus},taker_handle_status=#{takerHandleStatus},version=${version}+1,id=#{id},created=#{created},modified=#{modified}
+			match_tx_id=#{matchTxId},symbol=#{symbol},asset=#{asset},tk_bid_flag=#{tkBidFlag},tk_account_id=#{tkAccountId},tk_order_id=#{tkOrderId},mk_account_id=#{mkAccountId},mk_order_id=#{mkOrderId},price=#{price},number=#{number},trade_time=#{tradeTime},maker_handle_status=#{makerHandleStatus},taker_handle_status=#{takerHandleStatus},id=#{id},created=#{created},modified=#{modified}
 		where 
 			id=#{id}
 	</update>
@@ -139,5 +139,23 @@
 			and (maker_handle_status=0 or taker_handle_status=0)
 			order by id asc
 	</select>
+	
+	<update id="setMakerHandleStatus">
+		update 
+			bb_trade
+		set 
+			maker_handle_status=#{makerHandleStatus},modified=#{modified}
+		where 
+			id=#{id}
+	</update>
+	
+	<update id="setTakerHandleStatus">
+		update 
+			bb_trade
+		set 
+			taker_handle_status=#{takerHandleStatus},modified=#{modified}
+		where 
+			id=#{id}
+	</update>
 
 </mapper>

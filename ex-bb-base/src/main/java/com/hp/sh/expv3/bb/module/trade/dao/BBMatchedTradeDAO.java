@@ -23,4 +23,10 @@ public interface BBMatchedTradeDAO extends BaseMapper<BBMatchedTrade, Long> {
 
 	public List<BBMatchedTrade> queryPending(Page page, @Param("userId") Long userId, @Param("startTime") Long startTime, @Param("startId") Long startId);
 
+	public void setMakerHandleStatus(@Param("id") Long id, @Param("makerHandleStatus") Integer makerHandleStatus, @Param("modified") Long modified);
+	
+	public void setTakerHandleStatus(@Param("id") Long id, @Param("takerHandleStatus") Integer takerHandleStatus, @Param("modified") Long modified);
+
+	public long exist(@Param("mkOrderId") Long mkOrderId, @Param("tkOrderId") Long tkOrderId);
+
 }

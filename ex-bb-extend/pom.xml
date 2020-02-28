@@ -26,21 +26,16 @@
 			<artifactId>ex-bb-extend-def</artifactId>
 			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>com.hp.sh.expv3</groupId>
-			<artifactId>ex-fund-account-def</artifactId>
-			<version>3.0.0-SNAPSHOT</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.hp.sh.expv3</groupId>
-			<artifactId>ex-bb-base-jar</artifactId>
-			<version>3.0.0-SNAPSHOT</version>
-		</dependency>
 
 
-	</dependencies>
+		<!--<dependency>-->
+			<!--<groupId>com.hp.sh.expv3</groupId>-->
+			<!--<artifactId>ex-bb-base-jar</artifactId>-->
+			<!--<version>3.0.0-SNAPSHOT</version>-->
+		<!--</dependency>-->
+
+
+    </dependencies>
 	
 
 </project>

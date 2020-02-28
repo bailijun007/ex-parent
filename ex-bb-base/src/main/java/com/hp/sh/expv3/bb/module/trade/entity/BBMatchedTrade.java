@@ -7,7 +7,6 @@ package com.hp.sh.expv3.bb.module.trade.entity;
 import java.math.BigDecimal;
 
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import com.hp.sh.expv3.base.entity.BaseBizEntity;
 
@@ -51,9 +50,6 @@ public class BBMatchedTrade extends BaseBizEntity{
     private Integer makerHandleStatus;
     
     private Integer takerHandleStatus;
-    
-    @Version
-    private Long version;
     
 	public BBMatchedTrade() {
 	}
@@ -160,14 +156,6 @@ public class BBMatchedTrade extends BaseBizEntity{
 
 	public void setTakerHandleStatus(Integer takerHandleStatus) {
 		this.takerHandleStatus = takerHandleStatus;
-	}
-
-	public Long getVersion() {
-		return version;
-	}
-
-	public void setVersion(Long version) {
-		this.version = version;
 	}
 
 }

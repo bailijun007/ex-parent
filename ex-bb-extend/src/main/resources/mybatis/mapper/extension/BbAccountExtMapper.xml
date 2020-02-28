@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.bb.extension.dao.BbAccountExtMapper">
+
+    <resultMap type="com.hp.sh.expv3.bb.extension.vo.BbAccountVo" id="BbAccountVo">
+        <result column="user_id" property="userId"/>
+        <result column="asset" property="asset"/>
+        <result column="balance" property="balance"/>
+        <result column="version" property="version"/>
+        <result column="modified" property="modified"/>
+        <result column="created" property="created"/>
+    </resultMap>
+
+    <sql id="simple_where">
+        <where>
+            <if test="userIdList!=null">and user_id in
+                <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                    #{userIdList[${i}]}
+                </foreach>
+            </if>
+            <if test="assetList!=null">and asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="balance!=null">and balance=#{balance}</if>
+            <if test="version!=null">and version=#{version}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null">and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+		user_id,asset,balance,version,modified,created
+	</sql>
+
+
+    <insert id="save">
+        insert into bb_account
+        (user_id,asset,balance,version,modified,created)
+        values(#{userId},#{asset},#{balance},#{version},#{modified},#{created})
+    </insert>
+
+    <select id="queryOne" resultMap="BbAccountVo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM bb_account
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="queryList" resultMap="BbAccountVo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM bb_account
+        <include refid="simple_where"/>
+    </select>
+
+
+
+</mapper>

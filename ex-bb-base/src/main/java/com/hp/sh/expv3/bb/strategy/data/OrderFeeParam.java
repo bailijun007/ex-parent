@@ -9,15 +9,11 @@ import java.math.BigDecimal;
  */
 public interface OrderFeeParam {
 
-	BigDecimal getFaceValue();
-
 	BigDecimal getVolume();
 
 	BigDecimal getPrice();
 
 	BigDecimal getFeeRatio();
-
-	BigDecimal getCloseFeeRatio();
 
 	BigDecimal getMarginRatio();
 	

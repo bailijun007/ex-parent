@@ -12,13 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.constant.MqTags;
-import com.hp.sh.expv3.bb.job.TradeJob;
+import com.hp.sh.expv3.bb.job.BBMatchedHandler;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
 import com.hp.sh.expv3.bb.mq.match.msg.BBMatchNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.match.msg.BbOrderCancelMqMsg;
-import com.hp.sh.expv3.bb.msg.BBTradeMsg;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
@@ -52,13 +51,6 @@ public class MatchMqConsumer {
 		this.orderService.setCancelled(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
 	}
 	
-	//成交
-	@MQListener(tags=MqTags.TAGS_TRADE)
-	public void handleTradeMsg(BBTradeMsg msg){
-		logger.info("收到成交消息:{}", msg);
-//		bBTradeService.handleTradeOrder(msg);
-	}
-	
 	/**
 	 * 撮合成功
 	 */
@@ -66,16 +58,22 @@ public class MatchMqConsumer {
 	public void handleMatchedTrade(BBMatchedTrade matchedTrade){
 		logger.info("收到消息:{}", matchedTrade);
 		
+		boolean exist = this.matchedTradeService.exist(matchedTrade.getMkOrderId(), matchedTrade.getTkOrderId());
+		if(exist){
+			logger.warn("撮合已存在:{}", matchedTrade);
+			return;
+		}
+		
 		//保存
 		matchedTrade.setTakerHandleStatus(IntBool.NO);
 		matchedTrade.setMakerHandleStatus(IntBool.NO);
 		this.matchedTradeService.save(matchedTrade);
 		
-		tradeJob.handleMatchedTrade(matchedTrade);
+		matchedHandler.handleMatchedTrade(matchedTrade);
 		
 	}
 	
 	@Autowired
-	private TradeJob tradeJob;
+	private BBMatchedHandler matchedHandler;
     
 }
