@@ -94,7 +94,7 @@ public class OrderlyConsumer {
 			if(contractGroup.equals(bbvo.getBbSymbolGroup())){
 				this.buildConsumer(MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol()));
 			}
-	        logger.info("Consumer Started. asset={}, symbol={}", bbvo.getAsset(), bbvo.getSymbol());
+	        logger.info("MQConsumer Started. asset={}, symbol={}", bbvo.getAsset(), bbvo.getSymbol());
 		}
 	}
 	
