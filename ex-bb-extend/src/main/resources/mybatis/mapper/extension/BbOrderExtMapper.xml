@@ -146,9 +146,46 @@
         </where>
     </select>
 
+
+    <select id="queryOrderList" resultMap="BbOrderVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_order
+        <where>
+            <if test="assetList!=null">and asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+            <if test="statusList!=null">and status in
+                <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
+                    #{statusList[${i}]}
+                </foreach>
+            </if>
+            <if test="symbolList!=null">and symbol in
+                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
+                    #{symbolList[${i}]}
+                </foreach>
+            </if>
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
+            <if test="gtOrderId!=null">
+                and id &gt;#{gtOrderId}
+                ORDER BY id asc
+            </if>
+
+            <if test="ltOrderId!=null">
+                and id &lt;#{ltOrderId}
+                ORDER BY id desc
+            </if>
+        </where>
+        LIMIT 0,${limit}
+    </select>
+
     <select id="queryBbActiveOrderList" resultMap="BbOrderVo">
         SELECT
-        <include refid="Base_Column_List"/>
+        o.*
         FROM
         bb_active_order ao
         LEFT JOIN
@@ -169,7 +206,7 @@
 
     <select id="queryHistoryOrderList"  resultMap="BbOrderVo">
         SELECT
-        <include refid="Base_Column_List"/>
+        o.*
         FROM
         bb_active_order ao
         LEFT JOIN

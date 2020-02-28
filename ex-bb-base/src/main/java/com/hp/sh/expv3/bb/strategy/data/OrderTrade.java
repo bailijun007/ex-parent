@@ -11,6 +11,6 @@ public interface OrderTrade {
 
 	BigDecimal getVolume();
 
-	BigDecimal getPrice();
+    BigDecimal getPrice();
 
 }

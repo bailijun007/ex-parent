@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.bb.extension.dao.BbOrderExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
+import com.hp.sh.expv3.bb.extension.strategy.common.BBExtCommonOrderStrategy;
 import com.hp.sh.expv3.bb.extension.vo.BbHistoryOrderVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
@@ -33,8 +34,8 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     @Autowired
     private BbOrderTradeExtService bbOrderTradeExtService;
 
-//    @Autowired
-//    private BbCommonOrderStrategy orderStrategy;
+    @Autowired
+    private BBExtCommonOrderStrategy orderStrategy;
 
     @Override
     public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
@@ -63,10 +64,10 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("activeFlag", IntBool.NO);
         map.put("lastOrderId", lastOrderId);
         map.put("limit", pageSize);
-        List<BbOrderVo> list =null;
-        if(lastOrderId==null){
+        List<BbOrderVo> list = null;
+        if (lastOrderId == null) {
             list = bbOrderExtMapper.queryHistoryOrderList(map);
-        }else {
+        } else {
             map.put("nextPage", nextPage);
             list = bbOrderExtMapper.queryHistoryByIsNextPage(map);
         }
@@ -74,28 +75,10 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         if (list == null || list.isEmpty()) {
             return result;
         }
-        List<Long> orderIdList = BeanHelper.getDistinctPropertyList(list, "id");
-         List<BbOrderTradeVo> _tradeList = bbOrderTradeExtService.queryOrderTrade(userId, orderIdList);
-        Map<Long, List<BbOrderTradeVo>> tradeListMap = BeanHelper.groupByProperty(_tradeList, "orderId");
-
-        for (BbOrderVo order : list) {
-            BbHistoryOrderVo historyOrderVo = new BbHistoryOrderVo();
-            BeanUtils.copyProperties(order, historyOrderVo);
-            historyOrderVo.setOrderType(order.getOrderType());
-            historyOrderVo.setLeverage(order.getLeverage());
-            historyOrderVo.setFilledVolume(order.getFilledVolume());
-            historyOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
-
-//            List<OrderTradeVo> orderTradeList = tradeListMap.get(order.getId());
-//            BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
-
-//            historyOrderVo.setMeanPrice(meanPrice);
-            historyOrderVo.setPrice(order.getPrice());
-            historyOrderVo.setFeeCost(order.getFeeCost());
-            historyOrderVo.setStatus(order.getStatus());
-
-            result.add(historyOrderVo);
+        if (list == null || list.isEmpty()) {
+            return result;
         }
+        this.convertOrderList(userId, result, list);
         return result;
 
     }
@@ -103,12 +86,13 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
 
     @Override
     public BigDecimal getLockAsset(Long userId, String asset) {
-        BigDecimal lock=  bbOrderExtMapper.getLockAsset(userId,asset);
-        if(null==lock){
+        BigDecimal lock = bbOrderExtMapper.getLockAsset(userId, asset);
+        if (null == lock) {
             return BigDecimal.ZERO;
         }
         return lock;
     }
+
     @Override
     public List<BbHistoryOrderVo> queryBbActiveOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
         List<BbHistoryOrderVo> result = new ArrayList<>();
@@ -120,10 +104,10 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("activeFlag", IntBool.YES);
         map.put("lastOrderId", lastOrderId);
         map.put("limit", pageSize);
-        List<BbOrderVo> list =null;
-        if(lastOrderId==null){
+        List<BbOrderVo> list = null;
+        if (lastOrderId == null) {
             list = bbOrderExtMapper.queryBbActiveOrderList(map);
-        }else {
+        } else {
             map.put("nextPage", nextPage);
             list = bbOrderExtMapper.queryBbActiveOrdersByIsNextPage(map);
         }
@@ -131,6 +115,11 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         if (list == null || list.isEmpty()) {
             return result;
         }
+        this.convertOrderList(userId, result, list);
+        return result;
+    }
+
+    private void convertOrderList(Long userId, List<BbHistoryOrderVo> result, List<BbOrderVo> list) {
         List<Long> orderIdList = BeanHelper.getDistinctPropertyList(list, "id");
         List<BbOrderTradeVo> _tradeList = bbOrderTradeExtService.queryOrderTrade(userId, orderIdList);
         Map<Long, List<BbOrderTradeVo>> tradeListMap = BeanHelper.groupByProperty(_tradeList, "orderId");
@@ -143,16 +132,39 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
             historyOrderVo.setFilledVolume(order.getFilledVolume());
             historyOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
 
+
 //            List<OrderTradeVo> orderTradeList = tradeListMap.get(order.getId());
 //            BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
 
-//            historyOrderVo.setMeanPrice(meanPrice);
+            List<BbOrderTradeVo> orderTradeList = tradeListMap.get(order.getId());
+            BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
+
+            historyOrderVo.setMeanPrice(meanPrice);
 
             historyOrderVo.setPrice(order.getPrice());
             historyOrderVo.setFeeCost(order.getFeeCost());
             historyOrderVo.setStatus(order.getStatus());
             result.add(historyOrderVo);
         }
+    }
+
+    @Override
+    public List<BbHistoryOrderVo> queryOrderList(Long userId, List<String> assetList, List<String> symbolList, Long gtOrderId, Long ltOrderId, Integer count, List<Integer> statusList) {
+        List<BbHistoryOrderVo> result = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("assetList", assetList);
+        map.put("symbolList", symbolList);
+        map.put("statusList", statusList);
+        map.put("gtOrderId", gtOrderId);
+        map.put("ltOrderId", ltOrderId);
+        map.put("limit", count);
+        List<BbOrderVo> list = bbOrderExtMapper.queryOrderList(map);
+        if (list == null || list.isEmpty()) {
+            return result;
+        }
+        this.convertOrderList(userId, result, list);
         return result;
+
     }
 }

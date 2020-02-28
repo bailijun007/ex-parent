@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.bb.extension.vo;
 
+import com.hp.sh.expv3.bb.extension.strategy.data.BbOrderTrade;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Transient;
@@ -9,7 +10,7 @@ import java.math.BigDecimal;
 /**
  * @author BaiLiJun  on 2020/2/15
  */
-public class BbOrderTradeVo implements Serializable {
+public class BbOrderTradeVo implements BbOrderTrade,Serializable {
     @ApiModelProperty("自增主键")
     private Long id;
 
@@ -150,6 +151,7 @@ public class BbOrderTradeVo implements Serializable {
         this.symbol = symbol;
     }
 
+    @Override
     public BigDecimal getPrice() {
         return price;
     }
@@ -157,7 +159,7 @@ public class BbOrderTradeVo implements Serializable {
     public void setPrice(BigDecimal price) {
         this.price = price;
     }
-
+    @Override
     public BigDecimal getVolume() {
         return volume;
     }

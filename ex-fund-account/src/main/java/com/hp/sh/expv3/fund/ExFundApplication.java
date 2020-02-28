@@ -13,8 +13,8 @@ import org.springframework.context.annotation.ComponentScan;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @EnableDiscoveryClient
-@EnableFeignClients({"com.hp.sh.expv3.pc"})
-@ComponentScan("com.hp.sh.expv3")
+@EnableFeignClients({"com.hp.sh.expv3.pc", "com.hp.sh.expv3.bb"})
+@ComponentScan({"com.hp.sh.expv3"})
 @SpringBootApplication
 public class ExFundApplication {
 	private static final Logger logger = LoggerFactory.getLogger(ExFundApplication.class);
