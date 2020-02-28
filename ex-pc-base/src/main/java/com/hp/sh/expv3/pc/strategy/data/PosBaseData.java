@@ -15,8 +15,14 @@ public interface PosBaseData {
 
 	public Integer getLongFlag();
 
-	public BigDecimal getLeverage();
-
 	public BigDecimal getVolume();
 
+	public BigDecimal getFaceValue();
+
+	public BigDecimal getPosMargin();
+
+	public BigDecimal getMeanPrice();
+	
+	public BigDecimal getLeverage();
+	
 }

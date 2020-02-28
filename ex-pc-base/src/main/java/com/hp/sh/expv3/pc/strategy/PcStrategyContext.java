@@ -20,7 +20,7 @@ import com.hp.sh.expv3.pc.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBCompFieldCalc;
 import com.hp.sh.expv3.pc.strategy.data.OrderFeeParam;
 import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
-import com.hp.sh.expv3.pc.strategy.data.PosCalcBankruptPriceParam;
+import com.hp.sh.expv3.pc.strategy.data.PosBaseData;
 import com.hp.sh.expv3.pc.strategy.data.PosData;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeParamVo;
@@ -292,7 +292,7 @@ public class PcStrategyContext {
 		return holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), pos.getFaceValue(), pos.getVolume(), floatingPnl, markPrice);
 	}
 	
-	public BigDecimal calcBankruptPrice(PosCalcBankruptPriceParam calcParam){
+	public BigDecimal calcBankruptPrice(PosBaseData calcParam){
 		HoldPosStrategy hs = this.getHoldPosStrategy(calcParam.getAsset(), calcParam.getSymbol());
 		return hs.calcBankruptPrice(calcParam.getLongFlag(), calcParam.getVolume(), calcParam.getFaceValue(), calcParam.getPosMargin(), calcParam.getMeanPrice());
 	}

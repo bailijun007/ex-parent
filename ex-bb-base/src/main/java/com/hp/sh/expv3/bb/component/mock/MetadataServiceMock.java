@@ -12,7 +12,6 @@ import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 /**
  * @author BaiLiJun  on 2019/12/18
  */
-@Primary
 @Component
 public class MetadataServiceMock implements MetadataService {
 

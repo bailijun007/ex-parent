@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ScanOptions;
@@ -20,6 +21,7 @@ import com.hp.sh.expv3.bb.constant.RedisKey;
 /**
  * @author BaiLiJun  on 2019/12/18
  */
+@Primary
 @Component
 public class MetadataServiceImpl implements MetadataService {
 

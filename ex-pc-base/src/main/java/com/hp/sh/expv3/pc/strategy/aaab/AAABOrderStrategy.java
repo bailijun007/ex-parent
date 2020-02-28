@@ -134,7 +134,7 @@ public class AAABOrderStrategy implements OrderStrategy {
 
 	/**
 	 * 计算保证金
-	 * @param baseValue 基础货币价值
+	 * @param amount
 	 * @param ratio
 	 * @return
 	 */

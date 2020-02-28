@@ -2,6 +2,7 @@ package com.hp.sh.expv3.pc.strategy.aabb;
 
 import java.math.BigDecimal;
 
+import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.data.PosData;
 import com.hp.sh.expv3.utils.IntBool;
@@ -17,17 +18,23 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 	
 	/**
 	 * 计算收益
-	 * @param longFlag 是否多仓
-	 * @param amt 成交金额
-	 * @param openPrice 均价
+	 * @param faceValue 面值
+	 * @param volume 张数
+	 * @param openPrice 开仓价
 	 * @param closePrice 平仓价
 	 * @return
 	 */
-	@Override
-	public BigDecimal calcPnl(int longFlag, BigDecimal volume, BigDecimal faceValue, BigDecimal openPrice, BigDecimal closePrice) {
-		BigDecimal _amount = volume.multiply(faceValue);
-        return PnlCalc.calcPnl(longFlag, _amount, openPrice, closePrice);
-    }
+	public BigDecimal calcPnl(int longFlag, BigDecimal volume, BigDecimal faceValue, BigDecimal openPrice, BigDecimal closePrice){
+		BigDecimal amount = faceValue.multiply(volume); 	//金额（USD）
+		BigDecimal openBase = amount.divide(openPrice, Precision.COMMON_PRECISION ,Precision.LESS).stripTrailingZeros(); 	//基础货币（BTC）
+		BigDecimal closeBase = amount.divide(closePrice, Precision.COMMON_PRECISION ,Precision.LESS).stripTrailingZeros(); 	//基础货币（BTC）
+		BigDecimal pnl = closeBase.subtract(openBase) ;
+		if(longFlag==OrderFlag.TYPE_LONG){
+			return pnl.negate();
+		}else{
+			return pnl;
+		}
+	}
 	
 	/**
 	 * 成交均价
@@ -37,14 +44,18 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 	 * @return
 	 */
 	@Override
-    public BigDecimal calcMeanPrice(int longFlag, BigDecimal baseValue, BigDecimal amt) {
-        return PcPriceCalc.calcEntryPrice(IntBool.isTrue(longFlag), baseValue, amt);
+    public BigDecimal calcMeanPrice(int longFlag, BigDecimal baseValue, BigDecimal amount) {
+        if (IntBool.isTrue(longFlag)) {
+            return amount.divide(baseValue, Precision.COMMON_PRECISION, DecimalUtil.MORE).stripTrailingZeros();
+        } else {
+            return amount.divide(baseValue, Precision.COMMON_PRECISION, DecimalUtil.LESS).stripTrailingZeros();
+        }
     }
 	
 	@Override
 	public BigDecimal calcLiqPrice(PosData pos) {
-		BigDecimal amount = AABBCompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		return PcPriceCalc.calcLiqPrice( pos.getHoldMarginRatio(), IntBool.isTrue(pos.getLongFlag()), pos.getMeanPrice(), amount, pos.getPosMargin(), Precision.COMMON_PRECISION );
+		BigDecimal amt = AABBCompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
+		return PcPriceCalc.calcLiqPrice( pos.getHoldMarginRatio(), IntBool.isTrue(pos.getLongFlag()), pos.getMeanPrice(), amt, pos.getPosMargin(), Precision.COMMON_PRECISION );
 	}
 
 	/**

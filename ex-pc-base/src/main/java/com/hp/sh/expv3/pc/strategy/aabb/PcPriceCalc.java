@@ -88,20 +88,4 @@ class PcPriceCalc {
         }
     }
 
-    /**
-     * 计算持仓均价
-     *
-     * @param isLong
-     * @param baseValue
-     * @param amt
-     * @return
-     */
-    public static BigDecimal calcEntryPrice(boolean isLong, BigDecimal baseValue, BigDecimal amt) {
-        if (isLong) {
-            return amt.divide(baseValue, Precision.COMMON_PRECISION, DecimalUtil.MORE).stripTrailingZeros();
-        } else {
-            return amt.divide(baseValue, Precision.COMMON_PRECISION, DecimalUtil.LESS).stripTrailingZeros();
-        }
-    }
-
 }

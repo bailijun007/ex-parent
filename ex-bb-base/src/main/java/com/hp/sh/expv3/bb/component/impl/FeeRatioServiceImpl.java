@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import com.hp.sh.expv3.bb.constant.RedisKey;
 /**
  * @author BaiLiJun  on 2019/12/18
  */
+@Primary
 @Component
 public class FeeRatioServiceImpl implements FeeRatioService {
 	private static final Logger logger = LoggerFactory.getLogger(FeeRatioServiceImpl.class);

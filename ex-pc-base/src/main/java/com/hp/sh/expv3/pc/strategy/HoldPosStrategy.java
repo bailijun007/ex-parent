@@ -19,8 +19,13 @@ public interface HoldPosStrategy {
 	 * @param amt
 	 * @return
 	 */
-    public BigDecimal calcMeanPrice(int longFlag, BigDecimal baseValue, BigDecimal amt) ;
+    public BigDecimal calcMeanPrice(int longFlag, BigDecimal baseValue, BigDecimal amount) ;
 
+    /**
+     * 计算强平价
+     * @param pos
+     * @return
+     */
 	public BigDecimal calcLiqPrice(PosData pos);
 
 	/**

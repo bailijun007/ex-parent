@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  * @author wangjg
  *
  */
-public interface PosData extends PosBaseData, PosCalcBankruptPriceParam{
+public interface PosData extends PosBaseData{
 
 	public BigDecimal getMeanPrice();
 

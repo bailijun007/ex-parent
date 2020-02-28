@@ -13,7 +13,6 @@ import com.hp.sh.expv3.bb.component.FeeRatioService;
  * @author lw
  *
  */
-@Primary
 @Component
 public class FeeRatioServiceMock implements FeeRatioService {
 
