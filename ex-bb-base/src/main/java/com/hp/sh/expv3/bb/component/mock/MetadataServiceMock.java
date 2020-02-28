@@ -12,6 +12,7 @@ import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 /**
  * @author BaiLiJun  on 2019/12/18
  */
+@Primary
 @Component
 public class MetadataServiceMock implements MetadataService {
 
@@ -28,14 +29,14 @@ public class MetadataServiceMock implements MetadataService {
         List<BBSymbolVO> list = new ArrayList<>();
         
         BBSymbolVO bb1 = new BBSymbolVO();
-        bb1.setAsset("USD");
-        bb1.setSymbol("BTC_USD");
+        bb1.setAsset("USDT");
+        bb1.setSymbol("BTC_USDT");
         bb1.setBbSymbolGroup(1);
         list.add(bb1);
 
         BBSymbolVO bb2 = new BBSymbolVO();
-        bb2.setAsset("USD");
-        bb2.setSymbol("ETH_USD");
+        bb2.setAsset("USDT");
+        bb2.setSymbol("ETH_USDT");
         bb2.setBbSymbolGroup(1);
         list.add(bb2);
         

@@ -2,8 +2,6 @@ package com.hp.sh.expv3.pc.strategy.aaab;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.utils.math.Precision;
-
 /**
  * 计算合成字段
  * 计价货币
