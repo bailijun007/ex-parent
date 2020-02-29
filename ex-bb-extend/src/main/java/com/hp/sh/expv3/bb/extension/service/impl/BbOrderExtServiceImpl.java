@@ -94,8 +94,9 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     }
 
     @Override
-    public List<BbHistoryOrderVo> queryBbActiveOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
-        List<BbHistoryOrderVo> result = new ArrayList<>();
+    public PageResult<BbHistoryOrderVo> queryBbActiveOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
+        PageResult<BbHistoryOrderVo> result = new PageResult<>();
+        List<BbHistoryOrderVo> voList=new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
@@ -103,6 +104,10 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("bidFlag", bidFlag);
         map.put("activeFlag", IntBool.YES);
         map.put("lastOrderId", lastOrderId);
+
+        //总条数
+      Long count= bbOrderExtMapper.queryCount(map);
+
         map.put("limit", pageSize);
         List<BbOrderVo> list = null;
         if (lastOrderId == null) {
@@ -115,7 +120,9 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         if (list == null || list.isEmpty()) {
             return result;
         }
-        this.convertOrderList(userId, result, list);
+        this.convertOrderList(userId, voList, list);
+        result.setList(voList);
+        result.setRowTotal(count);
         return result;
     }
 
@@ -131,10 +138,6 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
             historyOrderVo.setLeverage(order.getLeverage());
             historyOrderVo.setFilledVolume(order.getFilledVolume());
             historyOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
-
-
-//            List<OrderTradeVo> orderTradeList = tradeListMap.get(order.getId());
-//            BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
 
             List<BbOrderTradeVo> orderTradeList = tradeListMap.get(order.getId());
             BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
