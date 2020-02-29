@@ -75,4 +75,16 @@ public interface BbTradeExtApi {
                                      @RequestParam(value = "symbol", required = true) String symbol,
                                      @RequestParam(value = "startTime") Long startTime);
 
+    @ApiOperation(value = "查询最新成交记录(撮合结果)")
+    @GetMapping(value = "/api/extension/pc/trade/queryLastTrade")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "count ", value = "返回数量（最多返回100条）", example = "1", required = true)
+    })
+    List<BbTradeVo> queryLastTrade(@RequestParam("asset") String asset,
+                                   @RequestParam("symbol") String symbol,
+                                   @RequestParam("count") Integer count);
+
+
 }

@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author BaiLiJun  on 2020/2/15
@@ -36,5 +38,15 @@ public class BbTradeExtServiceImpl implements BbTradeExtService {
     @Override
     public BbTradeVo queryLastTradeByLtTime(String asset, String symbol, Long startTime) {
         return bbTradeExtMapper.queryLastTradeByLtTime(asset,symbol,startTime);
+    }
+
+    @Override
+    public List<BbTradeVo> queryLastTrade(String asset, String symbol, Integer count) {
+        Map<String, Object> map=new HashMap<>();
+        map.put("asset",asset);
+        map.put("symbol",symbol);
+        map.put("orderBy","trade_time");
+        map.put("limit",count);
+        return bbTradeExtMapper.queryLastTrade(map);
     }
 }

@@ -15,4 +15,6 @@ public interface BbTradeExtService {
     List<BbTradeVo> queryTradeList(Long userId, String asset, String symbol, Integer count);
 
     BbTradeVo queryLastTradeByLtTime(String asset, String symbol, Long startTime1);
+
+    List<BbTradeVo> queryLastTrade(String asset, String symbol, Integer count);
 }
