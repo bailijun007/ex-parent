@@ -221,7 +221,7 @@
             <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
             <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
             <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
-            <if test="activeFlag!=null">and ao.active_flag=#{activeFlag}</if>
+            <if test="activeFlag!=null">and o.active_flag=#{activeFlag}</if>
             <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
         </where>
         ORDER BY ao.id desc
