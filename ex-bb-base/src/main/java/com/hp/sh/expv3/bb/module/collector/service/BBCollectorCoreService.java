@@ -79,7 +79,7 @@ public class BBCollectorCoreService{
 			return InvokeResult.NOCHANGE;
 		}
 		
-		BBCollectorAccount bBCollectorAccount = this.collectorAccountDAO.getAndLock(record.getCollectorId(), record.getAsset());
+		BBCollectorAccount bBCollectorAccount = this.collectorAccountDAO.get(record.getCollectorId(), record.getAsset());
 		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
 		if(bBCollectorAccount==null){
 			//检查余额
@@ -126,9 +126,9 @@ public class BBCollectorCoreService{
 	
 	private BBCollectorAccount newAccount(Long collectorId, String asset, BigDecimal balance, Long now){
 		BBCollectorAccount account = new BBCollectorAccount();
+		account.setId(collectorId);
 		account.setAsset(asset);
 		account.setBalance(balance);
-		account.setCollectorId(collectorId);
 		account.setCreated(now);
 		account.setModified(now);
 		account.setVersion(0L);

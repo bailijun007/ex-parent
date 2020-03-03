@@ -8,8 +8,18 @@ import java.util.concurrent.TimeUnit;
 
 public class OrderlyExecutor {
 	
-	private BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>(100);
-	private ExecutorService pool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.SECONDS, queue);
+	private BlockingQueue<Runnable> queue ;
+	
+	private ExecutorService pool ;
+
+	public OrderlyExecutor() {
+		this(100);
+	}
+
+	public OrderlyExecutor(int queueSize) {
+		this.queue = new LinkedBlockingQueue<Runnable>(queueSize);
+		this.pool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.SECONDS, queue);
+	}
 
 	public void submit(Runnable task){
 		pool.submit(task);

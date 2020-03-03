@@ -135,7 +135,7 @@
 		where 
 			created &gt;= #{startTime}
 			<if test="userId!=null"> and (tk_account_id=#{userId} or mk_account_id=#{userId})</if>
-			<if test="startId!=null"> and id &gt;= #{startId} </if>
+			<if test="startId!=null"> and id &gt; #{startId} </if>
 			and (maker_handle_status=0 or taker_handle_status=0)
 			order by id asc
 	</select>

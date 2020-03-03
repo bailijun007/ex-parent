@@ -61,10 +61,10 @@ public class DataEventListener {
 	private String getChannel(EventMsg eventMsg){
 		String channel = null;
 		if(eventMsg.getType()==EventType.BB_ACCOUNT){
-			channel = "pc:account:"+eventMsg.getAsset();
+			channel = "bb:account:"+eventMsg.getAsset();
 		}
 		if(eventMsg.getType()==EventType.ORDER){
-			channel = "pc:order:"+eventMsg.getAsset()+":"+eventMsg.getSymbol();
+			channel = "bb:order:"+eventMsg.getAsset()+":"+eventMsg.getSymbol();
 		}
 		channel.toString();
 		return channel;

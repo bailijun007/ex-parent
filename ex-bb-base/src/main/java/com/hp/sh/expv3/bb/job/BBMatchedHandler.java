@@ -29,10 +29,10 @@ public class BBMatchedHandler {
 
 	private OrderlyExecutors orderlyExecutors = new OrderlyExecutors(10);
 	
+	private Long startTime = DbDateUtils.now()-1000*3600*24*3;
+	
 	public void handlePending() {
-		Long now = DbDateUtils.now();
-		Long startTime = 0L; //now-1000*3600;
-		Page page = new Page(1, 100, 1000L);
+		Page page = new Page(1, 50, 1000L);
 		Long startId = null;
 		while(true){
 			List<BBMatchedTrade> list = this.matchedTradeService.queryPending(page, null, startTime, startId);
@@ -42,11 +42,17 @@ public class BBMatchedHandler {
 			}
 			
 			for(BBMatchedTrade matchedTrade : list){
-				handleMatchedTrade(matchedTrade);
+				try{
+					handleMatchedTrade(matchedTrade);
+				}catch(Exception e){
+					logger.error(e.getMessage(), e);
+				}
 				startId = matchedTrade.getId();
 			}
 			
 		}
+
+		this.startTime = DbDateUtils.now()-1000*3600;
 	}
 
 	public void handleMatchedTrade(BBMatchedTrade matchedVo){
