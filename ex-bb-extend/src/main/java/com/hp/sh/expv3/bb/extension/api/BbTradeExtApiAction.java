@@ -70,4 +70,17 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
         }
         return bbTradeExtService.queryLastTrade(asset,symbol,count);
     }
+
+    @Override
+    public List<BbTradeVo> selectTradeListByUserId(String asset, String symbol, Long userId, Long startTime, Long endTime) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null ) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+
+        if (startTime == null && endTime == null) {
+            endTime = Instant.now().toEpochMilli();
+        }
+        List<BbTradeVo> tradeVo = bbTradeExtService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId);
+        return tradeVo;
+    }
 }
