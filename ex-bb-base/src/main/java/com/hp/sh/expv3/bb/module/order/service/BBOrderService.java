@@ -19,7 +19,7 @@ import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.vo.BBSymbol;
 import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
-import com.hp.sh.expv3.bb.strategy.vo.OrderRatioData;
+import com.hp.sh.expv3.bb.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.BBCutRequest;
 import com.hp.sh.expv3.commons.lock.LockIt;
@@ -170,11 +170,11 @@ public class BBOrderService {
 		BigDecimal feeRatio = this.feeRatioService.getTakerFeeRatio(order.getUserId(), order.getAsset(), order.getSymbol());
 		order.setFeeRatio(feeRatio);
 		
-		OrderRatioData ratioData = orderStrategy.calcOrderAmt(order);
+		OrderFeeData orderFeeData = orderStrategy.calcOrderAmt(order);
 		//押金 & 手续费
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
-			order.setOrderMargin(ratioData.getOrderMargin());
-			order.setFee(ratioData.getFee());
+			order.setOrderMargin(orderFeeData.getOrderMargin());
+			order.setFee(orderFeeData.getFee());
 		}else{
 			order.setOrderMargin(order.getVolume());
 			order.setFee(BigDecimal.ZERO);

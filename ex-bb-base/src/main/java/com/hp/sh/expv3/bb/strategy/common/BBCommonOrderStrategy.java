@@ -14,7 +14,7 @@ import com.hp.sh.expv3.bb.strategy.OrderStrategy;
 import com.hp.sh.expv3.bb.strategy.data.OrderFeeParam;
 import com.hp.sh.expv3.bb.strategy.data.OrderTrade;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
-import com.hp.sh.expv3.bb.strategy.vo.OrderRatioData;
+import com.hp.sh.expv3.bb.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.bb.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigUtils;
@@ -37,7 +37,7 @@ public class BBCommonOrderStrategy implements OrderStrategy {
 	 * 计算新订单费用
 	 */
 		//交易金额
-	public OrderRatioData calcOrderAmt(OrderFeeParam orderParam){
+	public OrderFeeData calcOrderAmt(OrderFeeParam orderParam){
 		BigDecimal amount = calcAmount(orderParam.getVolume(), orderParam.getPrice());
 
 		//开仓手续费
@@ -49,7 +49,7 @@ public class BBCommonOrderStrategy implements OrderStrategy {
 		//总押金
 		BigDecimal grossMargin = BigCalc.sum(fee, orderMargin);
 
-		OrderRatioData orderAmount = new OrderRatioData();
+		OrderFeeData orderAmount = new OrderFeeData();
 		orderAmount.setAmount(amount);
 
 		orderAmount.setOrderMargin(orderMargin);
@@ -160,7 +160,7 @@ public class BBCommonOrderStrategy implements OrderStrategy {
 
 	public static BigDecimal calcFee(BigDecimal amount, BigDecimal feeRatio){
 		BigDecimal fee = amount.multiply(feeRatio);
-		return fee.stripTrailingZeros();
+		return new BigDecimal(fee.stripTrailingZeros().toPlainString());
 	}
 
 	/**

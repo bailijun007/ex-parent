@@ -30,9 +30,9 @@ public class FeeRatioServiceMock implements FeeRatioService {
 	 */
 	private BigDecimal getFeeRatio(long userId, boolean isMaker) {
 		if (isMaker) {
-			return new BigDecimal("0.1");
+			return new BigDecimal("0.001");
 		} else {
-			return new BigDecimal("0.15");
+			return new BigDecimal("0.0015");
 		}
 	
 	}

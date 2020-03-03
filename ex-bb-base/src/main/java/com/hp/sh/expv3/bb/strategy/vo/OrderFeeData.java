@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  * @author wangjg
  *
  */
-public class OrderRatioData {
+public class OrderFeeData {
 	
 	//交易金额 张数*面值
 	private BigDecimal amount;
@@ -27,7 +27,7 @@ public class OrderRatioData {
 	 */
 	private BigDecimal grossMargin;
 
-	public OrderRatioData() {
+	public OrderFeeData() {
 		super();
 	}
 
