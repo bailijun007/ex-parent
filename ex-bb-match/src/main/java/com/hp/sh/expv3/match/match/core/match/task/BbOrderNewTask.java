@@ -69,7 +69,7 @@ public class BbOrderNewTask extends BbOrderBaseTask implements ApplicationContex
         long now = System.currentTimeMillis();
         BbMatchHandlerContext context = BbMatchHandlerContext.getLocalContext();
 
-        context.getMatchResult().setMatchTxId(idService.getId(IdTypeEnum.MATCH));
+        context.getMatchResult().setMatchTxId(idService.getId(IdTypeEnum.BB_MATCH));
 
         while (true) {
             BbOrderHandler handler = null;

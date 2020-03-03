@@ -75,7 +75,7 @@ public class PcOrderNewTask extends PcOrderBaseTask implements ApplicationContex
         long now = System.currentTimeMillis();
         PcMatchHandlerContext context = PcMatchHandlerContext.getLocalContext();
 
-        context.getMatchResult().setMatchTxId(idService.getId(IdTypeEnum.MATCH));
+        context.getMatchResult().setMatchTxId(idService.getId(IdTypeEnum.PC_MATCH));
 
         while (true) {
             PcOrderHandler handler = null;

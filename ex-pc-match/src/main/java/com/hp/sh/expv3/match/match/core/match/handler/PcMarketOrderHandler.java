@@ -64,7 +64,7 @@ public class PcMarketOrderHandler extends PcOrderHandler {
             takerOrder.setFilledNumber(takerOrder.getFilledNumber().add(currentFillAmount));
             makerOrder.setFilledNumber(makerOrder.getFilledNumber().add(currentFillAmount));
 
-            long tradeId = idService.getId(IdTypeEnum.TRADE);
+            long tradeId = idService.getId(IdTypeEnum.PC_TRADE);
             PcTradeBo trade = buildTrade(context.getAsset(), context.getSymbol(), tradeId, context.getMatchResult().getMatchTxId(), takerOrder, makerOrder, makerPrice, currentFillAmount, takerOrder.getOrderTime());
 
             appendMatchResult(context, trade);

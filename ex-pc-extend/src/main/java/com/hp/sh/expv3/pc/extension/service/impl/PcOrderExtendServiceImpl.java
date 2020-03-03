@@ -51,6 +51,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         Map<String, Object> map = new HashMap<>();
         map.put("closePosId", closePosId);
         map.put("userId", userId);
+//        map.put("limit", null);
         List<PcOrderVo> pcOrderVos = pcOrderDAO.queryList(map);
         return pcOrderVos;
     }
@@ -61,6 +62,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("closePosId", closePosId);
         map.put("userId", userId);
         map.put("activeFlag", ExtCommonConstant.ACTIVE_FLAG);
+        map.put("limit", null);
         List<PcOrderVo> pcOrderVos = pcOrderDAO.queryList(map);
         return pcOrderVos;
     }
@@ -74,6 +76,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("orderType", orderType);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
+//        map.put("limit", null);
         List<PcOrderVo> pcOrderVos = pcOrderDAO.queryList(map);
         return pcOrderVos;
     }
@@ -170,6 +173,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("asset", asset);
         map.put("symbol", symbol);
         map.put("userId", userId);
+        map.put("limit", null);
         PcOrderVo pcOrderVo = pcOrderDAO.queryOne(map);
         return pcOrderVo;
     }

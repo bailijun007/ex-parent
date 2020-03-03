@@ -127,7 +127,7 @@ public class BbLimitOrderHandler extends BbOrderHandler {
             takerOrder.setFilledNumber(takerOrder.getFilledNumber().add(currentFillAmount));
             makerOrder.setFilledNumber(makerOrder.getFilledNumber().add(currentFillAmount));
 
-            long tradeId = idService.getId(IdTypeEnum.TRADE);
+            long tradeId = idService.getId(IdTypeEnum.BB_TRADE);
             BbTradeBo trade = buildTrade(context.getAsset(), context.getSymbol(), tradeId, context.getMatchResult().getMatchTxId(), takerOrder, makerOrder, makerPrice, currentFillAmount, takerOrder.getOrderTime());
 
             appendMatchResult(context, trade);

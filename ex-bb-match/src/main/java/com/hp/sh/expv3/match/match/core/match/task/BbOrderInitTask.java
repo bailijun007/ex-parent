@@ -159,9 +159,8 @@ public class BbOrderInitTask extends BbOrderBaseTask implements ApplicationConte
             Long startSnapshotOffset = snapshotOffset.floor(sentMqOffset);
 
             if (null == startSnapshotOffset) {
-                context.setLastPrice(null);
-                this.setCurrentMsgOffset(0L);
-                return;
+                logger.error("lastSentOffset:{},snapshot is null,please check.");
+                System.exit(-1);
             }
 
             String s = bbRedisUtil.hget(snapshotRedisKey, startSnapshotOffset + "");
@@ -208,7 +207,7 @@ public class BbOrderInitTask extends BbOrderBaseTask implements ApplicationConte
 
         } else {
             context.setLastPrice(null);
-            this.setCurrentMsgOffset(0L);
+            this.setCurrentMsgOffset(sentMqOffset);
         }
 
         /**

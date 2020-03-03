@@ -176,7 +176,7 @@ public class BbmatchOrderRmqConsumerThread extends Thread {
                 Long offset = topic2Offset.get(topicName);
                 PullResult pullResult = pull(consumer, mq, offset);
                 if (PullStatus.OFFSET_ILLEGAL.equals(pullResult.getPullStatus())) {
-                    logger.error("{}:offset illegal {},init offset:{},msgId:{},max offset:{}", topicName, offset, this.lastSentOffset, this.lastSentMsgId, pullResult.getMaxOffset());
+                    logger.error("{}:offset illegal {},init offset:{},msgId:{},min offset:{},max offset:{}", topicName, offset, this.lastSentOffset, this.lastSentMsgId, pullResult.getMinOffset(), pullResult.getMaxOffset());
                     System.exit(-1);
                 }
 

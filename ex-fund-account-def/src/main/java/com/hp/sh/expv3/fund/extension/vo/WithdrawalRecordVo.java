@@ -28,8 +28,12 @@ public class WithdrawalRecordVo implements Serializable {
     @ApiModelProperty("提币量")
     private BigDecimal amount;
 
-    @ApiModelProperty("状态：0：已创建，1：成功，2：失败，3-同步余额,4：审核中，5-审核通过,6：审核不通过")
+    @ApiModelProperty("1.审核中,2.审核通过,3.失败")
     private Integer status;
+
+
+    @ApiModelProperty("执行状态:0-提现中，1-提现成功，2-提现失败")
+    private Integer payStatus;
 
     @ApiModelProperty("创建时间")
     private Long ctime;
@@ -50,6 +54,14 @@ public class WithdrawalRecordVo implements Serializable {
         this.id = id;
     }
 
+
+    public Integer getPayStatus() {
+        return payStatus;
+    }
+
+    public void setPayStatus(Integer payStatus) {
+        this.payStatus = payStatus;
+    }
 
     public String getTxHash() {
         return txHash;
