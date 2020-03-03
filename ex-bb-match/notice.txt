@@ -3,3 +3,5 @@
 * 多配置
 * serverId
 * snapshot 如果沒有，坏打算是要rebase，因此尽量将snapshot 日志输出一份 (pc & bb)
+
+* 日志 logback.xml 新增了 snapshot 数据输出，需更新
