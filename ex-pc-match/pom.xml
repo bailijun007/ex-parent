@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.hp.sh</groupId>
+    <groupId>com.hp.sh.expv3</groupId>
     <artifactId>ex-pc-match3</artifactId>
     <packaging>jar</packaging>
     <description>永续合约-撮合交易</description>

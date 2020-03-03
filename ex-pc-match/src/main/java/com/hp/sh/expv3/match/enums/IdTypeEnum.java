@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.enums;
+package com.hp.sh.expv3.match.enums;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -13,8 +13,6 @@ public enum IdTypeEnum {
     COMMON(0),// 通用，ID可能会重复
     PC_MATCH(8),// 永续合约撮合ID，由PC撮合生成
     PC_TRADE(9), // 永续合约成交，由PC撮合生成
-    BB_MATCH(10),// 币币合约撮合，由BB撮合生成
-    BB_TRADE(11), // 币币合约成交，由BB撮合生成
     ;
 
     public final int value;
