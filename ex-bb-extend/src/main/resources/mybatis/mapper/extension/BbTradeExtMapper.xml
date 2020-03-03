@@ -102,6 +102,24 @@
         order by trade_time asc
     </select>
 
+    <select id="selectTradeListByUserId" resultMap="BbTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_trade b
+        <where>
+            b.asset=#{asset}
+            and b.symbol=#{symbol}
+            and (b.tk_account_id=#{userId} or b.mk_account_id=#{userId})
+            <if test="tradeTimeBegin!=null">
+                and b.trade_time &gt;#{tradeTimeBegin}
+            </if>
+            <if test="tradeTimeEnd!=null">
+                and b.trade_time &lt;=#{tradeTimeEnd}
+            </if>
+        </where>
+        ORDER BY b.id ASC
+    </select>
+
     <select id="queryLastTrade" resultMap="BbTradeVo">
         select
         <include refid="Base_Column_List"/>

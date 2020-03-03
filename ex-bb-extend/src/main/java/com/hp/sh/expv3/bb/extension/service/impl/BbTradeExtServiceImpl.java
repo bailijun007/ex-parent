@@ -49,4 +49,11 @@ public class BbTradeExtServiceImpl implements BbTradeExtService {
         map.put("limit",count);
         return bbTradeExtMapper.queryLastTrade(map);
     }
+
+    @Override
+    public List<BbTradeVo> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId) {
+        List<BbTradeVo> list = bbTradeExtMapper.selectTradeListByUserId(asset,symbol,startTime,endTime,userId);
+        return list;
+
+    }
 }
