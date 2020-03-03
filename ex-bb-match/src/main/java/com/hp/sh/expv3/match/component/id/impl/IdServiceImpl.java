@@ -6,7 +6,7 @@ package com.hp.sh.expv3.match.component.id.impl;
 
 import com.hp.sh.expv3.match.component.id.SnowflakeIdWorker;
 import com.hp.sh.expv3.match.component.id.def.IdService;
-import com.hp.sh.expv3.match.enums.IdTypeEnum;
+import com.hp.sh.expv3.enums.IdTypeEnum;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

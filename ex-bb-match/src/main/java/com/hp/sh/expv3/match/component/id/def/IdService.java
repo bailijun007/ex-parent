@@ -4,7 +4,7 @@
  */
 package com.hp.sh.expv3.match.component.id.def;
 
-import com.hp.sh.expv3.match.enums.IdTypeEnum;
+import com.hp.sh.expv3.enums.IdTypeEnum;
 
 public interface IdService {
 

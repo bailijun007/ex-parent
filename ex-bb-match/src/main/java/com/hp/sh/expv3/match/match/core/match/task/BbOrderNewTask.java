@@ -4,10 +4,10 @@
  */
 package com.hp.sh.expv3.match.match.core.match.task;
 
+import com.hp.sh.expv3.enums.IdTypeEnum;
 import com.hp.sh.expv3.match.bo.BbOrder4MatchBo;
 import com.hp.sh.expv3.match.component.id.def.IdService;
 import com.hp.sh.expv3.match.enums.BbOrderTypeEnum;
-import com.hp.sh.expv3.match.enums.IdTypeEnum;
 import com.hp.sh.expv3.match.match.core.match.handler.BbLimitOrderHandler;
 import com.hp.sh.expv3.match.match.core.match.handler.BbMarketOrderHandler;
 import com.hp.sh.expv3.match.match.core.match.handler.BbOrderHandler;
@@ -69,7 +69,7 @@ public class BbOrderNewTask extends BbOrderBaseTask implements ApplicationContex
         long now = System.currentTimeMillis();
         BbMatchHandlerContext context = BbMatchHandlerContext.getLocalContext();
 
-        context.getMatchResult().setMatchTxId(idService.getId(IdTypeEnum.MATCH));
+        context.getMatchResult().setMatchTxId(idService.getId(IdTypeEnum.BB_MATCH));
 
         while (true) {
             BbOrderHandler handler = null;
