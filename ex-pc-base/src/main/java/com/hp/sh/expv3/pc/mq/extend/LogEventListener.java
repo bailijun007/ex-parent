@@ -31,7 +31,7 @@ public class LogEventListener {
 	@Autowired
 	private PcPositionDataService positionDataService;
 
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
 	public void afterCommit(PcAccountRecord pcAccountRecord) {
 		Integer type = this.getType(pcAccountRecord.getTradeType());
 		if(type==null){
@@ -53,7 +53,7 @@ public class LogEventListener {
 		this.sendEventMsg(logMsg);
 	}
 
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
 	public void afterCommit(PcOrderTrade orderTrade) {
 		PcAccountLog logMsg = new PcAccountLog();
 		logMsg.setUserId(orderTrade.getUserId());
@@ -66,7 +66,7 @@ public class LogEventListener {
 		this.sendEventMsg(logMsg);
 	}
 
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
 	public void afterCommit(PcLiqRecord liqRecord) {
 		PcAccountLog logMsg = new PcAccountLog();
 		logMsg.setUserId(liqRecord.getUserId());

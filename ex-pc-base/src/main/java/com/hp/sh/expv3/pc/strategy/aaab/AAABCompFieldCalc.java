@@ -18,7 +18,7 @@ public class AAABCompFieldCalc {
 	 * @param faceValue 面值(基础货币)
 	 * @return`
 	 */
-	public BigDecimal calcAmount(BigDecimal volume, BigDecimal faceValue, BigDecimal price){
+	public static BigDecimal calcAmount(BigDecimal volume, BigDecimal faceValue, BigDecimal price){
 		BigDecimal fv = faceValue.multiply(volume);
 		BigDecimal amount = fv.multiply(price);
 		return amount;
