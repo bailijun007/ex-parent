@@ -79,9 +79,11 @@ public class BbMatchedBookSnapshotTask extends BbMatchedBaseTask {
 
         String snapshotRedisKey = RedisKeyUtil.buildBbOrderSnapshotRedisKey(bbmatchRedisKeySetting.getBbOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
 
-        bbRedisUtil.hset(snapshotRedisKey, "" + this.getCurrentMsgOffset(), JsonUtil.toJsonString(snapshot));
+        String field = "" + this.getCurrentMsgOffset();
+        String value = JsonUtil.toJsonString(snapshot);
+        bbRedisUtil.hset(snapshotRedisKey, field, value);
 
-        logger.info("save snapshot at {}", System.currentTimeMillis());
+        logger.info("save snapshot at {},{},{},{}", System.currentTimeMillis(), snapshotRedisKey, field, value);
 
         updateSentMqOffset();
     }
