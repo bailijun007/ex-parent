@@ -96,13 +96,23 @@ public class AAABHoldPosStrategy implements HoldPosStrategy{
 	
 	/**
 	 * pnl = (cp-op)*fv
+	 * (cp-op) = pnl/fv
+	 * cp = pnl/fv + op
+	 * 
 	 * @return
 	 */
 	public BigDecimal calcLiqPrice3(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
-		BigDecimal holdMargin = amount.multiply(openPrice).multiply(holdMarginRatio);
-		BigDecimal pnl = posMargin.subtract(holdMargin);
-		BigDecimal liqPrice = pnl.divide(amount, Precision.COMMON_PRECISION, Precision.LESS).add(openPrice);
-		return liqPrice;
+		if(IntBool.isTrue(longFlag)){
+			BigDecimal holdMargin = amount.multiply(openPrice).multiply(holdMarginRatio);
+			BigDecimal pnl = posMargin.subtract(holdMargin);
+			BigDecimal liqPrice = pnl.divide(amount, Precision.COMMON_PRECISION, Precision.LESS).subtract(openPrice);
+			return liqPrice;
+		}else{
+			BigDecimal holdMargin = amount.multiply(openPrice).multiply(holdMarginRatio);
+			BigDecimal pnl = posMargin.subtract(holdMargin);
+			BigDecimal liqPrice = pnl.divide(amount, Precision.COMMON_PRECISION, Precision.LESS).add(openPrice);
+			return liqPrice;
+		}
 	}
 	
 	/**
@@ -149,9 +159,16 @@ public class AAABHoldPosStrategy implements HoldPosStrategy{
 	}
 	
 	public BigDecimal calcBankruptPrice3(Integer longFlag, BigDecimal volume, BigDecimal faceValue, BigDecimal margin, BigDecimal openPrice) {
-		BigDecimal amount = faceValue.multiply(volume);
-		BigDecimal pnl = margin;
-		BigDecimal liqPrice = pnl.divide(amount, Precision.COMMON_PRECISION, Precision.LESS).add(openPrice);
-		return liqPrice;
+		if(IntBool.isTrue(longFlag)){
+			BigDecimal amount = faceValue.multiply(volume);
+			BigDecimal pnl = margin;
+			BigDecimal liqPrice = pnl.divide(amount, Precision.COMMON_PRECISION, Precision.LESS).subtract(openPrice);
+			return liqPrice;
+		}else{
+			BigDecimal amount = faceValue.multiply(volume);
+			BigDecimal pnl = margin;
+			BigDecimal liqPrice = pnl.divide(amount, Precision.COMMON_PRECISION, Precision.LESS).add(openPrice);
+			return liqPrice;
+		}
 	}
 }

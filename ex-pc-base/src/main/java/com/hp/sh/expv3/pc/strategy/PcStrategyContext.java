@@ -119,7 +119,8 @@ public class PcStrategyContext {
 		
 		OrderStrategy orderStrategy = this.getOrderStrategy(asset, symbol);
         HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(asset, symbol);
-		OrderFeeData tradeRatioData = orderStrategy.calcRaitoOrderFee(order, matchedVo.getNumber());
+        
+		OrderFeeData feeData = orderStrategy.calcRaitoOrderFee(order, matchedVo.getNumber());
 		
 		BigDecimal faceValue = this.metadataService.getFaceValue(asset, symbol);
 		
@@ -134,8 +135,8 @@ public class PcStrategyContext {
 		//手续费&率
 		if(closeFlag==OrderFlag.ACTION_OPEN){
 			tradeResult.setFeeRatio(order.getOpenFeeRatio());
-			tradeResult.setFee(tradeRatioData.getOpenFee());
-			tradeResult.setOrderMargin(tradeRatioData.getOrderMargin());//保证金
+			tradeResult.setFee(feeData.getOpenFee());
+			tradeResult.setOrderMargin(feeData.getOrderMargin());//保证金
 		}else{
 			BigDecimal closeFeeRatio = this.feeRatioService.getCloseFeeRatio(userId, asset, symbol);
 			BigDecimal closeFee = BigCalc.multiply(tradeResult.getBaseValue(), closeFeeRatio);
