@@ -211,20 +211,19 @@
 
     <select id="queryHistoryOrderList" resultMap="BbOrderVo">
         SELECT
-        o.*
+        <include refid="Base_Column_List"/>
         FROM
-        bb_active_order ao
-        LEFT JOIN
-        bb_order o ON o.id = ao.id
+        bb_order
+
         <where>
-            <if test="userId!=null">and ao.user_id=#{userId}</if>
-            <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
-            <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
-            <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
-            <if test="activeFlag!=null">and o.active_flag=#{activeFlag}</if>
-            <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="bidFlag!=null">and bid_flag=#{bidFlag}</if>
+            <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
+            <if test="lastOrderId!=null">and id &lt; #{lastOrderId}</if>
         </where>
-        ORDER BY ao.id desc
+        ORDER BY id desc
         <if test="limit!=null">
             LIMIT 0,${limit}
         </if>
