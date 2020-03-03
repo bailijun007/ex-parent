@@ -31,7 +31,7 @@ public class BBMatchedHandler {
 	
 	public void handlePending() {
 		Long now = DbDateUtils.now();
-		Long startTime = now-1000*3600;
+		Long startTime = 0L; //now-1000*3600;
 		Page page = new Page(1, 100, 1000L);
 		Long startId = null;
 		while(true){
@@ -108,10 +108,14 @@ public class BBMatchedHandler {
 
 		@Override
 		public void run() {
-			//成交
-			tradeService.handleTrade(tradeVo);
-			//修改态
-			matchedTradeService.setMakerHandleStatus(tradeVo.getTradeId());
+			try{
+				//成交
+				tradeService.handleTrade(tradeVo);
+				//修改态
+				matchedTradeService.setMakerHandleStatus(tradeVo.getTradeId());
+			}catch(Exception e){
+				logger.error(e.getMessage(), e);
+			}
 		}
 
 	}

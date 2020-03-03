@@ -96,15 +96,15 @@
 			where id=#{id} and user_id=#{userId}
 	</select>
 
-	<select id="exist" resultType="boolean">
+	<select id="exist" resultType="long">
 		select 
 			count(1)
 		from 
 			bb_order_trade
-		<include refid="simple_where" />
+		where 
+			user_id=#{userId} and trade_sn=#{tradeSn}
 		limit 1
 	</select>
-
 
 	<insert id="save">
 		insert into bb_order_trade (
