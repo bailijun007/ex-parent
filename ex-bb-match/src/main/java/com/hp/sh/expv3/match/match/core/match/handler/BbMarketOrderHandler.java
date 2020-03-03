@@ -4,11 +4,11 @@
  */
 package com.hp.sh.expv3.match.match.core.match.handler;
 
-import com.hp.sh.expv3.enums.IdTypeEnum;
 import com.hp.sh.expv3.match.bo.BbOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.BbTradeBo;
 import com.hp.sh.expv3.match.component.id.def.IdService;
 import com.hp.sh.expv3.match.constant.CommonConst;
+import com.hp.sh.expv3.match.enums.IdTypeEnum;
 import com.hp.sh.expv3.match.match.core.match.thread.BbMatchHandlerContext;
 import com.hp.sh.expv3.match.util.BbUtil;
 import org.slf4j.Logger;

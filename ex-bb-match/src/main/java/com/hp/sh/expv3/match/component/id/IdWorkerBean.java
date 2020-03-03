@@ -4,8 +4,8 @@
  */
 package com.hp.sh.expv3.match.component.id;
 
-import com.hp.sh.expv3.enums.IdTypeEnum;
 import com.hp.sh.expv3.match.config.setting.BbmatchIdSetting;
+import com.hp.sh.expv3.match.enums.IdTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
