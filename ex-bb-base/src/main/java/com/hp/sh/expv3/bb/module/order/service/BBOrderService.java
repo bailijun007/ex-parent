@@ -103,10 +103,10 @@ public class BBOrderService {
 		//押金
 		BBSymbol bs = new BBSymbol(symbol, bidFlag);
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
-			String remark = "买,押金="+order.getOrderMargin()+bs.getMarginCurrency()+"，手续费="+order.getFee().stripTrailingZeros()+asset;
+			String remark = "买,押金="+moneyString(order.getOrderMargin())+bs.getMarginCurrency()+"，手续费="+moneyString(order.getFee())+asset;
 			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getGrossMargin(), remark);
 		}else{
-			String remark = "卖,押金="+order.getVolume()+bs.getMarginCurrency()+"，手续费无";
+			String remark = "卖,押金="+moneyString(order.getVolume()) + bs.getMarginCurrency()+"，手续费无";
 			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getVolume(), remark);
 		}
 		
@@ -206,7 +206,7 @@ public class BBOrderService {
 		if(order.getStatus() == OrderStatus.CANCELED){
 			return false;
 		}
-		if(order.getStatus() == OrderStatus.FAILED){
+		if(order.getStatus() == OrderStatus.FILLED){
 			return false;
 		}
 		if(BigUtils.eq(order.getVolume(), order.getFilledVolume())){

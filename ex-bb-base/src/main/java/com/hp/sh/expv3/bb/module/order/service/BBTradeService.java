@@ -96,17 +96,10 @@ public class BBTradeService {
 		
 		//退还剩余押金和手续费
 		if(orderTrade.isOrderCompleted()){
-			if(order.getBidFlag()==OrderFlag.BID_BUY){
-				if(BigUtils.gtZero(orderTrade.getRemainFee()) || BigUtils.gtZero(orderTrade.getRemainOrderMargin())){
-					this.returnRemaining(order.getUserId(), order.getAsset(), order.getId(), orderTrade.getRemainFee(), orderTrade.getRemainOrderMargin());
-				}
+			if(BigUtils.gtZero(orderTrade.getRemainFee()) || BigUtils.gtZero(orderTrade.getRemainOrderMargin())){
+				this.returnRemaining(order.getUserId(), order.getAsset(), order.getId(), orderTrade.getRemainFee(), orderTrade.getRemainOrderMargin());
 			}
 		}
-		
-		//同步手续费
-		
-		//补充手续费
-		
 		
 	}
 
@@ -191,7 +184,11 @@ public class BBTradeService {
 		
 		orderTrade.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getTradeVolume()));
 		orderTrade.setRemainOrderMargin(BigCalc.subtract(order.getOrderMargin(), tradeResult.getTradeOrderMargin()));
-		orderTrade.setRemainFee(BigCalc.subtract(order.getFee(), tradeResult.getReceivableFeeRatio()));
+		if(IntBool.isTrue(order.getBidFlag())){
+			orderTrade.setRemainFee(BigCalc.subtract(order.getFee(), tradeResult.getReceivableFeeRatio()));
+		}else{
+			orderTrade.setRemainFee(BigDecimal.ZERO);
+		}
 		
 		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
 		orderTrade.setFeeSynchStatus(IntBool.NO);

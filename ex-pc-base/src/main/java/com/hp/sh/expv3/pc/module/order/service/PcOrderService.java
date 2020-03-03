@@ -375,6 +375,10 @@ public class PcOrderService {
 			logger.warn("订单已经是取消状态了");
 			return;
 		}
+		if(order.getStatus() == OrderStatus.FILLED){
+			logger.warn("订单已经是完成状态了");
+			return;
+		}
 		
 		if(!this.canCancel(order, orderId)){
 			logger.info("订单无法取消：{}", order);

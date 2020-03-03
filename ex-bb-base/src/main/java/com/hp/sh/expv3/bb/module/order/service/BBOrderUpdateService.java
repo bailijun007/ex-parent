@@ -44,23 +44,19 @@ public class BBOrderUpdateService {
 	}
 	
 	public BBOrderLog updateOrder(BBOrder order, long now) {
-		this.bBOrderDAO.update(order);
+		this.updateActiveOrder(order);
 		
 		//日志
 		BBOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), BBOrderLogType.SET_STATUS_CANCEL, now);
-		
 		this.publishOrderEvent(order, orderLog);
-		
-		this.updateActiveOrder(order);
 		
 		return orderLog;
 	}
 
 	public void updateOrder4Trad(BBOrder order){
-		this.bBOrderDAO.update(order);
-		this.saveSysOrderLog(order.getUserId(), order.getId(), BBOrderLogType.TRADE, order.getModified());
-		
 		this.updateActiveOrder(order);
+		
+		BBOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), BBOrderLogType.TRADE, order.getModified());
 	}
 
 	public BBOrderLog setNewStatus(long orderId, long userId, int newStatus, int pendingNew, long modified) {
@@ -131,6 +127,7 @@ public class BBOrderUpdateService {
 	}
 
 	private void updateActiveOrder(BBOrder order) {
+		this.bBOrderDAO.update(order);
 		if(order.getActiveFlag()==BBOrder.NO){
 			this.bBActiveOrderDAO.delete(order.getId(), order.getUserId());
 		}
