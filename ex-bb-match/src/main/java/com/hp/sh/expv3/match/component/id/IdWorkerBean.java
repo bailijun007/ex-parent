@@ -18,19 +18,14 @@ public class IdWorkerBean {
     @Autowired
     IdBitSetting idSetting;
 
-    @Bean(name = "commonIdWorker")
-    public SnowflakeIdWorker buildCommonIdWorker() {
-        return IdUtil.newIdWorker(idSetting.getDataCenterBits(), idSetting.getServerBits(), idSetting.getIdTypeBits(), idSetting.getSequenceBits(), bbmatchIdSetting.getDataCenterId(), bbmatchIdSetting.getServerId(), IdTypeEnum.COMMON.value);
-    }
-
-    @Bean(name = "tradeIdWorker")
+    @Bean(name = "bbTradeIdWorker")
     public SnowflakeIdWorker buildTradeIdWorker() {
-        return IdUtil.newIdWorker(idSetting.getDataCenterBits(), idSetting.getServerBits(), idSetting.getIdTypeBits(), idSetting.getSequenceBits(), bbmatchIdSetting.getDataCenterId(), bbmatchIdSetting.getServerId(), IdTypeEnum.TRADE.value);
+        return IdUtil.newIdWorker(idSetting.getDataCenterBits(), idSetting.getServerBits(), idSetting.getIdTypeBits(), idSetting.getSequenceBits(), bbmatchIdSetting.getDataCenterId(), bbmatchIdSetting.getServerId(), IdTypeEnum.BB_TRADE.value);
     }
 
-    @Bean(name = "matchIdWorker")
+    @Bean(name = "bbMatchIdWorker")
     public SnowflakeIdWorker buildMatchIdWorker() {
-        return IdUtil.newIdWorker(idSetting.getDataCenterBits(), idSetting.getServerBits(), idSetting.getIdTypeBits(), idSetting.getSequenceBits(), bbmatchIdSetting.getDataCenterId(), bbmatchIdSetting.getServerId(), IdTypeEnum.MATCH.value);
+        return IdUtil.newIdWorker(idSetting.getDataCenterBits(), idSetting.getServerBits(), idSetting.getIdTypeBits(), idSetting.getSequenceBits(), bbmatchIdSetting.getDataCenterId(), bbmatchIdSetting.getServerId(), IdTypeEnum.BB_MATCH.value);
     }
 
 }

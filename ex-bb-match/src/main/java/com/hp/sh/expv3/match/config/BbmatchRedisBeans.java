@@ -4,8 +4,8 @@
  */
 package com.hp.sh.expv3.match.config;
 
-import com.hp.sh.expv3.match.config.setting.MetadataRedisSetting;
 import com.hp.sh.expv3.match.config.setting.BbmatchRedisSetting;
+import com.hp.sh.expv3.match.config.setting.MetadataRedisSetting;
 import com.hp.sh.expv3.match.constant.BbmatchConst;
 import com.hp.sh.expv3.match.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;

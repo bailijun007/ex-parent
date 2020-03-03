@@ -22,7 +22,7 @@ public class BbmatchRedisKeySetting {
     private String bbOrderMatchedQueueEndOffsetRedisKeyPattern;
     private String bbOrderMatchedQueueSizeRedisKeyPattern;
 
-    private String bbPattern;
+    private String bbSymbolPattern;
 
     public String getBbBookChannelRedisKeyPattern() {
         return bbBookChannelRedisKeyPattern;
@@ -88,11 +88,11 @@ public class BbmatchRedisKeySetting {
         this.bbOrderMatchedQueueSizeRedisKeyPattern = bbOrderMatchedQueueSizeRedisKeyPattern;
     }
 
-    public String getBbPattern() {
-        return bbPattern;
+    public String getBbSymbolPattern() {
+        return bbSymbolPattern;
     }
 
-    public void setBbPattern(String bbPattern) {
-        this.bbPattern = bbPattern;
+    public void setBbSymbolPattern(String bbSymbolPattern) {
+        this.bbSymbolPattern = bbSymbolPattern;
     }
 }

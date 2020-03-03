@@ -4,10 +4,10 @@
  */
 package com.hp.sh.expv3.match.match.core.matched.task;
 
+import com.hp.sh.expv3.match.component.notify.BbNotify;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.enums.EventEnum;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
-import com.hp.sh.expv3.match.component.notify.BbNotify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ public class BbMatchedBookResetTask extends BbMatchedBaseTask {
         msg.setAsset(this.getAsset());
         msg.setLastPrice(lastPrice);
         msg.setResetFlag(CommonConst.YES);
-        msg.setMsgType(EventEnum.BOOK.getCode());
+        msg.setMsgType(EventEnum.BB_BOOK.getCode());
         msg.setOrders(this.bookUpdateList);
 
         bbNotify.safeNotify(this.getAsset(), this.getSymbol(), msg);

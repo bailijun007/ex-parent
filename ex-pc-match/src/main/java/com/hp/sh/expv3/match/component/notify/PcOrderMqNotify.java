@@ -11,7 +11,6 @@ import com.hp.sh.expv3.match.mqmsg.PcMatchOrderRebaseMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.PcMatchOrderSnapshotMqMsgDto;
 import com.hp.sh.expv3.match.util.JsonUtil;
 import com.hp.sh.expv3.match.util.PcRocketMqUtil;
-import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.apache.rocketmq.remoting.common.RemotingHelper;
@@ -109,13 +108,25 @@ public class PcOrderMqNotify {
     }
 
     private boolean safeSend2OrderTopic(Message message) {
+        boolean first = true;
         while (true) {
             try {
-                SendResult sr = orderProducer.send(message,
+                orderProducer.send(message,
                         (List<MessageQueue> mqs, Message msg, Object arg) -> mqs.get(0),
                         0);
+                first = false;
                 break;
             } catch (Exception e) {
+                if (first) {
+                    logger.error(e.getMessage(), e);
+                } else {
+                    logger.error(e.getMessage());
+                }
+            }
+            try {
+                Thread.sleep(200L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
         return true;

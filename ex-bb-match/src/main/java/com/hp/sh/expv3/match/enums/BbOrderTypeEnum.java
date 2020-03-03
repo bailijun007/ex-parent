@@ -1,7 +1,7 @@
 package com.hp.sh.expv3.match.enums;
 
 /**
- * 永续合约类型
+ * 现货类型
  */
 public enum BbOrderTypeEnum implements EnumDescribe {
     /**

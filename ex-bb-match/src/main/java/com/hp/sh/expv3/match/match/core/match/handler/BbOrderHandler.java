@@ -12,6 +12,7 @@ import com.hp.sh.expv3.match.enums.BbOrderTypeEnum;
 import com.hp.sh.expv3.match.match.core.match.thread.BbMatchHandlerContext;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
 import com.hp.sh.expv3.match.util.BbUtil;
+import com.hp.sh.expv3.match.util.BidUtil;
 import com.hp.sh.expv3.match.util.DecimalUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,13 +80,13 @@ public abstract class BbOrderHandler implements ApplicationContextAware {
                     , matchHandlerContext.limitAskQueue.size(),
                     matchHandlerContext.limitBidQueue.size(),
                     matchHandlerContext.allOpenOrders.size()
-                    , order.getOrderId(), BbUtil.getBidDesc(order.getBidFlag()), order.getAccountId(), DecimalUtil.toTrimLiteral(order.getNumber()), DecimalUtil.toTrimLiteral(order.getPrice()), DecimalUtil.toTrimLiteral(order.getFilledNumber()));
+                    , order.getOrderId(), BidUtil.getBidDesc(order.getBidFlag()), order.getAccountId(), DecimalUtil.toTrimLiteral(order.getNumber()), DecimalUtil.toTrimLiteral(order.getPrice()), DecimalUtil.toTrimLiteral(order.getFilledNumber()));
 
             Set<Long> askOrderId = new HashSet<>();
             logger.error("=======limit ask queue:====================");
             if (null != matchHandlerContext.limitAskQueue && !matchHandlerContext.limitAskQueue.isEmpty()) {
                 for (BbOrder4MatchBo orderBo : matchHandlerContext.limitAskQueue) {
-                    logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BbUtil.getBidDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
+                    logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BidUtil.getBidDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
                     if (!matchHandlerContext.allOpenOrders.containsKey(orderBo.getOrderId())) {
                         logger.error("ask oid:{} not in map", orderBo.getOrderId());
                     }
@@ -97,7 +98,7 @@ public abstract class BbOrderHandler implements ApplicationContextAware {
             logger.error("=======limit bid queue:====================");
 
             for (BbOrder4MatchBo orderBo : matchHandlerContext.limitBidQueue) {
-                logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BbUtil.getBidDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
+                logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BidUtil.getBidDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
                 if (!matchHandlerContext.allOpenOrders.containsKey(orderBo.getOrderId())) {
                     logger.error("bid oid:{} not in map", orderBo.getOrderId());
                 }
@@ -106,7 +107,7 @@ public abstract class BbOrderHandler implements ApplicationContextAware {
 
             logger.error("=======all orders in map:====================");
             for (BbOrder4MatchBo orderBo : matchHandlerContext.allOpenOrders.values()) {
-                logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BbUtil.getBidDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
+                logger.error("oid:{} {},u:{},{}@{}", orderBo.getOrderId(), BidUtil.getBidDesc(orderBo.getBidFlag()), orderBo.getAccountId(), DecimalUtil.toTrimLiteral(orderBo.getNumber()), DecimalUtil.toTrimLiteral(orderBo.getPrice()));
                 if (orderBo.getBidFlag() == CommonConst.BID && !bidOrderId.contains(orderBo.getOrderId())) {
                     logger.error("bid oid:{} not in queue. check!!!", orderBo.getOrderId());
                 }
@@ -225,10 +226,6 @@ public abstract class BbOrderHandler implements ApplicationContextAware {
         trade.setNumber(amt);
 
         trade.setTradeTime(ctime);
-
-        long now = System.currentTimeMillis();
-        trade.setCreated(now);
-        trade.setModified(now);
 
         trade.setTkAccountId(takerOrder.getAccountId());
         trade.setTkOrderId(takerOrder.getOrderId());

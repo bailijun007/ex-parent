@@ -9,9 +9,8 @@ import com.hp.sh.expv3.match.config.setting.BbmatchRocketMqSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
 import com.hp.sh.expv3.match.mqmsg.BbMatchOrderRebaseMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.BbMatchOrderSnapshotMqMsgDto;
-import com.hp.sh.expv3.match.util.BbRocketMqUtil;
 import com.hp.sh.expv3.match.util.JsonUtil;
-import org.apache.rocketmq.client.producer.SendResult;
+import com.hp.sh.expv3.match.util.BbRocketMqUtil;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.apache.rocketmq.remoting.common.RemotingHelper;
@@ -43,8 +42,8 @@ public class BbOrderMqNotify {
 
         Message message = buildMessage(
                 topic,// topic
-                "" + RmqTagEnum.MATCH_ORDER_SNAPSHOT_CREATE.getConstant(),// tag
-                "" + RmqTagEnum.MATCH_ORDER_SNAPSHOT_CREATE.getConstant(),// tag
+                "" + RmqTagEnum.BB_MATCH_ORDER_SNAPSHOT_CREATE.getConstant(),// tag
+                "" + RmqTagEnum.BB_MATCH_ORDER_SNAPSHOT_CREATE.getConstant(),// tag
                 msg// body
         );
         safeSend2OrderTopic(message);
@@ -64,8 +63,8 @@ public class BbOrderMqNotify {
 
         Message message = buildMessage(
                 topic,// topic
-                "" + RmqTagEnum.MATCH_CONSUMER_START.getConstant(),// tag
-                "" + RmqTagEnum.MATCH_CONSUMER_START.getConstant(),// keys
+                "" + RmqTagEnum.BB_MATCH_CONSUMER_START.getConstant(),// tag
+                "" + RmqTagEnum.BB_MATCH_CONSUMER_START.getConstant(),// keys
                 msg// body
         );
         safeSend2OrderTopic(message);
@@ -84,8 +83,8 @@ public class BbOrderMqNotify {
 
         Message message = buildMessage(
                 topic,// topic
-                "" + RmqTagEnum.ORDER_REBASE.getConstant(),// tag
-                "" + RmqTagEnum.ORDER_REBASE.getConstant(),// keys
+                "" + RmqTagEnum.BB_ORDER_REBASE.getConstant(),// tag
+                "" + RmqTagEnum.BB_ORDER_REBASE.getConstant(),// keys
                 msg// body
         );
         safeSend2OrderTopic(message);
@@ -109,13 +108,25 @@ public class BbOrderMqNotify {
     }
 
     private boolean safeSend2OrderTopic(Message message) {
+        boolean first = true;
         while (true) {
             try {
-                SendResult sr = orderProducer.send(message,
+                orderProducer.send(message,
                         (List<MessageQueue> mqs, Message msg, Object arg) -> mqs.get(0),
                         0);
+                first = false;
                 break;
             } catch (Exception e) {
+                if (first) {
+                    logger.error(e.getMessage(), e);
+                } else {
+                    logger.error(e.getMessage());
+                }
+            }
+            try {
+                Thread.sleep(200L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
         return true;

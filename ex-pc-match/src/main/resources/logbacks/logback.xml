@@ -144,6 +144,23 @@
         </encoder>
     </appender>
 
+    <appender name="pcSnapshot" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_dir}/pcSnapshot.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 按天回滚 daily -->
+            <fileNamePattern>${log_dir}/pcSnapshot/pcSnapshot-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <!-- 日志最大的历史 60天 -->
+            <maxHistory>${maxHistory}</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- 设置文件大于1KB进行压缩归档 -->
+                <maxFileSize>256MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder >
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{10} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <logger name="com.zaxxer.hikari" value="INFO" additivity="false"/>
     <logger name="org.springframework" value="INFO" additivity="false"/>
     <logger name="org.hibernate" value="INFO" additivity="false"/>
@@ -151,6 +168,9 @@
     <logger name="org.apache.skywalking" value="INFO" additivity="false"/>
 
     <logger name="com.hp.sh.expv3.match.component.notify.PcNotify" level="DEBUG" additivity="false">
+        <appender-ref ref="pcNotify"/>
+    </logger>
+    <logger name="com.hp.sh.expv3.match.match.core.matched.task.PcMatchedBookSnapshotTask" level="DEBUG" additivity="false">
         <appender-ref ref="pcNotify"/>
     </logger>
 

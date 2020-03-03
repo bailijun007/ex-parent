@@ -6,19 +6,17 @@ package com.hp.sh.expv3.match.match.core.match.task;
 
 import com.hp.sh.expv3.match.bo.BbOrder4MatchBo;
 import com.hp.sh.expv3.match.component.id.def.IdService;
-import com.hp.sh.expv3.match.enums.IdTypeEnum;
 import com.hp.sh.expv3.match.enums.BbOrderTypeEnum;
+import com.hp.sh.expv3.match.enums.IdTypeEnum;
 import com.hp.sh.expv3.match.match.core.match.handler.BbLimitOrderHandler;
 import com.hp.sh.expv3.match.match.core.match.handler.BbMarketOrderHandler;
 import com.hp.sh.expv3.match.match.core.match.handler.BbOrderHandler;
 import com.hp.sh.expv3.match.match.core.match.thread.BbMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.matched.task.def.BbMatchedTaskService;
-import com.hp.sh.expv3.match.thread.def.IThreadManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
@@ -53,10 +51,6 @@ public class BbOrderNewTask extends BbOrderBaseTask implements ApplicationContex
         this.order = order;
     }
 
-    @Autowired
-    @Qualifier("threadManagerBbMatchImpl")
-    private IThreadManager threadManagerMatchImpl;
-
     @Override
     public void onSucess() {
     }
@@ -75,7 +69,7 @@ public class BbOrderNewTask extends BbOrderBaseTask implements ApplicationContex
         long now = System.currentTimeMillis();
         BbMatchHandlerContext context = BbMatchHandlerContext.getLocalContext();
 
-        context.getMatchResult().setMatchTxId(idService.getId(IdTypeEnum.MATCH));
+        context.getMatchResult().setMatchTxId(idService.getId(IdTypeEnum.BB_MATCH));
 
         while (true) {
             BbOrderHandler handler = null;
@@ -92,7 +86,7 @@ public class BbOrderNewTask extends BbOrderBaseTask implements ApplicationContex
             break;
         }
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
-            bbMatchedTaskService.addMatchedOrderMatchedTask(context, this.getCurrentMsgOffset(), order);
+            bbMatchedTaskService.addMatchedOrderMatchedTask(context, this.getCurrentMsgOffset(), this.getCurrentMsgId(), order);
         }
         context.clear();
     }

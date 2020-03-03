@@ -13,14 +13,14 @@ public interface BbMatchTaskService {
 
     BbOrderInitTask buildBbOrderInitTask(String assetSymbol, String asset, String symbol, IThreadWorker matchedThreadWorker);
 
-    BbOrderNewTask buildBbOrderNewTask(String assetSymbol, String asset, String symbol, long currentOffset, BbOrder4MatchBo order);
+    BbOrderNewTask buildBbOrderNewTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId, BbOrder4MatchBo order);
 
-    BbOrderBookResetTask buildBbOrderBookReset(String assetSymbol, String asset, String symbol, long currentOffset);
+    BbOrderBookResetTask buildBbOrderBookReset(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId);
 
-    BbOrderCancelTask buildBbOrderCancelTask(String assetSymbol, String asset, String symbol, long currentOffset, long accountId, long orderId);
+    BbOrderCancelTask buildBbOrderCancelTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId, long accountId, long orderId);
 
-    BbOrderSnapshotCreateTask buildOrderSnapshotTask(String assetSymbol, String asset, String symbol, long currentOffset);
+    BbOrderSnapshotCreateTask buildOrderSnapshotTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId);
 
-    BbOrderRebaseTask buildOrderRebaseTask(String assetSymbol, String asset, String symbol, long currentOffset);
+    BbOrderRebaseTask buildOrderRebaseTask(String assetSymbol, String asset, String symbol, long currentOffset, String currentMsgId);
 
 }

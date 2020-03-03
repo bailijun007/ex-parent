@@ -12,6 +12,7 @@ public class BbOrder4MatchBo {
     private String asset;
     private String symbol;
     private Long accountId;
+
     private Integer bidFlag;
     private Integer timeInForce;
     private BigDecimal number;

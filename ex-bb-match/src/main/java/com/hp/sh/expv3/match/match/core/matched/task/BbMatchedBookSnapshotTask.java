@@ -74,14 +74,16 @@ public class BbMatchedBookSnapshotTask extends BbMatchedBaseTask {
         snapshot.setLastPrice(lastPrice);
         snapshot.setLimitAskOrders(limitAskOrders);
         snapshot.setLimitBidOrders(limitBidOrders);
-        long rmqNextOffset = this.getCurrentMsgOffset() + 1;
-        snapshot.setRmqNextOffset(rmqNextOffset);
+        snapshot.setRmqCurrentOffset(this.getCurrentMsgOffset());
+        snapshot.setRmqCurrentMsgId(this.getCurrentMsgId());
 
         String snapshotRedisKey = RedisKeyUtil.buildBbOrderSnapshotRedisKey(bbmatchRedisKeySetting.getBbOrderSnapshotRedisKeyPattern(), this.getAsset(), this.getSymbol());
 
-        bbRedisUtil.hset(snapshotRedisKey, "" + rmqNextOffset, JsonUtil.toJsonString(snapshot));
+        String field = "" + this.getCurrentMsgOffset();
+        String value = JsonUtil.toJsonString(snapshot);
+        bbRedisUtil.hset(snapshotRedisKey, field, value);
 
-        logger.info("save snapshot at {}", System.currentTimeMillis());
+        logger.info("save snapshot at {},{},{},{}", System.currentTimeMillis(), snapshotRedisKey, field, value);
 
         updateSentMqOffset();
     }

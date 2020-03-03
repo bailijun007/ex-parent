@@ -8,8 +8,8 @@ import com.hp.sh.expv3.match.thread.def.IThreadWorker;
 
 public interface ThreadWorkerService {
 
-    IThreadWorker getMatchThreadWorker(String assetSymbol);
+    IThreadWorker getBbMatchThreadWorker(String assetSymbol);
 
-    IThreadWorker getMatchedThreadWorker(String assetSymbol);
+    IThreadWorker getBbMatchedThreadWorker(String assetSymbol);
 
 }

@@ -33,7 +33,7 @@ public enum BbOrderTimeInForceEnum implements EnumDescribe {
     private int code;
     private String constant;
 
-    BbOrderTimeInForceEnum(int code, String constant) {
+    private BbOrderTimeInForceEnum(int code, String constant) {
         this.code = code;
         this.constant = constant;
     }

@@ -2,16 +2,11 @@
  * @author zw
  * @date 2019/8/23
  */
-package com.hp.sh.expv3.match.bo;
+package com.hp.sh.expv3.match.mqmsg;
 
-
-import java.io.Serializable;
 import java.math.BigDecimal;
 
-/**
- * 现货_成交(撮合结果)
- */
-public class BbTradeBo implements Serializable {
+public class BbTradeMqMsgDto {
 
     //id
     private Long id;
