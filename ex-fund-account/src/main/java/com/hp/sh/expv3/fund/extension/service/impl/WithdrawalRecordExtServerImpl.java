@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
+import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +47,15 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
             Optional<WithdrawalRecordVo> vo = Optional.ofNullable(historyVo);
             historyVo.setCtime(vo.map(d -> d.getCreated()).orElse(null));
             historyVo.setWithdrawTime(vo.map(d -> d.getCreated()).orElse(null));
+            //1.审核中,2.审核通过,3.失败
+            if (historyVo.getApprovalStatus()==4){
+                historyVo.setStatus(ApprovalStatus.IN_AUDIT);
+            }else if(historyVo.getApprovalStatus()==6){
+                historyVo.setStatus(ApprovalStatus.REJECTED);
+            }else if(historyVo.getApprovalStatus()==5&&historyVo.getStatus()==1){
+                    historyVo.setStatus(ApprovalStatus.APPROVED);
+            }
+
         }
 
         return list;
