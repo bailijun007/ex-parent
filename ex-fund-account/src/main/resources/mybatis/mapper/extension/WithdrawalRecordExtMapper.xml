@@ -50,7 +50,7 @@
     </select>
 
     <select id="queryHistory" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id,asset symbol,  amount, pay_status  status,created,account,user_id userId,asset,approval_status approvalStatus
+        select id,asset symbol,  amount, approval_status  status,created,account,user_id userId,asset,pay_status payStatus
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
