@@ -12,9 +12,6 @@ public class BbTradeVo implements Serializable {
     @ApiModelProperty("自增主键")
     private Long id;
 
-    //用户ID
-    @ApiModelProperty("用户ID")
-    protected Long userId;
     //资产
     @ApiModelProperty("资产")
     private String asset;
@@ -22,6 +19,7 @@ public class BbTradeVo implements Serializable {
     //合约交易品种
     @ApiModelProperty("合约交易品种")
     private String symbol;
+
 
     @ApiModelProperty("事务Id")
     private Long matchTxId;
@@ -57,7 +55,7 @@ public class BbTradeVo implements Serializable {
 
     private Integer takerHandleStatus;
 
-    private Long version;
+
 
     @ApiModelProperty("taker是否买：1-是，0-否")
     private Long tkBidFlag;
@@ -76,7 +74,6 @@ public class BbTradeVo implements Serializable {
     public String toString() {
         return "BbTradeVo{" +
                 "id=" + id +
-                ", userId=" + userId +
                 ", asset='" + asset + '\'' +
                 ", symbol='" + symbol + '\'' +
                 ", matchTxId=" + matchTxId +
@@ -91,7 +88,6 @@ public class BbTradeVo implements Serializable {
                 ", tradeTime=" + tradeTime +
                 ", makerHandleStatus=" + makerHandleStatus +
                 ", takerHandleStatus=" + takerHandleStatus +
-                ", version=" + version +
                 ", tkBidFlag=" + tkBidFlag +
                 ", modified=" + modified +
                 ", created=" + created +
@@ -106,13 +102,6 @@ public class BbTradeVo implements Serializable {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public String getAsset() {
         return asset;
@@ -226,13 +215,6 @@ public class BbTradeVo implements Serializable {
         this.takerHandleStatus = takerHandleStatus;
     }
 
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
 
     public Long getTkBidFlag() {
         return tkBidFlag;

@@ -59,4 +59,15 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
         }
         return bbTradeExtService.queryLastTradeByLtTime(asset,symbol,startTime);
     }
+
+    @Override
+    public List<BbTradeVo> queryLastTrade(String asset, String symbol, Integer count) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == count) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+        if (count > 100) {
+            throw new ExException(BbExtCommonErrorCode.MORE_THAN_MAX_ROW);
+        }
+        return bbTradeExtService.queryLastTrade(asset,symbol,count);
+    }
 }

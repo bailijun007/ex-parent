@@ -5,7 +5,6 @@
 <mapper namespace="com.hp.sh.expv3.bb.extension.dao.BbTradeExtMapper">
 
     <resultMap type="com.hp.sh.expv3.bb.extension.vo.BbTradeVo" id="BbTradeVo">
-        <result column="user_id" property="userId"/>
         <result column="id" property="id"/>
         <result column="asset" property="asset"/>
         <result column="symbol" property="symbol"/>
@@ -29,7 +28,7 @@
 
     <sql id="Base_Column_List">
 		id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,
-		mk_order_id,mk_close_flag,price,`number`,trade_time,maker_handle_status,taker_handle_status,version,created,modified
+		mk_order_id,mk_close_flag,price,`number`,trade_time,maker_handle_status,taker_handle_status,created,modified
 
     </sql>
 
@@ -101,6 +100,19 @@
             and trade_time &lt;#{tradeTimeEnd}
         </if>
         order by trade_time asc
+    </select>
+
+    <select id="queryLastTrade" resultMap="BbTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_trade
+        <include refid="simple_where"/>
+        <if test="orderBy!=null and orderBy!=''">
+            order by ${orderBy} desc
+        </if>
+        <if test="limit!=null and limit!=''">
+            LIMIT 0,${limit}
+        </if>
     </select>
 
     <select id="queryTradeList" resultMap="BbTradeVo">

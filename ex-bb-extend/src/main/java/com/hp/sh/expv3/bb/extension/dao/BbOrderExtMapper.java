@@ -29,4 +29,6 @@ public interface BbOrderExtMapper {
     List<BbOrderVo> queryBbActiveOrdersByIsNextPage(Map<String, Object> map);
 
     List<BbOrderVo> queryOrderList(Map<String, Object> map);
+
+    Long queryCount(Map<String, Object> map);
 }
