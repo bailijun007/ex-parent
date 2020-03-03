@@ -208,7 +208,7 @@ public class BBTradeService {
 	//检查订单状态
 	private boolean canTrade(BBOrder order, BBTradeVo tradeMsg) {
 		if(order==null){
-			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
+			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
 		}
 		
 		BigDecimal remainVol = order.getVolume().subtract(order.getFilledVolume());

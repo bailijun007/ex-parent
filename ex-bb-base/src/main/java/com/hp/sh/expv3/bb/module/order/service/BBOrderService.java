@@ -103,11 +103,11 @@ public class BBOrderService {
 		//押金
 		BBSymbol bs = new BBSymbol(symbol, bidFlag);
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
-			String remark = "买"+bs.getPayCurrency()+",押金="+order.getOrderMargin()+"，手续费="+order.getFee().stripTrailingZeros();
-			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getGrossMargin(), remark);
+			String remark = "买,押金="+order.getOrderMargin()+bs.getMarginCurrency()+"，手续费="+order.getFee().stripTrailingZeros()+asset;
+			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getGrossMargin(), remark);
 		}else{
-			String remark = "卖"+bs.getPayCurrency()+",押金="+order.getVolume()+"，手续费无";
-			this.cutMargin(userId, bs.getPayCurrency(), order.getId(), order.getVolume(), remark);
+			String remark = "卖,押金="+order.getVolume()+bs.getMarginCurrency()+"，手续费无";
+			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getVolume(), remark);
 		}
 		
 		return order;
@@ -152,13 +152,17 @@ public class BBOrderService {
 		BBAddRequest request = new BBAddRequest();
 		request.setAmount(orderMargin.add(fee));
 		request.setAsset(asset);
-		request.setRemark("撤单还余额:押金="+orderMargin+",手续费="+fee);
+		request.setRemark("撤单还余额:押金="+moneyString(orderMargin)+",手续费="+moneyString(fee));
 		request.setTradeNo(SnUtils.getCancelOrderReturnSn(""+orderId));
 		SnUtils.getSynchReturnSn(""+orderId);
 		request.setTradeType(BBAccountTradeType.ORDER_CANCEL);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
 		return this.bBAccountCoreService.add(request);
+	}
+	
+	private String moneyString(BigDecimal n){
+		return n.stripTrailingZeros().toPlainString();
 	}
 
 	//设置开仓订单的各种费率
@@ -167,17 +171,17 @@ public class BBOrderService {
 		order.setFeeRatio(feeRatio);
 		
 		OrderRatioData ratioData = orderStrategy.calcOrderAmt(order);
-		//押金
+		//押金 & 手续费
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
 			order.setOrderMargin(ratioData.getOrderMargin());
+			order.setFee(ratioData.getFee());
 		}else{
 			order.setOrderMargin(order.getVolume());
+			order.setFee(BigDecimal.ZERO);
 		}
-		//手续费
-		order.setFee(ratioData.getFee());
 
 		BBSymbol bs = new BBSymbol(order.getSymbol(), order.getBidFlag());
-		order.setOrderMarginCurrency(bs.getPayCurrency());
+		order.setOrderMarginCurrency(bs.getMarginCurrency());
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
@@ -246,7 +250,7 @@ public class BBOrderService {
 		
 		//退押金
 		BBSymbol bs = new BBSymbol(symbol, order.getBidFlag());
-		int result = this.returnCancelAmt(userId, bs.getPayCurrency(), orderId, order.getOrderMargin(), order.getFee());
+		int result = this.returnCancelAmt(userId, bs.getMarginCurrency(), orderId, order.getOrderMargin(), order.getFee());
 		if(result==InvokeResult.NOCHANGE){
 			//利用合约账户的幂等性实现本方法的幂等性
 			logger.warn("已经执行过了");

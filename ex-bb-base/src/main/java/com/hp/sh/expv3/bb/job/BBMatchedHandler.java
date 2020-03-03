@@ -16,6 +16,7 @@ import com.hp.sh.expv3.bb.strategy.vo.BBTradePair;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.component.executor.OrderlyExecutors;
 import com.hp.sh.expv3.utils.DbDateUtils;
+import com.hp.sh.expv3.utils.IntBool;
 
 @Component
 public class BBMatchedHandler {
@@ -29,7 +30,7 @@ public class BBMatchedHandler {
 
 	private OrderlyExecutors orderlyExecutors = new OrderlyExecutors(10);
 	
-	private Long startTime = DbDateUtils.now()-1000*3600*24*3;
+	private Long startTime = 0L;
 	
 	public void handlePending() {
 		Page page = new Page(1, 50, 1000L);
@@ -55,16 +56,20 @@ public class BBMatchedHandler {
 		this.startTime = DbDateUtils.now()-1000*3600;
 	}
 
-	public void handleMatchedTrade(BBMatchedTrade matchedVo){
-		BBTradePair tradePair = this.getTradePair(matchedVo);
+	public void handleMatchedTrade(BBMatchedTrade matchedTrade){
+		BBTradePair tradePair = this.getTradePair(matchedTrade);
 		
 		// MAKER
-		BBTradeVo makerTradeVo = tradePair.getMakerTradeVo();
-		this.orderlyExecutors.submit(makerTradeVo.getAccountId(), new TradeTask(makerTradeVo));
+		if(matchedTrade.getMakerHandleStatus()==BBMatchedTrade.NO){
+			BBTradeVo makerTradeVo = tradePair.getMakerTradeVo();
+			this.orderlyExecutors.submit(makerTradeVo.getAccountId(), new TradeTask(makerTradeVo));
+		}
 		
 		// TAKER
-		BBTradeVo takerTradeVo = tradePair.getTakerTradeVo();
-		this.orderlyExecutors.submit(takerTradeVo.getAccountId(), new TradeTask(takerTradeVo));
+		if(matchedTrade.getTakerHandleStatus()==BBMatchedTrade.NO){
+			BBTradeVo takerTradeVo = tradePair.getTakerTradeVo();
+			this.orderlyExecutors.submit(takerTradeVo.getAccountId(), new TradeTask(takerTradeVo));
+		}
 		
 	}
 	
@@ -80,8 +85,8 @@ public class BBMatchedHandler {
 		makerTradeVo.setTradeTime(matchedTrade.getTradeTime());
 		
 		makerTradeVo.setAccountId(matchedTrade.getMkAccountId());
-		makerTradeVo.setMatchTxId(matchedTrade.getMatchTxId());
 		makerTradeVo.setOrderId(matchedTrade.getMkOrderId());
+		makerTradeVo.setMatchTxId(matchedTrade.getMatchTxId());
 		
 		makerTradeVo.setOpponentOrderId(matchedTrade.getTkOrderId());
 
@@ -96,12 +101,12 @@ public class BBMatchedHandler {
 		takerTradeVo.setTradeTime(matchedTrade.getTradeTime());
 		
 		takerTradeVo.setAccountId(matchedTrade.getTkAccountId());
+		takerTradeVo.setOrderId(matchedTrade.getTkOrderId());
 		takerTradeVo.setMatchTxId(matchedTrade.getMatchTxId());
-		makerTradeVo.setOrderId(matchedTrade.getTkOrderId());
 		
 		takerTradeVo.setOpponentOrderId(matchedTrade.getMkOrderId());
 
-		return new BBTradePair(makerTradeVo, makerTradeVo);
+		return new BBTradePair(makerTradeVo, takerTradeVo);
 	}
 
 	class TradeTask implements Runnable{
@@ -117,8 +122,13 @@ public class BBMatchedHandler {
 			try{
 				//成交
 				tradeService.handleTrade(tradeVo);
+				
 				//修改态
-				matchedTradeService.setMakerHandleStatus(tradeVo.getTradeId());
+				if(tradeVo.getMakerFlag()==IntBool.YES){
+					matchedTradeService.setMakerHandleStatus(tradeVo.getTradeId());
+				}else{
+					matchedTradeService.setTakerHandleStatus(tradeVo.getTradeId());
+				}
 			}catch(Exception e){
 				logger.error(e.getMessage(), e);
 			}

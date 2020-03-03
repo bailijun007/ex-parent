@@ -72,7 +72,7 @@ public class BBSymbol {
 		}
 	}
 
-	public String getPayCurrency() {
+	public String getMarginCurrency() {
 		if(this.bidFlag==OrderFlag.BID_BUY){
 			return this.settleCurrency;
 		}else{

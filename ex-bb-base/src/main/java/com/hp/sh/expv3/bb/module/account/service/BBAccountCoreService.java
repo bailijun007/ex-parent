@@ -164,7 +164,7 @@ public class BBAccountCoreService{
 		//检查余额
 		if(FundFlowDirection.EXPENSES==record.getType()){
 			if(newBalance.compareTo(BigDecimal.ZERO) < 0){
-				throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH);
+				throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, record.getUserId(), record, newBalance);
 			}
 		}
 	}

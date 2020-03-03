@@ -152,5 +152,12 @@ public class BBAccountRecord extends BaseRecordEntity	 {
 				+ tradeNo + ", tradeType=" + tradeType + ", remark=" + remark + ", userId=" + this.getUserId()
 				+ "]";
 	}
+
+	@Override
+	public String toString() {
+		return "BBAccountRecord [asset=" + asset + ", sn=" + sn + ", type=" + type + ", amount=" + amount + ", remark="
+				+ remark + ", balance=" + balance + ", tradeNo=" + tradeNo + ", tradeType=" + tradeType + ", serialNo="
+				+ serialNo + ", associatedId=" + associatedId + ", txId=" + txId + "]";
+	}
 	
 }
