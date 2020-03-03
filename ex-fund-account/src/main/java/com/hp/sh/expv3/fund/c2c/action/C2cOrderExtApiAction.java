@@ -86,7 +86,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
     }
 
     /**
-     * 创建c2c体现订单
+     * 创建c2c提现订单
      *
      * @param userId       用户id
      * @param bank         开户银行

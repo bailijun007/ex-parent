@@ -53,7 +53,7 @@ public interface C2cOrderExtApi {
                          @RequestParam("receiveUrl") String receiveUrl, @RequestParam("pickupUrl") String pickupUrl);
 
 
-    @ApiOperation(value = "创建c2c体现订单")
+    @ApiOperation(value = "创建c2c提现订单")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "0", required = true),
             @ApiImplicitParam(name = "bank", value = "开户银行", example = "农业银行", required = true),
