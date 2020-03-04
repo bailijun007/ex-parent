@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hp.sh.expv3.base.entity.BaseBizEntity;
 
 /**
@@ -47,8 +48,10 @@ public class BBMatchedTrade extends BaseBizEntity{
     
     ///////////////////////
 
+    @JsonIgnore
     private Integer makerHandleStatus;
     
+    @JsonIgnore
     private Integer takerHandleStatus;
     
 	public BBMatchedTrade() {
