@@ -3,12 +3,15 @@ package com.hp.sh.expv3.bb.extension.api;
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
+import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
+import com.hp.sh.expv3.bb.extension.vo.BbUserOrderTrade;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.dev.CrossDB;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -42,5 +45,18 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
         return bbOrderTradeExtService.selectAllTradeListByUser(asset,symbol,userId);
+    }
+
+    @Override
+    public List<BbUserOrderTrade> selectTradeListByUserId(String asset, String symbol, Long userId, Long startTime, Long endTime) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null ) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+
+        if (startTime == null && endTime == null) {
+            endTime = Instant.now().toEpochMilli();
+        }
+        List<BbUserOrderTrade> tradeVo = bbOrderTradeExtService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId);
+        return tradeVo;
     }
 }

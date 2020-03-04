@@ -114,6 +114,24 @@
         limit 0,999
     </select>
 
+    <select id="selectTradeListByUserId" resultType="com.hp.sh.expv3.bb.extension.vo.BbUserOrderTrade">
+            select
+            id ,asset,symbol,user_id  tkAccountId,price,volume number,trade_time tradeTime,created,modified
+            from bb_order_trade b
+            <where>
+                b.asset=#{asset}
+                and b.symbol=#{symbol}
+                and b.user_id=#{userId}
+                <if test="tradeTimeBegin!=null">
+                    and b.trade_time &gt;#{tradeTimeBegin}
+                </if>
+                <if test="tradeTimeEnd!=null">
+                    and b.trade_time &lt;=#{tradeTimeEnd}
+                </if>
+            </where>
+            ORDER BY b.id ASC
+
+    </select>
 
     <select id="queryOrderTrade" resultMap="BBOrderTrade">
         select
