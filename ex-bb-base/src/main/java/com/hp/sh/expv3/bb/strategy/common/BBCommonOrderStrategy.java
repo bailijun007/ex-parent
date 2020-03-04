@@ -113,29 +113,22 @@ public class BBCommonOrderStrategy implements OrderStrategy {
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(tradeVo.getNumber())));
 
 		//手续费率
-		tradeResult.setTradeFeeRatio(order.getFeeRatio());
-		//手续费
-		BigDecimal fee = tradeResult.getTradeAmount().multiply(tradeResult.getTradeFeeRatio());
-		tradeResult.setTradeFee(fee);
-
-		//maker fee
-		if(tradeVo.getMakerFlag()==TradeRoles.MAKER){
-			BigDecimal makerFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
-			tradeResult.setMakerFeeRatio(makerFeeRatio);
-			BigDecimal makerFee = tradeResult.getTradeAmount().multiply(makerFeeRatio);
-			tradeResult.setMakerFee(makerFee);
+		BigDecimal tradeFeeRatio = order.getFeeRatio();
+		if(TradeRoles.isMaker(tradeVo.getMakerFlag())){
+			tradeFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
 		}
+		tradeResult.setTradeFeeRatio(tradeFeeRatio);
+		//手续费
+		tradeResult.setTradeFee(tradeResult.getTradeAmount().multiply(tradeFeeRatio));
 
 		//剩余数量
 		tradeResult.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getTradeVolume()));
-		tradeResult.setRemainFee(order.getFee().subtract(tradeResult.getReceivableFee()));
+		
 		//押金
 		if(bidFlag==OrderFlag.BID_BUY){
 			tradeResult.setTradeOrderMargin(tradeResult.getTradeAmount());
-			tradeResult.setRemainOrderMargin(order.getOrderMargin().subtract(tradeResult.getTradeAmount()));
 		}else{
 			tradeResult.setTradeOrderMargin(tradeResult.getTradeVolume());
-			tradeResult.setRemainOrderMargin(tradeResult.getRemainVolume());
 		}
 
 		return tradeResult;

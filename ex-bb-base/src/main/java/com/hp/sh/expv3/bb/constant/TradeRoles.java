@@ -10,5 +10,9 @@ public class TradeRoles {
 	public static final int MAKER = 1;
 	
 	public static final int TAKER = 0;
+
+	public static boolean isMaker(int flag){
+		return flag==MAKER;
+	}
 	
 }

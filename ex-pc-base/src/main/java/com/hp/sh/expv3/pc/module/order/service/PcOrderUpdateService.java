@@ -4,7 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.constant.PcOrderLogType;
@@ -18,7 +19,7 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrderLog;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
-@Service
+@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 public class PcOrderUpdateService {
 	private static final Logger logger = LoggerFactory.getLogger(PcOrderUpdateService.class);
 
@@ -36,31 +37,31 @@ public class PcOrderUpdateService {
 	
 	public void saveOrder(PcOrder pcOrder) {
 		this.pcOrderDAO.save(pcOrder);
+		this.saveActiveOrder(pcOrder);
+		
 		//日志
 		Long now = DbDateUtils.now();
 		this.saveUserOrderLog(pcOrder.getUserId(), pcOrder.getId(), PcOrderLogType.CREATE, now);
-		
-		this.saveActiveOrder(pcOrder);
 	}
 	
 	public PcOrderLog updateOrder(PcOrder order, long now) {
 		this.pcOrderDAO.update(order);
 		
+		this.updateActiveOrder(order);
+		
 		//日志
 		PcOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.SET_STATUS_CANCEL, now);
-		
 		this.publishOrderEvent(order, orderLog);
-		
-		this.updateActiveOrder(order);
 		
 		return orderLog;
 	}
 
 	public void updateOrder4Trad(PcOrder order){
 		this.pcOrderDAO.update(order);
-		this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.TRADE, order.getModified());
 		
 		this.updateActiveOrder(order);
+		
+		this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.TRADE, order.getModified());
 	}
 
 	public PcOrderLog setNewStatus(long orderId, long userId, int newStatus, int pendingNew, long modified) {

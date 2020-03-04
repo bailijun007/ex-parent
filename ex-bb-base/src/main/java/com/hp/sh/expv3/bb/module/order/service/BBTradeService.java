@@ -32,6 +32,7 @@ import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.SnUtils;
 import com.hp.sh.expv3.utils.math.BigCalc;
+import com.hp.sh.expv3.utils.math.BigFormat;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 @Service
@@ -82,12 +83,12 @@ public class BBTradeService {
 		BBSymbol bs = new BBSymbol(orderTrade.getSymbol(), orderTrade.getBidFlag());
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
 			BigDecimal income = orderTrade.getVolume();
-			String remark = String.format("购买成交：%s", income);
+			String remark = BigFormat.format("购买成交获得：%s", income);
 			this.addBalance(orderTrade.getUserId(), orderTrade.getId(), bs.getIncomeCurrency(), income, remark);
 		}else{
 			BigDecimal amount = orderTrade.getVolume().multiply(orderTrade.getPrice());
 			BigDecimal income = amount.subtract(orderTrade.getFee());
-			String remark = String.format("销售成交：%s", amount);
+			String remark = BigFormat.format("销售成交收入：%s，手续费-%s", amount, orderTrade.getFee());
 			this.addBalance(orderTrade.getUserId(), orderTrade.getId(), bs.getIncomeCurrency(), income, remark);
 		}
 		
@@ -109,7 +110,7 @@ public class BBTradeService {
 		request.setAmount(returnAmount);
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("剩余押金：%s，剩余手续费：%s", remainOrderMargin, remainFee));
+		request.setRemark(BigFormat.format("剩余押金：%s，剩余手续费：%s", remainOrderMargin, remainFee));
 		request.setTradeNo(SnUtils.getRemainSn(orderId));
 		request.setTradeType(BBAccountTradeType.INCOME);
 		request.setAssociatedId(orderId);
@@ -167,8 +168,8 @@ public class BBTradeService {
 		orderTrade.setMakerFlag(tradeMsg.getMakerFlag());
 		orderTrade.setBidFlag(order.getBidFlag());
 
-		orderTrade.setFee(tradeResult.getReceivableFee());
-		orderTrade.setFeeRatio(tradeResult.getReceivableFeeRatio());
+		orderTrade.setFee(tradeResult.getTradeFee());
+		orderTrade.setFeeRatio(tradeResult.getTradeFeeRatio());
 		
 		orderTrade.setUserId(order.getUserId());
 		orderTrade.setCreated(now);
@@ -184,8 +185,9 @@ public class BBTradeService {
 		
 		orderTrade.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getTradeVolume()));
 		orderTrade.setRemainOrderMargin(BigCalc.subtract(order.getOrderMargin(), tradeResult.getTradeOrderMargin()));
+		
 		if(IntBool.isTrue(order.getBidFlag())){
-			orderTrade.setRemainFee(BigCalc.subtract(order.getFee(), tradeResult.getReceivableFeeRatio()));
+			orderTrade.setRemainFee(BigCalc.subtract(order.getFee(), tradeResult.getTradeFee()));
 		}else{
 			orderTrade.setRemainFee(BigDecimal.ZERO);
 		}

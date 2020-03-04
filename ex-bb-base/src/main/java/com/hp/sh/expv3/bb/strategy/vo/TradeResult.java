@@ -21,11 +21,6 @@ public class TradeResult {
 	private BigDecimal tradeFee;
 	//此次成交扣除的保证金
 	private BigDecimal tradeOrderMargin;
-	//此次成交的maker手续费率
-	private BigDecimal makerFeeRatio;
-	//此次成交的taker手续费
-	private BigDecimal makerFee;
-	
 	
 	/* 以下为订单累计结果 */
 	
@@ -33,37 +28,9 @@ public class TradeResult {
 	private boolean isOrderCompleted;
 	//此次成交的成交量
 	private BigDecimal remainVolume;
-	//订单剩余保证金
-	private BigDecimal remainOrderMargin;
-	//订单剩余手续费
-	private BigDecimal remainFee;
 	
 	public TradeResult() {
 		super();
-	}
-
-	//maker 手续费差额
-	public BigDecimal getMakerFeeDiff(){
-		if(makerFee==null){
-			return BigDecimal.ZERO;
-		}
-		return tradeFee.subtract(makerFee);
-	}
-	
-	//应收手续费（考虑到maker收费优惠）
-	public BigDecimal getReceivableFee(){
-		if(makerFee!=null){
-			return makerFee;
-		}
-		return tradeFee;
-	}
-	
-	//应收手续费率（考虑到maker收费优惠）
-	public BigDecimal getReceivableFeeRatio(){
-		if(makerFeeRatio!=null){
-			return makerFeeRatio;
-		}
-		return tradeFeeRatio;
 	}
 
 	public BigDecimal getTradePrice() {
@@ -114,22 +81,6 @@ public class TradeResult {
 		this.isOrderCompleted = completed;
 	}
 
-	public BigDecimal getMakerFee() {
-		return makerFee;
-	}
-
-	public void setMakerFee(BigDecimal makerFee) {
-		this.makerFee = makerFee;
-	}
-
-	public BigDecimal getMakerFeeRatio() {
-		return makerFeeRatio;
-	}
-
-	public void setMakerFeeRatio(BigDecimal makerFeeRatio) {
-		this.makerFeeRatio = makerFeeRatio;
-	}
-
 	public BigDecimal getTradeAmount() {
 		return tradeAmount;
 	}
@@ -137,23 +88,7 @@ public class TradeResult {
 	public void setTradeAmount(BigDecimal amount) {
 		this.tradeAmount = amount;
 	}
-
-	public BigDecimal getRemainOrderMargin() {
-		return remainOrderMargin;
-	}
-
-	public void setRemainOrderMargin(BigDecimal remainOrderMargin) {
-		this.remainOrderMargin = remainOrderMargin;
-	}
-
-	public BigDecimal getRemainFee() {
-		return remainFee;
-	}
-
-	public void setRemainFee(BigDecimal remainFee) {
-		this.remainFee = remainFee;
-	}
-
+	
 	public BigDecimal getRemainVolume() {
 		return remainVolume;
 	}

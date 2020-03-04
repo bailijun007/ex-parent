@@ -27,6 +27,7 @@ import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.SnUtils;
+import com.hp.sh.expv3.utils.math.BigFormat;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
@@ -103,10 +104,10 @@ public class BBOrderService {
 		//押金
 		BBSymbol bs = new BBSymbol(symbol, bidFlag);
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
-			String remark = "买,押金="+moneyString(order.getOrderMargin())+bs.getMarginCurrency()+"，手续费="+moneyString(order.getFee())+asset;
+			String remark = BigFormat.format("买,押金=%s%s，手续费=%s%s", order.getOrderMargin(), bs.getMarginCurrency(), order.getFee(), asset);
 			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getGrossMargin(), remark);
 		}else{
-			String remark = "卖,押金="+moneyString(order.getVolume()) + bs.getMarginCurrency()+"，手续费无";
+			String remark = BigFormat.format("卖,押金=%s%s，手续费=%s%s", order.getVolume(), bs.getMarginCurrency(), "无", "");
 			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getVolume(), remark);
 		}
 		
@@ -152,17 +153,13 @@ public class BBOrderService {
 		BBAddRequest request = new BBAddRequest();
 		request.setAmount(orderMargin.add(fee));
 		request.setAsset(asset);
-		request.setRemark("撤单还余额:押金="+moneyString(orderMargin)+",手续费="+moneyString(fee));
+		request.setRemark("撤单还余额:押金="+BigFormat.plain(orderMargin)+",手续费="+BigFormat.plain(fee));
 		request.setTradeNo(SnUtils.getCancelOrderReturnSn(""+orderId));
 		SnUtils.getSynchReturnSn(""+orderId);
 		request.setTradeType(BBAccountTradeType.ORDER_CANCEL);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
 		return this.bBAccountCoreService.add(request);
-	}
-	
-	private String moneyString(BigDecimal n){
-		return n.stripTrailingZeros().toPlainString();
 	}
 
 	//设置开仓订单的各种费率

@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.constant.BBOrderLogType;
@@ -19,6 +21,7 @@ import com.hp.sh.expv3.bb.mq.extend.msg.BBOrderEvent;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Service
+@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 public class BBOrderUpdateService {
 	private static final Logger logger = LoggerFactory.getLogger(BBOrderUpdateService.class);
 
@@ -36,11 +39,12 @@ public class BBOrderUpdateService {
 	
 	public void saveOrder(BBOrder bBOrder) {
 		this.bBOrderDAO.save(bBOrder);
+		
+		this.saveActiveOrder(bBOrder);
+		
 		//日志
 		Long now = DbDateUtils.now();
 		this.saveUserOrderLog(bBOrder.getUserId(), bBOrder.getId(), BBOrderLogType.CREATE, now);
-		
-		this.saveActiveOrder(bBOrder);
 	}
 	
 	public BBOrderLog updateOrder(BBOrder order, long now) {
