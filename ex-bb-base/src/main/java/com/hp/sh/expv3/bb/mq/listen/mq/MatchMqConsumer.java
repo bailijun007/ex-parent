@@ -18,6 +18,7 @@ import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBMatchNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
+import com.hp.sh.expv3.bb.mq.send.BBSender;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
@@ -30,6 +31,8 @@ public class MatchMqConsumer {
 	private BBOrderService orderService;
 	@Autowired
 	private BBMatchedTradeService matchedTradeService;
+	@Autowired
+	private BBSender sender;
 	
 	private BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>(100);
 	private ExecutorService pool = new ThreadPoolExecutor(1, 20, 300L, TimeUnit.SECONDS, queue);
@@ -69,6 +72,10 @@ public class MatchMqConsumer {
 		matchedTrade.setMakerHandleStatus(IntBool.NO);
 		this.matchedTradeService.save(matchedTrade);
 		
+		//通知前端
+		sender.send(matchedTrade);
+		
+		//处理用户成交
 		matchedHandler.handleMatchedTrade(matchedTrade);
 		
 	}

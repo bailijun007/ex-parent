@@ -149,13 +149,13 @@ public class BBOrderService {
 		this.bBAccountCoreService.cut(request);
 	}
 	
-	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal orderMargin, BigDecimal fee){
+	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal orderMargin, BigDecimal fee, BigDecimal cancelVolume){
 		BBAddRequest request = new BBAddRequest();
 		request.setAmount(orderMargin.add(fee));
 		request.setAsset(asset);
-		request.setRemark("撤单还余额:押金="+BigFormat.plain(orderMargin)+",手续费="+BigFormat.plain(fee));
+		String remark = BigFormat.format("撤单:押金=%s,手续费=%s,撤销数量=%s", orderMargin, fee, cancelVolume);
+		request.setRemark(remark);
 		request.setTradeNo(SnUtils.getCancelOrderReturnSn(""+orderId));
-		SnUtils.getSynchReturnSn(""+orderId);
 		request.setTradeType(BBAccountTradeType.ORDER_CANCEL);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
@@ -182,17 +182,18 @@ public class BBOrderService {
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void setPendingCancel(long userId, String asset, String symbol, long orderId){
+	public boolean setPendingCancel(long userId, String asset, String symbol, long orderId){
 		
 		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
 		if(!this.canCancel(order, orderId)){
 			logger.info("订单无法取消：{}", order);
-			return;
+			return false;
 		}
 		
 		Long now = DbDateUtils.now();
 		orderUpdateService.setUserCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
+		return true;
 	}
 	
 	private boolean canCancel(BBOrder order, Long orderId){
@@ -247,7 +248,7 @@ public class BBOrderService {
 		
 		//退押金
 		BBSymbol bs = new BBSymbol(symbol, order.getBidFlag());
-		int result = this.returnCancelAmt(userId, bs.getMarginCurrency(), orderId, order.getOrderMargin(), order.getFee());
+		int result = this.returnCancelAmt(userId, bs.getMarginCurrency(), orderId, order.getOrderMargin(), order.getFee(), remaining);
 		if(result==InvokeResult.NOCHANGE){
 			//利用合约账户的幂等性实现本方法的幂等性
 			logger.warn("已经执行过了");

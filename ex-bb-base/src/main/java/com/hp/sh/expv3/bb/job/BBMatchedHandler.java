@@ -28,7 +28,7 @@ public class BBMatchedHandler {
 	@Autowired
 	private BBTradeService tradeService;
 
-	private OrderlyExecutors orderlyExecutors = new OrderlyExecutors(10);
+	private OrderlyExecutors orderlyExecutors = new OrderlyExecutors(20, 500);
 	
 	private Long startTime = 0L;
 	

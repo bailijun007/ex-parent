@@ -277,7 +277,6 @@ public class PcOrderService {
 		request.setAsset(asset);
 		request.setRemark("撤单还余额");
 		request.setTradeNo(SnUtils.getCancelOrderReturnSn(""+orderId));
-		SnUtils.getSynchReturnSn(""+orderId);
 		request.setTradeType(PcAccountTradeType.ORDER_CANCEL);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
@@ -311,13 +310,13 @@ public class PcOrderService {
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void setUserCancel(long userId, String asset, String symbol, long orderId){
+	public boolean setUserCancel(long userId, String asset, String symbol, long orderId){
 		
 		PcOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
 		if(!this.canCancel(order, orderId)){
 			logger.info("订单无法取消：{}", order);
-			return;
+			return false;
 		}
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
@@ -326,7 +325,9 @@ public class PcOrderService {
 		}
 		
 		Long now = DbDateUtils.now();
-		orderUpdateService.setUserCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
+		this.orderUpdateService.setUserCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
+		
+		return true;
 	}
 	
 	private boolean canCancel(PcOrder order, Long orderId){

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.bean.BeanHelper;
@@ -27,7 +28,7 @@ import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
 
 @Service
-@Transactional(readOnly=true)
+@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 public class BBOrderQueryService {
 
 	@Autowired

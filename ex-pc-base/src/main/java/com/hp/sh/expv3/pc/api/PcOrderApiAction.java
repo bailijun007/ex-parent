@@ -80,8 +80,11 @@ public class PcOrderApiAction implements PcOrderApi {
 	@Override
 	public void cancel(Long userId, String asset, String symbol, Long orderId) {
 
-		this.pcOrderService.setUserCancel(userId, asset, symbol, orderId);
+		boolean ok = this.pcOrderService.setUserCancel(userId, asset, symbol, orderId);
 
+		if(!ok){
+			return;
+		}
 		//发送消息
 		OrderPendingCancelMsg mqMsg = new OrderPendingCancelMsg(userId, asset, symbol, orderId);
 		mqMsg.setAccountId(userId);

@@ -7,9 +7,9 @@ public class OrderlyExecutors {
 	
 	private List<OrderlyExecutor> list = new ArrayList<OrderlyExecutor>();
 	
-	public OrderlyExecutors(int count) {
+	public OrderlyExecutors(int count, int queueSize) {
 		for(int i=0;i<count; i++){
-			list.add(new OrderlyExecutor());
+			list.add(new OrderlyExecutor(queueSize));
 		}
 	}
 

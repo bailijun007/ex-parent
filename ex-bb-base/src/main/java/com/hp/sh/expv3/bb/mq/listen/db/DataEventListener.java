@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.gitee.hupadev.commons.cache.RedisPublisher;
 import com.hp.sh.expv3.bb.constant.EventType;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.mq.msg.vo.BBOrderEvent;
+import com.hp.sh.expv3.bb.mq.send.BBSender;
 import com.hp.sh.expv3.bb.msg.EventMsg;
 import com.hp.sh.expv3.bb.msg.OrderEventMsg;
 
@@ -27,7 +27,7 @@ public class DataEventListener {
 	private static final Logger logger = LoggerFactory.getLogger(DataEventListener.class);
 	
 	@Autowired
-	private RedisPublisher publisher;
+	private BBSender sender;
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void afterCommit(BBAccountRecord bBAccountRecord) {
@@ -53,21 +53,7 @@ public class DataEventListener {
 	}
 	
 	private void sendEventMsg(EventMsg eventMsg) {
-		String channel = this.getChannel(eventMsg);
-		logger.debug("publish:{}", channel, eventMsg);
-		publisher.publish(channel, eventMsg);
-	}
-	
-	private String getChannel(EventMsg eventMsg){
-		String channel = null;
-		if(eventMsg.getType()==EventType.BB_ACCOUNT){
-			channel = "bb:account:"+eventMsg.getAsset();
-		}
-		if(eventMsg.getType()==EventType.ORDER){
-			channel = "bb:order:"+eventMsg.getAsset()+":"+eventMsg.getSymbol();
-		}
-		channel.toString();
-		return channel;
+		sender.sendEventMsg(eventMsg);
 	}
 
 }

@@ -4,6 +4,7 @@ package com.hp.sh.expv3.bb.module.order.entity;
 import java.math.BigDecimal;
 
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.bb.strategy.data.OrderData;
@@ -300,6 +301,7 @@ public class BBOrder extends UserDataEntity implements OrderData{
 		this.filledVolume = filledVolume;
 	}
 
+	@Version
 	public Long getVersion() {
 		return version;
 	}

@@ -60,8 +60,11 @@ public class BBOrderApiAction implements BBOrderApi {
 	@Override
 	public void cancel(Long userId, String asset, String symbol, Long orderId) {
 
-		this.bBOrderService.setPendingCancel(userId, asset, symbol, orderId);
+		boolean ok = this.bBOrderService.setPendingCancel(userId, asset, symbol, orderId);
 
+		if(!ok){
+			return;
+		}
 		//发送消息
 		OrderPendingCancelMsg mqMsg = new OrderPendingCancelMsg(userId, asset, symbol, orderId);
 		mqMsg.setAccountId(userId);
