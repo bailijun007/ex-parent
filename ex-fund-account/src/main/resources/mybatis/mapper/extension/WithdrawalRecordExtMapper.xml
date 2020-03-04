@@ -80,7 +80,7 @@
     </select>
 
     <select id="queryHistoryByTime" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-      select id,asset symbol,  amount, pay_status  status,created,account,user_id userId,asset
+      select id,asset symbol,  amount, pay_status  status,created,account,user_id userId,asset ,account targetAddress
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -99,7 +99,7 @@
     </select>
 
     <select id="queryLastHistory" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id,asset,   amount, pay_status  status,created,account,user_id userId
+        select id,asset,   amount, pay_status  status,created,account,user_id userId,account targetAddress
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -129,7 +129,7 @@
 
 
     <select id="queryList" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id, user_id,asset ,  amount, pay_status  status,created,account ,created ctime
+        select id, user_id,asset ,  amount, pay_status  status,created,account ,created ctime ,account targetAddress
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
