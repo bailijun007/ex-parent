@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.mq;
+package com.hp.sh.expv3.bb.mq.starter;
 
 import java.util.List;
 
@@ -27,8 +27,8 @@ import com.hp.sh.rocketmq.exceptions.ReSendException;
 import com.hp.sh.rocketmq.impl.EndpointContext;
 
 @Configuration
-public class OrderlyConsumer {
-	private static final Logger logger = LoggerFactory.getLogger(OrderlyConsumer.class);
+public class MqOrderlyConsumer {
+	private static final Logger logger = LoggerFactory.getLogger(MqOrderlyConsumer.class);
 	
 	@Autowired
 	private RocketmqServerSetting setting;

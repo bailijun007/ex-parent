@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.mq;
+package com.hp.sh.expv3.bb.mq.send;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.hp.sh.expv3.bb.constant.MqTopic;
-import com.hp.sh.expv3.bb.mq.utils.OrderMessageQueueSelector;
+import com.hp.sh.expv3.bb.mq.starter.MqOrderMessageQueueSelector;
 import com.hp.sh.expv3.bb.msg.BaseSymbolMsg;
 import com.hp.sh.rocketmq.codec.MsgCodec;
 
@@ -64,7 +64,7 @@ public class BaseMqSender {
 		int n = 0;
 		while(true){
 			try {
-		        SendResult sendResult = producer.send(mqMsg, new OrderMessageQueueSelector(), 0);
+		        SendResult sendResult = producer.send(mqMsg, new MqOrderMessageQueueSelector(), 0);
 		        logger.info("sendMsg:topic={}, tags={}, keys={},times={},r={}", mqMsg.getTopic(), mqMsg.getTags(), mqMsg.getKeys(),(n++) ,sendResult.toString());
 		        break;
 			} catch (Exception e) {

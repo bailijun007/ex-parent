@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.mq.extend;
+package com.hp.sh.expv3.bb.mq.listen.db;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import com.hp.sh.expv3.bb.constant.EventType;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
-import com.hp.sh.expv3.bb.mq.extend.msg.BBOrderEvent;
+import com.hp.sh.expv3.bb.mq.msg.vo.BBOrderEvent;
 import com.hp.sh.expv3.bb.msg.EventMsg;
 import com.hp.sh.expv3.bb.msg.OrderEventMsg;
 

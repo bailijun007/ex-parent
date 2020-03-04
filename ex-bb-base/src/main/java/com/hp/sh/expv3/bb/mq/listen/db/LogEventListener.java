@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.mq.extend;
+package com.hp.sh.expv3.bb.mq.listen.db;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

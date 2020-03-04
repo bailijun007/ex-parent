@@ -11,10 +11,10 @@ import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
-import com.hp.sh.expv3.bb.mq.MatchMqSender;
-import com.hp.sh.expv3.bb.mq.match.msg.BookResetMsg;
-import com.hp.sh.expv3.bb.mq.match.msg.OrderPendingCancelMsg;
-import com.hp.sh.expv3.bb.mq.match.msg.OrderPendingNewMsg;
+import com.hp.sh.expv3.bb.mq.msg.out.BookResetMsg;
+import com.hp.sh.expv3.bb.mq.msg.out.OrderPendingCancelMsg;
+import com.hp.sh.expv3.bb.mq.msg.out.OrderPendingNewMsg;
+import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
 
 import io.swagger.annotations.ApiOperation;

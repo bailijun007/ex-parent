@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.mq.extend.msg;
+package com.hp.sh.expv3.bb.mq.msg.vo;
 
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;

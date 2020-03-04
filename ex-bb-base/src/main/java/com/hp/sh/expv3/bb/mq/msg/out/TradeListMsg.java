@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.mq;
+package com.hp.sh.expv3.bb.mq.msg.out;
 
 import java.math.BigDecimal;
 import java.util.List;

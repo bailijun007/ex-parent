@@ -17,7 +17,7 @@ import com.hp.sh.expv3.bb.module.order.dao.BBOrderLogDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBActiveOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;
-import com.hp.sh.expv3.bb.mq.extend.msg.BBOrderEvent;
+import com.hp.sh.expv3.bb.mq.msg.vo.BBOrderEvent;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Service

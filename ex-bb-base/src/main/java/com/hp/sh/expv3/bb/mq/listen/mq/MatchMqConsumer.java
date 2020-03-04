@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.mq.match;
+package com.hp.sh.expv3.bb.mq.listen.mq;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -16,8 +16,8 @@ import com.hp.sh.expv3.bb.job.BBMatchedHandler;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
-import com.hp.sh.expv3.bb.mq.match.msg.BBMatchNotMatchMsg;
-import com.hp.sh.expv3.bb.mq.match.msg.BbOrderCancelMqMsg;
+import com.hp.sh.expv3.bb.mq.msg.in.BBMatchNotMatchMsg;
+import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.rocketmq.annotation.MQListener;
 

@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.mq;
+package com.hp.sh.expv3.bb.mq.send;
 
 import java.util.List;
 
@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.constant.MqTopic;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
-import com.hp.sh.expv3.bb.mq.match.msg.BookResetMsg;
-import com.hp.sh.expv3.bb.mq.match.msg.OrderPendingCancelMsg;
-import com.hp.sh.expv3.bb.mq.match.msg.OrderPendingNewMsg;
+import com.hp.sh.expv3.bb.mq.msg.out.BookResetMsg;
+import com.hp.sh.expv3.bb.mq.msg.out.OrderPendingCancelMsg;
+import com.hp.sh.expv3.bb.mq.msg.out.OrderPendingNewMsg;
 
 @Component
 public class MatchMqSender extends BaseMqSender{

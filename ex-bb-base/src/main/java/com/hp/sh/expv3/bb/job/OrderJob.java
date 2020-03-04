@@ -13,7 +13,7 @@ import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
-import com.hp.sh.expv3.bb.mq.MatchMqSender;
+import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 //@Component
