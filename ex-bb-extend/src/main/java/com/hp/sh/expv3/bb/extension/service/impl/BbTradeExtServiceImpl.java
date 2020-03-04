@@ -56,4 +56,9 @@ public class BbTradeExtServiceImpl implements BbTradeExtService {
         return list;
 
     }
+
+    @Override
+    public List<BbTradeVo> queryByTimeInterval(String asset, String symbol, long startTimeInMs, long endTimeInMs) {
+        return bbTradeExtMapper.queryByTimeInterval(asset,symbol,startTimeInMs,endTimeInMs);
+    }
 }

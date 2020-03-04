@@ -85,6 +85,18 @@
         order by trade_time asc
     </select>
 
+    <select id="queryByTimeInterval" resultMap="BbTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_trade
+        where
+        asset=#{asset}
+        and symbol=#{symbol}
+        and trade_time &gt;=#{tradeTimeBegin}
+        and trade_time &lt;#{tradeTimeEnd}
+        order by id asc
+    </select>
+
     <select id="selectTradeListByUser" resultMap="BbTradeVo">
         select
         <include refid="Base_Column_List"/>
