@@ -2,6 +2,7 @@ package com.hp.sh.expv3.bb.extension.job;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
+import com.hp.sh.expv3.bb.extension.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.extension.pojo.BBKLine;
 import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.extension.service.BbTradeExtService;
@@ -16,8 +17,10 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,7 +52,7 @@ public class BbKLineJob {
             String symbol = bbSymbol.getSymbol();
             while (true) {
                 //返回集合内元素的排名，以及分数（从小到大）
-                Set<ZSetOperations.TypedTuple<String>> task = templateDB0.opsForZSet().rangeWithScores("kline:from_exp:task:BB:" + asset + ":" + symbol, 0, -1);
+                Set<ZSetOperations.TypedTuple<String>> task = templateDB0.opsForZSet().rangeWithScores(BbKLineKey.BB_KLINE_TASK + asset + ":" + symbol, 0, -1);
                 if (CollectionUtils.isEmpty(task)) {
                     break;
                 }
@@ -63,7 +66,7 @@ public class BbKLineJob {
                     }
 
                     // 若修复数据已存在，忽略 从redis kline:from_exp:repair:BB:${asset}:${symbol}:${minute}中取
-                    Set<ZSetOperations.TypedTuple<String>> repaired = templateDB0.opsForZSet().rangeWithScores("kline:from_exp:repair:BB:" + asset + ":" + symbol + ":" + minute, 0, -1);
+                    Set<ZSetOperations.TypedTuple<String>> repaired = templateDB0.opsForZSet().rangeWithScores(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol + ":" + minute, 0, -1);
 
 //                    repaired = getRepairedData(minute);
                     if (null != repaired || !repaired.isEmpty()) {
@@ -76,11 +79,13 @@ public class BbKLineJob {
                     if (null == trades || trades.isEmpty()) {
                         continue;
                     } else {
-                        BBKLine kline = buildKline(trades);
+                        BBKLine kline = buildKline(trades, asset, symbol, minute);
 
-                        saveKline(kline); // kline:from_exp:repair:BB:${asset}:${symbol}
+                        // kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
+                        saveKline(kline,asset, symbol);
 
-                        notifyUpdate(minute); // kline:from_exp:update:BB:${asset}:${symbol}
+                        // kline:from_exp:update:BB:${asset}:${symbol}:${minute}
+                        notifyUpdate(minute,kline,asset, symbol);
                     }
 
                 }
@@ -92,9 +97,8 @@ public class BbKLineJob {
     }
 
     private List<BBSymbol> listSymbol() {
-        String key = "bb_symbol";
         HashOperations opsForHash = templateDB0.opsForHash();
-        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(key, ScanOptions.NONE);
+        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(BbKLineKey.BB_SYMBOL, ScanOptions.NONE);
 
         List<BBSymbol> list = new ArrayList<>();
         while (curosr.hasNext()) {
@@ -106,31 +110,48 @@ public class BbKLineJob {
         return list;
     }
 
-    private void saveKline(BBKLine kline) {
+    // kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
+    private void saveKline(BBKLine kline,String asset, String symbol) {
+        //向集合中插入元素，并设置分数
+        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_REPAIR+asset+":"+symbol, JSON.toJSONString(kline), Instant.now().toEpochMilli());
     }
 
-    private void notifyUpdate(long minute) {
+    // kline:from_exp:update:BB:${asset}:${symbol}:${minute}
+    private void notifyUpdate(long minute,BBKLine kline,String asset, String symbol) {
+        //向集合中插入元素，并设置分数
+        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_UPDATE+asset+":"+symbol+":"+minute, asset+"#"+symbol+"#"+minute, Instant.now().toEpochMilli());
 
     }
 
-    private BBKLine buildKline(List<BbTradeVo> trades) {
+    private BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, long minute) {
         BBKLine bBKLine = new BBKLine();
-//        bBKLine.setAsset();
-//        bBKLine.setSymbol();
-//        bBKLine.setSequence();
-//        bBKLine.setMinute();
-//        bBKLine.setVolume();
-//        bBKLine.setHigh();
-//        bBKLine.setLow();
-//        bBKLine.setOpen();
-//        bBKLine.setClose();
+        bBKLine.setAsset(asset);
+        bBKLine.setSymbol(symbol);
+        bBKLine.setSequence(1);
+        bBKLine.setMinute(minute);
 
+        BigDecimal highPrice = BigDecimal.ZERO;
+        BigDecimal lowPrice = BigDecimal.ZERO;
+        BigDecimal openPrice = null;
+        BigDecimal closePrice = BigDecimal.ZERO;
+        BigDecimal volume = BigDecimal.ZERO;
 
         for (BbTradeVo trade : trades) {
-
+             BigDecimal currentPrice = trade.getPrice();
+            highPrice = highPrice.compareTo(trade.getPrice()) >= 0 ? highPrice : currentPrice;
+            lowPrice = lowPrice.compareTo(trade.getPrice()) <= 0 ? lowPrice : currentPrice;
+            openPrice = null == openPrice ? currentPrice : openPrice;
+            closePrice = currentPrice;
+            volume = volume.add(trade.getNumber());
         }
 
-        return null;
+        bBKLine.setHigh(highPrice);
+        bBKLine.setLow(lowPrice);
+        bBKLine.setOpen(openPrice);
+        bBKLine.setClose(closePrice);
+        bBKLine.setVolume(volume);
+
+        return bBKLine;
     }
 
     /*
@@ -140,7 +161,7 @@ public class BbKLineJob {
     private List<BbTradeVo> listTrade(String asset, String symbol, long startTimeInMs, long endTimeInMs) {
         List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(asset, symbol, startTimeInMs, endTimeInMs);
         //返回 对象集合以时间升序 再以id升序
-         List<BbTradeVo> sortedList = voList.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
+        List<BbTradeVo> sortedList = voList.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
         return sortedList;
     }
 
@@ -148,13 +169,12 @@ public class BbKLineJob {
     long getMinute(ZSetOperations.TypedTuple<String> tuple) {
 //        System.out.println(tuple.getValue() + " : " + tuple.getScore());
         logger.info("k线1分钟时间为: {}", tuple.getValue());
-        return 0L;
+        return 26388150L;
     }
 
     Set<ZSetOperations.TypedTuple<String>> getRepairedData(long minute) {
         return new HashSet<>();
     }
-
 
 
 }

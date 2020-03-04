@@ -39,7 +39,7 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
         return bbTradeExtService.selectTradeListByTimeInterval(asset,symbol,startTime,endTime);
     }
 
-    @Override
+//    @Override
     public List<BbTradeVo> selectTradeListByUser(String asset, String symbol, Long userId, Long startTime, Long endTime) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);

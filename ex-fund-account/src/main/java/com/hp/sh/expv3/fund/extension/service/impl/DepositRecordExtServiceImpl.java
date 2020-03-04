@@ -41,7 +41,7 @@ public class DepositRecordExtServiceImpl implements DepositRecordExtService {
             for (DepositRecordHistoryVo historyVo : list) {
                 Optional<DepositRecordHistoryVo> vo = Optional.ofNullable(historyVo);
                 historyVo.setMtime(vo.map(d -> d.getModified()).orElse(null));
-                historyVo.setDepositTime(vo.map(d -> d.getPayTime()).orElse(null));
+                historyVo.setDepositTime(vo.map(d -> d.getCtime()).orElse(null));
             }
         }
 
