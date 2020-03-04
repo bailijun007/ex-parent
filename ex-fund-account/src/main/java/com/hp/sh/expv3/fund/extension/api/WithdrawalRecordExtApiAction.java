@@ -132,11 +132,6 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
 
     private List<WithdrawalRecordVo> getWithdrawalRecordVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         List<WithdrawalRecordVo> voList = withdrawalRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
-        for (WithdrawalRecordVo vo : voList) {
-            WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
-            Optional<WithdrawalAddrVo> voOptional = Optional.ofNullable(withdrawalAddrVo);
-            vo.setTargetAddress(voOptional.map(WithdrawalAddrVo::getAddress).orElse(null));
-        }
         return voList;
     }
 
