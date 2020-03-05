@@ -164,6 +164,7 @@ public class WithdrawalService {
 	@Deprecated
 	public void returnBalance(WithdrawalRecord rr){
 		FundAddRequest addRequest = new FundAddRequest();
+		addRequest.setAsset(rr.getAsset());
 		addRequest.setAmount(rr.getAmount());
 		addRequest.setRemark("提现失败返回账户:"+ PayChannel.getName(rr.getChannelId()));
 		addRequest.setTradeNo(SnUtils.getSynchReturnSn(rr.getSn()));

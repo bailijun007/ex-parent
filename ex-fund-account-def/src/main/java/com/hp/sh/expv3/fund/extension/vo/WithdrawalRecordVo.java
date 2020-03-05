@@ -1,10 +1,10 @@
 package com.hp.sh.expv3.fund.extension.vo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 提币历史Vo
@@ -138,11 +138,4 @@ public class WithdrawalRecordVo implements Serializable {
     public WithdrawalRecordVo() {
     }
 
-    public Integer getPayStatus() {
-        return payStatus;
-    }
-
-    public void setPayStatus(Integer payStatus) {
-        this.payStatus = payStatus;
-    }
 }

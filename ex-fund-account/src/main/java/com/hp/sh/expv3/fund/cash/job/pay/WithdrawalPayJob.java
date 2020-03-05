@@ -15,6 +15,7 @@ import com.hp.sh.chainserver.client.WithDrawResponse;
 import com.hp.sh.chainserver.exception.ErrorResponseException;
 import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
+import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
 import com.hp.sh.expv3.fund.cash.mq.WithDrawalMsg;
 import com.hp.sh.expv3.fund.cash.service.complex.WithdrawalService;
@@ -60,12 +61,17 @@ public class WithdrawalPayJob {
 	
 	private void handleOne(WithdrawalRecord record){
 		logger.warn("待处理提现:{}", record.getId());
+		if(record.getPayStatus()!=PaymentStatus.PENDING){
+			logger.warn("提现记录状态错误！{}", record.getId());
+			return;
+		}
 		//调用充值接口
 		BigDecimal amount = record.getAmount();
 		Integer symbol = asset2Symbol.getSymbol(record.getAsset());
 		
 		try{
 			WithDrawResponse response = exChainService.draw(record.getUserId(), symbol , amount, record.getSn());
+			logger.info("调用提币接口：{}", response.toString());
 			if( response.getStatus()==WithDrawResponse.STATUS_FAIL ){
 				this.withdrawalService.onDrawFail(record.getUserId(), record.getId());
 			}else{

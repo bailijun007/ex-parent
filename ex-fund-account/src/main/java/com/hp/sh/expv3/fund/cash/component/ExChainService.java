@@ -68,7 +68,6 @@ public class ExChainService{
 		request.setAccount(""+userId);
 		request.setAddress(self.getAddress(userId, symbol));
 		request.setMerchantId(merchantId);
-		request.setMerWithdrawId(null);
 		request.setSymbol(symbol);
 		request.setValue(amount.toString());
 		request.setMerWithdrawId(merWithdrawId);
