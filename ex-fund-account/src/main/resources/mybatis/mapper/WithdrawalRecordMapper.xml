@@ -20,6 +20,7 @@
 		<result column="user_id" property="userId" />
 		<result column="created" property="created" />
 		<result column="modified" property="modified" />
+		<result column="tx_hash" property="txHash" />
 	</resultMap>
 	
 	
@@ -29,7 +30,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,approval_status,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified
+		id,approval_status,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified,tx_hash
 	</sql>
 
 	<sql id="simple_where">
@@ -113,13 +114,10 @@
 
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into withdrawal_record (
-			id,approval_status,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified
+			id,approval_status,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified,tx_hash
 		)values(
-			#{id},#{approvalStatus},#{sn},#{asset},#{amount},#{channelId},#{account},#{transactionId},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{userId},#{created},#{modified}
+			#{id},#{approvalStatus},#{sn},#{asset},#{amount},#{channelId},#{account},#{transactionId},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{userId},#{created},#{modified},#{txHash}
 		)
 	</insert>
 	
@@ -127,7 +125,7 @@
 		update 
 			withdrawal_record
 		set 
-			approval_status=#{approvalStatus},sn=#{sn},asset=#{asset},amount=#{amount},channel_id=#{channelId},account=#{account},transaction_id=#{transactionId},pay_status=#{payStatus},pay_status_desc=#{payStatusDesc},pay_time=#{payTime},pay_finish_time=#{payFinishTime},synch_status=#{synchStatus},user_id=#{userId},created=#{created},modified=#{modified}
+			approval_status=#{approvalStatus},sn=#{sn},asset=#{asset},amount=#{amount},channel_id=#{channelId},account=#{account},transaction_id=#{transactionId},pay_status=#{payStatus},pay_status_desc=#{payStatusDesc},pay_time=#{payTime},pay_finish_time=#{payFinishTime},synch_status=#{synchStatus},user_id=#{userId},created=#{created},modified=#{modified},tx_hash=#{txHash}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>
