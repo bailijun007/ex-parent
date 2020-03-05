@@ -3,7 +3,15 @@
  */
 package com.hp.sh.expv3.fund.wallet.service;
 
-import com.gitee.hupadev.base.exceptions.CommonError;
+import java.math.BigDecimal;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.constant.InvokeResult;
@@ -17,16 +25,9 @@ import com.hp.sh.expv3.fund.wallet.error.WalletError;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundRequest;
+import com.hp.sh.expv3.utils.CheckUtils;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.SnUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.math.BigDecimal;
 
 /**
  * @author wangjg
@@ -48,6 +49,7 @@ public class FundAccountCoreService {
     }
 
     public int createAccount(Long userId, String asset) {
+    	CheckUtils.checkRequired(userId, asset);
         Long now = DbDateUtils.now();
         FundAccount fa = this.fundAccountDAO.get(userId, asset);
         if (fa != null) {

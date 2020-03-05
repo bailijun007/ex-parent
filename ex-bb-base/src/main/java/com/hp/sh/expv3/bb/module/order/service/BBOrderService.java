@@ -192,7 +192,7 @@ public class BBOrderService {
 		}
 		
 		Long now = DbDateUtils.now();
-		orderUpdateService.setUserCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
+		orderUpdateService.setPendingCancel(OrderStatus.PENDING_CANCEL, now, orderId, userId, order.getVersion());
 		return true;
 	}
 	

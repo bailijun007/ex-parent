@@ -143,19 +143,9 @@
 		update 
 			bb_order
 		set 
-			status=#{newStatus}, modified=#{modified}
+			status=#{newStatus}, modified=#{modified}, version=${version}+1
 		where 
-			id=#{orderId} and user_id=#{userId} and status=#{oldStatus}
-	</update>
-
-	<update id="updateCancelStatus">
-		update 
-			bb_order
-		set 
-			status=#{cancelStatus}, modified=#{modified}, cancel_time=#{modified}
-		where 
-			id=#{orderId} and user_id=#{userId}
-			and status != #{status1} and status != #{status2} and active_flag=#{activeFlag}
+			id=#{orderId} and user_id=#{userId} and version=#{version}
 	</update>
 	
 	<select id="queryActiveOrderList" resultMap="BBOrder">

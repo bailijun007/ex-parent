@@ -64,7 +64,8 @@ public class BBOrderUpdateService {
 	}
 
 	public BBOrderLog setNewStatus(long orderId, long userId, int newStatus, int pendingNew, long modified) {
-		long count = this.bBOrderDAO.updateStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, modified);
+		BBOrder bBOrder = this.bBOrderDAO.findById(userId, orderId);
+		long count = this.bBOrderDAO.updateStatus(OrderStatus.NEW, modified, orderId, userId, bBOrder.getVersion());
 		if(count==0){
 			logger.error("更新失败，orderId={}", orderId);
 			return null;
@@ -73,14 +74,13 @@ public class BBOrderUpdateService {
 		BBOrderLog orderLog = this.saveSysOrderLog(userId, orderId, BBOrderLogType.SET_STATUS_NEW, modified);
 		
 		//事件
-		BBOrder bBOrder = this.bBOrderDAO.findById(userId, orderId);
 		this.publishOrderEvent(bBOrder, orderLog);
 		
 		return orderLog;
 	}
 
-	public void setUserCancelStatus(long orderId, long userId, int cancelStatus, long modified, int status1, int status2, int activeFlag) {
-		long count = this.bBOrderDAO.updateCancelStatus(orderId, userId, cancelStatus, modified, status1, status2, activeFlag);
+	public void setPendingCancel(int cancelStatus, long modified, long orderId, long userId, Long version) {
+		long count = this.bBOrderDAO.updateStatus(cancelStatus, modified, orderId, userId, version);
 		
 		if(count==0){
 			logger.error("撤单更新失败，orderId={}", orderId);
