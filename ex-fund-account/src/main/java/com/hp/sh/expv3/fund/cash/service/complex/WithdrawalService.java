@@ -18,8 +18,6 @@ import com.hp.sh.expv3.fund.cash.constant.PayChannel;
 import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.cash.dao.WithdrawalRecordDAO;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
-import com.hp.sh.expv3.fund.cash.mq.WithDrawalSender;
-import com.hp.sh.expv3.fund.cash.mq.WithDrawalMsg;
 import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
@@ -41,33 +39,31 @@ public class WithdrawalService {
 
 	@Autowired
 	private WithdrawalRecordDAO withdrawalRecordDAO;
-	@Autowired
-	private WithDrawalSender mqSender;
 
 	public void createWithdrawal(Long userId, String asset, String account, BigDecimal amount, String transactionId, Integer channelId) {
 		
 		Long now = DbDateUtils.now();
-		WithdrawalRecord rr = new WithdrawalRecord();
-		rr.setSn(SnUtils.newDepositSn());
-		rr.setUserId(userId);
-		rr.setAsset(asset);
-		rr.setAccount(account);
-		rr.setAmount(amount);
-		rr.setChannelId(channelId);
-		rr.setCreated(now);
-		rr.setModified(now);
+		WithdrawalRecord record = new WithdrawalRecord();
+		record.setSn(SnUtils.newDepositSn());
+		record.setUserId(userId);
+		record.setAsset(asset);
+		record.setAccount(account);
+		record.setAmount(amount);
+		record.setChannelId(channelId);
+		record.setCreated(now);
+		record.setModified(now);
 		
-		rr.setTransactionId(transactionId);
-		rr.setPayStatus(Paystatus.PENDING);
-		rr.setPayStatusDesc(null);
-		rr.setPayTime(null);
-		rr.setPayFinishTime(null);
+		record.setTransactionId(transactionId);
+		record.setPayStatus(Paystatus.PENDING);
+		record.setPayStatusDesc(null);
+		record.setPayTime(null);
+		record.setPayFinishTime(null);
 		
-		rr.setSynchStatus(SynchStatus.NO);
+		record.setSynchStatus(SynchStatus.NO);
 		
-		rr.setApprovalStatus(ApprovalStatus.IN_AUDIT);
+		record.setApprovalStatus(ApprovalStatus.IN_AUDIT);
 		
-		this.withdrawalRecordDAO.save(rr);
+		this.withdrawalRecordDAO.save(record);
 	}
 	
 	/**
