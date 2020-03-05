@@ -9,6 +9,10 @@ public class BbKLineKey {
 
     public static final String BB_KLINE_REPAIR = "kline:from_exp:repair:BB:";
 
+    public static final String KLINE_BB = "kline:BB:";
+
+    public static final String KLINE_UPDATE_BB ="kline:update:BB";
+
     public static final String BB_KLINE_UPDATE ="kline:from_exp:update:BB:";
 
     public static final String BB_SYMBOL = "bb_symbol";

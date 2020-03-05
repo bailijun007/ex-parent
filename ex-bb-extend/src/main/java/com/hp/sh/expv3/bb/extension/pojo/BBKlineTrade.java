@@ -19,21 +19,11 @@ public class BBKlineTrade implements Serializable {
 
     private BigDecimal lastPrice;
 
-    private List<BbTradeVo> kLineTrades;
+    private List<BbTradeVo> trades;
 
     public BBKlineTrade() {
     }
 
-    @Override
-    public String toString() {
-        return "BBKlineTrade{" +
-                "msgType=" + msgType +
-                ", messageId=" + messageId +
-                ", matchTxId=" + matchTxId +
-                ", lastPrice=" + lastPrice +
-                ", kLineTrades=" + kLineTrades +
-                '}';
-    }
 
     public int getMsgType() {
         return msgType;
@@ -67,11 +57,22 @@ public class BBKlineTrade implements Serializable {
         this.lastPrice = lastPrice;
     }
 
-    public List<BbTradeVo> getkLineTrades() {
-        return kLineTrades;
+    public List<BbTradeVo> getTrades() {
+        return trades;
     }
 
-    public void setkLineTrades(List<BbTradeVo> kLineTrades) {
-        this.kLineTrades = kLineTrades;
+    public void setTrades(List<BbTradeVo> trades) {
+        this.trades = trades;
+    }
+
+    @Override
+    public String toString() {
+        return "BBKlineTrade{" +
+                "msgType=" + msgType +
+                ", messageId=" + messageId +
+                ", matchTxId=" + matchTxId +
+                ", lastPrice=" + lastPrice +
+                ", trades=" + trades +
+                '}';
     }
 }

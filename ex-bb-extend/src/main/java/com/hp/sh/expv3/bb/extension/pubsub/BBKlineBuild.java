@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class BBKlineBuild {
     private StringRedisTemplate klineTemplateDB5;
 
 
+    @PostConstruct
     public void trigger() {
         List<BBSymbol> bbSymbols = listSymbol();
         for (BBSymbol bbSymbol : bbSymbols) {
@@ -84,21 +86,13 @@ public class BBKlineBuild {
     private BBKLine merge(BBKLine newkLine, BBKLine oldkLine) {
         // oldKline 有可能是空，直接返回newKline
         if (null == oldkLine) {
-            return newkLine;
+        } else {
+            newkLine.setHigh(newkLine.getHigh().max(oldkLine.getHigh()));
+            newkLine.setLow(newkLine.getLow().min(oldkLine.getLow()));
+            newkLine.setOpen(oldkLine.getOpen());
+            newkLine.setVolume(newkLine.getVolume().add(oldkLine.getVolume()));
         }
-        BBKLine bBKLine = new BBKLine();
-        bBKLine.setAsset(newkLine.getAsset().equals(oldkLine.getAsset()) ? newkLine.getAsset() : null);
-        bBKLine.setSymbol(newkLine.getSymbol().equals(oldkLine.getSymbol()) ? newkLine.getAsset() : null);
-        bBKLine.setSequence(1);
-        bBKLine.setMinute(newkLine.getMinute() == oldkLine.getMinute() ? newkLine.getMinute() : null);
-
-        bBKLine.setHigh(newkLine.getHigh().compareTo(oldkLine.getHigh()) >= 0 ? newkLine.getHigh() : oldkLine.getHigh());
-        bBKLine.setLow(newkLine.getLow().compareTo(oldkLine.getLow()) <= 0 ? oldkLine.getLow() : newkLine.getHigh());
-        bBKLine.setOpen(oldkLine.getOpen());
-        bBKLine.setClose(newkLine.getClose());
-        bBKLine.setVolume(newkLine.getVolume().add(oldkLine.getVolume()));
-
-        return bBKLine;
+        return newkLine;
     }
 
 
@@ -122,12 +116,14 @@ public class BBKlineBuild {
      */
     private void saveKline(BBKLine kline, String asset, String symbol, long minute) {
         //向集合中插入元素，并设置分数
-        klineTemplateDB5.opsForZSet().add(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol + ":" + minute, JSON.toJSONString(kline), minute);
+        final String key = BbKLineKey.KLINE_BB + asset + ":" + symbol + ":" + minute;
+        klineTemplateDB5.opsForZSet().removeRangeByScore(key, minute, minute);
+        klineTemplateDB5.opsForZSet().add(key, JSON.toJSONString(kline), minute);
     }
 
     private void notifyUpdate(long minute, String asset, String symbol) {
         //向集合中插入元素，并设置分数
-        klineTemplateDB5.opsForZSet().add(BbKLineKey.BB_KLINE_UPDATE + asset + ":" + symbol + ":" + minute, asset + "#" + symbol + "#" + minute, minute);
+        klineTemplateDB5.opsForZSet().add(BbKLineKey.KLINE_UPDATE_BB + asset + ":" + symbol + ":" + minute, asset + "#" + symbol + "#" + minute, minute);
     }
 
     private BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, long minute) {
@@ -164,7 +160,7 @@ public class BBKlineBuild {
 
     private List<BbTradeVo> listTrade(String msg) {
         BBKlineTrade bbKlineTrade = JSON.parseObject(msg, BBKlineTrade.class);
-        return bbKlineTrade.getkLineTrades();
+        return bbKlineTrade.getTrades();
     }
 
 
