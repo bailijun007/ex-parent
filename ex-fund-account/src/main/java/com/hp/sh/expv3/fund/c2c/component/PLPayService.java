@@ -71,7 +71,7 @@ public class PLPayService {
         c2cOrder.setPayTime(Instant.now().toEpochMilli());
         c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
         c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_FALSE);
-        c2cOrder.setApprovalStatus(ApprovalStatus.IN_AUDIT);
+        c2cOrder.setApprovalStatus(C2cConst.C2C_APPROVAL_STATUS_IN_AUDIT);
         c2cOrder.setUserId(userId);
         c2cOrder.setCreated(Instant.now().toEpochMilli());
         c2cOrder.setModified(Instant.now().toEpochMilli());

@@ -1,35 +1,35 @@
 package com.hp.sh.expv3.bb.extension.pubsub;
 
 import com.alibaba.fastjson.JSON;
-import com.gitee.hupadev.commons.cache.RedisPool;
 import com.hp.sh.expv3.bb.extension.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.extension.pojo.BBKLine;
+import com.hp.sh.expv3.bb.extension.pojo.BBKlineTrade;
 import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun on 2020/3/4
  */
 
-
+@Component
 public class BBKlineBuild {
 
     private static final Logger logger = LoggerFactory.getLogger(BBKlineBuild.class);
@@ -37,38 +37,40 @@ public class BBKlineBuild {
     @Resource(name = "templateDB0")
     private StringRedisTemplate templateDB0;
 
-    @Autowired
-    private RedisPool redisPool;
+    @Resource(name = "klineTemplateDB5")
+    private StringRedisTemplate klineTemplateDB5;
+
 
     public void trigger() {
-
-        final List<BBSymbol> bbSymbols = listSymbol();
+        List<BBSymbol> bbSymbols = listSymbol();
         for (BBSymbol bbSymbol : bbSymbols) {
-            String channel = "bb:trade:${asset}:${symbol}";
-            final String asset = bbSymbol.getAsset();
-            final String symbol = bbSymbol.getSymbol();
+            String asset = bbSymbol.getAsset();
+            String symbol = bbSymbol.getSymbol();
+            String channel = BbKLineKey.BB_TRADE + ":" + asset + ":" + symbol;
+
             templateDB0.getConnectionFactory().getConnection().subscribe(new MessageListener() {
                 @Override
                 public void onMessage(Message message, byte[] pattern) {
-                    final String msg = new String(message.getBody());
+                    String msg = new String(message.getBody());
 
-                    final List<BbTradeVo> bbTradeVos = listTrade(msg);
+                    List<BbTradeVo> bbTradeVos = listTrade(msg);
 
-                    Map<Long, List<BbTradeVo>> minute2TradeList = null; // 拆成不同的分钟
+                    // 拆成不同的分钟
+                    Map<Long, List<BbTradeVo>> minute2TradeList = bbTradeVos.stream()
+                            .collect(Collectors.groupingBy(klineTrade -> klineTrade.getTradeTime()));
 
-                    for (Map.Entry<Long, List<BbTradeVo>> longListEntry : minute2TradeList.entrySet()) {
-                        long minute = longListEntry.getKey();
-                        final List<BbTradeVo> trades = longListEntry.getValue();
-                        final BBKLine newkLine = buildKline(trades, asset, symbol, minute);
+                    for (Long ms : minute2TradeList.keySet()) {
+                        long minute = TimeUnit.MILLISECONDS.toMinutes(ms);
+                        List<BbTradeVo> trades = minute2TradeList.get(ms);
+                        BBKLine newkLine = buildKline(trades, asset, symbol, minute);
 
-                        final BBKLine oldkLine = getKLine(asset, symbol, minute);
+                        BBKLine oldkLine = getOldKLine(asset, symbol, minute);
 
-                        final BBKLine mergedKline = merge(newkLine, oldkLine);
+                        BBKLine mergedKline = merge(newkLine, oldkLine);
 
-                        saveKline(mergedKline, asset, symbol, 1,minute);
+                        saveKline(mergedKline, asset, symbol, minute);
 
                         notifyUpdate(minute, asset, symbol);
-
                     }
 
                 }
@@ -81,7 +83,22 @@ public class BBKlineBuild {
 
     private BBKLine merge(BBKLine newkLine, BBKLine oldkLine) {
         // oldKline 有可能是空，直接返回newKline
-        return null;
+        if (null == oldkLine) {
+            return newkLine;
+        }
+        BBKLine bBKLine = new BBKLine();
+        bBKLine.setAsset(newkLine.getAsset().equals(oldkLine.getAsset()) ? newkLine.getAsset() : null);
+        bBKLine.setSymbol(newkLine.getSymbol().equals(oldkLine.getSymbol()) ? newkLine.getAsset() : null);
+        bBKLine.setSequence(1);
+        bBKLine.setMinute(newkLine.getMinute() == oldkLine.getMinute() ? newkLine.getMinute() : null);
+
+        bBKLine.setHigh(newkLine.getHigh().compareTo(oldkLine.getHigh()) >= 0 ? newkLine.getHigh() : oldkLine.getHigh());
+        bBKLine.setLow(newkLine.getLow().compareTo(oldkLine.getLow()) <= 0 ? oldkLine.getLow() : newkLine.getHigh());
+        bBKLine.setOpen(oldkLine.getOpen());
+        bBKLine.setClose(newkLine.getClose());
+        bBKLine.setVolume(newkLine.getVolume().add(oldkLine.getVolume()));
+
+        return bBKLine;
     }
 
 
@@ -100,18 +117,17 @@ public class BBKlineBuild {
     }
 
     /*
-    * kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
-    *   interval 频率；1分钟
+     * kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
+     *   interval 频率；1分钟
      */
-    private void saveKline(BBKLine kline, String asset, String symbol, int interval,long minute) {
+    private void saveKline(BBKLine kline, String asset, String symbol, long minute) {
         //向集合中插入元素，并设置分数
-        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol+":1", JSON.toJSONString(kline), minute);
+        klineTemplateDB5.opsForZSet().add(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol + ":" + minute, JSON.toJSONString(kline), minute);
     }
 
     private void notifyUpdate(long minute, String asset, String symbol) {
         //向集合中插入元素，并设置分数
-        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_UPDATE + asset + ":" + symbol + ":" + minute, asset + "#" + symbol + "#" + minute, minute);
-
+        klineTemplateDB5.opsForZSet().add(BbKLineKey.BB_KLINE_UPDATE + asset + ":" + symbol + ":" + minute, asset + "#" + symbol + "#" + minute, minute);
     }
 
     private BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, long minute) {
@@ -147,15 +163,23 @@ public class BBKlineBuild {
 
 
     private List<BbTradeVo> listTrade(String msg) {
-        List<BbTradeVo> voList = null;// bbTradeExtService.queryByTimeInterval(asset, symbol, startTimeInMs, endTimeInMs);
-        //返回 对象集合以时间升序 再以id升序
-        List<BbTradeVo> sortedList = voList.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
-        return sortedList;
+        BBKlineTrade bbKlineTrade = JSON.parseObject(msg, BBKlineTrade.class);
+        return bbKlineTrade.getkLineTrades();
     }
 
 
-    BBKLine getKLine(String asset, String symbol, long minute) {
-        return null;
+    BBKLine getOldKLine(String asset, String symbol, long minute) {
+        BBKLine bbkLine1 = null;
+        Set<String> range = klineTemplateDB5.opsForZSet()
+                .rangeByScore(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol + ":" + minute, minute, minute);
+
+        if (!range.isEmpty()) {
+            final String s = new ArrayList<>(range).get(0);
+            System.out.println("s = " + s);
+//            JSON字符串转JSON对象
+            bbkLine1 = JSON.parseObject(s, BBKLine.class);
+        }
+        return bbkLine1;
     }
 
 
