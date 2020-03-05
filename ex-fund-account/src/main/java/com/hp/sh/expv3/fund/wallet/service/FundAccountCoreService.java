@@ -16,7 +16,7 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
-import com.hp.sh.expv3.fund.wallet.constant.FundFlowDirection;
+import com.hp.sh.expv3.fund.constant.FundFlowDirection;
 import com.hp.sh.expv3.fund.wallet.dao.FundAccountDAO;
 import com.hp.sh.expv3.fund.wallet.dao.FundAccountRecordDAO;
 import com.hp.sh.expv3.fund.wallet.entity.FundAccount;

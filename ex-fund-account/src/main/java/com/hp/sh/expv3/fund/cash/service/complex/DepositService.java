@@ -17,12 +17,11 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.error.ExSysError;
-import com.hp.sh.expv3.fund.cash.constant.PayChannel;
-import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.cash.dao.DepositRecordDAO;
 import com.hp.sh.expv3.fund.cash.entity.DepositRecord;
-import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
-import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
+import com.hp.sh.expv3.fund.constant.PayChannel;
+import com.hp.sh.expv3.fund.constant.PaymentStatus;
+import com.hp.sh.expv3.fund.constant.SynchStatus;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
@@ -56,7 +55,7 @@ public class DepositService {
 		rr.setModified(now);
 
 		rr.setChannelId(channelId);
-		rr.setPayStatus(Paystatus.PENDING);
+		rr.setPayStatus(PaymentStatus.PENDING);
 		rr.setTransactionId(chainOrderId);
 		rr.setPayFinishTime(null);
 		rr.setPayStatusDesc(null);

@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.fund.cash.constant;
+package com.hp.sh.expv3.fund.constant;
 
 /**
  * 审批状态

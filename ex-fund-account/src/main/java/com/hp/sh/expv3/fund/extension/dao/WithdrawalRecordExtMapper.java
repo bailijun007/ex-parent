@@ -13,7 +13,7 @@ import java.util.Map;
 public interface WithdrawalRecordExtMapper {
 
 
-    BigDecimal getFrozenCapital(@Param("userId") Long userId,@Param("asset") String asset,@Param("approvalStatus") int approvalStatus,@Param("payStatus") int payStatus);
+    BigDecimal getFrozenCapital(@Param("userId") Long userId,@Param("asset") String asset,@Param("synchStatus") int synchStatus,@Param("payStatus") int payStatus);
 
     List<WithdrawalRecordVo> queryHistory(@Param("userId") Long userId,@Param("asset") String asset, @Param("queryId") Long queryId,
                                           @Param("pageSize") Integer pageSize,  @Param("pageStatus")  Integer pageStatus);

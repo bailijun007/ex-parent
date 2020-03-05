@@ -6,11 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
-import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
-import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
-import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
-import com.hp.sh.expv3.utils.IntBool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +14,9 @@ import org.springframework.util.CollectionUtils;
 import com.gitee.hupadev.base.api.PageResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hp.sh.expv3.fund.constant.ApprovalStatus;
+import com.hp.sh.expv3.fund.constant.PaymentStatus;
+import com.hp.sh.expv3.fund.constant.SynchStatus;
 import com.hp.sh.expv3.fund.extension.dao.WithdrawalRecordExtMapper;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo;
@@ -35,8 +33,8 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
     private WithdrawalRecordExtMapper withdrawalRecordExtMapper;
 
     @Override
-    public BigDecimal getFrozenCapital(Long userId, String asset,int approvalStatus,int payStatus) {
-        return withdrawalRecordExtMapper.getFrozenCapital(userId, asset,approvalStatus,payStatus);
+    public BigDecimal getFrozenCapital(Long userId, String asset) {
+        return withdrawalRecordExtMapper.getFrozenCapital(userId, asset, SynchStatus.SYNCH, PaymentStatus.PENDING);
     }
 
     @Override
@@ -82,7 +80,7 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("payStatus", Paystatus.FAIL);
+        map.put("payStatus", PaymentStatus.FAIL);
         map.put("createdBegin", startTime);
         map.put("createdEnd", endTime);
         List<WithdrawalRecordVo> recordVos = withdrawalRecordExtMapper.queryHistoryByTime(map);

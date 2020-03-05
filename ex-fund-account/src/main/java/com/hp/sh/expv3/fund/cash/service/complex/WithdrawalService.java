@@ -13,13 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.dev.CrossDB;
-import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
-import com.hp.sh.expv3.fund.cash.constant.PayChannel;
-import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.cash.dao.WithdrawalRecordDAO;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
-import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
-import com.hp.sh.expv3.fund.wallet.constant.SynchStatus;
+import com.hp.sh.expv3.fund.constant.ApprovalStatus;
+import com.hp.sh.expv3.fund.constant.PayChannel;
+import com.hp.sh.expv3.fund.constant.PaymentStatus;
+import com.hp.sh.expv3.fund.constant.SynchStatus;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.service.FundAccountCoreService;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
@@ -54,16 +53,18 @@ public class WithdrawalService {
 		record.setModified(now);
 		
 		record.setTransactionId(transactionId);
-		record.setPayStatus(Paystatus.PENDING);
+		record.setPayStatus(PaymentStatus.PENDING);
 		record.setPayStatusDesc(null);
 		record.setPayTime(null);
 		record.setPayFinishTime(null);
 		
-		record.setSynchStatus(SynchStatus.NO);
+		record.setSynchStatus(SynchStatus.SYNCH); // 下面同事务执行口扣款，所以这里直接设置为已同步
 		
 		record.setApprovalStatus(ApprovalStatus.IN_AUDIT);
 		
 		this.withdrawalRecordDAO.save(record);
+		
+		this.cutBalance(record);
 	}
 	
 	/**
@@ -76,10 +77,9 @@ public class WithdrawalService {
 			return null;
 		}
 		record.setApprovalStatus(ApprovalStatus.APPROVED);
-		record.setSynchStatus(SynchStatus.SYNCH); // 下面同事务执行口扣款，所以这里直接设置为已同步
 		record.setModified(DbDateUtils.now());
 		this.withdrawalRecordDAO.update(record);
-		this.cutBalance(record);
+		
 		return record;
 	}
 	
@@ -90,7 +90,10 @@ public class WithdrawalService {
 	public void rejectWithdrawal(Long userId, Long id){
 		WithdrawalRecord record = this.withdrawalRecordDAO.findById(userId, id);
 		record.setApprovalStatus(ApprovalStatus.REJECTED);
+		record.setSynchStatus(SynchStatus.RETURN);
 		this.withdrawalRecordDAO.update(record);
+		
+		this.returnBalance(record);
 	}
 
 	public void onDrawSuccess(Long userId, Long id, String txHash){
@@ -112,7 +115,7 @@ public class WithdrawalService {
 		rr.setPayStatusDesc("提现失败");
 		rr.setPayStatus(PaymentStatus.FAIL);
 		
-		rr.setSynchStatus(SynchStatus.SYNCH);
+		rr.setSynchStatus(SynchStatus.RETURN);
 		this.withdrawalRecordDAO.update(rr);
 		
 		//同步同事务执行
@@ -149,8 +152,6 @@ public class WithdrawalService {
 		fundAccountCoreApi.cut(request);
 	}
 	
-
-	
 	public void synchReturnBalance(WithdrawalRecord rr){
 		this.returnBalance(rr);
 		rr.setSynchStatus(SynchStatus.SYNCH);
@@ -158,7 +159,7 @@ public class WithdrawalService {
 	}
 	
 	@Deprecated
-	public void returnBalance(WithdrawalRecord rr){
+	private void returnBalance(WithdrawalRecord rr){
 		FundAddRequest addRequest = new FundAddRequest();
 		addRequest.setAsset(rr.getAsset());
 		addRequest.setAmount(rr.getAmount());

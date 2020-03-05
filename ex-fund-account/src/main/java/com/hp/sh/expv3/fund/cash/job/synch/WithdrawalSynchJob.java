@@ -13,7 +13,7 @@ import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
 import com.hp.sh.expv3.fund.cash.service.complex.WithdrawalService;
 
-@Component
+//@Component
 @EnableScheduling
 public class WithdrawalSynchJob {
     private static final Logger logger = LoggerFactory.getLogger(WithdrawalSynchJob.class);

@@ -15,10 +15,10 @@ import com.hp.sh.chainserver.client.WithDrawResponse;
 import com.hp.sh.chainserver.exception.ErrorResponseException;
 import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
-import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
 import com.hp.sh.expv3.fund.cash.mq.WithDrawalMsg;
 import com.hp.sh.expv3.fund.cash.service.complex.WithdrawalService;
+import com.hp.sh.expv3.fund.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.transfer.constant.MQConstant;
 import com.hp.sh.rocketmq.annotation.MQListener;
 

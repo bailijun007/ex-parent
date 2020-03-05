@@ -13,7 +13,7 @@ import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.fund.cash.entity.DepositRecord;
 import com.hp.sh.expv3.fund.cash.service.complex.DepositService;
 
-@Component
+//@Component
 @EnableScheduling
 public class DepositeSynchJob {
     private static final Logger logger = LoggerFactory.getLogger(DepositeSynchJob.class);

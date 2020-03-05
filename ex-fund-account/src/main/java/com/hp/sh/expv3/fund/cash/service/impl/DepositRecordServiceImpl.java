@@ -3,6 +3,7 @@ package com.hp.sh.expv3.fund.cash.service.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.fund.cash.dao.DepositRecordDAO;
 import com.hp.sh.expv3.fund.cash.entity.DepositRecord;
 import com.hp.sh.expv3.fund.cash.service.DepositRecordService;
-import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
+import com.hp.sh.expv3.fund.constant.PaymentStatus;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 /**
@@ -96,13 +97,13 @@ public class DepositRecordServiceImpl implements DepositRecordService{
 
 	@Override
 	public List<DepositRecord> findPending(Page page) {
-		List<DepositRecord> list = this.pageQuery(page, null, Paystatus.PENDING);
+		List<DepositRecord> list = this.pageQuery(page, null, PaymentStatus.PENDING);
 		return list;
 	}
 
 	@Override
 	public List<DepositRecord> findPaySuccess(Page page) {
-		List<DepositRecord> list = this.pageQuery(page, null, Paystatus.SUCCESS);
+		List<DepositRecord> list = this.pageQuery(page, null, PaymentStatus.SUCCESS);
 		return list;
 	}
 

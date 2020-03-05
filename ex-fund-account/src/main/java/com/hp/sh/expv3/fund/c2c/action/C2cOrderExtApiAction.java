@@ -8,7 +8,7 @@ import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
 import com.hp.sh.expv3.fund.c2c.service.QueryService;
 import com.hp.sh.expv3.fund.c2c.service.SellService;
 import com.hp.sh.expv3.fund.c2c.util.GenerateOrderNumUtils;
-import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
+import com.hp.sh.expv3.fund.constant.ApprovalStatus;
 import com.hp.sh.expv3.fund.extension.api.C2cOrderExtApi;
 import com.hp.sh.expv3.fund.extension.api.FundAccountExtApi;
 import com.hp.sh.expv3.fund.extension.error.ExFundError;

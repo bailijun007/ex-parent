@@ -1,15 +1,10 @@
 package com.hp.sh.expv3.fund.extension.service;
 
-import com.gitee.hupadev.base.api.PageResult;
-import com.hp.sh.expv3.fund.extension.dao.WithdrawalRecordExtMapper;
-import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
-import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.List;
+
+import com.gitee.hupadev.base.api.PageResult;
+import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo;
 
 /**
  * 体现记录扩展服务
@@ -18,7 +13,7 @@ import java.util.List;
  */
 public interface WithdrawalRecordExtService {
 
-    public BigDecimal getFrozenCapital(Long userId, String asset,int approvalStatus,int payStatus) ;
+    public BigDecimal getFrozenCapital(Long userId, String asset) ;
 
     List<WithdrawalRecordVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus);
 
