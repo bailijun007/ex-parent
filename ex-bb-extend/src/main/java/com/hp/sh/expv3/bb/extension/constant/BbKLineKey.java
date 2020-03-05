@@ -13,5 +13,6 @@ public class BbKLineKey {
 
     public static final String BB_SYMBOL = "bb_symbol";
 
+    public static final String BB_TRADE = "bb:trade";
 
 }

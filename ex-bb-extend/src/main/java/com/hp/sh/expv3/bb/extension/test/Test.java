@@ -2,17 +2,17 @@ package com.hp.sh.expv3.bb.extension.test;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.extension.pojo.BBKLine;
+import com.hp.sh.expv3.bb.extension.pubsub.BBKlineBuild;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.connection.RedisPassword;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author BaiLiJun  on 2020/3/5
@@ -20,8 +20,9 @@ import java.util.Set;
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class Test {
-    @Resource(name = "xbtemplateDB0")
-    private StringRedisTemplate xbtemplateDB0;
+
+    @Resource(name = "klineTemplateDB5")
+    private StringRedisTemplate klineTemplateDB5;
 
     @Resource(name = "templateDB0")
     private StringRedisTemplate templateDB0;
@@ -30,7 +31,7 @@ public class Test {
 
     @org.junit.Test
     public void test1() {
-        final Set<Object> xbbb_symbol = xbtemplateDB0.opsForHash().keys("bb_symbol");
+        final Set<Object> xbbb_symbol = klineTemplateDB5.opsForHash().keys("bb_symbol");
         System.out.println(xbbb_symbol.size());
         final Set<Object> bb_symbol = templateDB0.opsForHash().keys("bb_symbol");
         System.out.println(bb_symbol.size());
@@ -52,6 +53,19 @@ public class Test {
         templateDB0.opsForZSet().add("testkline:from_exp:repair:BB:" + "BTC" + ":" + "BTC_USDT:1", JSON.toJSONString(bbkLine), 26388150);
         Set<String> range = templateDB0.opsForZSet().range("testkline:from_exp:repair:BB:" + "BTC" + ":" + "BTC_USDT:1", 0, -1);
         System.out.println(range);
+    }
+@Autowired
+    BBKlineBuild bbKlineBuild;
+
+    @org.junit.Test
+    public void testoubsub(){
+        bbKlineBuild.trigger();
+    }
+
+    @org.junit.Test
+    public void test(){
+        final long l = TimeUnit.MILLISECONDS.toMinutes(1583394926831L);
+        System.out.println("l = " + l);
     }
 
 }

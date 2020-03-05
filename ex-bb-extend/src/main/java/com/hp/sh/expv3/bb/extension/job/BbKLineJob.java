@@ -68,7 +68,6 @@ public class BbKLineJob {
                     // 若修复数据已存在，忽略 从redis kline:from_exp:repair:BB:${asset}:${symbol}:${minute}中取
                     Set<ZSetOperations.TypedTuple<String>> repaired = templateDB0.opsForZSet().rangeWithScores(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol + ":" + minute, 0, -1);
 
-//                    repaired = getRepairedData(minute);
                     if (null != repaired || !repaired.isEmpty()) {
                         continue;
                     }

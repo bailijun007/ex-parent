@@ -30,8 +30,7 @@ public class BbTradeVo implements Serializable {
     @ApiModelProperty("taker订单ID")
     private Long tkOrderId;
 
-    @ApiModelProperty("taker是否平仓")
-    private Integer tkCloseFlag;
+
 
     @ApiModelProperty("maker账户Id")
     private Long mkAccountId;
@@ -39,8 +38,7 @@ public class BbTradeVo implements Serializable {
     @ApiModelProperty("maker订单ID")
     private Long mkOrderId;
 
-    @ApiModelProperty("maker是否平仓")
-    private Integer mkCloseFlag;
+
 
     @ApiModelProperty("成交价格")
     private BigDecimal price;
@@ -79,10 +77,9 @@ public class BbTradeVo implements Serializable {
                 ", matchTxId=" + matchTxId +
                 ", tkAccountId=" + tkAccountId +
                 ", tkOrderId=" + tkOrderId +
-                ", tkCloseFlag=" + tkCloseFlag +
                 ", mkAccountId=" + mkAccountId +
                 ", mkOrderId=" + mkOrderId +
-                ", mkCloseFlag=" + mkCloseFlag +
+
                 ", price=" + price +
                 ", number=" + number +
                 ", tradeTime=" + tradeTime +
@@ -143,13 +140,6 @@ public class BbTradeVo implements Serializable {
         this.tkOrderId = tkOrderId;
     }
 
-    public Integer getTkCloseFlag() {
-        return tkCloseFlag;
-    }
-
-    public void setTkCloseFlag(Integer tkCloseFlag) {
-        this.tkCloseFlag = tkCloseFlag;
-    }
 
     public Long getMkAccountId() {
         return mkAccountId;
@@ -167,13 +157,6 @@ public class BbTradeVo implements Serializable {
         this.mkOrderId = mkOrderId;
     }
 
-    public Integer getMkCloseFlag() {
-        return mkCloseFlag;
-    }
-
-    public void setMkCloseFlag(Integer mkCloseFlag) {
-        this.mkCloseFlag = mkCloseFlag;
-    }
 
     public BigDecimal getPrice() {
         return price;
