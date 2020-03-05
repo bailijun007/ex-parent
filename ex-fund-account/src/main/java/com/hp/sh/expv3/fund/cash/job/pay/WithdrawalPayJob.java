@@ -70,7 +70,7 @@ public class WithdrawalPayJob {
 		Integer symbol = asset2Symbol.getSymbol(record.getAsset());
 		
 		try{
-			WithDrawResponse response = exChainService.draw(record.getUserId(), symbol , amount, record.getSn());
+			WithDrawResponse response = exChainService.draw(record.getUserId(), symbol, record.getAccount(), amount, record.getSn());
 			logger.info("调用提币接口：{}", response.toString());
 			if( response.getStatus()==WithDrawResponse.STATUS_FAIL ){
 				this.withdrawalService.onDrawFail(record.getUserId(), record.getId());
