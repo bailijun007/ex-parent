@@ -45,12 +45,13 @@
         <if test="asset!=null and asset!=''">
             AND asset=#{asset}
         </if>
-        AND pay_status NOT IN (1,2);
+            AND pay_status=#{payStatus}
+            AND approval_status=#{approvalStatus}
         </where>
     </select>
 
     <select id="queryHistory" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id,asset symbol,  amount, approval_status  status,created,account,user_id userId,asset,pay_status payStatus
+        select id,asset symbol,  amount, approval_status  status,created,account,user_id userId,asset,pay_status payStatus,account targetAddress
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -80,7 +81,7 @@
     </select>
 
     <select id="queryHistoryByTime" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-      select id,asset symbol,  amount, pay_status  status,created,account,user_id userId,asset
+      select id,asset symbol,  amount, pay_status  status,created,account,user_id userId,asset ,account targetAddress
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -99,7 +100,7 @@
     </select>
 
     <select id="queryLastHistory" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id,asset,   amount, pay_status  status,created,account,user_id userId
+        select id,asset,   amount, pay_status  status,created,account,user_id userId,account targetAddress
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -129,7 +130,7 @@
 
 
     <select id="queryList" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id, user_id,asset ,  amount, pay_status  status,created,account ,created ctime
+        select id, user_id,asset ,  amount, pay_status  status,created,account ,created ctime ,account targetAddress
         FROM withdrawal_record
         <where>
             <if test="userId!=null">

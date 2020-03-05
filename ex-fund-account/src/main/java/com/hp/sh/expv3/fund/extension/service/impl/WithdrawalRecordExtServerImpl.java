@@ -8,6 +8,9 @@ import java.util.Optional;
 
 import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
+import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
+import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
+import com.hp.sh.expv3.utils.IntBool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +35,8 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
     private WithdrawalRecordExtMapper withdrawalRecordExtMapper;
 
     @Override
-    public BigDecimal getFrozenCapital(Long userId, String asset) {
-        return withdrawalRecordExtMapper.getFrozenCapital(userId, asset);
+    public BigDecimal getFrozenCapital(Long userId, String asset,int approvalStatus,int payStatus) {
+        return withdrawalRecordExtMapper.getFrozenCapital(userId, asset,approvalStatus,payStatus);
     }
 
     @Override
@@ -48,10 +51,15 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
             historyVo.setCtime(vo.map(d -> d.getCreated()).orElse(null));
             historyVo.setWithdrawTime(vo.map(d -> d.getCreated()).orElse(null));
             //1.审核中,2.审核通过,3.失败
-          if(historyVo.getStatus()==ApprovalStatus.APPROVED &&historyVo.getPayStatus()==1){
-             historyVo.setStatus(ApprovalStatus.APPROVED);
+            if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()== PaymentStatus.SUCCESS){
+                historyVo.setStatus(ApprovalStatus.APPROVED);
+            }else if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()== PaymentStatus.FAIL){
+              //审核通过，支付失败 状态也是失败
+                historyVo.setStatus(ApprovalStatus.REJECTED);
+            }else if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()== PaymentStatus.PENDING){
+                //审核通过，待支付 状态是审核中
+                historyVo.setStatus(ApprovalStatus.IN_AUDIT);
             }
-
         }
 
         return list;
@@ -74,7 +82,7 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("payStatus", C2cConst.WITHDRAWAL_RECORD_PAY_STATUS_PAYMENT_FAILED);
+        map.put("payStatus", Paystatus.FAIL);
         map.put("createdBegin", startTime);
         map.put("createdEnd", endTime);
         List<WithdrawalRecordVo> recordVos = withdrawalRecordExtMapper.queryHistoryByTime(map);

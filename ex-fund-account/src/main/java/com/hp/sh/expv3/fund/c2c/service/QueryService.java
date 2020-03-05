@@ -8,6 +8,7 @@ import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import com.hp.sh.expv3.fund.c2c.dao.C2cOrderDAO;
 import com.hp.sh.expv3.fund.c2c.entity.C2cOrder;
 import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
+import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
 import com.hp.sh.expv3.fund.extension.vo.C2cOrderVo;
 import groovy.util.logging.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +83,9 @@ public class QueryService {
                 put("userId", userId);
                 put("payCurrency", asset);
                 put("type", C2cConst.C2C_SELL);
-                put("approvalStatus", ApprovalStatus.IN_AUDIT);
+                put("approvalStatus", C2cConst.C2C_APPROVAL_STATUS_PASS);
+                put("payStatus", C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
+
             }
         });
 

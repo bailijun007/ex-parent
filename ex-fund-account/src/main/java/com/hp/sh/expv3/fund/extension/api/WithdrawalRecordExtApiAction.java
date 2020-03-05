@@ -64,11 +64,6 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     @Override
     public WithdrawalRecordVo queryLastHistory(Long userId, String asset) {
         WithdrawalRecordVo vo = withdrawalRecordExtService.queryLastHistory(userId, asset);
-        WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(userId, asset);
-        Optional<WithdrawalAddrVo> addrVo = Optional.ofNullable(withdrawalAddrVo);
-        if(null!=vo){
-            vo.setTargetAddress(addrVo.map(WithdrawalAddrVo::getAddress).orElse(null));
-        }
         return vo;
     }
 
@@ -95,13 +90,6 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
 
     private List<WithdrawalRecordVo> getWithdrawalRecordVos(Long userId, String asset, Long startTime, Long endTime) {
         List<WithdrawalRecordVo> voList = withdrawalRecordExtService.findWithdrawalRecordList(userId, asset, startTime, endTime);
-        if (!CollectionUtils.isEmpty(voList)) {
-            for (WithdrawalRecordVo vo : voList) {
-                WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
-                Optional<WithdrawalAddrVo> addrVo = Optional.ofNullable(withdrawalAddrVo);
-                vo.setTargetAddress(addrVo.map(WithdrawalAddrVo::getAddress).orElse(null));
-            }
-        }
         return voList;
     }
 
@@ -119,24 +107,19 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
         }
 
         PageResult<WithdrawalRecordVo> result = withdrawalRecordExtService.pageQueryHistory(userId, asset, pageNo, pageSize, startTime, endTime, approvalStatus);
-        if (!CollectionUtils.isEmpty(result.getList())) {
-            for (WithdrawalRecordVo vo : result.getList()) {
-                WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
-                Optional<WithdrawalAddrVo> optional = Optional.ofNullable(withdrawalAddrVo);
-                vo.setTargetAddress(optional.map(WithdrawalAddrVo::getAddress).orElse(null));
-            }
-        }
+//        if (!CollectionUtils.isEmpty(result.getList())) {
+//            for (WithdrawalRecordVo vo : result.getList()) {
+//                WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
+//                Optional<WithdrawalAddrVo> optional = Optional.ofNullable(withdrawalAddrVo);
+//                vo.setTargetAddress(optional.map(WithdrawalAddrVo::getAddress).orElse(null));
+//            }
+//        }
 
         return result;
     }
 
     private List<WithdrawalRecordVo> getWithdrawalRecordVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         List<WithdrawalRecordVo> voList = withdrawalRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
-        for (WithdrawalRecordVo vo : voList) {
-            WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
-            Optional<WithdrawalAddrVo> voOptional = Optional.ofNullable(withdrawalAddrVo);
-            vo.setTargetAddress(voOptional.map(WithdrawalAddrVo::getAddress).orElse(null));
-        }
         return voList;
     }
 

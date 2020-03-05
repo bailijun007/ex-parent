@@ -54,8 +54,9 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     }
 
     @Override
-    public List<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
-        List<BbHistoryOrderVo> result = new ArrayList<>();
+    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
+        PageResult<BbHistoryOrderVo> result=new PageResult<>();
+        List<BbHistoryOrderVo> bbHistoryOrderVos = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
@@ -63,6 +64,10 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("bidFlag", bidFlag);
         map.put("activeFlag", IntBool.NO);
         map.put("lastOrderId", lastOrderId);
+
+         Long count = bbOrderExtMapper.queryCount(map);
+        result.setRowTotal(count);
+
         map.put("limit", pageSize);
         List<BbOrderVo> list = null;
         if (lastOrderId == null) {
@@ -78,7 +83,9 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         if (list == null || list.isEmpty()) {
             return result;
         }
-        this.convertOrderList(userId, result, list);
+        this.convertOrderList(userId, bbHistoryOrderVos, list);
+
+        result.setList(bbHistoryOrderVos);
         return result;
 
     }

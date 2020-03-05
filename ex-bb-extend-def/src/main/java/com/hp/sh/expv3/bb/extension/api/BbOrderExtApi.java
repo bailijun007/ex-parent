@@ -49,7 +49,7 @@ public interface BbOrderExtApi {
             }
     )
     @GetMapping(value = "/api/bb/order/ext/queryHistoryOrderList")
-    List<BbHistoryOrderVo> queryHistoryOrderList(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam(value = "symbol",required = false) String symbol,
+    PageResult<BbHistoryOrderVo> queryHistoryOrderList(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam(value = "symbol",required = false) String symbol,
                                                  @RequestParam(value = "bidFlag",required = false) Integer bidFlag,
                                                  @RequestParam(value = "pageSize") Integer pageSize,
                                                  @RequestParam(value = "lastOrderId",required = false) Long lastOrderId,

@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.bb.extension.api;
 
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
+import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
+import com.hp.sh.expv3.bb.extension.vo.BbUserOrderTrade;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -43,5 +45,21 @@ public interface BbOrderTradeExtApi {
             @RequestParam(value = "userId", required = true) Long userId
     );
 
+    @ApiOperation(value = "查某个时间区间某个用户的成交记录 (不传时间则默认查今天以前的所有数据)")
+    @GetMapping(value = "/api/bb/trade/ext/selectTradeListByUserId")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "userId ", value = "用户id", required = true),
+            @ApiImplicitParam(name = "startTime ", value = "开始时间", required = false),
+            @ApiImplicitParam(name = "endTime ", value = "结束时间", required = false)
+    })
+    List<BbUserOrderTrade> selectTradeListByUserId(
+            @RequestParam(value = "asset", required = true) String asset,
+            @RequestParam(value = "symbol", required = true) String symbol,
+            @RequestParam(value = "userId", required = true) Long userId,
+            @RequestParam(value = "startTime", required = false) Long startTime,
+            @RequestParam(value = "endTime", required = false) Long endTime
+    );
 
 }

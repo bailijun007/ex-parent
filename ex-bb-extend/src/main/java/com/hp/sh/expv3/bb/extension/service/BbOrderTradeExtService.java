@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.bb.extension.service;
 
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
+import com.hp.sh.expv3.bb.extension.vo.BbUserOrderTrade;
 
 import java.util.List;
 
@@ -13,5 +14,7 @@ public interface BbOrderTradeExtService {
     List<BbOrderTradeVo> selectAllTradeListByUser(String asset, String symbol, Long userId);
 
     List<BbOrderTradeVo> queryOrderTrade(Long userId, List<Long> orderIdList);
+
+    List<BbUserOrderTrade> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId);
 }
 

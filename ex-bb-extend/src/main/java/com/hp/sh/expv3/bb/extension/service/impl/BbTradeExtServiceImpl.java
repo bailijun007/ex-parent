@@ -50,10 +50,15 @@ public class BbTradeExtServiceImpl implements BbTradeExtService {
         return bbTradeExtMapper.queryLastTrade(map);
     }
 
-    @Override
-    public List<BbTradeVo> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId) {
-        List<BbTradeVo> list = bbTradeExtMapper.selectTradeListByUserId(asset,symbol,startTime,endTime,userId);
-        return list;
+//    @Override
+//    public List<BbTradeVo> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId) {
+//        List<BbTradeVo> list = bbTradeExtMapper.selectTradeListByUserId(asset,symbol,startTime,endTime,userId);
+//        return list;
+//
+//    }
 
+    @Override
+    public List<BbTradeVo> queryByTimeInterval(String asset, String symbol, long startTimeInMs, long endTimeInMs) {
+        return bbTradeExtMapper.queryByTimeInterval(asset,symbol,startTimeInMs,endTimeInMs);
     }
 }

@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import com.hp.sh.expv3.fund.c2c.service.QueryService;
+import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
+import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,12 +59,12 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
         }
 
         //查询冻结资金
-        BigDecimal frozenCapital = withdrawalRecordExtServer.getFrozenCapital(userId, asset);
+        BigDecimal frozenCapital = withdrawalRecordExtServer.getFrozenCapital(userId, asset, ApprovalStatus.APPROVED, Paystatus.PENDING);
         //冻结资金 =c2c 被冻结的资产 + 合约冻结资金
         BigDecimal frozen = frozenCapital.add(c2cLockedVolume);
         capitalAccount.setLock(frozen);
-        //可用资产= 账户余额-c2c冻结资金
-        BigDecimal balance = capitalAccount.getAvailable().subtract(c2cLockedVolume);
+        //可用资产= 账户余额-冻结资金
+        BigDecimal balance = capitalAccount.getAvailable().subtract(frozen);
         if(balance.compareTo(BigDecimal.ZERO)==-1){
             throw new ExException(ExFundError.ORDER_NOT_SUFFICIENT_FUNDS);
         }
@@ -81,7 +83,7 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
         if (!CollectionUtils.isEmpty(result.getList())) {
             for (CapitalAccountVo vo : result.getList()) {
                 //查询冻结资金
-                BigDecimal frozenCapital = withdrawalRecordExtServer.getFrozenCapital(vo.getAccountId(), vo.getAsset());
+                BigDecimal frozenCapital = withdrawalRecordExtServer.getFrozenCapital(vo.getAccountId(), vo.getAsset(), ApprovalStatus.APPROVED, Paystatus.PENDING);
                 vo.setLock(frozenCapital);
                 vo.setTotalAssets(frozenCapital.add(vo.getAvailable()));
             }

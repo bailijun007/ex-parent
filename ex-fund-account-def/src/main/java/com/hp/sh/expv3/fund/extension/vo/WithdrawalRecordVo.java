@@ -137,4 +137,12 @@ public class WithdrawalRecordVo implements Serializable {
 
     public WithdrawalRecordVo() {
     }
+
+    public Integer getPayStatus() {
+        return payStatus;
+    }
+
+    public void setPayStatus(Integer payStatus) {
+        this.payStatus = payStatus;
+    }
 }

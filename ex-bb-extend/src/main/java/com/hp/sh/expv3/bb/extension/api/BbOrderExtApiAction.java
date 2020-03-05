@@ -37,7 +37,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
 
 
     @Override
-    public List<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
+    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
         checkParam(userId, asset, symbol, pageSize, nextPage);
         return bbOrderExtService.queryHistoryOrderList(userId,asset,symbol,bidFlag,pageSize,lastOrderId,nextPage);
     }
