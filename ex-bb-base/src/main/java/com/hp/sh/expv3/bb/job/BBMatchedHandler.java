@@ -9,9 +9,11 @@ import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.bb.constant.TradeRoles;
+import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
+import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradePair;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.component.executor.OrderlyExecutors;
@@ -27,7 +29,9 @@ public class BBMatchedHandler {
     
 	@Autowired
 	private BBTradeService tradeService;
-
+	@Autowired
+	private BBOrderService orderService;
+	
 	private OrderlyExecutors orderlyExecutors = new OrderlyExecutors(20, 500);
 	
 	private Long startTime = 0L;
@@ -71,6 +75,10 @@ public class BBMatchedHandler {
 			this.orderlyExecutors.submit(takerTradeVo.getAccountId(), new TradeTask(takerTradeVo));
 		}
 		
+	}
+	
+	public void handleCancelled(BbOrderCancelMqMsg msg){
+		this.orderlyExecutors.submit(msg.getAccountId(), new CancelledTask(msg));
 	}
 	
 	private BBTradePair getTradePair(BBMatchedTrade matchedTrade){
@@ -129,6 +137,25 @@ public class BBMatchedHandler {
 				}else{
 					matchedTradeService.setTakerHandleStatus(tradeVo.getTradeId());
 				}
+			}catch(Exception e){
+				logger.error(e.getMessage(), e);
+			}
+		}
+
+	}
+
+	class CancelledTask implements Runnable{
+
+		private BbOrderCancelMqMsg msg;
+		
+		public CancelledTask(BbOrderCancelMqMsg msg) {
+			this.msg = msg;
+		}
+
+		@Override
+		public void run() {
+			try{
+				orderService.setCancelled(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
 			}catch(Exception e){
 				logger.error(e.getMessage(), e);
 			}

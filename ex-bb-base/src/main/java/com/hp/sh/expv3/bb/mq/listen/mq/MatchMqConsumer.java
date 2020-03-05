@@ -51,7 +51,7 @@ public class MatchMqConsumer {
 	@MQListener(tags=MqTags.TAGS_CANCELLED)
 	public void handleCancelledMsg(BbOrderCancelMqMsg msg){
 		logger.info("收到取消订单消息:{}", msg);
-		this.orderService.setCancelled(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
+		this.matchedHandler.handleCancelled(msg);
 	}
 	
 	/**
