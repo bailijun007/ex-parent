@@ -300,6 +300,7 @@
            <if test="approvalStatus!=null">
                and  approval_status=#{approvalStatus}
            </if>
+           ORDER BY id desc;
        </where>
     </select>
 
