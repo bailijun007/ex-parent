@@ -65,20 +65,23 @@ public class BBMatchedHandler {
 		
 		// MAKER
 		if(matchedTrade.getMakerHandleStatus()==BBMatchedTrade.NO){
-			BBTradeVo makerTradeVo = tradePair.getMakerTradeVo();
-			this.orderlyExecutors.submit(makerTradeVo.getAccountId(), new TradeTask(makerTradeVo));
+			BBTradeVo tradeVo = tradePair.getMakerTradeVo();
+			int key = (tradeVo.getSymbol()+tradeVo.getAccountId()).hashCode();
+			this.orderlyExecutors.submit(key, new TradeTask(tradeVo));
 		}
 		
 		// TAKER
 		if(matchedTrade.getTakerHandleStatus()==BBMatchedTrade.NO){
-			BBTradeVo takerTradeVo = tradePair.getTakerTradeVo();
-			this.orderlyExecutors.submit(takerTradeVo.getAccountId(), new TradeTask(takerTradeVo));
+			BBTradeVo tradeVo = tradePair.getTakerTradeVo();
+			int key = (tradeVo.getSymbol()+tradeVo.getAccountId()).hashCode();
+			this.orderlyExecutors.submit(key, new TradeTask(tradeVo));
 		}
 		
 	}
 	
 	public void handleCancelled(BbOrderCancelMqMsg msg){
-		this.orderlyExecutors.submit(msg.getAccountId(), new CancelledTask(msg));
+		int key = (msg.getSymbol()+msg.getAccountId()).hashCode();
+		this.orderlyExecutors.submit(key, new CancelledTask(msg));
 	}
 	
 	private BBTradePair getTradePair(BBMatchedTrade matchedTrade){

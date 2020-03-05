@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.chainserver.client.WithDrawResponse;
+import com.hp.sh.chainserver.exception.ErrorResponseException;
 import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
@@ -62,12 +63,19 @@ public class WithdrawalPayJob {
 		//调用充值接口
 		BigDecimal amount = record.getAmount();
 		Integer symbol = asset2Symbol.getSymbol(record.getAsset());
-		WithDrawResponse response = exChainService.draw(record.getUserId(), symbol , amount, record.getSn());
-		if( response.getStatus()!=WithDrawResponse.STATUS_FAIL ){
-			this.withdrawalService.onDrawSuccess(record.getUserId(), record.getId(), response.getTxHash());
-		}else{
+		
+		try{
+			WithDrawResponse response = exChainService.draw(record.getUserId(), symbol , amount, record.getSn());
+			if( response.getStatus()==WithDrawResponse.STATUS_FAIL ){
+				this.withdrawalService.onDrawFail(record.getUserId(), record.getId());
+			}else{
+				this.withdrawalService.onDrawSuccess(record.getUserId(), record.getId(), response.getTxHash());
+			}
+		}catch(ErrorResponseException e){
 			this.withdrawalService.onDrawFail(record.getUserId(), record.getId());
+			logger.error(e.getMessage(), e);
 		}
+
 	}
 
 }

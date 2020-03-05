@@ -13,14 +13,14 @@ public class OrderlyExecutors {
 		}
 	}
 
-	public void submit(long code, Runnable task){
-		int index = getIndex(code);
+	public void submit(int key, Runnable task){
+		int index = getIndex(key);
 		OrderlyExecutor executor = list.get(index);
 		executor.submit(task);
 	}
 	
-	public int getQueueSize(long code){
-		int index = this.getIndex(code);
+	public int getQueueSize(int key){
+		int index = this.getIndex(key);
 		OrderlyExecutor executor = list.get(index);
 		return executor.getQueueSize();
 	}
@@ -33,8 +33,8 @@ public class OrderlyExecutors {
 		return total;
 	}
 
-	private int getIndex(long code){
-		int index = (int) (code % list.size());
+	private int getIndex(int key){
+		int index = key % list.size();
 		return index;
 	}
 
