@@ -1,32 +1,35 @@
 package com.hp.sh.expv3.bb.extension.pubsub;
 
 import com.alibaba.fastjson.JSON;
-import com.gitee.hupadev.commons.cache.JsonCacheSerializer;
-import com.gitee.hupadev.commons.cache.MsgListener;
 import com.gitee.hupadev.commons.cache.RedisPool;
-import com.gitee.hupadev.commons.cache.RedisSubscriber;
 import com.hp.sh.expv3.bb.extension.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.extension.pojo.BBKLine;
 import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
-import com.hp.sh.expv3.config.redis.RedisSubscriberTest;
-import com.netflix.discovery.converters.Auto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.*;
-import org.springframework.util.CollectionUtils;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @author BaiLiJun  on 2020/3/4
+ * @author BaiLiJun on 2020/3/4
  */
+
+
 public class BBKlineBuild {
 
     private static final Logger logger = LoggerFactory.getLogger(BBKlineBuild.class);
@@ -38,48 +41,42 @@ public class BBKlineBuild {
     private RedisPool redisPool;
 
     public void trigger() {
-        final RedisSubscriber rs = new RedisSubscriber(redisPool);
-        rs.setCacheSerializer(new JsonCacheSerializer());
-        rs.setMsgListener(new MsgListener() {
-
-            @Override
-            public void onMessage(Object message) {
-
-                String redisKey = "";
-                String msg = "";
-
-//                String asset = getAsset(redisKey);
-//                String symbol = getSymbol(redisKey);
-                final List<BbTradeVo> bbTradeVos = listTrade(msg);
-
-                Map<Long, List<BbTradeVo>> minute2TradeList = null; //
-
-                for (Map.Entry<Long, List<BbTradeVo>> longListEntry : minute2TradeList.entrySet()) {
-                    long minute = longListEntry.getKey();
-                    final List<BbTradeVo> trades = longListEntry.getValue();
-                    final String asset = trades.get(0).getAsset();
-                    final String symbol = trades.get(0).getSymbol();
-                    final BBKLine newkLine = buildKline(trades, asset, symbol, minute);
-
-                    final BBKLine oldkLine = getKLine(asset, symbol, minute);
-
-                    final BBKLine mergedKline = merge(newkLine, oldkLine);
-
-
-
-                }
-
-
-            }
-        });
 
         final List<BBSymbol> bbSymbols = listSymbol();
         for (BBSymbol bbSymbol : bbSymbols) {
             String channel = "bb:trade:${asset}:${symbol}";
-            rs.setChannel(channel);
+            final String asset = bbSymbol.getAsset();
+            final String symbol = bbSymbol.getSymbol();
+            templateDB0.getConnectionFactory().getConnection().subscribe(new MessageListener() {
+                @Override
+                public void onMessage(Message message, byte[] pattern) {
+                    final String msg = new String(message.getBody());
+
+                    final List<BbTradeVo> bbTradeVos = listTrade(msg);
+
+                    Map<Long, List<BbTradeVo>> minute2TradeList = null; // 拆成不同的分钟
+
+                    for (Map.Entry<Long, List<BbTradeVo>> longListEntry : minute2TradeList.entrySet()) {
+                        long minute = longListEntry.getKey();
+                        final List<BbTradeVo> trades = longListEntry.getValue();
+                        final BBKLine newkLine = buildKline(trades, asset, symbol, minute);
+
+                        final BBKLine oldkLine = getKLine(asset, symbol, minute);
+
+                        final BBKLine mergedKline = merge(newkLine, oldkLine);
+
+                        saveKline(mergedKline, asset, symbol, 1,minute);
+
+                        notifyUpdate(minute, asset, symbol);
+
+                    }
+
+                }
+            }, channel.getBytes());
+
         }
 
-        rs.subscribe();
+
     }
 
     private BBKLine merge(BBKLine newkLine, BBKLine oldkLine) {
@@ -102,16 +99,18 @@ public class BBKlineBuild {
         return list;
     }
 
-    // kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
-    private void saveKline(BBKLine kline, String asset, String symbol) {
+    /*
+    * kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
+    *   interval 频率；1分钟
+     */
+    private void saveKline(BBKLine kline, String asset, String symbol, int interval,long minute) {
         //向集合中插入元素，并设置分数
-        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol, JSON.toJSONString(kline), Instant.now().toEpochMilli());
+        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol+":1", JSON.toJSONString(kline), minute);
     }
 
-    // kline:from_exp:update:BB:${asset}:${symbol}:${minute}
-    private void notifyUpdate(long minute, BBKLine kline, String asset, String symbol) {
+    private void notifyUpdate(long minute, String asset, String symbol) {
         //向集合中插入元素，并设置分数
-        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_UPDATE + asset + ":" + symbol + ":" + minute, asset + "#" + symbol + "#" + minute, Instant.now().toEpochMilli());
+        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_UPDATE + asset + ":" + symbol + ":" + minute, asset + "#" + symbol + "#" + minute, minute);
 
     }
 
@@ -146,10 +145,7 @@ public class BBKlineBuild {
         return bBKLine;
     }
 
-    /*
-     *sql 中 按照ID排序，分批查询，查到没有返回结果时截止
-     * 查询全部数据之后，再按照时间升序，id 升序 在内存中排序
-     */
+
     private List<BbTradeVo> listTrade(String msg) {
         List<BbTradeVo> voList = null;// bbTradeExtService.queryByTimeInterval(asset, symbol, startTimeInMs, endTimeInMs);
         //返回 对象集合以时间升序 再以id升序

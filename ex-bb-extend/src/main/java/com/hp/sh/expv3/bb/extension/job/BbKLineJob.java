@@ -82,10 +82,10 @@ public class BbKLineJob {
                         BBKLine kline = buildKline(trades, asset, symbol, minute);
 
                         // kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
-                        saveKline(kline,asset, symbol);
+                        saveKline(kline, asset, symbol, 1, minute);
 
                         // kline:from_exp:update:BB:${asset}:${symbol}:${minute}
-                        notifyUpdate(minute,kline,asset, symbol);
+                        notifyUpdate(minute, asset, symbol);
                     }
 
                 }
@@ -111,15 +111,15 @@ public class BbKLineJob {
     }
 
     // kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
-    private void saveKline(BBKLine kline,String asset, String symbol) {
+    private void saveKline(BBKLine kline, String asset, String symbol,int interval,long minute) {
         //向集合中插入元素，并设置分数
-        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_REPAIR+asset+":"+symbol, JSON.toJSONString(kline), Instant.now().toEpochMilli());
+        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol+":"+interval, JSON.toJSONString(kline), minute);
     }
 
     // kline:from_exp:update:BB:${asset}:${symbol}:${minute}
-    private void notifyUpdate(long minute,BBKLine kline,String asset, String symbol) {
+    private void notifyUpdate(long minute, String asset, String symbol) {
         //向集合中插入元素，并设置分数
-        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_UPDATE+asset+":"+symbol+":"+minute, asset+"#"+symbol+"#"+minute, Instant.now().toEpochMilli());
+        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_UPDATE + asset + ":" + symbol + ":" + minute, asset + "#" + symbol + "#" + minute, minute);
 
     }
 
@@ -137,7 +137,7 @@ public class BbKLineJob {
         BigDecimal volume = BigDecimal.ZERO;
 
         for (BbTradeVo trade : trades) {
-             BigDecimal currentPrice = trade.getPrice();
+            BigDecimal currentPrice = trade.getPrice();
             highPrice = highPrice.compareTo(trade.getPrice()) >= 0 ? highPrice : currentPrice;
             lowPrice = lowPrice.compareTo(trade.getPrice()) <= 0 ? lowPrice : currentPrice;
             openPrice = null == openPrice ? currentPrice : openPrice;
