@@ -33,7 +33,7 @@ import com.hp.sh.expv3.utils.SnUtils;
  *
  */
 @Service
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class WithdrawalService {
 	private static final Logger logger = LoggerFactory.getLogger(WithdrawalService.class);
 
