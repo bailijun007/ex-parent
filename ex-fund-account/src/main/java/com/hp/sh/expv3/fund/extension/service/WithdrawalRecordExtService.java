@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface WithdrawalRecordExtService {
 
-    public BigDecimal getFrozenCapital(Long userId, String asset) ;
+    public BigDecimal getFrozenCapital(Long userId, String asset,int approvalStatus,int payStatus) ;
 
     List<WithdrawalRecordVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus);
 

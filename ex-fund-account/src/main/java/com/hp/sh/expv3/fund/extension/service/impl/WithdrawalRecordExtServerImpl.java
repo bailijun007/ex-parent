@@ -9,6 +9,7 @@ import java.util.Optional;
 import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
 import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
+import com.hp.sh.expv3.fund.wallet.constant.Paystatus;
 import com.hp.sh.expv3.utils.IntBool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,8 +35,8 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
     private WithdrawalRecordExtMapper withdrawalRecordExtMapper;
 
     @Override
-    public BigDecimal getFrozenCapital(Long userId, String asset) {
-        return withdrawalRecordExtMapper.getFrozenCapital(userId, asset);
+    public BigDecimal getFrozenCapital(Long userId, String asset,int approvalStatus,int payStatus) {
+        return withdrawalRecordExtMapper.getFrozenCapital(userId, asset,approvalStatus,payStatus);
     }
 
     @Override
@@ -81,7 +82,7 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("payStatus", C2cConst.WITHDRAWAL_RECORD_PAY_STATUS_PAYMENT_FAILED);
+        map.put("payStatus", Paystatus.FAIL);
         map.put("createdBegin", startTime);
         map.put("createdEnd", endTime);
         List<WithdrawalRecordVo> recordVos = withdrawalRecordExtMapper.queryHistoryByTime(map);

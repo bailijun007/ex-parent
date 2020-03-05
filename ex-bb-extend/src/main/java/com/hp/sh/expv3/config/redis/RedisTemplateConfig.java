@@ -17,6 +17,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
+import javax.annotation.PostConstruct;
+
 @Configuration
 public class RedisTemplateConfig {
 
@@ -26,6 +28,7 @@ public class RedisTemplateConfig {
 	private Integer port;
 	@Value("${meta.redis.password}")
 	private String password;
+
 
     @Primary
     @Bean("cf0")
@@ -39,6 +42,7 @@ public class RedisTemplateConfig {
         LettuceConnectionFactory cf = new LettuceConnectionFactory(standaloneConfiguration(5));
         return cf;
     }
+
 
 	private RedisStandaloneConfiguration standaloneConfiguration(int dataBase){
         RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
@@ -55,6 +59,8 @@ public class RedisTemplateConfig {
         template.setConnectionFactory(redisConnectionFactory);
         return template;
     }
+
+
 
     @Bean(name = "templateDB5")
     public StringRedisTemplate template5(@Qualifier("cf5") RedisConnectionFactory redisConnectionFactory) {

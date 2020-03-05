@@ -45,7 +45,8 @@
         <if test="asset!=null and asset!=''">
             AND asset=#{asset}
         </if>
-        AND pay_status NOT IN (1,2);
+            AND pay_status=#{payStatus}
+            AND approval_status=#{approvalStatus}
         </where>
     </select>
 

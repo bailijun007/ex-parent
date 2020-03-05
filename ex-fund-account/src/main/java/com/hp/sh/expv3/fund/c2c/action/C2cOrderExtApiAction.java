@@ -149,7 +149,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         C2cOrder order = new C2cOrder();
         order.setPayFinishTime(Instant.now().toEpochMilli());
         order.setApprovalStatus(auditStatus);
-        order.setPayStatus(auditStatus);
+//        order.setPayStatus(C2cConst.);
         order.setId(id);
         //更改订单状态 并返回该对象
         C2cOrder c2cOrder1 = sellService.updateById(order);
