@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import com.hp.sh.expv3.fund.c2c.constants.C2cConst;
 import com.hp.sh.expv3.fund.cash.constant.ApprovalStatus;
+import com.hp.sh.expv3.fund.cash.constant.PaymentStatus;
+import com.hp.sh.expv3.utils.IntBool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,8 +50,10 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
             historyVo.setCtime(vo.map(d -> d.getCreated()).orElse(null));
             historyVo.setWithdrawTime(vo.map(d -> d.getCreated()).orElse(null));
             //1.审核中,2.审核通过,3.失败
-            if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()==1){
+            if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()== PaymentStatus.SUCCESS){
                 historyVo.setStatus(ApprovalStatus.APPROVED);
+            }else if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()== PaymentStatus.FAIL){
+                historyVo.setStatus(ApprovalStatus.REJECTED);
             }
         }
 
