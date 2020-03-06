@@ -51,7 +51,7 @@
     </select>
 
     <select id="queryHistory" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id,asset symbol,  amount, approval_status  status,created,account,user_id userId,asset,pay_status payStatus,account targetAddress
+        select id,asset symbol,  amount, approval_status  status,created,account,user_id userId,asset,pay_status payStatus,account targetAddress,tx_hash txHash
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -81,7 +81,7 @@
     </select>
 
     <select id="queryHistoryByTime" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-      select id,asset symbol,  amount, pay_status  status,created,account,user_id userId,asset ,account targetAddress
+      select id,asset symbol,  amount, pay_status  status,created,account,user_id userId,asset ,account targetAddress,tx_hash txHash
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -100,7 +100,7 @@
     </select>
 
     <select id="queryLastHistory" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id,asset,   amount, pay_status  status,created,account,user_id userId,account targetAddress
+        select id,asset,   amount, pay_status  status,created,account,user_id userId,account targetAddress,tx_hash txHash
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -115,7 +115,7 @@
     </select>
 
     <select id="queryByUserIdAndAsset" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id, user_id,asset ,  amount, pay_status  status,created,account
+        select id, user_id,asset ,  amount, pay_status  status,created,account,tx_hash txHash
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -130,7 +130,7 @@
 
 
     <select id="queryHistoryByAdmin" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordByAdmin">
-         select id, user_id,asset ,  amount, approval_status  status,created,account ,created ctime ,account targetAddress,pay_status payStatus ,pay_status_desc payStatusDesc
+         select id, user_id,asset ,  amount, approval_status  status,created,account ,created ctime ,account targetAddress,pay_status payStatus ,pay_status_desc payStatusDesc,tx_hash txHash
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
@@ -144,7 +144,7 @@
     </select>
 
     <select id="listWithdrawalRecords" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id, user_id,asset ,  amount, approval_status  status,created,account ,created ctime ,account targetAddress,pay_status payStatus
+        select id, user_id,asset ,  amount, approval_status  status,created,account ,created ctime ,account targetAddress,pay_status payStatus,tx_hash txHash
         FROM withdrawal_record
         <where>
             <if test="userId!=null">
