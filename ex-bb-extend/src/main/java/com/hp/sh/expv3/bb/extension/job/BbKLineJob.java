@@ -124,13 +124,13 @@ public class BbKLineJob {
         BBKLine bBKLine = new BBKLine();
         bBKLine.setAsset(asset);
         bBKLine.setSymbol(symbol);
-        bBKLine.setSequence(1);
+        bBKLine.setFrequence(1);
         bBKLine.setMinute(minute);
 
         BigDecimal highPrice = BigDecimal.ZERO;
         BigDecimal lowPrice = BigDecimal.ZERO;
         BigDecimal openPrice = null;
-        BigDecimal closePrice = BigDecimal.ZERO;
+        BigDecimal closePrice = null;
         BigDecimal volume = BigDecimal.ZERO;
 
         for (BbTradeVo trade : trades) {

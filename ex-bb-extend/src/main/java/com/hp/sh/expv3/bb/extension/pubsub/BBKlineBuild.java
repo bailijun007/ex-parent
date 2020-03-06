@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,8 @@ public class BBKlineBuild {
     @PostConstruct
     public void trigger() {
         List<BBSymbol> bbSymbols = listSymbol();
+        List<BbTradeVo> list =new CopyOnWriteArrayList<>();
+
         for (BBSymbol bbSymbol : bbSymbols) {
             String asset = bbSymbol.getAsset();
             String symbol = bbSymbol.getSymbol();
@@ -57,8 +60,10 @@ public class BBKlineBuild {
                     logger.info("收到k线推送消息:{}" + msg);
                     List<BbTradeVo> bbTradeVos = listTrade(msg);
 
+                    list.addAll(bbTradeVos);
+
                     // 拆成不同的分钟
-                    Map<Long, List<BbTradeVo>> minute2TradeList = bbTradeVos.stream()
+                    Map<Long, List<BbTradeVo>> minute2TradeList = list.stream()
                             .collect(Collectors.groupingBy(klineTrade -> klineTrade.getTradeTime()));
 
                     for (Long ms : minute2TradeList.keySet()) {
@@ -68,8 +73,7 @@ public class BBKlineBuild {
 
                         BBKLine oldkLine = getOldKLine(asset, symbol, minute, 1);
 
-                        BBKLine mergedKline = merge(newkLine, oldkLine);
-
+                        BBKLine mergedKline = merge(oldkLine, newkLine);
                         saveKline(mergedKline, asset, symbol, minute, 1);
 
                         notifyUpdate(asset, symbol, minute, 1);
@@ -83,18 +87,23 @@ public class BBKlineBuild {
 
     }
 
-    private BBKLine merge(BBKLine newkLine, BBKLine oldkLine) {
+    private BBKLine merge(BBKLine oldkLine, BBKLine newkLine) {
         // oldKline 有可能是空，直接返回newKline
         if (null == oldkLine) {
-        } else {
-            newkLine.setHigh(newkLine.getHigh().max(oldkLine.getHigh()));
-            newkLine.setLow(newkLine.getLow().min(oldkLine.getLow()));
-            newkLine.setOpen(oldkLine.getOpen());
-            newkLine.setVolume(newkLine.getVolume().add(oldkLine.getVolume()));
+            return newkLine;
         }
+        newkLine.setHigh(newkLine.getHigh().max(oldkLine.getHigh()));
+        newkLine.setLow(newkLine.getLow().min(oldkLine.getLow()));
+        newkLine.setOpen(oldkLine.getOpen());
+        newkLine.setVolume(newkLine.getVolume().add(oldkLine.getVolume()));
+
         return newkLine;
     }
-
+//1,2,3,4,5
+//        2->1 1,3,4,5
+//        3->1 1,4,5
+//        4->1 1,5
+//        5->1 1
 
     private List<BBSymbol> listSymbol() {
         HashOperations opsForHash = templateDB0.opsForHash();
@@ -139,23 +148,23 @@ public class BBKlineBuild {
         BBKLine bBKLine = new BBKLine();
         bBKLine.setAsset(asset);
         bBKLine.setSymbol(symbol);
-        bBKLine.setSequence(1);
+        bBKLine.setFrequence(1);
         bBKLine.setMinute(minute);
 
         BigDecimal highPrice = BigDecimal.ZERO;
-        BigDecimal lowPrice = BigDecimal.ZERO;
         BigDecimal openPrice = null;
-        BigDecimal closePrice = BigDecimal.ZERO;
+        BigDecimal closePrice = null;
         BigDecimal volume = BigDecimal.ZERO;
 
         for (BbTradeVo trade : trades) {
             BigDecimal currentPrice = trade.getPrice();
-            highPrice = highPrice.compareTo(trade.getPrice()) >= 0 ? highPrice : currentPrice;
-            lowPrice = lowPrice.compareTo(trade.getPrice()) <= 0 ? lowPrice : currentPrice;
+            highPrice = highPrice.compareTo(currentPrice) >= 0 ? highPrice : currentPrice;
             openPrice = null == openPrice ? currentPrice : openPrice;
             closePrice = currentPrice;
             volume = volume.add(trade.getNumber());
         }
+
+         BigDecimal lowPrice = trades.stream().map(trade -> trade.getPrice()).min((t1, t2) -> t1.compareTo(t2)).get();
 
         bBKLine.setHigh(highPrice);
         bBKLine.setLow(lowPrice);

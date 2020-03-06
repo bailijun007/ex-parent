@@ -8,7 +8,7 @@ import java.math.BigDecimal;
  */
 public class BBKLine implements Serializable {
     private String asset, symbol;
-    private int sequence;// 频率，固定一分钟
+    private int frequence;// 频率，固定一分钟
     private long minute; // 同输入的分钟
     private BigDecimal volume; //  number 累加
     //        BigDecimal amt;//
@@ -26,7 +26,7 @@ public class BBKLine implements Serializable {
         return "BBKLine{" +
                 "asset='" + asset + '\'' +
                 ", symbol='" + symbol + '\'' +
-                ", sequence=" + sequence +
+                ", frequence=" + frequence +
                 ", minute=" + minute +
                 ", volume=" + volume +
                 ", high=" + high +
@@ -52,12 +52,12 @@ public class BBKLine implements Serializable {
         this.symbol = symbol;
     }
 
-    public int getSequence() {
-        return sequence;
+    public int getFrequence() {
+        return frequence;
     }
 
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
+    public void setFrequence(int frequence) {
+        this.frequence = frequence;
     }
 
     public long getMinute() {
