@@ -240,7 +240,7 @@ public class BBTradeService {
 			collectorCoreService.add(request);
 		}else if(BigUtils.ltZero(orderTrade.getFee())){
 			CollectorCutRequest request = new CollectorCutRequest();
-			request.setAmount(orderTrade.getFee());
+			request.setAmount(orderTrade.getFee().negate());
 			request.setAsset(orderTrade.getAsset());
 			request.setAssociatedId(orderTrade.getOrderId());
 			request.setRemark("倒贴手续费");
