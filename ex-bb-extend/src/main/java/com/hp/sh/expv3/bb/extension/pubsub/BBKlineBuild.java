@@ -54,7 +54,7 @@ public class BBKlineBuild {
                 @Override
                 public void onMessage(Message message, byte[] pattern) {
                     String msg = new String(message.getBody());
-                    logger.info("收到k线推送消息:{}"+msg);
+                    logger.info("收到k线推送消息:{}" + msg);
                     List<BbTradeVo> bbTradeVos = listTrade(msg);
 
                     // 拆成不同的分钟
@@ -66,13 +66,13 @@ public class BBKlineBuild {
                         List<BbTradeVo> trades = minute2TradeList.get(ms);
                         BBKLine newkLine = buildKline(trades, asset, symbol, minute);
 
-                        BBKLine oldkLine = getOldKLine(asset, symbol, minute);
+                        BBKLine oldkLine = getOldKLine(asset, symbol, minute, 1);
 
                         BBKLine mergedKline = merge(newkLine, oldkLine);
 
-                        saveKline(mergedKline, asset, symbol, minute);
+                        saveKline(mergedKline, asset, symbol, minute, 1);
 
-                        notifyUpdate(minute, asset, symbol);
+                        notifyUpdate(asset, symbol, minute, 1);
                     }
 
                 }
@@ -114,16 +114,25 @@ public class BBKlineBuild {
      * kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
      *   interval 频率；1分钟
      */
-    private void saveKline(BBKLine kline, String asset, String symbol, long minute) {
+    private void saveKline(BBKLine kline, String asset, String symbol, long minute, int interval) {
         //向集合中插入元素，并设置分数
-        final String key = BbKLineKey.KLINE_BB + asset + ":" + symbol + ":" + minute;
+        String key = buildKlineSaveRedisKey(asset, symbol, interval);
         klineTemplateDB5.opsForZSet().removeRangeByScore(key, minute, minute);
         klineTemplateDB5.opsForZSet().add(key, JSON.toJSONString(kline), minute);
     }
 
-    private void notifyUpdate(long minute, String asset, String symbol) {
+    private String buildUpdateRedisKey(String asset, String symbol, int interval) {
+        return BbKLineKey.KLINE_BB_UPDATE + asset + ":" + symbol + ":" + interval;
+    }
+
+    private String buildKlineSaveRedisKey(String asset, String symbol, int interval) {
+        return BbKLineKey.KLINE_BB + asset + ":" + symbol + ":" + interval;
+    }
+
+    private void notifyUpdate(String asset, String symbol, long minute, int interval) {
         //向集合中插入元素，并设置分数
-        klineTemplateDB5.opsForZSet().add(BbKLineKey.KLINE_UPDATE_BB + asset + ":" + symbol + ":" + minute, asset + "#" + symbol + "#" + minute, minute);
+        String key = buildUpdateRedisKey(asset, symbol, interval);
+        klineTemplateDB5.opsForZSet().add(key, asset + "#" + symbol + "#" + minute, minute);
     }
 
     private BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, long minute) {
@@ -164,10 +173,11 @@ public class BBKlineBuild {
     }
 
 
-    BBKLine getOldKLine(String asset, String symbol, long minute) {
+    BBKLine getOldKLine(String asset, String symbol, long minute, int interval) {
         BBKLine bbkLine1 = null;
+        String key = buildKlineSaveRedisKey(asset, symbol, interval);
         Set<String> range = klineTemplateDB5.opsForZSet()
-                .rangeByScore(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol + ":" + minute, minute, minute);
+                .rangeByScore(key, minute, minute);
 
         if (!range.isEmpty()) {
             final String s = new ArrayList<>(range).get(0);

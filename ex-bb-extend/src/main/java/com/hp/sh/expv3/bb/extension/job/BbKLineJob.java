@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.bb.extension.job;
 
 import com.alibaba.fastjson.JSON;
-import com.google.common.collect.Lists;
 import com.hp.sh.expv3.bb.extension.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.extension.pojo.BBKLine;
 import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
@@ -17,12 +16,9 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author BaiLiJun  on 2020/3/4
@@ -52,7 +48,8 @@ public class BbKLineJob {
             String symbol = bbSymbol.getSymbol();
             while (true) {
                 //返回集合内元素的排名，以及分数（从小到大）
-                Set<ZSetOperations.TypedTuple<String>> task = templateDB0.opsForZSet().rangeWithScores(BbKLineKey.BB_KLINE_TASK + asset + ":" + symbol, 0, -1);
+                String taskKey = BbKLineKey.KLINE_BB_TASK_FROM_EXP + asset + ":" + symbol;
+                Set<ZSetOperations.TypedTuple<String>> task = templateDB0.opsForZSet().rangeWithScores(taskKey, 0, -1);
                 if (CollectionUtils.isEmpty(task)) {
                     break;
                 }
@@ -66,7 +63,8 @@ public class BbKLineJob {
                     }
 
                     // 若修复数据已存在，忽略 从redis kline:from_exp:repair:BB:${asset}:${symbol}:${minute}中取
-                    Set<ZSetOperations.TypedTuple<String>> repaired = templateDB0.opsForZSet().rangeWithScores(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol + ":" + minute, 0, -1);
+                   String repairkey = BbKLineKey.KLINE_BB_REPAIR_FROM_EXP + asset + ":" + symbol + ":" + 1;
+                    Set<ZSetOperations.TypedTuple<String>> repaired = templateDB0.opsForZSet().rangeWithScores(repairkey, 0, -1);
 
                     if (null != repaired || !repaired.isEmpty()) {
                         continue;
@@ -112,7 +110,7 @@ public class BbKLineJob {
     // kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
     private void saveKline(BBKLine kline, String asset, String symbol,int interval,long minute) {
         //向集合中插入元素，并设置分数
-        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_REPAIR + asset + ":" + symbol+":"+interval, JSON.toJSONString(kline), minute);
+        templateDB0.opsForZSet().add(BbKLineKey.KLINE_BB_REPAIR_FROM_EXP + asset + ":" + symbol+":"+interval, JSON.toJSONString(kline), minute);
     }
 
     // kline:from_exp:update:BB:${asset}:${symbol}:${minute}
