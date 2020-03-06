@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.hp.sh.expv3.fund.extension.constants.WithdrawalStatus;
+import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordByAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,13 +52,13 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
             historyVo.setWithdrawTime(vo.map(d -> d.getCreated()).orElse(null));
             //1.审核中,2.审核通过,3.失败
             if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()== PaymentStatus.SUCCESS){
-                historyVo.setStatus(ApprovalStatus.APPROVED);
+                historyVo.setStatus(WithdrawalStatus.SUCCESS);
             }else if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()== PaymentStatus.FAIL){
               //审核通过，支付失败 状态也是失败
-                historyVo.setStatus(ApprovalStatus.REJECTED);
-            }else if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()== PaymentStatus.PENDING){
-                //审核通过，待支付 状态是审核中
-                historyVo.setStatus(ApprovalStatus.IN_AUDIT);
+                historyVo.setStatus(WithdrawalStatus.FAIL);
+            }else{
+                //审核中
+                historyVo.setStatus(WithdrawalStatus.IN_APPROVAL);
             }
         }
 
@@ -119,6 +121,19 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
         pageResult.setPageNo(info.getPageNum());
         pageResult.setPageCount(info.getPages());
         pageResult.setRowTotal(info.getTotal());
+        return pageResult;
+    }
+
+    @Override
+    public PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(Long userId, String asset, Integer pageNo, Integer pageSize) {
+        PageHelper.startPage(pageNo,pageSize);
+        PageResult<WithdrawalRecordByAdmin> pageResult=new PageResult<>();
+        List<WithdrawalRecordByAdmin> list = withdrawalRecordExtMapper.queryHistoryByAdmin(userId,asset);
+         PageInfo<WithdrawalRecordByAdmin> info = new PageInfo<>(list);
+        pageResult.setList(list);
+        pageResult.setRowTotal(info.getTotal());
+        pageResult.setPageNo(info.getPageNum());
+        pageResult.setPageCount(info.getPages());
         return pageResult;
     }
 
