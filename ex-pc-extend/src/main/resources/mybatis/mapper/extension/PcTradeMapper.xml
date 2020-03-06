@@ -144,10 +144,10 @@
            and p.symbol=#{symbol}
            and (p.tk_account_id=#{userId} or p.mk_account_id=#{userId})
            <if test="tradeTimeBegin!=null">
-               and p.trade_time &gt;#{tradeTimeBegin}
+               and p.trade_time &gt;=#{tradeTimeBegin}
            </if>
            <if test="tradeTimeEnd!=null">
-               and p.trade_time &lt;=#{tradeTimeEnd}
+               and p.trade_time &lt;#{tradeTimeEnd}
            </if>
        </where>
         ORDER BY p.id ASC

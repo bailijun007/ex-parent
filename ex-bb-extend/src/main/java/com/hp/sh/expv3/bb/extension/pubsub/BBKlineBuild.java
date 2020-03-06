@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,8 @@ public class BBKlineBuild {
     @PostConstruct
     public void trigger() {
         List<BBSymbol> bbSymbols = listSymbol();
+        List<BbTradeVo> list =new CopyOnWriteArrayList<>();
+
         for (BBSymbol bbSymbol : bbSymbols) {
             String asset = bbSymbol.getAsset();
             String symbol = bbSymbol.getSymbol();
@@ -57,8 +60,10 @@ public class BBKlineBuild {
                     logger.info("收到k线推送消息:{}" + msg);
                     List<BbTradeVo> bbTradeVos = listTrade(msg);
 
+                    list.addAll(bbTradeVos);
+
                     // 拆成不同的分钟
-                    Map<Long, List<BbTradeVo>> minute2TradeList = bbTradeVos.stream()
+                    Map<Long, List<BbTradeVo>> minute2TradeList = list.stream()
                             .collect(Collectors.groupingBy(klineTrade -> klineTrade.getTradeTime()));
 
                     for (Long ms : minute2TradeList.keySet()) {
@@ -147,19 +152,19 @@ public class BBKlineBuild {
         bBKLine.setMinute(minute);
 
         BigDecimal highPrice = BigDecimal.ZERO;
-        BigDecimal lowPrice = BigDecimal.ZERO;
         BigDecimal openPrice = null;
         BigDecimal closePrice = null;
         BigDecimal volume = BigDecimal.ZERO;
 
         for (BbTradeVo trade : trades) {
             BigDecimal currentPrice = trade.getPrice();
-            highPrice = highPrice.compareTo(trade.getPrice()) >= 0 ? highPrice : currentPrice;
-            lowPrice = lowPrice.compareTo(trade.getPrice()) <= 0 ? lowPrice : currentPrice;
+            highPrice = highPrice.compareTo(currentPrice) >= 0 ? highPrice : currentPrice;
             openPrice = null == openPrice ? currentPrice : openPrice;
             closePrice = currentPrice;
             volume = volume.add(trade.getNumber());
         }
+
+         BigDecimal lowPrice = trades.stream().map(trade -> trade.getPrice()).min((t1, t2) -> t1.compareTo(t2)).get();
 
         bBKLine.setHigh(highPrice);
         bBKLine.setLow(lowPrice);
