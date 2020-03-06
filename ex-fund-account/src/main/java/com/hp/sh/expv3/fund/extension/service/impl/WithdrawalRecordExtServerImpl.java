@@ -105,7 +105,7 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
         map.put("approvalStatus", approvalStatus);
         map.put("modifiedBegin", startTime);
         map.put("modifiedEnd", endTime);
-        List<WithdrawalRecordVo> list = withdrawalRecordExtMapper.queryList(map);
+        List<WithdrawalRecordVo> list = withdrawalRecordExtMapper.listWithdrawalRecords(map);
 
         if (!CollectionUtils.isEmpty(list)) {
             for (WithdrawalRecordVo vo : list) {

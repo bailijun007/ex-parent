@@ -24,5 +24,5 @@ public interface WithdrawalRecordExtMapper {
 
     List<WithdrawalRecordVo> queryByUserIdAndAsset(@Param("userId") Long userId,@Param("asset") String asset);
 
-    List<WithdrawalRecordVo> queryList(Map<String, Object> map);
+    List<WithdrawalRecordVo> listWithdrawalRecords(Map<String, Object> map);
 }

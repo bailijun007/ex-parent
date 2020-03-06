@@ -129,8 +129,8 @@
     </select>
 
 
-    <select id="queryList" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
-        select id, user_id,asset ,  amount, pay_status  status,created,account ,created ctime ,account targetAddress
+    <select id="listWithdrawalRecords" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
+        select id, user_id,asset ,  amount, approval_status  status,created,account ,created ctime ,account targetAddress,pay_status payStatus
         FROM withdrawal_record
         <where>
             <if test="userId!=null">

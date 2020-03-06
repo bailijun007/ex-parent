@@ -76,7 +76,7 @@ public interface WithdrawalRecordExtApi {
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "ETH", required = false),
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false),
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false),
-            @ApiImplicitParam(name = "approvalStatus", value = "审批状态(4:审批中 5:审批通过:6:拒绝)", required = false),
+            @ApiImplicitParam(name = "approvalStatus", value = "审批状态(1:审批中 2:审批通过:3:拒绝)", required = false),
             @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
