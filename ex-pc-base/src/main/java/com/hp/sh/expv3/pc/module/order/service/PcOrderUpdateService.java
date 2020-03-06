@@ -7,6 +7,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hp.sh.expv3.commons.exception.ExSysException;
+import com.hp.sh.expv3.error.ExSysError;
 import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.constant.PcOrderLogType;
 import com.hp.sh.expv3.pc.constant.TriggerType;
@@ -64,24 +66,23 @@ public class PcOrderUpdateService {
 		this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.TRADE, order.getModified());
 	}
 
-	public PcOrderLog setNewStatus(long orderId, long userId, int newStatus, int pendingNew, long modified) {
-		long count = this.pcOrderDAO.updateStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, modified);
+	public PcOrderLog setNewStatus(PcOrder order, long modified) {
+		long count = this.pcOrderDAO.updateStatus(OrderStatus.NEW, modified, order.getId(), order.getUserId(), order.getVersion());
 		if(count==0){
-			logger.error("更新失败，orderId={}", orderId);
-			return null;
+			throw new ExSysException(ExSysError.UPDATED_ERR, order);
 		}
+		
 		//日志
-		PcOrderLog orderLog = this.saveSysOrderLog(userId, orderId, PcOrderLogType.SET_STATUS_NEW, modified);
+		PcOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.SET_STATUS_NEW, modified);
 		
 		//事件
-		PcOrder pcOrder = this.pcOrderDAO.findById(userId, orderId);
-		this.publishOrderEvent(pcOrder, orderLog);
+		this.publishOrderEvent(order, orderLog);
 		
 		return orderLog;
 	}
 
-	public void setUserCancelStatus(long orderId, long userId, int cancelStatus, long modified, int status1, int status2, int activeFlag) {
-		long count = this.pcOrderDAO.updateCancelStatus(orderId, userId, cancelStatus, modified, status1, status2, activeFlag);
+	public void setPendingCancelStatus(long modified, long orderId, long userId, long version) {
+		long count = this.pcOrderDAO.updateStatus(OrderStatus.PENDING_CANCEL, modified, orderId, userId, version);
 		
 		if(count==0){
 			logger.error("撤单更新失败，orderId={}", orderId);

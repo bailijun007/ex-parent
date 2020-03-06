@@ -18,6 +18,8 @@ import com.hp.sh.expv3.bb.module.order.entity.BBActiveOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;
 import com.hp.sh.expv3.bb.mq.msg.vo.BBOrderEvent;
+import com.hp.sh.expv3.commons.exception.ExSysException;
+import com.hp.sh.expv3.error.ExSysError;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Service
@@ -63,18 +65,17 @@ public class BBOrderUpdateService {
 		BBOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), BBOrderLogType.TRADE, order.getModified());
 	}
 
-	public BBOrderLog setNewStatus(long orderId, long userId, int newStatus, int pendingNew, long modified) {
-		BBOrder bBOrder = this.bBOrderDAO.findById(userId, orderId);
-		long count = this.bBOrderDAO.updateStatus(OrderStatus.NEW, modified, orderId, userId, bBOrder.getVersion());
+	public BBOrderLog setNewStatus(BBOrder order, long modified) {
+		long count = this.bBOrderDAO.updateStatus(OrderStatus.NEW, modified, order.getId(), order.getUserId(), order.getVersion());
 		if(count==0){
-			logger.error("更新失败，orderId={}", orderId);
-			return null;
+			throw new ExSysException(ExSysError.UPDATED_ERR, order);
 		}
+		
 		//日志
-		BBOrderLog orderLog = this.saveSysOrderLog(userId, orderId, BBOrderLogType.SET_STATUS_NEW, modified);
+		BBOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), BBOrderLogType.SET_STATUS_NEW, modified);
 		
 		//事件
-		this.publishOrderEvent(bBOrder, orderLog);
+		this.publishOrderEvent(order, orderLog);
 		
 		return orderLog;
 	}

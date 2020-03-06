@@ -158,9 +158,9 @@
 		update 
 			pc_order
 		set 
-			status=#{newStatus}, modified=#{modified}
+			status=#{newStatus}, modified=#{modified}, version=${version}+1
 		where 
-			id=#{orderId} and user_id=#{userId} and status=#{oldStatus}
+			id=#{orderId} and user_id=#{userId} and version=#{version}
 	</update>
 
 	<update id="updateCancelStatus">
