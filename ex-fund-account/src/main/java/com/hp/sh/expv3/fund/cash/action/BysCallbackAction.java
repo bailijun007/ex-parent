@@ -50,7 +50,7 @@ public class BysCallbackAction extends BaseApiAction{
 	@ApiOperation(value = "创建充值通知")
 	@PostMapping("/deposit/create")
 	public BysCreateResult create(@RequestBody NotifyCreateBody notify){
-		logger.info("requestBody:{}", JsonUtils.toJson(notify));
+		logger.warn("requestBody:{}", JsonUtils.toJson(notify));
 		Map map = BeanHelper.beanToMap(notify);
 		NotifyCreateParams cp = exChainService.getCreateParams(map);
 		String asset = asset2Symbol.getAsset(cp.getSymbolId());
@@ -61,6 +61,7 @@ public class BysCallbackAction extends BaseApiAction{
 	@ApiOperation(value = "支付结果通知")
 	@PostMapping("/deposit/notify/{status}")
 	public void depositNotify(@PathVariable String status, @RequestBody NotifyResultBody resultBody){
+		logger.warn("requestBody:{}", JsonUtils.toJson(resultBody));
 		Map map = BeanHelper.beanToMap(resultBody);
 		NotifyResultParams np = exChainService.getNotifyParams(map);
 		Long userId = Long.parseLong(np.getUserId());

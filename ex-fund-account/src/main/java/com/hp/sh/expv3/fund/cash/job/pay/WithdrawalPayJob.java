@@ -72,13 +72,13 @@ public class WithdrawalPayJob {
 		try{
 			WithDrawResponse response = exChainService.draw(record.getUserId(), symbol, record.getAccount(), amount, record.getSn());
 			logger.info("调用提币接口：{}", response.toString());
-			if( response.getStatus()==WithDrawResponse.STATUS_FAIL ){
-				this.withdrawalService.onDrawFail(record.getUserId(), record.getId());
+			if(response.getStatus()==WithDrawResponse.STATUS_FAIL ){
+				this.withdrawalService.onDrawFail(record.getUserId(), record.getId(), "提币失败：status="+response.getStatus());
 			}else{
 				this.withdrawalService.onDrawSuccess(record.getUserId(), record.getId(), response.getTxHash());
 			}
 		}catch(ErrorResponseException e){
-			this.withdrawalService.onDrawFail(record.getUserId(), record.getId());
+			this.withdrawalService.onDrawFail(record.getUserId(), record.getId(), e.getDes());
 			logger.error(e.getMessage(), e);
 		}
 

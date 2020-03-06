@@ -29,13 +29,13 @@ public class MetadataServiceMock implements MetadataService {
         BBSymbolVO bb1 = new BBSymbolVO();
         bb1.setAsset("USDT");
         bb1.setSymbol("BTC_USDT");
-        bb1.setBbGroup(1);
+        bb1.setBbGroupId(1);
         list.add(bb1);
 
         BBSymbolVO bb2 = new BBSymbolVO();
         bb2.setAsset("USDT");
         bb2.setSymbol("ETH_USDT");
-        bb2.setBbGroup(1);
+        bb2.setBbGroupId(1);
         list.add(bb2);
         
         return list;

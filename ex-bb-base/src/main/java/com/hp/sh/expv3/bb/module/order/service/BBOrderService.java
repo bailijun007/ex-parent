@@ -272,7 +272,7 @@ public class BBOrderService {
 		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
 		if(order.getStatus()!=OrderStatus.PENDING_NEW){
-			logger.error("NEW状态错误，orderId={}", orderId);
+			logger.error("NEW状态错误，orderId={}", orderId, order.getStatus());
 			return ;
 		}
 
