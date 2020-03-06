@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.bb.api;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,8 @@ import com.hp.sh.expv3.bb.job.BBMatchedJob;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
+import com.hp.sh.expv3.component.executor.GroupTask;
+import com.hp.sh.expv3.component.executor.OrderlyExecutors;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -28,7 +32,10 @@ public class BBMaintainAction{
 	private BBOrderApiAction bBOrderApiAction;
 	
 	@Autowired
-	private BBMatchedHandler tradeJob;
+	private BBMatchedHandler matchedHandler;
+	
+	@Autowired
+	private OrderlyExecutors tradeExecutors;
 
 	@ApiOperation(value = "version")
 	@GetMapping(value = "/api/bb/maintain/version")
@@ -113,6 +120,20 @@ public class BBMaintainAction{
 	@ApiOperation(value = "job")
 	@GetMapping(value = "/api/bb/maintain/job/handle")	
 	public void jobHandle(){
-		tradeJob.handlePending();
+		matchedHandler.handlePending();
+	}
+
+	@ApiOperation(value = "thead")
+	@GetMapping(value = "/api/bb/maintain/thead/queueSizeMap")	
+	public Map getQueueSizeMap(){
+		Map result = new HashMap();
+		Map<Integer,Integer> map = tradeExecutors.getQueueSizeMap();
+		int total = 0;
+		for(int n : map.values()){
+			total += n;
+		}
+		result.put("total", total);
+		result.put("map", tradeExecutors.getQueueSizeMap());
+		return result;
 	}
 }

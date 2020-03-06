@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Component
+//禁用定时任务，靠mq排序无法使用job
+//@Component
 public class BBMatchedJob {
     private static final Logger logger = LoggerFactory.getLogger(BBMatchedJob.class);
 

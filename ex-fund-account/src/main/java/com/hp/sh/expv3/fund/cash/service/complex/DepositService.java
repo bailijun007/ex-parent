@@ -57,6 +57,7 @@ public class DepositService {
 		rr.setChannelId(channelId);
 		rr.setPayStatus(PaymentStatus.PENDING);
 		rr.setTransactionId(chainOrderId);
+		rr.setPayTime(now);
 		rr.setPayFinishTime(null);
 		rr.setPayStatusDesc(null);
 		
@@ -131,8 +132,12 @@ public class DepositService {
 	}
 
 	public void changePayStatus(DepositRecord rr, int status){
+		Long now = DbDateUtils.now();
+		if(status==PaymentStatus.SUCCESS){
+			rr.setPayFinishTime(now);
+		}
 		rr.setPayStatus(status);
-		rr.setModified(DbDateUtils.now());
+		rr.setModified(now);
 		this.depositRecordDAO.update(rr);
 	}
 	

@@ -107,12 +107,12 @@ public class WithdrawalService {
 		this.withdrawalRecordDAO.update(rr);
 	}
 
-	public void onDrawFail(Long userId, Long id){
+	public void onDrawFail(Long userId, Long id, String error){
 		Long now = DbDateUtils.now();
 		WithdrawalRecord rr = this.withdrawalRecordDAO.findById(userId, id);
 		rr.setPayTime(now);
 		rr.setPayFinishTime(now);
-		rr.setPayStatusDesc("提现失败");
+		rr.setPayStatusDesc(error);
 		rr.setPayStatus(PaymentStatus.FAIL);
 		
 		rr.setSynchStatus(SynchStatus.RETURN);

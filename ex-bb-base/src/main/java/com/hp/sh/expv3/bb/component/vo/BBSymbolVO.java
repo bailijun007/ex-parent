@@ -65,7 +65,7 @@ public class BBSymbolVO {
      * 分组
      * 每组最多放2个
      */
-    private Integer bbSymbolGroup;
+    private Integer bbGroupId;
     /**
      * 名称
      */
@@ -219,12 +219,12 @@ public class BBSymbolVO {
 		this.bbSymbolType = bbSymbolType;
 	}
 
-	public Integer getBbSymbolGroup() {
-		return bbSymbolGroup;
+	public Integer getBbGroupId() {
+		return bbGroupId;
 	}
 
-	public void setBbSymbolGroup(Integer bbSymbolGroup) {
-		this.bbSymbolGroup = bbSymbolGroup;
+	public void setBbGroupId(Integer bbSymbolGroup) {
+		this.bbGroupId = bbSymbolGroup;
 	}
 
 	public String getBbSymbolName() {
@@ -318,7 +318,7 @@ public class BBSymbolVO {
 	@Override
 	public String toString() {
 		return "BBSymbolVO [id=" + id + ", asset=" + asset + ", symbol=" + symbol + ", symbolType=" + symbolType
-				+ ", bbSymbolType=" + bbSymbolType + ", bbSymbolGroup=" + bbSymbolGroup + ", bbSymbolName="
+				+ ", bbSymbolType=" + bbSymbolType + ", bbGroupId=" + bbGroupId + ", bbSymbolName="
 				+ bbSymbolName + ", lastPrice=" + lastPrice + ", faceValue=" + faceValue + ", faceCurrency="
 				+ faceCurrency + ", baseCurrency=" + baseCurrency + ", settleCurrency=" + settleCurrency + "]";
 	}

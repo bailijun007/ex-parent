@@ -39,8 +39,8 @@ public class MqOrderlyConsumer {
 	@Autowired
 	private EndpointContext endpointContext;
 	
-	@Value("${pc.mq.consumer.contractGroup}")
-	private Integer contractGroup;
+	@Value("${pc.mq.consumer.bbGroupId}")
+	private Integer bbGroupId;
 	
 	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic);
@@ -75,7 +75,7 @@ public class MqOrderlyConsumer {
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error(cause.toString(), cause);
+        			logger.error("未知捕获"+cause.getMessage(), e);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		
@@ -91,7 +91,7 @@ public class MqOrderlyConsumer {
 	public void start123() throws MQClientException{
 		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
 		for(BBSymbolVO bbvo : pcList){
-			if(contractGroup.equals(bbvo.getBbSymbolGroup())){
+			if(bbGroupId.equals(bbvo.getBbGroupId())){
 				this.buildConsumer(MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol()));
 			}
 	        logger.info("MQConsumer Started. asset={}, symbol={}", bbvo.getAsset(), bbvo.getSymbol());

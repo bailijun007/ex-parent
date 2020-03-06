@@ -66,7 +66,6 @@ public class ChainCasehApiAction implements ChainCasehApi{
 		if(addr==null){
 			Integer symbolId = asset2Symbol.getSymbol(asset);
 			String address = chainService.getAddress(userId, symbolId);
-	        System.out.println("address = " + address);
 	        addr = new DepositAddr();
 	        addr.setAsset(asset);
 	        addr.setUserId(userId);

@@ -16,6 +16,7 @@ import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradePair;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.component.executor.AbstractGroupTask;
 import com.hp.sh.expv3.component.executor.OrderlyExecutors;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
@@ -29,10 +30,12 @@ public class BBMatchedHandler {
     
 	@Autowired
 	private BBTradeService tradeService;
+	
 	@Autowired
 	private BBOrderService orderService;
 	
-	private OrderlyExecutors orderlyExecutors = new OrderlyExecutors(20, 500);
+	@Autowired
+	private OrderlyExecutors tradeExecutors;
 	
 	private Long startTime = 0L;
 	
@@ -66,22 +69,19 @@ public class BBMatchedHandler {
 		// MAKER
 		if(matchedTrade.getMakerHandleStatus()==BBMatchedTrade.NO){
 			BBTradeVo tradeVo = tradePair.getMakerTradeVo();
-			int key = (tradeVo.getSymbol()+tradeVo.getAccountId()).hashCode();
-			this.orderlyExecutors.submit(key, new TradeTask(tradeVo));
+			this.tradeExecutors.submit(new TradeTask(tradeVo));
 		}
 		
 		// TAKER
 		if(matchedTrade.getTakerHandleStatus()==BBMatchedTrade.NO){
 			BBTradeVo tradeVo = tradePair.getTakerTradeVo();
-			int key = (tradeVo.getSymbol()+tradeVo.getAccountId()).hashCode();
-			this.orderlyExecutors.submit(key, new TradeTask(tradeVo));
+			this.tradeExecutors.submit(new TradeTask(tradeVo));
 		}
 		
 	}
 	
 	public void handleCancelled(BbOrderCancelMqMsg msg){
-		int key = (msg.getSymbol()+msg.getAccountId()).hashCode();
-		this.orderlyExecutors.submit(key, new CancelledTask(msg));
+		this.tradeExecutors.submit(new CancelledTask(msg));
 	}
 	
 	private BBTradePair getTradePair(BBMatchedTrade matchedTrade){
@@ -120,16 +120,20 @@ public class BBMatchedHandler {
 		return new BBTradePair(makerTradeVo, takerTradeVo);
 	}
 
-	class TradeTask implements Runnable{
+	class TradeTask extends AbstractGroupTask{
 
 		private BBTradeVo tradeVo;
 		
 		public TradeTask(BBTradeVo tradeVo) {
 			this.tradeVo = tradeVo;
 		}
+		
+		public int getKey(){
+			int key = tradeVo.getOrderId().hashCode();
+			return Math.abs(key);
+		}
 
-		@Override
-		public void run() {
+		public void doRun() {
 			try{
 				//成交
 				tradeService.handleTrade(tradeVo);
@@ -147,16 +151,20 @@ public class BBMatchedHandler {
 
 	}
 
-	class CancelledTask implements Runnable{
+	class CancelledTask extends AbstractGroupTask{
 
 		private BbOrderCancelMqMsg msg;
 		
 		public CancelledTask(BbOrderCancelMqMsg msg) {
 			this.msg = msg;
 		}
+		
+		public int getKey(){
+			int key = msg.getOrderId().hashCode();
+			return Math.abs(key);
+		}
 
-		@Override
-		public void run() {
+		public void doRun() {
 			try{
 				orderService.setCancelled(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
 			}catch(Exception e){

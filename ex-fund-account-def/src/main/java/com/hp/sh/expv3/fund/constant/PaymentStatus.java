@@ -7,7 +7,7 @@ package com.hp.sh.expv3.fund.constant;
  */
 public class PaymentStatus {
 	
-	//待查
+	//待确认
 	public static final int PENDING = 0;
 	//支付成功
 	public static final int SUCCESS = 1;

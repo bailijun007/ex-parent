@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.fund.cash.entity.DepositRecord;
 import com.hp.sh.expv3.fund.cash.service.complex.DepositService;
+import com.hp.sh.expv3.fund.constant.PaymentStatus;
 
 //@Component
 @EnableScheduling
@@ -39,7 +40,7 @@ public class DepositePayJob {
 	
 	private void handleOne(DepositRecord record){
 		boolean success = this.queryPayStatus(record.getSn());
-		this.depositService.changePayStatus(record, DepositRecord.YES);
+		this.depositService.changePayStatus(record, PaymentStatus.SUCCESS);
 	}
 	
 	private boolean queryPayStatus(String sn){
