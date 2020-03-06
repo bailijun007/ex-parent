@@ -23,6 +23,9 @@ public class WithDrawalSender {
 	@Value("${hp.rocketmq.namespace}")
 	private String namespace;
 	
+	@Value("${spring.application.name}")
+	private String appName;
+	
     private DefaultMQProducer producer;
     
 	public WithDrawalSender() {
@@ -46,6 +49,7 @@ public class WithDrawalSender {
 				producer = new DefaultMQProducer();
 			    producer.setNamesrvAddr(namesrvAddr);
 			    producer.setNamespace(namespace);
+			    producer.setProducerGroup(appName);
 				producer.start();
 			} catch (MQClientException e) {
 				throw new RuntimeException(e);
