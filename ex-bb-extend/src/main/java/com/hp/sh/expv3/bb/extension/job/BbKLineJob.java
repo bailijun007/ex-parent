@@ -168,7 +168,9 @@ public class BbKLineJob {
     long getMinute(ZSetOperations.TypedTuple<String> tuple) {
 //        System.out.println(tuple.getValue() + " : " + tuple.getScore());
         logger.info("k线1分钟时间为: {}", tuple.getValue());
-        return 26388150L;
+        //            JSON字符串转JSON对象
+        final BBKLine bbkLine = JSON.parseObject(tuple.getValue(), BBKLine.class);
+        return bbkLine.getMinute();
     }
 
     Set<ZSetOperations.TypedTuple<String>> getRepairedData(long minute) {

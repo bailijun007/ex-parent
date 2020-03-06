@@ -54,7 +54,7 @@ public class BBKlineBuild {
                 @Override
                 public void onMessage(Message message, byte[] pattern) {
                     String msg = new String(message.getBody());
-
+                    logger.info("收到k线推送消息:{}"+msg);
                     List<BbTradeVo> bbTradeVos = listTrade(msg);
 
                     // 拆成不同的分钟
@@ -171,7 +171,6 @@ public class BBKlineBuild {
 
         if (!range.isEmpty()) {
             final String s = new ArrayList<>(range).get(0);
-            System.out.println("s = " + s);
 //            JSON字符串转JSON对象
             bbkLine1 = JSON.parseObject(s, BBKLine.class);
         }
