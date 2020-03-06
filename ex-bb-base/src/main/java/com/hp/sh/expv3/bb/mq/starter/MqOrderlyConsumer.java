@@ -39,8 +39,8 @@ public class MqOrderlyConsumer {
 	@Autowired
 	private EndpointContext endpointContext;
 	
-	@Value("${pc.mq.consumer.contractGroup}")
-	private Integer contractGroup;
+	@Value("${pc.mq.consumer.bbGroup}")
+	private Integer bbGroup;
 	
 	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic);
@@ -91,7 +91,7 @@ public class MqOrderlyConsumer {
 	public void start123() throws MQClientException{
 		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
 		for(BBSymbolVO bbvo : pcList){
-			if(contractGroup.equals(bbvo.getBbSymbolGroup())){
+			if(bbGroup.equals(bbvo.getBbGroup())){
 				this.buildConsumer(MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol()));
 			}
 	        logger.info("MQConsumer Started. asset={}, symbol={}", bbvo.getAsset(), bbvo.getSymbol());
