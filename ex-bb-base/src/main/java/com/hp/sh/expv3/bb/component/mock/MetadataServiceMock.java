@@ -3,7 +3,6 @@ package com.hp.sh.expv3.bb.component.mock;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.component.MetadataService;
@@ -12,7 +11,6 @@ import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 /**
  * @author BaiLiJun  on 2019/12/18
  */
-@Primary
 @Component
 public class MetadataServiceMock implements MetadataService {
 

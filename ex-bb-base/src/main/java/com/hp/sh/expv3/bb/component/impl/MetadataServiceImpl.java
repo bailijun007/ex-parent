@@ -21,6 +21,7 @@ import com.hp.sh.expv3.bb.constant.RedisKey;
 /**
  * @author BaiLiJun  on 2019/12/18
  */
+@Primary
 @Component
 public class MetadataServiceImpl implements MetadataService {
 
@@ -34,7 +35,7 @@ public class MetadataServiceImpl implements MetadataService {
 	public BBSymbolVO getBBContract(String asset, String symbol) {
         HashOperations hashOperations = templateDB0.opsForHash();
         String hashKey = asset+"__"+symbol;
-        Object o = hashOperations.get(RedisKey.BB_CONTRACT, hashKey);
+        Object o = hashOperations.get(RedisKey.BB_SYMBOL, hashKey);
         String json = o.toString();
         BBSymbolVO vo = JSON.parseObject(json, BBSymbolVO.class);
         return vo;
@@ -43,7 +44,7 @@ public class MetadataServiceImpl implements MetadataService {
     @Override
     public List<BBSymbolVO> getAllBBContract(){
         HashOperations opsForHash = templateDB0.opsForHash();
-        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(RedisKey.BB_CONTRACT, ScanOptions.NONE);
+        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(RedisKey.BB_SYMBOL, ScanOptions.NONE);
 
         List<BBSymbolVO> list = new ArrayList<>();
         while (curosr.hasNext()) {

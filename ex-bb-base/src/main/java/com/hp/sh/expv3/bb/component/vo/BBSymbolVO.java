@@ -315,4 +315,12 @@ public class BBSymbolVO {
 		this.privilege = privilege;
 	}
 
+	@Override
+	public String toString() {
+		return "BBSymbolVO [id=" + id + ", asset=" + asset + ", symbol=" + symbol + ", symbolType=" + symbolType
+				+ ", bbSymbolType=" + bbSymbolType + ", bbSymbolGroup=" + bbSymbolGroup + ", bbSymbolName="
+				+ bbSymbolName + ", lastPrice=" + lastPrice + ", faceValue=" + faceValue + ", faceCurrency="
+				+ faceCurrency + ", baseCurrency=" + baseCurrency + ", settleCurrency=" + settleCurrency + "]";
+	}
+
 }
