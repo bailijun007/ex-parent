@@ -310,7 +310,7 @@ public class PcOrderService {
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public boolean setUserCancel(long userId, String asset, String symbol, long orderId){
+	public boolean setPendingCancel(long userId, String asset, String symbol, long orderId){
 		
 		PcOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
@@ -325,11 +325,25 @@ public class PcOrderService {
 		}
 		
 		Long now = DbDateUtils.now();
-		this.orderUpdateService.setUserCancelStatus(orderId, userId, OrderStatus.PENDING_CANCEL, now, OrderStatus.CANCELED, OrderStatus.FILLED, IntBool.YES);
+		this.orderUpdateService.setPendingCancelStatus(now, orderId, userId, order.getVersion());
 		
 		return true;
 	}
 	
+	@LockIt(key="${userId}-${asset}-${symbol}")
+	public void setNewStatus(long userId, String asset, String symbol, long orderId){
+		PcOrder order = this.orderQueryService.getOrder(userId, orderId);
+		
+		if(order.getStatus()!=OrderStatus.PENDING_NEW){
+			logger.error("NEW状态错误，orderId={}", orderId);
+			return ;
+		}
+
+		long now = DbDateUtils.now();
+		
+		this.orderUpdateService.setNewStatus(order, now);
+	}
+
 	private boolean canCancel(PcOrder order, Long orderId){
 		if(order==null){
 			logger.error("订单不存在：orderId={}", orderId);
@@ -417,12 +431,6 @@ public class PcOrderService {
 		this.orderUpdateService.updateOrder(order, now);
 		
 		return;
-	}
-
-	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void setNewStatus(long userId, String asset, String symbol, long orderId){
-		long now = DbDateUtils.now();
-		this.orderUpdateService.setNewStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, now);
 	}
 
 	/*

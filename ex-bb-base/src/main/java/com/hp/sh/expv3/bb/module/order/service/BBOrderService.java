@@ -269,8 +269,16 @@ public class BBOrderService {
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void setNewStatus(long userId, String asset, String symbol, long orderId){
+		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
+		
+		if(order.getStatus()!=OrderStatus.PENDING_NEW){
+			logger.error("NEW状态错误，orderId={}", orderId);
+			return ;
+		}
+
 		long now = DbDateUtils.now();
-		this.orderUpdateService.setNewStatus(orderId, userId, OrderStatus.NEW, OrderStatus.PENDING_NEW, now);
+		
+		this.orderUpdateService.setNewStatus(order, now);
 	}
 	
 }

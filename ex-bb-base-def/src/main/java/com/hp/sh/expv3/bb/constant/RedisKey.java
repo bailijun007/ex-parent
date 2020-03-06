@@ -5,7 +5,7 @@ package com.hp.sh.expv3.bb.constant;
  */
 public class RedisKey {
 
-    public static final String BB_CONTRACT = "bb_contract";
+    public static final String BB_SYMBOL = "bb_symbol";
 
     public static final String BB_FEE = "bb_fee";
 

@@ -2,7 +2,6 @@ package com.hp.sh.expv3.bb.component.mock;
 
 import java.math.BigDecimal;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.component.FeeRatioService;
@@ -13,7 +12,6 @@ import com.hp.sh.expv3.bb.component.FeeRatioService;
  * @author lw
  *
  */
-@Primary
 @Component
 public class FeeRatioServiceMock implements FeeRatioService {
 
