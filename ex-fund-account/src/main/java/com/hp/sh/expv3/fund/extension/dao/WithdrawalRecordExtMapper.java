@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.fund.extension.dao;
 
+import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordByAdmin;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -25,4 +26,7 @@ public interface WithdrawalRecordExtMapper {
     List<WithdrawalRecordVo> queryByUserIdAndAsset(@Param("userId") Long userId,@Param("asset") String asset);
 
     List<WithdrawalRecordVo> listWithdrawalRecords(Map<String, Object> map);
+
+
+    List<WithdrawalRecordByAdmin> queryHistoryByAdmin(@Param("userId") Long userId,@Param("asset") String asset);
 }

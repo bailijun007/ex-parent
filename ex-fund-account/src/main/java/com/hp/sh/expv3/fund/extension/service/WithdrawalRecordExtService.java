@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.gitee.hupadev.base.api.PageResult;
+import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordByAdmin;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo;
 
 /**
@@ -23,4 +24,6 @@ public interface WithdrawalRecordExtService {
     List<WithdrawalRecordVo> findWithdrawalRecordList(Long userId, String asset, Long startTime,Long endTime);
 
     PageResult<WithdrawalRecordVo> pageQueryHistory(Long userId, String asset, Integer pageNo, Integer pageSize, Long startTime, Long endTime,Integer approvalStatus);
+
+    PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(Long userId, String asset, Integer pageNo, Integer pageSize);
 }

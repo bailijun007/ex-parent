@@ -6,6 +6,7 @@ import com.hp.sh.expv3.fund.extension.error.ExFundError;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalAddrExtService;
 import com.hp.sh.expv3.fund.extension.service.WithdrawalRecordExtService;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalAddrVo;
+import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordByAdmin;
 import com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +35,26 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
 
     @Override
     public List<WithdrawalRecordVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
-        if (userId == null || pageSize == null || StringUtils.isEmpty(asset)||pageStatus==null) {
-            throw new ExException(ExFundError.PARAM_EMPTY);
-        }
+        checkParam(userId, asset, pageSize, pageStatus);
 
         List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, queryId, pageSize, pageStatus);
 
         return voList;
+    }
+
+    private void checkParam(Long userId, String asset, Integer pageSize, Integer pageStatus) {
+        if (userId == null || pageSize == null || StringUtils.isEmpty(asset)||pageStatus==null) {
+            throw new ExException(ExFundError.PARAM_EMPTY);
+        }
+    }
+
+    @Override
+    public PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(Long userId, String asset, Integer pageNo, Integer pageSize) {
+        if (userId == null || pageSize == null || StringUtils.isEmpty(asset)||pageNo==null) {
+            throw new ExException(ExFundError.PARAM_EMPTY);
+        }
+        return  withdrawalRecordExtService.queryHistoryByAdmin(userId, asset, pageNo, pageSize);
+
     }
 
     @Override

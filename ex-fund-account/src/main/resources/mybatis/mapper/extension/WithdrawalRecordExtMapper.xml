@@ -129,6 +129,20 @@
     </select>
 
 
+    <select id="queryHistoryByAdmin" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordByAdmin">
+         select id, user_id,asset ,  amount, approval_status  status,created,account ,created ctime ,account targetAddress,pay_status payStatus ,pay_status_desc payStatusDesc
+        FROM withdrawal_record
+        <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+        </where>
+        ORDER BY id desc
+    </select>
+
     <select id="listWithdrawalRecords" resultType="com.hp.sh.expv3.fund.extension.vo.WithdrawalRecordVo">
         select id, user_id,asset ,  amount, approval_status  status,created,account ,created ctime ,account targetAddress,pay_status payStatus
         FROM withdrawal_record
