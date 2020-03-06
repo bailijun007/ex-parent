@@ -238,7 +238,7 @@ public class BBTradeService {
 			request.setUserId(orderTrade.getUserId());
 			request.setCollectorId(orderTrade.getFeeCollectorId());
 			collectorCoreService.add(request);
-		}else{
+		}else if(BigUtils.ltZero(orderTrade.getFee())){
 			CollectorCutRequest request = new CollectorCutRequest();
 			request.setAmount(orderTrade.getFee());
 			request.setAsset(orderTrade.getAsset());
@@ -249,6 +249,8 @@ public class BBTradeService {
 			request.setUserId(orderTrade.getUserId());
 			request.setCollectorId(orderTrade.getFeeCollectorId());
 			collectorCoreService.cut(request);
+		}else{
+			logger.warn("手续费为0, {}", orderTrade);
 		}
 		
 	}

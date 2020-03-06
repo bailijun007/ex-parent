@@ -71,7 +71,7 @@ public class BBCollectorCoreService{
 		
 		//金额必须是正数
 		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
-			throw new ExSysException(ExCommonError.PARAM_EMPTY);
+			throw new ExSysException(BBCollectorAccountError.ZERO_AMOUNT);
 		}
 		
 		if(this.checkExist(record)){
