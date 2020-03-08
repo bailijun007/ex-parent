@@ -28,5 +28,5 @@ public interface WithdrawalRecordExtMapper {
     List<WithdrawalRecordVo> listWithdrawalRecords(Map<String, Object> map);
 
 
-    List<WithdrawalRecordByAdmin> queryHistoryByAdmin(@Param("userId") Long userId,@Param("asset") String asset);
+    List<WithdrawalRecordByAdmin> queryHistoryByAdmin(@Param("userId") Long userId,@Param("asset") String asset,@Param("approvalStatus")  Integer approvalStatus,@Param("payStatus")Integer payStatus);
 }

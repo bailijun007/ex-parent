@@ -139,6 +139,12 @@
             <if test="asset!=null and asset!=''">
                 and asset=#{asset}
             </if>
+            <if test="payStatus!=null">
+                and pay_status=#{payStatus}
+            </if>
+            <if test="approvalStatus!=null">
+                and approval_status=#{approvalStatus}
+            </if>
         </where>
         ORDER BY id desc
     </select>
