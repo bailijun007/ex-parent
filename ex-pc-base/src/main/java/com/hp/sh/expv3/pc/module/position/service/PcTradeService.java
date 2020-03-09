@@ -131,9 +131,9 @@ public class PcTradeService {
 		
 		/*  1、修改仓位数据  */
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
-			this.addPositon(pcPosition, tradeResult);
+			this.openPositon(pcPosition, tradeResult);
 		}else{
-			this.subPostion(pcPosition, tradeResult);
+			this.closePostion(pcPosition, tradeResult);
 		}
 		
 		//修改维持保证金率
@@ -289,14 +289,14 @@ public class PcTradeService {
 		return pcPosition;
 	}
 
-	private void addPositon(PcPosition pcPosition, TradeResult tradeResult) {
+	private void openPositon(PcPosition pcPosition, TradeResult tradeResult) {
 		pcPosition.setVolume(pcPosition.getVolume().add(tradeResult.getVolume()));
 		pcPosition.setPosMargin(pcPosition.getPosMargin().add(tradeResult.getOrderMargin()));
 		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeResult.getReceivableFee()));
 		
 		pcPosition.setMeanPrice(tradeResult.getNewPosMeanPrice());
 		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeResult.getOrderMargin()));
-		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeResult.getReceivableFee())); //TODO 这个地方好像错了?
+//		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeResult.getReceivableFee()));
 		
 		pcPosition.setAccuVolume(pcPosition.getAccuVolume().add(tradeResult.getVolume()));
 		
@@ -307,13 +307,13 @@ public class PcTradeService {
 		
 	}
 
-	private void subPostion(PcPosition pcPosition, TradeResult tradeResult) {
+	private void closePostion(PcPosition pcPosition, TradeResult tradeResult) {
 		pcPosition.setVolume(pcPosition.getVolume().subtract(tradeResult.getVolume()));
 		pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(tradeResult.getOrderMargin()));
 		pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(tradeResult.getReceivableFee()));
 		
 		pcPosition.setInitMargin(pcPosition.getInitMargin().subtract(tradeResult.getOrderMargin()));
-		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeResult.getReceivableFee())); //TODO 这个地方好像错了?
+		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeResult.getReceivableFee()));
 		
 		pcPosition.setRealisedPnl(pcPosition.getRealisedPnl().add(tradeResult.getPnl()));
 

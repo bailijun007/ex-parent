@@ -73,15 +73,17 @@ public class RedisConfig {
 	@ConditionalOnProperty(name="swagger.host")
 	@Bean
 	public RedisSubscriber testRs(RedisPool redisPool){
+		this.testRs(redisPool, "bb:account:USDT");
+		
 		this.testRs(redisPool, "bb:account:BTC");
-		this.testRs(redisPool, "bb:order:BTC:BTC_USDT");
-		this.testRs(redisPool, "bb:pos:BTC:BTC_USDT");
-		this.testRs(redisPool, "bb:user:symbol:BTC:BTC_USDT");
+		this.testRs(redisPool, "bb:order:USDT:BTC_USDT");
+		this.testRs(redisPool, "bb:pos:USDT:BTC_USDT");
+		this.testRs(redisPool, "bb:user:symbol:USDT:BTC_USDT");
 		
 		this.testRs(redisPool, "bb:account:ETH");
-		this.testRs(redisPool, "bb:order:ETH:ETH_USDT");
-		this.testRs(redisPool, "bb:pos:ETH:ETH_USDT");
-		this.testRs(redisPool, "bb:symbol:ETH:ETH_USDT");
+		this.testRs(redisPool, "bb:order:USDT:ETH_USDT");
+		this.testRs(redisPool, "bb:pos:USDT:ETH_USDT");
+		this.testRs(redisPool, "bb:symbol:USDT:ETH_USDT");
 		return null;
 	}
 	
