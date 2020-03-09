@@ -2,10 +2,11 @@
  * @author corleone
  * @date 2018/7/6 0006
  */
-package com.hp.sh.expv3.match.util;
+package com.hp.sh.expv3.config.redis;
 
 
 import com.alibaba.fastjson.JSON;
+import com.hp.sh.expv3.bb.extension.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.*;
 import redis.clients.jedis.commands.JedisCommands;
@@ -737,6 +738,32 @@ public class RedisUtil {
                 value = empty;
             }
             return value;
+        } finally {
+            returnJedis(jedis);
+        }
+    }
+
+    public Set<Tuple> zpopmin(String key, int count) {
+        Jedis jedis = getOriginalJedis();
+        try {
+            Set<Tuple> tupls = jedis.zpopmin(key, count);
+            if (null == tupls) {
+                tupls = new TreeSet<>();
+            }
+            return tupls;
+        } finally {
+            returnJedis(jedis);
+        }
+    }
+
+    public Set<Tuple> zpopmax(String key, int count) {
+        Jedis jedis = getOriginalJedis();
+        try {
+            Set<Tuple> tupls = jedis.zpopmax(key, count);
+            if (null == tupls) {
+                tupls = new TreeSet<>();
+            }
+            return tupls;
         } finally {
             returnJedis(jedis);
         }
