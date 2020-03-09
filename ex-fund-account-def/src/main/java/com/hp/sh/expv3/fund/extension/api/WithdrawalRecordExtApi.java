@@ -36,15 +36,18 @@ public interface WithdrawalRecordExtApi {
                                                  @RequestParam(value = "pageStatus") Integer pageStatus);
 
 
-    @ApiOperation("获取提币历史")
+    @ApiOperation("后台admin获取提币历史")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "用户id", example = "2", required = true),
-            @ApiImplicitParam(name = "asset", value = "资产类型", example = "ETH", required = true),
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "2", required = false),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "ETH", required = false),
+            @ApiImplicitParam(name = "status", value = "1.审核中,2.审核通过,3.失败", example = "2", required = false),
+            @ApiImplicitParam(name = "payStatus", value = "执行状态:0-提现中，1-提现成功，2-提现失败", example = "2", required = false),
             @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
     @GetMapping(value = "/api/extension/account/withdrawal/queryHistoryByAdmin")
-    public PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset") String asset,
+    public PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(@RequestParam(value = "userId",required = false) Long userId, @RequestParam(value = "asset",required = false) String asset,
+                                                                   @RequestParam(value = "status",required = false) Integer status, @RequestParam(value = "payStatus",required = false) Integer payStatus,
                                                                    @RequestParam(value = "pageNo") Integer pageNo, @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize);
 
 

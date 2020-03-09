@@ -125,10 +125,10 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
     }
 
     @Override
-    public PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(Long userId, String asset, Integer pageNo, Integer pageSize) {
+    public PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(Long userId, String asset, Integer status,Integer payStatus, Integer pageNo, Integer pageSize) {
         PageHelper.startPage(pageNo,pageSize);
         PageResult<WithdrawalRecordByAdmin> pageResult=new PageResult<>();
-        List<WithdrawalRecordByAdmin> list = withdrawalRecordExtMapper.queryHistoryByAdmin(userId,asset);
+        List<WithdrawalRecordByAdmin> list = withdrawalRecordExtMapper.queryHistoryByAdmin(userId,asset ,status,payStatus);
          PageInfo<WithdrawalRecordByAdmin> info = new PageInfo<>(list);
         pageResult.setList(list);
         pageResult.setRowTotal(info.getTotal());

@@ -78,11 +78,11 @@ public class BbKLineJob {
                     } else {
                         BBKLine kline = buildKline(trades, asset, symbol, minute);
 
-                        // kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
+                        // kline:from_exp:repair:BB:${asset}:${symbol}:${interval}:${minute}
                         saveKline(kline, asset, symbol, 1, minute);
 
-                        // kline:from_exp:update:BB:${asset}:${symbol}:${minute}
-                        notifyUpdate(minute, asset, symbol);
+                        // kline:from_exp:update:BB:${asset}:${symbol}:${interval}:${minute}
+                        notifyUpdate( asset, symbol,1,minute);
                     }
 
                 }
@@ -107,16 +107,16 @@ public class BbKLineJob {
         return list;
     }
 
-    // kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
+    // kline:from_exp:repair:BB:${asset}:${symbol}:${interval}:${minute}
     private void saveKline(BBKLine kline, String asset, String symbol,int interval,long minute) {
         //向集合中插入元素，并设置分数
-        templateDB0.opsForZSet().add(BbKLineKey.KLINE_BB_REPAIR_FROM_EXP + asset + ":" + symbol+":"+interval, JSON.toJSONString(kline), minute);
+        templateDB0.opsForZSet().add(BbKLineKey.KLINE_BB_REPAIR_FROM_EXP + asset + ":" + symbol+":"+interval+":"+minute, JSON.toJSONString(kline), minute);
     }
 
-    // kline:from_exp:update:BB:${asset}:${symbol}:${minute}
-    private void notifyUpdate(long minute, String asset, String symbol) {
+    // kline:from_exp:update:BB:${asset}:${symbol}:${interval}:${minute}
+    private void notifyUpdate(String asset, String symbol,int interval,long minute) {
         //向集合中插入元素，并设置分数
-        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_UPDATE + asset + ":" + symbol + ":" + minute, asset + "#" + symbol + "#" + minute, minute);
+        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_UPDATE + asset + ":" + symbol + ":" +interval+":"+ minute, asset + "#" + symbol + "#" + minute, minute);
 
     }
 

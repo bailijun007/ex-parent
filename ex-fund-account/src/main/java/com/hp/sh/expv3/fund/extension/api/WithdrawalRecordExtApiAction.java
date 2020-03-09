@@ -49,11 +49,11 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
     }
 
     @Override
-    public PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(Long userId, String asset, Integer pageNo, Integer pageSize) {
-        if (userId == null || pageSize == null || StringUtils.isEmpty(asset)||pageNo==null) {
+    public PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(Long userId, String asset, Integer status,Integer payStatus,Integer pageNo, Integer pageSize) {
+        if ( pageSize == null ||pageNo==null) {
             throw new ExException(ExFundError.PARAM_EMPTY);
         }
-        return  withdrawalRecordExtService.queryHistoryByAdmin(userId, asset, pageNo, pageSize);
+        return  withdrawalRecordExtService.queryHistoryByAdmin(userId, asset,status, payStatus,pageNo, pageSize);
 
     }
 
