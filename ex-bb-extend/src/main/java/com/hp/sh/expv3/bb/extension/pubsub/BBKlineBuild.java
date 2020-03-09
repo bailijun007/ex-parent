@@ -141,7 +141,7 @@ public class BBKlineBuild {
     private void notifyUpdate(String asset, String symbol, long minute, int interval) {
         //向集合中插入元素，并设置分数
         String key = buildUpdateRedisKey(asset, symbol, interval);
-        klineTemplateDB5.opsForZSet().add(key, asset + "#" + symbol + "#" + minute, minute);
+        klineTemplateDB5.opsForZSet().add(key, asset + "#" + symbol + "#" + interval+"#"+minute, minute);
     }
 
     private BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, long minute) {
@@ -152,6 +152,7 @@ public class BBKlineBuild {
         bBKLine.setMinute(minute);
 
         BigDecimal highPrice = BigDecimal.ZERO;
+        BigDecimal lowPrice =new BigDecimal(String.valueOf(Long.MAX_VALUE));
         BigDecimal openPrice = null;
         BigDecimal closePrice = null;
         BigDecimal volume = BigDecimal.ZERO;
@@ -159,12 +160,13 @@ public class BBKlineBuild {
         for (BbTradeVo trade : trades) {
             BigDecimal currentPrice = trade.getPrice();
             highPrice = highPrice.compareTo(currentPrice) >= 0 ? highPrice : currentPrice;
+            lowPrice=lowPrice.compareTo(currentPrice)<=0?lowPrice:currentPrice;
             openPrice = null == openPrice ? currentPrice : openPrice;
             closePrice = currentPrice;
             volume = volume.add(trade.getNumber());
         }
 
-         BigDecimal lowPrice = trades.stream().map(trade -> trade.getPrice()).min((t1, t2) -> t1.compareTo(t2)).get();
+//         BigDecimal lowPrice = trades.stream().map(trade -> trade.getPrice()).min((t1, t2) -> t1.compareTo(t2)).get();
 
         bBKLine.setHigh(highPrice);
         bBKLine.setLow(lowPrice);
