@@ -49,8 +49,13 @@ public class BBKlineBuild {
     @Qualifier("metadataRedisUtil")
     private RedisUtil metadataRedisUtil;
 
+    @Value("${bb.kline.update}")
+    private String bbKlineUpdatePattern;
 
-    @PostConstruct
+    @Value("${bb.kline}")
+    private String bbKlinePattern;
+
+//    @PostConstruct
     public void trigger() {
         List<BBSymbol> bbSymbols = listSymbol();
 
@@ -88,16 +93,10 @@ public class BBKlineBuild {
                         saveKline(mergedKline, asset, symbol, oneMinute, oneMinuteInterval);
 
                         notifyUpdate(asset, symbol, oneMinute, oneMinuteInterval);
-
                     }
-
                 }
             }, channel);
-
-
         }
-
-
     }
 
 
@@ -195,10 +194,7 @@ public class BBKlineBuild {
         return bbkLine1;
     }
 
-    @Value("${bb.kline.update}")
-    private String bbKlineUpdatePattern;
-    @Value("${bb.kline}")
-    private String bbKlinePattern;
+
 
     private String buildUpdateRedisKey(String asset, String symbol, int frequency) {
         return StringReplaceUtil.replace(bbKlineUpdatePattern, new HashMap<String, String>() {{

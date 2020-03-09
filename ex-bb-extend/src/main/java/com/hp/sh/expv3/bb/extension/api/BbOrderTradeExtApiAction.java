@@ -2,6 +2,7 @@ package com.hp.sh.expv3.bb.extension.api;
 
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
+import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeDetailVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
 import com.hp.sh.expv3.bb.extension.vo.BbUserOrderTrade;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,5 +60,15 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
         }
         List<BbUserOrderTrade> tradeVo = bbOrderTradeExtService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId);
         return tradeVo;
+    }
+
+    @Override
+    public List<BbOrderTradeDetailVo> selectBbFeeCollectByAccountId(String asset, String symbol, Long userId, Long statTime, Long endTime) {
+        if (userId == null||statTime==null||endTime==null||StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+
+        List<BbOrderTradeDetailVo> result = bbOrderTradeExtService.selectPcFeeCollectByAccountId(asset, symbol, userId,statTime,endTime);
+        return result;
     }
 }

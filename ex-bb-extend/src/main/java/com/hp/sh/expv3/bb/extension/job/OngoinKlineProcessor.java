@@ -55,7 +55,8 @@ public class OngoinKlineProcessor {
     @Qualifier("bbKlineOngoingRedisUtil")
     private RedisUtil bbKlineOngoingRedisUtil;
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+//    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "*/5 * * * * *")
     public void getFiveMinuteklineData() {
         List<BBSymbol> bbSymbols = listSymbol();
         List<BBSymbol> targetBbSymbols = filterBbSymbols(bbSymbols);

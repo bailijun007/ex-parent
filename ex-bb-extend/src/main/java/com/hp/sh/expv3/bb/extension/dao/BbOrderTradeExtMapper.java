@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.bb.extension.dao;
 
+import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeDetailVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.bb.extension.vo.BbUserOrderTrade;
 import org.apache.ibatis.annotations.Param;
@@ -25,4 +26,5 @@ public interface BbOrderTradeExtMapper {
 
     List<BbUserOrderTrade> selectTradeListByUserId(@Param("asset") String asset,@Param("symbol") String symbol,@Param("tradeTimeBegin")  Long tradeTimeBegin,@Param("tradeTimeEnd") Long tradeTimeEnd,@Param("userId") Long userId);
 
+    List<BbOrderTradeDetailVo> selectPcFeeCollectByAccountId(Map<String, Object> map);
 }
