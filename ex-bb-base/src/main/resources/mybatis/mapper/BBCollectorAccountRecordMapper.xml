@@ -106,9 +106,6 @@
 
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into bb_collector_account_record (
 			asset,sn,type,amount,remark,balance,trade_no,trade_type,serial_no,associated_id,tx_id,collector_id,request_id,user_id,id,created,modified
 		)values(
