@@ -129,9 +129,16 @@ public class PcOrderService {
 		pcOrder.setActiveFlag(IntBool.YES);
 		pcOrder.setLiqFlag(IntBool.NO);
 		
-		/////////押金数据/////////
+		//设置开仓订单的各种费率
+		pcOrder.setMarginRatio(feeRatioService.getInitedMarginRatio(pcOrder.getLeverage()));
+		pcOrder.setOpenFeeRatio(feeRatioService.getOpenFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
+		pcOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
 		
-		this.setOpenOrderFee(pcOrder);
+		OrderFeeData feeData = strategyContext.calcNewOrderFee(pcOrder.getAsset(), pcOrder.getSymbol(), pcOrder);
+		pcOrder.setOpenFee(feeData.getOpenFee());
+		pcOrder.setCloseFee(feeData.getCloseFee());
+		pcOrder.setOrderMargin(feeData.getOrderMargin());
+		pcOrder.setGrossMargin(feeData.getGrossMargin());
 		
 		////////其他字段，后面随状态修改////////
 		this.setOther(pcOrder, pos);
@@ -162,7 +169,6 @@ public class PcOrderService {
 		
 		Long now = DbDateUtils.now();
 		
-		
 		//订单基本数据
 		PcOrder pcOrder = new PcOrder();
 		
@@ -187,8 +193,16 @@ public class PcOrderService {
 		pcOrder.setLiqFlag(liqFlag);
 		
 		/////////押金数据/////////
+
+		//设置平仓订单的各种费率，平仓订单
+		pcOrder.setMarginRatio(BigDecimal.ZERO);
+		pcOrder.setOpenFeeRatio(BigDecimal.ZERO);
+		pcOrder.setCloseFeeRatio(BigDecimal.ZERO);
 		
-		this.setCloseOrderFee(pcOrder);
+		pcOrder.setOrderMargin(BigDecimal.ZERO);
+		pcOrder.setOpenFee(BigDecimal.ZERO);
+		pcOrder.setCloseFee(BigDecimal.ZERO);
+		pcOrder.setGrossMargin(BigDecimal.ZERO);
 		
 		////////其他字段，后面随状态修改////////
 		this.setOther(pcOrder, pos);
@@ -281,32 +295,6 @@ public class PcOrderService {
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
 		return this.accountCoreService.add(request);
-	}
-
-	//设置平仓订单的各种费率，平仓订单
-	private void setCloseOrderFee(PcOrder pcOrder) {
-		pcOrder.setMarginRatio(BigDecimal.ZERO);
-		pcOrder.setOpenFeeRatio(BigDecimal.ZERO);
-		pcOrder.setCloseFeeRatio(BigDecimal.ZERO);
-		
-		pcOrder.setOrderMargin(BigDecimal.ZERO);
-		pcOrder.setOpenFee(BigDecimal.ZERO);
-		pcOrder.setCloseFee(BigDecimal.ZERO);
-		pcOrder.setGrossMargin(BigDecimal.ZERO);
-	}
-
-	//设置开仓订单的各种费率
-	private void setOpenOrderFee(PcOrder pcOrder) {
-		pcOrder.setMarginRatio(feeRatioService.getInitedMarginRatio(pcOrder.getLeverage()));
-		pcOrder.setOpenFeeRatio(feeRatioService.getOpenFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
-		pcOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
-		
-		OrderFeeData feeData = strategyContext.calcNewOrderFee(pcOrder.getAsset(), pcOrder.getSymbol(), pcOrder);
-		
-		pcOrder.setOpenFee(feeData.getOpenFee());
-		pcOrder.setCloseFee(feeData.getCloseFee());
-		pcOrder.setOrderMargin(feeData.getGrossMargin());
-		pcOrder.setGrossMargin(feeData.getGrossMargin());
 	}
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
