@@ -9,10 +9,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableDiscoveryClient
 @ComponentScan("com.hp.sh.expv3")
 @SpringBootApplication
+@EnableScheduling
 public class ExBBExtendApplication {
 	private static final Logger logger = LoggerFactory.getLogger(ExBBExtendApplication.class);
 

@@ -14,13 +14,26 @@
 	</parent>
 	
     <dependencies>
-		
-		<dependency>
+
+        <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+
+
+        <dependency>
 			<groupId>com.hp.sh.expv3</groupId>
 			<artifactId>ex-common3</artifactId>
 			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
-		
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.7</version>
+        </dependency>
 		<dependency>
 			<groupId>com.hp.sh.expv3</groupId>
 			<artifactId>ex-bb-extend-def</artifactId>

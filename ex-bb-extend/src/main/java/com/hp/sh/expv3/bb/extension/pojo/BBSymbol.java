@@ -65,7 +65,7 @@ public class BBSymbol implements Serializable {
      * 分组
      * 每组最多放2个
      */
-    private Integer bbSymbolGroup;
+    private Integer bbGroupId;
     /**
      * 名称
      */
@@ -218,12 +218,12 @@ public class BBSymbol implements Serializable {
         this.bbSymbolType = bbSymbolType;
     }
 
-    public Integer getBbSymbolGroup() {
-        return bbSymbolGroup;
+    public Integer getBbGroupId() {
+        return bbGroupId;
     }
 
-    public void setBbSymbolGroup(Integer bbSymbolGroup) {
-        this.bbSymbolGroup = bbSymbolGroup;
+    public void setBbGroupId(Integer bbGroupId) {
+        this.bbGroupId = bbGroupId;
     }
 
     public String getBbSymbolName() {

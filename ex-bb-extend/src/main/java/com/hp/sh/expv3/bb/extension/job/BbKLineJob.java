@@ -39,7 +39,7 @@ public class BbKLineJob {
     /**
      * fixedDelay = 5,fixedRate = 5
      */
-    @Scheduled(cron = "*/5 * * * * *")
+//    @Scheduled(cron = "*/5 * * * * *")
     public void kLineJobTask() {
         List<BBSymbol> bbSymbols = listSymbol();
 
