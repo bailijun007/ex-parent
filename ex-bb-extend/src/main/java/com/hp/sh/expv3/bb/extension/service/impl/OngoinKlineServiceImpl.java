@@ -1,18 +1,19 @@
-package com.hp.sh.expv3.bb.extension.job;
+package com.hp.sh.expv3.bb.extension.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.extension.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
 import com.hp.sh.expv3.bb.extension.pojo.BBKLine;
 import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
+import com.hp.sh.expv3.bb.extension.service.OngoinKlineService;
 import com.hp.sh.expv3.bb.extension.util.StringReplaceUtil;
-import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Tuple;
 
 import javax.annotation.PostConstruct;
@@ -21,13 +22,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * k线数据
- *
- * @author BaiLiJun  on 2020/3/9
+ * @author BaiLiJun  on 2020/3/10
  */
-//@Component
-public class OngoinKlineProcessor {
-
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class OngoinKlineServiceImpl implements OngoinKlineService {
     @Value("${bb.kline.bbGroupIds}")
     private Set<Integer> supportBbGroupIds;
 
@@ -66,6 +65,7 @@ public class OngoinKlineProcessor {
 
 
     //    @Scheduled(cron = "0 0/1 * * * ?")
+    @Override
     @Scheduled(cron = "*/1 * * * * *")
     public void getKlineData() {
         List<BBSymbol> bbSymbols = listSymbol();
