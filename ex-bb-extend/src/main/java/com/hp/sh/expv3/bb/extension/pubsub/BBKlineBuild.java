@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @author BaiLiJun on 2020/3/4
  */
 
-@Component
+//@Component
 public class BBKlineBuild {
 
     private static final Logger logger = LoggerFactory.getLogger(BBKlineBuild.class);
@@ -55,27 +55,29 @@ public class BBKlineBuild {
     @Value("${bb.kline}")
     private String bbKlinePattern;
 
-    private static   ScheduledExecutorService timer = Executors.newScheduledThreadPool(2);
+//    private static   ScheduledExecutorService timer = Executors.newScheduledThreadPool(2);
 
-    private static List<BbTradeVo> list=new CopyOnWriteArrayList<>();
+    private static List<BbTradeVo> list = new CopyOnWriteArrayList<>();
 
-//    @PostConstruct
+
+    private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
+            2,
+            Runtime.getRuntime().availableProcessors() + 1,
+            2L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(100000),
+            Executors.defaultThreadFactory(),
+            new ThreadPoolExecutor.AbortPolicy()
+    );
+
+    @PostConstruct
     public void bbKlineBuild() {
-//        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
-//                2,
-//                Runtime.getRuntime().availableProcessors()+1,
-//                2L,TimeUnit.SECONDS,
-//                new LinkedBlockingQueue<Runnable>(100000),
-//                Executors.defaultThreadFactory(),
-//                new  ThreadPoolExecutor.AbortPolicy()
-//        );
-//
-//        threadPool.execute(()->trigger());
+
+        threadPool.execute(() -> trigger());
 
 
-        timer.scheduleAtFixedRate(() -> {
-            trigger();
-        }, 0, 10, TimeUnit.SECONDS);
+//        timer.scheduleAtFixedRate(() -> {
+//            trigger();
+//        }, 0, 10, TimeUnit.SECONDS);
     }
 
 
@@ -123,7 +125,7 @@ public class BBKlineBuild {
     }
 
 
-    private BBKLine merge(BBKLine oldkLine, BBKLine newkLine) {
+    public BBKLine merge(BBKLine oldkLine, BBKLine newkLine) {
         // oldKline 有可能是空，直接返回newKline
         if (null == oldkLine) {
             return newkLine;
@@ -146,7 +148,7 @@ public class BBKlineBuild {
      * kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
      *   interval 频率；1分钟
      */
-    private void saveKline(BBKLine kline, String asset, String symbol, long minute, int interval) {
+    public void saveKline(BBKLine kline, String asset, String symbol, long minute, int interval) {
         //向集合中插入元素，并设置分数
         String key = buildKlineSaveRedisKey(asset, symbol, interval);
 
@@ -157,16 +159,16 @@ public class BBKlineBuild {
         }});
     }
 
-    private void notifyUpdate(String asset, String symbol, long minute, int frequency) {
+    public void notifyUpdate(String asset, String symbol, long minute, int frequency) {
         //向集合中插入元素，并设置分数
         String key = buildUpdateRedisKey(asset, symbol, frequency);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
-                    put(buildUpdateRedisMember(asset, symbol, frequency), Long.valueOf(minute).doubleValue());
+                    put(buildUpdateRedisMember(asset, symbol, frequency, minute), Long.valueOf(minute).doubleValue());
                 }}
         );
     }
 
-    private BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, int interval, long minute) {
+    public BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, int interval, long minute) {
         BBKLine bBKLine = new BBKLine();
         bBKLine.setAsset(asset);
         bBKLine.setSymbol(symbol);
@@ -202,7 +204,7 @@ public class BBKlineBuild {
         return bbKlineTrade.getTrades();
     }
 
-    BBKLine getOldKLine(String asset, String symbol, long minute, int interval) {
+    public BBKLine getOldKLine(String asset, String symbol, long minute, int interval) {
         BBKLine bbkLine1 = null;
         String key = buildKlineSaveRedisKey(asset, symbol, interval);
 //        Set<String> range = klineTemplateDB5.opsForZSet().rangeByScore(key, minute, minute);
@@ -226,11 +228,12 @@ public class BBKlineBuild {
         }});
     }
 
-    private String buildUpdateRedisMember(String asset, String symbol, int frequency) {
+    private String buildUpdateRedisMember(String asset, String symbol, int frequency, long minute) {
         return StringReplaceUtil.replace(BbextendConst.BB_KLINE_UPDATE_MEMBER, new HashMap<String, String>() {{
             put("asset", asset);
             put("symbol", symbol);
             put("freq", "" + frequency);
+            put("minute", "" + minute);
         }});
     }
 
