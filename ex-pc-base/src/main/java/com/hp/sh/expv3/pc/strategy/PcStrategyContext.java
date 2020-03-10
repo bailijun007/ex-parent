@@ -120,8 +120,6 @@ public class PcStrategyContext {
 		OrderStrategy orderStrategy = this.getOrderStrategy(asset, symbol);
         HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(asset, symbol);
         
-		OrderFeeData feeData = orderStrategy.calcRaitoOrderFee(order, matchedVo.getNumber());
-		
 		BigDecimal faceValue = this.metadataService.getFaceValue(asset, symbol);
 		
 		TradeResult tradeResult = new TradeResult();
@@ -132,32 +130,34 @@ public class PcStrategyContext {
 		tradeResult.setBaseValue(orderStrategy.calcBaseValue(tradeResult.getVolume(), faceValue, tradeResult.getPrice()));
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		
-		//手续费&率
+		
+		//手续费率
+		if(matchedVo.getMakerFlag()==TradingRoles.MAKER){
+			BigDecimal feeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
+			tradeResult.setFeeRatio(feeRatio);
+		}else{
+			if(closeFlag==OrderFlag.ACTION_OPEN){
+				tradeResult.setFeeRatio(order.getOpenFeeRatio());
+			}else{
+				BigDecimal feeRatio = this.feeRatioService.getTakerFeeRatio(userId, asset, symbol);
+				tradeResult.setFeeRatio(feeRatio);
+			}
+		}
+
+		//手续费
+		BigDecimal tradeFee = orderStrategy.calcTradeFee(tradeResult.getVolume(), faceValue, tradeResult.getPrice(), tradeResult.getFeeRatio());
+		tradeResult.setFee(tradeFee);
+		
+		// 保证金
 		if(closeFlag==OrderFlag.ACTION_OPEN){
-			tradeResult.setFeeRatio(order.getOpenFeeRatio());
-			tradeResult.setFee(feeData.getOpenFee());
+			OrderFeeData feeData = orderStrategy.calcRaitoOrderFee(order, matchedVo.getNumber());
 			tradeResult.setOrderMargin(feeData.getOrderMargin());//保证金
 		}else{
-			BigDecimal closeFeeRatio = this.feeRatioService.getCloseFeeRatio(userId, asset, symbol);
-			BigDecimal closeFee = BigCalc.multiply(tradeResult.getBaseValue(), closeFeeRatio);
-
-			tradeResult.setFeeRatio(closeFeeRatio);
-			tradeResult.setFee(closeFee);
-			
-			BigDecimal orderMargin = BigCalc.slope(tradeResult.getVolume(), pcPosition.getVolume(), pcPosition.getPosMargin());
-			tradeResult.setOrderMargin(orderMargin);
-		}
-		
-		//maker fee
-		if(matchedVo.getMakerFlag()==TradingRoles.MAKER){
-			if(closeFlag==OrderFlag.ACTION_OPEN){
-				BigDecimal makerFeeRatio = feeRatioService.getMakerOpenFeeRatio(userId, asset, symbol);
-				tradeResult.setMakerFeeRatio(makerFeeRatio);
-				tradeResult.setMakerFee(BigCalc.multiply(tradeResult.getBaseValue(), makerFeeRatio));
+			if(BigUtils.eq(tradeResult.getVolume(), pcPosition.getVolume())){
+				tradeResult.setOrderMargin(pcPosition.getPosMargin());
 			}else{
-				BigDecimal makerFeeRatio = feeRatioService.getMakerCloseFeeRatio(userId, asset, symbol);
-				tradeResult.setMakerFeeRatio(makerFeeRatio);
-				tradeResult.setMakerFee(BigCalc.multiply(tradeResult.getBaseValue(), makerFeeRatio));
+				BigDecimal orderMargin = BigCalc.slope(tradeResult.getVolume(), pcPosition.getVolume(), pcPosition.getPosMargin());
+				tradeResult.setOrderMargin(orderMargin);
 			}
 		}
 		
@@ -210,8 +210,8 @@ public class PcStrategyContext {
 		
 		BigDecimal faceValue = this.metadataService.getFaceValue(asset, symbol);
 		BigDecimal initedMarginRatio = feeRatioService.getInitedMarginRatio(leverage);
-		BigDecimal openFeeRatio = feeRatioService.getOpenFeeRatio(userId, asset, symbol);
-		BigDecimal closeFeeRatio = feeRatioService.getCloseFeeRatio(userId, asset, symbol);
+		BigDecimal openFeeRatio = feeRatioService.getTakerFeeRatio(userId, asset, symbol);
+		BigDecimal closeFeeRatio = feeRatioService.getTakerFeeRatio(userId, asset, symbol);
 		
 		OrderFeeParamVo orderParam = new OrderFeeParamVo();
 		orderParam.setVolume(BigDecimal.ONE);

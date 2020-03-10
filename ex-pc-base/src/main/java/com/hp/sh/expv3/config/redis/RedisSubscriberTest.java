@@ -28,7 +28,7 @@ public class RedisSubscriberTest extends Thread{
 
 				@Override
 				public void onMessage(Object message) {
-					logger.info("收到订阅信息 : {},{}", channel, message);
+					logger.debug("收到订阅信息 : {},{}", channel, message);
 				}
 
 			});

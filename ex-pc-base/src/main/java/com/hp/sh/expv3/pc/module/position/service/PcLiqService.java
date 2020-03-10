@@ -212,7 +212,7 @@ public class PcLiqService {
 		record.setLiqPrice(pos.getLiqPrice());
 		record.setMeanPrice(pos.getMeanPrice());
 		record.setFee(pos.getCloseFee());
-		record.setFeeRatio(feeRatioService.getCloseFeeRatio(pos.getUserId(), pos.getAsset(), pos.getSymbol()));
+		record.setFeeRatio(feeRatioService.getTakerFeeRatio(pos.getUserId(), pos.getAsset(), pos.getSymbol()));
 		
 		//save
 		pcLiqRecordDAO.save(record);

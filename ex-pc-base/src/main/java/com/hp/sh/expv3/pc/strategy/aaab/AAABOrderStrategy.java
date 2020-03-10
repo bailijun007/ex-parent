@@ -17,6 +17,10 @@ import com.hp.sh.expv3.utils.math.BigUtils;
  */
 public class AAABOrderStrategy implements OrderStrategy {
 	
+	public BigDecimal calcTradeFee(BigDecimal volume, BigDecimal faceValue, BigDecimal price, BigDecimal feeRatio) {
+		return BigCalc.multiply(volume.multiply(faceValue).multiply(price), feeRatio);
+	}
+
 	/**
 	 * 计算交易合约 基础货币总价值
 	 * @param volume 合约张数

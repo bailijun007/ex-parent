@@ -52,27 +52,26 @@ public class FeeRatioServiceImpl implements FeeRatioService {
      * @return
      */
     @Override
-    public BigDecimal getOpenFeeRatio(long userId, String asset, String symbol) {
+    public BigDecimal getTakerFeeRatio(long userId, String asset, String symbol) {
         return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.KEY_PREFIX_TAKER,templateDB0);
     }
-
+    
     /**
-     * redis :
-     * db: 0
-     * redis key:pc_fee
-     * hash key: t__${userId}
-     * 取 value
-     *
-     * @param userId
-     * @return
-     */
-    @Override
-    public BigDecimal getCloseFeeRatio(long userId, String asset, String symbol) {
-        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.KEY_PREFIX_TAKER,templateDB0);
-    }
+	 * redis :
+	 * db: 0
+	 * redis key:pc_fee
+	 * hash key: m__${userId}
+	 * 取 value
+	 *
+	 * @param userId
+	 * @return
+	 */
+	@Override
+	public BigDecimal getMakerFeeRatio(long userId, String asset, String symbol) {
+	    return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.KEY_PREFIX_MAKER,templateDB0);
+	}
 
-
-    /**
+	/**
      * redis :
      * db: 0
      * redis key:pc_pos_level
@@ -125,39 +124,6 @@ public class FeeRatioServiceImpl implements FeeRatioService {
         }
         return result;
     }
-
-    /**
-     * redis :
-     * db: 0
-     * redis key:pc_fee
-     * hash key: m__${userId}
-     * 取 value
-     *
-     * @param userId
-     * @return
-     */
-    @Override
-    public BigDecimal getMakerOpenFeeRatio(long userId, String asset, String symbol) {
-        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.KEY_PREFIX_MAKER,templateDB0);
-    }
-
-    /**
-     * redis :
-     * db: 0
-     * redis key:pc_fee
-     * hash key: m__${userId}
-     * 取 value
-     *
-     * @param userId
-     * @return
-     */
-    @Override
-    public BigDecimal getMakerCloseFeeRatio(long userId, String asset, String symbol) {
-        return findFeeRatio(userId, RedisKey.PC_FEE, RedisKey.KEY_PREFIX_MAKER,templateDB0);
-    }
-
-
-
 
     private BigDecimal findFeeRatio(long userId, String key, String prefix,StringRedisTemplate template) {
         HashOperations hashOperations = template.opsForHash();

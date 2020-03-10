@@ -22,12 +22,7 @@ public class FeeRatioServiceMock implements FeeRatioService {
 	}
 
 	@Override
-	public BigDecimal getOpenFeeRatio(long userId, String asset, String symbol) {
-		return getFeeRatio(userId, false);
-	}
-
-	@Override
-	public BigDecimal getCloseFeeRatio(long userId, String asset, String symbol) {
+	public BigDecimal getTakerFeeRatio(long userId, String asset, String symbol) {
 		return getFeeRatio(userId, false);
 	}
 
@@ -54,12 +49,7 @@ public class FeeRatioServiceMock implements FeeRatioService {
 	int ___________;
 	
 	@Override
-	public BigDecimal getMakerOpenFeeRatio(long userId, String asset, String symbol) {
-		return getFeeRatio(userId, true);
-	}
-
-	@Override
-	public BigDecimal getMakerCloseFeeRatio(long userId, String asset, String symbol) {
+	public BigDecimal getMakerFeeRatio(long userId, String asset, String symbol) {
 		return getFeeRatio(userId, true);
 	}
 

@@ -27,15 +27,15 @@ public interface FeeRatioService {
 	 * @param userId
 	 * @return
 	 */
-	BigDecimal getOpenFeeRatio(long userId, String asset, String symbol);
+	BigDecimal getTakerFeeRatio(long userId, String asset, String symbol);
 
 	/**
-	 * 平仓手续费率
+	 * 获取maker开仓手续费率
 	 * 
 	 * @param userId
 	 * @return
 	 */
-	BigDecimal getCloseFeeRatio(long userId, String asset, String symbol);
+	BigDecimal getMakerFeeRatio(long userId, String asset, String symbol);
 
 	/**
 	 * 维持保证金率
@@ -46,22 +46,6 @@ public interface FeeRatioService {
 	 * @return
 	 */
 	BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume);
-
-	/**
-	 * 获取maker开仓手续费率
-	 * 
-	 * @param userId
-	 * @return
-	 */
-	BigDecimal getMakerOpenFeeRatio(long userId, String asset, String symbol);
-
-	/**
-	 * 获取maker平仓手续费率
-	 * 
-	 * @param userId
-	 * @return
-	 */
-	BigDecimal getMakerCloseFeeRatio(long userId, String asset, String symbol);
 
 	default BigDecimal getMaxLeverage(Long userId, String asset, String symbol, BigDecimal posVolume){
 		return new BigDecimal(50);

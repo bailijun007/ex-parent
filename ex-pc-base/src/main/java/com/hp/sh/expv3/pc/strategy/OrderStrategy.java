@@ -22,5 +22,7 @@ public interface OrderStrategy {
 	OrderFeeData calcRaitoOrderFee(PcOrder order, BigDecimal number);
 
 	BigDecimal calMargin(BigDecimal volume, BigDecimal faceValue, BigDecimal price, BigDecimal marginRatio);
+
+	BigDecimal calcTradeFee(BigDecimal volume, BigDecimal faceValue, BigDecimal price, BigDecimal feeRatio);
 	
 }

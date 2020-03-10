@@ -37,6 +37,7 @@ import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.SnUtils;
+import com.hp.sh.expv3.utils.math.BigFormat;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
@@ -131,8 +132,8 @@ public class PcOrderService {
 		
 		//设置开仓订单的各种费率
 		pcOrder.setMarginRatio(feeRatioService.getInitedMarginRatio(pcOrder.getLeverage()));
-		pcOrder.setOpenFeeRatio(feeRatioService.getOpenFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
-		pcOrder.setCloseFeeRatio(feeRatioService.getCloseFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
+		pcOrder.setOpenFeeRatio(feeRatioService.getTakerFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
+		pcOrder.setCloseFeeRatio(feeRatioService.getTakerFeeRatio(pcOrder.getUserId(), pcOrder.getAsset(), pcOrder.getSymbol()));
 		
 		OrderFeeData feeData = strategyContext.calcNewOrderFee(pcOrder.getAsset(), pcOrder.getSymbol(), pcOrder);
 		pcOrder.setOpenFee(feeData.getOpenFee());
@@ -289,7 +290,7 @@ public class PcOrderService {
 		PcAddRequest request = new PcAddRequest();
 		request.setAmount(orderMargin.add(openFee).add(closeFee));
 		request.setAsset(asset);
-		request.setRemark("撤单还余额");
+		request.setRemark(BigFormat.format("撤单还押金：%s,%s,%s", orderMargin, openFee, closeFee));
 		request.setTradeNo(SnUtils.getCancelOrderReturnSn(""+orderId));
 		request.setTradeType(PcAccountTradeType.ORDER_CANCEL);
 		request.setUserId(userId);
