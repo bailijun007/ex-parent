@@ -1,5 +1,7 @@
 package com.hp.sh.expv3.bb.mq.listen.mq;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -57,8 +59,33 @@ public class MatchMqConsumer {
 	/**
 	 * 撮合成功
 	 */
+	public void handleMatchedTradeList(List<BBMatchedTrade> list, Map<String,Integer> map){
+		logger.info("收到消息:{}", list.size());
+		for(BBMatchedTrade matchedTrade : list){
+			boolean exist = this.matchedTradeService.exist(matchedTrade.getMkOrderId(), matchedTrade.getTkOrderId());
+			if(exist){
+				logger.warn("撮合已存在:{}", matchedTrade);
+				return;
+			}
+			
+			//保存
+			matchedTrade.setTakerHandleStatus(IntBool.NO);
+			matchedTrade.setMakerHandleStatus(IntBool.NO);
+			this.matchedTradeService.save(matchedTrade);
+			
+			//处理用户成交
+			matchedHandler.handleMatchedTrade(matchedTrade);
+		}
+		
+		//通知前端
+		sender.send(list);
+	}
+	
+	/**
+	 * 撮合成功
+	 */
 	@MQListener(tags=MqTags.TAGS_MATCHED)
-	public void handleMatchedTrade(BBMatchedTrade matchedTrade){
+	public void handleMatchedTradeOne(BBMatchedTrade matchedTrade){
 		logger.info("收到消息:{}", matchedTrade);
 		
 		boolean exist = this.matchedTradeService.exist(matchedTrade.getMkOrderId(), matchedTrade.getTkOrderId());

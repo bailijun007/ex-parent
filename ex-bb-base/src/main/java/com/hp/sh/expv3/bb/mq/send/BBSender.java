@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.bb.mq.send;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,17 @@ public class BBSender {
 		publisher.publish(channel, eventMsg);
 	}
 	
+	public void send(List<BBMatchedTrade> list) {
+		TradeListMsg listMsg = new TradeListMsg();
+		BBMatchedTrade matchedTrade = list.get(list.size()-1);
+		listMsg.setLastPrice(matchedTrade.getPrice());
+		listMsg.setMatchTxId(matchedTrade.getMatchTxId());
+		listMsg.setMessageId(""+matchedTrade.getId());
+		listMsg.setTrades(list);
+		
+		this.publisher.publish(String.format("bb:trade:%s:%s", matchedTrade.getAsset(), matchedTrade.getSymbol()), listMsg);
+	}
+
 	public void send(BBMatchedTrade matchedTrade){
 		TradeListMsg listMsg = new TradeListMsg();
 		
