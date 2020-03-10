@@ -59,7 +59,7 @@ public class BBKlineBuild {
 
     private static List<BbTradeVo> list=new CopyOnWriteArrayList<>();
 
-    @PostConstruct
+//    @PostConstruct
     public void bbKlineBuild() {
 //        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
 //                2,

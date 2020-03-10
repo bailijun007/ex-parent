@@ -54,7 +54,7 @@ public class OngoinKlineProcessor {
     @Value("${bb.kline.update}")
     private String bbKlineUpdatePattern;
 
-    @PostConstruct
+//    @PostConstruct
     private void init() {
         final String[] freqs = supportFrequenceString.split(",");
         for (String freq : freqs) {
@@ -67,7 +67,7 @@ public class OngoinKlineProcessor {
 
 
 //    @Scheduled(cron = "0 0/1 * * * ?")
-    @Scheduled(cron = "*/5 * * * * *")
+//    @Scheduled(cron = "*/5 * * * * *")
     public void getFiveMinuteklineData() {
         List<BBSymbol> bbSymbols = listSymbol();
         List<BBSymbol> targetBbSymbols = filterBbSymbols(bbSymbols);
