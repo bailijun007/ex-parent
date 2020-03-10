@@ -12,6 +12,8 @@ public class BbOrderTradeDetailVo implements Serializable {
     @ApiModelProperty("id")
     private Long id;
 
+    private Integer bidFlag;
+
     @ApiModelProperty("用户id")
     private Long userId;
 
@@ -45,6 +47,14 @@ public class BbOrderTradeDetailVo implements Serializable {
     }
 
     public BbOrderTradeDetailVo() {
+    }
+
+    public Integer getBidFlag() {
+        return bidFlag;
+    }
+
+    public void setBidFlag(Integer bidFlag) {
+        this.bidFlag = bidFlag;
     }
 
     public Long getId() {

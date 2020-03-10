@@ -1,15 +1,14 @@
-package com.hp.sh.expv3.bb.extension.service.impl;
+package com.hp.sh.expv3.bb.kline.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.hp.sh.expv3.bb.extension.constant.BbKLineKey;
-import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
-import com.hp.sh.expv3.bb.extension.pojo.BBKLine;
-import com.hp.sh.expv3.bb.extension.pojo.BBKlineTrade;
-import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
-import com.hp.sh.expv3.bb.extension.pubsub.BBKlineBuild;
-import com.hp.sh.expv3.bb.extension.service.BBKlineBuildService;
-import com.hp.sh.expv3.bb.extension.util.StringReplaceUtil;
-import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
+import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
+import com.hp.sh.expv3.bb.kline.constant.BbextendConst;
+import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
+import com.hp.sh.expv3.bb.kline.pojo.BBKlineTrade;
+import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
+import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
+import com.hp.sh.expv3.bb.kline.service.BBKlineBuildService;
+import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +70,7 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
             new ThreadPoolExecutor.AbortPolicy()
     );
 
-//    @PostConstruct
+    @PostConstruct
     public void bbKlineBuild() {
 
         threadPool.execute(() -> trigger());
