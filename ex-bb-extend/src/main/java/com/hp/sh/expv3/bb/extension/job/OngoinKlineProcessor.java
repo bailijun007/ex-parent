@@ -37,6 +37,22 @@ public class OngoinKlineProcessor {
     @Value("${support.supportFrequenceString:1,5,10,15,30}")
     private String supportFrequenceString;
 
+    @Value("${bb.kline}")
+    private String bbKlinePattern;
+
+    @Autowired
+    @Qualifier("metadataRedisUtil")
+    private RedisUtil metadataRedisUtil;
+
+    @Autowired
+    @Qualifier("bbKlineOngoingRedisUtil")
+    private RedisUtil bbKlineOngoingRedisUtil;
+
+    @Value("${bb.kline.trigger.pattern}")
+    private String bbKlineTriggerPattern;
+    @Value("${bb.kline.update}")
+    private String bbKlineUpdatePattern;
+
     @PostConstruct
     private void init() {
         final String[] freqs = supportFrequenceString.split(",");
@@ -47,13 +63,7 @@ public class OngoinKlineProcessor {
 
     private List<Integer> supportFrequence = new ArrayList<>();
 
-    @Autowired
-    @Qualifier("metadataRedisUtil")
-    private RedisUtil metadataRedisUtil;
 
-    @Autowired
-    @Qualifier("bbKlineOngoingRedisUtil")
-    private RedisUtil bbKlineOngoingRedisUtil;
 
 //    @Scheduled(cron = "0 0/1 * * * ?")
     @Scheduled(cron = "*/5 * * * * *")
@@ -94,8 +104,7 @@ public class OngoinKlineProcessor {
         }
     }
 
-    @Value("${bb.kline}")
-    private String bbKlinePattern;
+
 
     private String buildKlineSaveRedisKey(String asset, String symbol, int frequency) {
         return StringReplaceUtil.replace(bbKlinePattern, new HashMap<String, String>() {{
@@ -198,10 +207,7 @@ public class OngoinKlineProcessor {
         return new Long[]{divisor * targetFreq, (divisor + 1) * targetFreq - 1};
     }
 
-    @Value("${bb.kline.trigger.pattern}")
-    private String bbKlineTriggerPattern;
-    @Value("${bb.kline.update}")
-    private String bbKlineUpdatePattern;
+
 
     private String buildTriggerRedisKey(String asset, String symbol, Integer frequency) {
         return StringReplaceUtil.replace(bbKlineTriggerPattern, new HashMap<String, String>() {

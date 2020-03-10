@@ -56,6 +56,6 @@ public class BbOrderTradeExtServiceImpl implements BbOrderTradeExtService {
         for (BbOrderTradeDetailVo bbOrderTradeDetailVo : list) {
             bbOrderTradeDetailVo.setAmt(bbOrderTradeDetailVo.getPrice().multiply(bbOrderTradeDetailVo.getQty()));
         }
-        return null;
+        return list;
     }
 }

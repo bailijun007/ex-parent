@@ -20,7 +20,7 @@ import redis.clients.jedis.JedisPubSub;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -55,7 +55,28 @@ public class BBKlineBuild {
     @Value("${bb.kline}")
     private String bbKlinePattern;
 
-   @PostConstruct
+    private static   ScheduledExecutorService timer = Executors.newScheduledThreadPool(2);
+
+    @PostConstruct
+    public void bbKlineBuild() {
+//        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
+//                2,
+//                Runtime.getRuntime().availableProcessors()+1,
+//                2L,TimeUnit.SECONDS,
+//                new LinkedBlockingQueue<Runnable>(100000),
+//                Executors.defaultThreadFactory(),
+//                new  ThreadPoolExecutor.AbortPolicy()
+//        );
+//
+//        threadPool.execute(()->trigger());
+
+
+        timer.scheduleAtFixedRate(() -> {
+            trigger();
+        }, 0, 10, TimeUnit.SECONDS);
+    }
+
+
     public void trigger() {
         List<BBSymbol> bbSymbols = listSymbol();
 
@@ -193,7 +214,6 @@ public class BBKlineBuild {
         }
         return bbkLine1;
     }
-
 
 
     private String buildUpdateRedisKey(String asset, String symbol, int frequency) {
