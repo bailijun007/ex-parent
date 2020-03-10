@@ -107,11 +107,12 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
                     Map<Long, List<BbTradeVo>> minute2TradeList = list.stream()
                             .collect(Collectors.groupingBy(klineTrade -> klineTrade.getTradeTime()));
 
+                    final int oneMinuteInterval = 1;
                     //1分钟kline 数据
                     for (Long ms : minute2TradeList.keySet()) {
                         long oneMinute = TimeUnit.MILLISECONDS.toMinutes(ms);
                         List<BbTradeVo> trades = minute2TradeList.get(ms);
-                        final int oneMinuteInterval = 1;
+
                         BBKLine newkLine = buildKline(trades, asset, symbol, oneMinuteInterval, oneMinute);
 
                         BBKLine oldkLine = getOldKLine(asset, symbol, oneMinute, oneMinuteInterval);
@@ -136,7 +137,9 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
         newkLine.setLow(newkLine.getLow().min(oldkLine.getLow()));
         newkLine.setOpen(oldkLine.getOpen());
         newkLine.setVolume(newkLine.getVolume().add(oldkLine.getVolume()));
-// close 不用修改
+
+        logger.info("合并k线数据:{}" + newkLine);
+
         return newkLine;
     }
 
@@ -147,27 +150,27 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
     }
 
     /*
-     * kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
+     * bb:kline:%{asset}:%{symbol}:%{freq}
      *   interval 频率；1分钟
      */
     public void saveKline(BBKLine kline, String asset, String symbol, long minute, int interval) {
-        //向集合中插入元素，并设置分数
         String key = buildKlineSaveRedisKey(asset, symbol, interval);
-
 
         bbKlineOngoingRedisUtil.zremrangeByScore(key, minute, minute);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
             put(JSON.toJSONString(kline), Long.valueOf(minute).doubleValue());
         }});
+       logger.info("保存的K线数据为:{}"+kline);
     }
 
     public void notifyUpdate(String asset, String symbol, long minute, int frequency) {
         //向集合中插入元素，并设置分数
+        final String key1 = buildUpdateRedisMember(asset, symbol, frequency, minute);
         String key = buildUpdateRedisKey(asset, symbol, frequency);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
-                    put(buildUpdateRedisMember(asset, symbol, frequency, minute), Long.valueOf(minute).doubleValue());
-                }}
+            put(key1, Long.valueOf(minute).doubleValue()); }}
         );
+        logger.info("通知:{}"+key1);
     }
 
     public BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, int interval, long minute) {
@@ -198,6 +201,8 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
         bBKLine.setClose(closePrice);
         bBKLine.setVolume(volume);
 
+        logger.info("生成实时k线数据:{}" + bBKLine);
+
         return bBKLine;
     }
 
@@ -218,6 +223,7 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
 //            JSON字符串转JSON对象
             bbkLine1 = JSON.parseObject(s, BBKLine.class);
         }
+        logger.info("旧k线数据:{}" + bbkLine1);
         return bbkLine1;
     }
 
