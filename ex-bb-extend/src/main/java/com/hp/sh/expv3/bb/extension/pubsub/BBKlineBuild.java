@@ -55,7 +55,7 @@ public class BBKlineBuild {
     @Value("${bb.kline}")
     private String bbKlinePattern;
 
-//    @PostConstruct
+   @PostConstruct
     public void trigger() {
         List<BBSymbol> bbSymbols = listSymbol();
 
