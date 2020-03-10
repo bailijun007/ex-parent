@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.kline.module.order.dao.BBOrderTradeDAO">
+
+	<resultMap type="com.hp.sh.expv3.bb.kline.module.order.entity.BBOrderTrade" id="BBOrderTrade">
+		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="price" property="price" />
+		<result column="volume" property="volume" />
+		<result column="bid_flag" property="bidFlag" />
+		<result column="trade_sn" property="tradeSn" />
+		<result column="trade_id" property="tradeId" />
+		<result column="order_id" property="orderId" />
+		<result column="maker_flag" property="makerFlag" />
+		<result column="trade_time" property="tradeTime" />
+		<result column="fee_collector_id" property="feeCollectorId" />
+		<result column="fee_ratio" property="feeRatio" />
+		<result column="fee" property="fee" />
+		<result column="remain_volume" property="remainVolume" />
+		<result column="remain_order_margin" property="remainOrderMargin" />
+		<result column="remain_fee" property="remainFee" />
+		<result column="match_tx_id" property="matchTxId" />
+		<result column="tx_id" property="txId" />
+		<result column="fee_synch_status" property="feeSynchStatus" />
+		<result column="user_id" property="userId" />
+		<result column="id" property="id" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		asset,symbol,price,volume,bid_flag,trade_sn,trade_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,remain_volume,remain_order_margin,remain_fee,match_tx_id,tx_id,fee_synch_status,user_id,id,created,modified
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="bidFlag!=null"> and bid_flag=#{bidFlag}</if>
+		<if test="tradeId!=null"> and trade_id=#{tradeId}</if>
+		<if test="orderId!=null"> and order_id=#{orderId}</if>
+		<if test="makerFlag!=null"> and maker_flag=#{makerFlag}</if>
+		<if test="tradeTime!=null"> and trade_time=#{tradeTime}</if>
+		<if test="feeCollectorId!=null"> and fee_collector_id=#{feeCollectorId}</if>
+		<if test="matchTxId!=null"> and match_tx_id=#{matchTxId}</if>
+		<if test="txId!=null"> and tx_id=#{txId}</if>
+		<if test="feeSynchStatus!=null"> and fee_synch_status=#{feeSynchStatus}</if>
+		<if test="userId!=null"> and user_id=#{userId}</if>
+		<if test="id!=null"> and id=#{id}</if>
+		<if test="created!=null"> and created=#{created}</if>
+		<if test="modified!=null"> and modified=#{modified}</if>
+		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(asset,''),IFNULL(symbol,''),IFNULL(trade_sn,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from bb_order_trade
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="BBOrderTrade">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="BBOrderTrade">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="BBOrderTrade">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from bb_order_trade
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="BBOrderTrade">
+		select
+			<include refid="Base_Column_List" />
+		from bb_order_trade
+			where id=#{id} and user_id=#{userId}
+	</select>
+
+	<select id="exist" resultType="long">
+		select 
+			count(1)
+		from 
+			bb_order_trade
+		where 
+			user_id=#{userId} and trade_sn=#{tradeSn}
+		limit 1
+	</select>
+
+	<insert id="save">
+		insert into bb_order_trade (
+			asset,symbol,price,volume,bid_flag,trade_sn,trade_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,remain_volume,remain_order_margin,remain_fee,match_tx_id,tx_id,fee_synch_status,user_id,id,created,modified
+		)values(
+			#{asset},#{symbol},#{price},#{volume},#{bidFlag},#{tradeSn},#{tradeId},#{orderId},#{makerFlag},#{tradeTime},#{feeCollectorId},#{feeRatio},#{fee},#{remainVolume},#{remainOrderMargin},#{remainFee},#{matchTxId},#{txId},#{feeSynchStatus},#{userId},#{id},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			bb_order_trade
+		set 
+			asset=#{asset},symbol=#{symbol},price=#{price},volume=#{volume},bid_flag=#{bidFlag},trade_sn=#{tradeSn},trade_id=#{tradeId},order_id=#{orderId},maker_flag=#{makerFlag},trade_time=#{tradeTime},fee_collector_id=#{feeCollectorId},fee_ratio=#{feeRatio},fee=#{fee},remain_volume=#{remainVolume},remain_order_margin=#{remainOrderMargin},remain_fee=#{remainFee},match_tx_id=#{matchTxId},tx_id=#{txId},fee_synch_status=#{feeSynchStatus},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+		where 
+			id=#{id} and user_id=#{userId}
+	</update>
+
+	<delete id="delete">
+        delete from bb_order_trade where id=#{id} and user_id=#{userId}
+    </delete>
+
+    <delete id="condDelete">
+        delete from bb_order_trade
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+	<select id="queryOrderTrade" resultType="com.hp.sh.expv3.bb.kline.strategy.vo.OrderTradeVo">
+		select
+			volume, price, order_id, id
+		from 
+			bb_order_trade
+		where
+			user_id=#{userId}
+		and order_id in
+			<foreach item="item" index="i" collection="orderIdList" open="(" separator="," close=")">
+			#{orderIdList[${i}]}
+			</foreach>
+	</select>
+	
+	<update id="setSynchStatus">
+		update 
+			bb_order_trade
+		set 
+			fee_synch_status=#{feeSynchStatus},modified=#{modified}
+		where 
+			id=#{id} and user_id=#{userId}
+	</update>
+
+</mapper>
