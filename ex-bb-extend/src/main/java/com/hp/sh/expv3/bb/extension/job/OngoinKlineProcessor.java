@@ -48,8 +48,9 @@ public class OngoinKlineProcessor {
     @Qualifier("bbKlineOngoingRedisUtil")
     private RedisUtil bbKlineOngoingRedisUtil;
 
-    @Value("${bb.kline.trigger.pattern}")
-    private String bbKlineTriggerPattern;
+//    @Value("${bb.kline.trigger.pattern}")
+//    private String bbKlineTriggerPattern;
+
     @Value("${bb.kline.update}")
     private String bbKlineUpdatePattern;
 
@@ -80,7 +81,8 @@ public class OngoinKlineProcessor {
             final String asset = bbSymbol.getAsset();
             final String symbol = bbSymbol.getSymbol();
             for (Integer triggerFreq : supportFrequence) {
-                String triggerRedisKey = buildTriggerRedisKey(asset, symbol, triggerFreq);
+//                String triggerRedisKey = buildTriggerRedisKey(asset, symbol, triggerFreq);
+                String triggerRedisKey = buildKlineSaveRedisKey(asset, symbol, triggerFreq);
                 final Set<Tuple> triggers = bbKlineOngoingRedisUtil.zpopmin(triggerRedisKey, triggerBatchSize);
                 for (Tuple trigger : triggers) {
 //                    final String element = trigger.getElement();
@@ -135,7 +137,7 @@ public class OngoinKlineProcessor {
         final String targetFreqRedisKey = buildKlineSaveRedisKey(asset, symbol, targetFreq);
         //删除老数据
         bbKlineOngoingRedisUtil.zremrangeByScore(targetFreqRedisKey, newKline.getMinute(), newKline.getMinute());
-        //更新新数据
+        //新增新数据
         bbKlineOngoingRedisUtil.zadd(targetFreqRedisKey, new HashMap<String, Double>() {{
             put(JSON.toJSONString(newKline), Long.valueOf(newKline.getMinute()).doubleValue());
         }});
@@ -209,15 +211,15 @@ public class OngoinKlineProcessor {
 
 
 
-    private String buildTriggerRedisKey(String asset, String symbol, Integer frequency) {
-        return StringReplaceUtil.replace(bbKlineTriggerPattern, new HashMap<String, String>() {
-            {
-                put("asset", asset);
-                put("symbol", symbol);
-                put("freq", "" + frequency);
-            }
-        });
-    }
+//    private String buildTriggerRedisKey(String asset, String symbol, Integer frequency) {
+//        return StringReplaceUtil.replace(bbKlineTriggerPattern, new HashMap<String, String>() {
+//            {
+//                put("asset", asset);
+//                put("symbol", symbol);
+//                put("freq", "" + frequency);
+//            }
+//        });
+//    }
 
     private TreeMap<Integer, TreeSet<Integer>> buildTrigger2TarFrequence(TreeMap<Integer, Integer> targetFreq2TriggerFreq) {
         TreeMap<Integer, TreeSet<Integer>> trigger2Tar = new TreeMap<>();

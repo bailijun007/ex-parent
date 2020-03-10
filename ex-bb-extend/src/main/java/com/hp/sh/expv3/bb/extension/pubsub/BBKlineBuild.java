@@ -57,6 +57,8 @@ public class BBKlineBuild {
 
     private static   ScheduledExecutorService timer = Executors.newScheduledThreadPool(2);
 
+    private static List<BbTradeVo> list=new CopyOnWriteArrayList<>();
+
     @PostConstruct
     public void bbKlineBuild() {
 //        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
@@ -96,9 +98,9 @@ public class BBKlineBuild {
 
                     logger.info("收到k线推送消息:{}" + msg);
                     List<BbTradeVo> bbTradeVos = listTrade(msg);
-
+                    list.addAll(bbTradeVos);
                     // 拆成不同的分钟
-                    Map<Long, List<BbTradeVo>> minute2TradeList = bbTradeVos.stream()
+                    Map<Long, List<BbTradeVo>> minute2TradeList = list.stream()
                             .collect(Collectors.groupingBy(klineTrade -> klineTrade.getTradeTime()));
 
                     //1分钟kline 数据
