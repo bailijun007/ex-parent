@@ -1,13 +1,11 @@
 package com.hp.sh.expv3.bb.kline.service.impl;
 
-import com.alibaba.fastjson.JSON;
-
 import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.constant.BbextendConst;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
-import com.hp.sh.expv3.bb.kline.service.OngoinKlineService;
-
+import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingMergeService;
+import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +19,7 @@ import redis.clients.jedis.Tuple;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class OngoinKlineServiceImpl implements OngoinKlineService {
+public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeService {
     @Value("${bb.kline.bbGroupIds}")
     private Set<Integer> supportBbGroupIds;
 
@@ -52,8 +51,11 @@ public class OngoinKlineServiceImpl implements OngoinKlineService {
 //    @Value("${bb.kline.trigger.pattern}")
 //    private String bbKlineTriggerPattern;
 
-    @Value("${bb.kline.update}")
-    private String bbKlineUpdatePattern;
+    @Value("${bb.kline.updateEventPattern}")
+    private String updateEventPattern;
+
+    @Value("${bb.kline.ongoingMerge.enable}")
+    private int ongoingMergeEnable;
 
     @PostConstruct
     private void init() {
@@ -70,6 +72,11 @@ public class OngoinKlineServiceImpl implements OngoinKlineService {
     @Override
     @Scheduled(cron = "*/1 * * * * *")
     public void getKlineData() {
+      //  ongoingMergeEnable=1
+        if (1 != ongoingMergeEnable) {
+            return;
+        }
+
         List<BBSymbol> bbSymbols = listSymbol();
         List<BBSymbol> targetBbSymbols = filterBbSymbols(bbSymbols);
 
@@ -140,10 +147,11 @@ public class OngoinKlineServiceImpl implements OngoinKlineService {
     private void saveOrUpdateKline(String asset, String symbol, Integer targetFreq, BBKLine newKline) {
         final String targetFreqRedisKey = buildKlineSaveRedisKey(asset, symbol, targetFreq);
         //删除老数据
-        bbKlineOngoingRedisUtil.zremrangeByScore(targetFreqRedisKey, newKline.getMinute(), newKline.getMinute());
+        bbKlineOngoingRedisUtil.zremrangeByScore(targetFreqRedisKey, newKline.getMs(), newKline.getMs());
         //新增新数据
         bbKlineOngoingRedisUtil.zadd(targetFreqRedisKey, new HashMap<String, Double>() {{
-            put(JSON.toJSONString(newKline), Long.valueOf(newKline.getMinute()).doubleValue());
+            final String data = BBKlineUtil.kline2ArrayData(newKline);
+            put(data, Long.valueOf(newKline.getMs()).doubleValue());
         }});
 
     }
@@ -176,17 +184,21 @@ public class OngoinKlineServiceImpl implements OngoinKlineService {
         bbkLine.setVolume(volume);
         bbkLine.setFrequence(targetFreq);
         bbkLine.setMinute(startMinute);
+        bbkLine.setMs(TimeUnit.MINUTES.toMillis(startMinute));
         return bbkLine;
     }
 
     private List<BBKLine> listKlineResource(String asset, String symbol, Integer triggerFreq, Long startMinute, Long endMinute) {
         final String triggerFreqRedisKey = buildKlineSaveRedisKey(asset, symbol, triggerFreq);
-        final Set<String> klines = bbKlineOngoingRedisUtil.zrangeByScore(triggerFreqRedisKey, startMinute + "", endMinute + "", 0, Long.valueOf(endMinute - startMinute + 1).intValue());
+
+        final long startMs = TimeUnit.MINUTES.toMillis(startMinute);
+        final long endMs = TimeUnit.MINUTES.toMillis(endMinute);
+        final Set<String> klines = bbKlineOngoingRedisUtil.zrangeByScore(triggerFreqRedisKey, startMs + "", endMs + "", 0, Long.valueOf(endMinute - startMinute + 1).intValue());
         List<BBKLine> list = new ArrayList<>();
         // 按照时间minute升序
         if (!klines.isEmpty()) {
             for (String kline : klines) {
-                BBKLine bbkLine1 = JSON.parseObject(kline, BBKLine.class);
+                BBKLine bbkLine1 = BBKlineUtil.convert2KlineData(kline, triggerFreq);
                 list.add(bbkLine1);
             }
         }
@@ -215,7 +227,7 @@ public class OngoinKlineServiceImpl implements OngoinKlineService {
 
 
     private String buildTriggerRedisKey(String asset, String symbol, Integer frequency) {
-        return StringReplaceUtil.replace(bbKlineUpdatePattern, new HashMap<String, String>() {
+        return StringReplaceUtil.replace(updateEventPattern, new HashMap<String, String>() {
             {
                 put("asset", asset);
                 put("symbol", symbol);
@@ -292,7 +304,7 @@ public class OngoinKlineServiceImpl implements OngoinKlineService {
 
     private String buildUpdateRedisKey(String asset, String symbol, int frequency) {
 //        bb.kline.update
-        return StringReplaceUtil.replace(bbKlineUpdatePattern, new HashMap<String, String>() {
+        return StringReplaceUtil.replace(updateEventPattern, new HashMap<String, String>() {
             {
                 put("asset", asset);
                 put("symbol", symbol);

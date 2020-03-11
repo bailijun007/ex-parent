@@ -7,7 +7,8 @@ import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBKlineTrade;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
-import com.hp.sh.expv3.bb.kline.service.BBKlineBuildService;
+import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingCalcService;
+import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.slf4j.Logger;
@@ -22,7 +23,10 @@ import redis.clients.jedis.JedisPubSub;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -30,8 +34,8 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class BBKlineBuildServiceImpl implements BBKlineBuildService {
-    private static final Logger logger = LoggerFactory.getLogger(BBKlineBuildServiceImpl.class);
+public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
 //    @Resource(name = "templateDB0")
 //    private StringRedisTemplate templateDB0;
@@ -50,15 +54,15 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
     @Qualifier("metadataRedisUtil")
     private RedisUtil metadataRedisUtil;
 
-    @Value("${bb.kline.update}")
-    private String bbKlineUpdatePattern;
+    @Value("${bb.kline.updateEventPattern}")
+    private String updateEventPattern;
 
     @Value("${bb.kline}")
     private String bbKlinePattern;
+    @Value("${bb.kline.ongoingCalc.enable}")
+    private int ongoingCalcEnable;
 
 //    private static   ScheduledExecutorService timer = Executors.newScheduledThreadPool(2);
-
-    private static List<BbTradeVo> list = new CopyOnWriteArrayList<>();
 
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
@@ -81,9 +85,13 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
 //        }, 0, 10, TimeUnit.SECONDS);
     }
 
-
     @Override
     public void trigger() {
+
+        if (1 != ongoingCalcEnable) {
+            return;
+        }
+
         List<BBSymbol> bbSymbols = listSymbol();
 
         for (BBSymbol bbSymbol : bbSymbols) {
@@ -101,26 +109,23 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
                 public void onMessage(String channel, String msg) {
 
                     logger.info("收到k线推送消息:{}" + msg);
-                    List<BbTradeVo> bbTradeVos = listTrade(msg);
-                    list.addAll(bbTradeVos);
+                    List<BbTradeVo> list = listTrade(msg);
                     // 拆成不同的分钟
                     Map<Long, List<BbTradeVo>> minute2TradeList = list.stream()
-                            .collect(Collectors.groupingBy(klineTrade -> klineTrade.getTradeTime()));
+                            .collect(Collectors.groupingBy(klineTrade -> TimeUnit.MILLISECONDS.toMinutes(klineTrade.getTradeTime())));
 
-                    final int oneMinuteInterval = 1;
                     //1分钟kline 数据
-                    for (Long ms : minute2TradeList.keySet()) {
-                        long oneMinute = TimeUnit.MILLISECONDS.toMinutes(ms);
-                        List<BbTradeVo> trades = minute2TradeList.get(ms);
+                    for (Long minute : minute2TradeList.keySet()) {
+                        List<BbTradeVo> trades = minute2TradeList.get(minute);
+                        final int oneMinuteInterval = 1;
+                        BBKLine newkLine = buildKline(trades, asset, symbol, oneMinuteInterval, minute);
 
-                        BBKLine newkLine = buildKline(trades, asset, symbol, oneMinuteInterval, oneMinute);
-
-                        BBKLine oldkLine = getOldKLine(asset, symbol, oneMinute, oneMinuteInterval);
+                        BBKLine oldkLine = getOldKLine(asset, symbol, minute, oneMinuteInterval);
 
                         BBKLine mergedKline = merge(oldkLine, newkLine);
-                        saveKline(mergedKline, asset, symbol, oneMinute, oneMinuteInterval);
+                        saveKline(mergedKline, asset, symbol, minute, oneMinuteInterval);
 
-                        notifyUpdate(asset, symbol, oneMinute, oneMinuteInterval);
+                        notifyUpdate(asset, symbol, minute, oneMinuteInterval);
                     }
                 }
             }, channel);
@@ -137,9 +142,7 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
         newkLine.setLow(newkLine.getLow().min(oldkLine.getLow()));
         newkLine.setOpen(oldkLine.getOpen());
         newkLine.setVolume(newkLine.getVolume().add(oldkLine.getVolume()));
-
-        logger.info("合并k线数据:{}" + newkLine);
-
+// close 不用修改
         return newkLine;
     }
 
@@ -150,35 +153,36 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
     }
 
     /*
-     * bb:kline:%{asset}:%{symbol}:%{freq}
-     *   interval 频率；1分钟
+     * kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
+     *   frequency 频率；1分钟
      */
-    public void saveKline(BBKLine kline, String asset, String symbol, long minute, int interval) {
-        String key = buildKlineSaveRedisKey(asset, symbol, interval);
-
-        bbKlineOngoingRedisUtil.zremrangeByScore(key, minute, minute);
+    public void saveKline(BBKLine kline, String asset, String symbol, long minute, int frequency) {
+        //向集合中插入元素，并设置分数
+        String key = buildKlineSaveRedisKey(asset, symbol, frequency);
+        final long ms = TimeUnit.MINUTES.toMillis(minute);
+        bbKlineOngoingRedisUtil.zremrangeByScore(key, ms, ms);
+        final String data = BBKlineUtil.kline2ArrayData(kline);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
-            put(JSON.toJSONString(kline), Long.valueOf(minute).doubleValue());
+            put(data, Long.valueOf(ms).doubleValue());
         }});
-       logger.info("保存的K线数据为:{}"+kline);
     }
 
     public void notifyUpdate(String asset, String symbol, long minute, int frequency) {
         //向集合中插入元素，并设置分数
-        final String key1 = buildUpdateRedisMember(asset, symbol, frequency, minute);
         String key = buildUpdateRedisKey(asset, symbol, frequency);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
-            put(key1, Long.valueOf(minute).doubleValue()); }}
+                    put(buildUpdateRedisMember(asset, symbol, frequency, minute), Long.valueOf(minute).doubleValue());
+                }}
         );
-        logger.info("通知:{}"+key1);
     }
 
-    public BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, int interval, long minute) {
+    public BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, int frequency, long minute) {
         BBKLine bBKLine = new BBKLine();
         bBKLine.setAsset(asset);
         bBKLine.setSymbol(symbol);
-        bBKLine.setFrequence(interval);
+        bBKLine.setFrequence(frequency);
         bBKLine.setMinute(minute);
+        bBKLine.setMs(TimeUnit.MINUTES.toMillis(minute));
 
         BigDecimal highPrice = BigDecimal.ZERO;
         BigDecimal lowPrice = new BigDecimal(String.valueOf(Long.MAX_VALUE));
@@ -201,8 +205,6 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
         bBKLine.setClose(closePrice);
         bBKLine.setVolume(volume);
 
-        logger.info("生成实时k线数据:{}" + bBKLine);
-
         return bBKLine;
     }
 
@@ -211,25 +213,23 @@ public class BBKlineBuildServiceImpl implements BBKlineBuildService {
         return bbKlineTrade.getTrades();
     }
 
-    public BBKLine getOldKLine(String asset, String symbol, long minute, int interval) {
+    public BBKLine getOldKLine(String asset, String symbol, long minute, int freq) {
         BBKLine bbkLine1 = null;
-        String key = buildKlineSaveRedisKey(asset, symbol, interval);
-//        Set<String> range = klineTemplateDB5.opsForZSet().rangeByScore(key, minute, minute);
-
-        Set<String> range = bbKlineOngoingRedisUtil.zrangeByScore(key, "" + minute, minute + "", 0, 1);
+        long ms = TimeUnit.MINUTES.toMillis(minute);
+        String key = buildKlineSaveRedisKey(asset, symbol, freq);
+        Set<String> range = bbKlineOngoingRedisUtil.zrangeByScore(key, "" + ms, ms + "", 0, 1);
 
         if (!range.isEmpty()) {
             final String s = new ArrayList<>(range).get(0);
 //            JSON字符串转JSON对象
-            bbkLine1 = JSON.parseObject(s, BBKLine.class);
+            bbkLine1 = BBKlineUtil.convert2KlineData(s, freq);
         }
-        logger.info("旧k线数据:{}" + bbkLine1);
         return bbkLine1;
     }
 
 
     private String buildUpdateRedisKey(String asset, String symbol, int frequency) {
-        return StringReplaceUtil.replace(bbKlineUpdatePattern, new HashMap<String, String>() {{
+        return StringReplaceUtil.replace(updateEventPattern, new HashMap<String, String>() {{
             put("asset", asset);
             put("symbol", symbol);
             put("freq", "" + frequency);

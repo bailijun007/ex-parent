@@ -7,7 +7,8 @@ import java.math.BigDecimal;
  * @author BaiLiJun  on 2020/3/10
  */
 public class ExBbKlineVo implements Serializable {
-    private long timestamp; // 毫秒时间戳
+    private long ms; // 毫秒时间戳
+    private long minute; // 毫秒时间戳
     private BigDecimal volume; //  number 累加
     private BigDecimal high; // max(price)
     private BigDecimal low;// min(price)
@@ -16,12 +17,20 @@ public class ExBbKlineVo implements Serializable {
     public ExBbKlineVo() {
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public long getMs() {
+        return ms;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setMs(long ms) {
+        this.ms = ms;
+    }
+
+    public long getMinute() {
+        return minute;
+    }
+
+    public void setMinute(long minute) {
+        this.minute = minute;
     }
 
     public BigDecimal getVolume() {
