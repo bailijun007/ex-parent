@@ -10,6 +10,8 @@ import com.hp.sh.expv3.bb.kline.service.BbTradeExtService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BbKlineHistoryCalcFromExpServiceImpl implements BbKlineHistoryCalcFromExpService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Value("${bb.kline.bbGroupIds}")
     private Set<Integer> supportBbGroupIds;
 
@@ -98,9 +102,12 @@ public class BbKlineHistoryCalcFromExpServiceImpl implements BbKlineHistoryCalcF
                     // 若修复数据已存在，忽略 从redis kline:from_exp:repair:BB:${asset}:${symbol}:${minute}中取
                     final Set<String> set = bbKlineExpHistoryRedisUtil.zrangeByScore(repairkey, ms + "", maxMs + "", 0, Long.valueOf(maxMs - ms).intValue() + 1);
 
-                    if (null != set || !set.isEmpty()) {
+                    if (!set.isEmpty()) {
                         continue;
                     }
+//                    if (null != set || !set.isEmpty()) {
+//                        continue;
+//                    }
 
                     List<BbTradeVo> trades = listTrade(asset, symbol, ms, maxMs);
                     if (null == trades || trades.isEmpty()) {
@@ -108,10 +115,10 @@ public class BbKlineHistoryCalcFromExpServiceImpl implements BbKlineHistoryCalcF
                     } else {
                         BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
 
-                        // kline:from_exp:repair:BB:${asset}:${symbol}:${interval}:${minute}
+                        logger.info("build kline data:{}",kline.toString());
+
                         saveKline(repairkey, kline);
 
-                        // kline:from_exp:update:BB:${asset}:${symbol}:${interval}:${minute}
                         notifyUpdate(notifyUpdateKey,ms);
                     }
 
@@ -188,39 +195,16 @@ public class BbKlineHistoryCalcFromExpServiceImpl implements BbKlineHistoryCalcF
                 .collect(Collectors.toList());
     }
 
-    private List<BBKLine> listBbKline(String asset, String symbol, Long minMs, Long maxMs, int freq) {
-//        String thirdDataKey = buildThirdDataKey(asset, symbol, freq);
-//        final Set<String> klines = bbKlineOngoingRedisUtil.zrangeByScore(thirdDataKey, "" + minMs, "" + maxMs, 0, Long.valueOf(maxMs - minMs).intValue() + 1);
-//        List<BBKLine> list = new ArrayList<>();
-//        // 按照时间minute升序
-//        if (!klines.isEmpty()) {
-//            for (String kline : klines) {
-//                BBKLine bbkLine1 = BBKlineUtil.convert2KlineData(kline, freq);
-//                list.add(bbkLine1);
-//            }
-//        }
-//        return list;\
-        List<BBKLine> list = new ArrayList<>();
-
-        Long minute = TimeUnit.MILLISECONDS.toMinutes(minMs);
-
-        List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(asset, symbol, minMs, maxMs);
-        //返回 对象集合以时间升序 再以id升序
-        List<BbTradeVo> sortedList = voList.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
-        BBKLine bbkLine = buildKline(sortedList, asset, symbol, minute, freq);
-
-        return list;
-    }
-
-    private BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, long minute, int freq) {
+    private BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, long ms, int freq) {
         BBKLine bBKLine = new BBKLine();
         bBKLine.setAsset(asset);
         bBKLine.setSymbol(symbol);
         bBKLine.setFrequence(freq);
-        bBKLine.setMinute(minute);
+        bBKLine.setMs(ms);
+        bBKLine.setMinute(TimeUnit.MILLISECONDS.toMinutes(ms));
 
         BigDecimal highPrice = BigDecimal.ZERO;
-        BigDecimal lowPrice = BigDecimal.ZERO;
+        BigDecimal lowPrice = new BigDecimal(String.valueOf(Long.MAX_VALUE));
         BigDecimal openPrice = null;
         BigDecimal closePrice = null;
         BigDecimal volume = BigDecimal.ZERO;
