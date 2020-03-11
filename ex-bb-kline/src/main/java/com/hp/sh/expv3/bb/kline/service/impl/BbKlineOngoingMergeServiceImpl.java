@@ -1,12 +1,11 @@
 package com.hp.sh.expv3.bb.kline.service.impl;
 
 import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
-import com.hp.sh.expv3.bb.kline.constant.BbextendConst;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingMergeService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
-import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
+import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,9 +47,6 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     @Qualifier("bbKlineOngoingRedisUtil")
     private RedisUtil bbKlineOngoingRedisUtil;
 
-//    @Value("${bb.kline.trigger.pattern}")
-//    private String bbKlineTriggerPattern;
-
     @Value("${bb.kline.updateEventPattern}")
     private String updateEventPattern;
 
@@ -67,12 +63,10 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
 
     private List<Integer> supportFrequence = new ArrayList<>();
 
-
-    //    @Scheduled(cron = "0 0/1 * * * ?")
     @Override
     @Scheduled(cron = "*/1 * * * * *")
-    public void getKlineData() {
-      //  ongoingMergeEnable=1
+    public void mergeKlineData() {
+        //  ongoingMergeEnable=1
         if (1 != ongoingMergeEnable) {
             return;
         }
@@ -89,7 +83,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
             final String asset = bbSymbol.getAsset();
             final String symbol = bbSymbol.getSymbol();
             for (Integer triggerFreq : supportFrequence) {
-                String triggerRedisKey = buildTriggerRedisKey(asset, symbol, triggerFreq);
+                String triggerRedisKey = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, triggerFreq);
 //                String triggerRedisKey = buildKlineSaveRedisKey(asset, symbol, triggerFreq);
                 final Set<Tuple> triggers = bbKlineOngoingRedisUtil.zpopmin(triggerRedisKey, triggerBatchSize);
                 final TreeSet<Integer> targetFreqs = trigger2TarFrequence.get(triggerFreq);
@@ -111,41 +105,21 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
                         }
                     }
                 }
-
             }
-
         }
-    }
-
-
-    private String buildKlineSaveRedisKey(String asset, String symbol, int frequency) {
-        return StringReplaceUtil.replace(bbKlinePattern, new HashMap<String, String>() {{
-            put("asset", asset);
-            put("symbol", symbol);
-            put("freq", "" + frequency);
-        }});
     }
 
     private void notifyKlineUpdate(String asset, String symbol, Integer targetFreq, Long startMinute) {
         //向集合中插入元素，并设置分数
-        String key = buildUpdateRedisKey(asset, symbol, targetFreq);
+        String key = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, targetFreq);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
-                    put(buildUpdateRedisMember(asset, symbol, targetFreq, startMinute), Long.valueOf(startMinute).doubleValue());
+                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, targetFreq, startMinute), Long.valueOf(startMinute).doubleValue());
                 }}
         );
     }
 
-    private String buildUpdateRedisMember(String asset, String symbol, int frequency, long minute) {
-        return StringReplaceUtil.replace(BbextendConst.BB_KLINE_UPDATE_MEMBER, new HashMap<String, String>() {{
-            put("asset", asset);
-            put("symbol", symbol);
-            put("freq", "" + frequency);
-            put("minute", "" + minute);
-        }});
-    }
-
     private void saveOrUpdateKline(String asset, String symbol, Integer targetFreq, BBKLine newKline) {
-        final String targetFreqRedisKey = buildKlineSaveRedisKey(asset, symbol, targetFreq);
+        final String targetFreqRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, targetFreq);
         //删除老数据
         bbKlineOngoingRedisUtil.zremrangeByScore(targetFreqRedisKey, newKline.getMs(), newKline.getMs());
         //新增新数据
@@ -189,7 +163,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     }
 
     private List<BBKLine> listKlineResource(String asset, String symbol, Integer triggerFreq, Long startMinute, Long endMinute) {
-        final String triggerFreqRedisKey = buildKlineSaveRedisKey(asset, symbol, triggerFreq);
+        final String triggerFreqRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, triggerFreq);
 
         final long startMs = TimeUnit.MINUTES.toMillis(startMinute);
         final long endMs = TimeUnit.MINUTES.toMillis(endMinute);
@@ -225,16 +199,6 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
         return new Long[]{divisor * targetFreq, (divisor + 1) * targetFreq - 1};
     }
 
-
-    private String buildTriggerRedisKey(String asset, String symbol, Integer frequency) {
-        return StringReplaceUtil.replace(updateEventPattern, new HashMap<String, String>() {
-            {
-                put("asset", asset);
-                put("symbol", symbol);
-                put("freq", "" + frequency);
-            }
-        });
-    }
 
     private TreeMap<Integer, TreeSet<Integer>> buildTrigger2TarFrequence(TreeMap<Integer, Integer> targetFreq2TriggerFreq) {
         TreeMap<Integer, TreeSet<Integer>> trigger2Tar = new TreeMap<>();
@@ -302,14 +266,4 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     }
 
 
-    private String buildUpdateRedisKey(String asset, String symbol, int frequency) {
-//        bb.kline.update
-        return StringReplaceUtil.replace(updateEventPattern, new HashMap<String, String>() {
-            {
-                put("asset", asset);
-                put("symbol", symbol);
-                put("freq", "" + frequency);
-            }
-        });
-    }
 }
