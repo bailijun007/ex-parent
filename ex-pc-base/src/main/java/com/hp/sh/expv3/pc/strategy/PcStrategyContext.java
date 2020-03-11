@@ -125,10 +125,10 @@ public class PcStrategyContext {
 		
 		TradeResult tradeResult = new TradeResult();
   
-		tradeResult.setVolume(matchedVo.getNumber());
+		tradeResult.setNumber(matchedVo.getNumber());
 		tradeResult.setPrice(matchedVo.getPrice());
-		tradeResult.setAmount(orderStrategy.calcAmount(tradeResult.getVolume(), faceValue, tradeResult.getPrice()));
-		tradeResult.setBaseValue(orderStrategy.calcBaseValue(tradeResult.getVolume(), faceValue, tradeResult.getPrice()));
+		tradeResult.setAmount(orderStrategy.calcAmount(tradeResult.getNumber(), faceValue, tradeResult.getPrice()));
+		tradeResult.setBaseValue(orderStrategy.calcBaseValue(tradeResult.getNumber(), faceValue, tradeResult.getPrice()));
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		
 		//手续费率
@@ -145,7 +145,7 @@ public class PcStrategyContext {
 		}
 
 		//手续费
-		BigDecimal tradeFee = orderStrategy.calcTradeFee(tradeResult.getVolume(), faceValue, tradeResult.getPrice(), tradeResult.getFeeRatio());
+		BigDecimal tradeFee = orderStrategy.calcTradeFee(tradeResult.getNumber(), faceValue, tradeResult.getPrice(), tradeResult.getFeeRatio());
 		tradeResult.setFee(tradeFee);
 		
 		// 保证金
@@ -166,7 +166,7 @@ public class PcStrategyContext {
 		if(pcPosition!=null){
 			if((closeFlag == OrderFlag.ACTION_OPEN)){
 				BigDecimal _newBaseValue = pcPosition.getBaseValue().add(tradeResult.getBaseValue());//一共几个基础货币
-				BigDecimal _newVolume = pcPosition.getVolume().add(tradeResult.getVolume());//当前张数
+				BigDecimal _newVolume = pcPosition.getVolume().add(tradeResult.getNumber());//当前张数
 				BigDecimal _newAmount = orderStrategy.calcAmount(_newVolume, faceValue, tradeResult.getPrice()); //当前金额
 
 				BigDecimal newMeanPrice = holdPosStrategy.calcMeanPrice(longFlag, _newBaseValue, _newAmount);
@@ -188,14 +188,14 @@ public class PcStrategyContext {
 		
 		//强平价
 		if(pcPosition!=null){
-			BigDecimal _newVolume = IntBool.isTrue(closeFlag)?pcPosition.getVolume().subtract(tradeResult.getVolume()):pcPosition.getVolume().add(tradeResult.getVolume());
+			BigDecimal _newVolume = IntBool.isTrue(closeFlag)?pcPosition.getVolume().subtract(tradeResult.getNumber()):pcPosition.getVolume().add(tradeResult.getNumber());
 			BigDecimal _amount = _newVolume.multiply(order.getFaceValue());
 			BigDecimal _newPosMargin = IntBool.isTrue(closeFlag)?pcPosition.getPosMargin().subtract(tradeResult.getOrderMargin()):pcPosition.getPosMargin().add(tradeResult.getOrderMargin());
 			tradeResult.setNewPosLiqPrice(
 				holdPosStrategy.calcLiqPrice(longFlag, _amount, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), _newPosMargin)
 			);
 		}else{
-			BigDecimal holdRatio = feeRatioService.getHoldRatio(userId, asset, symbol, tradeResult.getVolume());
+			BigDecimal holdRatio = feeRatioService.getHoldRatio(userId, asset, symbol, tradeResult.getNumber());
 			tradeResult.setNewPosLiqPrice(
 				holdPosStrategy.calcLiqPrice(longFlag, tradeResult.getAmount(), tradeResult.getNewPosMeanPrice(), holdRatio, tradeResult.getOrderMargin())
 			);
