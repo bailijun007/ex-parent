@@ -2,11 +2,16 @@ package com.hp.sh.expv3.bb.kline.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
+import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hupa.exp.common.tool.format.JsonUtil;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2020/3/11
@@ -41,6 +46,7 @@ public class BBKlineUtil {
         bbkLine.setVolume(ja.getBigDecimal(5));
         return bbkLine;
     }
+
 
     /**
      * 分钟时间戳转成毫秒时间戳

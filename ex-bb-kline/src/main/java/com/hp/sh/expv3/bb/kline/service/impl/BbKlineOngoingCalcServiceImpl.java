@@ -33,15 +33,8 @@ import java.util.stream.Collectors;
  * @author BaiLiJun  on 2020/3/10
  */
 @Service
-@Transactional(rollbackFor = Exception.class)
 public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
-//    @Resource(name = "templateDB0")
-//    private StringRedisTemplate templateDB0;
-
-//    @Resource(name = "klineTemplateDB5")
-//    private StringRedisTemplate klineTemplateDB5;
 
     @Value("${bb.trade.pattern}")
     private String bbTradePattern;
@@ -122,7 +115,7 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
 
                         BBKLine oldkLine = getOldKLine(asset, symbol, minute, oneMinuteInterval);
 
-                        BBKLine mergedKline = merge(oldkLine, newkLine);
+                        BBKLine mergedKline = append(oldkLine, newkLine);
                         saveKline(mergedKline, asset, symbol, minute, oneMinuteInterval);
 
                         notifyUpdate(asset, symbol, minute, oneMinuteInterval);
@@ -133,7 +126,7 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
     }
 
 
-    public BBKLine merge(BBKLine oldkLine, BBKLine newkLine) {
+    public BBKLine append(BBKLine oldkLine, BBKLine newkLine) {
         // oldKline 有可能是空，直接返回newKline
         if (null == oldkLine) {
             return newkLine;

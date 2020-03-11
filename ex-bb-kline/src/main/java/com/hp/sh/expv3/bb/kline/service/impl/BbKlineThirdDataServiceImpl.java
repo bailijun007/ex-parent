@@ -80,6 +80,7 @@ public class BbKlineThirdDataServiceImpl implements BbKlineThirdDataService {
             String thirdDataUpdateEventKey = buildThirdDataUpdateEventKey(asset, symbol, freq);
             Long[] minAndMaxMs = listThirdUpdateEvent(thirdDataUpdateEventKey);
             if (null == minAndMaxMs) {
+
             } else {
                 List<BBKLine> klines = listBbKline(asset, symbol, minAndMaxMs[0], minAndMaxMs[1], freq);
                 if (null == klines || klines.isEmpty()) {
