@@ -31,7 +31,13 @@
 			<artifactId>ex-common3</artifactId>
 			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
-		
+
+        <dependency>
+            <groupId>com.hupa.ex3</groupId>
+            <artifactId>ex-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
 	</dependencies>
 	
 
