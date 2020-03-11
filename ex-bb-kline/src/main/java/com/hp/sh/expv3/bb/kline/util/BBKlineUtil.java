@@ -14,7 +14,7 @@ public class BBKlineUtil {
 
     public static String buildKlineData(BBKLine bbkLine) {
         BigDecimal[] bigDecimals = new BigDecimal[6];
-        bigDecimals[0] = new BigDecimal(TimeUnit.MINUTES.toMillis(bbkLine.getMs()));
+//        bigDecimals[0] = new BigDecimal(bbkLine.getMs());
         bigDecimals[1] = bbkLine.getHigh() == null ? BigDecimal.ZERO : bbkLine.getHigh();
         bigDecimals[2] = bbkLine.getLow() == null ? BigDecimal.ZERO : bbkLine.getLow();
         bigDecimals[3] = bbkLine.getOpen() == null ? BigDecimal.ZERO : bbkLine.getOpen();
@@ -30,7 +30,7 @@ public class BBKlineUtil {
         final long ms = Long.parseLong(array[0].substring(1));
 //        final long minute = TimeUnit.MINUTES.toMillis(l);
         bbkLine.setFrequence(1);
-        bbkLine.setMs(ms);
+//        bbkLine.setMs(ms);
         bbkLine.setOpen(new BigDecimal(array[1]));
         bbkLine.setHigh(new BigDecimal(array[2]));
         bbkLine.setLow(new BigDecimal(array[3]));
