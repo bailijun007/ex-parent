@@ -1,129 +1,142 @@
-//package com.hp.sh.expv3.bb.kline.service.impl;
-//
-//import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
-//import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
-//import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
-//import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
-//import com.hp.sh.expv3.bb.kline.service.BbKlineThirdDataService;
-//import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
-//import com.hp.sh.expv3.config.redis.RedisUtil;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.beans.factory.annotation.Qualifier;
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.data.redis.core.ZSetOperations;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//import org.springframework.util.CollectionUtils;
-//import redis.clients.jedis.Tuple;
-//
-//import java.util.*;
-//import java.util.concurrent.TimeUnit;
-//import java.util.stream.Collectors;
-//
-///**
-// * @author BaiLiJun  on 2020/3/11
-// */
-//@Service
-//@Transactional(rollbackFor = Exception.class)
-//public class BbKlineThirdDataServiceImpl implements BbKlineThirdDataService {
-//    @Value("${bb.kline.triggerBatchSize}")
-//    private Integer triggerBatchSize;
-//
-//    @Autowired
-//    @Qualifier("metadataRedisUtil")
-//    private RedisUtil metadataRedisUtil;
-//
-//    @Autowired
-//    @Qualifier("bbKlineOngoingRedisUtil")
-//    private RedisUtil bbKlineOngoingRedisUtil;
-//
-//    @Value("${kline.bb.thirdDataUpdateEventPattern}")
-//    private String thirdDataUpdateEventPattern;
-//
-//    @Value("${kline.bb.thirdDataPattern}")
-//    private String thirdDataPattern;
-//
-//
-//    //    @Scheduled(cron = "*/1 * * * * *")
-//    public void getThirdDataJobTask(){
-//        List<BBSymbol> bbSymbols = listSymbol();
-//
-//        for (BBSymbol bbSymbol : bbSymbols) {
-//            String asset = bbSymbol.getAsset();
-//            String symbol = bbSymbol.getSymbol();
-//            String thirdDataUpdateEventKey = StringReplaceUtil.replace(thirdDataUpdateEventPattern, new HashMap<String, String>() {
-//                {
-//                    put("asset", asset);
-//                    put("symbol", symbol);
-//                }
-//            });
-//
-//            String thirdDataPatternKey = StringReplaceUtil.replace(thirdDataPattern, new HashMap<String, String>() {
-//                {
-//                    put("asset", asset);
-//                    put("symbol", symbol);
-//                    put("freq", "1");
-//                }
-//            });
-//
-//            while (true) {
-//                final Set<Tuple> triggers = bbKlineOngoingRedisUtil.zpopmin(thirdDataUpdateEventKey, triggerBatchSize);
-//                if (CollectionUtils.isEmpty(triggers)) {
-//                    continue;
-//                }
-//
-//                for (Tuple trigger : triggers) {
-//                    final long ms = Double.valueOf(trigger.getScore()).longValue();
-//                    // 时间大于等于当前时间的 忽略
-//                    long currentMs = Calendar.getInstance().getTimeInMillis();
-//                    if (ms >= currentMs) {
-//                        continue;
-//                    }
-//                    long startTimeInMs = ms;
-//                    long endTimeInMs = TimeUnit.MINUTES.toMillis(TimeUnit.MILLISECONDS.toMinutes(ms) + 1) - 1;
-//                    // 若修复数据已存在，忽略
-//                    bbKlineOngoingRedisUtil.zrangeByScore();
-//
-//                }
-////                for (ZSetOperations.TypedTuple<String> tuple : task) {
-////                    long minute = getMinute(tuple);
-////
-////
-////
-////                    // 若修复数据已存在，忽略 从redis kline:from_exp:repair:BB:${asset}:${symbol}:${minute}中取
-////                    String repairkey = BbKLineKey.KLINE_BB_REPAIR_FROM_EXP + asset + ":" + symbol + ":" + 1;
-////                    Set<ZSetOperations.TypedTuple<String>> repaired = templateDB0.opsForZSet().rangeWithScores(repairkey, 0, -1);
-////
-////                    if (null != repaired || !repaired.isEmpty()) {
-////                        continue;
-////                    }
-////
-////                    long startTimeInMs = TimeUnit.MINUTES.toMillis(minute);
-////                    long endTimeInMs = TimeUnit.MINUTES.toMillis(minute + 1) - 1;
-////                    List<BbTradeVo> trades = listTrade(asset, symbol, startTimeInMs, endTimeInMs);
-////                    if (null == trades || trades.isEmpty()) {
-////                        continue;
-////                    } else {
-////                        BBKLine kline = buildKline(trades, asset, symbol, minute);
-////
-////                        // kline:from_exp:repair:BB:${asset}:${symbol}:${interval}:${minute}
-////                        saveKline(kline, asset, symbol, 1, minute);
-////
-////                        // kline:from_exp:update:BB:${asset}:${symbol}:${interval}:${minute}
-////                        notifyUpdate( asset, symbol,1,minute);
-////                    }
-////
-////                }
-//            }
-//
-//
-//        }
-//
-//    }
-//
-//    private List<BBSymbol> listSymbol() {
-//        final Map<String, BBSymbol> key2Value = metadataRedisUtil.hgetAll(BbKLineKey.BB_SYMBOL, BBSymbol.class);
-//        List<BBSymbol> list = key2Value.values().stream().collect(Collectors.toList());
-//        return list;
-//    }
-//}
+package com.hp.sh.expv3.bb.kline.service.impl;
+
+import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
+import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
+import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
+import com.hp.sh.expv3.bb.kline.service.BbKlineThirdDataService;
+import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
+import com.hp.sh.expv3.config.redis.RedisUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * @author BaiLiJun  on 2020/3/11
+ */
+@Service
+public class BbKlineThirdDataServiceImpl implements BbKlineThirdDataService {
+
+    @Value("${bb.kline.bbGroupIds}")
+    private Set<Integer> supportBbGroupIds;
+
+    @Value("${bb.kline.triggerBatchSize}")
+    private Integer triggerBatchSize;
+
+    @Value("${bb.kline.supportFrequenceString}")
+    private String supportFrequenceString;
+
+    @Autowired
+    @Qualifier("metadataRedisUtil")
+    private RedisUtil metadataRedisUtil;
+
+    @Autowired
+    @Qualifier("bbKlineOngoingRedisUtil")
+    private RedisUtil bbKlineOngoingRedisUtil;
+
+    @Value("${kline.bb.thirdDataUpdateEventPattern}")
+    private String thirdDataUpdateEventPattern;
+    @Value("${kline.bb.thirdDataPattern}")
+    private String thirdDataPattern;
+    @Value("${bb.kline}")
+    private String bbKlinePattern;
+    @Value("${bb.kline.updateEventPattern}")
+    private String updateEventPattern;
+
+    @Value("${bb.kline.thirdUpdate.enable}")
+    private int thirdUpdateEnable;
+    @Value("${bb.kline.thirdBatchSize}")
+    private int thirdBatchSize;
+
+
+    @Override
+    public void updateKlineByThirdData() {
+
+        List<BBSymbol> bbSymbols = listSymbol();
+        List<BBSymbol> targetBbSymbols = filterBbSymbols(bbSymbols);
+
+        for (BBSymbol bbSymbol : targetBbSymbols) {
+
+            final String asset = bbSymbol.getAsset();
+            final String symbol = bbSymbol.getSymbol();
+            int freq = 1;
+            String thirdDataUpdateEventKey = buildThirdDataUpdateEventKey(asset, symbol, freq);
+            Long[] minAndMaxMs = listThirdUpdateEvent(thirdDataUpdateEventKey, thirdBatchSize);
+            List<BBKLine> klines = listBbKline(asset, symbol, minAndMaxMs[0], minAndMaxMs[1], freq);
+            coverData(asset, symbol, klines, freq);
+            notifyKlineUpdate(asset, symbol, klines, freq);
+
+        }
+
+
+    }
+
+
+    private void notifyKlineUpdate(String asset, String symbol, Integer targetFreq, Long startMinute) {
+        //向集合中插入元素，并设置分数
+        String key = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, targetFreq);
+        bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
+                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, targetFreq, startMinute), Long.valueOf(startMinute).doubleValue());
+                }}
+        );
+    }
+
+
+    /**
+     * 覆盖
+     *
+     * @param asset
+     * @param symbol
+     * @param klines
+     * @param freq
+     */
+    private void coverData(String asset, String symbol, List<BBKLine> klines, int freq) {
+    }
+
+    /**
+     * 批量更新
+     *
+     * @param asset
+     * @param symbol
+     * @param klines
+     * @param freq
+     */
+    private void notifyKlineUpdate(String asset, String symbol, List<BBKLine> klines, int freq) {
+    }
+
+    private List<BBKLine> listBbKline(String asset, String symbol, Long minAndMaxM, Long minAndMax, int freq) {
+        String thirdDataKey = buildThirdDataKey(asset, symbol, freq);
+        return null;
+    }
+
+    private String buildThirdDataKey(String asset, String symbol, int freq) {
+        return "";
+    }
+
+    private Long[] listThirdUpdateEvent(String thirdDataUpdateEventKey, int thirdBatchSize) {
+        return null;
+    }
+
+    private String buildThirdDataUpdateEventKey(String asset, String symbol, int freq) {
+        // TODO xb
+        return "";
+    }
+
+    private List<BBSymbol> listSymbol() {
+        final Map<String, BBSymbol> key2Value = metadataRedisUtil.hgetAll(BbKLineKey.BB_SYMBOL, BBSymbol.class);
+        List<BBSymbol> list = key2Value.values().stream().collect(Collectors.toList());
+        return list;
+    }
+
+    private List<BBSymbol> filterBbSymbols(List<BBSymbol> bbSymbols) {
+        return bbSymbols.stream()
+                .filter(symbol -> supportBbGroupIds.contains(symbol.getBbGroupId()))
+                .collect(Collectors.toList());
+    }
+}

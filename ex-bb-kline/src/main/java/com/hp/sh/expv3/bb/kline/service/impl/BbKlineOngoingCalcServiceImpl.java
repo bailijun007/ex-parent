@@ -2,13 +2,13 @@ package com.hp.sh.expv3.bb.kline.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
-import com.hp.sh.expv3.bb.kline.constant.BbextendConst;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBKlineTrade;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
 import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingCalcService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
+import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.slf4j.Logger;
@@ -158,7 +158,7 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
      */
     public void saveKline(BBKLine kline, String asset, String symbol, long minute, int frequency) {
         //向集合中插入元素，并设置分数
-        String key = buildKlineSaveRedisKey(asset, symbol, frequency);
+        String key = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, frequency);
         final long ms = TimeUnit.MINUTES.toMillis(minute);
         bbKlineOngoingRedisUtil.zremrangeByScore(key, ms, ms);
         final String data = BBKlineUtil.kline2ArrayData(kline);
@@ -169,9 +169,9 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
 
     public void notifyUpdate(String asset, String symbol, long minute, int frequency) {
         //向集合中插入元素，并设置分数
-        String key = buildUpdateRedisKey(asset, symbol, frequency);
+        String key = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, frequency);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
-                    put(buildUpdateRedisMember(asset, symbol, frequency, minute), Long.valueOf(minute).doubleValue());
+                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, frequency, minute), Long.valueOf(minute).doubleValue());
                 }}
         );
     }
@@ -216,7 +216,7 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
     public BBKLine getOldKLine(String asset, String symbol, long minute, int freq) {
         BBKLine bbkLine1 = null;
         long ms = TimeUnit.MINUTES.toMillis(minute);
-        String key = buildKlineSaveRedisKey(asset, symbol, freq);
+        String key = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
         Set<String> range = bbKlineOngoingRedisUtil.zrangeByScore(key, "" + ms, ms + "", 0, 1);
 
         if (!range.isEmpty()) {
@@ -227,29 +227,4 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
         return bbkLine1;
     }
 
-
-    private String buildUpdateRedisKey(String asset, String symbol, int frequency) {
-        return StringReplaceUtil.replace(updateEventPattern, new HashMap<String, String>() {{
-            put("asset", asset);
-            put("symbol", symbol);
-            put("freq", "" + frequency);
-        }});
-    }
-
-    private String buildUpdateRedisMember(String asset, String symbol, int frequency, long minute) {
-        return StringReplaceUtil.replace(BbextendConst.BB_KLINE_UPDATE_MEMBER, new HashMap<String, String>() {{
-            put("asset", asset);
-            put("symbol", symbol);
-            put("freq", "" + frequency);
-            put("minute", "" + minute);
-        }});
-    }
-
-    private String buildKlineSaveRedisKey(String asset, String symbol, int frequency) {
-        return StringReplaceUtil.replace(bbKlinePattern, new HashMap<String, String>() {{
-            put("asset", asset);
-            put("symbol", symbol);
-            put("freq", "" + frequency);
-        }});
-    }
 }
