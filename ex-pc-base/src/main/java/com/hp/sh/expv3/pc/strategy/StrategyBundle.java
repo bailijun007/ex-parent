@@ -26,4 +26,9 @@ public class StrategyBundle {
 		return orderStrategy;
 	}
 
+	@Override
+	public String toString() {
+		return "StrategyBundle [strategyId=" + strategyId + "]";
+	}
+
 }

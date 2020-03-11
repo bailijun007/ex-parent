@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrderLog;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
+@Service
 @Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 public class PcOrderUpdateService {
 	private static final Logger logger = LoggerFactory.getLogger(PcOrderUpdateService.class);
@@ -128,6 +130,7 @@ public class PcOrderUpdateService {
 		pcActiveOrder.setUserId(pcOrder.getUserId());
 		pcActiveOrder.setAsset(pcOrder.getAsset());
 		pcActiveOrder.setSymbol(pcOrder.getSymbol());
+		pcActiveOrder.setLongFlag(pcOrder.getLongFlag());
 		this.pcActiveOrderDAO.save(pcActiveOrder);
 	}
 

@@ -9,10 +9,10 @@ import java.math.BigDecimal;
  */
 public class TradeResult {
 	
-	//此次成交的成交量
-	private BigDecimal volume;
 	//此次成交的成交价
 	private BigDecimal price;
+	//此次成交的成交量
+	private BigDecimal number;
 	//此次成交的成交金额
 	private BigDecimal amount;
 	//此次成交的成交合约价值
@@ -86,12 +86,12 @@ public class TradeResult {
 		this.pnl = pnl;
 	}
 
-	public BigDecimal getVolume() {
-		return volume;
+	public BigDecimal getNumber() {
+		return number;
 	}
 
-	public void setVolume(BigDecimal volume) {
-		this.volume = volume;
+	public void setNumber(BigDecimal volume) {
+		this.number = volume;
 	}
 
 	public BigDecimal getBaseValue() {

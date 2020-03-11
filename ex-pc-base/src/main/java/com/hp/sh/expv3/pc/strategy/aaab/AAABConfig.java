@@ -10,8 +10,8 @@ import com.hp.sh.expv3.pc.strategy.StrategyBundle;
 public class AAABConfig {
 	
 	@Bean
-	public StrategyBundle aabbStrategyBundle(){
-		return new StrategyBundle(PcContractType.REVERSE, new AAABHoldPosStrategy(), new AAABOrderStrategy());
+	public StrategyBundle aaabStrategyBundle(){
+		return new StrategyBundle(PcContractType.FORWARD, new AAABHoldPosStrategy(), new AAABOrderStrategy());
 	}
 
 }

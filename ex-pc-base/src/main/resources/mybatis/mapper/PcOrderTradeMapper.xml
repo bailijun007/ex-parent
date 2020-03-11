@@ -140,10 +140,12 @@
 			pc_order_trade
 		where
 			user_id=#{userId}
-		and order_id in
-			<foreach item="item" index="i" collection="orderIdList" open="(" separator="," close=")">
-			#{orderIdList[${i}]}
-			</foreach>
+		<if test="orderIdList!=null">
+			and order_id in
+				<foreach item="item" index="i" collection="orderIdList" open="(" separator="," close=")">
+				#{orderIdList[${i}]}
+				</foreach>
+		</if>
 	</select>
 	
 	<update id="setSynchStatus">
