@@ -31,7 +31,6 @@ import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
-import com.hp.sh.expv3.pc.strategy.aabb.AABBCompFieldCalc;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.pc.vo.request.CollectorAddRequest;
 import com.hp.sh.expv3.pc.vo.request.CollectorCutRequest;
@@ -110,12 +109,18 @@ public class PcTradeService {
 		
 		/*  4、返还保证金和手续费  */
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
+			BigDecimal posCloseFee = BigDecimal.ZERO;
+			if(BigUtils.isZero(pcPosition.getVolume())){
+				posCloseFee = pcPosition.getCloseFee();
+			}
 			this.closeMarginToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult, order.getLongFlag());
 		}
 		
 		/* 5、返还剩余保证金 */
 		if(tradeResult.getOrderCompleted()){
-			this.returnRemainFee(pcOrderTrade.getUserId(), pcOrderTrade.getId(), pcOrderTrade.getAsset(), order.getOpenFee(), order.getCloseFee());
+			
+			/* 6、返还剩余平仓手续费 */
+			this.returnRemainFee(pcOrderTrade.getUserId(), pcOrderTrade.getId(), pcOrderTrade.getAsset(), order.getOpenFee());
 		}
 		
 	}
@@ -187,12 +192,12 @@ public class PcTradeService {
 		this.accountCoreService.add(request);
 	}
 	
-	private void returnRemainFee(Long userId, Long orderTradeId, String asset, BigDecimal openFee, BigDecimal closeFee) {
+	private void returnRemainFee(Long userId, Long orderTradeId, String asset, BigDecimal orderOpenFee) {
 		PcAddRequest request = new PcAddRequest();
-		request.setAmount(openFee.add(closeFee));
+		request.setAmount(orderOpenFee.add(orderOpenFee));
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("返还手续费差额：%s,%s", openFee, closeFee));
+		request.setRemark(String.format("返还剩余开仓手续费：%s", orderOpenFee, orderOpenFee));
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(PcAccountTradeType.RETURN_FEE_DIFF);
 		request.setAssociatedId(orderTradeId);

@@ -2,12 +2,9 @@ package com.hp.sh.expv3.pc.strategy.aabb;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.constant.OrderFlag;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
-import com.hp.sh.expv3.pc.strategy.data.OrderData;
-import com.hp.sh.expv3.pc.strategy.data.OrderMargin;
 import com.hp.sh.expv3.pc.strategy.data.OrderFeeParam;
+import com.hp.sh.expv3.pc.strategy.data.OrderMargin;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigUtils;

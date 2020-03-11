@@ -319,7 +319,7 @@ public class PcStrategyContext {
 	
 	private Integer genStrategyId(String asset, String symbol){
 		PcContractVO pcContract = this.metadataService.getPcContract(asset, symbol);
-		return pcContract.getSymbolType();
+		return pcContract.getContractType();
 	}
 	
 	@Autowired(required=false)
