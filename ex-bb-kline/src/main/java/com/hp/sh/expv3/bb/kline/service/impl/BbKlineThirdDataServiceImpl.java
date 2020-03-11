@@ -4,17 +4,19 @@ import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.service.BbKlineThirdDataService;
+import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
+import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import redis.clients.jedis.Tuple;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -42,21 +44,30 @@ public class BbKlineThirdDataServiceImpl implements BbKlineThirdDataService {
 
     @Value("${kline.bb.thirdDataUpdateEventPattern}")
     private String thirdDataUpdateEventPattern;
+
     @Value("${kline.bb.thirdDataPattern}")
     private String thirdDataPattern;
+
     @Value("${bb.kline}")
     private String bbKlinePattern;
+
     @Value("${bb.kline.updateEventPattern}")
     private String updateEventPattern;
 
     @Value("${bb.kline.thirdUpdate.enable}")
     private int thirdUpdateEnable;
+
     @Value("${bb.kline.thirdBatchSize}")
     private int thirdBatchSize;
 
 
     @Override
+    @Scheduled(cron = "*/1 * * * * *")
     public void updateKlineByThirdData() {
+
+        if (1 != thirdUpdateEnable) {
+            return;
+        }
 
         List<BBSymbol> bbSymbols = listSymbol();
         List<BBSymbol> targetBbSymbols = filterBbSymbols(bbSymbols);
@@ -67,14 +78,17 @@ public class BbKlineThirdDataServiceImpl implements BbKlineThirdDataService {
             final String symbol = bbSymbol.getSymbol();
             int freq = 1;
             String thirdDataUpdateEventKey = buildThirdDataUpdateEventKey(asset, symbol, freq);
-            Long[] minAndMaxMs = listThirdUpdateEvent(thirdDataUpdateEventKey, thirdBatchSize);
-            List<BBKLine> klines = listBbKline(asset, symbol, minAndMaxMs[0], minAndMaxMs[1], freq);
-            coverData(asset, symbol, klines, freq);
-            notifyKlineUpdate(asset, symbol, klines, freq);
-
+            Long[] minAndMaxMs = listThirdUpdateEvent(thirdDataUpdateEventKey);
+            if (null == minAndMaxMs) {
+            } else {
+                List<BBKLine> klines = listBbKline(asset, symbol, minAndMaxMs[0], minAndMaxMs[1], freq);
+                if (null == klines || klines.isEmpty()) {
+                    continue;
+                }
+                coverData(asset, symbol, minAndMaxMs[0], minAndMaxMs[1], freq, klines);
+                notifyKlineUpdate(asset, symbol, minAndMaxMs[0], minAndMaxMs[1], freq, klines);
+            }
         }
-
-
     }
 
 
@@ -87,7 +101,6 @@ public class BbKlineThirdDataServiceImpl implements BbKlineThirdDataService {
         );
     }
 
-
     /**
      * 覆盖
      *
@@ -96,7 +109,17 @@ public class BbKlineThirdDataServiceImpl implements BbKlineThirdDataService {
      * @param klines
      * @param freq
      */
-    private void coverData(String asset, String symbol, List<BBKLine> klines, int freq) {
+    private void coverData(String asset, String symbol, Long minMs, Long maxMs, int freq, List<BBKLine> klines) {
+        final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
+        //删除老数据
+        bbKlineOngoingRedisUtil.zremrangeByScore(klineDataRedisKey, minMs, maxMs);
+        //新增新数据
+        HashMap<String, Double> scoreMembers = new HashMap<String, Double>();
+        for (BBKLine kline : klines) {
+            final String data = BBKlineUtil.kline2ArrayData(kline);
+            scoreMembers.put(data, Long.valueOf(kline.getMs()).doubleValue());
+        }
+        bbKlineOngoingRedisUtil.zadd(klineDataRedisKey, scoreMembers);
     }
 
     /**
@@ -107,25 +130,70 @@ public class BbKlineThirdDataServiceImpl implements BbKlineThirdDataService {
      * @param klines
      * @param freq
      */
-    private void notifyKlineUpdate(String asset, String symbol, List<BBKLine> klines, int freq) {
+    private void notifyKlineUpdate(String asset, String symbol, Long minMs, Long maxMs, int freq, List<BBKLine> klines) {
+        String key = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, freq);
+        HashMap<String, Double> scoreMembers = new HashMap<String, Double>();
+        for (BBKLine kline : klines) {
+            final String member = BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, freq, kline.getMs());
+            scoreMembers.put(member, Long.valueOf(kline.getMs()).doubleValue());
+        }
+        bbKlineOngoingRedisUtil.zadd(key, scoreMembers);
     }
 
-    private List<BBKLine> listBbKline(String asset, String symbol, Long minAndMaxM, Long minAndMax, int freq) {
+    private List<BBKLine> listBbKline(String asset, String symbol, Long minMs, Long maxMs, int freq) {
         String thirdDataKey = buildThirdDataKey(asset, symbol, freq);
-        return null;
+        final Set<String> klines = bbKlineOngoingRedisUtil.zrangeByScore(thirdDataKey, "" + minMs, "" + maxMs, 0, Long.valueOf(maxMs - minMs).intValue() + 1);
+        List<BBKLine> list = new ArrayList<>();
+        // 按照时间minute升序
+        if (!klines.isEmpty()) {
+            for (String kline : klines) {
+                BBKLine bbkLine1 = BBKlineUtil.convert2KlineData(kline, freq);
+                list.add(bbkLine1);
+            }
+        }
+        return list;
     }
 
     private String buildThirdDataKey(String asset, String symbol, int freq) {
-        return "";
+        return BbKlineRedisKeyUtil.buildThirdDataRedisKey(thirdDataPattern, asset, symbol, freq);
     }
 
-    private Long[] listThirdUpdateEvent(String thirdDataUpdateEventKey, int thirdBatchSize) {
+    private Long[] listThirdUpdateEvent(String thirdDataUpdateEventKey) {
+        final Set<Tuple> triggers = bbKlineOngoingRedisUtil.zpopmin(thirdDataUpdateEventKey, triggerBatchSize);
+        if (null == triggers || CollectionUtils.isEmpty(triggers)) {
+        } else {
+            Long maxMs = null, minMs = null;
+            for (Tuple trigger : triggers) {
+                final long score = Double.valueOf(trigger.getScore()).longValue();
+                minMs = (null == minMs) ? score : Long.min(minMs, score);
+                maxMs = (null == maxMs) ? score : Long.max(maxMs, score);
+            }
+            if (maxMs == null || minMs == null) {
+                return null;
+            } else {
+                return new Long[]{minMs, maxMs};
+            }
+        }
         return null;
     }
 
+    /**
+     * 返回第三方数据的key
+     *
+     * @param asset
+     * @param symbol
+     * @param freq
+     * @return 返回第三方数据的key
+     */
     private String buildThirdDataUpdateEventKey(String asset, String symbol, int freq) {
-        // TODO xb
-        return "";
+        String thirdDataUpdateEventKey = StringReplaceUtil.replace(thirdDataUpdateEventPattern, new HashMap<String, String>() {
+            {
+                put("asset", asset);
+                put("symbol", symbol);
+                put("freq", "1");
+            }
+        });
+        return thirdDataUpdateEventKey;
     }
 
     private List<BBSymbol> listSymbol() {
