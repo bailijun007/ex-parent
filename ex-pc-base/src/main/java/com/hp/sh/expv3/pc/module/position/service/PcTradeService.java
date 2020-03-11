@@ -76,6 +76,7 @@ public class PcTradeService {
 	
     @Autowired
     private ApplicationEventPublisher publisher;
+
 	
 	//处理成交订单
     @LockIt(key="${trade.accountId}-${trade.asset}-${trade.symbol}")
@@ -87,6 +88,40 @@ public class PcTradeService {
 			return;
 		}
 		
+		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN){
+			this.handleTradeOpenOrder(order, trade);
+		}else{
+			this.handleTradeCloseOrder(order, trade);
+		}
+		
+	}
+    
+	//处理成交订单
+	protected void handleTradeOpenOrder(PcOrder order, PcTradeMsg trade){
+		Long now = DbDateUtils.now();
+		
+		PcPosition pcPosition = this.positionDataService.getCurrentPosition(trade.getAccountId(), trade.getAsset(), trade.getSymbol(), order.getLongFlag());
+		
+		TradeResult tradeResult = this.positionStrategy.calcTradeResult(trade, order, pcPosition);
+		
+		/*  1、修改仓位数据  */
+		this.modPositon(pcPosition, order, tradeResult, now);
+		
+		/*  2、修改订单数据和订单状态  */
+		this.updateOrder4Trade(order, tradeResult, now);
+		
+		/* 3、生成成交流水 */
+		PcOrderTrade pcOrderTrade = this.saveOrderTrade(trade, order, tradeResult, pcPosition.getId(), now);
+		
+		/* 4、返开仓手续费 */
+		if(tradeResult.getOrderCompleted()){
+			this.returnRemainOpenfee(pcOrderTrade.getUserId(), pcOrderTrade.getId(), pcOrderTrade.getAsset(), order.getOpenFee());
+		}
+		
+	}
+    
+    //处理成交订单
+	protected void handleTradeCloseOrder(PcOrder order, PcTradeMsg trade){
 		Long now = DbDateUtils.now();
 		
 		PcPosition pcPosition = this.positionDataService.getCurrentPosition(trade.getAccountId(), trade.getAsset(), trade.getSymbol(), order.getLongFlag());
@@ -108,24 +143,16 @@ public class PcTradeService {
 		}
 		
 		/*  4、返还保证金和手续费  */
-		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
-			BigDecimal posCloseFee = BigDecimal.ZERO;
-			if(BigUtils.isZero(pcPosition.getVolume())){
-				posCloseFee = pcPosition.getCloseFee();
-			}
-			this.closeMarginToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), tradeResult, order.getLongFlag());
+		BigDecimal posCloseFee = BigDecimal.ZERO;
+		if(BigUtils.isZero(pcPosition.getVolume())){
+			posCloseFee = pcPosition.getCloseFee();
 		}
-		
-		/* 5、返还剩余保证金 */
-		if(tradeResult.getOrderCompleted()){
-			
-			/* 6、返还剩余平仓手续费 */
-			this.returnRemainFee(pcOrderTrade.getUserId(), pcOrderTrade.getId(), pcOrderTrade.getAsset(), order.getOpenFee());
-		}
-		
+		BigDecimal amount = tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFee()).add(posCloseFee);
+		String remark = String.format("平仓。保证金：%s,收益:%s,手续费：-%s,仓位剩余手续费：%s", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getFee(), posCloseFee);
+		this.closeMarginToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), amount, order.getLongFlag(), remark);
 	}
-    
-    private void modPositon(PcPosition pcPosition, PcOrder order, TradeResult tradeResult, Long now){
+
+	private void modPositon(PcPosition pcPosition, PcOrder order, TradeResult tradeResult, Long now){
 		////////// 仓位 ///////////
 		//如果仓位不存在则创建新仓位
 		boolean isNewPos = false;
@@ -171,9 +198,8 @@ public class PcTradeService {
 		}
 	}
 	
-	private void closeMarginToPcAccount(Long userId, Long orderTradeId, String asset, TradeResult tradeResult, int longFlag) {
+	private void closeMarginToPcAccount(Long userId, Long orderTradeId, String asset, BigDecimal amount, int longFlag, String remark) {
 		PcAddRequest request = new PcAddRequest();
-		BigDecimal amount = tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFee());
 		if(BigUtils.isZero(amount)){
 			logger.warn("没有保证金可以返还");
 			return;
@@ -185,14 +211,14 @@ public class PcTradeService {
 		request.setAmount(amount);
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("平仓。保证金：%s,收益:%s,手续费：-%s", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getFee()));
+		request.setRemark(remark);
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(IntBool.isTrue(longFlag)?PcAccountTradeType.ORDER_CLOSE_LONG:PcAccountTradeType.ORDER_CLOSE_SHORT);
 		request.setAssociatedId(orderTradeId);
 		this.accountCoreService.add(request);
 	}
 	
-	private void returnRemainFee(Long userId, Long orderTradeId, String asset, BigDecimal orderOpenFee) {
+	private void returnRemainOpenfee(Long userId, Long orderTradeId, String asset, BigDecimal orderOpenFee) {
 		PcAddRequest request = new PcAddRequest();
 		request.setAmount(orderOpenFee.add(orderOpenFee));
 		request.setUserId(userId);
