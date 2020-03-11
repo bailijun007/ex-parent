@@ -1,12 +1,14 @@
-package com.hp.sh.expv3.bb.extension.service.impl;
+package com.hp.sh.expv3.bb.kline.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.hp.sh.expv3.bb.extension.constant.BbKLineKey;
-import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
-import com.hp.sh.expv3.bb.extension.pojo.BBKLine;
-import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
-import com.hp.sh.expv3.bb.extension.service.OngoinKlineService;
-import com.hp.sh.expv3.bb.extension.util.StringReplaceUtil;
+
+import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
+import com.hp.sh.expv3.bb.kline.constant.BbextendConst;
+import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
+import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
+import com.hp.sh.expv3.bb.kline.service.OngoinKlineService;
+
+import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -53,7 +55,7 @@ public class OngoinKlineServiceImpl implements OngoinKlineService {
     @Value("${bb.kline.update}")
     private String bbKlineUpdatePattern;
 
-//    @PostConstruct
+    @PostConstruct
     private void init() {
         final String[] freqs = supportFrequenceString.split(",");
         for (String freq : freqs) {
@@ -66,7 +68,7 @@ public class OngoinKlineServiceImpl implements OngoinKlineService {
 
     //    @Scheduled(cron = "0 0/1 * * * ?")
     @Override
-//    @Scheduled(cron = "*/1 * * * * *")
+    @Scheduled(cron = "*/1 * * * * *")
     public void getKlineData() {
         List<BBSymbol> bbSymbols = listSymbol();
         List<BBSymbol> targetBbSymbols = filterBbSymbols(bbSymbols);

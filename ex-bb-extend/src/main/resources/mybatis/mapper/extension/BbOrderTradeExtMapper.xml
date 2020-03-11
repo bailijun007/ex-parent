@@ -116,7 +116,7 @@
 
     <select id="selectPcFeeCollectByAccountId" resultType="com.hp.sh.expv3.bb.extension.vo.BbOrderTradeDetailVo">
           select
-            id ,asset,symbol,user_id  userId,price,volume qty,trade_time tradeTime,fee
+            id ,asset,symbol,user_id  userId,price,volume qty,trade_time tradeTime,fee,bid_flag bidFlag
             from bb_order_trade
         <where>
             <if test="userId!=null"> user_id=#{userId}</if>
