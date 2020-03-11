@@ -2,10 +2,9 @@ package com.hp.sh.expv3.pc.strategy.aaab;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.constant.OrderFlag;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
 import com.hp.sh.expv3.pc.strategy.data.OrderFeeParam;
+import com.hp.sh.expv3.pc.strategy.data.OrderMargin;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigUtils;
@@ -67,29 +66,6 @@ public class AAABOrderStrategy implements OrderStrategy {
 		
 		return orderAmount;
 	}
-	
-	/**
-	 * 按比例计算费用
-	 * @param order 订单数据
-	 * @param volume 分量
-	 * @return
-	 */
-	public OrderFeeData calcRaitoOrderFee(PcOrder order, BigDecimal number){
-		OrderFeeData orderAmount = new OrderFeeData();
-		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
-			this.calcOpenRaitoAmt(order, number, orderAmount);
-		}else{
-			this.calcCloseRaitoAmt(order, number, orderAmount);
-		}
-		return orderAmount;
-	}
-	
-	protected void calcCloseRaitoAmt(PcOrder order, BigDecimal number, OrderFeeData orderAmount) {
-		orderAmount.setOpenFee(BigDecimal.ZERO);
-		orderAmount.setCloseFee(BigDecimal.ZERO);
-		orderAmount.setOrderMargin(BigDecimal.ZERO);
-		orderAmount.setGrossMargin(BigDecimal.ZERO);
-	}
 
 	/**
 	 * 按比例计算开仓订单费用
@@ -97,35 +73,34 @@ public class AAABOrderStrategy implements OrderStrategy {
 	 * @param number
 	 * @return
 	 */
-	protected void calcOpenRaitoAmt(PcOrder order, BigDecimal number, OrderFeeData orderAmount){
+	public OrderFeeData calcRaitoFee(OrderMargin order, BigDecimal total, BigDecimal number){
+		OrderFeeData orderAmount = new OrderFeeData();
 		
 		BigDecimal openFee; 
 		BigDecimal closeFee; 
 		BigDecimal orderMargin;
-		BigDecimal grossMargin;
 
 		if(BigUtils.eq(number, BigDecimal.ZERO)){
 			openFee = BigDecimal.ZERO;
 			closeFee = BigDecimal.ZERO;
 			orderMargin = BigDecimal.ZERO;
-			grossMargin = BigDecimal.ZERO;
-		}else if(BigUtils.eq(number, order.getVolume().subtract(order.getFilledVolume()))){
+		}else if(BigUtils.eq(number, total)){
 			openFee = order.getOpenFee();
 			closeFee = order.getCloseFee();
 			orderMargin = order.getOrderMargin();
-			grossMargin = order.getGrossMargin();
 		}else{
-			openFee = BigCalc.slope(number, order.getVolume(), order.getOpenFee());
-			closeFee = BigCalc.slope(number, order.getVolume(), order.getCloseFee());
-			orderMargin = BigCalc.slope(number, order.getVolume(), order.getOrderMargin());
-			grossMargin = BigCalc.sum(openFee, closeFee, orderMargin);
+			openFee = BigCalc.slope(number, total, order.getOpenFee());
+			closeFee = BigCalc.slope(number, total, order.getCloseFee());
+			orderMargin = BigCalc.slope(number, total, order.getOrderMargin());
 		}
 		
 		orderAmount.setOrderMargin(orderMargin);
 		orderAmount.setOpenFee(openFee);
 		orderAmount.setCloseFee(closeFee);
 		orderAmount.setOrderMargin(orderMargin);
-		orderAmount.setGrossMargin(grossMargin);
+		orderAmount.setGrossMargin(BigCalc.sum(openFee, closeFee, orderMargin));
+		
+		return orderAmount;
 
 	}
 

@@ -203,6 +203,7 @@ public class PcTradeService {
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getFee()));
+	        order.setCloseFee(order.getCloseFee().subtract(tradeResult.getCloseFee()));
 		}
 		order.setFeeCost(order.getFeeCost().add(tradeResult.getFee()));
 		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getVolume()));
@@ -294,7 +295,7 @@ public class PcTradeService {
 	private void openPositon(PcPosition pcPosition, TradeResult tradeResult) {
 		pcPosition.setVolume(pcPosition.getVolume().add(tradeResult.getVolume()));
 		pcPosition.setPosMargin(pcPosition.getPosMargin().add(tradeResult.getOrderMargin()));
-		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeResult.getFee()));
+		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeResult.getCloseFee()));
 		
 		pcPosition.setMeanPrice(tradeResult.getNewPosMeanPrice());
 		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeResult.getOrderMargin()));

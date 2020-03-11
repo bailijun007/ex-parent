@@ -12,6 +12,7 @@ public class OrderFeeParamVo implements OrderFeeParam {
 	private BigDecimal openFeeRatio;
 	private BigDecimal closeFeeRatio;
 	private BigDecimal marginRatio;
+    private Integer closeFlag;
 
 	public OrderFeeParamVo() {
 	}
@@ -62,6 +63,14 @@ public class OrderFeeParamVo implements OrderFeeParam {
 
 	public void setMarginRatio(BigDecimal marginRatio) {
 		this.marginRatio = marginRatio;
+	}
+
+	public Integer getCloseFlag() {
+		return closeFlag;
+	}
+
+	public void setCloseFlag(Integer closeFlag) {
+		this.closeFlag = closeFlag;
 	}
 
 }
