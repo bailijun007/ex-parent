@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.component.id.config.SequencConfig;
 import com.hp.sh.expv3.component.id.config.WorkerConfig;
+import com.hp.sh.expv3.enums.IdTypeEnum;
 import com.hp.sh.expv3.fund.cash.entity.DepositAddr;
 import com.hp.sh.expv3.fund.cash.entity.DepositRecord;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalAddr;
@@ -21,31 +22,31 @@ import com.hp.sh.expv3.fund.wallet.entity.FundAccountRecord;
 public class WorkerConfigBuilder {
 	
 	public static final String 	USER  = "user";
-	private static final int 	USER_ID  = 0;
+	private static final int 	USER_ID  = IdTypeEnum.USER.getValue();
 
 	private static final String DEPOSIT_ADDR  = DepositAddr.class.getName();
-	private static final int 	DEPOSIT_ADDR_ID  = 1;
+	private static final int 	DEPOSIT_ADDR_ID  = IdTypeEnum.DEPOSIT_ADDR_ID.getValue();
 
 	private static final String DEPOSIT_RECORD  = DepositRecord.class.getName();
-	private static final int 	DEPOSIT_RECORD_ID  = 2;
+	private static final int 	DEPOSIT_RECORD_ID  = IdTypeEnum.DEPOSIT_RECORD_ID.getValue();
 
 	private static final String FUND_ACCOUNT  = FundAccount.class.getName();
-	private static final int 	FUND_ACCOUNT_ID  = 3;
+	private static final int 	FUND_ACCOUNT_ID  = IdTypeEnum.FUND_ACCOUNT_ID.getValue();
 
 	private static final String FUND_ACCOUNT_RECORD  = FundAccountRecord.class.getName();
-	private static final int 	FUND_ACCOUNT_RECORD_ID  = 4;
+	private static final int 	FUND_ACCOUNT_RECORD_ID  = IdTypeEnum.FUND_ACCOUNT_RECORD_ID.getValue();
 
 	private static final String FUND_TRANSFER  = FundTransfer.class.getName();
-	private static final int 	FUND_TRANSFER_ID  = 5;
+	private static final int 	FUND_TRANSFER_ID  = IdTypeEnum.FUND_TRANSFER_ID.getValue();
 
 	private static final String WITHDRAWAL_ADDR  = WithdrawalAddr.class.getName();
-	private static final int 	WITHDRAWAL_ADDR_ID  = 6;
+	private static final int 	WITHDRAWAL_ADDR_ID  = IdTypeEnum.WITHDRAWAL_ADDR_ID.getValue();
 
 	private static final String WITHDRAWAL_RECORD  = WithdrawalRecord.class.getName();
-	private static final int 	WITHDRAWAL_RECORD_ID  = 7;
+	private static final int 	WITHDRAWAL_RECORD_ID  = IdTypeEnum.WITHDRAWAL_RECORD_ID.getValue();
 
 	private static final String C2C_ORDER= C2cOrder.class.getName();
-	private static final int 	C2C_ORDER_ID  = 8;
+	private static final int 	C2C_ORDER_ID  = IdTypeEnum.C2C_ORDER_ID.getValue();
 
 	@Value("${id.generator.dataCenterId}")
 	private int dataCenterId;
