@@ -2,7 +2,7 @@ package com.hp.sh.expv3.pc.strategy;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.strategy.data.OrderMargin;
 import com.hp.sh.expv3.pc.strategy.data.OrderFeeParam;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeData;
 
@@ -19,7 +19,7 @@ public interface OrderStrategy {
 
 	OrderFeeData calcNewOrderFee(OrderFeeParam pcOrder);
 
-	OrderFeeData calcRaitoOrderFee(PcOrder order, BigDecimal number);
+	OrderFeeData calcRaitoFee(OrderMargin order, BigDecimal total, BigDecimal number);
 
 	BigDecimal calMargin(BigDecimal volume, BigDecimal faceValue, BigDecimal price, BigDecimal marginRatio);
 

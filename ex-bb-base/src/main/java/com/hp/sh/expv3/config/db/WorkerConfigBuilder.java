@@ -6,7 +6,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.hp.sh.expv3.bb.module.account.entity.BBAccount;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
 import com.hp.sh.expv3.bb.module.collector.entity.BBCollectorAccount;
 import com.hp.sh.expv3.bb.module.collector.entity.BBCollectorAccountRecord;
@@ -18,43 +17,41 @@ import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.component.id.config.SequencConfig;
 import com.hp.sh.expv3.component.id.config.WorkerConfig;
+import com.hp.sh.expv3.enums.IdTypeEnum;
 
 @Component
 public class WorkerConfigBuilder {
 	
 	public static final String TX = "tx";
-	private static final int TX_ID = 0;
-	
-	private static final String BB_ACCOUNT = BBAccount.class.getName();
-	private static final int BB_ACCOUNT_ID = 1;
+	private static final int TX_ID = IdTypeEnum.BB_TX_ID.getValue();
 
 	private static final String BB_ACCOUNT_LOG = BBAccountLog.class.getName();
-	private static final int BB_ACCOUNT_LOG_ID = 2;
+	private static final int BB_ACCOUNT_LOG_ID = IdTypeEnum.BB_ACCOUNT_LOG_ID.getValue();
 
 	private static final String BB_ACCOUNT_RECORD = BBAccountRecord.class.getName();
-	private static final int BB_ACCOUNT_RECORD_ID = 3;
+	private static final int BB_ACCOUNT_RECORD_ID = IdTypeEnum.BB_ACCOUNT_RECORD_ID.getValue();
 
 	private static final String BB_ORDER = BBOrder.class.getName();
-	private static final int BB_ORDER_ID = 6;
+	private static final int BB_ORDER_ID = IdTypeEnum.BB_ORDER_ID.getValue();
 	
 	private static final String BB_ORDER_LOG = BBOrderLog.class.getName();
-	private static final int BB_ORDER_LOG_ID = 7;
+	private static final int BB_ORDER_LOG_ID = IdTypeEnum.BB_ORDER_LOG_ID.getValue();
 
 	private static final String BB_ORDER_TRADE = BBOrderTrade.class.getName();
-	private static final int BB_ORDER_TRADE_ID = 8;
+	private static final int BB_ORDER_TRADE_ID = IdTypeEnum.BB_ORDER_TRADE_ID.getValue();
 
 	private static final String BB_ACTIVE_ORDER = BBActiveOrder.class.getName();
-	private static final int BB_ACTIVE_ORDER_ID = 10;
+	private static final int BB_ACTIVE_ORDER_ID = IdTypeEnum.BB_ACTIVE_ORDER_ID.getValue();
 
 	private static final String BB_MATCHED_TRADE = BBMatchedTrade.class.getName();
-	private static final int BB_MATCHED_TRADE_ID = 11;
+	private static final int BB_MATCHED_TRADE_ID = IdTypeEnum.BB_MATCHED_TRADE_ID.getValue();
 
 
 	private static final String BB_COLLECTOR_ACCOUNT = BBCollectorAccount.class.getName();
-	private static final int BB_COLLECTOR_ACCOUNT_ID = 12;
+	private static final int BB_COLLECTOR_ACCOUNT_ID = IdTypeEnum.BB_COLLECTOR_ACCOUNT_ID.getValue();
 
 	private static final String BBCOLLECTOR_ACCOUNTRECORD_TRADE = BBCollectorAccountRecord.class.getName();
-	private static final int BBCOLLECTOR_ACCOUNTRECORD_TRADE_ID = 13;
+	private static final int BBCOLLECTOR_ACCOUNTRECORD_TRADE_ID = IdTypeEnum.BB_COLLECTOR_ACCOUNTRECORD_TRADE_ID.getValue();
 	
 	
 	@Value("${id.generator.dataCenterId}")
@@ -75,7 +72,6 @@ public class WorkerConfigBuilder {
 	
 	private void set(WorkerConfig workerConfig){
 		this.set(workerConfig, TX_ID, TX);
-		this.set(workerConfig, BB_ACCOUNT_ID, BB_ACCOUNT);
 		this.set(workerConfig, BB_ACCOUNT_LOG_ID, BB_ACCOUNT_LOG);
 		this.set(workerConfig, BB_ACCOUNT_RECORD_ID, BB_ACCOUNT_RECORD);
 		this.set(workerConfig, BB_ORDER_ID, BB_ORDER);

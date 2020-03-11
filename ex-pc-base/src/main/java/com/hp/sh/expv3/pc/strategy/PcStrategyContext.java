@@ -24,6 +24,7 @@ import com.hp.sh.expv3.pc.strategy.data.PosBaseData;
 import com.hp.sh.expv3.pc.strategy.data.PosData;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeParamVo;
+import com.hp.sh.expv3.pc.strategy.vo.OrderMarginVo;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigCalc;
@@ -130,7 +131,6 @@ public class PcStrategyContext {
 		tradeResult.setBaseValue(orderStrategy.calcBaseValue(tradeResult.getVolume(), faceValue, tradeResult.getPrice()));
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		
-		
 		//手续费率
 		if(matchedVo.getMakerFlag()==TradingRoles.MAKER){
 			BigDecimal feeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
@@ -150,15 +150,14 @@ public class PcStrategyContext {
 		
 		// 保证金
 		if(closeFlag==OrderFlag.ACTION_OPEN){
-			OrderFeeData feeData = orderStrategy.calcRaitoOrderFee(order, matchedVo.getNumber());
-			tradeResult.setOrderMargin(feeData.getOrderMargin());//保证金
+			OrderFeeData feeData = orderStrategy.calcRaitoFee(order, matchedVo.getNumber(), order.getVolume());
+			tradeResult.setOrderMargin(feeData.getOrderMargin()); //保证金
+			tradeResult.setCloseFee(feeData.getCloseFee());
 		}else{
-			if(BigUtils.eq(tradeResult.getVolume(), pcPosition.getVolume())){
-				tradeResult.setOrderMargin(pcPosition.getPosMargin());
-			}else{
-				BigDecimal orderMargin = BigCalc.slope(tradeResult.getVolume(), pcPosition.getVolume(), pcPosition.getPosMargin());
-				tradeResult.setOrderMargin(orderMargin);
-			}
+			OrderMarginVo posMargin = new OrderMarginVo(pcPosition.getPosMargin(), BigDecimal.ZERO, pcPosition.getCloseFee());
+			OrderFeeData feeData = orderStrategy.calcRaitoFee(posMargin, matchedVo.getNumber(), order.getVolume());
+			tradeResult.setOrderMargin(feeData.getOrderMargin()); //保证金
+			tradeResult.setCloseFee(BigDecimal.ZERO);
 		}
 		
 		/* **************** 仓位累计数据 **************** */
