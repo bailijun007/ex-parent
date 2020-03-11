@@ -8,6 +8,7 @@ import com.hp.sh.expv3.bb.kline.pojo.BBKlineTrade;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
 import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingCalcService;
+import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.slf4j.Logger;
@@ -22,7 +23,10 @@ import redis.clients.jedis.JedisPubSub;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -150,16 +154,16 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
 
     /*
      * kline:from_exp:repair:BB:${asset}:${symbol}:${minute}
-     *   interval 频率；1分钟
+     *   frequency 频率；1分钟
      */
-    public void saveKline(BBKLine kline, String asset, String symbol, long minute, int interval) {
+    public void saveKline(BBKLine kline, String asset, String symbol, long minute, int frequency) {
         //向集合中插入元素，并设置分数
-        String key = buildKlineSaveRedisKey(asset, symbol, interval);
-
-
-        bbKlineOngoingRedisUtil.zremrangeByScore(key, minute, minute);
+        String key = buildKlineSaveRedisKey(asset, symbol, frequency);
+        final long ms = TimeUnit.MINUTES.toMillis(minute);
+        bbKlineOngoingRedisUtil.zremrangeByScore(key, ms, ms);
+        final String data = BBKlineUtil.kline2ArrayData(kline);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
-            put(JSON.toJSONString(kline), Long.valueOf(minute).doubleValue());
+            put(data, Long.valueOf(ms).doubleValue());
         }});
     }
 
@@ -172,12 +176,13 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
         );
     }
 
-    public BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, int interval, long minute) {
+    public BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, int frequency, long minute) {
         BBKLine bBKLine = new BBKLine();
         bBKLine.setAsset(asset);
         bBKLine.setSymbol(symbol);
-        bBKLine.setFrequence(interval);
+        bBKLine.setFrequence(frequency);
         bBKLine.setMinute(minute);
+        bBKLine.setMs(TimeUnit.MINUTES.toMillis(minute));
 
         BigDecimal highPrice = BigDecimal.ZERO;
         BigDecimal lowPrice = new BigDecimal(String.valueOf(Long.MAX_VALUE));
@@ -208,17 +213,16 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
         return bbKlineTrade.getTrades();
     }
 
-    public BBKLine getOldKLine(String asset, String symbol, long minute, int interval) {
+    public BBKLine getOldKLine(String asset, String symbol, long minute, int freq) {
         BBKLine bbkLine1 = null;
-        String key = buildKlineSaveRedisKey(asset, symbol, interval);
-//        Set<String> range = klineTemplateDB5.opsForZSet().rangeByScore(key, minute, minute);
-
-        Set<String> range = bbKlineOngoingRedisUtil.zrangeByScore(key, "" + minute, minute + "", 0, 1);
+        long ms = TimeUnit.MINUTES.toMillis(minute);
+        String key = buildKlineSaveRedisKey(asset, symbol, freq);
+        Set<String> range = bbKlineOngoingRedisUtil.zrangeByScore(key, "" + ms, ms + "", 0, 1);
 
         if (!range.isEmpty()) {
             final String s = new ArrayList<>(range).get(0);
 //            JSON字符串转JSON对象
-            bbkLine1 = JSON.parseObject(s, BBKLine.class);
+            bbkLine1 = BBKlineUtil.convert2KlineData(s, freq);
         }
         return bbkLine1;
     }

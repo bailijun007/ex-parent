@@ -1,11 +1,11 @@
 package com.hp.sh.expv3.bb.kline.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.constant.BbextendConst;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingMergeService;
+import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,7 @@ import redis.clients.jedis.Tuple;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -71,7 +72,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     @Override
     @Scheduled(cron = "*/1 * * * * *")
     public void getKlineData() {
-//        ongoingMergeEnable=1
+      //  ongoingMergeEnable=1
         if (1 != ongoingMergeEnable) {
             return;
         }
@@ -146,10 +147,11 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     private void saveOrUpdateKline(String asset, String symbol, Integer targetFreq, BBKLine newKline) {
         final String targetFreqRedisKey = buildKlineSaveRedisKey(asset, symbol, targetFreq);
         //删除老数据
-        bbKlineOngoingRedisUtil.zremrangeByScore(targetFreqRedisKey, newKline.getMinute(), newKline.getMinute());
+        bbKlineOngoingRedisUtil.zremrangeByScore(targetFreqRedisKey, newKline.getMs(), newKline.getMs());
         //新增新数据
         bbKlineOngoingRedisUtil.zadd(targetFreqRedisKey, new HashMap<String, Double>() {{
-            put(JSON.toJSONString(newKline), Long.valueOf(newKline.getMinute()).doubleValue());
+            final String data = BBKlineUtil.kline2ArrayData(newKline);
+            put(data, Long.valueOf(newKline.getMs()).doubleValue());
         }});
 
     }
@@ -182,17 +184,21 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
         bbkLine.setVolume(volume);
         bbkLine.setFrequence(targetFreq);
         bbkLine.setMinute(startMinute);
+        bbkLine.setMs(TimeUnit.MINUTES.toMillis(startMinute));
         return bbkLine;
     }
 
     private List<BBKLine> listKlineResource(String asset, String symbol, Integer triggerFreq, Long startMinute, Long endMinute) {
         final String triggerFreqRedisKey = buildKlineSaveRedisKey(asset, symbol, triggerFreq);
-        final Set<String> klines = bbKlineOngoingRedisUtil.zrangeByScore(triggerFreqRedisKey, startMinute + "", endMinute + "", 0, Long.valueOf(endMinute - startMinute + 1).intValue());
+
+        final long startMs = TimeUnit.MINUTES.toMillis(startMinute);
+        final long endMs = TimeUnit.MINUTES.toMillis(endMinute);
+        final Set<String> klines = bbKlineOngoingRedisUtil.zrangeByScore(triggerFreqRedisKey, startMs + "", endMs + "", 0, Long.valueOf(endMinute - startMinute + 1).intValue());
         List<BBKLine> list = new ArrayList<>();
         // 按照时间minute升序
         if (!klines.isEmpty()) {
             for (String kline : klines) {
-                BBKLine bbkLine1 = JSON.parseObject(kline, BBKLine.class);
+                BBKLine bbkLine1 = BBKlineUtil.convert2KlineData(kline, triggerFreq);
                 list.add(bbkLine1);
             }
         }
