@@ -16,6 +16,9 @@ import com.hp.sh.expv3.utils.math.BigUtils;
  */
 public class AAABOrderStrategy implements OrderStrategy {
 	
+	/**
+	 * 计算成交费用
+	 */
 	public BigDecimal calcTradeFee(BigDecimal volume, BigDecimal faceValue, BigDecimal price, BigDecimal feeRatio) {
 		return BigCalc.multiply(volume.multiply(faceValue).multiply(price), feeRatio);
 	}

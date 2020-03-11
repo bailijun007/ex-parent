@@ -5,11 +5,11 @@ package com.hp.sh.expv3.pc.constant;
  */
 public class RedisKey {
 
-    public static final String PC_CONTRACT = "bb_contract";
+    public static final String PC_CONTRACT = "pc_contract";
 
-    public static final String PC_FEE = "bb_fee";
+    public static final String PC_FEE = "pc_fee";
 
-    public static final String PC_POS_LEVEL = "bb_pos_level";
+    public static final String PC_POS_LEVEL = "pc_pos_level";
 
     public static final String KEY_PREFIX_MAKER = "m_";
 

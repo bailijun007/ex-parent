@@ -3,7 +3,7 @@ package com.hp.sh.expv3.pc.error;
 import com.gitee.hupadev.base.exceptions.ErrorCode;
 /**
  * 币币异常模块
- * -13001 ~ -13999 见： bb_exception
+ * -13001 ~ -13999 见： pc_exception
  * 账号：-13201 ~ -13299
  * @author wangjg
  *

@@ -13,7 +13,7 @@ import com.hp.sh.expv3.commons.mybatis.TxId;
  * @author lw
  *
  */
-@Table(name="bb_collector_account_record")
+@Table(name="pc_collector_account_record")
 public class PcCollectorAccountRecord extends BaseRecordEntity	 {
 
 	private static final long serialVersionUID = 1L;

@@ -12,7 +12,7 @@ import com.hp.sh.expv3.base.entity.BaseBizEntity;
  * @author lw
  *
  */
-@Table(name="bb_collector_account")
+@Table(name="pc_collector_account")
 public class PcCollectorAccount extends BaseBizEntity {
 
 	private static final long serialVersionUID = 1L;

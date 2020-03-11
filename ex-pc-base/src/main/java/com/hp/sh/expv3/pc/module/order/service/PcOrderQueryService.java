@@ -2,6 +2,7 @@ package com.hp.sh.expv3.pc.module.order.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +76,10 @@ public class PcOrderQueryService {
 	public List<ActiveOrderVo> queryActiveList(long userId, String asset, String symbol){
 		List<ActiveOrderVo> result = new ArrayList<ActiveOrderVo>();
 		List<PcOrder> list = this.pcOrderDAO.queryActiveOrderList(userId, asset, symbol);
+		
+		if(list==null||list.isEmpty()){
+			return Collections.emptyList();
+		}
 		
 		List<Long> _orderIdList = BeanHelper.getDistinctPropertyList(list, "id");
 		List<OrderTradeVo> _tradeList = pcOrderTradeDAO.queryOrderTrade(userId, _orderIdList);
