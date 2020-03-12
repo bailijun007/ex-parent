@@ -149,6 +149,15 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
         bbKlineOngoingRedisUtil.zadd(key, scoreMembers);
     }
 
+    /**
+     * 通过监听到的score分数 去第三方data中查找并转化
+     * @param asset
+     * @param symbol
+     * @param minMs
+     * @param maxMs
+     * @param freq
+     * @return
+     */
     private List<BBKLine> listBbKline(String asset, String symbol, Long minMs, Long maxMs, int freq) {
         String thirdDataKey = buildThirdDataKey(asset, symbol, freq);
         final Set<String> klines = bbKlineOngoingRedisUtil.zrangeByScore(thirdDataKey, "" + minMs, "" + maxMs, 0, Long.valueOf(maxMs - minMs).intValue() + 1);

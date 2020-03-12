@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+
     @Value("${bb.trade.pattern}")
     private String bbTradePattern;
 
@@ -69,7 +70,9 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
 
     @PostConstruct
     public void bbKlineBuild() {
-
+        if (1 != ongoingCalcEnable) {
+            return;
+        }
         threadPool.execute(() -> trigger());
 
     }
@@ -77,15 +80,12 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
     @Override
     public void trigger() {
 
-        if (1 != ongoingCalcEnable) {
-            return;
-        }
-
         List<BBSymbol> bbSymbols = listSymbol();
 
         for (BBSymbol bbSymbol : bbSymbols) {
             String asset = bbSymbol.getAsset();
             String symbol = bbSymbol.getSymbol();
+            //监听 Exp 平台实时推送消息
             String channel = StringReplaceUtil.replace(bbTradePattern, new HashMap<String, String>() {
                 {
                     put("asset", asset);
