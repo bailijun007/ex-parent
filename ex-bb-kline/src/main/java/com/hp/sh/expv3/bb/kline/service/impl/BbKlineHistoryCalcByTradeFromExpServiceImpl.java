@@ -7,7 +7,7 @@ import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
 import com.hp.sh.expv3.bb.kline.service.BbKlineHistoryCalcByTradeFromExpService;
 import com.hp.sh.expv3.bb.kline.service.BbTradeExtService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
-import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
+import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,17 +52,17 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     private RedisUtil bbKlineExpHistoryRedisUtil;
 
 
-    @Value("${bb.kline.notifyUpdate}")
-    private String bbKlineFromExpUpdate;
+    @Value("${from_exp.bbKlineDataUpdateEventPattern}")
+    private String fromExpBbKlineDataUpdateEventPattern;
 
-    @Value("${bb.kline.repair}")
-    private String bbKlineFromExpRepair;
+    @Value("${from_exp.bbKlineDataPattern}")
+    private String fromExpBbKlineDataPattern;
 
-    @Value("${bb.kline.task}")
-    private String bbKlineFromExpTask;
+    @Value("${from_exp.bbKlineTaskPattern}")
+    private String fromExpBbKlineTaskPattern;
 
-    @Value("${bb.kline.expHistory.enable}")
-    private int bbKlineExpHistoryEnable;
+    @Value("${bb.kline.bbKlineFromExpCalcEnable}")
+    private int bbKlineFromExpCalcEnable;
 
     @Autowired
     private BbTradeExtService bbTradeExtService;
@@ -78,7 +78,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 
     @Scheduled(cron = "*/1 * * * * *")
     public void execute() {
-        if (1 != bbKlineExpHistoryEnable) {
+        if (1 != bbKlineFromExpCalcEnable) { // bbKlineFromExpCalcEnable=1
             return;
         } else {
             threadPool.execute(() -> repairKlineFromExp());
@@ -97,9 +97,9 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
             final String symbol = bbSymbol.getSymbol();
             int freq = 1;
             {
-                String taskKey = buildBbKlineFromExpTaskRedisKey(asset, symbol, freq);
-                String repairkey = buildBbKlineFromExpRepairKey(asset, symbol, freq);
-                String notifyUpdateKey = buildBbKlineFromExpUpdateKey(asset, symbol, freq);
+                String taskKey = BbKlineRedisKeyUtil.buildFromExpBbKlineTaskRedisKey(fromExpBbKlineTaskPattern, asset, symbol, freq);
+                String repairkey = BbKlineRedisKeyUtil.buildFromExpBbKlineDataByTradeRedisKey(fromExpBbKlineDataPattern, asset, symbol, freq);
+                String notifyUpdateKey = BbKlineRedisKeyUtil.buildFromExpBbKlineUpdateEventKey(fromExpBbKlineDataUpdateEventPattern, asset, symbol, freq);
 
                 final Set<Tuple> task = bbKlineExpHistoryRedisUtil.zpopmin(taskKey, expHistoryBatchSize);
                 if (CollectionUtils.isEmpty(task)) {
@@ -146,17 +146,6 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
         }
     }
 
-    private String buildBbKlineFromExpUpdateKey(String asset, String symbol, int freq) {
-        String bbKlineFromExpUpdateKey = StringReplaceUtil.replace(bbKlineFromExpUpdate, new HashMap<String, String>() {
-            {
-                put("asset", asset);
-                put("symbol", symbol);
-                put("freq", freq + "");
-            }
-        });
-        return bbKlineFromExpUpdateKey;
-    }
-
     private void notifyUpdate(String notifyUpdateKey, long ms) {
         HashMap<String, Double> scoreMembers = new HashMap<String, Double>();
         scoreMembers.put(ms + "", Long.valueOf(ms).doubleValue());
@@ -179,28 +168,6 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
         return sortedList;
     }
 
-    private String buildBbKlineFromExpRepairKey(String asset, String symbol, int freq) {
-        String BbKlineFromExpTaskRedisKey = StringReplaceUtil.replace(bbKlineFromExpRepair, new HashMap<String, String>() {
-            {
-                put("asset", asset);
-                put("symbol", symbol);
-                put("freq", freq + "");
-            }
-        });
-        return BbKlineFromExpTaskRedisKey;
-    }
-
-
-    private String buildBbKlineFromExpTaskRedisKey(String asset, String symbol, int freq) {
-        String BbKlineFromExpTaskRedisKey = StringReplaceUtil.replace(bbKlineFromExpTask, new HashMap<String, String>() {
-            {
-                put("asset", asset);
-                put("symbol", symbol);
-                put("freq", freq + "");
-            }
-        });
-        return BbKlineFromExpTaskRedisKey;
-    }
 
     private List<BBSymbol> listSymbol() {
         final Map<String, BBSymbol> key2Value = metadataRedisUtil.hgetAll(BbKLineKey.BB_SYMBOL, BBSymbol.class);

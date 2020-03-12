@@ -1,7 +1,7 @@
 package com.hp.sh.expv3.bb.kline.test;
 
-import com.hp.sh.expv3.bb.kline.service.impl.BbKlineHistoryCalcFromExpServiceImpl;
-import com.hp.sh.expv3.bb.kline.service.impl.BbKlineHistoryMergeFromExpServiceImpl;
+import com.hp.sh.expv3.bb.kline.service.impl.BbKlineHistoryCalcByTradeFromExpServiceImpl;
+import com.hp.sh.expv3.bb.kline.service.impl.BbKlineHistoryCoverByTradeFromExpServiceImpl;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,10 +16,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 public class Test {
     @Autowired
-   private BbKlineHistoryCalcFromExpServiceImpl bbKlineHistoryCalcFromExpService;
+   private BbKlineHistoryCalcByTradeFromExpServiceImpl bbKlineHistoryCalcFromExpService;
 
     @Autowired
-    private BbKlineHistoryMergeFromExpServiceImpl bbKlineHistoryMergeFromExpService;
+    private BbKlineHistoryCoverByTradeFromExpServiceImpl bbKlineHistoryMergeFromExpService;
 
 
     @org.junit.Test

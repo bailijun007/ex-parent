@@ -6,7 +6,6 @@ import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.service.BbKlineHistoryCoverByTradeFromExpService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
-import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,18 +48,17 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
     @Qualifier("bbKlineOngoingRedisUtil")
     private RedisUtil bbKlineExpHistoryRedisUtil;
 
-    @Value("${bb.kline.notifyUpdate}")
-    private String bbKlineFromExpUpdateEvent;
-
     @Value("${bb.kline.updateEventPattern}")
     private String updateEventPattern;
 
     @Value("${bb.kline}")
     private String bbKlinePattern;
-
-
-    @Value("${bb.kline.expHistory.enable}")
-    private int bbKlineExpHistoryEnable;
+    @Value("${from_exp.bbKlineDataPattern}")
+    private String fromExpBbKlineDataPattern;
+    @Value("${from_exp.bbKlineDataUpdateEventPattern}")
+    private String fromExpBbKlineDataUpdateEventPattern;
+    @Value("${bb.kline.bbKlineFromExpCoverEnable}")
+    private int bbKlineFromExpCoverEnable;
 
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
@@ -73,19 +71,15 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
     );
 
     @Scheduled(cron = "*/1 * * * * *")
-    public void execute(){
-        if (1 != bbKlineExpHistoryEnable) {
+    public void execute() {
+        if (1 != bbKlineFromExpCoverEnable) {
             return;
-        }else {
-            threadPool.execute(()->updateKlineByExpHistory());
+        } else {
+            threadPool.execute(() -> updateKlineByExpHistory());
         }
     }
 
     public void updateKlineByExpHistory() {
-
-        if (1 != bbKlineExpHistoryEnable) {
-            return;
-        }
 
         List<BBSymbol> bbSymbols = listSymbol();
         List<BBSymbol> targetBbSymbols = filterBbSymbols(bbSymbols);
@@ -96,8 +90,14 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
             final String symbol = bbSymbol.getSymbol();
             int freq = 1;
             //监听通知消息
-            String bbKlineFromExpUpdateKey = bbKlineFromExpUpdateKey(asset, symbol, freq);
+            String bbKlineFromExpUpdateKey = BbKlineRedisKeyUtil.buildFromExpBbKlineUpdateEventKey(fromExpBbKlineDataUpdateEventPattern, asset, symbol, freq);
+            logger.info("监听通知消息:{}", bbKlineFromExpUpdateKey);
+
+            //返回通知消息的最小分数跟最大分数
             Long[] minAndMaxMs = listListeningTask(bbKlineFromExpUpdateKey);
+
+            logger.info("返回通知消息的最小分数和最大分数:{}", minAndMaxMs);
+
             if (null == minAndMaxMs) {
 
             } else {
@@ -111,7 +111,6 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
         }
     }
 
-    
 
     /**
      * 覆盖
@@ -152,8 +151,18 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
         bbKlineExpHistoryRedisUtil.zadd(key, scoreMembers);
     }
 
+    /**
+     * 通过范围条件查询
+     *
+     * @param asset
+     * @param symbol
+     * @param minMs
+     * @param maxMs
+     * @param freq
+     * @return
+     */
     private List<BBKLine> listBbKline(String asset, String symbol, Long minMs, Long maxMs, int freq) {
-        String thirdDataKey = buildExpHistoryDataKey(asset, symbol, freq);
+        String thirdDataKey = BbKlineRedisKeyUtil.buildFromExpBbKlineDataByTradeRedisKey(fromExpBbKlineDataPattern, asset, symbol, freq);
         final Set<String> klines = bbKlineExpHistoryRedisUtil.zrangeByScore(thirdDataKey, "" + minMs, "" + maxMs, 0, Long.valueOf(maxMs - minMs).intValue() + 1);
         List<BBKLine> list = new ArrayList<>();
         // 按照时间minute升序
@@ -166,10 +175,12 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
         return list;
     }
 
-    private String buildExpHistoryDataKey(String asset, String symbol, int freq) {
-        return BbKlineRedisKeyUtil.buildThirdDataRedisKey(bbKlinePattern, asset, symbol, freq);
-    }
-
+    /**
+     * 返回通知消息的最小分数跟最大分数
+     *
+     * @param bbKlineFromExpUpdateKey
+     * @return
+     */
     private Long[] listListeningTask(String bbKlineFromExpUpdateKey) {
         final Set<Tuple> triggers = bbKlineExpHistoryRedisUtil.zpopmin(bbKlineFromExpUpdateKey, expHistoryBatchSize);
         if (null == triggers || CollectionUtils.isEmpty(triggers)) {
@@ -187,18 +198,6 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
             }
         }
         return null;
-    }
-
-
-    private String bbKlineFromExpUpdateKey(String asset, String symbol, int freq) {
-        String bbKlineFromExpUpdateKey = StringReplaceUtil.replace(bbKlineFromExpUpdateEvent, new HashMap<String, String>() {
-            {
-                put("asset", asset);
-                put("symbol", symbol);
-                put("freq", "1");
-            }
-        });
-        return bbKlineFromExpUpdateKey;
     }
 
     private List<BBSymbol> listSymbol() {

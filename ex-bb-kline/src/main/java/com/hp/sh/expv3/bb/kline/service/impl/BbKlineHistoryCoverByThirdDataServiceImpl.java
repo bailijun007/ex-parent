@@ -58,8 +58,8 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
     @Value("${bb.kline.updateEventPattern}")
     private String updateEventPattern;
 
-    @Value("${bb.kline.thirdUpdate.enable}")
-    private int thirdUpdateEnable;
+    @Value("${bb.kline.bbKlineThirdCoverEnable}")
+    private int bbKlineThirdCoverEnable;
 
     @Value("${bb.kline.thirdBatchSize}")
     private int thirdBatchSize;
@@ -73,14 +73,17 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
             new ThreadPoolExecutor.AbortPolicy()
     );
 
-    @Override
     @Scheduled(cron = "*/1 * * * * *")
-    public void updateKlineByThirdData() {
-
-        if (1 != thirdUpdateEnable) {
+    public void execute() {
+        if (1 != bbKlineThirdCoverEnable) {
             return;
+        } else {
+            threadPool.execute(() -> updateKlineByThirdData());
         }
+    }
 
+    @Override
+    public void updateKlineByThirdData() {
         List<BBSymbol> bbSymbols = listSymbol();
         List<BBSymbol> targetBbSymbols = filterBbSymbols(bbSymbols);
 
@@ -89,7 +92,9 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
             final String asset = bbSymbol.getAsset();
             final String symbol = bbSymbol.getSymbol();
             int freq = 1;
+            //返回第三方通知的key
             String thirdDataUpdateEventKey = buildThirdDataUpdateEventKey(asset, symbol, freq);
+            //返回通知消息的最小分数跟最大分数
             Long[] minAndMaxMs = listThirdUpdateEvent(thirdDataUpdateEventKey);
             if (null == minAndMaxMs) {
 
@@ -162,6 +167,12 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
         return BbKlineRedisKeyUtil.buildThirdDataRedisKey(thirdDataPattern, asset, symbol, freq);
     }
 
+
+    /**
+     * 返回通知消息的最小分数跟最大分数
+     * @param thirdDataUpdateEventKey
+     * @return
+     */
     private Long[] listThirdUpdateEvent(String thirdDataUpdateEventKey) {
         final Set<Tuple> triggers = bbKlineOngoingRedisUtil.zpopmin(thirdDataUpdateEventKey, triggerBatchSize);
         if (null == triggers || CollectionUtils.isEmpty(triggers)) {
@@ -182,12 +193,12 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
     }
 
     /**
-     * 返回第三方数据的key
+     * 返回第三方通知的key
      *
      * @param asset
      * @param symbol
      * @param freq
-     * @return 返回第三方数据的key
+     * @return 返回第三方通知的key
      */
     private String buildThirdDataUpdateEventKey(String asset, String symbol, int freq) {
         String thirdDataUpdateEventKey = StringReplaceUtil.replace(thirdDataUpdateEventPattern, new HashMap<String, String>() {
