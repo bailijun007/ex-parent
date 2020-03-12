@@ -23,7 +23,7 @@ public class PcOrderTradeFeeJob {
 	@Autowired
 	private PcTradeService tradeService;
 	
-	@Scheduled(cron = "0 0/10 * * * ?")
+//	@Scheduled(cron = "0 * * * * ?")
 	public void handleJob() {
 		Long now = DbDateUtils.now();
 		Long startTime = now-1000*3600*20000;

@@ -12,7 +12,7 @@ import com.hp.sh.expv3.pc.module.collector.entity.PcCollectorAccount;
  */
 public interface PcCollectorAccountDAO {
 	
-	public PcCollectorAccount get(@Param("id") Long id, @Param("asset") String asset);
+	public PcCollectorAccount get(@Param("id") Long id);
 	
 	void save(PcCollectorAccount entity);
 

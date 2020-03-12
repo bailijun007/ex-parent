@@ -79,26 +79,29 @@ public class PcCollectorCoreService{
 			return InvokeResult.NOCHANGE;
 		}
 		
-		PcCollectorAccount bBCollectorAccount = this.collectorAccountDAO.get(record.getCollectorId(), record.getAsset());
+		PcCollectorAccount collectorAccount = this.collectorAccountDAO.get(record.getCollectorId());
 		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
-		if(bBCollectorAccount==null){
+		if(collectorAccount==null){
 			//检查余额
 			this.checkBalance(record, recordAmount);
 			
-			bBCollectorAccount = this.newAccount(record.getCollectorId(), record.getAsset(), recordAmount, now);
+			collectorAccount = this.newAccount(record.getCollectorId(), record.getAsset(), recordAmount, now);
 		}else{
-			BigDecimal newBalance = bBCollectorAccount.getBalance().add(recordAmount);
+			if(!collectorAccount.getAsset().equals(record.getAsset())){
+				throw new RuntimeException("asset 不一致！");
+			}
+			BigDecimal newBalance = collectorAccount.getBalance().add(recordAmount);
 			//检查余额
 			this.checkBalance(record, newBalance);
 			//更新余额
-			bBCollectorAccount.setModified(now);
-			bBCollectorAccount.setBalance(newBalance);
-			this.updateAccount(bBCollectorAccount);
+			collectorAccount.setModified(now);
+			collectorAccount.setBalance(newBalance);
+			this.updateAccount(collectorAccount);
 		}
 		
 		//设置本比余额
-		record.setSerialNo(bBCollectorAccount.getVersion());
-		record.setBalance(bBCollectorAccount.getBalance());
+		record.setSerialNo(collectorAccount.getVersion());
+		record.setBalance(collectorAccount.getBalance());
 		
 		//保存记录
 		record.setCreated(now);
@@ -128,7 +131,7 @@ public class PcCollectorCoreService{
 		PcCollectorAccount account = new PcCollectorAccount();
 		account.setAsset(asset);
 		account.setBalance(balance);
-		account.setCollectorId(collectorId);
+		account.setId(collectorId);
 		account.setCreated(now);
 		account.setModified(now);
 		account.setVersion(0L);
