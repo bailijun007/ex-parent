@@ -79,7 +79,7 @@ public class PcCollectorCoreService{
 			return InvokeResult.NOCHANGE;
 		}
 		
-		PcCollectorAccount collectorAccount = this.collectorAccountDAO.get(record.getCollectorId());
+		PcCollectorAccount collectorAccount = this.collectorAccountDAO.get(record.getCollectorId(), record.getAsset());
 		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
 		if(collectorAccount==null){
 			//检查余额
@@ -87,9 +87,6 @@ public class PcCollectorCoreService{
 			
 			collectorAccount = this.newAccount(record.getCollectorId(), record.getAsset(), recordAmount, now);
 		}else{
-			if(!collectorAccount.getAsset().equals(record.getAsset())){
-				throw new RuntimeException("asset 不一致！");
-			}
 			BigDecimal newBalance = collectorAccount.getBalance().add(recordAmount);
 			//检查余额
 			this.checkBalance(record, newBalance);

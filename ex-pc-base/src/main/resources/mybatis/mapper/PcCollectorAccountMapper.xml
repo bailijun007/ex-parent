@@ -4,7 +4,7 @@
 <mapper namespace="com.hp.sh.expv3.pc.module.collector.dao.PcCollectorAccountDAO">
 
 	<resultMap type="com.hp.sh.expv3.pc.module.collector.entity.PcCollectorAccount" id="PcCollectorAccount">
-		<result column="id" property="id" />
+		<result column="collector_id" property="collectorId" />
 		<result column="asset" property="asset" />
 		<result column="balance" property="balance" />
 		<result column="version" property="version" />
@@ -13,18 +13,12 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,asset,balance,version,created,modified
+		collector_id,asset,balance,version,created,modified
 	</sql>
 
 	<sql id="simple_where">
 		<where>
-			<if test="idList!=null">
-				and id in
-				<foreach item="item" index="i" collection="idList" open="("
-					separator="," close=")">
-					#{idList[${i}]}
-				</foreach>
-			</if>
+			<if test="collectorId!=null and collectorId!=''"> and collector_id=#{collectorId}</if>
 			<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
 			<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
 			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
@@ -73,13 +67,6 @@
 		<include refid="simple_where" />
 	</select>
 
-	<select id="findById" resultMap="PcCollectorAccount">
-		select
-			<include refid="Base_Column_List" />
-		from pc_collector_account
-			where id=#{id}
-	</select>
-
 	<select id="exist" resultType="boolean">
 		select 
 			count(1)
@@ -92,9 +79,9 @@
 
 	<insert id="save">
 		insert into pc_collector_account (
-			id,asset,balance,version,created,modified
+			collector_id,asset,balance,version,created,modified
 		)values(
-			#{id},#{asset},#{balance},#{version},#{created},#{modified}
+			#{collectorId},#{asset},#{balance},#{version},#{created},#{modified}
 		)
 	</insert>
 	
@@ -104,12 +91,8 @@
 		set 
 			asset=#{asset},balance=#{balance},version=${version}+1,created=#{created},modified=#{modified}
 		where 
-			id=#{id} and asset=#{asset} and version=#{version}
+			collector_id=#{collectorId} and asset=#{asset} and version=#{version}
 	</update>
-
-	<delete id="delete">
-        delete from pc_collector_account where id=#{id}
-    </delete>
 
     <delete id="condDelete">
         delete from pc_collector_account
@@ -122,7 +105,7 @@
 		select
 			<include refid="Base_Column_List" />
 		from pc_collector_account
-			where id=#{id}
+			where collector_id=#{collectorId} and asset=#{asset}
 	</select>
 	
 </mapper>
