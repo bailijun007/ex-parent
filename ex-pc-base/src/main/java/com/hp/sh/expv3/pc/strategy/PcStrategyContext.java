@@ -297,8 +297,7 @@ public class PcStrategyContext {
 	
 	public BigDecimal calPosMarginRatio(PosData pos, BigDecimal posPnl, BigDecimal markPrice) {
 		 HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
-		 holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), pos.getFaceValue(), pos.getVolume(), posPnl, markPrice);
-		return null;
+		 return holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), pos.getFaceValue(), pos.getVolume(), posPnl, markPrice);
 	}
 
 	int ____________________________;

@@ -18,3 +18,4 @@ package.bat
 *.iml
 *.ipr
 bin
+/ex-bb-extend-def/deploy.cmd

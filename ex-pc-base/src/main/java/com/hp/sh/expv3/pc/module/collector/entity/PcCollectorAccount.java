@@ -3,9 +3,6 @@ package com.hp.sh.expv3.pc.module.collector.entity;
 import java.math.BigDecimal;
 
 import javax.persistence.Table;
-import javax.persistence.Version;
-
-import com.hp.sh.expv3.base.entity.BaseBizEntity;
 
 /**
  * 币币_币币手续费
@@ -13,18 +10,21 @@ import com.hp.sh.expv3.base.entity.BaseBizEntity;
  *
  */
 @Table(name="pc_collector_account")
-public class PcCollectorAccount extends BaseBizEntity {
+public class PcCollectorAccount {
 
-	private static final long serialVersionUID = 1L;
-	
-	//用户ID
-	private Long collectorId;
+	protected Long id;
 	
 	//资产类型
 	private String asset;
 	
 	//余额
 	private BigDecimal balance;
+
+	// 创建时间
+	private Long created;
+	
+	// 修改时间
+	private Long modified;
 	
 	//版本
 	private Long version;
@@ -32,12 +32,12 @@ public class PcCollectorAccount extends BaseBizEntity {
 	public PcCollectorAccount() {
 	}
 
-	public Long getCollectorId() {
-		return collectorId;
+	public Long getId() {
+		return id;
 	}
 
-	public void setCollectorId(Long collectorId) {
-		this.collectorId = collectorId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getAsset() {
@@ -56,18 +56,28 @@ public class PcCollectorAccount extends BaseBizEntity {
 		this.balance = balance;
 	}
 
-	@Version
+	public Long getCreated() {
+		return created;
+	}
+
+	public void setCreated(Long created) {
+		this.created = created;
+	}
+
+	public Long getModified() {
+		return modified;
+	}
+
+	public void setModified(Long modified) {
+		this.modified = modified;
+	}
+
 	public Long getVersion() {
 		return version;
 	}
 
 	public void setVersion(Long version) {
 		this.version = version;
-	}
-
-	@Override
-	public String toString() {
-		return "PcCollectorAccount [asset=" + asset + ", balance=" + balance + ", version=" + version + "]";
 	}
 
 }

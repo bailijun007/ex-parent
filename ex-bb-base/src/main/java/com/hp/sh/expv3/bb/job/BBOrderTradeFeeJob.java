@@ -23,7 +23,7 @@ public class BBOrderTradeFeeJob {
 	@Autowired
 	private BBTradeService tradeService;
 	
-	@Scheduled(cron = "0 0/1 * * * ?")
+//	@Scheduled(cron = "0 0/1 * * * ?")
 	public void handleJob() {
 		Long now = DbDateUtils.now();
 		Long startTime = now-1000*3600*20000;

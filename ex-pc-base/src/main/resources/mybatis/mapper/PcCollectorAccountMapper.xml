@@ -122,7 +122,7 @@
 		select
 			<include refid="Base_Column_List" />
 		from pc_collector_account
-			where id=#{id} and asset=#{asset}
+			where id=#{id}
 	</select>
 	
 </mapper>
