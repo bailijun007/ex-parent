@@ -13,11 +13,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Tuple;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -30,13 +35,11 @@ public class BbKlineHistoryMergeFromExpServiceImpl implements BbKlineHistoryMerg
     @Value("${bb.kline.bbGroupIds}")
     private Set<Integer> supportBbGroupIds;
 
-
     @Value("${bb.kline.expHistoryBatchSize}")
     private Integer expHistoryBatchSize;
 
     @Value("${bb.kline.supportFrequenceString}")
     private String supportFrequenceString;
-
 
     @Autowired
     @Qualifier("metadataRedisUtil")
@@ -46,20 +49,38 @@ public class BbKlineHistoryMergeFromExpServiceImpl implements BbKlineHistoryMerg
     @Qualifier("bbKlineOngoingRedisUtil")
     private RedisUtil bbKlineExpHistoryRedisUtil;
 
-    @Value("${bb.kline.task}")
-    private String bbKlineFromExpTask;
-
     @Value("${bb.kline.notifyUpdate}")
-    private String bbKlineFromExpUpdate;
+    private String bbKlineFromExpUpdateEvent;
 
-    @Value("${bb.kline.repair}")
-    private String bbKlineFromExpRepair;
+    @Value("${bb.kline.updateEventPattern}")
+    private String updateEventPattern;
+
+    @Value("${bb.kline}")
+    private String bbKlinePattern;
+
 
     @Value("${bb.kline.expHistory.enable}")
     private int bbKlineExpHistoryEnable;
 
 
-//    @Scheduled(cron = "*/1 * * * * *")
+    private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
+            2,
+            Runtime.getRuntime().availableProcessors() + 1,
+            2L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(100000),
+            Executors.defaultThreadFactory(),
+            new ThreadPoolExecutor.AbortPolicy()
+    );
+
+    @Scheduled(cron = "*/1 * * * * *")
+    public void execute(){
+        if (1 != bbKlineExpHistoryEnable) {
+            return;
+        }else {
+            threadPool.execute(()->updateKlineByExpHistory());
+        }
+    }
+
     public void updateKlineByExpHistory() {
 
         if (1 != bbKlineExpHistoryEnable) {
@@ -74,9 +95,9 @@ public class BbKlineHistoryMergeFromExpServiceImpl implements BbKlineHistoryMerg
             final String asset = bbSymbol.getAsset();
             final String symbol = bbSymbol.getSymbol();
             int freq = 1;
-            //监听消息
-            String taskKey = buildThirdDataUpdateEventKey(asset, symbol, freq);
-            Long[] minAndMaxMs = listListeningTask(taskKey);
+            //监听通知消息
+            String bbKlineFromExpUpdateKey = bbKlineFromExpUpdateKey(asset, symbol, freq);
+            Long[] minAndMaxMs = listListeningTask(bbKlineFromExpUpdateKey);
             if (null == minAndMaxMs) {
 
             } else {
@@ -101,7 +122,7 @@ public class BbKlineHistoryMergeFromExpServiceImpl implements BbKlineHistoryMerg
      * @param freq
      */
     private void coverData(String asset, String symbol, Long minMs, Long maxMs, int freq, List<BBKLine> klines) {
-        final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlineFromExpRepair, asset, symbol, freq);
+        final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
         //删除老数据
         bbKlineExpHistoryRedisUtil.zremrangeByScore(klineDataRedisKey, minMs, maxMs);
         //新增新数据
@@ -122,7 +143,7 @@ public class BbKlineHistoryMergeFromExpServiceImpl implements BbKlineHistoryMerg
      * @param freq
      */
     private void notifyKlineUpdate(String asset, String symbol, Long minMs, Long maxMs, int freq, List<BBKLine> klines) {
-        String key = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(bbKlineFromExpUpdate, asset, symbol, freq);
+        String key = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, freq);
         HashMap<String, Double> scoreMembers = new HashMap<String, Double>();
         for (BBKLine kline : klines) {
             final String member = BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, freq, kline.getMs());
@@ -132,7 +153,7 @@ public class BbKlineHistoryMergeFromExpServiceImpl implements BbKlineHistoryMerg
     }
 
     private List<BBKLine> listBbKline(String asset, String symbol, Long minMs, Long maxMs, int freq) {
-        String thirdDataKey = buildThirdDataKey(asset, symbol, freq);
+        String thirdDataKey = buildExpHistoryDataKey(asset, symbol, freq);
         final Set<String> klines = bbKlineExpHistoryRedisUtil.zrangeByScore(thirdDataKey, "" + minMs, "" + maxMs, 0, Long.valueOf(maxMs - minMs).intValue() + 1);
         List<BBKLine> list = new ArrayList<>();
         // 按照时间minute升序
@@ -145,12 +166,12 @@ public class BbKlineHistoryMergeFromExpServiceImpl implements BbKlineHistoryMerg
         return list;
     }
 
-    private String buildThirdDataKey(String asset, String symbol, int freq) {
-        return BbKlineRedisKeyUtil.buildThirdDataRedisKey(bbKlineFromExpRepair, asset, symbol, freq);
+    private String buildExpHistoryDataKey(String asset, String symbol, int freq) {
+        return BbKlineRedisKeyUtil.buildThirdDataRedisKey(bbKlinePattern, asset, symbol, freq);
     }
 
-    private Long[] listListeningTask(String taskKey) {
-        final Set<Tuple> triggers = bbKlineExpHistoryRedisUtil.zpopmin(taskKey, expHistoryBatchSize);
+    private Long[] listListeningTask(String bbKlineFromExpUpdateKey) {
+        final Set<Tuple> triggers = bbKlineExpHistoryRedisUtil.zpopmin(bbKlineFromExpUpdateKey, expHistoryBatchSize);
         if (null == triggers || CollectionUtils.isEmpty(triggers)) {
         } else {
             Long maxMs = null, minMs = null;
@@ -168,23 +189,16 @@ public class BbKlineHistoryMergeFromExpServiceImpl implements BbKlineHistoryMerg
         return null;
     }
 
-    /**
-     * 返回第三方数据的key
-     *
-     * @param asset
-     * @param symbol
-     * @param freq
-     * @return 返回第三方数据的key
-     */
-    private String buildThirdDataUpdateEventKey(String asset, String symbol, int freq) {
-        String taskKey = StringReplaceUtil.replace(bbKlineFromExpTask, new HashMap<String, String>() {
+
+    private String bbKlineFromExpUpdateKey(String asset, String symbol, int freq) {
+        String bbKlineFromExpUpdateKey = StringReplaceUtil.replace(bbKlineFromExpUpdateEvent, new HashMap<String, String>() {
             {
                 put("asset", asset);
                 put("symbol", symbol);
                 put("freq", "1");
             }
         });
-        return taskKey;
+        return bbKlineFromExpUpdateKey;
     }
 
     private List<BBSymbol> listSymbol() {

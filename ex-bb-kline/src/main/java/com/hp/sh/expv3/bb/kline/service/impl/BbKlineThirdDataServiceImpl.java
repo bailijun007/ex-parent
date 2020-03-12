@@ -17,6 +17,10 @@ import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Tuple;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +64,14 @@ public class BbKlineThirdDataServiceImpl implements BbKlineThirdDataService {
     @Value("${bb.kline.thirdBatchSize}")
     private int thirdBatchSize;
 
+    private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
+            2,
+            Runtime.getRuntime().availableProcessors() + 1,
+            2L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(100000),
+            Executors.defaultThreadFactory(),
+            new ThreadPoolExecutor.AbortPolicy()
+    );
 
     @Override
     @Scheduled(cron = "*/1 * * * * *")
@@ -92,15 +104,6 @@ public class BbKlineThirdDataServiceImpl implements BbKlineThirdDataService {
         }
     }
 
-
-    private void notifyKlineUpdate(String asset, String symbol, Integer targetFreq, Long startMinute) {
-        //向集合中插入元素，并设置分数
-        String key = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, targetFreq);
-        bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
-                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, targetFreq, startMinute), Long.valueOf(startMinute).doubleValue());
-                }}
-        );
-    }
 
     /**
      * 覆盖
@@ -191,7 +194,7 @@ public class BbKlineThirdDataServiceImpl implements BbKlineThirdDataService {
             {
                 put("asset", asset);
                 put("symbol", symbol);
-                put("freq", "1");
+                put("freq", freq+"");
             }
         });
         return thirdDataUpdateEventKey;

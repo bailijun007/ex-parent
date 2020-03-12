@@ -1,7 +1,7 @@
 package com.hp.sh.expv3.bb.kline.test;
 
 import com.hp.sh.expv3.bb.kline.service.impl.BbKlineHistoryCalcFromExpServiceImpl;
-import com.hp.sh.expv3.bb.kline.service.impl.BbKlineHistoryMergeFromExpServiceImpl2;
+import com.hp.sh.expv3.bb.kline.service.impl.BbKlineHistoryMergeFromExpServiceImpl;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +19,7 @@ public class Test {
    private BbKlineHistoryCalcFromExpServiceImpl bbKlineHistoryCalcFromExpService;
 
     @Autowired
-    private BbKlineHistoryMergeFromExpServiceImpl2 bbKlineHistoryMergeFromExpService;
+    private BbKlineHistoryMergeFromExpServiceImpl bbKlineHistoryMergeFromExpService;
 
 
     @org.junit.Test
@@ -30,7 +30,7 @@ public class Test {
 
     @org.junit.Test
     public void test2(){
-        bbKlineHistoryMergeFromExpService.mergeKlineData();
+        bbKlineHistoryMergeFromExpService.updateKlineByExpHistory();
     }
 
 }

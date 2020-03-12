@@ -19,6 +19,9 @@ import redis.clients.jedis.Tuple;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -64,8 +67,26 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
 
     private List<Integer> supportFrequence = new ArrayList<>();
 
-    @Override
+
+    private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
+            2,
+            Runtime.getRuntime().availableProcessors() + 1,
+            2L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(100000),
+            Executors.defaultThreadFactory(),
+            new ThreadPoolExecutor.AbortPolicy()
+    );
+
     @Scheduled(cron = "*/1 * * * * *")
+    public void satrt() {
+        if (1 != ongoingMergeEnable) {
+            return;
+        } else {
+            threadPool.execute(() -> mergeKlineData());
+        }
+    }
+
+    @Override
     public void mergeKlineData() {
         //  ongoingMergeEnable=1
         if (1 != ongoingMergeEnable) {

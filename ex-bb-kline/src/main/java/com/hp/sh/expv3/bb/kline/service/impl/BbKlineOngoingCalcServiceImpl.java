@@ -72,10 +72,6 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
 
         threadPool.execute(() -> trigger());
 
-
-//        timer.scheduleAtFixedRate(() -> {
-//            trigger();
-//        }, 0, 10, TimeUnit.SECONDS);
     }
 
     @Override
