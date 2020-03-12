@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : localhost
-Source Server Version : 50716
-Source Host           : localhost:3306
+Source Server         : 192.168.0.190-ex
+Source Server Version : 50726
+Source Host           : 192.168.0.190:3306
 Source Database       : expv3_bb
 
 Target Server Type    : MYSQL
 Target Server Version : 50599
 File Encoding         : 65001
 
-Date: 2020-02-14 18:04:28
+Date: 2020-03-12 13:39:26
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -31,8 +31,7 @@ UNIQUE INDEX `un_user_asset` (`user_id`, `asset`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币资金账户'
-
+COMMENT='用户资金账户'
 ;
 
 -- ----------------------------
@@ -77,11 +76,12 @@ CREATE TABLE `bb_account_record` (
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
 PRIMARY KEY (`id`),
-UNIQUE INDEX `un_sn` (`sn`) USING BTREE 
+UNIQUE INDEX `un_sn` (`sn`) USING BTREE ,
+UNIQUE INDEX `un_trade_no` (`trade_no`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_账户明细'
+COMMENT='永续合约_账户明细'
 ;
 
 -- ----------------------------
@@ -93,14 +93,62 @@ CREATE TABLE `bb_active_order` (
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
-`bid_flag`  int(11) NOT NULL COMMENT '1-买，0-卖' ,
+`bid_flag`  int(11) NOT NULL COMMENT '多空' ,
 PRIMARY KEY (`id`),
 INDEX `idx_userid` (`user_id`) USING BTREE ,
 INDEX `idx_symbol` (`symbol`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_活动订单（委托）'
+COMMENT='永续合约_活动订单（委托）'
+;
+
+-- ----------------------------
+-- Table structure for `bb_collector_account`
+-- ----------------------------
+DROP TABLE IF EXISTS `bb_collector_account`;
+CREATE TABLE `bb_collector_account` (
+`id`  bigint(20) NOT NULL ,
+`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产类型' ,
+`balance`  decimal(50,30) NOT NULL COMMENT '余额' ,
+`version`  bigint(20) NOT NULL COMMENT '版本' ,
+`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
+`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+COMMENT='币币_币币手续费'
+;
+
+-- ----------------------------
+-- Table structure for `bb_collector_account_record`
+-- ----------------------------
+DROP TABLE IF EXISTS `bb_collector_account_record`;
+CREATE TABLE `bb_collector_account_record` (
+`id`  bigint(20) NOT NULL ,
+`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
+`sn`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '流水号' ,
+`type`  int(11) NOT NULL COMMENT '类型：1 收入,-1 支出' ,
+`amount`  decimal(50,30) NOT NULL COMMENT '本笔金额' ,
+`remark`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '备注' ,
+`balance`  decimal(50,30) NOT NULL COMMENT '本笔余额' ,
+`trade_no`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '调用方支付单号' ,
+`trade_type`  int(11) NOT NULL ,
+`serial_no`  bigint(20) NOT NULL COMMENT '序号:' ,
+`associated_id`  bigint(20) NOT NULL COMMENT '关联对象的ID' ,
+`collector_id`  bigint(20) NOT NULL ,
+`tx_id`  bigint(20) NULL DEFAULT NULL COMMENT '事务ID' ,
+`request_id`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '请求ID' ,
+`user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
+`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
+`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+COMMENT='币币手续费_账户明细'
+
 ;
 
 -- ----------------------------
@@ -189,8 +237,11 @@ CREATE TABLE `bb_order_trade` (
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
 `remain_volume`  decimal(50,30) NULL DEFAULT NULL COMMENT '未成交量' ,
+`remain_order_margin`  decimal(10,0) NOT NULL COMMENT '订单剩余保证金' ,
+`remain_fee`  decimal(10,0) NOT NULL COMMENT '订单剩余手续费' ,
 `match_tx_id`  bigint(20) NULL DEFAULT NULL COMMENT '撮合事务Id' ,
 `tx_id`  bigint(20) NULL DEFAULT NULL COMMENT '事务ID' ,
+`fee_synch_status`  int(11) NOT NULL COMMENT '手续费同步状态' ,
 PRIMARY KEY (`id`),
 UNIQUE INDEX `un_trade_no` (`trade_sn`) USING BTREE ,
 INDEX `idx_userid` (`user_id`) USING BTREE ,
@@ -198,7 +249,7 @@ INDEX `idx_orderid` (`order_id`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_用户订单成交记录'
+COMMENT='永续合约_用户订单成交记录'
 ;
 
 -- ----------------------------
@@ -213,10 +264,8 @@ CREATE TABLE `bb_trade` (
 `tk_bid_flag`  int(11) NOT NULL COMMENT 'taker是否买：1-是，0-否' ,
 `tk_account_id`  bigint(20) NOT NULL COMMENT 'taker账户ID' ,
 `tk_order_id`  bigint(20) NOT NULL COMMENT 'taker订单ID' ,
-`tk_close_flag`  int(11) NULL DEFAULT NULL COMMENT 'taker是否平仓' ,
 `mk_account_id`  bigint(20) NOT NULL COMMENT 'maker账户Id' ,
 `mk_order_id`  bigint(20) NOT NULL COMMENT 'maker订单ID' ,
-`mk_close_flag`  int(11) NULL DEFAULT NULL COMMENT 'maker是否平仓' ,
 `price`  decimal(50,30) NOT NULL COMMENT '成交价格' ,
 `number`  decimal(50,30) NOT NULL COMMENT '数量' ,
 `trade_time`  bigint(20) NOT NULL COMMENT '成交时间' ,
@@ -225,12 +274,11 @@ CREATE TABLE `bb_trade` (
 `created`  bigint(20) NULL DEFAULT NULL ,
 `modified`  bigint(20) NULL DEFAULT NULL ,
 PRIMARY KEY (`id`),
-INDEX `idx_tk_order_id` (`tk_order_id`) USING BTREE ,
-INDEX `idx_mk_order_id` (`mk_order_id`) USING BTREE ,
-INDEX `idx_created` (`created`) USING BTREE 
+INDEX `idx_trade_time` (`trade_time`) USING BTREE ,
+INDEX `idx_tk_account_id` (`tk_account_id`) USING BTREE ,
+INDEX `idx_mk_account_id` (`mk_account_id`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_成交(撮合结果)'
-
+COMMENT='永续合约_成交(撮合结果)'
 ;

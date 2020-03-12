@@ -17,7 +17,6 @@ import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
-import com.hp.sh.expv3.pc.strategy.aabb.AABBCompFieldCalc;
 import com.hp.sh.expv3.pc.strategy.data.OrderFeeParam;
 import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
 import com.hp.sh.expv3.pc.strategy.data.PosBaseData;
@@ -27,7 +26,6 @@ import com.hp.sh.expv3.pc.strategy.vo.OrderFeeParamVo;
 import com.hp.sh.expv3.pc.strategy.vo.OrderMarginVo;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.IntBool;
-import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.Precision;
 
