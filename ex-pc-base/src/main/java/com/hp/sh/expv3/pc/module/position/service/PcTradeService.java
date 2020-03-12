@@ -105,7 +105,7 @@ public class PcTradeService {
 		TradeResult tradeResult = this.positionStrategy.calcTradeResult(trade, order, pcPosition);
 		
 		/*  1、修改仓位数据  */
-		this.modPositon(pcPosition, order, tradeResult, now);
+		pcPosition = this.modPositon(pcPosition, order, tradeResult, now);
 		
 		/*  2、修改订单数据和订单状态  */
 		this.updateOrder4Trade(order, tradeResult, now);
@@ -129,7 +129,7 @@ public class PcTradeService {
 		TradeResult tradeResult = this.positionStrategy.calcTradeResult(trade, order, pcPosition);
 		
 		/*  1、修改仓位数据  */
-		this.modPositon(pcPosition, order, tradeResult, now);
+		pcPosition = this.modPositon(pcPosition, order, tradeResult, now);
 		
 		/*  2、修改订单数据和订单状态  */
 		this.updateOrder4Trade(order, tradeResult, now);
@@ -152,7 +152,7 @@ public class PcTradeService {
 		this.closeMarginToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), amount, order.getLongFlag(), remark);
 	}
 
-	private void modPositon(PcPosition pcPosition, PcOrder order, TradeResult tradeResult, Long now){
+	private PcPosition modPositon(PcPosition pcPosition, PcOrder order, TradeResult tradeResult, Long now){
 		////////// 仓位 ///////////
 		//如果仓位不存在则创建新仓位
 		boolean isNewPos = false;
@@ -188,6 +188,8 @@ public class PcTradeService {
 			pcPosition.setModified(now);
 			this.positionDataService.update(pcPosition);
 		}
+		
+		return pcPosition;
     }
 	
 	private int getLogType(int closeFlag, int longFlag){
@@ -319,6 +321,8 @@ public class PcTradeService {
 		pcPosition.setAccuBaseValue(BigDecimal.ZERO);
 		
 		pcPosition.setFaceValue(faceValue);
+		
+		pcPosition.setVersion(0L);
 		
 		return pcPosition;
 	}

@@ -90,11 +90,12 @@ public class MqOrderlyConsumer {
 	@PostConstruct
 	public void start123() throws MQClientException{
 		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
+		logger.info("启动MQ监听：{}", pcList.size());
 		for(BBSymbolVO bbvo : pcList){
 			if(bbGroupId.equals(bbvo.getBbGroupId())){
 				this.buildConsumer(MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol()));
+				logger.info("MQConsumer Started. asset={}, symbol={}", bbvo.getAsset(), bbvo.getSymbol());
 			}
-	        logger.info("MQConsumer Started. asset={}, symbol={}", bbvo.getAsset(), bbvo.getSymbol());
 		}
 	}
 	
