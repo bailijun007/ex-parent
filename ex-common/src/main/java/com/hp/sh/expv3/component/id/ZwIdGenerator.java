@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.gitee.hupadev.commons.id.IdGenerator;
 import com.hp.sh.expv3.component.id.config.SequencConfig;
@@ -14,6 +16,7 @@ import com.hp.sh.expv3.component.id.utils.IdUtil;
 import com.hp.sh.expv3.component.id.utils.SnowflakeIdWorker;
 
 public class ZwIdGenerator implements IdGenerator{
+	private final Logger logger = LoggerFactory.getLogger(ZwIdGenerator.class);
 	
 	private final Map<Integer, SnowflakeIdWorker> idWorkerMap = new HashMap<Integer, SnowflakeIdWorker>();
 	
@@ -37,6 +40,9 @@ public class ZwIdGenerator implements IdGenerator{
 	public Long nextId(String entityId) {
 		Integer seqId = this.entitySequenceMap.get(entityId);
 		SnowflakeIdWorker idworker = idWorkerMap.get(seqId);
+		if(idworker==null){
+			logger.error("idworker is null, entityId={}, seqId={}", entityId, seqId);
+		}
 		return idworker.nextId();
 	}
 

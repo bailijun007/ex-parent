@@ -102,7 +102,7 @@ public class PcLiqService {
 	 * @return 是否触发强平
 	 */
 	private boolean checkAndResetLiqStatus(PcPosition pos, BigDecimal markPrice) {
-		if(checkLiqStatus(pos, markPrice)){ //强平
+		if(this.checkLiqStatus(pos, markPrice)){ //强平
 			return true;
 		}else{ //不强平
 			if(pos.getLiqStatus()!=LiqStatus.NON){
