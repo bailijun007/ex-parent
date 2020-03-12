@@ -28,6 +28,8 @@ public class BBKLine implements Serializable {
                 "asset='" + asset + '\'' +
                 ", symbol='" + symbol + '\'' +
                 ", frequence=" + frequence +
+                ", minute=" + minute +
+                ", ms=" + ms +
                 ", volume=" + volume +
                 ", high=" + high +
                 ", low=" + low +

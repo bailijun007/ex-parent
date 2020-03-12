@@ -51,7 +51,7 @@ public class BbKLineJob {
                 String taskKey = BbKLineKey.KLINE_BB_TASK_FROM_EXP + asset + ":" + symbol;
                 Set<ZSetOperations.TypedTuple<String>> task = templateDB0.opsForZSet().rangeWithScores(taskKey, 0, -1);
                 if (CollectionUtils.isEmpty(task)) {
-                    break;
+                    continue;
                 }
                 for (ZSetOperations.TypedTuple<String> tuple : task) {
                     long minute = getMinute(tuple);
@@ -63,7 +63,7 @@ public class BbKLineJob {
                     }
 
                     // 若修复数据已存在，忽略 从redis kline:from_exp:repair:BB:${asset}:${symbol}:${minute}中取
-                   String repairkey = BbKLineKey.KLINE_BB_REPAIR_FROM_EXP + asset + ":" + symbol + ":" + 1;
+                    String repairkey = BbKLineKey.KLINE_BB_REPAIR_FROM_EXP + asset + ":" + symbol + ":" + 1;
                     Set<ZSetOperations.TypedTuple<String>> repaired = templateDB0.opsForZSet().rangeWithScores(repairkey, 0, -1);
 
                     if (null != repaired || !repaired.isEmpty()) {

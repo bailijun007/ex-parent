@@ -2,11 +2,16 @@ package com.hp.sh.expv3.bb.kline.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
+import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hupa.exp.common.tool.format.JsonUtil;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2020/3/11
@@ -17,11 +22,11 @@ public class BBKlineUtil {
     public static String kline2ArrayData(BBKLine bbkLine) {
         BigDecimal[] bigDecimals = new BigDecimal[6];
         bigDecimals[0] = new BigDecimal(bbkLine.getMs());
-        bigDecimals[1] = bbkLine.getHigh() == null ? BigDecimal.ZERO : bbkLine.getHigh();
-        bigDecimals[2] = bbkLine.getLow() == null ? BigDecimal.ZERO : bbkLine.getLow();
-        bigDecimals[3] = bbkLine.getOpen() == null ? BigDecimal.ZERO : bbkLine.getOpen();
-        bigDecimals[4] = bbkLine.getClose() == null ? BigDecimal.ZERO : bbkLine.getClose();
-        bigDecimals[5] = bbkLine.getVolume() == null ? BigDecimal.ZERO : bbkLine.getVolume();
+        bigDecimals[1] = bbkLine.getHigh() == null ? BigDecimal.ZERO : bbkLine.getHigh().stripTrailingZeros();
+        bigDecimals[2] = bbkLine.getLow() == null ? BigDecimal.ZERO : bbkLine.getLow().stripTrailingZeros();
+        bigDecimals[3] = bbkLine.getOpen() == null ? BigDecimal.ZERO : bbkLine.getOpen().stripTrailingZeros();
+        bigDecimals[4] = bbkLine.getClose() == null ? BigDecimal.ZERO : bbkLine.getClose().stripTrailingZeros();
+        bigDecimals[5] = bbkLine.getVolume() == null ? BigDecimal.ZERO : bbkLine.getVolume().stripTrailingZeros();
         final String s = JsonUtil.toJsonString(bigDecimals);
         return s;
     }
@@ -41,6 +46,7 @@ public class BBKlineUtil {
         bbkLine.setVolume(ja.getBigDecimal(5));
         return bbkLine;
     }
+
 
     /**
      * 分钟时间戳转成毫秒时间戳

@@ -7,17 +7,21 @@ import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingMergeService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Tuple;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -25,8 +29,8 @@ import java.util.stream.Collectors;
  * @author BaiLiJun  on 2020/3/10
  */
 @Service
-@Transactional(rollbackFor = Exception.class)
 public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Value("${bb.kline.bbGroupIds}")
     private Set<Integer> supportBbGroupIds;
 
@@ -63,8 +67,26 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
 
     private List<Integer> supportFrequence = new ArrayList<>();
 
-    @Override
+
+    private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
+            2,
+            Runtime.getRuntime().availableProcessors() + 1,
+            2L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(100000),
+            Executors.defaultThreadFactory(),
+            new ThreadPoolExecutor.AbortPolicy()
+    );
+
     @Scheduled(cron = "*/1 * * * * *")
+    public void satrt() {
+        if (1 != ongoingMergeEnable) {
+            return;
+        } else {
+            threadPool.execute(() -> mergeKlineData());
+        }
+    }
+
+    @Override
     public void mergeKlineData() {
         //  ongoingMergeEnable=1
         if (1 != ongoingMergeEnable) {
@@ -90,30 +112,55 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
                 if (null == targetFreqs) {
                     continue;
                 }
+
+/**
+ * 此参数用于优化如下场景：
+ * 补历史数据时，1分钟的数据批量更新，则5分钟的数据只需要处理一次即可。
+ * 如：1分钟数据 中，第 0 ~ 9 分钟数据更新，则 5分钟的 0,5 数据，只需要在 第0和5分钟的1分钟数据 更新时触发
+ * 第 1,2,3,4 分钟的1分钟数据，和 0分钟的数据是一样的，直接continue;
+ */
+
+                Map<Integer, Set<Long>> targetFreq2StartMsSet = new HashMap<>(targetFreqs.size());
+
                 for (Tuple trigger : triggers) {
                     final String element = trigger.getElement();
-                    final long minute = Double.valueOf(trigger.getScore()).longValue();
+                    final long ms = Double.valueOf(trigger.getScore()).longValue();
                     for (Integer targetFreq : targetFreqs) {
-                        Long[] startAndEndMinutes = getStartEndMinute(minute, triggerFreq, targetFreq);
-                        final List<BBKLine> bbkLines = listKlineResource(asset, symbol, triggerFreq, startAndEndMinutes[0], startAndEndMinutes[1]);
+                        Long[] startAndEndMs = getStartEndMs(ms, triggerFreq, targetFreq);
+
+                        Set<Long> startMsSet = targetFreq2StartMsSet.get(targetFreq);
+                        if (null == startMsSet) {
+                            startMsSet = new HashSet<>();
+                            targetFreq2StartMsSet.put(targetFreq, startMsSet);
+                        }
+
+                        if (startMsSet.contains(startAndEndMs[0])) {
+                            logger.debug("freq {},{},ignore", targetFreq, startAndEndMs[0]);
+                            continue;
+                        }
+
+                        final List<BBKLine> bbkLines = listKlineResource(asset, symbol, triggerFreq, startAndEndMs[0], startAndEndMs[1]);
+
+                        logger.debug("freq {},{},data empty,ignore", targetFreq, startAndEndMs[0]);
                         if (null == bbkLines || bbkLines.isEmpty()) {
                             continue;
                         } else {
-                            BBKLine newKline = merge(asset, symbol, targetFreq, startAndEndMinutes[0], bbkLines);
+                            BBKLine newKline = merge(asset, symbol, targetFreq, startAndEndMs[0], bbkLines);
                             saveOrUpdateKline(asset, symbol, targetFreq, newKline);
-                            notifyKlineUpdate(asset, symbol, targetFreq, startAndEndMinutes[0]);
+                            notifyKlineUpdate(asset, symbol, targetFreq, startAndEndMs[0]);
                         }
+                        startMsSet.add(startAndEndMs[0]);
                     }
                 }
             }
         }
     }
 
-    private void notifyKlineUpdate(String asset, String symbol, Integer targetFreq, Long startMinute) {
+    private void notifyKlineUpdate(String asset, String symbol, Integer targetFreq, Long startMs) {
         //向集合中插入元素，并设置分数
         String key = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, targetFreq);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
-                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, targetFreq, startMinute), Long.valueOf(startMinute).doubleValue());
+                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, targetFreq, startMs), Long.valueOf(startMs).doubleValue());
                 }}
         );
     }
@@ -127,10 +174,10 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
             final String data = BBKlineUtil.kline2ArrayData(newKline);
             put(data, Long.valueOf(newKline.getMs()).doubleValue());
         }});
-
+        logger.debug("freq {},{}", targetFreq, newKline.getMs());
     }
 
-    private BBKLine merge(String asset, String symbol, Integer targetFreq, Long startMinute, List<BBKLine> bbkLines) {
+    private BBKLine merge(String asset, String symbol, Integer targetFreq, Long startMs, List<BBKLine> bbkLines) {
         final BBKLine bbkLine = new BBKLine();
         bbkLine.setAsset(asset);
         bbkLine.setSymbol(symbol);
@@ -157,17 +204,14 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
         bbkLine.setClose(closePrice);
         bbkLine.setVolume(volume);
         bbkLine.setFrequence(targetFreq);
-        bbkLine.setMinute(startMinute);
-        bbkLine.setMs(TimeUnit.MINUTES.toMillis(startMinute));
+        bbkLine.setMinute(TimeUnit.MILLISECONDS.toMinutes(startMs));
+        bbkLine.setMs(startMs);
         return bbkLine;
     }
 
-    private List<BBKLine> listKlineResource(String asset, String symbol, Integer triggerFreq, Long startMinute, Long endMinute) {
+    private List<BBKLine> listKlineResource(String asset, String symbol, Integer triggerFreq, Long startMs, Long endMs) {
         final String triggerFreqRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, triggerFreq);
-
-        final long startMs = TimeUnit.MINUTES.toMillis(startMinute);
-        final long endMs = TimeUnit.MINUTES.toMillis(endMinute);
-        final Set<String> klines = bbKlineOngoingRedisUtil.zrangeByScore(triggerFreqRedisKey, startMs + "", endMs + "", 0, Long.valueOf(endMinute - startMinute + 1).intValue());
+        final Set<String> klines = bbKlineOngoingRedisUtil.zrangeByScore(triggerFreqRedisKey, startMs + "", endMs + "", 0, Long.valueOf(endMs - startMs + 1).intValue());
         List<BBKLine> list = new ArrayList<>();
         // 按照时间minute升序
         if (!klines.isEmpty()) {
@@ -189,14 +233,17 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
      * targetFreq = 10
      * </pre>
      *
-     * @param minute      triggerFreq的起始时间
+     * @param ms          triggerFreq的起始时间
      * @param triggerFreq
      * @param targetFreq
      * @return
      */
-    private Long[] getStartEndMinute(long minute, Integer triggerFreq, Integer targetFreq) {
-        final long divisor = minute / targetFreq;
-        return new Long[]{divisor * targetFreq, (divisor + 1) * targetFreq - 1};
+    private Long[] getStartEndMs(long ms, Integer triggerFreq, Integer targetFreq) {
+        final long divisor = TimeUnit.MILLISECONDS.toMinutes(ms) / targetFreq;
+        return new Long[]{
+                TimeUnit.MINUTES.toMillis(divisor * targetFreq),
+                TimeUnit.MINUTES.toMillis((divisor + 1) * targetFreq - 1)
+        };
     }
 
 

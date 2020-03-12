@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.kline.dao.BbTradeExtMapper">
+
+    <resultMap type="com.hp.sh.expv3.bb.kline.pojo.BbTradeVo" id="BbTradeVo">
+        <result column="id" property="id"/>
+        <result column="asset" property="asset"/>
+        <result column="symbol" property="symbol"/>
+        <result column="match_tx_id" property="matchTxId"/>
+        <result column="tk_bid_flag" property="tkBidFlag"/>
+        <result column="tk_account_id" property="tkAccountId"/>
+        <result column="tk_order_id" property="tkOrderId"/>
+        <result column="mk_account_id" property="mkAccountId"/>
+        <result column="mk_order_id" property="mkOrderId"/>
+        <result column="mk_order_id" property="mkOrderId"/>
+        <result column="price" property="price"/>
+        <result column="number" property="number"/>
+        <result column="trade_time" property="tradeTime"/>
+        <result column="maker_handle_status" property="makerHandleStatus"/>
+        <result column="taker_handle_status" property="takerHandleStatus"/>
+        <result column="created" property="created"/>
+        <result column="modified" property="modified"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,
+		mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,created,modified
+
+    </sql>
+
+
+    <select id="queryByTimeInterval" resultMap="BbTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_trade
+        where
+        asset=#{asset}
+        and symbol=#{symbol}
+        and trade_time &gt;=#{tradeTimeBegin}
+        and trade_time &lt;#{tradeTimeEnd}
+        order by id asc
+    </select>
+
+</mapper>
