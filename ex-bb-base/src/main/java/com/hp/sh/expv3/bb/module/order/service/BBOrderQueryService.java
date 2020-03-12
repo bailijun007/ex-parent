@@ -32,7 +32,7 @@ import com.hp.sh.expv3.utils.math.Precision;
 public class BBOrderQueryService {
 
 	@Autowired
-	private BBOrderDAO bBOrderDAO;
+	private BBOrderDAO bbOrderDAO;
 
 	@Autowired
 	private BBActiveOrderDAO bBActiveOrderDAO;
@@ -47,11 +47,11 @@ public class BBOrderQueryService {
 	private BBCommonOrderStrategy orderStrategy;
 
 	public Long queryCount(Map<String, Object> params) {
-		return this.bBOrderDAO.queryCount(params);
+		return this.bbOrderDAO.queryCount(params);
 	}
 
 	public List<BBOrder> queryList(Map<String, Object> params) {
-		return this.bBOrderDAO.queryList(params);
+		return this.bbOrderDAO.queryList(params);
 	}
 	
 	public boolean hasActiveOrder(long userId, String asset, String symbol, Integer bidFlag) {
@@ -61,7 +61,7 @@ public class BBOrderQueryService {
 	
 	public List<ActiveOrderVo> queryActiveList(long userId, String asset, String symbol){
 		List<ActiveOrderVo> result = new ArrayList<ActiveOrderVo>();
-		List<BBOrder> list = this.bBOrderDAO.queryActiveOrderList(userId, asset, symbol);
+		List<BBOrder> list = this.bbOrderDAO.queryActiveOrderList(userId, asset, symbol);
 		
 		List<Long> _orderIdList = BeanHelper.getDistinctPropertyList(list, "id");
 		List<OrderTradeVo> _tradeList = bBOrderTradeDAO.queryOrderTrade(userId, _orderIdList);
@@ -92,6 +92,12 @@ public class BBOrderQueryService {
 		return result;
 	}
 	
+
+	public List<BBOrder> queryPendingActive(Page page, Long createdEnd, Integer status) {
+		List<BBOrder> list = this.bbOrderDAO.queryPendingActiveOrders(page, createdEnd, status, IntBool.NO);
+		return list;
+	}
+	
 	public List<BBOrder> queryRebaseOrder(Page page, Long createdEnd) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("activeFlag", IntBool.YES);
@@ -101,12 +107,12 @@ public class BBOrderQueryService {
 		params.put("page", page);
 		params.put("status", OrderStatus.PENDING_NEW);
 		params.put("createdEnd", createdEnd);
-		List<BBOrder> list = this.bBOrderDAO.queryList(params);
+		List<BBOrder> list = this.bbOrderDAO.queryList(params);
 		return list;
 	}
 	
 	public BBOrder getOrder(long userId, Long orderId){
-		BBOrder order = this.bBOrderDAO.findById(userId, orderId);
+		BBOrder order = this.bbOrderDAO.findById(userId, orderId);
 		return order;
 	}
 	
@@ -116,7 +122,7 @@ public class BBOrderQueryService {
 		params.put("page", page);
 		params.put("status", status);
 		params.put("modifiedEnd", modified);
-		List<BBOrder> list = this.bBOrderDAO.queryList(params);
+		List<BBOrder> list = this.bbOrderDAO.queryList(params);
 		return list;
 	}
 	

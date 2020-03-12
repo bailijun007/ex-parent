@@ -161,4 +161,19 @@
 			and ao.symbol=#{symbol}
 	</select>
 
+	<select id="queryPendingActiveOrders" resultMap="PcOrder">
+		SELECT
+			o.*
+		FROM
+			pc_active_order ao
+		LEFT JOIN 
+			bb_order o ON o.id = ao.id
+		<where> 
+			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+			<if test="status!=null"> and status=#{status}</if>
+			<if test="liqFlag!=null"> and liq_flag=#{liqFlag}</if>
+		</where>
+			order by id asc
+	</select>
+
 </mapper>

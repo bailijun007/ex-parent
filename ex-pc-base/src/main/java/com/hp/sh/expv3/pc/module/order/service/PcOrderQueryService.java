@@ -111,17 +111,9 @@ public class PcOrderQueryService {
 		}
 		return result;
 	}
-	
-	public List<PcOrder> queryRebaseOrder(Page page, Long createdEnd) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("activeFlag", IntBool.YES);
-		params.put("liqFlag", IntBool.NO);
-		params.put("orderBy", "id");
-		params.put("asc", true);
-		params.put("page", page);
-		params.put("status", OrderStatus.PENDING_NEW);
-		params.put("createdEnd", createdEnd);
-		List<PcOrder> list = this.pcOrderDAO.queryList(params);
+
+	public List<PcOrder> queryPendingActive(Page page, Long createdEnd, Integer status) {
+		List<PcOrder> list = this.pcOrderDAO.queryPendingActiveOrders(page, createdEnd, status, IntBool.NO);
 		return list;
 	}
 	
