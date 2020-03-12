@@ -25,6 +25,7 @@ public final class BbKlineRedisKeyUtil {
         }});
     }
 
+
     public static String buildKlineUpdateEventRedisKey(String pattern, String asset, String symbol, int frequency) {
 //        bb.kline.update
         return StringReplaceUtil.replace(pattern, new HashMap<String, String>() {
@@ -44,4 +45,35 @@ public final class BbKlineRedisKeyUtil {
             put("ms", "" + ms);
         }});
     }
+
+
+    public static String buildFromExpBbKlineTaskRedisKey(String pattern, String asset, String symbol, int freq) {
+        String BbKlineFromExpTaskRedisKey = StringReplaceUtil.replace(pattern, new HashMap<String, String>() {
+            {
+                put("asset", asset);
+                put("symbol", symbol);
+                put("freq", freq + "");
+            }
+        });
+        return BbKlineFromExpTaskRedisKey;
+    }
+
+    public static String buildFromExpBbKlineDataByTradeRedisKey(String pattern, String asset, String symbol, int frequency) {
+        return StringReplaceUtil.replace(pattern, new HashMap<String, String>() {{
+            put("asset", asset);
+            put("symbol", symbol);
+            put("freq", "" + frequency);
+        }});
+    }
+    public static String buildFromExpBbKlineUpdateEventKey(String pattern,String asset, String symbol, int freq) {
+        String bbKlineFromExpUpdateKey = StringReplaceUtil.replace(pattern, new HashMap<String, String>() {
+            {
+                put("asset", asset);
+                put("symbol", symbol);
+                put("freq", freq + "");
+            }
+        });
+        return bbKlineFromExpUpdateKey;
+    }
+
 }
