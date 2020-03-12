@@ -115,7 +115,7 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
     private void doLimit() {
         if (null == tradeList || tradeList.isEmpty()) {
         } else {
-            bbMatchMqNotify.sendTradeBatch(this.getAsset(), this.getSymbol(), this.tradeList);
+            bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
         }
 
         Long tkOrderId = takerOrder.getOrderId();
@@ -146,7 +146,7 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
         // 先发成交消息
         if (null == tradeList || tradeList.isEmpty()) {
         } else {
-            bbMatchMqNotify.sendTradeBatch(this.getAsset(), this.getSymbol(), this.tradeList);
+            bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
         }
 
         if (isCancelFlag()) {
