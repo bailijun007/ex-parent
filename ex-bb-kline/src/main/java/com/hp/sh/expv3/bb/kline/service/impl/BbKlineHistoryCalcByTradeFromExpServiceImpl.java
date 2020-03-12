@@ -1,11 +1,10 @@
 package com.hp.sh.expv3.bb.kline.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
-import com.hp.sh.expv3.bb.kline.service.BbKlineHistoryCalcFromExpService;
+import com.hp.sh.expv3.bb.kline.service.BbKlineHistoryCalcByTradeFromExpService;
 import com.hp.sh.expv3.bb.kline.service.BbTradeExtService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -33,7 +31,7 @@ import java.util.stream.Collectors;
  * @author BaiLiJun  on 2020/3/11
  */
 @Service
-public class BbKlineHistoryCalcFromExpServiceImpl implements BbKlineHistoryCalcFromExpService {
+public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHistoryCalcByTradeFromExpService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${bb.kline.bbGroupIds}")
@@ -79,11 +77,11 @@ public class BbKlineHistoryCalcFromExpServiceImpl implements BbKlineHistoryCalcF
     );
 
     @Scheduled(cron = "*/1 * * * * *")
-    public void execute(){
+    public void execute() {
         if (1 != bbKlineExpHistoryEnable) {
             return;
-        }else {
-            threadPool.execute(()->repairKlineFromExp());
+        } else {
+            threadPool.execute(() -> repairKlineFromExp());
         }
     }
 
@@ -119,11 +117,11 @@ public class BbKlineHistoryCalcFromExpServiceImpl implements BbKlineHistoryCalcF
                     }
 
                     // 若修复数据已存在，忽略 从redis kline:from_exp:repair:BB:${asset}:${symbol}:${minute}中取
-                    final Set<String> set = bbKlineExpHistoryRedisUtil.zrangeByScore(repairkey, ms + "", maxMs + "", 0, Long.valueOf(maxMs - ms).intValue() + 1);
-
-                    if (!set.isEmpty()) {
-                        continue;
-                    }
+//                    final Set<String> set = bbKlineExpHistoryRedisUtil.zrangeByScore(repairkey, ms + "", maxMs + "", 0, Long.valueOf(maxMs - ms).intValue() + 1);
+//
+//                    if (!set.isEmpty()) {
+//                        continue;
+//                    }
 //                    if (null != set || !set.isEmpty()) {
 //                        continue;
 //                    }
@@ -134,11 +132,11 @@ public class BbKlineHistoryCalcFromExpServiceImpl implements BbKlineHistoryCalcF
                     } else {
                         BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
 
-                        logger.info("build kline data:{}",kline.toString());
+                        logger.info("build kline data:{}", kline.toString());
 
                         saveKline(repairkey, kline);
 
-                        notifyUpdate(notifyUpdateKey,ms);
+                        notifyUpdate(notifyUpdateKey, ms);
                     }
 
                 }
@@ -159,16 +157,18 @@ public class BbKlineHistoryCalcFromExpServiceImpl implements BbKlineHistoryCalcF
         return bbKlineFromExpUpdateKey;
     }
 
-    private void notifyUpdate(String notifyUpdateKey,long ms) {
+    private void notifyUpdate(String notifyUpdateKey, long ms) {
         HashMap<String, Double> scoreMembers = new HashMap<String, Double>();
-        scoreMembers.put(ms+ "", Long.valueOf(ms).doubleValue());
+        scoreMembers.put(ms + "", Long.valueOf(ms).doubleValue());
         bbKlineExpHistoryRedisUtil.zadd(notifyUpdateKey, scoreMembers);
     }
 
     private void saveKline(String repairkey, BBKLine kline) {
+        final double score = Long.valueOf(kline.getMs()).doubleValue();
+        bbKlineExpHistoryRedisUtil.zremrangeByScore(repairkey, score, score);
         HashMap<String, Double> scoreMembers = new HashMap<String, Double>();
         final String data = BBKlineUtil.kline2ArrayData(kline);
-        scoreMembers.put(data, Long.valueOf(kline.getMs()).doubleValue());
+        scoreMembers.put(data, score);
         bbKlineExpHistoryRedisUtil.zadd(repairkey, scoreMembers);
     }
 
