@@ -79,7 +79,7 @@ public class PcCollectorCoreService{
 			return InvokeResult.NOCHANGE;
 		}
 		
-		PcCollectorAccount bBCollectorAccount = this.collectorAccountDAO.getAndLock(record.getCollectorId(), record.getAsset());
+		PcCollectorAccount bBCollectorAccount = this.collectorAccountDAO.get(record.getCollectorId(), record.getAsset());
 		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
 		if(bBCollectorAccount==null){
 			//检查余额

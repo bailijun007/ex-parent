@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.page.Page;
-import com.hp.sh.expv3.pc.module.order.entity.PcActiveOrder;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.dao.PcActivePositionDAO;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcActivePosition;
@@ -81,6 +79,7 @@ public class PcPositionDataService {
 		pcActivePosition.setUserId(pcPosition.getUserId());
 		pcActivePosition.setAsset(pcPosition.getAsset());
 		pcActivePosition.setSymbol(pcPosition.getSymbol());
+		pcActivePosition.setLongFlag(pcPosition.getLongFlag());
 		this.pcActivePositionDAO.save(pcActivePosition);
 	}
 

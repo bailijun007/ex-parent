@@ -28,7 +28,7 @@ import com.hp.sh.rocketmq.impl.EndpointContext;
 
 @Configuration
 public class OrderlyConsumer {
-	private static final Logger logger = LoggerFactory.getLogger(OrderlyConsumer.class);
+	private final Logger logger = LoggerFactory.getLogger(OrderlyConsumer.class);
 	
 	@Autowired
 	private RocketmqServerSetting setting;
@@ -75,7 +75,7 @@ public class OrderlyConsumer {
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error(cause.toString(), cause);
+        			logger.error(cause.toString(), e);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		
@@ -87,7 +87,7 @@ public class OrderlyConsumer {
         return consumer;
 	}
 	
-//	@PostConstruct
+	@PostConstruct
 	public void start123() throws MQClientException{
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 		for(PcContractVO pc : pcList){
