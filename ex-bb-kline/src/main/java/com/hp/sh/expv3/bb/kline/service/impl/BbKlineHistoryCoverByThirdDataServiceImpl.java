@@ -73,16 +73,17 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
 
-    @Scheduled(cron = "*/1 * * * * *")
-    public void execute() {
-        if (1 != bbKlineThirdCoverEnable) {
-            return;
-        } else {
-            threadPool.execute(() -> updateKlineByThirdData());
-        }
-    }
+//    @Scheduled(cron = "*/1 * * * * *")
+//    public void execute() {
+//        if (1 != bbKlineThirdCoverEnable) {
+//            return;
+//        } else {
+//            threadPool.execute(() -> updateKlineByThirdData());
+//        }
+//    }
 
     @Override
+    @Scheduled(cron = "*/1 * * * * *")
     public void updateKlineByThirdData() {
         List<BBSymbol> bbSymbols = listSymbol();
         List<BBSymbol> targetBbSymbols = filterBbSymbols(bbSymbols);
