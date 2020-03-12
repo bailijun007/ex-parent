@@ -5,30 +5,30 @@ import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;
 
 public class BBOrderEvent {
 
-	private BBOrder bBOrder;
+	private BBOrder order;
 
-	private BBOrderLog bBOrderLog;
+	private BBOrderLog orderLog;
 
 	public BBOrderEvent(BBOrder bBOrder, BBOrderLog bBOrderLog) {
 		super();
-		this.bBOrder = bBOrder;
-		this.bBOrderLog = bBOrderLog;
+		this.order = bBOrder;
+		this.orderLog = bBOrderLog;
 	}
 
-	public BBOrder getPcOrder() {
-		return bBOrder;
+	public BBOrder getOrder() {
+		return order;
 	}
 
-	public void setPcOrder(BBOrder bBOrder) {
-		this.bBOrder = bBOrder;
+	public void setOrder(BBOrder bBOrder) {
+		this.order = bBOrder;
 	}
 
-	public BBOrderLog getPcOrderLog() {
-		return bBOrderLog;
+	public BBOrderLog getOrderLog() {
+		return orderLog;
 	}
 
-	public void setPcOrderLog(BBOrderLog bBOrderLog) {
-		this.bBOrderLog = bBOrderLog;
+	public void setOrderLog(BBOrderLog bBOrderLog) {
+		this.orderLog = bBOrderLog;
 	}
 
 }

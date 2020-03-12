@@ -47,7 +47,7 @@ public class DataEventListener {
 
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void afterCommit(BBOrderEvent orderEvent) {
-		BBOrder order = orderEvent.getPcOrder();
+		BBOrder order = orderEvent.getOrder();
 		EventMsg msg = new EventMsg(EventType.ORDER, order.getId(), order.getCreated(), order.getUserId(), order.getAsset(), order.getSymbol());
 		this.sendEventMsg(msg);
 	}

@@ -161,7 +161,7 @@
 			and ao.symbol=#{symbol}
 	</select>
 
-	<select id="queryPendingActiveOrders" resultMap="PcOrder">
+	<select id="queryPendingActiveOrders" resultMap="BBOrder">
 		SELECT
 			o.*
 		FROM
