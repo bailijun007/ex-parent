@@ -21,20 +21,20 @@ public class PcTradeMsg extends BaseSymbolMsg {
 	//订单Id
 	private Long orderId;
 
+	//是否maker
+	private Integer makerFlag;
+	
+	//对手订单ID
+	private Long opponentOrderId;
+
 	//交易ID
 	private Long tradeId;
 
 	//成交时间
 	private Long tradeTime;
-
-	//是否maker
-	private Integer makerFlag;
 	
 	//撮合事务Id
 	private Long matchTxId;
-	
-	//对手订单ID
-	private Long opponentOrderId;
 
 	public PcTradeMsg() {
 	}

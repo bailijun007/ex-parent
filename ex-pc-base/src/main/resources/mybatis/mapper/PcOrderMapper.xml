@@ -196,8 +196,23 @@
 			pc_order o ON o.id = ao.id
 		where 
 			ao.user_id=#{userId}
-			and ao.asset=#{asset}
-			and ao.symbol=#{symbol}
+			<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+			<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
+	</select>
+	
+	<select id="queryPendingActiveOrders" resultMap="PcOrder">
+		SELECT
+			o.*
+		FROM
+			pc_active_order ao
+		LEFT JOIN 
+			pc_order o ON o.id = ao.id
+		<where> 
+			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+			<if test="status!=null"> and status=#{status}</if>
+			<if test="liqFlag!=null"> and liq_flag=#{liqFlag}</if>
+		</where>
+			order by id asc
 	</select>
 
 </mapper>

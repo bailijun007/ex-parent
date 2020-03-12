@@ -4,17 +4,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.job.BBMatchedHandler;
-import com.hp.sh.expv3.bb.job.BBMatchedJob;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
-import com.hp.sh.expv3.component.executor.GroupTask;
 import com.hp.sh.expv3.component.executor.OrderlyExecutors;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
@@ -22,6 +23,8 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController
 public class BBMaintainAction{
+	private static final Logger logger = LoggerFactory.getLogger(BBMaintainAction.class);
+	
 	@Autowired
 	private BBOrderQueryService orderQueryService;
 	
@@ -29,7 +32,7 @@ public class BBMaintainAction{
 	private MatchMqSender matchMqSender;
 	
 	@Autowired
-	private BBOrderApiAction bBOrderApiAction;
+	private BBOrderApiAction orderApiAction;
 	
 	@Autowired
 	private BBMatchedHandler matchedHandler;
@@ -43,26 +46,14 @@ public class BBMaintainAction{
 		return 1001;
 	}
 
-	@ApiOperation(value = "rebase")
-	@GetMapping(value = "/api/bb/maintain/rebase")	
-	public List<BBOrder> rebase(){
-		long now = DbDateUtils.now();
-		List<BBOrder> list = orderQueryService.queryRebaseOrder(null, now);
-		for(BBOrder order : list){
-			bBOrderApiAction.sendOrderMsg(order);
-		}
-		return list;
-	}
-	
-
 	@ApiOperation(value = "queryResend")
-	@GetMapping(value = "/api/bb/maintain/queryResend")	
+	@GetMapping(value = "/api/pc/maintain/queryResend")	
 	public Integer queryResend(){
-		long now = DbDateUtils.now();
+		long now = DbDateUtils.now()-2000;
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		while(true){
-			List<BBOrder> list = orderQueryService.queryRebaseOrder(page, now);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, now, OrderStatus.PENDING_NEW);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -79,14 +70,26 @@ public class BBMaintainAction{
 		return n;
 	}
 
-	@ApiOperation(value = "resend")
-	@GetMapping(value = "/api/bb/maintain/resend")	
-	public Integer resend(){
+
+	@ApiOperation(value = "resendPending")
+	@GetMapping(value = "/api/pc/maintain/resendPending")	
+	public Map resendPending(){
+		Map map = new HashMap();
+		Integer resendPendingCancel = this.resendPendingCancel();
+		Integer resendPendingNew = this.resendPendingNew();
+		map.put("resendPendingCancel", resendPendingCancel);
+		map.put("resendPendingNew", resendPendingNew);
+		return map;
+	}
+
+	@ApiOperation(value = "resendPendingCancel")
+	@GetMapping(value = "/api/pc/maintain/resendPendingCancel")	
+	public Integer resendPendingCancel(){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		long now = DbDateUtils.now()-2000;
 		while(true){
-			List<BBOrder> list = orderQueryService.queryRebaseOrder(page, now);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, now, OrderStatus.PENDING_CANCEL);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -94,22 +97,50 @@ public class BBMaintainAction{
 			for(BBOrder order : list){
 				boolean isExist = matchMqSender.exist(order.getAsset(), order.getSymbol(), ""+order.getId(), order.getCreated());
 				if(!isExist){
-					bBOrderApiAction.sendOrderMsg(order);
+					orderApiAction.sendOrderMsg(order);
+					n++;
 				}
 				try {
-					Thread.sleep(20);
+					Thread.sleep(10);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					logger.error(e.getMessage(), e);
 				}
 			}
-			
-			n += list.size();
 			
 			page.setPageNo(page.getPageNo()+1);
 		}
 		return n;
 	}
-	
+
+	@ApiOperation(value = "resendPendingNew")
+	@GetMapping(value = "/api/pc/maintain/resendPendingNew")	
+	public Integer resendPendingNew(){
+		int n = 0;
+		Page page = new Page(1, 200, 1000L);
+		long now = DbDateUtils.now()-2000;
+		while(true){
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, now, OrderStatus.PENDING_NEW);
+			if(list==null||list.isEmpty()){
+				break;
+			}
+			
+			for(BBOrder order : list){
+				boolean isExist = matchMqSender.exist(order.getAsset(), order.getSymbol(), ""+order.getId(), order.getCreated());
+				if(!isExist){
+					orderApiAction.sendOrderMsg(order);
+					n++;
+				}
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+			
+			page.setPageNo(page.getPageNo()+1);
+		}
+		return n;
+	}
 	
 	@ApiOperation(value = "time")
 	@GetMapping(value = "/api/bb/maintain/sys/time")	

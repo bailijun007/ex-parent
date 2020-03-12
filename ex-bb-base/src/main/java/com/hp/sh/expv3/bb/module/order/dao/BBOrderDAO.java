@@ -6,8 +6,10 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.base.mapper.BaseAccountDataMapper;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
+import com.hp.sh.expv3.dev.CrossDB;
 
 /**
  * 
@@ -33,5 +35,8 @@ public interface BBOrderDAO extends BaseAccountDataMapper<BBOrder, Long> {
 	);
 
 	public List<BBOrder> queryActiveOrderList(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol);
+	
+	@CrossDB
+	public List<BBOrder> queryPendingActiveOrders(Page page, @Param("createdEnd") long createdEnd, @Param("status") int status, @Param("liqFlag") int liqFlag);
 
 }
