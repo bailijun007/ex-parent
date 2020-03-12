@@ -71,9 +71,9 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
             2,
             Runtime.getRuntime().availableProcessors() + 1,
             2L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(100000),
+            new LinkedBlockingQueue<Runnable>(10000000),
             Executors.defaultThreadFactory(),
-            new ThreadPoolExecutor.AbortPolicy()
+            new ThreadPoolExecutor.DiscardOldestPolicy()
     );
 
     @Scheduled(cron = "*/1 * * * * *")
