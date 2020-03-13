@@ -15,15 +15,15 @@ import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Component
-public class BBOrderTradeFeeJob {
-    private static final Logger logger = LoggerFactory.getLogger(BBOrderTradeFeeJob.class);
+public class SynchCollectorJob {
+    private static final Logger logger = LoggerFactory.getLogger(SynchCollectorJob.class);
 
 	@Autowired
 	private BBOrderQueryService orderQueryService;
 	@Autowired
 	private BBTradeService tradeService;
 	
-//	@Scheduled(cron = "0 0/1 * * * ?")
+	@Scheduled(cron = "0 0/1 * * * ?")
 	public void handleJob() {
 		Long now = DbDateUtils.now();
 		Long startTime = now-1000*3600*20000;
@@ -36,8 +36,11 @@ public class BBOrderTradeFeeJob {
 			}
 			
 			for(BBOrderTrade orderTrade : list){
-				handleOrderTrade(orderTrade);
-				
+				try{
+					handleOrderTrade(orderTrade);
+				}catch(Exception e){
+					logger.error(e.getMessage(), e);
+				}
 			}
 			
 		}

@@ -13,7 +13,7 @@ import javax.persistence.Version;
 @Table(name="bb_collector_account")
 public class BBCollectorAccount {
 
-	protected Long id;
+	protected Long collectorId;
 	
 	//资产类型
 	private String asset;
@@ -58,12 +58,12 @@ public class BBCollectorAccount {
 		this.version = version;
 	}
 
-	public Long getId() {
-		return id;
+	public Long getCollectorId() {
+		return collectorId;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setCollectorId(Long id) {
+		this.collectorId = id;
 	}
 
 	public Long getCreated() {

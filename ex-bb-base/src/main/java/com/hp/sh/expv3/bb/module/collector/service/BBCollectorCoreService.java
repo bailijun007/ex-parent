@@ -87,9 +87,6 @@ public class BBCollectorCoreService{
 			
 			collectorAccount = this.newAccount(record.getCollectorId(), record.getAsset(), recordAmount, now);
 		}else{
-			if(!collectorAccount.getAsset().equals(record.getAsset())){
-				throw new RuntimeException("asset 不一致！");
-			}
 			BigDecimal newBalance = collectorAccount.getBalance().add(recordAmount);
 			//检查余额
 			this.checkBalance(record, newBalance);
@@ -129,7 +126,7 @@ public class BBCollectorCoreService{
 	
 	private BBCollectorAccount newAccount(Long collectorId, String asset, BigDecimal balance, Long now){
 		BBCollectorAccount account = new BBCollectorAccount();
-		account.setId(collectorId);
+		account.setCollectorId(collectorId);
 		account.setAsset(asset);
 		account.setBalance(balance);
 		account.setCreated(now);
