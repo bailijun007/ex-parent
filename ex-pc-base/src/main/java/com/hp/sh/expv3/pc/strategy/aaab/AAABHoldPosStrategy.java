@@ -97,17 +97,17 @@ public class AAABHoldPosStrategy implements HoldPosStrategy{
 	 * mr = (m + (op - cp) * fv) / (fv * cp)
 	 * mr * (fv * cp) = m + op*fv - cp * fv
 	 * mr * fv * cp = m + op*fv - cp * fv
-	 * mr * fv * cp - cp * fv = m + op*fv
-	 * cp * fv * (mr - 1) = m + op*fv
-	 * cp = (m + op*fv) / (fv * (mr - 1)) 
-	 * cp = (m/fv + op) / (mr - 1) 
+	 * mr * fv * cp + cp * fv = m + op*fv
+	 * cp * fv * (mr + 1) = m + op*fv
+	 * cp = (m + op*fv) / (fv * (mr + 1)) 
+	 * cp = (m/fv + op) / (mr + 1)
 	 */
 	public BigDecimal calcLiqPrice(int longFlag, BigDecimal faceValue, BigDecimal volume, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
 		BigDecimal fv = faceValue.multiply(volume);
 		if(longFlag==OrderFlag.TYPE_LONG){
 			return posMargin.subtract(openPrice.multiply(fv)).divide(fv.multiply(holdMarginRatio.subtract(BigDecimal.ONE)));
 		}else{
-			return posMargin.divide(fv).add(openPrice).divideToIntegralValue(holdMarginRatio.subtract(BigDecimal.ONE));
+			return posMargin.divide(fv).add(openPrice).divideToIntegralValue(holdMarginRatio.add(BigDecimal.ONE));
 		}
 	}
 	
@@ -129,7 +129,7 @@ public class AAABHoldPosStrategy implements HoldPosStrategy{
 		BigDecimal holdMargin = fv.multiply(openPrice).multiply(holdMarginRatio);
 		BigDecimal pnl = posMargin.subtract(holdMargin);
 		pnl = pnl.negate();
-		if(IntBool.isTrue(longFlag)){
+		if(IntBool.isTrue(longFlag)){ 
 			BigDecimal liqPrice = pnl.divide(fv, Precision.COMMON_PRECISION, Precision.LESS).add(openPrice);
 			return liqPrice;
 		}else{
