@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 public class BBKLine implements Serializable {
     private String asset, symbol;
     private int frequence;// 频率，固定一分钟
-    private long minute; // 分钟
+    private long minute; // 分钟时间戳
     private long ms; // 毫秒时间戳
     private BigDecimal volume; //  number 累加
     //        BigDecimal amt;//

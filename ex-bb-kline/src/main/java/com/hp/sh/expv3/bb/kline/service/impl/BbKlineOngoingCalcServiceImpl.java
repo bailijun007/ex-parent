@@ -80,7 +80,7 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
     @Override
     public void trigger() {
 
-        List<BBSymbol> bbSymbols = listSymbol();
+        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
 
         for (BBSymbol bbSymbol : bbSymbols) {
             String asset = bbSymbol.getAsset();
@@ -135,11 +135,6 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
         return newkLine;
     }
 
-    private List<BBSymbol> listSymbol() {
-        final Map<String, BBSymbol> key2Value = metadataRedisUtil.hgetAll(BbKLineKey.BB_SYMBOL, BBSymbol.class);
-        List<BBSymbol> list = key2Value.values().stream().collect(Collectors.toList());
-        return list;
-    }
 
     /*
      * kline:from_exp:repair:BB:${asset}:${symbol}:${minute}

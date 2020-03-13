@@ -11,7 +11,6 @@
         <result column="tk_bid_flag" property="tkBidFlag"/>
         <result column="tk_account_id" property="tkAccountId"/>
         <result column="tk_order_id" property="tkOrderId"/>
-        <result column="tk_close_flag" property="tkCloseFlag"/>
         <result column="mk_account_id" property="mkAccountId"/>
         <result column="mk_order_id" property="mkOrderId"/>
         <result column="mk_close_flag" property="mkCloseFlag"/>

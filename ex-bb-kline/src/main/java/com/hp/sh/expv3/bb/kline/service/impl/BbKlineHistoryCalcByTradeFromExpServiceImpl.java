@@ -88,8 +88,8 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 
     public void repairKlineFromExp() {
 
-        List<BBSymbol> bbSymbols = listSymbol();
-        List<BBSymbol> targetBbSymbols = filterBbSymbols(bbSymbols);
+        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
 
@@ -168,18 +168,6 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
         return sortedList;
     }
 
-
-    private List<BBSymbol> listSymbol() {
-        final Map<String, BBSymbol> key2Value = metadataRedisUtil.hgetAll(BbKLineKey.BB_SYMBOL, BBSymbol.class);
-        List<BBSymbol> list = key2Value.values().stream().collect(Collectors.toList());
-        return list;
-    }
-
-    private List<BBSymbol> filterBbSymbols(List<BBSymbol> bbSymbols) {
-        return bbSymbols.stream()
-                .filter(symbol -> supportBbGroupIds.contains(symbol.getBbGroupId()))
-                .collect(Collectors.toList());
-    }
 
     private BBKLine buildKline(List<BbTradeVo> trades, String asset, String symbol, long ms, int freq) {
         BBKLine bBKLine = new BBKLine();
