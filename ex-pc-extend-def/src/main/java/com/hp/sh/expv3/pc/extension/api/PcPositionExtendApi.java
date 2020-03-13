@@ -73,7 +73,7 @@ public interface PcPositionExtendApi {
     @GetMapping(value = "/api/extension/pc/position/symbolPositionStat")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
-            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = true)
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true)
     })
 	List<PcSymbolPositionStatVo> getSymbolPositionStat(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
     
@@ -81,7 +81,7 @@ public interface PcPositionExtendApi {
     @GetMapping(value = "/api/extension/pc/position/symbolPositionTotal")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
-            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = true)
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true)
     })
     PcSymbolPositionTotalVo getSymbolPositionTotal(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
 

@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.aabb.AABBCompFieldCalc;
-import com.hp.sh.expv3.pc.strategy.data.PosData;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.DecimalUtil;
 import com.hp.sh.expv3.utils.math.Precision;
@@ -18,6 +17,34 @@ import com.hp.sh.expv3.utils.math.Precision;
 public class AAABHoldPosStrategy implements HoldPosStrategy{
 	
 	/**
+	 * 计算仓位保证金率
+	 * 保证金率 =（保证金+未实现盈亏) / (合约面值*持仓张数*最新标记价格）
+	 * @return
+	 */
+	@Override
+	public BigDecimal calPosMarginRatio(BigDecimal posMargin, BigDecimal posPnl, BigDecimal faceValue, BigDecimal volume, BigDecimal markPrice){
+		BigDecimal marginRatio = posMargin.add(posPnl).divide(faceValue.multiply(volume).multiply(markPrice), Precision.COMMON_PRECISION, DecimalUtil.LESS);
+		return marginRatio;
+	}
+
+	/**
+	 * 简化。。。
+	 * 用 均价 标记价格 未实现盈亏 计算 仓位保证金
+	 * @param longFlag
+	 * @param initMarginRatio
+	 * @param amount
+	 * @param meanPrice
+	 * @param markPrice
+	 * @return
+	 */
+	@Override
+	public BigDecimal calcInitMargin(Integer longFlag, BigDecimal initMarginRatio, BigDecimal volume, BigDecimal faceValue, BigDecimal meanPrice, BigDecimal markPrice) {
+	    BigDecimal pnl = this.calcPnl(longFlag, volume, faceValue, meanPrice, markPrice);
+	    BigDecimal amount = AAABCompFieldCalc.calcAmount(volume, faceValue, meanPrice);
+	    return amount.multiply(initMarginRatio).subtract(pnl.min(BigDecimal.ZERO)).stripTrailingZeros();//保证金覆盖亏损
+	}
+
+	/**
 	 * 计算收益
 	 * @param longFlag 是否多仓
 	 * @param amt 成交金额
@@ -27,21 +54,21 @@ public class AAABHoldPosStrategy implements HoldPosStrategy{
 	 */
 	@Override
 	public BigDecimal calcPnl(int longFlag, BigDecimal volume, BigDecimal faceValue, BigDecimal openPrice, BigDecimal closePrice) {
-		BigDecimal priceDiff = closePrice.subtract(openPrice);
-		BigDecimal count = volume.multiply(faceValue);
-		
-		BigDecimal pnl = priceDiff.multiply(count);
+		BigDecimal priceDiff;
 		if(longFlag==OrderFlag.TYPE_LONG){
-			return pnl;
+			priceDiff = closePrice.subtract(openPrice);
 		}else{
-			return pnl.negate();
+			priceDiff = openPrice.subtract(closePrice);
 		}
+		BigDecimal count = volume.multiply(faceValue);
+		BigDecimal pnl = priceDiff.multiply(count);
+		return pnl;
     }
 	
 	/**
 	 * 成交均价
 	 * @param isLong
-	 * @param baseValue
+	 * @param baseValue 几个币
 	 * @param amt
 	 * @return
 	 */
@@ -53,95 +80,62 @@ public class AAABHoldPosStrategy implements HoldPosStrategy{
             return amt.divide(baseValue, Precision.COMMON_PRECISION, DecimalUtil.LESS).stripTrailingZeros();
         }
     }
-	
-	/**
-	 * TODO
-	 */
-	@Override
-	public BigDecimal calcLiqPrice(PosData pos) {
-		BigDecimal amount = AAABCompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice());
-		return PcPriceCalc.calcLiqPrice( pos.getHoldMarginRatio(), IntBool.isTrue(pos.getLongFlag()), pos.getMeanPrice(), amount, pos.getPosMargin(), Precision.COMMON_PRECISION );
-	}
-	
+
 	/**
 	 * 计算仓位的强平价(预估强平价)
-	 * @param longFlag 多/空
-	 * @param amount 持仓金额
-	 * @param meanPrice 均价 
-	 * @param holdMarginRatio 维持保证金率
-	 * @param posMargin 保证金
-	 * @return 强平价
+	 * 保证金率 =（保证金+未实现盈亏) / (合约面值*持仓张数*最新标记价格）
+	 * 保证金率 =（保证金+(cp-op)*f*v) / (f*v*cp）
+	 * long : 
+	 * mr = (m + (cp - op) * fv) / (fv * cp)
+	 * mr * fv * cp = m + (cp - op) * fv
+	 * mr * fv * cp = m + cp * fv - op * fv
+	 * mr * fv * cp - cp * fv = m - op * fv
+	 * cp * (mr * fv - fv) = m - op * fv
+	 * cp * fv * (mr - 1) = m - op * fv
+	 * cp = (m - op * fv) / (fv * (mr - 1))
+	 * short : 
+	 * mr = (m + (op - cp) * fv) / (fv * cp)
+	 * mr * (fv * cp) = m + op*fv - cp * fv
+	 * mr * fv * cp = m + op*fv - cp * fv
+	 * mr * fv * cp - cp * fv = m + op*fv
+	 * cp * fv * (mr - 1) = m + op*fv
+	 * cp = (m + op*fv) / (fv * (mr - 1)) 
+	 * cp = (m/fv + op) / (mr - 1) 
 	 */
-	@Override
-	public BigDecimal calcLiqPrice(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
-		return PcPriceCalc.calcLiqPrice( holdMarginRatio, IntBool.isTrue(longFlag), openPrice, amount, posMargin, Precision.COMMON_PRECISION );
-	}
-	
-	/**
-	 * 保证金率 =（保证金+未实现盈亏) / (合约面值*持仓张数／最新标记价格）
-	 * 保证金率 =（保证金+(cp-op)*fv) / (合约面值*持仓张数／cp）
-	 * mr =（m+(cp-op)*fv) / (fv／cp）
-	 * mr =（m+(cp-op)*fv) * (cp/fv）
-	 * mr =（m+(cp-op)*fv) * cp / fv
-	 * mr =（m+ (cp-op)*fv) / fv * cp
-	 * mr =（m+ (cp-op)*fv)* cp / fv 
-	 * 
-	 * （m + (cp-op)*fv)* cp = mr*fv
-	 * （m + (cp-op)*fv)* cp = mr*fv
-	 * 
-	 */
-	public BigDecimal calcLiqPrice2(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
-		return null;
-	}
-	
-	/**
-	 * pnl = (cp-op)*fv
-	 * (cp-op) = pnl/fv
-	 * cp = pnl/fv + op
-	 * 
-	 * @return
-	 */
-	public BigDecimal calcLiqPrice3(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
-		if(IntBool.isTrue(longFlag)){
-			BigDecimal holdMargin = amount.multiply(openPrice).multiply(holdMarginRatio);
-			BigDecimal pnl = posMargin.subtract(holdMargin);
-			BigDecimal liqPrice = pnl.divide(amount, Precision.COMMON_PRECISION, Precision.LESS).subtract(openPrice);
-			return liqPrice;
+	public BigDecimal calcLiqPrice(int longFlag, BigDecimal faceValue, BigDecimal volume, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
+		BigDecimal fv = faceValue.multiply(volume);
+		if(longFlag==OrderFlag.TYPE_LONG){
+			return posMargin.subtract(openPrice.multiply(fv)).divide(fv.multiply(holdMarginRatio.subtract(BigDecimal.ONE)));
 		}else{
-			BigDecimal holdMargin = amount.multiply(openPrice).multiply(holdMarginRatio);
-			BigDecimal pnl = posMargin.subtract(holdMargin);
-			BigDecimal liqPrice = pnl.divide(amount, Precision.COMMON_PRECISION, Precision.LESS).add(openPrice);
-			return liqPrice;
+			return posMargin.divide(fv).add(openPrice).divideToIntegralValue(holdMarginRatio.subtract(BigDecimal.ONE));
 		}
 	}
 	
 	/**
-	 * 计算仓位保证金率
-	 * 保证金率 =（保证金+未实现盈亏) / (合约面值*持仓张数／最新标记价格）
+	 * long:
+	 * pnl = (cp-op)*fv
+	 * (cp-op) = pnl/fv
+	 * cp = pnl/fv + op
+	 * 
+	 * short:
+	 * pnl = (op-cp)*fv
+	 * op-cp = pnl/fv
+	 * cp = op - pnl/fv
+	 * 
 	 * @return
 	 */
-	@Override
-	public BigDecimal calPosMarginRatio(BigDecimal posMargin, BigDecimal posPnl, BigDecimal faceValue, BigDecimal volume, BigDecimal markPrice){
-		BigDecimal marginRatio = posMargin.add(posPnl).multiply(markPrice).divide(faceValue.multiply(volume), Precision.COMMON_PRECISION, DecimalUtil.LESS);
-		
-		return marginRatio;
-	}
-
-	/**
-	 * 用 均价 标记价格 未实现盈亏 计算 仓位保证金
-	 * @param longFlag
-	 * @param initMarginRatio
-	 * @param amount
-	 * @param meanPrice
-	 * @param markPrice
-	 * @return
-	 */
-	@Override
-	public BigDecimal calcInitMargin(Integer longFlag, BigDecimal initMarginRatio, BigDecimal volume, BigDecimal faceValue, BigDecimal meanPrice, BigDecimal markPrice) {
-        // ( 1 / leverage ) * volume = volume / leverage
-        BigDecimal pnl = this.calcPnl(longFlag, volume, faceValue, meanPrice, markPrice);
-        BigDecimal baseValue = AABBCompFieldCalc.calcBaseValue(volume, faceValue, meanPrice);
-        return baseValue.multiply(initMarginRatio).subtract(pnl.min(BigDecimal.ZERO)).stripTrailingZeros();
+	public BigDecimal calcLiqPrice3(int longFlag, BigDecimal faceValue, BigDecimal volume, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
+		BigDecimal fv = faceValue.multiply(volume);
+		BigDecimal holdMargin = fv.multiply(openPrice).multiply(holdMarginRatio);
+		BigDecimal pnl = posMargin.subtract(holdMargin);
+		pnl = pnl.negate();
+		if(IntBool.isTrue(longFlag)){
+			BigDecimal liqPrice = pnl.divide(fv, Precision.COMMON_PRECISION, Precision.LESS).add(openPrice);
+			return liqPrice;
+		}else{
+			BigDecimal liqPrice = openPrice.subtract(pnl.divide(fv, Precision.COMMON_PRECISION, Precision.LESS));
+			return liqPrice;
+		}
 	}
 	
 	/**
@@ -153,22 +147,19 @@ public class AAABHoldPosStrategy implements HoldPosStrategy{
 	 * @return
 	 */
 	@Override
-	public BigDecimal calcBankruptPrice(Integer longFlag, BigDecimal volume, BigDecimal faceValue, BigDecimal margin, BigDecimal openPrice) {
-		BigDecimal _amount = AABBCompFieldCalc.calcAmount(faceValue, volume);
-		return PcPriceCalc.calcBankruptPrice(IntBool.isTrue(longFlag), openPrice, _amount, margin, Precision.COMMON_PRECISION );
-	}
-	
-	public BigDecimal calcBankruptPrice3(Integer longFlag, BigDecimal volume, BigDecimal faceValue, BigDecimal margin, BigDecimal openPrice) {
+	public BigDecimal calcBankruptPrice(Integer longFlag, BigDecimal volume, BigDecimal faceValue, BigDecimal posMargin, BigDecimal openPrice) {
+		BigDecimal holdMarginRatio = BigDecimal.ONE;
+		BigDecimal fv = faceValue.multiply(volume);
+		BigDecimal holdMargin = fv.multiply(openPrice).multiply(holdMarginRatio);
+		BigDecimal pnl = posMargin.subtract(holdMargin);
+		pnl = pnl.negate();
 		if(IntBool.isTrue(longFlag)){
-			BigDecimal amount = faceValue.multiply(volume);
-			BigDecimal pnl = margin;
-			BigDecimal liqPrice = pnl.divide(amount, Precision.COMMON_PRECISION, Precision.LESS).subtract(openPrice);
+			BigDecimal liqPrice = pnl.divide(fv, Precision.COMMON_PRECISION, Precision.LESS).add(openPrice);
 			return liqPrice;
 		}else{
-			BigDecimal amount = faceValue.multiply(volume);
-			BigDecimal pnl = margin;
-			BigDecimal liqPrice = pnl.divide(amount, Precision.COMMON_PRECISION, Precision.LESS).add(openPrice);
+			BigDecimal liqPrice = openPrice.subtract(pnl.divide(fv, Precision.COMMON_PRECISION, Precision.LESS));
 			return liqPrice;
 		}
 	}
+
 }

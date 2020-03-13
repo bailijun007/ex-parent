@@ -71,7 +71,7 @@ public class RedisConfig {
 	}
 	
 	@ConditionalOnProperty(name="swagger.host")
-	@Bean
+//	@Bean
 	public RedisSubscriber testRs(RedisPool redisPool){
 		this.testRs(redisPool, "bb:account:USDT");
 		

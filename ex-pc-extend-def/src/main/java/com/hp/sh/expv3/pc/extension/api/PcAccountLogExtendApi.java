@@ -22,7 +22,7 @@ public interface PcAccountLogExtendApi {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
-            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USD", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
             @ApiImplicitParam(name = "tradeType",
                     value = "类型 " +
                             "0.全部," +

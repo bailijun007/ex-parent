@@ -21,18 +21,11 @@ public interface HoldPosStrategy {
 	 */
     public BigDecimal calcMeanPrice(int longFlag, BigDecimal baseValue, BigDecimal amount) ;
 
-    /**
-     * 计算强平价
-     * @param pos
-     * @return
-     */
-	public BigDecimal calcLiqPrice(PosData pos);
-
 	/**
 	 * 计算仓位预估强评价
 	 * @return
 	 */
-	public BigDecimal calcLiqPrice(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin);
+	public BigDecimal calcLiqPrice(int longFlag, BigDecimal faceValue, BigDecimal volume, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin);
 
 	/**
 	 * 计算仓位保证金率

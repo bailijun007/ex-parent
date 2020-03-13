@@ -51,12 +51,6 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
             return amount.divide(baseValue, Precision.COMMON_PRECISION, DecimalUtil.LESS).stripTrailingZeros();
         }
     }
-	
-	@Override
-	public BigDecimal calcLiqPrice(PosData pos) {
-		BigDecimal amt = AABBCompFieldCalc.calcAmount(pos.getVolume(), pos.getFaceValue());
-		return PcPriceCalc.calcLiqPrice( pos.getHoldMarginRatio(), IntBool.isTrue(pos.getLongFlag()), pos.getMeanPrice(), amt, pos.getPosMargin(), Precision.COMMON_PRECISION );
-	}
 
 	/**
 	 * 计算仓位的强平价(预估强平价)
@@ -67,8 +61,8 @@ public class AABBHoldPosStrategy implements HoldPosStrategy{
 	 * @param posMargin 保证金
 	 * @return 强平价
 	 */
-	@Override
-	public BigDecimal calcLiqPrice(int longFlag, BigDecimal amount, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
+	public BigDecimal calcLiqPrice(int longFlag, BigDecimal faceValue, BigDecimal volume, BigDecimal openPrice, BigDecimal holdMarginRatio, BigDecimal posMargin){
+		BigDecimal amount = faceValue.multiply(volume);
 		return PcPriceCalc.calcLiqPrice( holdMarginRatio, IntBool.isTrue(longFlag), openPrice, amount, posMargin, Precision.COMMON_PRECISION );
 	}
 	
