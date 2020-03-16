@@ -67,8 +67,6 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     @Value("${bb.kline.bbKlineFromExpCalcEnable}")
     private int bbKlineFromExpCalcEnable;
 
-    @Autowired
-    private  BbRepairTradeExtService bbRepairTradeExtService;
 
     @Autowired
     private BbTradeExtService bbTradeExtService;
@@ -176,22 +174,9 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
      * @return
      */
     private List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {
-        List<BbTradeVo> result = new ArrayList<>();
-
-         List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, ms, maxMs);
-       if(!CollectionUtils.isEmpty(list)){
-           for (BbRepairTradeVo tradeVo : list) {
-               BbTradeVo bbTradeVo = new BbTradeVo();
-               BeanUtils.copyProperties(tradeVo,bbTradeVo);
-               result.add(bbTradeVo);
-           }
-       }else {
-            List<BbTradeVo> bbTradeVos = bbTradeExtService.queryByTimeInterval(asset, symbol, ms, maxMs);
-           result.addAll(bbTradeVos);
-       }
-
+        List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(asset, symbol, ms, maxMs);
         //返回 对象集合以时间升序 再以id升序
-        List<BbTradeVo> sortedList = result.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
+        List<BbTradeVo> sortedList = voList.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
         return sortedList;
     }
 

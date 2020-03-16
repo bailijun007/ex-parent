@@ -63,8 +63,10 @@ public class BbRepairTradeJobServiceImpl implements BbRepairTradeJobService {
     @Value("${bb.kline.bbRepairTrade.enable}")
     private Integer bbRepairTradeEnable;
 
+
     @Scheduled(cron = "*/1 * * * * *")
     public void execute() {
+        // int bbRepairTradeEnable=1;
         if (1 != bbRepairTradeEnable) {
             return;
         }
@@ -94,8 +96,7 @@ public class BbRepairTradeJobServiceImpl implements BbRepairTradeJobService {
 
                 long endMs = TimeUnit.MINUTES.toMillis(TimeUnit.MILLISECONDS.toMinutes(ms) + 1) - 1;
 
-                final int count = bbRepairTradeMapper.batchUpdate(trades, ms, endMs);
-                System.out.println("count = " + count);
+              bbRepairTradeMapper.batchUpdate(trades, ms, endMs);
 
                 bbRepairTradeMapper.batchSave(trades);
 
