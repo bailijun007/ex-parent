@@ -10,6 +10,8 @@ import java.util.List;
  */
 public interface BbTradeExtMapper {
 
-    List<BbTradeVo> queryByTimeInterval(@Param("asset") String asset, @Param("symbol") String symbol, @Param("tradeTimeBegin")  Long tradeTimeBegin, @Param("tradeTimeEnd") Long tradeTimeEnd);
+    List<BbTradeVo> queryByTimeInterval(@Param("asset") String asset, @Param("symbol") String symbol, @Param("tradeTimeBegin") Long tradeTimeBegin, @Param("tradeTimeEnd") Long tradeTimeEnd);
+
+    int update(@Param("enableFlag") int enableFlag,@Param("asset") String asset, @Param("symbol") String symbol, @Param("tradeTimeBegin") Long tradeTimeBegin, @Param("tradeTimeEnd") Long tradeTimeEnd);
 
 }

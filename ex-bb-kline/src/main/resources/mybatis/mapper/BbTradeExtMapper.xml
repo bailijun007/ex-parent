@@ -43,4 +43,17 @@
         order by id asc
     </select>
 
+
+    <update id="update">
+		update
+			bb_trade
+		set
+			enable_flag=#{enableFlag}
+		where
+			asset=#{asset}
+			and symbol=#{symbol}
+			and trade_time &gt;=#{tradeTimeBegin}
+             and trade_time &lt;#{tradeTimeEnd}
+	</update>
+
 </mapper>

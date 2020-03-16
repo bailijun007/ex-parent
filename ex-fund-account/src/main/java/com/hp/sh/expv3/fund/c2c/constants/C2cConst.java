@@ -18,6 +18,7 @@ public final class C2cConst {
     public static final String C2C_PAY_STATUS_DESC_RECHARGE = "c2c充值";
     public static final String C2C_PAY_STATUS_DESC_WITHDRAWAL = "c2c体现";
     public static final String C2C_PAY_STATUS_DESC_PAY_OVERTIME = "支付超时";
+    public static final String C2C_PAY_STATUS_DESC_NO_PAYMENT = "待支付";
 
     //审批状态：4-审批中, 5-审批通过, 6-拒绝
     public static final int C2C_APPROVAL_STATUS_IN_AUDIT  = 4;

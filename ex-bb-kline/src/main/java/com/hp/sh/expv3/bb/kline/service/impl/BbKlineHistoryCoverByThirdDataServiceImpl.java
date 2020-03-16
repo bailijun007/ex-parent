@@ -85,8 +85,8 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
     @Override
     @Scheduled(cron = "*/1 * * * * *")
     public void updateKlineByThirdData() {
-        List<BBSymbol> bbSymbols = listSymbol();
-        List<BBSymbol> targetBbSymbols = filterBbSymbols(bbSymbols);
+        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
 
@@ -151,7 +151,7 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
     }
 
     /**
-     * 通过监听到的score分数 去第三方data中查找并转化
+     * 通过监听到的score分数 去第三方 data中查找并转化
      * @param asset
      * @param symbol
      * @param minMs
@@ -221,15 +221,4 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
         return thirdDataUpdateEventKey;
     }
 
-    private List<BBSymbol> listSymbol() {
-        final Map<String, BBSymbol> key2Value = metadataRedisUtil.hgetAll(BbKLineKey.BB_SYMBOL, BBSymbol.class);
-        List<BBSymbol> list = key2Value.values().stream().collect(Collectors.toList());
-        return list;
-    }
-
-    private List<BBSymbol> filterBbSymbols(List<BBSymbol> bbSymbols) {
-        return bbSymbols.stream()
-                .filter(symbol -> supportBbGroupIds.contains(symbol.getBbGroupId()))
-                .collect(Collectors.toList());
-    }
 }

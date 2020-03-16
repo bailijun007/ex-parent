@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.kline.dao.BbRepairTradeMapper">
+
+    <resultMap type="com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo" id="BbRepairTradeVo">
+        <result column="id" property="id"/>
+        <result column="asset" property="asset"/>
+        <result column="symbol" property="symbol"/>
+        <result column="match_tx_id" property="matchTxId"/>
+        <result column="tk_bid_flag" property="tkBidFlag"/>
+        <result column="tk_account_id" property="tkAccountId"/>
+        <result column="tk_order_id" property="tkOrderId"/>
+        <result column="mk_account_id" property="mkAccountId"/>
+        <result column="mk_order_id" property="mkOrderId"/>
+        <result column="mk_order_id" property="mkOrderId"/>
+        <result column="price" property="price"/>
+        <result column="number" property="number"/>
+        <result column="trade_time" property="tradeTime"/>
+        <result column="maker_handle_status" property="makerHandleStatus"/>
+        <result column="taker_handle_status" property="takerHandleStatus"/>
+        <result column="created" property="created"/>
+        <result column="modified" property="modified"/>
+    </resultMap>
+
+
+    <insert id="save">
+        insert into bb_repair_trade (
+			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,enable_flag,created,modified
+			)values(
+			#{asset},#{symbol},#{matchTxId},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{mkAccountId},#{mkOrderId},#{price},#{number},#{tradeTime},#{makerHandleStatus},#{takerHandleStatus},#{enableFlag},#{created},#{modified})
+    </insert>
+
+    <insert id="batchSave">
+        insert into bb_repair_trade (
+			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,enable_flag,created,modified
+			)values
+        <foreach collection="trades" item="item" index="index" separator=",">
+            (#{item.asset},#{item.symbol},#{item.matchTxId},#{item.tkBidFlag},#{item.tkAccountId},#{item.tkOrderId},#{item.mkAccountId},#{item.mkOrderId},#{item.price},
+            #{item.number},#{item.tradeTime},#{item.makerHandleStatus},#{item.takerHandleStatus},#{item.enableFlag},#{item.created},#{item.modified})
+        </foreach>
+
+    </insert>
+     <!--update table set enable_flag = 0 where enable_flag = 1 and asset = ? and symbole = ? and ms >= ? and ms < ${endMs}-->
+
+    <update id="batchUpdate">
+        <foreach collection="trades" item="item" index="index" open="" close="" separator=";">
+            UPDATE bb_repair_trade
+            <set>
+                enable_flag=0
+
+            </set>
+            <where>
+                enable_flag=1 and asset =#{trades.asset} and symbole =#{trades.symbole}
+                and trade_time &gt;= #{tradeTimeBegin}
+                and ms &lt; #{tradeTimeEnd}
+            </where>
+        </foreach>
+    </update>
+
+
+    <select id="listRepairTrades" resultMap="BbRepairTradeVo">
+        select
+        id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,enable_flag,
+		mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,created,modified
+
+        from bb_repair_trade
+        where
+        enable_flag=1
+        and   asset=#{asset}
+        and symbol=#{symbol}
+        and trade_time &gt;=#{tradeTimeBegin}
+        and trade_time &lt;#{tradeTimeEnd}
+        order by id asc
+    </select>
+
+</mapper>

@@ -39,7 +39,6 @@ public class BbTradeVo implements Serializable {
     private Long mkOrderId;
 
 
-
     @ApiModelProperty("成交价格")
     private BigDecimal price;
 
@@ -68,6 +67,8 @@ public class BbTradeVo implements Serializable {
     public BbTradeVo() {
     }
 
+
+
     @Override
     public String toString() {
         return "BbTradeVo{" +
@@ -79,7 +80,6 @@ public class BbTradeVo implements Serializable {
                 ", tkOrderId=" + tkOrderId +
                 ", mkAccountId=" + mkAccountId +
                 ", mkOrderId=" + mkOrderId +
-
                 ", price=" + price +
                 ", number=" + number +
                 ", tradeTime=" + tradeTime +
