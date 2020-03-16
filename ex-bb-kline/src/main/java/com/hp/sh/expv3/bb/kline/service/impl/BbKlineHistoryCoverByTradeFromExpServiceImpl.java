@@ -90,7 +90,7 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
     public void updateKlineByExpHistory() {
 
         List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
 
@@ -109,15 +109,21 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
                 //先从mysql的交易修复表中查询，查询不到再从redis中查询
                 final Long minMs = minAndMaxMs[0];
                 final Long maxMs = minAndMaxMs[1];
-                List<BBKLine> klines =null;
+                List<BBKLine> klines = null;
                 List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, minMs, maxMs);
-                if(!CollectionUtils.isEmpty(list)){
-                    BBKLine bbkLine = buildKline(list, asset, symbol, freq, minMs);
-                    if (null!=bbkLine){
-                        klines =new ArrayList<>();
-                        klines.add(bbkLine);
+                if (!CollectionUtils.isEmpty(list)) {
+                    klines =new ArrayList<>();
+                    // 拆成不同的分钟
+                    Map<Long, List<BbRepairTradeVo>> minute2TradeList = list.stream()
+                            .collect(Collectors.groupingBy(klineTrade -> TimeUnit.MILLISECONDS.toMinutes(klineTrade.getTradeTime())));
+
+                    //1分钟kline 数据
+                    for (Long minute : minute2TradeList.keySet()) {
+                        List<BbRepairTradeVo> trades = minute2TradeList.get(minute);
+                        BBKLine kLine = buildKline(trades, asset, symbol, freq, TimeUnit.MINUTES.toMillis(minute));
+                        klines.add(kLine);
                     }
-                }else {
+                } else {
                     klines = listBbKline(asset, symbol, minMs, maxMs, freq);
                 }
 
@@ -213,12 +219,11 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
      * @return
      */
     private List<BBKLine> listBbKline(String asset, String symbol, Long minMs, Long maxMs, int freq) {
-        String thirdDataKey = BbKlineRedisKeyUtil.buildFromExpBbKlineDataByTradeRedisKey(fromExpBbKlineDataPattern, asset, symbol, freq);
+        String fromExpBbKlineDataRedisKey = BbKlineRedisKeyUtil.buildFromExpBbKlineDataByTradeRedisKey(fromExpBbKlineDataPattern, asset, symbol, freq);
         List<BBKLine> list = new ArrayList<>();
 
-        final Set<String> klines = bbKlineExpHistoryRedisUtil.zrangeByScore(thirdDataKey, "" + minMs, "" + maxMs, 0, Long.valueOf(maxMs - minMs).intValue() + 1);
+        final Set<String> klines = bbKlineExpHistoryRedisUtil.zrangeByScore(fromExpBbKlineDataRedisKey, "" + minMs, "" + maxMs, 0, Long.valueOf(maxMs - minMs).intValue() + 1);
 
-        // 按照时间minute升序
         if (!klines.isEmpty()) {
             for (String kline : klines) {
                 BBKLine bbkLine1 = BBKlineUtil.convert2KlineData(kline, freq);
@@ -247,7 +252,7 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
             if (maxMs == null || minMs == null) {
                 return null;
             } else {
-                logger.info("返回通知消息的最小分数为:{},最大分数为:{}", minMs,maxMs);
+                logger.info("返回通知消息的最小分数为:{},最大分数为:{}", minMs, maxMs);
                 return new Long[]{minMs, maxMs};
             }
         }
