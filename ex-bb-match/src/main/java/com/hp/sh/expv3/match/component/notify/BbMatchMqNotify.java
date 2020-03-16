@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.hp.sh.expv3.match.bo.BbTradeBo;
 import com.hp.sh.expv3.match.component.rocketmq.BbMatchProducer;
 import com.hp.sh.expv3.match.config.setting.BbmatchRocketMqSetting;
+import com.hp.sh.expv3.match.config.setting.BbmatchSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
 import com.hp.sh.expv3.match.mqmsg.BbOrderCancelMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.BbOrderNotMatchedMqMsgDto;
@@ -20,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -37,6 +37,8 @@ public class BbMatchMqNotify {
 
     @Autowired
     private BbmatchRocketMqSetting bbmatchRocketMqSetting;
+    @Autowired
+    private BbmatchSetting bbmatchSetting;
 
     public boolean sendOrderNotMatched(String asset, String symbol, long accountId, long orderId) {
         String topic = BbRocketMqUtil.buildBbAccountContractMqTopicName(bbmatchRocketMqSetting.getBbMatchTopicNamePattern(), asset, symbol);
@@ -83,14 +85,12 @@ public class BbMatchMqNotify {
         return true;
     }
 
-    @Value("${bbmatch.trade.batchSize:10}")
-    private int batchSize;
 
     public boolean sendTradeBatch(String asset, String symbol, List<BbTradeBo> tradeList) {
         if (null == tradeList || tradeList.isEmpty()) {
         } else {
             String topic = BbRocketMqUtil.buildBbAccountContractMqTopicName(bbmatchRocketMqSetting.getBbMatchTopicNamePattern(), asset, symbol);
-            List<List<BbTradeBo>> tradeLists = Lists.partition(tradeList, batchSize);
+            List<List<BbTradeBo>> tradeLists = Lists.partition(tradeList, bbmatchSetting.getTradeBatchSize());
 
             for (List<BbTradeBo> trades : tradeLists) {
                 Long tkOrderId = trades.get(0).getTkOrderId();

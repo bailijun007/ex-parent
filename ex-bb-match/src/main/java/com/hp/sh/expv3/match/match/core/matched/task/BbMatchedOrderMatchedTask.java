@@ -8,6 +8,7 @@ import com.hp.sh.expv3.match.bo.BbOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.BbTradeBo;
 import com.hp.sh.expv3.match.component.notify.BbMatchMqNotify;
 import com.hp.sh.expv3.match.component.notify.BbNotify;
+import com.hp.sh.expv3.match.config.setting.BbmatchSetting;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.enums.BbOrderTimeInForceEnum;
 import com.hp.sh.expv3.match.enums.BbOrderTypeEnum;
@@ -115,7 +116,11 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
     private void doLimit() {
         if (null == tradeList || tradeList.isEmpty()) {
         } else {
-            bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
+            if (1 == bbmatchSetting.getSendMatchBatchEnable()) {
+                bbMatchMqNotify.sendTradeBatch(this.getAsset(), this.getSymbol(), this.tradeList);
+            } else {
+                bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
+            }
         }
 
         Long tkOrderId = takerOrder.getOrderId();
@@ -140,13 +145,19 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
         sendNotifyMsg();
     }
 
+    @Autowired
+    private BbmatchSetting bbmatchSetting;
 
     private void doMarket() {
 
         // 先发成交消息
         if (null == tradeList || tradeList.isEmpty()) {
         } else {
-            bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
+            if (1 == bbmatchSetting.getSendMatchBatchEnable()) {
+                bbMatchMqNotify.sendTradeBatch(this.getAsset(), this.getSymbol(), this.tradeList);
+            } else {
+                bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
+            }
         }
 
         if (isCancelFlag()) {
