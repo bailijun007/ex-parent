@@ -109,24 +109,7 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
                 //先从mysql的交易修复表中查询，查询不到再从redis中查询
                 final Long minMs = minAndMaxMs[0];
                 final Long maxMs = minAndMaxMs[1];
-                List<BBKLine> klines = null;
-                List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, minMs, maxMs);
-                if (!CollectionUtils.isEmpty(list)) {
-                    klines =new ArrayList<>();
-                    // 拆成不同的分钟
-                    Map<Long, List<BbRepairTradeVo>> minute2TradeList = list.stream()
-                            .collect(Collectors.groupingBy(klineTrade -> TimeUnit.MILLISECONDS.toMinutes(klineTrade.getTradeTime())));
-
-                    //1分钟kline 数据
-                    for (Long minute : minute2TradeList.keySet()) {
-                        List<BbRepairTradeVo> trades = minute2TradeList.get(minute);
-                        BBKLine kLine = buildKline(trades, asset, symbol, freq, TimeUnit.MINUTES.toMillis(minute));
-                        klines.add(kLine);
-                    }
-                } else {
-                    klines = listBbKline(asset, symbol, minMs, maxMs, freq);
-                }
-
+                List<BBKLine>  klines = listBbKline(asset, symbol, minMs, maxMs, freq);
                 if (null == klines || klines.isEmpty()) {
                     continue;
                 }

@@ -54,8 +54,11 @@ public class BbRepairTradeJobServiceImpl implements BbRepairTradeJobService {
     @Value("${bb.kline2Trade.taskEventPattern}")
     private String kline2TradeTaskEventPattern;
 
-    @Value("${from_exp.bbKlineDataUpdateEventPattern}")
-    private String fromExpBbKlineDataUpdateEventPattern;
+//    @Value("${from_exp.bbKlineDataUpdateEventPattern}")
+//    private String fromExpBbKlineDataUpdateEventPattern;
+
+    @Value("${from_exp.bbKlineTaskPattern}")
+    private String fromExpBbKlineTaskPattern;
 
     @Value("${bb.kline.kline2TradeBatchSize}")
     private Integer kline2TradeBatchSize;
@@ -80,12 +83,13 @@ public class BbRepairTradeJobServiceImpl implements BbRepairTradeJobService {
             final int freq = 1;
 
             String taskKey = BbKlineRedisKeyUtil.buildKline2TradeTaskEventKey(kline2TradeTaskEventPattern, asset, symbol, freq);
-            String bbKlineFromExpUpdateKey = BbKlineRedisKeyUtil.buildFromExpBbKlineUpdateEventKey(fromExpBbKlineDataUpdateEventPattern, asset, symbol, freq);
             //监听通知消息
             final Set<Tuple> task = bbRepairTradeUtil.zpopmin(taskKey, kline2TradeBatchSize);
             if (CollectionUtils.isEmpty(task)) {
                 continue;
             }
+
+            String fromExpBbKlineTaskRedisKey = BbKlineRedisKeyUtil.buildFromExpBbKlineTaskRedisKey(fromExpBbKlineTaskPattern, asset, symbol, freq);
             for (Tuple tuple : task) {
                 //[1483200240000,956.54,956.54,956.54,956.54,0.48375944]
                 String element = tuple.getElement();
@@ -96,14 +100,16 @@ public class BbRepairTradeJobServiceImpl implements BbRepairTradeJobService {
 
                 long endMs = TimeUnit.MINUTES.toMillis(TimeUnit.MILLISECONDS.toMinutes(ms) + 1) - 1;
 
+                // 批量更新修正的交易记录表
               bbRepairTradeMapper.batchUpdate(trades, ms, endMs);
 
+              // 批量保存
                 bbRepairTradeMapper.batchSave(trades);
 
                 //updateNotify
                 HashMap<String, Double> scoreMembers = new HashMap<>();
                 scoreMembers.put(ms + "", Long.valueOf(ms).doubleValue());
-                bbRepairTradeUtil.zadd(bbKlineFromExpUpdateKey, scoreMembers);
+                bbRepairTradeUtil.zadd(fromExpBbKlineTaskRedisKey, scoreMembers);
 
             }
         }
