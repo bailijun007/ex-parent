@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -59,8 +60,15 @@ public class BbRepairTradeJobServiceImpl implements BbRepairTradeJobService {
     @Value("${bb.kline.kline2TradeBatchSize}")
     private Integer kline2TradeBatchSize;
 
-    //    @Scheduled(cron = "*/1 * * * * *")
+    @Value("${bb.kline.bbRepairTrade.enable}")
+    private Integer bbRepairTradeEnable;
+
+    @Scheduled(cron = "*/1 * * * * *")
     public void execute() {
+        if (1 != bbRepairTradeEnable) {
+            return;
+        }
+
         List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
         List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
 
@@ -86,7 +94,8 @@ public class BbRepairTradeJobServiceImpl implements BbRepairTradeJobService {
 
                 long endMs = TimeUnit.MINUTES.toMillis(TimeUnit.MILLISECONDS.toMinutes(ms) + 1) - 1;
 
-                bbRepairTradeMapper.batchUpdate(trades,ms,endMs);
+                final int count = bbRepairTradeMapper.batchUpdate(trades, ms, endMs);
+                System.out.println("count = " + count);
 
                 bbRepairTradeMapper.batchSave(trades);
 
