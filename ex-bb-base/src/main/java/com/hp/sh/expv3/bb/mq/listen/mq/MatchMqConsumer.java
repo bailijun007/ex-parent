@@ -60,7 +60,7 @@ public class MatchMqConsumer {
 	 * 撮合成功
 	 */
 	public void handleMatchedTradeList(List<BBMatchedTrade> list, Map<String,Integer> map){
-		logger.info("收到消息:{}", list.size());
+		logger.info("收到撮合成功消息:{}", list.size());
 		for(BBMatchedTrade matchedTrade : list){
 			boolean exist = this.matchedTradeService.exist(matchedTrade.getMkOrderId(), matchedTrade.getTkOrderId());
 			if(exist){
