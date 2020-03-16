@@ -16,6 +16,7 @@
         <result column="mk_order_id" property="mkOrderId"/>
         <result column="mk_order_id" property="mkOrderId"/>
         <result column="price" property="price"/>
+        <result column="enable_flag" property="enableFlag"/>
         <result column="number" property="number"/>
         <result column="trade_time" property="tradeTime"/>
         <result column="maker_handle_status" property="makerHandleStatus"/>
@@ -42,5 +43,18 @@
         and trade_time &lt;#{tradeTimeEnd}
         order by id asc
     </select>
+
+
+    <update id="update">
+		update
+			bb_trade
+		set
+			enable_flag=#{enableFlag}
+		where
+			asset=#{asset}
+			and symbol=#{symbol}
+			and trade_time &gt;=#{tradeTimeBegin}
+             and trade_time &lt;#{tradeTimeEnd}
+	</update>
 
 </mapper>

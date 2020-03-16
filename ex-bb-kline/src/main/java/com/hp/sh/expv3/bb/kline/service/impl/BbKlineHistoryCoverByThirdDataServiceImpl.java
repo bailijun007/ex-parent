@@ -151,7 +151,7 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
     }
 
     /**
-     * 通过监听到的score分数 去第三方data中查找并转化
+     * 通过监听到的score分数 去第三方 data中查找并转化
      * @param asset
      * @param symbol
      * @param minMs

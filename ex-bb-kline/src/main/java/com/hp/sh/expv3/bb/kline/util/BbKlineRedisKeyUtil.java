@@ -76,4 +76,18 @@ public final class BbKlineRedisKeyUtil {
         return bbKlineFromExpUpdateKey;
     }
 
+    public static String buildKline2TradeTaskEventKey(String pattern, String asset, String symbol, int freq) {
+        String bbKlineFromExpUpdateKey = StringReplaceUtil.replace(pattern, new HashMap<String, String>() {
+            {
+                put("asset", asset);
+                put("symbol", symbol);
+                put("freq", freq + "");
+            }
+        });
+        return bbKlineFromExpUpdateKey;
+    }
+
+
+
+
 }

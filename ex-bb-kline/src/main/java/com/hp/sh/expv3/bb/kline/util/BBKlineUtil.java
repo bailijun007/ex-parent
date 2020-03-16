@@ -5,12 +5,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
+import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import com.hupa.exp.common.tool.format.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +51,6 @@ public class BBKlineUtil {
         bbkLine.setVolume(ja.getBigDecimal(5));
         return bbkLine;
     }
-
 
     /**
      * 分钟时间戳转成毫秒时间戳

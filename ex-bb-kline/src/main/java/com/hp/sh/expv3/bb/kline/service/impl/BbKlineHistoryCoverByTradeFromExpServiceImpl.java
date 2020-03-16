@@ -91,7 +91,6 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
             int freq = 1;
             //监听通知消息
             String bbKlineFromExpUpdateKey = BbKlineRedisKeyUtil.buildFromExpBbKlineUpdateEventKey(fromExpBbKlineDataUpdateEventPattern, asset, symbol, freq);
-            logger.info("监听通知消息:{}", bbKlineFromExpUpdateKey);
 
             //返回通知消息的最小分数跟最大分数
             Long[] minAndMaxMs = listListeningTask(bbKlineFromExpUpdateKey);

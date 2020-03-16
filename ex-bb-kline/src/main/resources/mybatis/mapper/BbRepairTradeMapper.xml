@@ -25,7 +25,6 @@
     </resultMap>
 
 
-
     <insert id="save">
         insert into bb_repair_trade (
 			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,enable_flag,created,modified
@@ -33,6 +32,31 @@
 			#{asset},#{symbol},#{matchTxId},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{mkAccountId},#{mkOrderId},#{price},#{number},#{tradeTime},#{makerHandleStatus},#{takerHandleStatus},#{enableFlag},#{created},#{modified})
     </insert>
 
+    <insert id="batchSave">
+        insert into bb_repair_trade (
+			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,enable_flag,created,modified
+			)values
+        <foreach collection="trades" item="item" index="index" separator=",">
+            (#{item.asset},#{item.symbol},#{item.matchTxId},#{item.tkBidFlag},#{item.tkAccountId},#{item.tkOrderId},#{item.mkAccountId},#{item.mkOrderId},#{item.price},
+            #{item.number},#{item.tradeTime},#{item.makerHandleStatus},#{item.takerHandleStatus},#{item.enableFlag},#{item.created},#{item.modified})
+        </foreach>
 
+    </insert>
+     <!--update table set enable_flag = 0 where enable_flag = 1 and asset = ? and symbole = ? and ms >= ? and ms < ${endMs}-->
+
+    <update id="batchUpdate">
+        <foreach collection="trades" item="item" index="index" open="" close="" separator=";">
+            UPDATE bb_repair_trade
+            <set>
+                enable_flag=0
+
+            </set>
+            <where>
+                enable_flag=1 and asset =#{trades.asset} and symbole =#{trades.symbole}
+                and trade_time &gt;= #{tradeTimeBegin}
+                and ms &lt; #{tradeTimeEnd}
+            </where>
+        </foreach>
+    </update>
 
 </mapper>
