@@ -3,9 +3,8 @@ package com.hp.sh.expv3.bb.kline.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.hp.sh.expv3.bb.kline.dao.BbRepairTradeMapper;
-import com.hp.sh.expv3.bb.kline.dao.BbTradeExtMapper;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
-import com.hp.sh.expv3.bb.kline.service.BbRepairTradeService;
+import com.hp.sh.expv3.bb.kline.service.BbRepairTradeJobService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
@@ -33,8 +32,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class BbRepairTradeImpl implements BbRepairTradeService {
-    private static final Logger logger = LoggerFactory.getLogger(BbRepairTradeImpl.class);
+public class BbRepairTradeJobServiceImpl implements BbRepairTradeJobService {
+    private static final Logger logger = LoggerFactory.getLogger(BbRepairTradeJobServiceImpl.class);
 
     @Autowired
     private BbRepairTradeMapper bbRepairTradeMapper;

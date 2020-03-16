@@ -38,7 +38,6 @@ public class BbTradeVo implements Serializable {
     @ApiModelProperty("maker订单ID")
     private Long mkOrderId;
 
-    private Integer enableFlag;
 
     @ApiModelProperty("成交价格")
     private BigDecimal price;
@@ -68,13 +67,7 @@ public class BbTradeVo implements Serializable {
     public BbTradeVo() {
     }
 
-    public Integer getEnableFlag() {
-        return enableFlag;
-    }
 
-    public void setEnableFlag(Integer enableFlag) {
-        this.enableFlag = enableFlag;
-    }
 
     @Override
     public String toString() {
@@ -87,7 +80,6 @@ public class BbTradeVo implements Serializable {
                 ", tkOrderId=" + tkOrderId +
                 ", mkAccountId=" + mkAccountId +
                 ", mkOrderId=" + mkOrderId +
-                ", enableFlag=" + enableFlag +
                 ", price=" + price +
                 ", number=" + number +
                 ", tradeTime=" + tradeTime +

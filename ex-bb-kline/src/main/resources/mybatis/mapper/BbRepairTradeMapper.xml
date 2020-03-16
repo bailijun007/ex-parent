@@ -59,4 +59,20 @@
         </foreach>
     </update>
 
+
+    <select id="listRepairTrades" resultMap="BbRepairTradeVo">
+        select
+        id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,enable_flag,
+		mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,created,modified
+
+        from bb_repair_trade
+        where
+        enable_flag=1
+        and   asset=#{asset}
+        and symbol=#{symbol}
+        and trade_time &gt;=#{tradeTimeBegin}
+        and trade_time &lt;#{tradeTimeEnd}
+        order by id asc
+    </select>
+
 </mapper>

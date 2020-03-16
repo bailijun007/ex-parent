@@ -16,7 +16,6 @@
         <result column="mk_order_id" property="mkOrderId"/>
         <result column="mk_order_id" property="mkOrderId"/>
         <result column="price" property="price"/>
-        <result column="enable_flag" property="enableFlag"/>
         <result column="number" property="number"/>
         <result column="trade_time" property="tradeTime"/>
         <result column="maker_handle_status" property="makerHandleStatus"/>

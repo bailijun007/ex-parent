@@ -5,12 +5,15 @@ import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
 import com.hp.sh.expv3.bb.kline.service.BbKlineHistoryCalcByTradeFromExpService;
+import com.hp.sh.expv3.bb.kline.service.BbRepairTradeExtService;
 import com.hp.sh.expv3.bb.kline.service.BbTradeExtService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
+import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,6 +66,9 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 
     @Value("${bb.kline.bbKlineFromExpCalcEnable}")
     private int bbKlineFromExpCalcEnable;
+
+    @Autowired
+    private  BbRepairTradeExtService bbRepairTradeExtService;
 
     @Autowired
     private BbTradeExtService bbTradeExtService;
@@ -161,10 +167,31 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
         bbKlineExpHistoryRedisUtil.zadd(repairkey, scoreMembers);
     }
 
+    /**
+     * 从mysql中查询
+     * @param asset
+     * @param symbol
+     * @param ms
+     * @param maxMs
+     * @return
+     */
     private List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {
-        List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(asset, symbol, ms, maxMs);
+        List<BbTradeVo> result = new ArrayList<>();
+
+         List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, ms, maxMs);
+       if(!CollectionUtils.isEmpty(list)){
+           for (BbRepairTradeVo tradeVo : list) {
+               BbTradeVo bbTradeVo = new BbTradeVo();
+               BeanUtils.copyProperties(tradeVo,bbTradeVo);
+               result.add(bbTradeVo);
+           }
+       }else {
+            List<BbTradeVo> bbTradeVos = bbTradeExtService.queryByTimeInterval(asset, symbol, ms, maxMs);
+           result.addAll(bbTradeVos);
+       }
+
         //返回 对象集合以时间升序 再以id升序
-        List<BbTradeVo> sortedList = voList.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
+        List<BbTradeVo> sortedList = result.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
         return sortedList;
     }
 
