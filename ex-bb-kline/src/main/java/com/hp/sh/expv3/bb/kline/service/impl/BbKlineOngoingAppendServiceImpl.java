@@ -1,12 +1,11 @@
 package com.hp.sh.expv3.bb.kline.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBKlineTrade;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
-import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingCalcService;
+import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingAppendService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.JedisPubSub;
 
 import javax.annotation.PostConstruct;
@@ -33,7 +31,7 @@ import java.util.stream.Collectors;
  * @author BaiLiJun  on 2020/3/10
  */
 @Service
-public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService {
+public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
 
@@ -98,7 +96,7 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
                 public void onMessage(String channel, String msg) {
 
                     logger.info("收到k线推送消息:{}" + msg);
-                    List<BbTradeVo> list = listTrade(msg);
+                    List<BbTradeVo> list = parseTrades(msg);
                     // 拆成不同的分钟
                     Map<Long, List<BbTradeVo>> minute2TradeList = list.stream()
                             .collect(Collectors.groupingBy(klineTrade -> TimeUnit.MILLISECONDS.toMinutes(klineTrade.getTradeTime())));
@@ -192,7 +190,7 @@ public class BbKlineOngoingCalcServiceImpl implements BbKlineOngoingCalcService 
         return bBKLine;
     }
 
-    private List<BbTradeVo> listTrade(String msg) {
+    private List<BbTradeVo> parseTrades(String msg) {
         BBKlineTrade bbKlineTrade = JSON.parseObject(msg, BBKlineTrade.class);
         return bbKlineTrade.getTrades();
     }
