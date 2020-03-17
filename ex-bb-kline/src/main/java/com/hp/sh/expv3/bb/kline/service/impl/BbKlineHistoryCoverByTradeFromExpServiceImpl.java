@@ -72,7 +72,7 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
             2,
             Runtime.getRuntime().availableProcessors() + 1,
             2L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(10000000),
+            new LinkedBlockingQueue<Runnable>(20000000),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
@@ -117,39 +117,6 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
                 notifyKlineUpdate(asset, symbol, minMs, maxMs, freq, klines);
             }
         }
-    }
-
-
-    public BBKLine buildKline(List<BbRepairTradeVo> trades, String asset, String symbol, int frequency, long ms) {
-        BBKLine bBKLine = new BBKLine();
-        bBKLine.setAsset(asset);
-        bBKLine.setSymbol(symbol);
-        bBKLine.setFrequence(frequency);
-        bBKLine.setMinute(TimeUnit.MILLISECONDS.toMinutes(ms));
-        bBKLine.setMs(ms);
-
-        BigDecimal highPrice = BigDecimal.ZERO;
-        BigDecimal lowPrice = new BigDecimal(String.valueOf(Long.MAX_VALUE));
-        BigDecimal openPrice = null;
-        BigDecimal closePrice = null;
-        BigDecimal volume = BigDecimal.ZERO;
-
-        for (BbRepairTradeVo trade : trades) {
-            BigDecimal currentPrice = trade.getPrice();
-            highPrice = (highPrice.compareTo(currentPrice) >= 0) ? highPrice : currentPrice;
-            lowPrice = (lowPrice.compareTo(currentPrice) <= 0) ? lowPrice : currentPrice;
-            openPrice = (null == openPrice) ? currentPrice : openPrice;
-            closePrice = currentPrice;
-            volume = volume.add(trade.getNumber());
-        }
-
-        bBKLine.setHigh(highPrice);
-        bBKLine.setLow(lowPrice);
-        bBKLine.setOpen(openPrice);
-        bBKLine.setClose(closePrice);
-        bBKLine.setVolume(volume);
-
-        return bBKLine;
     }
 
     /**

@@ -85,6 +85,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 
     @Scheduled(cron = "*/1 * * * * *")
     public void execute() {
+        //bbKlineFromExpCalcEnable=1;
         if (1 != bbKlineFromExpCalcEnable) { // bbKlineFromExpCalcEnable=1
             return;
         } else {

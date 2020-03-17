@@ -72,7 +72,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
             2,
             Runtime.getRuntime().availableProcessors() + 1,
             2L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(10000000),
+            new LinkedBlockingQueue<Runnable>(20000000),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
