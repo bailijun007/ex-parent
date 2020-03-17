@@ -18,20 +18,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.JedisPubSub;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2020/3/10
  */
-//@Service
-public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendService {
+@Service
+public class BbKlineOngoingAppendServiceImpl2 implements BbKlineOngoingAppendService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
 
@@ -71,8 +67,8 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
         if (1 != ongoingCalcEnable) {
             return;
         }
-//        threadPool.execute(() -> trigger());
-//        trigger();
+        threadPool.execute(() -> trigger());
+
     }
 
     @Override
@@ -91,38 +87,62 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
                 }
             });
 
-            Executors.newSingleThreadExecutor().submit(
-                    new Runnable() {
-                        @Override
-                        public void run() {
+            final ArrayBlockingQueue<List<BbTradeVo>> queue = new ArrayBlockingQueue<>(1024);
 
+            Executors.newSingleThreadExecutor().submit(
+                    () ->
                             bbKlineOngoingRedisUtil.getOriginalJedis().subscribe(new JedisPubSub() {
                                 @Override
                                 public void onMessage(String channel, String msg) {
-                                    logger.info("收到k线推送消息:{},{}" , channel, msg);
+                                    logger.info("收到k线推送消息:{},{}", channel, msg);
                                     List<BbTradeVo> list = parseTrades(msg);
-                                    // 拆成不同的分钟
-                                    Map<Long, List<BbTradeVo>> minute2TradeList = list.stream()
-                                            .collect(Collectors.groupingBy(klineTrade -> TimeUnit.MILLISECONDS.toMinutes(klineTrade.getTradeTime())));
-
-                                    //1分钟kline 数据
-                                    for (Long minute : minute2TradeList.keySet()) {
-                                        List<BbTradeVo> trades = minute2TradeList.get(minute);
-                                        final int oneMinuteInterval = 1;
-                                        BBKLine newkLine = buildKline(trades, asset, symbol, oneMinuteInterval, minute);
-
-                                        BBKLine oldkLine = getOldKLine(asset, symbol, minute, oneMinuteInterval);
-
-                                        BBKLine mergedKline = append(oldkLine, newkLine);
-                                        saveKline(mergedKline, asset, symbol, minute, oneMinuteInterval);
-
-                                        notifyUpdate(asset, symbol, minute, oneMinuteInterval);
-                                    }
+                                    queue.add(list);
                                 }
-                            }, channel);
+                            }, channel)
+            );
+
+            Executors.newSingleThreadExecutor().submit(
+                    () -> {
+                        while (true) {
+                            List<BbTradeVo> tradeList = new ArrayList<>();
+                            for (int i = 0; i < 5; i++) {
+                                final List<BbTradeVo> list = queue.poll();
+                                if (null == list) {
+                                    break;
+                                } else {
+                                    logger.info("{},{},{}", asset, symbol, list.size());
+                                    tradeList.addAll(list);
+                                }
+                            }
+
+                            if (tradeList.isEmpty()) {
+                                Thread.sleep(1L);
+                                continue;
+                            }
+
+                            logger.info("{},{},trade size:{}", asset, symbol, tradeList.size());
+
+                            // 拆成不同的分钟
+                            Map<Long, List<BbTradeVo>> minute2TradeList = tradeList.stream()
+                                    .collect(Collectors.groupingBy(klineTrade -> TimeUnit.MILLISECONDS.toMinutes(klineTrade.getTradeTime())));
+
+                            //1分钟kline 数据
+                            for (Long minute : minute2TradeList.keySet()) {
+                                List<BbTradeVo> trades = minute2TradeList.get(minute);
+                                final int oneMinuteInterval = 1;
+                                BBKLine newkLine = buildKline(trades, asset, symbol, oneMinuteInterval, minute);
+
+                                BBKLine oldkLine = getOldKLine(asset, symbol, minute, oneMinuteInterval);
+
+                                BBKLine mergedKline = append(oldkLine, newkLine);
+                                saveKline(mergedKline, asset, symbol, minute, oneMinuteInterval);
+
+                                notifyUpdate(asset, symbol, minute, oneMinuteInterval);
+                            }
                         }
                     }
             );
+
 
         }
     }

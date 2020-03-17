@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.bb.kline.service.impl;
 
-import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
@@ -17,7 +16,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Tuple;
@@ -70,7 +68,6 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     @Autowired
     private BbRepairTradeExtService bbRepairTradeExtService;
 
-
     @Autowired
     private BbTradeExtService bbTradeExtService;
 
@@ -83,13 +80,22 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
 
-    @Scheduled(cron = "*/1 * * * * *")
+    //    @Scheduled(cron = "*/1 * * * * *")
+    @Override
     public void execute() {
         //bbKlineFromExpCalcEnable=1;
         if (1 != bbKlineFromExpCalcEnable) { // bbKlineFromExpCalcEnable=1
             return;
         } else {
-            threadPool.execute(() -> repairKlineFromExp());
+
+            while (true) {
+                threadPool.execute(() -> repairKlineFromExp());
+                try {
+                    Thread.sleep(1L);
+                } catch (InterruptedException e) {
+                }
+            }
+
         }
     }
 
@@ -138,7 +144,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 
                     if (null == trades || trades.isEmpty()) {
                         trades = listTrade(asset, symbol, ms, maxMs);
-                    }else {
+                    } else {
                         BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
 
                         logger.info("build kline data:{}", kline.toString());
@@ -156,11 +162,11 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     }
 
     private List<BbTradeVo> listTradeFromRepaired(String asset, String symbol, long ms, long maxMs) {
-        List<BbTradeVo> result=new ArrayList<>();
+        List<BbTradeVo> result = new ArrayList<>();
         List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, ms, maxMs);
         if (!CollectionUtils.isEmpty(list)) {
             for (BbRepairTradeVo tradeVo : list) {
-                 BbTradeVo bbTradeVo = new BbTradeVo();
+                BbTradeVo bbTradeVo = new BbTradeVo();
                 BeanUtils.copyProperties(tradeVo, bbTradeVo);
                 result.add(bbTradeVo);
             }
