@@ -29,7 +29,7 @@ public interface FundTransferExtApi {
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
     @GetMapping(value = "/api/extension/account/transfer/queryHistory")
-    public List<FundTransferExtVo> queryHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset", required = false) String asset,
+    public PageResult<FundTransferExtVo> queryHistory(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset", required = false) String asset,
                                                 @RequestParam(value = "queryId", required = false) Long queryId, @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize,
                                                 @RequestParam(value = "pageStatus") Integer pageStatus);
 

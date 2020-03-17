@@ -114,7 +114,7 @@ public class PcAccountCoreService{
 		
 		//金额必须是正数
 		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
-			throw new ExSysException(ExCommonError.PARAM_EMPTY);
+			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE);
 		}
 		
 		if(this.checkExist(record)){
