@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.hp.sh.expv3.bb.kline.dao.BbRepairTradeMapper;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
-import com.hp.sh.expv3.bb.kline.service.BbRepairTradeJobService;
+import com.hp.sh.expv3.bb.kline.service.BbKlineRepairDataFromBbRepairTradeService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
@@ -33,8 +33,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class BbRepairTradeJobServiceImpl implements BbRepairTradeJobService {
-    private static final Logger logger = LoggerFactory.getLogger(BbRepairTradeJobServiceImpl.class);
+public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRepairDataFromBbRepairTradeService {
+    private static final Logger logger = LoggerFactory.getLogger(BbKlineRepairDataFromBbRepairTradeServiceImpl.class);
 
     @Autowired
     private BbRepairTradeMapper bbRepairTradeMapper;
@@ -54,8 +54,6 @@ public class BbRepairTradeJobServiceImpl implements BbRepairTradeJobService {
     @Value("${bb.kline2Trade.taskEventPattern}")
     private String kline2TradeTaskEventPattern;
 
-//    @Value("${from_exp.bbKlineDataUpdateEventPattern}")
-//    private String fromExpBbKlineDataUpdateEventPattern;
 
     @Value("${from_exp.bbKlineTaskPattern}")
     private String fromExpBbKlineTaskPattern;
