@@ -79,6 +79,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
 
     @Scheduled(cron = "*/1 * * * * *")
     public void satrt() {
+        //  ongoingMergeEnable=1
         if (1 != ongoingMergeEnable) {
             return;
         } else {
@@ -88,10 +89,6 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
 
     @Override
     public void mergeKlineData() {
-        //  ongoingMergeEnable=1
-        if (1 != ongoingMergeEnable) {
-            return;
-        }
 
         List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
         List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);

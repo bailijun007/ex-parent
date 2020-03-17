@@ -3,12 +3,16 @@ package com.hp.sh.expv3.bb.kline.service.impl;
 import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
+import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
 import com.hp.sh.expv3.bb.kline.service.BbKlineHistoryCoverByTradeFromExpService;
+import com.hp.sh.expv3.bb.kline.service.BbRepairTradeExtService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
+import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Tuple;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -60,6 +65,8 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
     @Value("${bb.kline.bbKlineFromExpCoverEnable}")
     private int bbKlineFromExpCoverEnable;
 
+    @Autowired
+    private BbRepairTradeExtService bbRepairTradeExtService;
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             2,
@@ -72,6 +79,7 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
 
     @Scheduled(cron = "*/1 * * * * *")
     public void execute() {
+        //bbKlineFromExpCoverEnable=1;
         if (1 != bbKlineFromExpCoverEnable) {
             return;
         } else {
@@ -82,7 +90,7 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
     public void updateKlineByExpHistory() {
 
         List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
 
@@ -95,21 +103,54 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
             //返回通知消息的最小分数跟最大分数
             Long[] minAndMaxMs = listListeningTask(bbKlineFromExpUpdateKey);
 
-            logger.info("返回通知消息的最小分数和最大分数:{}", minAndMaxMs);
-
             if (null == minAndMaxMs) {
 
             } else {
-                List<BBKLine> klines = listBbKline(asset, symbol, minAndMaxMs[0], minAndMaxMs[1], freq);
+                //先从mysql的交易修复表中查询，查询不到再从redis中查询
+                final Long minMs = minAndMaxMs[0];
+                final Long maxMs = minAndMaxMs[1];
+                List<BBKLine>  klines = listBbKline(asset, symbol, minMs, maxMs, freq);
                 if (null == klines || klines.isEmpty()) {
                     continue;
                 }
-                coverData(asset, symbol, minAndMaxMs[0], minAndMaxMs[1], freq, klines);
-                notifyKlineUpdate(asset, symbol, minAndMaxMs[0], minAndMaxMs[1], freq, klines);
+                coverData(asset, symbol, minMs, maxMs, freq, klines);
+                notifyKlineUpdate(asset, symbol, minMs, maxMs, freq, klines);
             }
         }
     }
 
+
+    public BBKLine buildKline(List<BbRepairTradeVo> trades, String asset, String symbol, int frequency, long ms) {
+        BBKLine bBKLine = new BBKLine();
+        bBKLine.setAsset(asset);
+        bBKLine.setSymbol(symbol);
+        bBKLine.setFrequence(frequency);
+        bBKLine.setMinute(TimeUnit.MILLISECONDS.toMinutes(ms));
+        bBKLine.setMs(ms);
+
+        BigDecimal highPrice = BigDecimal.ZERO;
+        BigDecimal lowPrice = new BigDecimal(String.valueOf(Long.MAX_VALUE));
+        BigDecimal openPrice = null;
+        BigDecimal closePrice = null;
+        BigDecimal volume = BigDecimal.ZERO;
+
+        for (BbRepairTradeVo trade : trades) {
+            BigDecimal currentPrice = trade.getPrice();
+            highPrice = (highPrice.compareTo(currentPrice) >= 0) ? highPrice : currentPrice;
+            lowPrice = (lowPrice.compareTo(currentPrice) <= 0) ? lowPrice : currentPrice;
+            openPrice = (null == openPrice) ? currentPrice : openPrice;
+            closePrice = currentPrice;
+            volume = volume.add(trade.getNumber());
+        }
+
+        bBKLine.setHigh(highPrice);
+        bBKLine.setLow(lowPrice);
+        bBKLine.setOpen(openPrice);
+        bBKLine.setClose(closePrice);
+        bBKLine.setVolume(volume);
+
+        return bBKLine;
+    }
 
     /**
      * 覆盖
@@ -161,10 +202,11 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
      * @return
      */
     private List<BBKLine> listBbKline(String asset, String symbol, Long minMs, Long maxMs, int freq) {
-        String thirdDataKey = BbKlineRedisKeyUtil.buildFromExpBbKlineDataByTradeRedisKey(fromExpBbKlineDataPattern, asset, symbol, freq);
-        final Set<String> klines = bbKlineExpHistoryRedisUtil.zrangeByScore(thirdDataKey, "" + minMs, "" + maxMs, 0, Long.valueOf(maxMs - minMs).intValue() + 1);
+        String fromExpBbKlineDataRedisKey = BbKlineRedisKeyUtil.buildFromExpBbKlineDataByTradeRedisKey(fromExpBbKlineDataPattern, asset, symbol, freq);
         List<BBKLine> list = new ArrayList<>();
-        // 按照时间minute升序
+
+        final Set<String> klines = bbKlineExpHistoryRedisUtil.zrangeByScore(fromExpBbKlineDataRedisKey, "" + minMs, "" + maxMs, 0, Long.valueOf(maxMs - minMs).intValue() + 1);
+
         if (!klines.isEmpty()) {
             for (String kline : klines) {
                 BBKLine bbkLine1 = BBKlineUtil.convert2KlineData(kline, freq);
@@ -193,6 +235,7 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
             if (maxMs == null || minMs == null) {
                 return null;
             } else {
+                logger.info("返回通知消息的最小分数为:{},最大分数为:{}", minMs, maxMs);
                 return new Long[]{minMs, maxMs};
             }
         }

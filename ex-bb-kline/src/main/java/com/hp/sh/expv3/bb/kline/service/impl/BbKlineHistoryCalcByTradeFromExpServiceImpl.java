@@ -68,7 +68,8 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     private int bbKlineFromExpCalcEnable;
 
     @Autowired
-    private  BbRepairTradeExtService bbRepairTradeExtService;
+    private BbRepairTradeExtService bbRepairTradeExtService;
+
 
     @Autowired
     private BbTradeExtService bbTradeExtService;
@@ -95,7 +96,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     public void repairKlineFromExp() {
 
         List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
 
@@ -132,10 +133,11 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 //                        continue;
 //                    }
 
-                    List<BbTradeVo> trades = listTrade(asset, symbol, ms, maxMs);
+                    List<BbTradeVo> trades = listTradeFromRepaired(asset, symbol, ms, maxMs);
+
                     if (null == trades || trades.isEmpty()) {
-                        continue;
-                    } else {
+                        trades = listTrade(asset, symbol, ms, maxMs);
+                    }else {
                         BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
 
                         logger.info("build kline data:{}", kline.toString());
@@ -150,6 +152,20 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
             }
 
         }
+    }
+
+    private List<BbTradeVo> listTradeFromRepaired(String asset, String symbol, long ms, long maxMs) {
+        List<BbTradeVo> result=new ArrayList<>();
+        List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, ms, maxMs);
+        if (!CollectionUtils.isEmpty(list)) {
+            for (BbRepairTradeVo tradeVo : list) {
+                 BbTradeVo bbTradeVo = new BbTradeVo();
+                BeanUtils.copyProperties(tradeVo, bbTradeVo);
+                result.add(bbTradeVo);
+            }
+        }
+
+        return result;
     }
 
     private void notifyUpdate(String notifyUpdateKey, long ms) {
@@ -169,6 +185,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 
     /**
      * 从mysql中查询
+     *
      * @param asset
      * @param symbol
      * @param ms
@@ -176,22 +193,9 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
      * @return
      */
     private List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {
-        List<BbTradeVo> result = new ArrayList<>();
-
-         List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, ms, maxMs);
-       if(!CollectionUtils.isEmpty(list)){
-           for (BbRepairTradeVo tradeVo : list) {
-               BbTradeVo bbTradeVo = new BbTradeVo();
-               BeanUtils.copyProperties(tradeVo,bbTradeVo);
-               result.add(bbTradeVo);
-           }
-       }else {
-            List<BbTradeVo> bbTradeVos = bbTradeExtService.queryByTimeInterval(asset, symbol, ms, maxMs);
-           result.addAll(bbTradeVos);
-       }
-
+        List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(asset, symbol, ms, maxMs);
         //返回 对象集合以时间升序 再以id升序
-        List<BbTradeVo> sortedList = result.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
+        List<BbTradeVo> sortedList = voList.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
         return sortedList;
     }
 

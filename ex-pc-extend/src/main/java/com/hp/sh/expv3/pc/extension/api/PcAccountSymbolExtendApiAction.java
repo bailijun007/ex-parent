@@ -35,6 +35,8 @@ public class PcAccountSymbolExtendApiAction implements PcAccountSymbolExtendApi 
             result.setAskMaxLeverage(symbolVo.getShortMaxLeverage());
             result.setBidLeverage(symbolVo.getLongLeverage());
             result.setAskLeverage(symbolVo.getShortLeverage());
+        }else {
+            return null;
         }
 
         return result;

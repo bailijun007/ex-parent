@@ -19,8 +19,17 @@ public class BbRepairTradeExtServiceImpl implements BbRepairTradeExtService {
     @Autowired
     private BbRepairTradeMapper bbRepairTradeMapper;
 
+    /**
+     *  拆成不同的分钟
+     * @param asset
+     * @param symbol
+     * @param ms
+     * @param maxMs
+     * @return
+     */
     @Override
     public List<BbRepairTradeVo> listRepairTrades(String asset, String symbol, long ms, long maxMs) {
-        return bbRepairTradeMapper.listRepairTrades(asset,symbol,ms,maxMs);
+         List<BbRepairTradeVo> voList = bbRepairTradeMapper.listRepairTrades(asset, symbol, ms, maxMs);
+         return voList;
     }
 }

@@ -51,7 +51,7 @@
 
             </set>
             <where>
-                enable_flag=1 and asset =#{trades.asset} and symbole =#{trades.symbole}
+                enable_flag=1 and asset =#{item.asset} and symbol =#{item.symbol}
                 and trade_time &gt;= #{tradeTimeBegin}
                 and trade_time &lt; #{tradeTimeEnd}
             </where>
