@@ -27,11 +27,11 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
     private FundTransferExtMapper fundTransferExtMapper;
 
     @Override
-    public List<FundTransferExtVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
-
+    public PageResult<FundTransferExtVo> pageQueryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
+        PageResult<FundTransferExtVo> pageResult=new PageResult<>();
         List<FundTransferExtVo> voList = fundTransferExtMapper.queryHistory(userId, asset, queryId, pageSize, pageStatus);
         if (CollectionUtils.isEmpty(voList)) {
-            return voList;
+            return null;
         }
         for (FundTransferExtVo transferExtVo : voList) {
             Optional<FundTransferExtVo> vo = Optional.ofNullable(transferExtVo);
@@ -43,8 +43,10 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
                 transferExtVo.setStatus(1);
             }
         }
-
-        return voList;
+         PageInfo<FundTransferExtVo> info = new PageInfo<>(voList);
+        pageResult.setRowTotal(info.getTotal());
+        pageResult.setList(voList);
+        return pageResult;
     }
 
     @Override
