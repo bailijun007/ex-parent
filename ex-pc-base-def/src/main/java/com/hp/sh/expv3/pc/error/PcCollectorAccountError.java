@@ -4,7 +4,7 @@ import com.gitee.hupadev.base.exceptions.ErrorCode;
 /**
  * 币币异常模块
  * -13001 ~ -13999 见： pc_exception
- * 账号：-13301 ~ -13399
+ * 账号：-13301 ~ -13309
  * @author wangjg
  *
  */
