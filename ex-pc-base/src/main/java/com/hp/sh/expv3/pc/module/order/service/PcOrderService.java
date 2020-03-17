@@ -119,7 +119,7 @@ public class PcOrderService {
 		pcOrder.setFaceValue(metadataService.getFaceValue(asset, symbol));
 		pcOrder.setPrice(price);
 		
-		pcOrder.setOrderType(PcOrderType.LIMIT);
+		pcOrder.setOrderType(PcOrderType.MARKET);
 		pcOrder.setMarginMode(MarginMode.FIXED);
 		pcOrder.setTimeInForce(timeInForce);
 		pcOrder.setUserId(userId);

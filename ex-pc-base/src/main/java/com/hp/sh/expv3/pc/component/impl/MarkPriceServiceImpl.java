@@ -10,11 +10,14 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.hp.sh.expv3.config.redis.RedisConfig;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 
@@ -26,6 +29,8 @@ import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 @Primary
 @Component
 public class MarkPriceServiceImpl implements MarkPriceService {
+    private static final Logger logger = LoggerFactory.getLogger(MarkPriceServiceImpl.class);
+    
     @Resource(name = "templateDB0")
     private StringRedisTemplate templateDB0;
 
@@ -36,6 +41,10 @@ public class MarkPriceServiceImpl implements MarkPriceService {
     public BigDecimal getCurrentMarkPrice(String asset, String symbol) {
         String key = "markPrice:pc:current:";
         String s = templateDB5.opsForValue().get(key + asset + ":" + symbol);
+        if(s==null){
+        	logger.error("标记价格不存在!{}__{}",asset, symbol);
+        	return null;
+        }
         return new BigDecimal(s);
     }
 

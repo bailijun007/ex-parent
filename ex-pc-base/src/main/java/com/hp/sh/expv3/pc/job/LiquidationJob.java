@@ -44,10 +44,14 @@ public class LiquidationJob {
 			}
 			logger.warn("活动仓位:{}", list.size());
 			for(PosUID pos : list){
-				LiqHandleResult liqResult = pcLiqService.checkPosLiq(pos);
-				if(liqResult.isTrigger()){
-					logger.warn("触发强平:{}", pos);
-					this.sendLiqMsg(liqResult);
+				try{
+					LiqHandleResult liqResult = pcLiqService.checkPosLiq(pos);
+					if(liqResult.isTrigger()){
+						logger.warn("触发强平:{}", pos);
+						this.sendLiqMsg(liqResult);
+					}
+				}catch(Exception e){
+					logger.error("检查强平错误:"+e.getMessage(), e);
 				}
 			}
 			
