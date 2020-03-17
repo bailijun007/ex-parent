@@ -27,11 +27,11 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
     private FundTransferExtMapper fundTransferExtMapper;
 
     @Override
-    public List<FundTransferExtVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
-
+    public PageResult<FundTransferExtVo> pageQueryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
+        PageResult<FundTransferExtVo> pageResult = new PageResult<>();
         List<FundTransferExtVo> voList = fundTransferExtMapper.queryHistory(userId, asset, queryId, pageSize, pageStatus);
         if (CollectionUtils.isEmpty(voList)) {
-            return voList;
+            return null;
         }
         for (FundTransferExtVo transferExtVo : voList) {
             Optional<FundTransferExtVo> vo = Optional.ofNullable(transferExtVo);
@@ -43,17 +43,19 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
                 transferExtVo.setStatus(1);
             }
         }
-
-        return voList;
+        PageInfo<FundTransferExtVo> info = new PageInfo<>(voList);
+        pageResult.setRowTotal(info.getTotal());
+        pageResult.setList(voList);
+        return pageResult;
     }
 
     @Override
-    public PageResult<FundTransferExtVo> queryAllUserHistory(Long userId, String asset, Integer pageNo,Integer pageSize) {
-        PageResult<FundTransferExtVo> pageResult=new PageResult<>();
-        Map<String, Object> map=new HashMap<>();
-        map.put("userId",userId);
-        map.put("asset",asset);
-        PageHelper.startPage(pageNo,pageSize);
+    public PageResult<FundTransferExtVo> queryAllUserHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
+        PageResult<FundTransferExtVo> pageResult = new PageResult<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("asset", asset);
+        PageHelper.startPage(pageNo, pageSize);
         List<FundTransferExtVo> voList = fundTransferExtMapper.queryList(map);
         if (!CollectionUtils.isEmpty(voList)) {
             for (FundTransferExtVo transferExtVo : voList) {
