@@ -270,6 +270,8 @@ public class PcOrderService {
 		pcOrder.setCancelOperator(null);
 		pcOrder.setRemark(null);
 		
+		pcOrder.setVersion(0L);
+		
 		///////////其他///
 		pcOrder.setCancelVolume(BigDecimal.ZERO);
 	}

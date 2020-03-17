@@ -38,6 +38,15 @@ public class BBMatchedTradeService {
 		return c > 0;
 	}
 
+	public void save(List<BBMatchedTrade> list) {
+		for(BBMatchedTrade matchedTrade : list){
+			Long now = DbDateUtils.now();
+			matchedTrade.setCreated(now);
+			matchedTrade.setModified(now);
+			this.matchedTradeDAO.save(matchedTrade);
+		}
+	}
+
 	public void save(BBMatchedTrade matchedTrade) {
 		Long now = DbDateUtils.now();
 		matchedTrade.setCreated(now);

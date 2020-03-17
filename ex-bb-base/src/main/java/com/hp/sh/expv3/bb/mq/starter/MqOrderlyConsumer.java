@@ -56,7 +56,7 @@ public class MqOrderlyConsumer {
 
         	@Override
         	public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext context) {
-        		logger.info("收到消息：{}", msgs);
+        		logger.debug("收到消息：{}", msgs);
         		context.setAutoCommit(true);
         		try{
         			boolean success = endpointContext.consumeMessage(null, msgs);
