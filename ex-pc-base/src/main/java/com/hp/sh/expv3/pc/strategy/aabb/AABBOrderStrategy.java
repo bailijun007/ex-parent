@@ -4,10 +4,8 @@ import java.math.BigDecimal;
 
 import com.hp.sh.expv3.pc.strategy.OrderStrategy;
 import com.hp.sh.expv3.pc.strategy.data.OrderFeeParam;
-import com.hp.sh.expv3.pc.strategy.data.OrderMargin;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.utils.math.BigCalc;
-import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
  * 
@@ -72,42 +70,6 @@ public class AABBOrderStrategy implements OrderStrategy {
 		orderAmount.setCloseFee(closeFee);
 		orderAmount.setOrderMargin(orderMargin);
 		orderAmount.setGrossMargin(grossMargin);
-		
-		return orderAmount;
-	}
-
-	/**
-	 * 按比例计算费用
-	 * @param order
-	 * @param number
-	 * @return
-	 */
-	public OrderFeeData calcRaitoFee(OrderMargin order, BigDecimal total, BigDecimal number){
-		OrderFeeData orderAmount = new OrderFeeData();
-		
-		BigDecimal openFee; 
-		BigDecimal closeFee; 
-		BigDecimal orderMargin;
-
-		if(BigUtils.eq(number, BigDecimal.ZERO)){
-			openFee = BigDecimal.ZERO;
-			closeFee = BigDecimal.ZERO;
-			orderMargin = BigDecimal.ZERO;
-		}else if(BigUtils.eq(number, total)){
-			openFee = order.getOpenFee();
-			closeFee = order.getCloseFee();
-			orderMargin = order.getOrderMargin();
-		}else{
-			openFee = BigCalc.slope(number, total, order.getOpenFee());
-			closeFee = BigCalc.slope(number, total, order.getCloseFee());
-			orderMargin = BigCalc.slope(number, total, order.getOrderMargin());
-		}
-		
-		orderAmount.setOrderMargin(orderMargin);
-		orderAmount.setOpenFee(openFee);
-		orderAmount.setCloseFee(closeFee);
-		orderAmount.setOrderMargin(orderMargin);
-		orderAmount.setGrossMargin(BigCalc.sum(openFee, closeFee, orderMargin));
 		
 		return orderAmount;
 	}

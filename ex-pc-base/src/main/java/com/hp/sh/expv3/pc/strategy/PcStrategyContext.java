@@ -142,16 +142,18 @@ public class PcStrategyContext {
 			}
 		}
 
-		//手续费
-		BigDecimal tradeFee = orderStrategy.calcTradeFee(tradeResult.getNumber(), faceValue, tradeResult.getPrice(), tradeResult.getFeeRatio());
-		tradeResult.setFee(tradeFee);
-		
-		// 保证金
+		// 手续费&保证金
 		if(closeFlag==OrderFlag.ACTION_OPEN){
 			OrderFeeData feeData = orderStrategy.calcRaitoFee(order, matchedVo.getNumber(), order.getVolume());
+			tradeResult.setFee(feeData.getOpenFee());
+			
 			tradeResult.setOrderMargin(feeData.getOrderMargin()); //保证金
 			tradeResult.setCloseFee(feeData.getCloseFee());
 		}else{
+			
+			BigDecimal tradeFee = orderStrategy.calcTradeFee(tradeResult.getNumber(), faceValue, tradeResult.getPrice(), tradeResult.getFeeRatio());
+			tradeResult.setFee(tradeFee);
+			
 			OrderMarginVo posMargin = new OrderMarginVo(pcPosition.getPosMargin(), BigDecimal.ZERO, pcPosition.getCloseFee());
 			OrderFeeData feeData = orderStrategy.calcRaitoFee(posMargin, matchedVo.getNumber(), order.getVolume());
 			tradeResult.setOrderMargin(feeData.getOrderMargin()); //保证金
