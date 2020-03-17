@@ -80,7 +80,7 @@ public class LockAdvice {
     }
 	
 	private void lock(String realKey) {
-		this.locker.lock(realKey, 60);
+		this.locker.lock(realKey, 300);
 	}
 
 	private void unlock(String realKey) {
