@@ -83,6 +83,7 @@ public class PcMatchedBookSnapshotTask extends PcMatchedBaseTask {
         String value = JsonUtil.toJsonString(snapshot);
         pcRedisUtil.hset(snapshotRedisKey, field, value);
 
+        logger.info("======================{} {}===================",this.getAsset(), this.getSymbol());
         logger.info("save snapshot at {},{},{},{}", System.currentTimeMillis(), snapshotRedisKey, field, value);
 
         updateSentMqOffset();
