@@ -82,6 +82,10 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
     @Override
     @Scheduled(cron = "*/1 * * * * *")
     public void updateKlineByThirdData() {
+        if (bbKlineThirdCoverEnable!=1){
+            return;
+        }
+
 //        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
 //        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
         List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService,supportBbGroupIds);

@@ -65,8 +65,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("activeFlag", IntBool.NO);
         map.put("lastOrderId", lastOrderId);
 
-         Long count = bbOrderExtMapper.queryCount(map);
-        result.setRowTotal(count);
+        result.setRowTotal(0L);
 
         map.put("limit", pageSize);
         List<BbOrderVo> list = null;
@@ -113,7 +112,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("lastOrderId", lastOrderId);
 
         //总条数
-      Long count= bbOrderExtMapper.queryCount(map);
+//      Long count= bbOrderExtMapper.queryCount(map);
 
         map.put("limit", pageSize);
         List<BbOrderVo> list = null;
@@ -129,7 +128,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         }
         this.convertOrderList(userId, voList, list);
         result.setList(voList);
-        result.setRowTotal(count);
+        result.setRowTotal(0L);
         return result;
     }
 
