@@ -19,7 +19,9 @@ public class BbKLineKey {
 
     public static final String BB_KLINE_UPDATE = "kline:from_exp:update:BB:";
 
-    public static final String BB_SYMBOL = "bb_symbol";
-    public static final String BB_TRADE = "bb:trade";
+//    public static final String BB_SYMBOL = "bb_symbol";
+
+    public static final String BB_SYMBOL = "test_bb_symbol";
+
 
 }

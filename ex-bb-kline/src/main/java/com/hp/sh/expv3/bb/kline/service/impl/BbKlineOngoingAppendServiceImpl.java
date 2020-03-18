@@ -11,6 +11,7 @@ import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
+import com.hp.sh.expv3.utils.math.DecimalUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,6 @@ import redis.clients.jedis.JedisPubSub;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2020/3/10
@@ -49,8 +49,8 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
     @Value("${bb.kline}")
     private String bbKlinePattern;
 
-    @Value("${bb.kline.ongoingCalc.enable}")
-    private int ongoingCalcEnable;
+    @Value("${bb.kline.ongoingAppend.enable}")
+    private int ongoingAppendEnable;
 
     @Value("${bb.kline.bbGroupIds}")
     private Set<Integer> supportBbGroupIds;
@@ -82,9 +82,9 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
 
 
     @Override
-    @Scheduled(cron = "*/1 * * * * *")
+    @Scheduled(cron = "*/5 * * * * *")
     public void trigger() {
-        if (1 != ongoingCalcEnable) {
+        if (1 != ongoingAppendEnable) {
             return;
         }
 
@@ -131,50 +131,90 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
         final ExecutorService appendExecutor = Executors.newSingleThreadExecutor();
         appendExecutor.submit(
                 () -> {
-                    while (true) {
-                        List<BbTradeVo> tradeList = new ArrayList<>();
-                        for (int i = 0; i < 10; i++) {
-                            final List<BbTradeVo> list = queue.poll();
-                            if (null == list) {
-                                break;
-                            } else {
-                                logger.info("{},{},{}", asset, symbol, list.size());
-                                tradeList.addAll(list);
+
+                    try {
+                        {
+                            while (true) {
+                                List<BbTradeVo> tradeList = new ArrayList<>();
+                                for (int i = 0; i < 10; i++) {
+                                    final List<BbTradeVo> list = queue.poll();
+                                    if (null == list) {
+                                        break;
+                                    } else {
+                                        logger.info("{},{},{}", asset, symbol, list.size());
+                                        tradeList.addAll(list);
+                                    }
+                                }
+
+                                if (tradeList.isEmpty()) {
+                                    Thread.sleep(1L);
+                                    continue;
+                                }
+
+                                logger.info("{},{},trade size:{}", asset, symbol, tradeList.size());
+
+                                // 拆成不同的分钟
+//                        Map<Long, List<BbTradeVo>> minute2TradeList = tradeList.stream()
+//                                .collect(Collectors.groupingBy(klineTrade -> TimeUnit.MILLISECONDS.toMinutes(klineTrade.getTradeTime())));
+                                Map<Long, List<BbTradeVo>> minute2TradeList = new HashMap<>();
+                                for (BbTradeVo bbTradeVo : tradeList) {
+                                    final long minute = TimeUnit.MILLISECONDS.toMinutes(bbTradeVo.getTradeTime());
+                                    List<BbTradeVo> trades = minute2TradeList.get(minute);
+                                    if (null == trades) {
+                                        trades = new ArrayList<>();
+                                        minute2TradeList.put(minute, trades);
+                                    }
+                                    trades.add(bbTradeVo);
+                                }
+
+
+                                //1分钟kline 数据
+                                for (Long minute : minute2TradeList.keySet()) {
+                                    List<BbTradeVo> trades = minute2TradeList.get(minute);
+                                    final int oneMinuteInterval = 1;
+                                    BBKLine newkLine = buildKline(trades, asset, symbol, oneMinuteInterval, minute);
+
+                                    BBKLine oldkLine = getOldKLine(asset, symbol, minute, oneMinuteInterval);
+
+                                    BBKLine mergedKline = append(oldkLine, newkLine);
+                                    saveKline(mergedKline, asset, symbol, minute, oneMinuteInterval);
+                                    if (null != oldkLine) {
+                                        logger.info("{}{},t:{},o:{},c:{},h:{},l:{},v:{}", oldkLine.getAsset(), oldkLine.getSymbol(), TimeUnit.MILLISECONDS.toMinutes(oldkLine.getMs())
+                                                , DecimalUtil.toTrimLiteral(oldkLine.getOpen()),
+                                                DecimalUtil.toTrimLiteral(oldkLine.getClose()),
+                                                DecimalUtil.toTrimLiteral(oldkLine.getHigh()),
+                                                DecimalUtil.toTrimLiteral(oldkLine.getLow()),
+                                                DecimalUtil.toTrimLiteral(oldkLine.getVolume())
+                                        );
+                                    }
+                                    logger.info("{}{},t:{},o:{},c:{},h:{},l:{},v:{}", newkLine.getAsset(), newkLine.getSymbol(), TimeUnit.MILLISECONDS.toMinutes(newkLine.getMs())
+                                            , DecimalUtil.toTrimLiteral(newkLine.getOpen()),
+                                            DecimalUtil.toTrimLiteral(newkLine.getClose()),
+                                            DecimalUtil.toTrimLiteral(newkLine.getHigh()),
+                                            DecimalUtil.toTrimLiteral(newkLine.getLow()),
+                                            DecimalUtil.toTrimLiteral(newkLine.getVolume())
+                                    );
+                                    logger.info("{}{},t:{},o:{},c:{},h:{},l:{},v:{}", mergedKline.getAsset(), mergedKline.getSymbol(), TimeUnit.MILLISECONDS.toMinutes(mergedKline.getMs())
+                                            , DecimalUtil.toTrimLiteral(mergedKline.getOpen()),
+                                            DecimalUtil.toTrimLiteral(mergedKline.getClose()),
+                                            DecimalUtil.toTrimLiteral(mergedKline.getHigh()),
+                                            DecimalUtil.toTrimLiteral(mergedKline.getLow()),
+                                            DecimalUtil.toTrimLiteral(mergedKline.getVolume())
+                                    );
+                                    logger.info("===============");
+                                    notifyUpdate(asset, symbol, minute, oneMinuteInterval);
+                                }
                             }
                         }
-
-                        if (tradeList.isEmpty()) {
-                            Thread.sleep(1L);
-                            continue;
-                        }
-
-                        logger.info("{},{},trade size:{}", asset, symbol, tradeList.size());
-
-                        // 拆成不同的分钟
-                        Map<Long, List<BbTradeVo>> minute2TradeList = tradeList.stream()
-                                .collect(Collectors.groupingBy(klineTrade -> TimeUnit.MILLISECONDS.toMinutes(klineTrade.getTradeTime())));
-
-                        //1分钟kline 数据
-                        for (Long minute : minute2TradeList.keySet()) {
-                            List<BbTradeVo> trades = minute2TradeList.get(minute);
-                            final int oneMinuteInterval = 1;
-                            BBKLine newkLine = buildKline(trades, asset, symbol, oneMinuteInterval, minute);
-
-                            BBKLine oldkLine = getOldKLine(asset, symbol, minute, oneMinuteInterval);
-
-                            BBKLine mergedKline = append(oldkLine, newkLine);
-                            saveKline(mergedKline, asset, symbol, minute, oneMinuteInterval);
-
-                            notifyUpdate(asset, symbol, minute, oneMinuteInterval);
-                        }
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
                     }
+
                 }
         );
         appendExecutors.put(key, appendExecutor);
 
     }
-
-
 
 
     public BBKLine append(BBKLine oldkLine, BBKLine newkLine) {
@@ -262,6 +302,10 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
             final String s = new ArrayList<>(range).get(0);
 //            JSON字符串转JSON对象
             bbkLine1 = BBKlineUtil.convert2KlineData(s, freq);
+        }
+        if (null != bbkLine1) {
+            bbkLine1.setAsset(asset);
+            bbkLine1.setSymbol(symbol);
         }
         return bbkLine1;
     }
