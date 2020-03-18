@@ -115,7 +115,11 @@ public class PcTradeService {
 		
 		/* 4、返开仓手续费 */
 		if(tradeResult.getOrderCompleted()){
-			this.returnRemainOpenfee(pcOrderTrade.getUserId(), pcOrderTrade.getId(), pcOrderTrade.getAsset(), order.getOpenFee());
+			if(BigUtils.gtZero(order.getOpenFee())){
+				this.returnRemainOpenfee(pcOrderTrade.getUserId(), pcOrderTrade.getId(), pcOrderTrade.getAsset(), order.getOpenFee());
+			}else if(BigUtils.ltZero(order.getOpenFee())){
+				logger.error("剩余手续费小于0,{}", pcOrderTrade.getId());
+			}
 		}
 		
 	}

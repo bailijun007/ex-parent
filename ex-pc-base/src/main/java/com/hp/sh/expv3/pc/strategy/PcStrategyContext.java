@@ -144,7 +144,7 @@ public class PcStrategyContext {
 
 		// 手续费&保证金
 		if(closeFlag==OrderFlag.ACTION_OPEN){
-			OrderFeeData feeData = orderStrategy.calcRaitoFee(order, matchedVo.getNumber(), order.getVolume());
+			OrderFeeData feeData = orderStrategy.calcRaitoFee(order, order.getVolume(), matchedVo.getNumber());
 			tradeResult.setFee(feeData.getOpenFee());
 			
 			tradeResult.setOrderMargin(feeData.getOrderMargin()); //保证金
@@ -155,8 +155,7 @@ public class PcStrategyContext {
 			tradeResult.setFee(tradeFee);
 			
 			OrderMarginVo posMargin = new OrderMarginVo(pcPosition.getPosMargin(), BigDecimal.ZERO, pcPosition.getCloseFee());
-			OrderFeeData feeData = orderStrategy.calcRaitoFee(posMargin, matchedVo.getNumber(), order.getVolume());
-			tradeResult.setOrderMargin(feeData.getOrderMargin()); //保证金
+			tradeResult.setOrderMargin(posMargin.getOrderMargin()); //保证金
 			tradeResult.setCloseFee(BigDecimal.ZERO);
 		}
 		

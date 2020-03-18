@@ -44,12 +44,12 @@ public class BigCalc {
 	/**
 	 * 按比例计算amount
 	 * @param number 比例分子
-	 * @param volume 比例分母
+	 * @param total 比例分母
 	 * @param amount 求值对象
 	 * @return
 	 */
-	public static BigDecimal slope(BigDecimal number, BigDecimal volume, BigDecimal amount){
-		return number.multiply(amount).divide(volume, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
+	public static BigDecimal slope(BigDecimal number, BigDecimal total, BigDecimal amount){
+		return number.multiply(amount).divide(total, Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
 	}
 	
 }

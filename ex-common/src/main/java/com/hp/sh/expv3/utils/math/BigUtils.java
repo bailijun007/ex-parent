@@ -9,9 +9,14 @@ import java.math.BigDecimal;
  */
 public class BigUtils {
 	
-	//是否负数
+	//是否小于0
 	public static boolean ltZero(BigDecimal val){
 		return val.compareTo(BigDecimal.ZERO)<0;
+	}
+	
+	//是否小于等于0
+	public static boolean leZero(BigDecimal val){
+		return val.compareTo(BigDecimal.ZERO)<=0;
 	}
 
 	//大于零

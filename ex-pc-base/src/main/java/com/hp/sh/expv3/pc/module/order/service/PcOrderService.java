@@ -90,18 +90,18 @@ public class PcOrderService {
 	public PcOrder create(long userId, String clientOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(closeFlag==OrderFlag.ACTION_OPEN){
-			return this.createOpenOrder(userId, clientOrderId, asset, symbol, longFlag, timeInForce, price, number, pos, IntBool.YES);
+			return this.createOpenOrder(userId, clientOrderId, asset, symbol, longFlag, timeInForce, price, number, pos, IntBool.YES, PcOrderType.LIMIT);
 		}else{
-			return this.createCloseOrder(userId, clientOrderId, asset, symbol, longFlag, timeInForce, price, number, pos, IntBool.YES, IntBool.NO);
+			return this.createCloseOrder(userId, clientOrderId, asset, symbol, longFlag, timeInForce, price, number, pos, IntBool.YES, PcOrderType.LIMIT, IntBool.NO);
 		}
 	}
 	
 	public PcOrder createLiqOrder(long userId, String clientOrderId, String asset, String symbol, int longFlag, BigDecimal price, BigDecimal number, PcPosition pos){
-		return this.createCloseOrder(userId, clientOrderId, asset, symbol, longFlag, TimeInForce.IMMEDIATE_OR_CANCEL, price, number, pos, IntBool.NO, IntBool.YES);
+		return this.createCloseOrder(userId, clientOrderId, asset, symbol, longFlag, TimeInForce.IMMEDIATE_OR_CANCEL, price, number, pos, IntBool.NO, PcOrderType.MARKET, IntBool.YES);
 	}
 	
 	//创建开仓委托
-	protected PcOrder createOpenOrder(long userId, String clientOrderId, String asset, String symbol, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag){
+	protected PcOrder createOpenOrder(long userId, String clientOrderId, String asset, String symbol, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag, Integer orderType){
 
 		this.checkClientOrderId(userId, clientOrderId);
 		
@@ -119,7 +119,7 @@ public class PcOrderService {
 		pcOrder.setFaceValue(metadataService.getFaceValue(asset, symbol));
 		pcOrder.setPrice(price);
 		
-		pcOrder.setOrderType(PcOrderType.MARKET);
+		pcOrder.setOrderType(orderType);
 		pcOrder.setMarginMode(MarginMode.FIXED);
 		pcOrder.setTimeInForce(timeInForce);
 		pcOrder.setUserId(userId);
@@ -146,7 +146,7 @@ public class PcOrderService {
 		
 		pcOrder.setVisibleFlag(visibleFlag);
 		
-		this.orderUpdateService.saveOrder(pcOrder);
+		this.orderUpdateService.createNewOrder(pcOrder);
 
 		//开仓押金扣除
 		this.cutBalance(userId, asset, pcOrder.getId(), pcOrder.getGrossMargin(), longFlag);
@@ -155,7 +155,7 @@ public class PcOrderService {
 	}
 	
 	//平仓委托
-	protected PcOrder createCloseOrder(long userId, String clientOrderId, String asset, String symbol, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag, int liqFlag){
+	protected PcOrder createCloseOrder(long userId, String clientOrderId, String asset, String symbol, int longFlag, int timeInForce, BigDecimal price, BigDecimal number, PcPosition pos, Integer visibleFlag, Integer orderType, int liqFlag){
 		
 		this.checkClientOrderId(userId, clientOrderId);
 		
@@ -182,7 +182,7 @@ public class PcOrderService {
 		pcOrder.setFaceValue(metadataService.getFaceValue(asset, symbol));
 		pcOrder.setPrice(price);
 		
-		pcOrder.setOrderType(PcOrderType.LIMIT);
+		pcOrder.setOrderType(orderType);
 		pcOrder.setMarginMode(MarginMode.FIXED);
 		pcOrder.setTimeInForce(timeInForce);
 		pcOrder.setUserId(userId);
@@ -210,7 +210,7 @@ public class PcOrderService {
 		
 		pcOrder.setVisibleFlag(visibleFlag);
 		
-		this.orderUpdateService.saveOrder(pcOrder);
+		this.orderUpdateService.createNewOrder(pcOrder);
 		
 		return pcOrder;
 	}
@@ -289,8 +289,21 @@ public class PcOrderService {
 	}
 	
 	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal orderMargin, BigDecimal openFee, BigDecimal closeFee){
+		
+		if(BigUtils.ltZero(openFee)){
+			logger.error("剩余手续费小于0,{}", openFee);
+			openFee = BigDecimal.ZERO;
+		}
+		
+		BigDecimal amount = orderMargin.add(openFee).add(closeFee);
+		
+		if(BigUtils.ltZero(amount)){
+			logger.error("剩余保证金小于0,{}", orderMargin);
+			return InvokeResult.NOCHANGE;
+		}
+		
 		PcAddRequest request = new PcAddRequest();
-		request.setAmount(orderMargin.add(openFee).add(closeFee));
+		request.setAmount(amount);
 		request.setAsset(asset);
 		request.setRemark(BigFormat.format("撤单还押金：%s,%s,%s", orderMargin, openFee, closeFee));
 		request.setTradeNo(SnUtils.getCancelOrderReturnSn(""+orderId));
@@ -419,7 +432,7 @@ public class PcOrderService {
 		order.setOpenFee(BigDecimal.ZERO);
 		order.setCloseFee(BigDecimal.ZERO);
 		
-		this.orderUpdateService.updateOrder(order, now);
+		this.orderUpdateService.setCancelStatus(order, now);
 		
 		return;
 	}

@@ -28,6 +28,7 @@ import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.SnUtils;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
  * @author wangjg
@@ -113,7 +114,7 @@ public class PcAccountCoreService{
 		Long now = DbDateUtils.now();
 		
 		//金额必须是正数
-		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
+		if(BigUtils.leZero(record.getAmount())){
 			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE);
 		}
 		

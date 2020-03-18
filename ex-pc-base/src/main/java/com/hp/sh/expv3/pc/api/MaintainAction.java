@@ -70,14 +70,7 @@ public class MaintainAction{
 			if(list==null||list.isEmpty()){
 				break;
 			}
-			
-			for(PcOrder order : list){
-				boolean isExist = matchMqSender.exist(order.getAsset(), order.getSymbol(), ""+order.getId(), order.getCreated());
-				if(!isExist){
-					n++;
-				}
-			}
-			
+			n += list.size();
 			page.setPageNo(page.getPageNo()+1);
 		}
 		return n;
@@ -108,11 +101,8 @@ public class MaintainAction{
 			}
 			
 			for(PcOrder order : list){
-				boolean isExist = matchMqSender.exist(order.getAsset(), order.getSymbol(), ""+order.getId(), order.getCreated());
-				if(!isExist){
-					pcOrderApiAction.sendOrderMsg(order);
-					n++;
-				}
+				pcOrderApiAction.sendOrderMsg(order);
+				n++;
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
@@ -138,11 +128,8 @@ public class MaintainAction{
 			}
 			
 			for(PcOrder order : list){
-				boolean isExist = matchMqSender.exist(order.getAsset(), order.getSymbol(), ""+order.getId(), order.getCreated());
-				if(!isExist){
-					pcOrderApiAction.sendOrderMsg(order);
-					n++;
-				}
+				pcOrderApiAction.sendOrderMsg(order);
+				n++;
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {

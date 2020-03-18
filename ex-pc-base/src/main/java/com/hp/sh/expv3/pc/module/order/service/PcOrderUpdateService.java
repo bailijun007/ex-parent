@@ -39,7 +39,7 @@ public class PcOrderUpdateService {
     @Autowired
     private ApplicationEventPublisher publisher;
 	
-	public void saveOrder(PcOrder pcOrder) {
+	public void createNewOrder(PcOrder pcOrder) {
 		this.pcOrderDAO.save(pcOrder);
 		this.saveActiveOrder(pcOrder);
 		
@@ -48,26 +48,6 @@ public class PcOrderUpdateService {
 		this.saveUserOrderLog(pcOrder.getUserId(), pcOrder.getId(), PcOrderLogType.CREATE, now);
 	}
 	
-	public PcOrderLog updateOrder(PcOrder order, long now) {
-		this.pcOrderDAO.update(order);
-		
-		this.updateActiveOrder(order);
-		
-		//日志
-		PcOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.SET_STATUS_CANCEL, now);
-		this.publishOrderEvent(order, orderLog);
-		
-		return orderLog;
-	}
-
-	public void updateOrder4Trad(PcOrder order){
-		this.pcOrderDAO.update(order);
-		
-		this.updateActiveOrder(order);
-		
-		this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.TRADE, order.getModified());
-	}
-
 	public PcOrderLog setNewStatus(PcOrder order, long modified) {
 		long count = this.pcOrderDAO.updateStatus(OrderStatus.NEW, modified, order.getId(), order.getUserId(), order.getVersion());
 		if(count==0){
@@ -94,7 +74,27 @@ public class PcOrderUpdateService {
 		//日志
 		this.saveUserOrderLog(userId, orderId, PcOrderLogType.CHANGE_STATUS_CANCEL, modified);
 	}
-	
+
+	public PcOrderLog setCancelStatus(PcOrder order, long now) {
+		this.pcOrderDAO.update(order);
+		
+		this.updateActiveOrder(order);
+		
+		//日志
+		PcOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.SET_STATUS_CANCEL, now);
+		this.publishOrderEvent(order, orderLog);
+		
+		return orderLog;
+	}
+
+	public void updateOrder4Trad(PcOrder order){
+		this.pcOrderDAO.update(order);
+		
+		this.updateActiveOrder(order);
+		
+		this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.TRADE, order.getModified());
+	}
+
 	private PcOrderLog saveUserOrderLog(long userId, long orderId, int type, long now){
 		PcOrderLog pcOrderLog = new PcOrderLog();
 		pcOrderLog.setUserId(userId);
