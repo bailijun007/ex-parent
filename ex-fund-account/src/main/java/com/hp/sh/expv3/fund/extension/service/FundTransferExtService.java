@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface FundTransferExtService {
 
-    List<FundTransferExtVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus);
+    PageResult<FundTransferExtVo> pageQueryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus);
 
     PageResult<FundTransferExtVo> queryAllUserHistory(Long userId, String asset, Integer pageNo,Integer pageSize);
 }
