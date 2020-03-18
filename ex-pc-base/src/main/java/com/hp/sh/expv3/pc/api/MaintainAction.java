@@ -22,6 +22,7 @@ import com.hp.sh.expv3.pc.module.position.service.PcLiqService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
+import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
@@ -101,7 +102,13 @@ public class MaintainAction{
 			}
 			
 			for(PcOrder order : list){
-				pcOrderApiAction.sendOrderMsg(order);
+				OrderPendingCancelMsg mqMsg = new OrderPendingCancelMsg(order.getUserId(), order.getAsset(), order.getSymbol(), order.getId());
+				mqMsg.setAccountId(order.getUserId());
+				mqMsg.setAsset(order.getAsset());
+				mqMsg.setOrderId(order.getId());
+				mqMsg.setSymbol(order.getSymbol());
+				this.matchMqSender.sendPendingCancel(mqMsg);
+				
 				n++;
 				try {
 					Thread.sleep(10);
@@ -128,7 +135,7 @@ public class MaintainAction{
 			}
 			
 			for(PcOrder order : list){
-				pcOrderApiAction.sendOrderMsg(order);
+				matchMqSender.sendPendingNew(order);
 				n++;
 				try {
 					Thread.sleep(10);

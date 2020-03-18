@@ -13,10 +13,8 @@ import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.match.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
-import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingNewMsg;
 import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.vo.response.ActiveOrderVo;
-import com.hp.sh.expv3.utils.BidUtils;
 
 @RestController
 public class PcOrderApiAction implements PcOrderApi {
@@ -55,26 +53,9 @@ public class PcOrderApiAction implements PcOrderApi {
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
 
 		//send mq
-		this.sendOrderMsg(order);
+		matchMqSender.sendPendingNew(order);
 		
 		return order.getId();
-	}
-	
-	void sendOrderMsg(PcOrder order){
-		OrderPendingNewMsg msg = new OrderPendingNewMsg();
-		msg.setAccountId(order.getUserId());
-		msg.setAsset(order.getAsset());
-		msg.setBidFlag(BidUtils.getBidFlag(order.getCloseFlag(), order.getLongFlag()));
-		msg.setCloseFlag(order.getCloseFlag());
-		msg.setDisplayNumber(order.getVolume());
-		msg.setNumber(order.getVolume().subtract(order.getFilledVolume()));
-		msg.setOrderId(order.getId());
-		msg.setPrice(order.getPrice());
-		msg.setSymbol(order.getSymbol());
-		msg.setOrderType(order.getOrderType());
-		msg.setOrderTime(order.getCreated());
-		msg.setTimeInForce(order.getTimeInForce());
-		matchMqSender.sendPendingNew(msg);
 	}
 	
 	@Override

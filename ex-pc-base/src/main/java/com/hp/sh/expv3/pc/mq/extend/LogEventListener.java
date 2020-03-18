@@ -12,6 +12,8 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
+import com.hp.sh.expv3.pc.mq.MatchMqSender;
+import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderMsg;
 import com.hp.sh.expv3.pc.msg.PcAccountLog;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.NumberUtils;
@@ -29,10 +31,13 @@ public class LogEventListener {
 	private EventSender sender;
 	
 	@Autowired
+	private MatchMqSender matchMqSender;
+	
+	@Autowired
 	private PcPositionDataService positionDataService;
 
 	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-	public void afterCommit(PcAccountRecord pcAccountRecord) {
+	public void beforeCommit(PcAccountRecord pcAccountRecord) {
 		Integer type = this.getType(pcAccountRecord.getTradeType());
 		if(type==null){
 			return;
@@ -54,7 +59,7 @@ public class LogEventListener {
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-	public void afterCommit(PcOrderTrade orderTrade) {
+	public void beforeCommit(PcOrderTrade orderTrade) {
 		PcAccountLog logMsg = new PcAccountLog();
 		logMsg.setUserId(orderTrade.getUserId());
 		logMsg.setAsset(orderTrade.getAsset());
@@ -67,7 +72,7 @@ public class LogEventListener {
 	}
 
 	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-	public void afterCommit(PcLiqRecord liqRecord) {
+	public void beforeCommit(PcLiqRecord liqRecord) {
 		PcAccountLog logMsg = new PcAccountLog();
 		logMsg.setUserId(liqRecord.getUserId());
 		logMsg.setAsset(liqRecord.getAsset());
@@ -77,6 +82,11 @@ public class LogEventListener {
 		logMsg.setRefId(liqRecord.getId());
 		
 		this.sendEventMsg(logMsg);
+	}
+
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void afterCommit(PcOrderMsg orderMsg) {
+		this.matchMqSender.sendPendingNew(orderMsg.getOrder());
 	}
 
 	private Integer getType(int tradeType) {

@@ -15,13 +15,14 @@ import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.job.LiqHandleResult;
+import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.dao.PcLiqRecordDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.vo.PosUID;
+import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderMsg;
 import com.hp.sh.expv3.pc.mq.liq.msg.CancelOrder;
-import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
 import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -181,7 +182,7 @@ public class PcLiqService {
 		//2、清空仓位
 		this.clearLiqPos(pos, now);
 		//3、创建强平委托
-//		this.createLiqOrder(record);
+		this.createLiqOrder(record);
 	}
 	
 	private void clearLiqPos(PcPosition pos, Long now){
@@ -222,7 +223,9 @@ public class PcLiqService {
 	
 	private void createLiqOrder(PcLiqRecord record){
 		PcPosition pos = positionDataService.getPosition(record.getUserId(), record.getAsset(), record.getSymbol(), record.getPosId());
-		this.pcOrderService.createLiqOrder(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), record.getLongFlag(), record.getBankruptPrice(), record.getVolume(), pos);
+		PcOrder order = this.pcOrderService.createLiqOrder(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), record.getLongFlag(), record.getBankruptPrice(), record.getVolume(), pos);
+		PcOrderMsg msg = new PcOrderMsg(order);
+		this.publisher.publishEvent(msg);
 	}
 
 }
