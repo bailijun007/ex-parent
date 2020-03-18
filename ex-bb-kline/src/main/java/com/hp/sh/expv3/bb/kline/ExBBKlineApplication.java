@@ -1,7 +1,9 @@
 package com.hp.sh.expv3.bb.kline;
 
+import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.service.BbKlineHistoryCalcByTradeFromExpService;
 import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingAppendService;
+import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @EnableScheduling
 @EnableDiscoveryClient

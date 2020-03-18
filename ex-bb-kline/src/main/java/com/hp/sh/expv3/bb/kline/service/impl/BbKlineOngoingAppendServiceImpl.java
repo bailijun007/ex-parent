@@ -6,6 +6,7 @@ import com.hp.sh.expv3.bb.kline.pojo.BBKlineTrade;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
 import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingAppendService;
+import com.hp.sh.expv3.bb.kline.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
@@ -50,8 +51,15 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
 
     @Value("${bb.kline}")
     private String bbKlinePattern;
+
     @Value("${bb.kline.ongoingCalc.enable}")
     private int ongoingCalcEnable;
+
+    @Value("${bb.kline.bbGroupIds}")
+    private Set<Integer> supportBbGroupIds;
+
+    @Autowired
+    private  SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 //    private static   ScheduledExecutorService timer = Executors.newScheduledThreadPool(2);
 
@@ -74,10 +82,13 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
 //        trigger();
     }
 
+
+
     @Override
     public void trigger() {
+        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService,supportBbGroupIds);
 
-        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
+//        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
 
         for (BBSymbol bbSymbol : bbSymbols) {
             String asset = bbSymbol.getAsset();

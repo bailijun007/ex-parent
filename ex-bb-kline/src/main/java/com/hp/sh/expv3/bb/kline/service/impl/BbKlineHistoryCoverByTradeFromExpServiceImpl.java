@@ -6,6 +6,7 @@ import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
 import com.hp.sh.expv3.bb.kline.service.BbKlineHistoryCoverByTradeFromExpService;
 import com.hp.sh.expv3.bb.kline.service.BbRepairTradeExtService;
+import com.hp.sh.expv3.bb.kline.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
@@ -68,6 +69,8 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
     @Value("${bb.kline.bbKlineFromExpCoverEnable}")
     private int bbKlineFromExpCoverEnable;
 
+    @Autowired
+    private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             2,
@@ -88,10 +91,13 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
         }
     }
 
+
+
     public void updateKlineByExpHistory() {
 
-        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
+//        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
+//        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService,supportBbGroupIds);
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
 

@@ -4,6 +4,7 @@ import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingMergeService;
+import com.hp.sh.expv3.bb.kline.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
@@ -57,6 +58,9 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     @Value("${bb.kline.ongoingMerge.enable}")
     private int ongoingMergeEnable;
 
+    @Autowired
+    private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
+
     @PostConstruct
     private void init() {
         final String[] freqs = supportFrequenceString.split(",");
@@ -87,11 +91,14 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
         }
     }
 
+
+
     @Override
     public void mergeKlineData() {
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService,supportBbGroupIds);
 
-        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
+//        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
+//        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
 
 
         // 谁由谁触发
