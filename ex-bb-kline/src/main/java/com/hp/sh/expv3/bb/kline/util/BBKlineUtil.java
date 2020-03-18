@@ -52,13 +52,6 @@ public class BBKlineUtil {
         return bbkLine;
     }
 
-    /**
-     * 分钟时间戳转成毫秒时间戳
-     */
-    public static Long minutesToMillis(Long minute) {
-        return TimeUnit.MINUTES.toMillis(minute);
-    }
-
 
     public static List<BBSymbol> listSymbol(RedisUtil metadataRedisUtil) {
         final Map<String, BBSymbol> key2Value = metadataRedisUtil.hgetAll(BbKLineKey.BB_SYMBOL, BBSymbol.class);

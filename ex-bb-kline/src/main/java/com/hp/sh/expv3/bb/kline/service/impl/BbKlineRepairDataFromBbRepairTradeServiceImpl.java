@@ -39,7 +39,6 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
     @Autowired
     private BbRepairTradeMapper bbRepairTradeMapper;
 
-
     @Autowired
     @Qualifier("metadataRedisUtil")
     private RedisUtil metadataRedisUtil;

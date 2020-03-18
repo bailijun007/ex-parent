@@ -58,15 +58,16 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
 
     @Value("${bb.kline}")
     private String bbKlinePattern;
+
     @Value("${from_exp.bbKlineDataPattern}")
     private String fromExpBbKlineDataPattern;
+
     @Value("${from_exp.bbKlineDataUpdateEventPattern}")
     private String fromExpBbKlineDataUpdateEventPattern;
+
     @Value("${bb.kline.bbKlineFromExpCoverEnable}")
     private int bbKlineFromExpCoverEnable;
 
-    @Autowired
-    private BbRepairTradeExtService bbRepairTradeExtService;
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             2,

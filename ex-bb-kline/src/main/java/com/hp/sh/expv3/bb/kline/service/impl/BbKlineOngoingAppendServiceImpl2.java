@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 public class BbKlineOngoingAppendServiceImpl2 implements BbKlineOngoingAppendService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-
     @Value("${bb.trade.pattern}")
     private String bbTradePattern;
 
@@ -47,11 +46,9 @@ public class BbKlineOngoingAppendServiceImpl2 implements BbKlineOngoingAppendSer
 
     @Value("${bb.kline}")
     private String bbKlinePattern;
+
     @Value("${bb.kline.ongoingCalc.enable}")
     private int ongoingCalcEnable;
-
-//    private static   ScheduledExecutorService timer = Executors.newScheduledThreadPool(2);
-
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             2,

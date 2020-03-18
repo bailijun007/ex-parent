@@ -185,6 +185,7 @@
                 ORDER BY id desc
             </if>
         </where>
+        ORDER BY id desc
         LIMIT 0,${limit}
     </select>
 

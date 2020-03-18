@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-
     @Value("${bb.trade.pattern}")
     private String bbTradePattern;
 
