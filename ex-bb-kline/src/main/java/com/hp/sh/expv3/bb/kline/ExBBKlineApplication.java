@@ -27,9 +27,6 @@ public class ExBBKlineApplication {
     public static void main(String[] args) throws Exception {
         final ConfigurableApplicationContext ac = SpringApplication.run(ExBBKlineApplication.class, args);
 
-        final BbKlineOngoingAppendService bean = ac.getBean(BbKlineOngoingAppendService.class);
-        bean.trigger();
-
         final BbKlineHistoryCalcByTradeFromExpService bbKlineHistoryCalcByTradeFromExpService = ac.getBean(BbKlineHistoryCalcByTradeFromExpService.class);
         bbKlineHistoryCalcByTradeFromExpService.execute();
 

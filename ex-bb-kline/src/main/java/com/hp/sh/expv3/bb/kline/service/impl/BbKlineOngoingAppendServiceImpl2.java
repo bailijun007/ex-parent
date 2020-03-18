@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.JedisPubSub;
 
@@ -67,90 +68,107 @@ public class BbKlineOngoingAppendServiceImpl2 implements BbKlineOngoingAppendSer
     );
 
     //    @PostConstruct
-    public void bbKlineBuild() {
-        if (1 != ongoingCalcEnable) {
+//    public void bbKlineBuild() {
+//        if (1 != ongoingCalcEnable) {
+//            return;
+//        }
+//        threadPool.execute(() -> trigger());
+//
+//    }
+
+    Map<String, ExecutorService> pubsubExecutors = new HashMap<>();
+    Map<String, ExecutorService> appendExecutors = new HashMap<>();
+
+    public void appendSymbol(BBSymbol bbSymbol) {
+        final String key = bbSymbol.getAsset() + "_" + bbSymbol.getSymbol();
+        if (pubsubExecutors.containsKey(key)) {
             return;
         }
-        threadPool.execute(() -> trigger());
+
+        String asset = bbSymbol.getAsset();
+        String symbol = bbSymbol.getSymbol();
+        //监听 Exp 平台实时推送消息
+        String channel = StringReplaceUtil.replace(bbTradePattern, new HashMap<String, String>() {
+            {
+                put("asset", asset);
+                put("symbol", symbol);
+            }
+        });
+
+        final ArrayBlockingQueue<List<BbTradeVo>> queue = new ArrayBlockingQueue<>(10000000);
+
+        final ExecutorService pubsubExecutor = Executors.newSingleThreadExecutor();
+        pubsubExecutor.submit(
+                () ->
+                        bbKlineOngoingRedisUtil.getOriginalJedis().subscribe(new JedisPubSub() {
+                            @Override
+                            public void onMessage(String channel, String msg) {
+                                logger.info("收到k线推送消息:{},{}", channel, msg);
+                                List<BbTradeVo> list = parseTrades(msg);
+                                queue.add(list);
+                            }
+                        }, channel)
+        );
+        pubsubExecutors.put(key, pubsubExecutor);
+
+        final ExecutorService appendExecutor = Executors.newSingleThreadExecutor();
+        appendExecutor.submit(
+                () -> {
+                    while (true) {
+                        List<BbTradeVo> tradeList = new ArrayList<>();
+                        for (int i = 0; i < 10; i++) {
+                            final List<BbTradeVo> list = queue.poll();
+                            if (null == list) {
+                                break;
+                            } else {
+                                logger.info("{},{},{}", asset, symbol, list.size());
+                                tradeList.addAll(list);
+                            }
+                        }
+
+                        if (tradeList.isEmpty()) {
+                            Thread.sleep(1L);
+                            continue;
+                        }
+
+                        logger.info("{},{},trade size:{}", asset, symbol, tradeList.size());
+
+                        // 拆成不同的分钟
+                        Map<Long, List<BbTradeVo>> minute2TradeList = tradeList.stream()
+                                .collect(Collectors.groupingBy(klineTrade -> TimeUnit.MILLISECONDS.toMinutes(klineTrade.getTradeTime())));
+
+                        //1分钟kline 数据
+                        for (Long minute : minute2TradeList.keySet()) {
+                            List<BbTradeVo> trades = minute2TradeList.get(minute);
+                            final int oneMinuteInterval = 1;
+                            BBKLine newkLine = buildKline(trades, asset, symbol, oneMinuteInterval, minute);
+
+                            BBKLine oldkLine = getOldKLine(asset, symbol, minute, oneMinuteInterval);
+
+                            BBKLine mergedKline = append(oldkLine, newkLine);
+                            saveKline(mergedKline, asset, symbol, minute, oneMinuteInterval);
+
+                            notifyUpdate(asset, symbol, minute, oneMinuteInterval);
+                        }
+                    }
+                }
+        );
+        appendExecutors.put(key, appendExecutor);
 
     }
 
-
-
     @Override
+    @Scheduled()
     public void trigger() {
-//        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService,supportBbGroupIds);
+        if (1 != ongoingCalcEnable) {
+            return;
+        }
 
+//        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
+        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService, supportBbGroupIds);
 
         for (BBSymbol bbSymbol : bbSymbols) {
-            String asset = bbSymbol.getAsset();
-            String symbol = bbSymbol.getSymbol();
-            //监听 Exp 平台实时推送消息
-            String channel = StringReplaceUtil.replace(bbTradePattern, new HashMap<String, String>() {
-                {
-                    put("asset", asset);
-                    put("symbol", symbol);
-                }
-            });
-
-            final ArrayBlockingQueue<List<BbTradeVo>> queue = new ArrayBlockingQueue<>(10000000);
-
-            Executors.newSingleThreadExecutor().submit(
-                    () ->
-                            bbKlineOngoingRedisUtil.getOriginalJedis().subscribe(new JedisPubSub() {
-                                @Override
-                                public void onMessage(String channel, String msg) {
-                                    logger.info("收到k线推送消息:{},{}", channel, msg);
-                                    List<BbTradeVo> list = parseTrades(msg);
-                                    queue.add(list);
-                                }
-                            }, channel)
-            );
-
-            Executors.newSingleThreadExecutor().submit(
-                    () -> {
-                        while (true) {
-                            List<BbTradeVo> tradeList = new ArrayList<>();
-                            for (int i = 0; i < 10; i++) {
-                                final List<BbTradeVo> list = queue.poll();
-                                if (null == list) {
-                                    break;
-                                } else {
-                                    logger.info("{},{},{}", asset, symbol, list.size());
-                                    tradeList.addAll(list);
-                                }
-                            }
-
-                            if (tradeList.isEmpty()) {
-                                Thread.sleep(1L);
-                                continue;
-                            }
-
-                            logger.info("{},{},trade size:{}", asset, symbol, tradeList.size());
-
-                            // 拆成不同的分钟
-                            Map<Long, List<BbTradeVo>> minute2TradeList = tradeList.stream()
-                                    .collect(Collectors.groupingBy(klineTrade -> TimeUnit.MILLISECONDS.toMinutes(klineTrade.getTradeTime())));
-
-                            //1分钟kline 数据
-                            for (Long minute : minute2TradeList.keySet()) {
-                                List<BbTradeVo> trades = minute2TradeList.get(minute);
-                                final int oneMinuteInterval = 1;
-                                BBKLine newkLine = buildKline(trades, asset, symbol, oneMinuteInterval, minute);
-
-                                BBKLine oldkLine = getOldKLine(asset, symbol, minute, oneMinuteInterval);
-
-                                BBKLine mergedKline = append(oldkLine, newkLine);
-                                saveKline(mergedKline, asset, symbol, minute, oneMinuteInterval);
-
-                                notifyUpdate(asset, symbol, minute, oneMinuteInterval);
-                            }
-                        }
-                    }
-            );
-
-
+            appendSymbol(bbSymbol);
         }
     }
 
