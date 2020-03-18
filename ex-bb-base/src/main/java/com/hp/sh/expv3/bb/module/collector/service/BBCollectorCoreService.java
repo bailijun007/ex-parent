@@ -126,7 +126,7 @@ public class BBCollectorCoreService{
 	
 	private BBCollectorAccount newAccount(Long collectorId, String asset, BigDecimal balance, Long now){
 		BBCollectorAccount account = new BBCollectorAccount();
-		account.setCollectorId(collectorId);
+		account.setId(collectorId);
 		account.setAsset(asset);
 		account.setBalance(balance);
 		account.setCreated(now);

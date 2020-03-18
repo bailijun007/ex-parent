@@ -27,7 +27,7 @@ public class TradeResult {
 	private BigDecimal pnl;
 	
 	//此次成交的委托到仓位的平仓手续费
-	private BigDecimal closeFee;
+	private BigDecimal orderCloseFee;
 
 	/* 以下为累计结果 */
 	
@@ -142,12 +142,12 @@ public class TradeResult {
 		this.amount = amount;
 	}
 
-	public BigDecimal getCloseFee() {
-		return closeFee;
+	public BigDecimal getOrderCloseFee() {
+		return orderCloseFee;
 	}
 
-	public void setCloseFee(BigDecimal closeFee) {
-		this.closeFee = closeFee;
+	public void setOrderCloseFee(BigDecimal closeFee) {
+		this.orderCloseFee = closeFee;
 	}
 
 }

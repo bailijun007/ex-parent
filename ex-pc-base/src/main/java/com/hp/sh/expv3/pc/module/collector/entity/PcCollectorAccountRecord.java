@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import javax.persistence.Table;
 
-import com.hp.sh.expv3.base.entity.BaseRecordEntity;
+import com.hp.sh.expv3.base.entity.BaseSysEntity;
 import com.hp.sh.expv3.commons.mybatis.TxId;
 
 /**
@@ -14,10 +14,8 @@ import com.hp.sh.expv3.commons.mybatis.TxId;
  *
  */
 @Table(name="pc_collector_account_record")
-public class PcCollectorAccountRecord extends BaseRecordEntity	 {
+public class PcCollectorAccountRecord extends BaseSysEntity	 {
 
-	private static final long serialVersionUID = 1L;
-	
 	//资产
 	private String asset;
 	
@@ -55,6 +53,11 @@ public class PcCollectorAccountRecord extends BaseRecordEntity	 {
 	private Long txId;
 	
 	private Long collectorId;
+	//用户ID
+	protected Long userId;
+	
+	//请求ID
+	protected String requestId;
 
 	public PcCollectorAccountRecord() {
 	}
@@ -156,9 +159,25 @@ public class PcCollectorAccountRecord extends BaseRecordEntity	 {
 		this.collectorId = collectorId;
 	}
 
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public String getRequestId() {
+		return requestId;
+	}
+
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
+	}
+
 	public String toValueString() {
 		return "[type=" + type + ", asset=" + asset + ", amount=" + amount.stripTrailingZeros().toPlainString() + ", tradeNo=" 
-				+ tradeNo + ", tradeType=" + tradeType + ", remark=" + remark + ", userId=" + this.getUserId()
+				+ tradeNo + ", tradeType=" + tradeType + ", remark=" + remark + ", userId=" + userId
 				+ "]";
 	}
 	

@@ -18,7 +18,9 @@ public class Precision {
     public static final int INTEGER_PRECISION = 0;
     
     public static final int LIQ_MARGIN_RATIO = 4;
-    
+
 	public static final RoundingMode LESS = RoundingMode.DOWN;
+	
+	public static final RoundingMode MORE = RoundingMode.UP;
 	
 }

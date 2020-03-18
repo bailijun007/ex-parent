@@ -4,7 +4,7 @@
 <mapper namespace="com.hp.sh.expv3.pc.module.collector.dao.PcCollectorAccountDAO">
 
 	<resultMap type="com.hp.sh.expv3.pc.module.collector.entity.PcCollectorAccount" id="PcCollectorAccount">
-		<result column="collector_id" property="collectorId" />
+		<result column="id" property="id" />
 		<result column="asset" property="asset" />
 		<result column="balance" property="balance" />
 		<result column="version" property="version" />
@@ -13,12 +13,12 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		collector_id,asset,balance,version,created,modified
+		id,asset,balance,version,created,modified
 	</sql>
 
 	<sql id="simple_where">
 		<where>
-			<if test="collectorId!=null and collectorId!=''"> and collector_id=#{collectorId}</if>
+			<if test="id!=null and id!=''"> and id=#{id}</if>
 			<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
 			<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
 			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
@@ -79,9 +79,9 @@
 
 	<insert id="save">
 		insert into pc_collector_account (
-			collector_id,asset,balance,version,created,modified
+			id,asset,balance,version,created,modified
 		)values(
-			#{collectorId},#{asset},#{balance},#{version},#{created},#{modified}
+			#{id},#{asset},#{balance},#{version},#{created},#{modified}
 		)
 	</insert>
 	
@@ -91,7 +91,7 @@
 		set 
 			asset=#{asset},balance=#{balance},version=${version}+1,created=#{created},modified=#{modified}
 		where 
-			collector_id=#{collectorId} and asset=#{asset} and version=#{version}
+			id=#{id} and asset=#{asset} and version=#{version}
 	</update>
 
     <delete id="condDelete">
@@ -105,7 +105,7 @@
 		select
 			<include refid="Base_Column_List" />
 		from pc_collector_account
-			where collector_id=#{collectorId} and asset=#{asset}
+			where id=#{id} and asset=#{asset}
 	</select>
 	
 </mapper>

@@ -145,18 +145,17 @@ public class PcStrategyContext {
 		// 手续费&保证金
 		if(closeFlag==OrderFlag.ACTION_OPEN){
 			OrderFeeData feeData = orderStrategy.calcRaitoFee(order, order.getVolume(), matchedVo.getNumber());
-			tradeResult.setFee(feeData.getOpenFee());
+			tradeResult.setFee(feeData.getOpenFee().multiply(tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE)));
 			
 			tradeResult.setOrderMargin(feeData.getOrderMargin()); //保证金
-			tradeResult.setCloseFee(feeData.getCloseFee());
+			tradeResult.setOrderCloseFee(feeData.getCloseFee());
 		}else{
-			
 			BigDecimal tradeFee = orderStrategy.calcTradeFee(tradeResult.getNumber(), faceValue, tradeResult.getPrice(), tradeResult.getFeeRatio());
-			tradeResult.setFee(tradeFee);
+			tradeResult.setFee(tradeFee.multiply(tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE)));
 			
 			OrderMarginVo posMargin = new OrderMarginVo(pcPosition.getPosMargin(), BigDecimal.ZERO, pcPosition.getCloseFee());
 			tradeResult.setOrderMargin(posMargin.getOrderMargin()); //保证金
-			tradeResult.setCloseFee(BigDecimal.ZERO);
+			tradeResult.setOrderCloseFee(BigDecimal.ZERO);
 		}
 		
 		/* **************** 仓位累计数据 **************** */

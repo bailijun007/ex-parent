@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.hp.sh.expv3.base.mapper.BaseAccountDataMapper;
+import com.hp.sh.expv3.base.mapper.BaseMapper;
 import com.hp.sh.expv3.pc.module.riskfund.entity.PcRiskfundAccountRecord;
 
 /**
@@ -14,7 +14,7 @@ import com.hp.sh.expv3.pc.module.riskfund.entity.PcRiskfundAccountRecord;
  * @author wangjg
  *
  */
-public interface PcRiskfundAccountRecordDAO extends BaseAccountDataMapper<PcRiskfundAccountRecord,Long> {
+public interface PcRiskfundAccountRecordDAO extends BaseMapper<PcRiskfundAccountRecord,Long> {
 
 	public List<PcRiskfundAccountRecord> queryList(Map<String,Object> params);
 	

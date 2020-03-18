@@ -4,40 +4,26 @@ import java.math.BigDecimal;
 
 import javax.persistence.Table;
 
+import com.hp.sh.expv3.base.entity.BaseSysEntity;
+
 /**
  * 币币_币币手续费
  * @author lw
  *
  */
 @Table(name="pc_collector_account")
-public class PcCollectorAccount {
+public class PcCollectorAccount extends BaseSysEntity{
 
-	protected Long id;
-	
 	//资产类型
 	private String asset;
 	
 	//余额
 	private BigDecimal balance;
-
-	// 创建时间
-	private Long created;
-	
-	// 修改时间
-	private Long modified;
 	
 	//版本
 	private Long version;
 
 	public PcCollectorAccount() {
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getAsset() {
@@ -54,22 +40,6 @@ public class PcCollectorAccount {
 
 	public void setBalance(BigDecimal balance) {
 		this.balance = balance;
-	}
-
-	public Long getCreated() {
-		return created;
-	}
-
-	public void setCreated(Long created) {
-		this.created = created;
-	}
-
-	public Long getModified() {
-		return modified;
-	}
-
-	public void setModified(Long modified) {
-		this.modified = modified;
 	}
 
 	public Long getVersion() {

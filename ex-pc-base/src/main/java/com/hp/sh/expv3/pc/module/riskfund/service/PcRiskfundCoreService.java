@@ -79,13 +79,13 @@ public class PcRiskfundCoreService{
 			return InvokeResult.NOCHANGE;
 		}
 		
-		PcRiskfundAccount collectorAccount = this.accountDAO.get(record.getCollectorId(), record.getAsset());
+		PcRiskfundAccount collectorAccount = this.accountDAO.get(record.getRiskfundAccountId(), record.getAsset());
 		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
 		if(collectorAccount==null){
 			//检查余额
 			this.checkBalance(record, recordAmount);
 			
-			collectorAccount = this.newAccount(record.getCollectorId(), record.getAsset(), recordAmount, now);
+			collectorAccount = this.newAccount(record.getRiskfundAccountId(), record.getAsset(), recordAmount, now);
 		}else{
 			BigDecimal newBalance = collectorAccount.getBalance().add(recordAmount);
 			//检查余额
@@ -137,7 +137,7 @@ public class PcRiskfundCoreService{
 	}
 
 	private boolean checkExist(PcRiskfundAccountRecord record) {
-		PcRiskfundAccountRecord oldRcd = this.accountRecordDAO.findByTradeNo(record.getCollectorId(), record.getTradeNo());
+		PcRiskfundAccountRecord oldRcd = this.accountRecordDAO.findByTradeNo(record.getRiskfundAccountId(), record.getTradeNo());
 		if(oldRcd == null){
 			return false;
 		}
@@ -163,9 +163,8 @@ public class PcRiskfundCoreService{
 		record.setRemark(request.getRemark());
 		record.setTradeNo(request.getTradeNo());
 		record.setTradeType(request.getTradeType());
-		record.setUserId(request.getUserId());
 		record.setAssociatedId(request.getAssociatedId());
-		record.setCollectorId(request.getCollectorId());
+		record.setRiskfundAccountId(request.getCollectorId());
 		return record;
 	}
 	
