@@ -3,6 +3,36 @@
 
 <mapper namespace="com.hp.sh.expv3.fund.extension.dao.FundTransferExtMapper">
 
+    <select id="queryCount" resultType="java.lang.Long">
+        select count(1)
+        FROM fund_transfer
+        <where>
+            <if test="userId!=null">
+                user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+
+            <choose>
+                <when test="pageStatus==1  and queryId!=null">
+                    and id &lt;  #{queryId}
+                    ORDER BY id desc
+
+                </when>
+                <when test="pageStatus==-1 and queryId!=null">
+                    and id &gt;= #{queryId}
+                    ORDER BY id asc
+
+                </when>
+                <otherwise>
+                    ORDER BY id desc
+
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
     <select id="queryHistory" resultType="com.hp.sh.expv3.fund.extension.vo.FundTransferExtVo">
     SELECT id transferId,asset,  amount qty,created,status,src_account_type  fromAccount,target_account_type toAccount FROM fund_transfer
         <where>

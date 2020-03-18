@@ -17,4 +17,6 @@ public interface FundTransferExtMapper {
 
     List<FundTransferExtVo> queryList(Map<String,Object> map);
 
+    Long queryCount(@Param("userId") Long userId,@Param("asset") String asset,
+                    @Param("queryId") Long queryId, @Param("pageStatus") Integer pageStatus);
 }

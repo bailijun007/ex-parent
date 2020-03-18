@@ -43,8 +43,9 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
                 transferExtVo.setStatus(1);
             }
         }
-        PageInfo<FundTransferExtVo> info = new PageInfo<>(voList);
-        pageResult.setRowTotal(info.getTotal());
+        Long count = fundTransferExtMapper.queryCount(userId, asset, queryId, pageStatus);
+
+        pageResult.setRowTotal(count);
         pageResult.setList(voList);
         return pageResult;
     }
