@@ -87,7 +87,7 @@ public class BbKlineOngoingAppendServiceImpl2 implements BbKlineOngoingAppendSer
                 }
             });
 
-            final ArrayBlockingQueue<List<BbTradeVo>> queue = new ArrayBlockingQueue<>(1024);
+            final ArrayBlockingQueue<List<BbTradeVo>> queue = new ArrayBlockingQueue<>(10000000);
 
             Executors.newSingleThreadExecutor().submit(
                     () ->
@@ -105,7 +105,7 @@ public class BbKlineOngoingAppendServiceImpl2 implements BbKlineOngoingAppendSer
                     () -> {
                         while (true) {
                             List<BbTradeVo> tradeList = new ArrayList<>();
-                            for (int i = 0; i < 5; i++) {
+                            for (int i = 0; i < 10; i++) {
                                 final List<BbTradeVo> list = queue.poll();
                                 if (null == list) {
                                     break;
