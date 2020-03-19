@@ -30,11 +30,11 @@ public class BBKlineUtil {
     public static String kline2ArrayData(BBKLine bbkLine) {
         BigDecimal[] bigDecimals = new BigDecimal[6];
         bigDecimals[0] = new BigDecimal(bbkLine.getMs());
-        bigDecimals[1] = bbkLine.getOpen() == null ? BigDecimal.ZERO : bbkLine.getOpen().stripTrailingZeros();
-        bigDecimals[2] = bbkLine.getHigh() == null ? BigDecimal.ZERO : bbkLine.getHigh().stripTrailingZeros();
-        bigDecimals[3] = bbkLine.getLow() == null ? BigDecimal.ZERO : bbkLine.getLow().stripTrailingZeros();
-        bigDecimals[4] = bbkLine.getClose() == null ? BigDecimal.ZERO : bbkLine.getClose().stripTrailingZeros();
-        bigDecimals[5] = bbkLine.getVolume() == null ? BigDecimal.ZERO : bbkLine.getVolume().stripTrailingZeros();
+        bigDecimals[1] = bbkLine.getOpen().stripTrailingZeros();
+        bigDecimals[2] = bbkLine.getHigh().stripTrailingZeros();
+        bigDecimals[3] = bbkLine.getLow().stripTrailingZeros();
+        bigDecimals[4] = bbkLine.getClose().stripTrailingZeros();
+        bigDecimals[5] = bbkLine.getVolume().stripTrailingZeros();
         final String s = JsonUtil.toJsonString(bigDecimals);
         return s;
     }
@@ -62,11 +62,11 @@ public class BBKlineUtil {
 //        return list;
 //    }
 
-    public  static List<BBSymbol> listSymbols(SupportBbGroupIdsJobService supportBbGroupIdsJobService,Set<Integer> supportBbGroupIds){
-        List<BBSymbol> bbSymbols =null;
+    public static List<BBSymbol> listSymbols(SupportBbGroupIdsJobService supportBbGroupIdsJobService, Set<Integer> supportBbGroupIds) {
+        List<BBSymbol> bbSymbols = null;
         final Map<Integer, List<BBSymbol>> map = supportBbGroupIdsJobService.listSymbols();
         for (Integer integer : map.keySet()) {
-            if(supportBbGroupIds.contains(integer)){
+            if (supportBbGroupIds.contains(integer)) {
                 bbSymbols = map.get(integer);
             }
         }

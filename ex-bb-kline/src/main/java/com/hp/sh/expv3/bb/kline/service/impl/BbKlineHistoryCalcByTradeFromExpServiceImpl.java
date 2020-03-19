@@ -84,6 +84,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
+
     @Scheduled(cron = "*/1 * * * * *")
     @Override
     public void execute() {
@@ -93,11 +94,11 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
         } else {
 
 //            while (true) {
-                threadPool.execute(() -> repairKlineFromExp());
-                try {
-                    Thread.sleep(1L);
-                } catch (InterruptedException e) {
-                }
+            threadPool.execute(() -> repairKlineFromExp());
+            try {
+                Thread.sleep(1L);
+            } catch (InterruptedException e) {
+            }
 //            }
 
         }
@@ -108,7 +109,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 
 //        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
 //        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService,supportBbGroupIds);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService, supportBbGroupIds);
 
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
@@ -150,20 +151,17 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 
                     if (null == trades || trades.isEmpty()) {
                         trades = listTrade(asset, symbol, ms, maxMs);
-                    } else {
-                        BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
-
-                        logger.info("build kline data:{}", kline.toString());
-
-                        saveKline(repairkey, kline);
-
-                        notifyUpdate(notifyUpdateKey, ms);
                     }
 
+                    if (null == trades || trades.isEmpty()) {
+                    } else {
+                        BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
+                        logger.info("build kline data:{}", kline.toString());
+                        saveKline(repairkey, kline);
+                        notifyUpdate(notifyUpdateKey, ms);
+                    }
                 }
-
             }
-
         }
     }
 
@@ -205,7 +203,20 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
      * @param maxMs
      * @return
      */
-    private List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {
+    private List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {// TODO xb,一分钟内成交太多，会引入性能问题。
+        /**
+         * 首次查询：
+         * sql: select *(具体的列，不需要所有列)
+         * from table
+         *  where trade_time >= ms and trade_time <= maxMs
+         *  and id > ? (第一次不需要加这个条件，第二次才需要)
+         *  order by id
+         *  limit N
+         *
+         * 将本次查询的结果最后一条 BbTradeVo.id 作为参数，查询第二次
+         *
+         * 跳出循环条件：返回结果 < N
+         */
         List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(asset, symbol, ms, maxMs);
         //返回 对象集合以时间升序 再以id升序
         List<BbTradeVo> sortedList = voList.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());

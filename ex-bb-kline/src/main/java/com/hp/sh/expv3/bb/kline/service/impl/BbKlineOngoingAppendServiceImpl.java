@@ -249,8 +249,9 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
     public void notifyUpdate(String asset, String symbol, long minute, int frequency) {
         //向集合中插入元素，并设置分数
         String key = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, frequency);
+        final long ms = TimeUnit.MINUTES.toMillis(minute);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
-                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, frequency, minute), Long.valueOf(minute).doubleValue());
+                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, frequency, ms), Long.valueOf(ms).doubleValue());
                 }}
         );
     }
