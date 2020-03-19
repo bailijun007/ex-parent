@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.hp.sh.expv3.bb.kline.dao.BbRepairTradeMapper;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.service.BbKlineRepairDataFromBbRepairTradeService;
+import com.hp.sh.expv3.bb.kline.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
@@ -39,7 +40,6 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
     @Autowired
     private BbRepairTradeMapper bbRepairTradeMapper;
 
-
     @Autowired
     @Qualifier("metadataRedisUtil")
     private RedisUtil metadataRedisUtil;
@@ -64,6 +64,10 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
     @Value("${bb.kline.bbRepairTrade.enable}")
     private Integer bbRepairTradeEnable;
 
+    @Autowired
+    private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
+
+
 
     @Scheduled(cron = "*/1 * * * * *")
     public void execute() {
@@ -71,9 +75,10 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
         if (1 != bbRepairTradeEnable) {
             return;
         }
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService,supportBbGroupIds);
 
-        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
+//        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
+//        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
             final String asset = bbSymbol.getAsset();

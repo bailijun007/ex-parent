@@ -1,9 +1,9 @@
 package com.hp.sh.expv3.bb.kline.service.impl;
 
-import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.service.BbKlineOngoingMergeService;
+import com.hp.sh.expv3.bb.kline.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
@@ -19,10 +19,7 @@ import redis.clients.jedis.Tuple;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -57,6 +54,9 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     @Value("${bb.kline.ongoingMerge.enable}")
     private int ongoingMergeEnable;
 
+    @Autowired
+    private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
+
     @PostConstruct
     private void init() {
         final String[] freqs = supportFrequenceString.split(",");
@@ -65,14 +65,14 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
         }
     }
 
-    private List<Integer> supportFrequence = new ArrayList<>();
+    private List<Integer> supportFrequence = new CopyOnWriteArrayList<>();
 
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
-            2,
-            Runtime.getRuntime().availableProcessors() + 1,
-            2L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(10000000),
+            1,
+             1,
+            0, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(20000000),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
@@ -87,11 +87,13 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
         }
     }
 
+
     @Override
     public void mergeKlineData() {
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService, supportBbGroupIds);
 
-        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
+//        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
+//        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
 
 
         // 谁由谁触发
@@ -111,12 +113,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
                     continue;
                 }
 
-/**
- * 此参数用于优化如下场景：
- * 补历史数据时，1分钟的数据批量更新，则5分钟的数据只需要处理一次即可。
- * 如：1分钟数据 中，第 0 ~ 9 分钟数据更新，则 5分钟的 0,5 数据，只需要在 第0和5分钟的1分钟数据 更新时触发
- * 第 1,2,3,4 分钟的1分钟数据，和 0分钟的数据是一样的，直接continue;
- */
+
 
                 Map<Integer, Set<Long>> targetFreq2StartMsSet = new HashMap<>(targetFreqs.size());
 
@@ -131,7 +128,12 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
                             startMsSet = new HashSet<>();
                             targetFreq2StartMsSet.put(targetFreq, startMsSet);
                         }
-
+/**
+ * 此参数用于优化如下场景：
+ * 补历史数据时，1分钟的数据批量更新，则5分钟的数据只需要处理一次即可。
+ * 如：1分钟数据 中，第 0 ~ 9 分钟数据更新，则 5分钟的 0,5 数据，只需要在 第0和5分钟的1分钟数据 更新时触发
+ * 第 1,2,3,4 分钟的1分钟数据，和 0分钟的数 据是一样的，直接continue;
+ */
                         if (startMsSet.contains(startAndEndMs[0])) {
                             logger.debug("freq {},{},ignore", targetFreq, startAndEndMs[0]);
                             continue;
@@ -139,8 +141,8 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
 
                         final List<BBKLine> bbkLines = listKlineResource(asset, symbol, triggerFreq, startAndEndMs[0], startAndEndMs[1]);
 
-                        logger.debug("freq {},{},data empty,ignore", targetFreq, startAndEndMs[0]);
                         if (null == bbkLines || bbkLines.isEmpty()) {
+                            logger.debug("freq {},{},data empty,ignore", targetFreq, startAndEndMs[0]);
                             continue;
                         } else {
                             BBKLine newKline = merge(asset, symbol, targetFreq, startAndEndMs[0], bbkLines);
@@ -188,11 +190,13 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
 
         for (BBKLine kLine : bbkLines) {
             BigDecimal high = kLine.getHigh();
-            BigDecimal low = kLine.getHigh();
-            BigDecimal open = kLine.getHigh();
+            BigDecimal low = kLine.getLow();
+            BigDecimal open = kLine.getOpen();
+            BigDecimal close = kLine.getClose();
             highPrice = (high.compareTo(highPrice) >= 0) ? high : highPrice;
             lowPrice = (low.compareTo(lowPrice) <= 0) ? low : lowPrice;
             openPrice = (null == openPrice) ? open : openPrice;
+            closePrice = close;
             volume = volume.add(kLine.getVolume());
         }
 
@@ -215,6 +219,8 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
         if (!klines.isEmpty()) {
             for (String kline : klines) {
                 BBKLine bbkLine1 = BBKlineUtil.convert2KlineData(kline, triggerFreq);
+                bbkLine1.setAsset(asset);
+                bbkLine1.setSymbol(symbol);
                 list.add(bbkLine1);
             }
         }

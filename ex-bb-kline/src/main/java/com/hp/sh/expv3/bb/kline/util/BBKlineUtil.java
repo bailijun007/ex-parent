@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
+import com.hp.sh.expv3.bb.kline.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import com.hupa.exp.common.tool.format.JsonUtil;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,14 +26,15 @@ import java.util.stream.Collectors;
  */
 public class BBKlineUtil {
 
+
     public static String kline2ArrayData(BBKLine bbkLine) {
         BigDecimal[] bigDecimals = new BigDecimal[6];
         bigDecimals[0] = new BigDecimal(bbkLine.getMs());
-        bigDecimals[1] = bbkLine.getHigh() == null ? BigDecimal.ZERO : bbkLine.getHigh().stripTrailingZeros();
-        bigDecimals[2] = bbkLine.getLow() == null ? BigDecimal.ZERO : bbkLine.getLow().stripTrailingZeros();
-        bigDecimals[3] = bbkLine.getOpen() == null ? BigDecimal.ZERO : bbkLine.getOpen().stripTrailingZeros();
-        bigDecimals[4] = bbkLine.getClose() == null ? BigDecimal.ZERO : bbkLine.getClose().stripTrailingZeros();
-        bigDecimals[5] = bbkLine.getVolume() == null ? BigDecimal.ZERO : bbkLine.getVolume().stripTrailingZeros();
+        bigDecimals[1] = bbkLine.getOpen().stripTrailingZeros();
+        bigDecimals[2] = bbkLine.getHigh().stripTrailingZeros();
+        bigDecimals[3] = bbkLine.getLow().stripTrailingZeros();
+        bigDecimals[4] = bbkLine.getClose().stripTrailingZeros();
+        bigDecimals[5] = bbkLine.getVolume().stripTrailingZeros();
         final String s = JsonUtil.toJsonString(bigDecimals);
         return s;
     }
@@ -52,18 +55,22 @@ public class BBKlineUtil {
         return bbkLine;
     }
 
-    /**
-     * 分钟时间戳转成毫秒时间戳
-     */
-    public static Long minutesToMillis(Long minute) {
-        return TimeUnit.MINUTES.toMillis(minute);
-    }
 
+//    public static List<BBSymbol> listSymbol(RedisUtil metadataRedisUtil) {
+//        final Map<String, BBSymbol> key2Value = metadataRedisUtil.hgetAll(BbKLineKey.BB_SYMBOL, BBSymbol.class);
+//        List<BBSymbol> list = key2Value.values().stream().collect(Collectors.toList());
+//        return list;
+//    }
 
-    public static List<BBSymbol> listSymbol(RedisUtil metadataRedisUtil) {
-        final Map<String, BBSymbol> key2Value = metadataRedisUtil.hgetAll(BbKLineKey.BB_SYMBOL, BBSymbol.class);
-        List<BBSymbol> list = key2Value.values().stream().collect(Collectors.toList());
-        return list;
+    public static List<BBSymbol> listSymbols(SupportBbGroupIdsJobService supportBbGroupIdsJobService, Set<Integer> supportBbGroupIds) {
+        List<BBSymbol> bbSymbols = null;
+        final Map<Integer, List<BBSymbol>> map = supportBbGroupIdsJobService.listSymbols();
+        for (Integer integer : map.keySet()) {
+            if (supportBbGroupIds.contains(integer)) {
+                bbSymbols = map.get(integer);
+            }
+        }
+        return bbSymbols;
     }
 
     public static List<BBSymbol> filterBbSymbols(List<BBSymbol> bbSymbols, Set<Integer> supportBbGroupIds) {

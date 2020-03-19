@@ -6,6 +6,7 @@ import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
 import com.hp.sh.expv3.bb.kline.service.BbKlineHistoryCoverByTradeFromExpService;
 import com.hp.sh.expv3.bb.kline.service.BbRepairTradeExtService;
+import com.hp.sh.expv3.bb.kline.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
@@ -58,21 +59,24 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
 
     @Value("${bb.kline}")
     private String bbKlinePattern;
+
     @Value("${from_exp.bbKlineDataPattern}")
     private String fromExpBbKlineDataPattern;
+
     @Value("${from_exp.bbKlineDataUpdateEventPattern}")
     private String fromExpBbKlineDataUpdateEventPattern;
+
     @Value("${bb.kline.bbKlineFromExpCoverEnable}")
     private int bbKlineFromExpCoverEnable;
 
     @Autowired
-    private BbRepairTradeExtService bbRepairTradeExtService;
+    private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             2,
             Runtime.getRuntime().availableProcessors() + 1,
             2L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(10000000),
+            new LinkedBlockingQueue<Runnable>(20000000),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
@@ -87,10 +91,13 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
         }
     }
 
+
+
     public void updateKlineByExpHistory() {
 
-        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
+//        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
+//        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService,supportBbGroupIds);
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
 
@@ -117,39 +124,6 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
                 notifyKlineUpdate(asset, symbol, minMs, maxMs, freq, klines);
             }
         }
-    }
-
-
-    public BBKLine buildKline(List<BbRepairTradeVo> trades, String asset, String symbol, int frequency, long ms) {
-        BBKLine bBKLine = new BBKLine();
-        bBKLine.setAsset(asset);
-        bBKLine.setSymbol(symbol);
-        bBKLine.setFrequence(frequency);
-        bBKLine.setMinute(TimeUnit.MILLISECONDS.toMinutes(ms));
-        bBKLine.setMs(ms);
-
-        BigDecimal highPrice = BigDecimal.ZERO;
-        BigDecimal lowPrice = new BigDecimal(String.valueOf(Long.MAX_VALUE));
-        BigDecimal openPrice = null;
-        BigDecimal closePrice = null;
-        BigDecimal volume = BigDecimal.ZERO;
-
-        for (BbRepairTradeVo trade : trades) {
-            BigDecimal currentPrice = trade.getPrice();
-            highPrice = (highPrice.compareTo(currentPrice) >= 0) ? highPrice : currentPrice;
-            lowPrice = (lowPrice.compareTo(currentPrice) <= 0) ? lowPrice : currentPrice;
-            openPrice = (null == openPrice) ? currentPrice : openPrice;
-            closePrice = currentPrice;
-            volume = volume.add(trade.getNumber());
-        }
-
-        bBKLine.setHigh(highPrice);
-        bBKLine.setLow(lowPrice);
-        bBKLine.setOpen(openPrice);
-        bBKLine.setClose(closePrice);
-        bBKLine.setVolume(volume);
-
-        return bBKLine;
     }
 
     /**

@@ -60,7 +60,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         if (gtOrderId != null && ltOrderId != null) {
             ltOrderId = null;
         }
-        List<BbHistoryOrderVo> result = new ArrayList<>();
+
         List<String> assetList = null;
         List<String> symbolList = null;
         List<Integer> statusList = null;

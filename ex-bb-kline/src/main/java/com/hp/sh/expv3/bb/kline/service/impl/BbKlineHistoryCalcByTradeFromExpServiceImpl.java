@@ -1,12 +1,12 @@
 package com.hp.sh.expv3.bb.kline.service.impl;
 
-import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.pojo.BbTradeVo;
 import com.hp.sh.expv3.bb.kline.service.BbKlineHistoryCalcByTradeFromExpService;
 import com.hp.sh.expv3.bb.kline.service.BbRepairTradeExtService;
 import com.hp.sh.expv3.bb.kline.service.BbTradeExtService;
+import com.hp.sh.expv3.bb.kline.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
@@ -70,9 +70,11 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     @Autowired
     private BbRepairTradeExtService bbRepairTradeExtService;
 
-
     @Autowired
     private BbTradeExtService bbTradeExtService;
+
+    @Autowired
+    private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             2,
@@ -84,19 +86,31 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     );
 
     @Scheduled(cron = "*/1 * * * * *")
+    @Override
     public void execute() {
+        //bbKlineFromExpCalcEnable=1;
         if (1 != bbKlineFromExpCalcEnable) { // bbKlineFromExpCalcEnable=1
             return;
         } else {
+
+//            while (true) {
             threadPool.execute(() -> repairKlineFromExp());
+            try {
+                Thread.sleep(1L);
+            } catch (InterruptedException e) {
+            }
+//            }
+
         }
     }
 
 
     public void repairKlineFromExp() {
 
-        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
+//        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
+//        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService, supportBbGroupIds);
+
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
 
@@ -137,29 +151,26 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 
                     if (null == trades || trades.isEmpty()) {
                         trades = listTrade(asset, symbol, ms, maxMs);
-                    }else {
-                        BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
-
-                        logger.info("build kline data:{}", kline.toString());
-
-                        saveKline(repairkey, kline);
-
-                        notifyUpdate(notifyUpdateKey, ms);
                     }
 
+                    if (null == trades || trades.isEmpty()) {
+                    } else {
+                        BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
+                        logger.info("build kline data:{}", kline.toString());
+                        saveKline(repairkey, kline);
+                        notifyUpdate(notifyUpdateKey, ms);
+                    }
                 }
-
             }
-
         }
     }
 
     private List<BbTradeVo> listTradeFromRepaired(String asset, String symbol, long ms, long maxMs) {
-        List<BbTradeVo> result=new ArrayList<>();
+        List<BbTradeVo> result = new ArrayList<>();
         List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, ms, maxMs);
         if (!CollectionUtils.isEmpty(list)) {
             for (BbRepairTradeVo tradeVo : list) {
-                 BbTradeVo bbTradeVo = new BbTradeVo();
+                BbTradeVo bbTradeVo = new BbTradeVo();
                 BeanUtils.copyProperties(tradeVo, bbTradeVo);
                 result.add(bbTradeVo);
             }
@@ -192,7 +203,20 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
      * @param maxMs
      * @return
      */
-    private List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {
+    private List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {// TODO xb,一分钟内成交太多，会引入性能问题。
+        /**
+         * 首次查询：
+         * sql: select *(具体的列，不需要所有列)
+         * from table
+         *  where trade_time >= ms and trade_time <= maxMs
+         *  and id > ? (第一次不需要加这个条件，第二次才需要)
+         *  order by id
+         *  limit N
+         *
+         * 将本次查询的结果最后一条 BbTradeVo.id 作为参数，查询第二次
+         *
+         * 跳出循环条件：返回结果 < N
+         */
         List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(asset, symbol, ms, maxMs);
         //返回 对象集合以时间升序 再以id升序
         List<BbTradeVo> sortedList = voList.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());

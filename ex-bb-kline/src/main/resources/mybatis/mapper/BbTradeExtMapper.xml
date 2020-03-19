@@ -33,7 +33,7 @@
 
     <select id="queryByTimeInterval" resultMap="BbTradeVo">
         select
-        <include refid="Base_Column_List"/>
+        id,asset,symbol,price,trade_time  tradeTime
         from bb_trade
         where
         asset=#{asset}

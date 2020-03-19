@@ -4,6 +4,7 @@ import com.hp.sh.expv3.bb.kline.constant.BbKLineKey;
 import com.hp.sh.expv3.bb.kline.pojo.BBKLine;
 import com.hp.sh.expv3.bb.kline.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.kline.service.BbKlineHistoryCoverByThirdDataService;
+import com.hp.sh.expv3.bb.kline.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.util.StringReplaceUtil;
@@ -64,6 +65,9 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
     @Value("${bb.kline.thirdBatchSize}")
     private int thirdBatchSize;
 
+    @Autowired
+    private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
+
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             2,
             Runtime.getRuntime().availableProcessors() + 1,
@@ -73,20 +77,18 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
 
-//    @Scheduled(cron = "*/1 * * * * *")
-//    public void execute() {
-//        if (1 != bbKlineThirdCoverEnable) {
-//            return;
-//        } else {
-//            threadPool.execute(() -> updateKlineByThirdData());
-//        }
-//    }
+
 
     @Override
     @Scheduled(cron = "*/1 * * * * *")
     public void updateKlineByThirdData() {
-        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
+        if (bbKlineThirdCoverEnable!=1){
+            return;
+        }
+
+//        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
+//        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService,supportBbGroupIds);
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
 

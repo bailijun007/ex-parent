@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.pc.extension.dao;
 
+import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeExtendVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
+import com.hp.sh.expv3.pc.extension.vo.PcTradeVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -32,4 +34,7 @@ public interface PcOrderTradeDAO {
     List<PcOrderTradeVo> queryLastTradeRecord(Map<String, Object> map);
 
     List<PcOrderTradeVo> selectPcFeeCollectByAccountId(Map<String, Object> map);
+
+    List<PcOrderTradeExtendVo> selectTradeListByUserId(@Param("asset") String asset, @Param("symbol") String symbol, @Param("tradeTimeBegin")  Long tradeTimeBegin, @Param("tradeTimeEnd") Long tradeTimeEnd, @Param("userId") Long userId);
+
 }

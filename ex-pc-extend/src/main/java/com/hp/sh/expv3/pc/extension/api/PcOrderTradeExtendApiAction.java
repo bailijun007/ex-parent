@@ -5,13 +5,16 @@ import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeDetailVo;
+import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeExtendVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
+import com.hp.sh.expv3.pc.extension.vo.PcTradeVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -120,6 +123,20 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         List<PcOrderTradeVo> voList = pcOrderTradeService.selectAllTradeListByUser(asset, symbol, userId);
         this.toResult(result,voList);
         return result;
+    }
+
+    @Override
+    public List<PcOrderTradeExtendVo> selectTradeListByUserId(String asset, String symbol, Long userId, Long startTime, Long endTime) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null ) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+
+        if (startTime == null && endTime == null) {
+            endTime = Instant.now().toEpochMilli();
+        }
+
+        List<PcOrderTradeExtendVo> pcTradeVo = pcOrderTradeService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId);
+        return pcTradeVo;
     }
 
     @Override
