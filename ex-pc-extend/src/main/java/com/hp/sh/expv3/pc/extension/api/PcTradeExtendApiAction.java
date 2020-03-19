@@ -86,19 +86,19 @@ public class PcTradeExtendApiAction implements PcTradeExtendApi {
         return pcTradeVo;
     }
 
-    @Override
-    public List<PcTradeVo> selectTradeListByUserId(String asset, String symbol, Long userId, Long startTime, Long endTime) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null ) {
-            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
-        }
-
-        if (startTime == null && endTime == null) {
-            endTime = Instant.now().toEpochMilli();
-        }
-
-        List<PcTradeVo> pcTradeVo = pcTradeExtendService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId);
-        return pcTradeVo;
-    }
+//    @Override
+//    public List<PcTradeVo> selectTradeListByUserId(String asset, String symbol, Long userId, Long startTime, Long endTime) {
+//        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null ) {
+//            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+//        }
+//
+//        if (startTime == null && endTime == null) {
+//            endTime = Instant.now().toEpochMilli();
+//        }
+//
+//        List<PcTradeVo> pcTradeVo = pcTradeExtendService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId);
+//        return pcTradeVo;
+//    }
 
     @Override
     public BigDecimal getTotalTurnover(String asset, String symbol, Long startTime, Long endTime) {

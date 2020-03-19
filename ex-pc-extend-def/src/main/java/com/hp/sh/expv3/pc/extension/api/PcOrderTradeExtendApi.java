@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.pc.extension.api;
 
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeDetailVo;
+import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeExtendVo;
+import com.hp.sh.expv3.pc.extension.vo.PcTradeVo;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -89,4 +91,20 @@ public interface PcOrderTradeExtendApi {
                                                     @RequestParam("userId") Long userId, @RequestParam("statTime") Long statTime, @RequestParam("endTime") Long endTime);
 
 
+    @ApiOperation(value = "查某个时间区间某个用户的成交记录 (不传时间则默认查今天以前的所有数据)")
+    @GetMapping(value = "/api/extension/pc/orderTrade/selectTradeListByUserId")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "userId ", value = "用户id", required = true),
+            @ApiImplicitParam(name = "startTime ", value = "开始时间", required = false),
+            @ApiImplicitParam(name = "endTime ", value = "结束时间", required = false)
+    })
+    List<PcOrderTradeExtendVo> selectTradeListByUserId(
+            @RequestParam(value = "asset", required = true) String asset,
+            @RequestParam(value = "symbol", required = true) String symbol,
+            @RequestParam(value = "userId", required = true) Long userId,
+            @RequestParam(value = "startTime", required = false) Long startTime,
+            @RequestParam(value = "endTime", required = false) Long endTime
+    );
 }

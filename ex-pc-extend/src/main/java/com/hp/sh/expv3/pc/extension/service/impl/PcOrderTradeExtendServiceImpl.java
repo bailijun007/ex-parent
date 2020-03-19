@@ -2,8 +2,10 @@ package com.hp.sh.expv3.pc.extension.service.impl;
 
 import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
+import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeExtendVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
+import com.hp.sh.expv3.pc.extension.vo.PcTradeVo;
 import com.hp.sh.expv3.utils.IntBool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -156,6 +158,12 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         map.put("tradeTimeBegin", statTime);
         map.put("tradeTimeEnd", endTime);
         List<PcOrderTradeVo> list = pcOrderTradeDAO.selectPcFeeCollectByAccountId(map);
+        return list;
+    }
+
+    @Override
+    public List<PcOrderTradeExtendVo> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId) {
+        List<PcOrderTradeExtendVo> list = pcOrderTradeDAO.selectTradeListByUserId(asset,symbol,startTime,endTime,userId);
         return list;
     }
 
