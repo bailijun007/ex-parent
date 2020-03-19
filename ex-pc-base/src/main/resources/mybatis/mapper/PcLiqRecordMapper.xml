@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.hp.sh.expv3.pc.module.position.dao.PcLiqRecordDAO">
+<mapper namespace="com.hp.sh.expv3.pc.module.liq.dao.PcLiqRecordDAO">
 
-	<resultMap type="com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord" id="PcLiqRecord">
+	<resultMap type="com.hp.sh.expv3.pc.module.liq.entity.PcLiqRecord" id="PcLiqRecord">
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
 		<result column="pos_id" property="posId" />
@@ -130,5 +130,18 @@
     </delete>
 
 	<!--  -->
+	
+	<select id="queryPending" resultMap="PcLiqRecord">
+		select
+			<include refid="Base_Column_List" />
+		from 
+			pc_liq_record 
+		where 
+			created &gt;= #{startTime}
+			<if test="userId!=null"> and (tk_account_id=#{userId} or mk_account_id=#{userId})</if>
+			<if test="startId!=null"> and id &gt; #{startId} </if>
+			and status!=4
+			order by id asc
+	</select>
 	
 </mapper>

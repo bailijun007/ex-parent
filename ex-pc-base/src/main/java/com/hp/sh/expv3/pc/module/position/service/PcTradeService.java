@@ -91,11 +91,36 @@ public class PcTradeService {
 		if(order.getCloseFlag()==OrderFlag.ACTION_OPEN){
 			this.handleTradeOpenOrder(order, trade);
 		}else{
-			this.handleTradeCloseOrder(order, trade);
+			if(order.getLiqFlag()==IntBool.YES){//强平委托
+				this.handleTradeLiqOrder(order, trade);
+			}else{
+				this.handleTradeCloseOrder(order, trade);
+			}
 		}
 		
 	}
     
+	private void handleTradeLiqOrder(PcOrder order, PcTradeMsg trade) {
+		Long now = DbDateUtils.now();
+		/*  2、修改订单数据和订单状态  */
+		order.setFilledVolume(order.getFilledVolume().add(trade.getNumber()));
+		boolean com = BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(order.getCancelVolume()));
+        order.setStatus(com?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
+        order.setActiveFlag(com?PcOrder.NO:PcOrder.YES);
+		order.setModified(now);
+		this.orderUpdateService.updateOrder4Trad(order);
+		
+		/*  4、返还保证金和手续费  */
+		//仓位全平
+//		BigDecimal posCloseFee = BigDecimal.ZERO;
+//		if(BigUtils.isZero(pcPosition.getVolume())){
+//			posCloseFee = pcPosition.getCloseFee();
+//		}
+//		BigDecimal amount = tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFee()).add(posCloseFee);
+//		String remark = String.format("平仓。保证金：%s,收益:%s,手续费：-%s,仓位剩余手续费：%s", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getFee(), posCloseFee);
+//		this.closeMarginToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), amount, order.getLongFlag(), remark);
+	}
+
 	//处理成交订单
 	protected void handleTradeOpenOrder(PcOrder order, PcTradeMsg trade){
 		Long now = DbDateUtils.now();
@@ -140,14 +165,9 @@ public class PcTradeService {
 		
 		/* 3、生成成交流水 */
 		PcOrderTrade pcOrderTrade = this.saveOrderTrade(trade, order, tradeResult, pcPosition.getId(), now);
-		
-		//////////pc_account ///////////
-		if(order.getLiqFlag()==IntBool.YES){//强平委托
-			
-			return ;
-		}
-		
+
 		/*  4、返还保证金和手续费  */
+		//仓位全平
 		BigDecimal posCloseFee = BigDecimal.ZERO;
 		if(BigUtils.isZero(pcPosition.getVolume())){
 			posCloseFee = pcPosition.getCloseFee();

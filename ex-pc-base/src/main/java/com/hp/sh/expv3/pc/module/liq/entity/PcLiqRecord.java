@@ -1,6 +1,8 @@
-package com.hp.sh.expv3.pc.module.position.entity;
+package com.hp.sh.expv3.pc.module.liq.entity;
 
 import java.math.BigDecimal;
+
+import javax.persistence.Version;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 
@@ -46,6 +48,11 @@ public class PcLiqRecord extends UserDataEntity {
 	
 	//手续费率
 	private BigDecimal feeRatio;
+	
+	private Integer status;
+	
+	//版本
+	private Long version;
 
 	public PcLiqRecord() {
 	}
@@ -144,6 +151,23 @@ public class PcLiqRecord extends UserDataEntity {
 
 	public void setMeanPrice(BigDecimal meanPrice) {
 		this.meanPrice = meanPrice;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	@Version
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 }

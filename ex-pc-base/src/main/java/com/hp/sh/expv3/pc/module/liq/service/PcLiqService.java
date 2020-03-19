@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.module.position.service;
+package com.hp.sh.expv3.pc.module.liq.service;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,11 +15,14 @@ import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.job.LiqHandleResult;
+import com.hp.sh.expv3.pc.module.liq.dao.PcLiqRecordDAO;
+import com.hp.sh.expv3.pc.module.liq.entity.PcLiqRecord;
+import com.hp.sh.expv3.pc.module.liq.entity.PcLiqStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
-import com.hp.sh.expv3.pc.module.position.dao.PcLiqRecordDAO;
-import com.hp.sh.expv3.pc.module.position.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
+import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
+import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
 import com.hp.sh.expv3.pc.module.position.vo.PosUID;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderMsg;
 import com.hp.sh.expv3.pc.mq.liq.msg.CancelOrder;
@@ -40,7 +43,6 @@ import com.hp.sh.expv3.utils.math.Precision;
 public class PcLiqService {
 	private static final Logger logger = LoggerFactory.getLogger(PcLiqService.class);
     
-
     @Autowired
     private PcPositionDataService positionDataService;
 
@@ -178,11 +180,12 @@ public class PcLiqService {
 	private void doLiq(PcPosition pos){
 		Long now = DbDateUtils.now();
 		//1、保存强平记录
-		PcLiqRecord record = this.saveLiqRecord(pos, now);
+		this.saveLiqRecord(pos, now);
 		//2、清空仓位
 		this.clearLiqPos(pos, now);
+		
 		//3、创建强平委托
-//		this.createLiqOrder(record);
+		//this.createLiqOrder(record);
 	}
 	
 	private void clearLiqPos(PcPosition pos, Long now){
@@ -208,6 +211,7 @@ public class PcLiqService {
 		record.setBankruptPrice(bankruptPrice);
 		record.setCreated(now);
 		record.setModified(now);
+		record.setStatus(PcLiqStatus.init);
 		
 		//log
 		record.setLiqPrice(pos.getLiqPrice());
@@ -221,7 +225,8 @@ public class PcLiqService {
 		return record;
 	}
 	
-	private void createLiqOrder(PcLiqRecord record){
+	//3、创建强平委托
+	public void createLiqOrder(PcLiqRecord record){
 		PcPosition pos = positionDataService.getPosition(record.getUserId(), record.getAsset(), record.getSymbol(), record.getPosId());
 		PcOrder order = this.pcOrderService.createLiqOrder(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), record.getLongFlag(), record.getBankruptPrice(), record.getVolume(), pos);
 		PcOrderMsg msg = new PcOrderMsg(order);

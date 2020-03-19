@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pc.constant.MqTags;
-import com.hp.sh.expv3.pc.module.position.service.PcLiqService;
+import com.hp.sh.expv3.pc.module.liq.service.PcLiqService;
 import com.hp.sh.expv3.pc.mq.liq.msg.LiqCancelledMsg;
 import com.hp.sh.rocketmq.annotation.MQListener;
 

@@ -18,6 +18,7 @@ import com.hp.sh.expv3.bb.strategy.vo.BBTradePair;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.component.executor.AbstractGroupTask;
 import com.hp.sh.expv3.component.executor.OrderlyExecutors;
+import com.hp.sh.expv3.dev.LimitTimeHandle;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 
@@ -37,8 +38,9 @@ public class BBMatchedHandler {
 	@Autowired
 	private OrderlyExecutors tradeExecutors;
 	
-	private Long startTime = 0L;
+	private Long startTime = DbDateUtils.now()-1000*3600;
 	
+	@LimitTimeHandle
 	public void handlePending() {
 		Page page = new Page(1, 50, 1000L);
 		Long startId = null;
@@ -59,8 +61,7 @@ public class BBMatchedHandler {
 			}
 			
 		}
-
-		this.startTime = DbDateUtils.now()-1000*3600;
+		
 	}
 
 	public void handleMatchedTrade(BBMatchedTrade matchedTrade){
