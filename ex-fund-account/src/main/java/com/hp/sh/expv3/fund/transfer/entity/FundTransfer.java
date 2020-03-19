@@ -33,16 +33,16 @@ public class FundTransfer extends BaseRecordEntity {
 	protected BigDecimal amount;
 	
 	//源账户类型
-    private long srcAccountType;
+    private Integer srcAccountType;
     
     //目标账户类型
-    private long targetAccountType;
+    private Integer targetAccountType;
 	
 	//源账户ID
-    private long srcAccountId;
+    private Long srcAccountId;
     
     //目标账户ID
-    private long targetAccountId;
+    private Long targetAccountId;
 
     //备注
     private String remark;
@@ -80,35 +80,35 @@ public class FundTransfer extends BaseRecordEntity {
 		this.amount = amount;
 	}
 
-	public long getSrcAccountType() {
+	public Integer getSrcAccountType() {
 		return srcAccountType;
 	}
 
-	public void setSrcAccountType(long srcAccountType) {
+	public void setSrcAccountType(Integer srcAccountType) {
 		this.srcAccountType = srcAccountType;
 	}
 
-	public long getTargetAccountType() {
+	public Integer getTargetAccountType() {
 		return targetAccountType;
 	}
 
-	public void setTargetAccountType(long targetAccountType) {
+	public void setTargetAccountType(Integer targetAccountType) {
 		this.targetAccountType = targetAccountType;
 	}
 
-	public long getSrcAccountId() {
+	public Long getSrcAccountId() {
 		return srcAccountId;
 	}
 
-	public void setSrcAccountId(long srcAccountId) {
+	public void setSrcAccountId(Long srcAccountId) {
 		this.srcAccountId = srcAccountId;
 	}
 
-	public long getTargetAccountId() {
+	public Long getTargetAccountId() {
 		return targetAccountId;
 	}
 
-	public void setTargetAccountId(long targetAccountId) {
+	public void setTargetAccountId(Long targetAccountId) {
 		this.targetAccountId = targetAccountId;
 	}
 

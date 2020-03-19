@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
-import com.hp.sh.expv3.pc.strategy.data.PosData;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.DecimalUtil;
 import com.hp.sh.expv3.utils.math.Precision;

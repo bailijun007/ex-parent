@@ -20,6 +20,6 @@ public interface BBCollectorAccountRecordDAO extends BaseMapper<BBCollectorAccou
 	
 	public BBCollectorAccountRecord queryOne(Map<String,Object> params);
 
-	public BBCollectorAccountRecord findByTradeNo(@Param("id") Long collectorId, @Param("tradeNo") String tradeNo);
+	public BBCollectorAccountRecord findByTradeNo(@Param("collectorId") Long collectorId, @Param("tradeNo") String tradeNo);
 
 }

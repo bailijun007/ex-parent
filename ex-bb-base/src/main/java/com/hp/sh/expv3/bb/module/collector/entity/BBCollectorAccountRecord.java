@@ -2,10 +2,13 @@ package com.hp.sh.expv3.bb.module.collector.entity;
 
 import java.math.BigDecimal;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.hp.sh.expv3.base.entity.BaseSysEntity;
 import com.hp.sh.expv3.commons.mybatis.TxId;
+import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 /**
  * 币币手续费_账户明细
@@ -60,6 +63,12 @@ public class BBCollectorAccountRecord extends BaseSysEntity	 {
 	private Long userId;
 
 	public BBCollectorAccountRecord() {
+	}
+	
+	@Id
+	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
+	public Long getId() {
+		return id;
 	}
 
 	public String getAsset() {
