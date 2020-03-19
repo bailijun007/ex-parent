@@ -55,8 +55,7 @@ public class PLpayClient {
     @Value("${cnyPlpay.server.customerId}")
     private String customerId;
 
-    @Value("${expv3.base.url}")
-    private String baseUrl;
+
 
     /**
      * 转发请求到第三方支付，并返回支付路径
