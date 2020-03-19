@@ -71,7 +71,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             1,
              1,
-            1, TimeUnit.SECONDS,
+            0, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(20000000),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
