@@ -184,8 +184,10 @@
                 and id &lt;#{ltOrderId}
                 ORDER BY id desc
             </if>
+            <if test="ltOrderId==null and gtOrderId==null">
+                ORDER BY id desc
+            </if>
         </where>
-        ORDER BY id desc
         LIMIT 0,${limit}
     </select>
 
