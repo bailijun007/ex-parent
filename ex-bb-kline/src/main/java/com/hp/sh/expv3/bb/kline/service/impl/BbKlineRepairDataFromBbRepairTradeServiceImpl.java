@@ -105,12 +105,13 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
                     List<BbRepairTradeVo> trades = buildTradeList(ja, asset, symbol, ms, IntBool.YES);
                     // 批量更新修正的交易记录表
                     bbRepairTradeMapper.batchUpdate(trades, ms, endMs, IntBool.YES);
+
                     // 批量保存
                     bbRepairTradeMapper.batchSave(trades);
                 } else  if (isCancel == 0){
                     List<BbRepairTradeVo> trades = buildTradeList(ja, asset, symbol, ms, IntBool.NO);
                     // 批量更新修正的交易记录表
-                    bbRepairTradeMapper.batchUpdate(trades, ms, endMs, IntBool.NO);
+                    bbRepairTradeMapper.batchUpdate(trades, ms, endMs, IntBool.YES);
                 }
 
                 //updateNotify
