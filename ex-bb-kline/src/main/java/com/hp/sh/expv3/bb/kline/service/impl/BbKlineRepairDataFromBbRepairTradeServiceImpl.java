@@ -68,14 +68,14 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-
+    @Override
     @Scheduled(cron = "*/1 * * * * *")
     public void execute() {
         // int bbRepairTradeEnable=1;
         if (1 != bbRepairTradeEnable) {
             return;
         }
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService,supportBbGroupIds);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService, supportBbGroupIds);
 
 //        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
 //        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
@@ -97,17 +97,21 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
                 //[1483200240000,956.54,956.54,956.54,956.54,0.48375944]
                 String element = tuple.getElement();
                 JSONArray ja = JSON.parseArray(element);
-                Long ms = ja.getLong(0);
-
-                List<BbRepairTradeVo> trades = buildTradeList(ja, asset, symbol, ms);
-
+                //isCancel 是否取消（0：取消，1：不取消）
+                final Integer isCancel = ja.getInteger(0);
+                Long ms = ja.getLong(1);
                 long endMs = TimeUnit.MINUTES.toMillis(TimeUnit.MILLISECONDS.toMinutes(ms) + 1) - 1;
-
-                // 批量更新修正的交易记录表
-              bbRepairTradeMapper.batchUpdate(trades, ms, endMs);
-
-              // 批量保存
-                bbRepairTradeMapper.batchSave(trades);
+                if (isCancel == 1) {
+                    List<BbRepairTradeVo> trades = buildTradeList(ja, asset, symbol, ms, IntBool.YES);
+                    // 批量更新修正的交易记录表
+                    bbRepairTradeMapper.batchUpdate(trades, ms, endMs, IntBool.YES);
+                    // 批量保存
+                    bbRepairTradeMapper.batchSave(trades);
+                } else  if (isCancel == 0){
+                    List<BbRepairTradeVo> trades = buildTradeList(ja, asset, symbol, ms, IntBool.NO);
+                    // 批量更新修正的交易记录表
+                    bbRepairTradeMapper.batchUpdate(trades, ms, endMs, IntBool.NO);
+                }
 
                 //updateNotify
                 HashMap<String, Double> scoreMembers = new HashMap<>();
@@ -119,7 +123,7 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
     }
 
 
-    private List<BbRepairTradeVo> buildTradeList(JSONArray ja, String asset, String symbol, Long ms) {
+    private List<BbRepairTradeVo> buildTradeList(JSONArray ja, String asset, String symbol, Long ms, int enableFlag) {
         List<BbRepairTradeVo> trades = new ArrayList<>();
 
         if (trades.stream().anyMatch(Objects::isNull)) {
@@ -128,11 +132,11 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
         }
 
 //[1577774220000,null,null,null,null,0] time,open,high,low,close,volume
-        BigDecimal open = ja.getBigDecimal(1);
-        BigDecimal high = ja.getBigDecimal(2);
-        BigDecimal low = ja.getBigDecimal(3);
-        BigDecimal close = ja.getBigDecimal(4);
-        BigDecimal volume = ja.getBigDecimal(5);
+        BigDecimal open = ja.getBigDecimal(2);
+        BigDecimal high = ja.getBigDecimal(3);
+        BigDecimal low = ja.getBigDecimal(4);
+        BigDecimal close = ja.getBigDecimal(5);
+        BigDecimal volume = ja.getBigDecimal(6);
 
         Set<String> priceCount = new HashSet<String>() {
             {
@@ -144,15 +148,15 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
         };
         BigDecimal v = volume.divide(BigDecimal.valueOf(priceCount.size()), 20, RoundingMode.HALF_UP).stripTrailingZeros();
 
-        trades.add(this.buildRepairTrade(asset, symbol, v, open, ms));
-        trades.add(this.buildRepairTrade(asset, symbol, v, high, ms + 15000));
-        trades.add(this.buildRepairTrade(asset, symbol, v, low, ms + 30000));
-        trades.add(this.buildRepairTrade(asset, symbol, v, close, ms + 59999));
+        trades.add(this.buildRepairTrade(asset, symbol, v, open, ms, enableFlag));
+        trades.add(this.buildRepairTrade(asset, symbol, v, high, ms + 15000, enableFlag));
+        trades.add(this.buildRepairTrade(asset, symbol, v, low, ms + 30000, enableFlag));
+        trades.add(this.buildRepairTrade(asset, symbol, v, close, ms + 59999, enableFlag));
 
         return trades;
     }
 
-    private BbRepairTradeVo buildRepairTrade(String asset, String symbol, BigDecimal v, BigDecimal price, Long tradeInMs) {
+    private BbRepairTradeVo buildRepairTrade(String asset, String symbol, BigDecimal v, BigDecimal price, Long tradeInMs, int enableFlag) {
         BbRepairTradeVo bbRepairTradeVo = new BbRepairTradeVo();
         bbRepairTradeVo.setMatchTxId(0L);
         bbRepairTradeVo.setTkBidFlag(0);
@@ -165,7 +169,7 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
         bbRepairTradeVo.setTradeTime(tradeInMs);
         bbRepairTradeVo.setMakerHandleStatus(0);
         bbRepairTradeVo.setTakerHandleStatus(0);
-        bbRepairTradeVo.setEnableFlag(IntBool.YES);
+        bbRepairTradeVo.setEnableFlag(enableFlag);
         long now = Instant.now().toEpochMilli();
         bbRepairTradeVo.setModified(now);
         bbRepairTradeVo.setCreated(now);

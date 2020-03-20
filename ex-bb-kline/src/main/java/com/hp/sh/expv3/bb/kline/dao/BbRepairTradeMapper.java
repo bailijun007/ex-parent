@@ -14,7 +14,7 @@ public interface BbRepairTradeMapper {
 
     void batchSave(@Param("trades") List<BbRepairTradeVo> trades);
 
-    void batchUpdate(@Param("trades") List<BbRepairTradeVo> trades,@Param("tradeTimeBegin") Long tradeTimeBegin, @Param("tradeTimeEnd") long tradeTimeEnd);
+    void batchUpdate(@Param("trades") List<BbRepairTradeVo> trades,@Param("tradeTimeBegin") Long tradeTimeBegin, @Param("tradeTimeEnd") long tradeTimeEnd,@Param("enableFlag") int enableFlag);
 
     List<BbRepairTradeVo> listRepairTrades(@Param("asset") String asset,@Param("symbol") String symbol, @Param("tradeTimeBegin")long tradeTimeBegin, @Param("tradeTimeEnd")long tradeTimeEnd);
 }
