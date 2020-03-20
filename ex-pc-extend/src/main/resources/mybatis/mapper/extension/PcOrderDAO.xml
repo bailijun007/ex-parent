@@ -121,7 +121,7 @@
 		cancel_volume,close_pos_id,time_in_force,trigger_flag,cancel_time,visible_flag,active_flag,create_operator,cancel_operator,
 		remark,client_order_id,user_id,created,modified
 	</sql>
-	
+
     <sql id="Base_Column_List2">
 		o.id,o.asset,o.symbol,o.close_flag,o.long_flag,o.margin_mode,o.leverage,o.price,o.order_type,o.volume,o.face_value,o.status,o.margin_ratio,
 		o.open_fee_ratio,o.close_fee_ratio,o.fee_cost,o.gross_margin,o.order_margin,o.open_fee,o.close_fee,o.filled_volume,o.cancel_volume,o.close_pos_id,
@@ -130,10 +130,10 @@
 	</sql>
 
     <select id="getGrossMargin" resultType="java.math.BigDecimal">
-        select IFNULL(SUM(gross_margin),0) from pc_order
-        where active_flag=1
-        and user_id=#{userId}
-        and asset=#{asset}
+        select IFNULL(SUM(o.gross_margin),0) from pc_active_order ao LEFT JOIN pc_order o
+		on ao.id=o.id WHERE
+         ao.user_id=#{userId}
+        and ao.asset=#{asset}
     </select>
 
     <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
@@ -327,7 +327,7 @@
             <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
         </where>
         ORDER BY ao.id desc
-            LIMIT 0,${limit}
+        LIMIT 0,${limit}
     </select>
 
     <select id="queryNextList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">

@@ -47,6 +47,9 @@ public class PcAccountExtendServiceImpl implements PcAccountExtendService {
     public PcAccountExtVo findContractAccount(Long userId, String asset) {
         PcAccountExtVo vo=new PcAccountExtVo();
         PcAccountVo pcAccount = pcAccountDAO.get(userId, asset);
+        if(null==pcAccount){
+            return null;
+        }
         Optional<PcAccountVo> optional = Optional.ofNullable(pcAccount);
         vo.setAccountId(optional.map(u->u.getUserId()).orElse(null));
         vo.setAsset(optional.map(a->a.getAsset()).orElse(null));

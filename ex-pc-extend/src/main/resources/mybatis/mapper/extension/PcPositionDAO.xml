@@ -88,10 +88,11 @@
 	</sql>
 
     <select id="getPosMargin" resultType="java.math.BigDecimal">
-        select  IFNULL(SUM(pos_margin),0)from pc_position
-        where volume &gt;  0
-        and user_id=#{userId}
-        and asset=#{asset}
+
+         select  IFNULL(SUM(p.pos_margin),0) from pc_active_position ap LEFT JOIN pc_position p
+        on ap.id=p.id
+        where ap.user_id=#{userId}
+        and  ap.asset=#{asset}
     </select>
 
     <select id="getInitMargin" resultType="java.math.BigDecimal">
