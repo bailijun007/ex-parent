@@ -29,4 +29,6 @@ public interface PcOrderDAO {
     List<PcOrderVo> queryUserActivityOrder(Map<String, Object> map);
 
 	List<PcOrderVo> queryNextList(Map<String, Object> map);
+
+    List<PcOrderVo> queryActivityOrder(Map<String, Object> map);
 }

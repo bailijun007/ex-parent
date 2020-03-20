@@ -294,7 +294,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("activeFlag", IntBool.YES);
         map.put("lastOrderId", lastOrderId);
         map.put("limit", pageSize);
-        List<PcOrderVo> list = this.pcOrderDAO.queryNextList(map);
+        List<PcOrderVo> list = this.pcOrderDAO.queryActivityOrder(map);
         result.setList(list);
         result.setRowTotal(Long.parseLong(String.valueOf(list.size())));
         result.setPageNo(currentPage);
