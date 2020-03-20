@@ -43,20 +43,27 @@
 
     </insert>
 
+    <update id="batchCancel">
+            UPDATE bb_repair_trade
+            <set>
+                enable_flag=0
+            </set>
+            <where>
+                enable_flag=1
+                and trade_time &gt;= #{tradeTimeBegin}
+                and trade_time &lt; #{tradeTimeEnd}
+            </where>
+
+    </update>
+
     <update id="batchUpdate">
         <foreach collection="trades" item="item" index="index" open="" close="" separator=";">
             UPDATE bb_repair_trade
             <set>
-                <if test="enableFlag==1">
-                    enable_flag=0
-                </if>
-
-                <if test="enableFlag==0">
-                    enable_flag=1
-                </if>
+                enable_flag=0
             </set>
             <where>
-                enable_flag=#{enableFlag} and asset =#{item.asset} and symbol =#{item.symbol}
+                enable_flag=1 and asset =#{item.asset} and symbol =#{item.symbol}
                 and trade_time &gt;= #{tradeTimeBegin}
                 and trade_time &lt; #{tradeTimeEnd}
             </where>

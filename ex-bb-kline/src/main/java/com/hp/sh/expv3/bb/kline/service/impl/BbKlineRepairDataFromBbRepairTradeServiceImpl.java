@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -93,6 +94,7 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
             }
 
             String fromExpBbKlineTaskRedisKey = BbKlineRedisKeyUtil.buildFromExpBbKlineTaskRedisKey(fromExpBbKlineTaskPattern, asset, symbol, freq);
+
             for (Tuple tuple : task) {
                 //[1483200240000,956.54,956.54,956.54,956.54,0.48375944]
                 String element = tuple.getElement();
@@ -104,14 +106,12 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
                 if (isCancel == 1) {
                     List<BbRepairTradeVo> trades = buildTradeList(ja, asset, symbol, ms, IntBool.YES);
                     // 批量更新修正的交易记录表
-                    bbRepairTradeMapper.batchUpdate(trades, ms, endMs, IntBool.YES);
-
+                    bbRepairTradeMapper.batchUpdate(trades, ms, endMs);
                     // 批量保存
                     bbRepairTradeMapper.batchSave(trades);
-                } else  if (isCancel == 0){
-                    List<BbRepairTradeVo> trades = buildTradeList(ja, asset, symbol, ms, IntBool.NO);
-                    // 批量更新修正的交易记录表
-                    bbRepairTradeMapper.batchUpdate(trades, ms, endMs, IntBool.YES);
+                }else {
+                    // 批量取消
+                    bbRepairTradeMapper.batchCancel(ms,endMs);
                 }
 
                 //updateNotify
@@ -120,6 +120,8 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
                 bbRepairTradeUtil.zadd(fromExpBbKlineTaskRedisKey, scoreMembers);
 
             }
+
+
         }
     }
 
