@@ -55,6 +55,8 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
     @Value("${bb.kline2Trade.taskEventPattern}")
     private String kline2TradeTaskEventPattern;
 
+    @Value("${bb.kline}")
+    private String bbKlinePattern;
 
     @Value("${from_exp.bbKlineTaskPattern}")
     private String fromExpBbKlineTaskPattern;
@@ -112,6 +114,10 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
                 }else {
                     // 批量取消
                     bbRepairTradeMapper.batchCancel(ms,endMs);
+                    //取消数据
+                    final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
+                    //删除老数据
+                    bbRepairTradeUtil.zremrangeByScore(klineDataRedisKey, ms, endMs);
                 }
 
                 //updateNotify

@@ -151,12 +151,12 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 
                     if (null == trades || trades.isEmpty()) {
                         trades = listTrade(asset, symbol, ms, maxMs);
-                    }else {
+                    }
                         BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
                         logger.info("build kline data:{}", kline.toString());
                         saveKline(repairkey, kline);
                         notifyUpdate(notifyUpdateKey, ms);
-                    }
+
                 }
             }
         }
