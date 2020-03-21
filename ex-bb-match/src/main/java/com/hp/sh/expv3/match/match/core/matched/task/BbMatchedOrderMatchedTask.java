@@ -169,7 +169,7 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
 
     private void sendNotifyMsg() {
         sendBookMsg();
-//        sendTradeMsg();
+        sendTradeMsg();
     }
 
     private TradeListMsgDto.TradeMsgDto buildTrade(BbTradeBo trade) {
