@@ -61,6 +61,9 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
     @Value("${from_exp.bbKlineTaskPattern}")
     private String fromExpBbKlineTaskPattern;
 
+    @Value("${from_exp.bbKlineTaskCancelPattern}")
+    private String fromExpBbKlineTaskCancelPattern;
+
     @Value("${bb.kline.kline2TradeBatchSize}")
     private Integer kline2TradeBatchSize;
 
@@ -97,8 +100,11 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
 
             String fromExpBbKlineTaskRedisKey = BbKlineRedisKeyUtil.buildFromExpBbKlineTaskRedisKey(fromExpBbKlineTaskPattern, asset, symbol, freq);
 
+            String fromExpBbKlineTaskCancelRedisKey = BbKlineRedisKeyUtil.buildFromExpBbKlineTaskCancelRedisKey(fromExpBbKlineTaskCancelPattern, asset, symbol, freq);
+
+
             for (Tuple tuple : task) {
-                //[1483200240000,956.54,956.54,956.54,956.54,0.48375944]
+                //[1,1483200240000,956.54,956.54,956.54,956.54,0.48375944]
                 String element = tuple.getElement();
                 JSONArray ja = JSON.parseArray(element);
                 //isCancel 是否取消（0：取消，1：不取消）
@@ -111,6 +117,7 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
                     bbRepairTradeMapper.batchUpdate(trades, ms, endMs);
                     // 批量保存
                     bbRepairTradeMapper.batchSave(trades);
+
                 }else {
                     // 批量取消
                     bbRepairTradeMapper.batchCancel(ms,endMs);
@@ -118,6 +125,7 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
                     final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
                     //删除老数据
                     bbRepairTradeUtil.zremrangeByScore(klineDataRedisKey, ms, endMs);
+
                 }
 
                 //updateNotify

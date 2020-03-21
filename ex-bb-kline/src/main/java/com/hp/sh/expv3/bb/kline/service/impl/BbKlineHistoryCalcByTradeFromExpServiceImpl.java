@@ -77,10 +77,10 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
-            2,
-            Runtime.getRuntime().availableProcessors() + 1,
-            2L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(10000000),
+            1,
+            1,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(20000000),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
@@ -92,12 +92,11 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
         if (1 != bbKlineFromExpCalcEnable) { // bbKlineFromExpCalcEnable=1
             return;
         } else {
-
+            try {
 //            while (true) {
             threadPool.execute(() -> repairKlineFromExp());
-            try {
-                Thread.sleep(1L);
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
+                logger.error("EXP平台历史计算k线发生错误，{}", e.getMessage());
             }
 //            }
 
@@ -137,25 +136,17 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
                         continue;
                     }
 
-                    // 若修复数据已存在，忽略 从redis kline:from_exp:repair:BB:${asset}:${symbol}:${minute}中取
-//                    final Set<String> set = bbKlineExpHistoryRedisUtil.zrangeByScore(repairkey, ms + "", maxMs + "", 0, Long.valueOf(maxMs - ms).intValue() + 1);
-//
-//                    if (!set.isEmpty()) {
-//                        continue;
-//                    }
-//                    if (null != set || !set.isEmpty()) {
-//                        continue;
-//                    }
-
                     List<BbTradeVo> trades = listTradeFromRepaired(asset, symbol, ms, maxMs);
-
                     if (null == trades || trades.isEmpty()) {
                         trades = listTrade(asset, symbol, ms, maxMs);
                     }
+
+                    if (null != trades || !trades.isEmpty()) {
                         BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
                         logger.info("build kline data:{}", kline.toString());
                         saveKline(repairkey, kline);
                         notifyUpdate(notifyUpdateKey, ms);
+                    }
 
                 }
             }

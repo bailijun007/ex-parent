@@ -81,7 +81,7 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
 
     @Override
     @Scheduled(cron = "*/1 * * * * *")
-    public void updateKlineByThirdData() {
+    public void updateKlineByThirdData() {//bbKlineThirdCoverEnable=1;
         if (bbKlineThirdCoverEnable!=1){
             return;
         }

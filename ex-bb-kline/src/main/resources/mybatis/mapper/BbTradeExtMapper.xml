@@ -36,7 +36,7 @@
 
     <select id="queryByTimeInterval" resultMap="BbTradeVo">
         select
-        id,asset,symbol,price,trade_time  tradeTime
+        id,asset,symbol,price,trade_time,`number`
         from bb_trade
       <where>
           <if test="id!=null">

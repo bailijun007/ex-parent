@@ -113,7 +113,6 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
             if (null == minAndMaxMs) {
 
             } else {
-                //先从mysql的交易修复表中查询，查询不到再从redis中查询
                 final Long minMs = minAndMaxMs[0];
                 final Long maxMs = minAndMaxMs[1];
                 List<BBKLine>  klines = listBbKline(asset, symbol, minMs, maxMs, freq);
@@ -184,6 +183,8 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
         if (!klines.isEmpty()) {
             for (String kline : klines) {
                 BBKLine bbkLine1 = BBKlineUtil.convert2KlineData(kline, freq);
+                bbkLine1.setAsset(asset);
+                bbkLine1.setSymbol(symbol);
                 list.add(bbkLine1);
             }
         }
