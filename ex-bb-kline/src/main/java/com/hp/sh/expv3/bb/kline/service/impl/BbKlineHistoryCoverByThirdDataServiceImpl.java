@@ -172,6 +172,7 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
                 list.add(bbkLine1);
             }
         }
+        bbKlineOngoingRedisUtil.zremrangeByScore(thirdDataKey,minMs.doubleValue(),maxMs.doubleValue());
         return list;
     }
 
