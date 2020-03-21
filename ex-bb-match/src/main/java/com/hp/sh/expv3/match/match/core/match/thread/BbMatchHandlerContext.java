@@ -18,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BbMatchHandlerContext {
 
+    public Long lastBookResetTimeInMs = null;
+
     public IThreadWorker matchedThreadWorker;
 
     private BbOrderMatchResultVo matchResult = new BbOrderMatchResultVo();
