@@ -61,8 +61,6 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
     @Value("${from_exp.bbKlineTaskPattern}")
     private String fromExpBbKlineTaskPattern;
 
-    @Value("${from_exp.bbKlineTaskCancelPattern}")
-    private String fromExpBbKlineTaskCancelPattern;
 
     @Value("${bb.kline.kline2TradeBatchSize}")
     private Integer kline2TradeBatchSize;
@@ -99,8 +97,6 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
             }
 
             String fromExpBbKlineTaskRedisKey = BbKlineRedisKeyUtil.buildFromExpBbKlineTaskRedisKey(fromExpBbKlineTaskPattern, asset, symbol, freq);
-
-            String fromExpBbKlineTaskCancelRedisKey = BbKlineRedisKeyUtil.buildFromExpBbKlineTaskCancelRedisKey(fromExpBbKlineTaskCancelPattern, asset, symbol, freq);
 
 
             for (Tuple tuple : task) {
