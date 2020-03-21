@@ -203,7 +203,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
      * @param maxMs
      * @return
      */
-    private List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {// TODO xb,一分钟内成交太多，会引入性能问题。
+    public List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {// TODO xb,一分钟内成交太多，会引入性能问题。
         /**
          * 首次查询：
          * sql: select *(具体的列，不需要所有列)
@@ -217,9 +217,13 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
          *
          * 跳出循环条件：返回结果 < N
          */
-        List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(asset, symbol, ms, maxMs);
+        List<BbTradeVo> list = new ArrayList<>();
+        int endLimit = 99999;
+        List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(null, asset, symbol, ms, maxMs, endLimit);
+        list.addAll(voList);
+
         //返回 对象集合以时间升序 再以id升序
-        List<BbTradeVo> sortedList = voList.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
+        List<BbTradeVo> sortedList = list.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
         return sortedList;
     }
 

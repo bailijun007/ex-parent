@@ -8,5 +8,8 @@ import java.util.List;
  * @author BaiLiJun  on 2020/3/11
  */
 public interface BbTradeExtService {
-    List<BbTradeVo> queryByTimeInterval(String asset, String symbol, long startTimeInMs, long endTimeInMs);
+    List<BbTradeVo> queryByTimeInterval(Long id,String asset, String symbol, long startTimeInMs, long endTimeInMs,int endLimit);
+
+
+
 }

@@ -24,6 +24,7 @@
         <result column="modified" property="modified"/>
     </resultMap>
 
+
     <sql id="Base_Column_List">
 		id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,
 		mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,created,modified
@@ -31,16 +32,24 @@
     </sql>
 
 
+
+
     <select id="queryByTimeInterval" resultMap="BbTradeVo">
         select
         id,asset,symbol,price,trade_time  tradeTime
         from bb_trade
-        where
-        asset=#{asset}
-        and symbol=#{symbol}
-        and trade_time &gt;=#{tradeTimeBegin}
-        and trade_time &lt;#{tradeTimeEnd}
+      <where>
+          <if test="id!=null">
+              id>#{id}
+          </if>
+          and   asset=#{asset}
+          and symbol=#{symbol}
+          and trade_time &gt;=#{tradeTimeBegin}
+          and trade_time &lt;#{tradeTimeEnd}
+      </where>
+
         order by id asc
+        LIMIT 0,${endLimit};
     </select>
 
 
