@@ -50,7 +50,14 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
         }
         CapitalAccountVo capitalAccount = fundAccountExtendServer.getCapitalAccount(userId, asset);
         if (null == capitalAccount) {
-            throw new ExException(ExFundError.ACCOUNT_NOT_FIND);
+             CapitalAccountVo accountVo = new CapitalAccountVo();
+            accountVo.setAccountId(userId);
+            accountVo.setAsset(asset);
+            accountVo.setAvailable(BigDecimal.ZERO);
+            accountVo.setLock(BigDecimal.ZERO);
+            accountVo.setTotalAssets(BigDecimal.ZERO);
+            return capitalAccount;
+//            throw new ExException(ExFundError.ACCOUNT_NOT_FIND);
         }
         //检查c2c 被冻结的资产
         BigDecimal c2cLockedVolume =BigDecimal.ZERO;

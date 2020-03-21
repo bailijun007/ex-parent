@@ -218,7 +218,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
          * 跳出循环条件：返回结果 < N
          */
         List<BbTradeVo> list = new ArrayList<>();
-        int endLimit = 99999;
+        int endLimit = 999999;
         List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(null, asset, symbol, ms, maxMs, endLimit);
         list.addAll(voList);
 
