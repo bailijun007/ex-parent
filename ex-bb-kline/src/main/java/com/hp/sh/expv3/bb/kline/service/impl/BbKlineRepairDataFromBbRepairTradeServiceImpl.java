@@ -117,9 +117,6 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
                 }else {
                     // 批量取消
                     bbRepairTradeMapper.batchCancel(asset, symbol,ms,endMs);
-                    //取消数据
-//                    final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
-//                    bbRepairTradeUtil.zremrangeByScore(klineDataRedisKey, ms, endMs);
 
                 }
 

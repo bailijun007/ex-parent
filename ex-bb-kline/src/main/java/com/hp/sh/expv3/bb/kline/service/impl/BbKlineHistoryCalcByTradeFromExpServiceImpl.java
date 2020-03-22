@@ -76,6 +76,9 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     @Autowired
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
+    @Value("${bb.kline}")
+    private String bbKlinePattern;
+
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             1,
             1,
@@ -94,7 +97,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
         } else {
             try {
 //            while (true) {
-            threadPool.execute(() -> repairKlineFromExp());
+                threadPool.execute(() -> repairKlineFromExp());
             } catch (Exception e) {
                 logger.error("EXP平台历史计算k线发生错误，{}", e.getMessage());
             }
@@ -142,16 +145,23 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
                         trades = listTrade(asset, symbol, ms, maxMs);
                     }
                     //返回 对象集合以时间升序 再以id升序
-                    List<BbTradeVo> sortedList =null;
-                   if(!CollectionUtils.isEmpty(trades)){
-                       sortedList = trades.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
-                   }
+                    List<BbTradeVo> sortedList = null;
+                    if (!CollectionUtils.isEmpty(trades)) {
+                        sortedList = trades.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
+                    }
 
                     if (null != sortedList || !sortedList.isEmpty()) {
                         BBKLine kline = buildKline(sortedList, asset, symbol, ms, freq);
                         logger.info("build kline data:{}", kline.toString());
                         saveKline(repairkey, kline);
                         notifyUpdate(notifyUpdateKey, ms);
+                    } else {
+                        //如果最终sortedList==null，说明修复表，平台交易表中都没有数据，则直接将这条kline数据删除（如果需要修复可以走手动修复
+                        // 或者第三方数据覆盖）
+                        //删除数据
+                        final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
+                        bbKlineExpHistoryRedisUtil.zremrangeByScore(klineDataRedisKey, ms, maxMs);
+
                     }
 
                 }
