@@ -81,7 +81,7 @@
         and   asset=#{asset}
         and symbol=#{symbol}
         and trade_time &gt;=#{tradeTimeBegin}
-        and trade_time &lt;#{tradeTimeEnd}
+        and trade_time &lt;=#{tradeTimeEnd}
         order by id asc
     </select>
 

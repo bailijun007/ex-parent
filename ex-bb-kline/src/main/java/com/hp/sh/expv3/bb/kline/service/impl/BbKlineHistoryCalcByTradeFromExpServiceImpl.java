@@ -158,9 +158,11 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
                     } else {
                         //如果最终sortedList==null，说明修复表，平台交易表中都没有数据，则直接将这条kline数据删除（如果需要修复可以走手动修复
                         // 或者第三方数据覆盖）
+
+
                         //删除数据
                         final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
-                        bbKlineExpHistoryRedisUtil.zremrangeByScore(klineDataRedisKey, ms, maxMs);
+                        bbKlineExpHistoryRedisUtil.zremrangeByScore(klineDataRedisKey, ms, ms);
 
                     }
 
