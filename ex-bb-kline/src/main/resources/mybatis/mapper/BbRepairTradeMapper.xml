@@ -52,7 +52,7 @@
                 enable_flag=1 and asset =#{asset} and symbol =#{symbol}
                AND
                  trade_time &gt;= #{tradeTimeBegin}
-                and trade_time &lt; #{tradeTimeEnd}
+                and trade_time &lt;= #{tradeTimeEnd}
             </where>
 
     </update>
@@ -66,7 +66,7 @@
             <where>
                 enable_flag=1 and asset =#{item.asset} and symbol =#{item.symbol}
                 and trade_time &gt;= #{tradeTimeBegin}
-                and trade_time &lt; #{tradeTimeEnd}
+                and trade_time &lt;=#{tradeTimeEnd}
             </where>
         </foreach>
     </update>
