@@ -150,7 +150,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
                         sortedList = trades.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
                     }
 
-                    if (null != sortedList || !sortedList.isEmpty()) {
+                    if (!CollectionUtils.isEmpty(sortedList)) {
                         BBKLine kline = buildKline(sortedList, asset, symbol, ms, freq);
                         logger.info("build kline data:{}", kline.toString());
                         saveKline(repairkey, kline);
