@@ -18,5 +18,5 @@ public interface BbRepairTradeMapper {
 
     List<BbRepairTradeVo> listRepairTrades(@Param("asset") String asset,@Param("symbol") String symbol, @Param("tradeTimeBegin")long tradeTimeBegin, @Param("tradeTimeEnd")long tradeTimeEnd);
 
-    void batchCancel(@Param("tradeTimeBegin")long tradeTimeBegin, @Param("tradeTimeEnd")long tradeTimeEnd);
+    void batchCancel(@Param("asset") String asset,@Param("symbol") String symbol, @Param("tradeTimeBegin")long tradeTimeBegin, @Param("tradeTimeEnd")long tradeTimeEnd);
 }

@@ -138,11 +138,17 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 
                     List<BbTradeVo> trades = listTradeFromRepaired(asset, symbol, ms, maxMs);
                     if (null == trades || trades.isEmpty()) {
+                        //如果修复表中没有数据就从平台交易表中查询数据
                         trades = listTrade(asset, symbol, ms, maxMs);
                     }
+                    //返回 对象集合以时间升序 再以id升序
+                    List<BbTradeVo> sortedList =null;
+                   if(!CollectionUtils.isEmpty(trades)){
+                       sortedList = trades.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
+                   }
 
-                    if (null != trades || !trades.isEmpty()) {
-                        BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
+                    if (null != sortedList || !sortedList.isEmpty()) {
+                        BBKLine kline = buildKline(sortedList, asset, symbol, ms, freq);
                         logger.info("build kline data:{}", kline.toString());
                         saveKline(repairkey, kline);
                         notifyUpdate(notifyUpdateKey, ms);
@@ -210,9 +216,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
         List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(null, asset, symbol, ms, maxMs, endLimit);
         list.addAll(voList);
 
-        //返回 对象集合以时间升序 再以id升序
-        List<BbTradeVo> sortedList = list.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
-        return sortedList;
+        return list;
     }
 
 

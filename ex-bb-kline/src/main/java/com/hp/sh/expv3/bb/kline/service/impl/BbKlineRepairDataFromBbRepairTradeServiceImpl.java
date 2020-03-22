@@ -113,21 +113,20 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
                     bbRepairTradeMapper.batchUpdate(trades, ms, endMs);
                     // 批量保存
                     bbRepairTradeMapper.batchSave(trades);
-
+                    //updateNotify
+                    HashMap<String, Double> scoreMembers = new HashMap<>();
+                    scoreMembers.put(ms + "", Long.valueOf(ms).doubleValue());
+                    bbRepairTradeUtil.zadd(fromExpBbKlineTaskRedisKey, scoreMembers);
                 }else {
                     // 批量取消
-                    bbRepairTradeMapper.batchCancel(ms,endMs);
+                    bbRepairTradeMapper.batchCancel(asset, symbol,ms,endMs);
                     //取消数据
                     final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
-                    //删除老数据
                     bbRepairTradeUtil.zremrangeByScore(klineDataRedisKey, ms, endMs);
 
                 }
 
-                //updateNotify
-                HashMap<String, Double> scoreMembers = new HashMap<>();
-                scoreMembers.put(ms + "", Long.valueOf(ms).doubleValue());
-                bbRepairTradeUtil.zadd(fromExpBbKlineTaskRedisKey, scoreMembers);
+
 
             }
 
