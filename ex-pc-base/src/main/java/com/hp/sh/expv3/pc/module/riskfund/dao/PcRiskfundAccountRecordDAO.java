@@ -20,6 +20,6 @@ public interface PcRiskfundAccountRecordDAO extends BaseMapper<PcRiskfundAccount
 	
 	public PcRiskfundAccountRecord queryOne(Map<String,Object> params);
 
-	public PcRiskfundAccountRecord findByTradeNo(@Param("collectorId") Long collectorId, @Param("tradeNo") String tradeNo);
+	public PcRiskfundAccountRecord findByTradeNo(@Param("id") Long collectorId, @Param("tradeNo") String tradeNo);
 
 }

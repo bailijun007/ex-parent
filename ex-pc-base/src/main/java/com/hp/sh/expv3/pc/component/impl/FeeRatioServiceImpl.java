@@ -107,6 +107,9 @@ public class FeeRatioServiceImpl implements FeeRatioService {
     @Override
     public BigDecimal getMaxLeverage(Long userId, String asset, String symbol, BigDecimal posVolume){
     	PosLevelVo vo = this.findPosLevelVo(userId, asset, symbol, posVolume);
+    	if(vo==null){
+    		logger.error("{}__{}:{} is null", asset, symbol, posVolume);
+    	}
     	return vo.getMaxLeverage();
     }
     
@@ -129,7 +132,8 @@ public class FeeRatioServiceImpl implements FeeRatioService {
         HashOperations hashOperations = template.opsForHash();
         Object pcFee = hashOperations.get(key, prefix + userId);
         if (pcFee == null) {
-            return BigDecimal.ZERO;
+        	logger.error("FeeRatio:{}__{} is null", key, prefix);
+            throw new RuntimeException("获取手续费率失败:"+key+"#"+prefix);
         }
         return new BigDecimal(pcFee + "");
     }

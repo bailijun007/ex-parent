@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.pc.module.position.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.pc.module.position.dao.PcActivePositionDAO;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcActivePosition;
@@ -30,6 +33,19 @@ public class PcPositionDataService {
 	
 	@Autowired
     private ApplicationEventPublisher publisher;
+	
+	/**
+	 * 查询减仓仓位
+	 */
+	@CrossDB
+	public PcPosition getCutPos(String asset, String symbol, int longFlag) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("asset", asset);
+		params.put("symbol", symbol);
+		
+		PcPosition pos = this.pcPositionDAO.getCutPos(asset, symbol, longFlag);
+		return pos;
+	}
 	
 	public void save(PcPosition pcPosition) {
 		this.pcPositionDAO.save(pcPosition);

@@ -145,13 +145,21 @@ public class PcStrategyContext {
 		// 手续费&保证金
 		if(closeFlag==OrderFlag.ACTION_OPEN){
 			OrderFeeData feeData = orderStrategy.calcRaitoFee(order, order.getVolume(), matchedVo.getNumber());
-			tradeResult.setFee(feeData.getOpenFee().multiply(tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE)));
+			if(BigUtils.isZero(order.getOpenFeeRatio())){
+				tradeResult.setFee(BigDecimal.ZERO);
+			}else{
+				tradeResult.setFee(feeData.getOpenFee().multiply(tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE)));
+			}
 			
 			tradeResult.setOrderMargin(feeData.getOrderMargin()); //保证金
 			tradeResult.setOrderCloseFee(feeData.getCloseFee());
 		}else{
 			BigDecimal tradeFee = orderStrategy.calcTradeFee(tradeResult.getNumber(), faceValue, tradeResult.getPrice(), tradeResult.getFeeRatio());
-			tradeResult.setFee(tradeFee.multiply(tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE)));
+			if(BigUtils.isZero(order.getOpenFeeRatio())){
+				tradeResult.setFee(BigDecimal.ZERO);
+			}else{
+				tradeResult.setFee(tradeFee.multiply(tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE)));
+			}
 			
 			OrderMarginVo posMargin = new OrderMarginVo(pcPosition.getPosMargin(), BigDecimal.ZERO, pcPosition.getCloseFee());
 			tradeResult.setOrderMargin(posMargin.getOrderMargin()); //保证金
@@ -278,6 +286,14 @@ public class PcStrategyContext {
 		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
 		 HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
 		 return holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice(), markPrice);
+	}
+	
+	/**
+	 * 计算收益
+	 */
+	public BigDecimal calcPnl(String asset, String symbol, int longFlag, BigDecimal faceValue, BigDecimal volume, BigDecimal openPrice, BigDecimal closePrice) {
+		HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(asset, symbol);
+		return holdPosStrategy.calcPnl(longFlag, volume, faceValue, openPrice, closePrice);
 	}
 
 	/**

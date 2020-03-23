@@ -37,9 +37,9 @@ public interface PcOrderDAO extends BaseAccountDataMapper<PcOrder, Long> {
 
 	public BigDecimal getClosingVolume(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol, @Param("posId") Long posId);
 	
-	public List<PcOrder> queryActiveOrderList(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol);
+	public List<PcOrder> queryUserActiveOrderList(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol, @Param("status") Integer status, @Param("liqFlag") Integer liqFlag);
 	
 	@CrossDB
-	public List<PcOrder> queryPendingActiveOrders(Page page, @Param("createdEnd") long createdEnd, @Param("status") int status, @Param("liqFlag") int liqFlag);
+	public List<PcOrder> queryActiveOrderList(Page page, @Param("asset") String asset, @Param("symbol") String symbol, @Param("createdEnd") Long createdEnd, @Param("status") Integer status, @Param("liqFlag") Integer liqFlag);
 
 }

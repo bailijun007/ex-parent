@@ -66,6 +66,7 @@ public class PcOrderApiAction implements PcOrderApi {
 		if(!ok){
 			return;
 		}
+		
 		//发送消息
 		OrderPendingCancelMsg mqMsg = new OrderPendingCancelMsg(userId, asset, symbol, orderId);
 		mqMsg.setAccountId(userId);
@@ -96,7 +97,7 @@ public class PcOrderApiAction implements PcOrderApi {
 
 	@Override
 	public List<ActiveOrderVo> queryActiveList(Long userId, String asset, String symbol){
-		List<ActiveOrderVo> list = orderQueryService.queryActiveList(userId, asset, symbol);
+		List<ActiveOrderVo> list = orderQueryService.queryUserActiveList(userId, asset, symbol);
 		return list;
 	}
 }

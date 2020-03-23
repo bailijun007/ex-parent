@@ -9,12 +9,13 @@ import com.hp.sh.expv3.pc.constant.LogType;
 import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
 import com.hp.sh.expv3.pc.module.liq.entity.PcLiqRecord;
+import com.hp.sh.expv3.pc.module.order.entity.PcAccountLog;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
+import com.hp.sh.expv3.pc.module.order.service.PcAccountLogService;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderMsg;
-import com.hp.sh.expv3.pc.msg.PcAccountLog;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.NumberUtils;
 
@@ -35,6 +36,9 @@ public class LogEventListener {
 	
 	@Autowired
 	private PcPositionDataService positionDataService;
+	
+	@Autowired
+	private PcAccountLogService pcAccountLogService;
 
 	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
 	public void beforeCommit(PcAccountRecord pcAccountRecord) {
@@ -102,8 +106,8 @@ public class LogEventListener {
 		return null;
 	}
 
-	private void sendEventMsg(PcAccountLog logMsg) {
-		sender.sendEventMsg(logMsg);
+	private void sendEventMsg(PcAccountLog accountLog) {
+		pcAccountLogService.save(accountLog);
 	}
 
 }

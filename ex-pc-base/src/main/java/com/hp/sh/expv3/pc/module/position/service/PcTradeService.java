@@ -20,6 +20,9 @@ import com.hp.sh.expv3.pc.constant.PcAccountTradeType;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.collector.service.PcCollectorCoreService;
+import com.hp.sh.expv3.pc.module.liq.dao.PcLiqRecordDAO;
+import com.hp.sh.expv3.pc.module.liq.entity.PcLiqRecord;
+import com.hp.sh.expv3.pc.module.liq.entity.LiqRecordStatus;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
@@ -75,6 +78,9 @@ public class PcTradeService {
 	private PcPositionMarginService positionMarginService;
 	
     @Autowired
+	private PcLiqRecordDAO pcLiqRecordDAO;
+
+	@Autowired
     private ApplicationEventPublisher publisher;
 
 	
@@ -100,28 +106,36 @@ public class PcTradeService {
 		
 	}
     
-	private void handleTradeLiqOrder(PcOrder order, PcTradeMsg trade) {
+    protected void handleTradeLiqOrder(PcOrder order, PcTradeMsg trade) {
 		Long now = DbDateUtils.now();
-		/*  2、修改订单数据和订单状态  */
+		/*  1、修改订单数据和订单状态  */
 		order.setFilledVolume(order.getFilledVolume().add(trade.getNumber()));
 		boolean com = BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(order.getCancelVolume()));
         order.setStatus(com?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
-        order.setActiveFlag(com?PcOrder.NO:PcOrder.YES);
+//        order.setActiveFlag(com?PcOrder.NO:PcOrder.YES);
 		order.setModified(now);
 		this.orderUpdateService.updateOrder4Trad(order);
 		
-		/*  4、返还保证金和手续费  */
-		//仓位全平
-//		BigDecimal posCloseFee = BigDecimal.ZERO;
-//		if(BigUtils.isZero(pcPosition.getVolume())){
-//			posCloseFee = pcPosition.getCloseFee();
-//		}
-//		BigDecimal amount = tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFee()).add(posCloseFee);
-//		String remark = String.format("平仓。保证金：%s,收益:%s,手续费：-%s,仓位剩余手续费：%s", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getFee(), posCloseFee);
-//		this.closeMarginToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), amount, order.getLongFlag(), remark);
+		/* 2、保险基金 */
+		BigDecimal pnl = positionStrategy.calcPnl(order.getAsset(), order.getSymbol(), order.getLongFlag(), order.getFaceValue(), trade.getNumber(), order.getPrice(), trade.getPrice());
+		
+		if(BigUtils.ltZero(pnl)){
+			throw new RuntimeException("破产价委托，盈余:{}" + pnl);
+		}
+		
+		/* 3、强平记录 */
+		String _rid = order.getClientOrderId().split("-")[1];
+		Long recordId = Long.parseLong(_rid);
+		PcLiqRecord lqRecord = pcLiqRecordDAO.findById(order.getUserId(), recordId);
+		lqRecord.setFilledVolume(trade.getNumber());
+		lqRecord.setPnl(lqRecord.getPnl()==null?pnl:lqRecord.getPnl().add(pnl));
+		lqRecord.setModified(now);
+		lqRecord.setStatus(LiqRecordStatus.BANKRUPT_ORDER_TRADE);
+		this.pcLiqRecordDAO.update(lqRecord);
+		
 	}
 
-	//处理成交订单
+    //处理成交订单
 	protected void handleTradeOpenOrder(PcOrder order, PcTradeMsg trade){
 		Long now = DbDateUtils.now();
 		

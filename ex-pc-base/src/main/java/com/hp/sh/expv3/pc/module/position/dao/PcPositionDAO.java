@@ -49,4 +49,10 @@ public interface PcPositionDAO extends BaseUserDataMapper<PcPosition,Long> {
 			@Param("asset") String asset,
 			@Param("symbol") String symbol);
 
+	public PcPosition getCutPos(
+		@Param("asset") String asset,
+		@Param("symbol") String symbol,
+		@Param("longFlag") Integer longFlag
+	);
+
 }

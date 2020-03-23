@@ -12,11 +12,14 @@
 		<result column="volume" property="volume" />
 		<result column="pos_margin" property="posMargin" />
 		<result column="bankrupt_price" property="bankruptPrice" />
-		<result column="filled_volume" property="filledVolume" />
 		<result column="liq_price" property="liqPrice" />
 		<result column="mean_price" property="meanPrice" />
 		<result column="fee" property="fee" />
 		<result column="fee_ratio" property="feeRatio" />
+		<result column="filled_volume" property="filledVolume" />
+		<result column="pnl" property="pnl" />
+		<result column="status" property="status" />
+		<result column="version" property="version" />
 		<result column="user_id" property="userId" />
 		<result column="id" property="id" />
 		<result column="created" property="created" />
@@ -24,7 +27,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		asset,symbol,pos_id,long_flag,volume,pos_margin,bankrupt_price,filled_volume,liq_price,mean_price,fee,fee_ratio,user_id,id,created,modified
+		asset,symbol,pos_id,long_flag,volume,pos_margin,bankrupt_price,liq_price,mean_price,fee,fee_ratio,filled_volume,pnl,status,version,user_id,id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -101,13 +104,10 @@
 	</select>
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into pc_liq_record (
-			asset,symbol,pos_id,long_flag,volume,pos_margin,bankrupt_price,filled_volume,liq_price,mean_price,fee,fee_ratio,user_id,id,created,modified
+			asset,symbol,pos_id,long_flag,volume,pos_margin,bankrupt_price,liq_price,mean_price,fee,fee_ratio,filled_volume,pnl,status,version,user_id,id,created,modified
 		)values(
-			#{asset},#{symbol},#{posId},#{longFlag},#{volume},#{posMargin},#{bankruptPrice},#{filledVolume},#{liqPrice},#{meanPrice},#{fee},#{feeRatio},#{userId},#{id},#{created},#{modified}
+			#{asset},#{symbol},#{posId},#{longFlag},#{volume},#{posMargin},#{bankruptPrice},#{liqPrice},#{meanPrice},#{fee},#{feeRatio},#{filledVolume},#{pnl},#{status},#{version},#{userId},#{id},#{created},#{modified}
 		)
 	</insert>
 	
@@ -115,9 +115,9 @@
 		update 
 			pc_liq_record
 		set 
-			asset=#{asset},symbol=#{symbol},pos_id=#{posId},long_flag=#{longFlag},volume=#{volume},pos_margin=#{posMargin},bankrupt_price=#{bankruptPrice},filled_volume=#{filledVolume},liq_price=#{liqPrice},mean_price=#{meanPrice},fee=#{fee},fee_ratio=#{feeRatio},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},pos_id=#{posId},long_flag=#{longFlag},volume=#{volume},pos_margin=#{posMargin},bankrupt_price=#{bankruptPrice},liq_price=#{liqPrice},mean_price=#{meanPrice},fee=#{fee},fee_ratio=#{feeRatio},filled_volume=#{filledVolume},pnl=#{pnl},status=#{status},version=${version}+1,user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
-			id=#{id} and user_id=#{userId}
+			id=#{id} and user_id=#{userId} and version=#{version}
 	</update>
 
 	<delete id="delete">
@@ -140,7 +140,20 @@
 			created &gt;= #{startTime}
 			<if test="userId!=null"> and (tk_account_id=#{userId} or mk_account_id=#{userId})</if>
 			<if test="startId!=null"> and id &gt; #{startId} </if>
-			and status!=4
+			and status=#{status}
+			order by id asc
+	</select>
+	
+	<select id="queryPendingFund" resultMap="PcLiqRecord">
+		select
+			<include refid="Base_Column_List" />
+		from 
+			pc_liq_record 
+		where 
+			created &gt;= #{startTime}
+			<if test="userId!=null"> and (tk_account_id=#{userId} or mk_account_id=#{userId})</if>
+			<if test="startId!=null"> and id &gt; #{startId} </if>
+			and status=#{status} and filled_volume &gt; 0
 			order by id asc
 	</select>
 	

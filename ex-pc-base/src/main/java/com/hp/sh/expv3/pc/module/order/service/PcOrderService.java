@@ -97,7 +97,7 @@ public class PcOrderService {
 	}
 	
 	public PcOrder createLiqOrder(long userId, String clientOrderId, String asset, String symbol, int longFlag, BigDecimal price, BigDecimal number, PcPosition pos){
-		return this.createCloseOrder(userId, clientOrderId, asset, symbol, longFlag, TimeInForce.IMMEDIATE_OR_CANCEL, price, number, pos, IntBool.NO, PcOrderType.MARKET, IntBool.YES);
+		return this.createCloseOrder(userId, clientOrderId, asset, symbol, longFlag, TimeInForce.IMMEDIATE_OR_CANCEL, price, number, pos, IntBool.NO, PcOrderType.LIMIT, IntBool.YES);
 	}
 	
 	//创建开仓委托
@@ -291,8 +291,8 @@ public class PcOrderService {
 	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal orderMargin, BigDecimal openFee, BigDecimal closeFee){
 		
 		if(BigUtils.ltZero(openFee)){
-			logger.error("剩余手续费小于0,{}", openFee);
-			openFee = BigDecimal.ZERO;
+			logger.error("剩余手续费小于0,{},orderId={}", openFee, orderId);
+			throw new RuntimeException("剩余手续费小于0,"+openFee);
 		}
 		
 		BigDecimal amount = orderMargin.add(openFee).add(closeFee);

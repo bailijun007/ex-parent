@@ -13,6 +13,7 @@ import com.hp.sh.expv3.pc.module.account.entity.PcAccount;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
 import com.hp.sh.expv3.pc.module.collector.entity.PcCollectorAccountRecord;
 import com.hp.sh.expv3.pc.module.liq.entity.PcLiqRecord;
+import com.hp.sh.expv3.pc.module.order.entity.PcAccountLog;
 import com.hp.sh.expv3.pc.module.order.entity.PcActiveOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderLog;
@@ -20,7 +21,6 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcActivePosition;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
-import com.hp.sh.expv3.pc.msg.PcAccountLog;
 
 @Component
 public class WorkerConfigBuilder {

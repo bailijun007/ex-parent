@@ -17,7 +17,7 @@ import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.job.LiqHandleResult;
 import com.hp.sh.expv3.pc.module.liq.dao.PcLiqRecordDAO;
 import com.hp.sh.expv3.pc.module.liq.entity.PcLiqRecord;
-import com.hp.sh.expv3.pc.module.liq.entity.PcLiqStatus;
+import com.hp.sh.expv3.pc.module.liq.entity.LiqRecordStatus;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
@@ -207,11 +207,13 @@ public class PcLiqService {
 		record.setVolume(pos.getVolume());
 		record.setFilledVolume(BigDecimal.ZERO);
 		record.setPosMargin(pos.getPosMargin());
+		record.setPnl(BigDecimal.ZERO);
 		BigDecimal bankruptPrice = this.strategyContext.calcBankruptPrice(pos);
 		record.setBankruptPrice(bankruptPrice);
 		record.setCreated(now);
 		record.setModified(now);
-		record.setStatus(PcLiqStatus.init);
+		record.setStatus(LiqRecordStatus.NEW);
+		record.setVersion(0L);
 		
 		//log
 		record.setLiqPrice(pos.getLiqPrice());
@@ -226,11 +228,17 @@ public class PcLiqService {
 	}
 	
 	//3、创建强平委托
-	public void createLiqOrder(PcLiqRecord record){
+	public PcOrder createLiqOrder(PcLiqRecord record){
 		PcPosition pos = positionDataService.getPosition(record.getUserId(), record.getAsset(), record.getSymbol(), record.getPosId());
 		PcOrder order = this.pcOrderService.createLiqOrder(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), record.getLongFlag(), record.getBankruptPrice(), record.getVolume(), pos);
+		
+		record.setStatus(LiqRecordStatus.BANKRUPT_ORDER);
+		record.setModified(order.getModified());
+		this.pcLiqRecordDAO.update(record);
+		
 		PcOrderMsg msg = new PcOrderMsg(order);
 		this.publisher.publishEvent(msg);
+		return order;
 	}
 
 }

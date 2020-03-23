@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.pc.module.order.dao.PcAccountLogDAO">
+
+	<resultMap type="com.hp.sh.expv3.pc.module.order.entity.PcAccountLog" id="PcAccountLog">
+		<result column="type" property="type" />
+		<result column="user_id" property="userId" />
+		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="ref_id" property="refId" />
+		<result column="time" property="time" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		type,user_id,asset,symbol,ref_id,time
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="type!=null"> and type=#{type}</if>
+		<if test="userId!=null"> and user_id=#{userId}</if>
+		<if test="refId!=null"> and ref_id=#{refId}</if>
+		<if test="time!=null"> and time=#{time}</if>
+		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(asset,''),IFNULL(symbol,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from pc_account_log
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="PcAccountLog">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="PcAccountLog">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="PcAccountLog">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from pc_account_log
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="PcAccountLog">
+		select
+			<include refid="Base_Column_List" />
+		from pc_account_log
+			where id=#{id}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			pc_account_log
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		insert into pc_account_log (
+			id,type,user_id,asset,symbol,ref_id,time
+		)values(
+			#{id},#{type},#{userId},#{asset},#{symbol},#{refId},#{time}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			pc_account_log
+		set 
+			type=#{type},user_id=#{userId},asset=#{asset},symbol=#{symbol},ref_id=#{refId},time=#{time}
+		where 
+			id=#{id} and user_id=#{userId}
+	</update>
+
+	<delete id="delete">
+        delete from pc_account_log where id=#{id}
+    </delete>
+
+    <delete id="condDelete">
+        delete from pc_account_log
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+</mapper>

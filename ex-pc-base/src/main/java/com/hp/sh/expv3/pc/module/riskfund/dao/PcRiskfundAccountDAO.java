@@ -12,7 +12,7 @@ import com.hp.sh.expv3.pc.module.riskfund.entity.PcRiskfundAccount;
  */
 public interface PcRiskfundAccountDAO {
 	
-	public PcRiskfundAccount get(@Param("collectorId") Long collectorId, @Param("asset") String asset);
+	public PcRiskfundAccount get(@Param("asset") String asset);
 	
 	void save(PcRiskfundAccount entity);
 

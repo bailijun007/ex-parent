@@ -84,7 +84,7 @@ public class BBOrderUpdateService {
 		long count = this.bBOrderDAO.updateStatus(cancelStatus, modified, orderId, userId, version);
 		
 		if(count==0){
-			logger.error("撤单更新失败，orderId={}", orderId);
+			logger.warn("撤单更新失败，orderId={}", orderId);
 			return;
 		}
 		

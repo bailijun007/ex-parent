@@ -70,7 +70,7 @@ public class MatchMqConsumer {
 		
 		try{
 			this.matchedTradeService.save(list);
-			this.sender.send(list);
+//			this.sender.send(list);
 			for(BBMatchedTrade matchedTrade : list){
 				this.matchedHandler.handleMatchedTrade(matchedTrade);
 			}
@@ -116,7 +116,7 @@ public class MatchMqConsumer {
 		this.matchedTradeService.save(matchedTrade);
 		
 		//通知前端
-		sender.send(matchedTrade);
+//		sender.send(matchedTrade);
 		
 		//处理用户成交
 		matchedHandler.handleMatchedTrade(matchedTrade);

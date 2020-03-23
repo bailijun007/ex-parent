@@ -1,7 +1,10 @@
-package com.hp.sh.expv3.pc.msg;
+package com.hp.sh.expv3.pc.module.order.entity;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.hp.sh.expv3.component.id.utils.GeneratorName;
 import com.hp.sh.expv3.pc.constant.LogType;
 
 /**
@@ -25,12 +28,13 @@ public class PcAccountLog {
     public static final int TYPE_AUTO_ADD_MARGIN = LogType.TYPE_ACCOUNT_AUTO_ADD_MARGIN;        //-自动追加保证金
     public static final int TYPE_LEVERAGE_ADD_MARGIN = LogType.TYPE_ACCOUNT_LEVERAGE_ADD_MARGIN;    //-调低杠杆追加保证金
 
-    public static final int TYPE_LIQ_LONG = LogType.TYPE_LIQ_LONG;
-    ;                //强平平多
-    public static final int TYPE_LIQ_SHORT = LogType.TYPE_LIQ_SHORT;
-    ;            //强平平空
+    public static final int TYPE_LIQ_LONG = LogType.TYPE_LIQ_LONG;                //强平平多
+    public static final int TYPE_LIQ_SHORT = LogType.TYPE_LIQ_SHORT;				//强平平空
 
 
+    //Id
+    private Long id;
+    
     /**
      * 日志类型
      */
@@ -103,7 +107,17 @@ public class PcAccountLog {
         this.time = time;
     }
 
-    @Override
+	@Id
+	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
+    public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@Override
     public String toString() {
         return "PcAccountLog{" +
                 "type=" + type +

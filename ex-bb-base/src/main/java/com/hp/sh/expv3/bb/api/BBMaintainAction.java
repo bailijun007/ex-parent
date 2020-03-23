@@ -48,12 +48,12 @@ public class BBMaintainAction{
 
 	@ApiOperation(value = "queryResend")
 	@GetMapping(value = "/api/pc/maintain/queryResend")	
-	public Integer queryResend(){
+	public Integer queryResend(String symbol){
 		long now = DbDateUtils.now()-2000;
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, now, OrderStatus.PENDING_NEW);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, symbol, now, OrderStatus.PENDING_NEW);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -73,10 +73,10 @@ public class BBMaintainAction{
 
 	@ApiOperation(value = "resendPending")
 	@GetMapping(value = "/api/pc/maintain/resendPending")	
-	public Map resendPending(){
+	public Map resendPending(String symbol){
 		Map map = new HashMap();
-		Integer resendPendingCancel = this.resendPendingCancel();
-		Integer resendPendingNew = this.resendPendingNew();
+		Integer resendPendingCancel = this.resendPendingCancel(symbol);
+		Integer resendPendingNew = this.resendPendingNew(symbol);
 		map.put("resendPendingCancel", resendPendingCancel);
 		map.put("resendPendingNew", resendPendingNew);
 		return map;
@@ -84,12 +84,12 @@ public class BBMaintainAction{
 
 	@ApiOperation(value = "resendPendingCancel")
 	@GetMapping(value = "/api/pc/maintain/resendPendingCancel")	
-	public Integer resendPendingCancel(){
+	public Integer resendPendingCancel(String symbol){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		long now = DbDateUtils.now()-2000;
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, now, OrderStatus.PENDING_CANCEL);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, symbol, now, OrderStatus.PENDING_CANCEL);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -114,12 +114,12 @@ public class BBMaintainAction{
 
 	@ApiOperation(value = "resendPendingNew")
 	@GetMapping(value = "/api/pc/maintain/resendPendingNew")	
-	public Integer resendPendingNew(){
+	public Integer resendPendingNew(String symbol){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		long now = DbDateUtils.now()-2000;
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, now, OrderStatus.PENDING_NEW);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, symbol, now, OrderStatus.PENDING_NEW);
 			if(list==null||list.isEmpty()){
 				break;
 			}

@@ -293,6 +293,9 @@ public class PcOrder extends UserDataEntity implements OrderData{
 	}
 
 	public BigDecimal getGrossMargin() {
+		if(grossMargin==null){
+			return this.orderMargin.add(this.openFee).add(this.closeFee);
+		}
 		return grossMargin;
 	}
 

@@ -191,5 +191,23 @@
         order by 
         	ap.long_flag desc
     </select>
+    
+    <select id="getCutPos" resultMap="PcPosition">
+        select
+        	p.*
+        from
+			pc_active_position ap
+		LEFT JOIN 
+			pc_position p ON p.id = ap.id
+        where
+        	and ap.asset=#{asset} 
+        	and ap.symbol=#{symbol} 
+        	and long_flag=#{longFlag} 
+        order by 
+        	ap.mean_price 
+        <if test="longFlag=0">desc</if>
+        <if test="longFlag=1">asc</if>
+        limit 0,1
+    </select>
 
 </mapper>

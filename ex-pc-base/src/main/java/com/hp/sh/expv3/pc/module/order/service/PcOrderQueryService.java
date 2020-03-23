@@ -73,9 +73,9 @@ public class PcOrderQueryService {
 		return count>0;
 	}
 	
-	public List<ActiveOrderVo> queryActiveList(long userId, String asset, String symbol){
+	public List<ActiveOrderVo> queryUserActiveList(long userId, String asset, String symbol){
 		List<ActiveOrderVo> result = new ArrayList<ActiveOrderVo>();
-		List<PcOrder> list = this.pcOrderDAO.queryActiveOrderList(userId, asset, symbol);
+		List<PcOrder> list = this.pcOrderDAO.queryUserActiveOrderList(userId, asset, symbol, null, IntBool.NO);
 		
 		if(list==null||list.isEmpty()){
 			return Collections.emptyList();
@@ -112,8 +112,13 @@ public class PcOrderQueryService {
 		return result;
 	}
 
-	public List<PcOrder> queryPendingActive(Page page, Long createdEnd, Integer status) {
-		List<PcOrder> list = this.pcOrderDAO.queryPendingActiveOrders(page, createdEnd, status, IntBool.NO);
+	public List<PcOrder> queryPendingActive(Page page, String asset, String symbol, Long createdEnd, Integer status) {
+		List<PcOrder> list = this.pcOrderDAO.queryActiveOrderList(page, asset, symbol, createdEnd, status, IntBool.NO);
+		return list;
+	}
+
+	public List<PcOrder> queryLiqCutOrders(Page page, Long createdEnd) {
+		List<PcOrder> list = this.pcOrderDAO.queryActiveOrderList(page, null, null, createdEnd, OrderStatus.CANCELED, IntBool.YES);
 		return list;
 	}
 	

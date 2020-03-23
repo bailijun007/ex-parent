@@ -1,6 +1,12 @@
 package com.hp.sh.expv3.pc.mq;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
@@ -17,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.component.MetadataService;
@@ -41,6 +48,8 @@ public class OrderlyConsumer {
 	
 	@Value("${pc.mq.consumer.contractGroup:1}")
 	private Integer contractGroup;
+
+	private Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
 	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic);
@@ -75,7 +84,8 @@ public class OrderlyConsumer {
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error(cause.toString(), e);
+        			logger.error(e.getMessage(), e);
+        			logger.error(cause.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		
@@ -87,16 +97,39 @@ public class OrderlyConsumer {
         return consumer;
 	}
 	
+	@Scheduled(cron = "0 * * * * ?")
 	@PostConstruct
 	public void start123() throws MQClientException{
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
-		for(PcContractVO pc : pcList){
-			if(contractGroup.equals(pc.getContractGroup())){
-				this.buildConsumer(MqTopic.getMatchTopic(pc.getAsset(), pc.getSymbol()));
-			}
-	        logger.info("Consumer Started. asset={}, symbol={}", pc.getAsset(), pc.getSymbol());
+
+		logger.info("更新MQ监听,{}", pcList.size());
+		
+		Map<String, PcContractVO> symbolMap = new HashMap<String, PcContractVO>();
+		for(PcContractVO bbvo : pcList){
+			String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
+			symbolMap.put(topic, bbvo);
 		}
+		
+		for(String topic : new ArrayList<String>(this.mqMap.keySet())){
+			DefaultMQPushConsumer mq = this.mqMap.get(topic);
+			if(!symbolMap.containsKey(topic)){
+				logger.info("关闭监听. topic={}", topic);
+				mq.shutdown();
+				this.mqMap.remove(topic);
+			}
+		}
+		
+		Set<Entry<String, PcContractVO>> entrySet = symbolMap.entrySet();
+		for(Entry<String, PcContractVO> entry : entrySet){
+			String topic = entry.getKey();
+			PcContractVO symbolVO = entry.getValue();
+			if(!mqMap.containsKey(topic)){
+				logger.info("启动监听. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
+				DefaultMQPushConsumer mq = this.buildConsumer(topic);
+				this.mqMap.put(topic, mq);
+			}
+		}
+
 	}
-	
 
 }

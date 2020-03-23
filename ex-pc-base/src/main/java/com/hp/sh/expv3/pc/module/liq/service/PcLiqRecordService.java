@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.pc.module.liq.dao.PcLiqRecordDAO;
+import com.hp.sh.expv3.pc.module.liq.entity.LiqRecordStatus;
 import com.hp.sh.expv3.pc.module.liq.entity.PcLiqRecord;
 
 /**
@@ -30,11 +31,22 @@ public class PcLiqRecordService {
     private ApplicationEventPublisher publisher;
 
 	public List<PcLiqRecord> queryPending(Page page, Long userId, Long startTime, Long startId) {
-		List<PcLiqRecord> list = liqRecordDAO.queryPending(page, userId, startTime, startId);
+		List<PcLiqRecord> list = liqRecordDAO.queryPending(page, userId, startTime, startId, LiqRecordStatus.NEW);
 		return list;
 	}
 
+	public List<PcLiqRecord> queryPendingFund(Page page, Long userId, Long startTime, Long startId) {
+		List<PcLiqRecord> list = liqRecordDAO.queryPendingFund(page, userId, startTime, startId, LiqRecordStatus.BANKRUPT_ORDER_TRADE);
+		return list;
+	}
 
-    
+	public List<PcLiqRecord> queryPendingCut(Page page, Long userId, Long startTime, Long startId) {
+		List<PcLiqRecord> list = liqRecordDAO.queryPendingFund(page, userId, startTime, startId, LiqRecordStatus.BANKRUPT_ORDER_CANCELLED);
+		return list;
+	}
+
+	public void update(PcLiqRecord record) {
+		this.liqRecordDAO.update(record);
+	}
 
 }
