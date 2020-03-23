@@ -182,8 +182,6 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
         bbRepairTradeVo.setPrice(price);
         bbRepairTradeVo.setNumber(v);
         bbRepairTradeVo.setTradeTime(tradeInMs);
-        bbRepairTradeVo.setMakerHandleStatus(0);
-        bbRepairTradeVo.setTakerHandleStatus(0);
         bbRepairTradeVo.setEnableFlag(enableFlag);
         long now = Instant.now().toEpochMilli();
         bbRepairTradeVo.setModified(now);
