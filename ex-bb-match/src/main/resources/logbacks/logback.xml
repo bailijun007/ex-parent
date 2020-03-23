@@ -167,7 +167,7 @@
     <logger name="org.mybatis.spring" value="INFO" additivity="false"/>
     <logger name="org.apache.skywalking" value="INFO" additivity="false"/>
 
-    <logger name="com.hp.sh.expv3.match.component.notify.BbNotify" level="DEBUG" additivity="false">
+    <logger name="com.hp.sh.expv3.match.component.notify.BbNotify" level="info" additivity="false">
         <appender-ref ref="bbNotify"/>
     </logger>
     <logger name="com.hp.sh.expv3.match.match.core.matched.task.BbMatchedBookSnapshotTask" level="INFO" additivity="false">
@@ -175,7 +175,7 @@
     </logger>
 
     <!-- root级别   DEBUG -->
-    <root level="debug">
+    <root level="info">
         <!-- 控制台输出 -->
         <appender-ref ref="STDOUT"/>
         <!-- 文件输出 -->

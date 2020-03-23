@@ -4,6 +4,7 @@
  */
 package com.hp.sh.expv3.match.match.core.match.task;
 
+import com.hp.sh.expv3.match.bo.BbOrder4MatchBo;
 import com.hp.sh.expv3.match.match.core.match.task.service.BbOrderBookEventService;
 import com.hp.sh.expv3.match.match.core.match.thread.BbMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.matched.task.def.BbMatchedTaskService;
@@ -66,15 +67,18 @@ public class BbOrderBookResetTask extends BbOrderBaseTask implements ITask {
             // 此任务将占用大量内存：大量活动委托持久化发送到redis
             // 避免重复的book reset 任务，一定时间内不能重复发送
             if (context.lastBookResetTimeInMs == null || context.lastBookResetTimeInMs + 30000 < now) {
-                BigDecimal maxBidPrice = context.limitBidQueue.peek().getPrice();
-                BigDecimal minAskPrice = context.limitAskQueue.peek().getPrice();
-                logger.info("{},currentOffset:{},contextOffset:{},limitBid:{},limitAsk:{},maxBidPrice:{},minAskPrice:{}",
+                BbOrder4MatchBo maxBidLimit = context.limitBidQueue.peek();
+                BigDecimal maxBidPrice = (null == maxBidLimit) ? null : maxBidLimit.getPrice();
+                BbOrder4MatchBo minAskLimit = context.limitAskQueue.peek();
+                BigDecimal minAskPrice = (null == minAskLimit) ? null : minAskLimit.getPrice();
+                logger.info("{},currentOffset:{},contextOffset:{},limitBid:{},limitAsk:{},maxBidPrice:{},minAskPrice:{},lastBookResetMs:{},now:{}",
                         now, this.getCurrentMsgOffset(), context.getSentMqOffset(),
                         context.limitBidQueue.size(), context.limitAskQueue.size(),
                         DecimalUtil.toTrimLiteral(maxBidPrice),
-                        DecimalUtil.toTrimLiteral(minAskPrice)
+                        DecimalUtil.toTrimLiteral(minAskPrice),
+                        context.lastBookResetTimeInMs, now
                 );
-                if (maxBidPrice.compareTo(minAskPrice) >= 0) {
+                if (null != maxBidLimit && null != minAskPrice && maxBidPrice.compareTo(minAskPrice) >= 0) {
                     logger.error("bid ask price cross:maxBidPrice:{},minAskPrice:{}",
                             DecimalUtil.toTrimLiteral(maxBidPrice),
                             DecimalUtil.toTrimLiteral(minAskPrice));

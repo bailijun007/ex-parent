@@ -31,19 +31,15 @@ public class BbNotify {
 
     public boolean safeNotify(String asset, String symbol, BookMsgDto msg) {
         String channel = RedisKeyUtil.buildBbBookChannelRedisKey(bbmatchRedisKeySetting.getBbBookChannelRedisKeyPattern(), asset, symbol);
-        if (logger.isDebugEnabled()) {
-            logger.debug("{} {} send book:{}", asset, symbol, JsonUtil.toJsonString(msg));
-        }
         RedisPublisher.safeNotify(bbRedisUtil, channel, msg);
+        logger.info("{} {} send book:{}", asset, symbol, JsonUtil.toJsonString(msg));
         return true;
     }
 
     public boolean safeNotify(String asset, String symbol, TradeListMsgDto msg) {
         String channel = RedisKeyUtil.buildBbTradeChannelRedisKey(bbmatchRedisKeySetting.getBbTradeChannelRedisKeyPattern(), asset, symbol);
-        if (logger.isDebugEnabled()) {
-            logger.debug("{} {} send trade list:{}", asset, symbol, JsonUtil.toJsonString(msg));
-        }
         RedisPublisher.safeNotify(bbRedisUtil, channel, msg);
+        logger.info("{} {} send trade list:{}", asset, symbol, JsonUtil.toJsonString(msg));
         return true;
     }
 
