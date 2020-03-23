@@ -53,6 +53,7 @@ public class PcAccountExtendApiAction implements PcAccountExtendApi {
             long userId = Long.parseLong(split[i]);
             PcAccountExtVo vo = pcAccountExtendService.findContractAccount(userId, asset);
             if (null == vo) {
+                vo=new PcAccountExtVo();
                 vo.setTotal(BigDecimal.ZERO);
                 vo.setPoserMargin(BigDecimal.ZERO);
                 vo.setOrderMargin(BigDecimal.ZERO);
