@@ -50,13 +50,22 @@ public class PcAccountExtendApiAction implements PcAccountExtendApi {
         List<PcAccountExtVo> list = new ArrayList<>();
         String[] split = userIds.split(",");
         for (int i = 0; i < split.length; i++) {
-            PcAccountExtVo vo = pcAccountExtendService.findContractAccount(Long.parseLong(split[i]), asset);
-            BigDecimal orderMargin = pcOrderExtendService.getGrossMargin(Long.parseLong(split[i]), asset);
-            vo.setOrderMargin(orderMargin);
-            BigDecimal posMargin = pcPositionExtendService.getPosMargin(Long.parseLong(split[i]), asset);
-            vo.setPoserMargin(posMargin);
-
-            vo.setTotal(vo.getAvailable().add(orderMargin).add(posMargin));
+            long userId = Long.parseLong(split[i]);
+            PcAccountExtVo vo = pcAccountExtendService.findContractAccount(userId, asset);
+            if (null == vo) {
+                vo.setTotal(BigDecimal.ZERO);
+                vo.setPoserMargin(BigDecimal.ZERO);
+                vo.setOrderMargin(BigDecimal.ZERO);
+                vo.setAvailable(BigDecimal.ZERO);
+                vo.setAsset(asset);
+                vo.setAccountId(userId);
+            } else {
+                BigDecimal orderMargin = pcOrderExtendService.getGrossMargin(userId, asset);
+                vo.setOrderMargin(orderMargin);
+                BigDecimal posMargin = pcPositionExtendService.getPosMargin(userId, asset);
+                vo.setPoserMargin(posMargin);
+                vo.setTotal(vo.getAvailable().add(orderMargin).add(posMargin));
+            }
             list.add(vo);
         }
 
