@@ -165,28 +165,24 @@
 
     <select id="getPositionVolumeStat" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionVolumeStatVo">
 		select 
-			long_flag, sum(volume) as volume 
-		from 
-			pc_position p 
-        where
-        	p.volume>0
-	        and asset=#{asset}
-	        and symbol=#{symbol}
-		group by 
-			long_flag
+			ap.long_flag, sum(p.volume) as volume
+		from pc_active_position ap LEFT JOIN pc_position p
+            ON ap.id=p.id
+             where  ap.asset=#{asset}
+	        and ap.symbol=#{symbol}
+		group by
+			ap.long_flag
     </select>
 
     <select id="getPositionNumStat" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionNumStatVo">
-		select 
-			long_flag, count(1) as pos_num 
-		from 
-			pc_position p 
-        where
-        	p.volume>0
-	        and asset=#{asset}
-	        and symbol=#{symbol}
-		group by 
-			long_flag
+	select
+		ap.long_flag, count(1) as pos_num
+		from pc_active_position ap LEFT JOIN pc_position p
+        ON ap.id=p.id
+          where  ap.asset=#{asset}
+	        and ap.symbol=#{symbol}
+		group by
+			ap.long_flag
     </select>
 
 </mapper>
