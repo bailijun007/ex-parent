@@ -25,14 +25,14 @@
 
     <insert id="save">
         insert into ${table} (
-			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,enable_flag,created,modified
+			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,enable_flag,created,modified
 			)values(
 			#{tradeVo.asset},#{tradeVo.symbol},#{tradeVo.matchTxId},#{tradeVo.tkBidFlag},#{tradeVo.tkAccountId},#{tradeVo.tkOrderId},#{tradeVo.mkAccountId},#{tradeVo.mkOrderId},#{tradeVo.price},#{tradeVo.number},#{tradeVo.tradeTime},#{tradeVo.makerHandleStatus},#{tradeVo.takerHandleStatus},#{tradeVo.enableFlag},#{tradeVo.created},#{tradeVo.modified})
     </insert>
 
     <insert id="batchSave">
         insert into ${table} (
-			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,enable_flag,created,modified
+			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,enable_flag,created,modified
 			)values
         <foreach collection="trades" item="item" index="index" separator=",">
             (#{item.asset},#{item.symbol},#{item.matchTxId},#{item.tkBidFlag},#{item.tkAccountId},#{item.tkOrderId},#{item.mkAccountId},#{item.mkOrderId},#{item.price},

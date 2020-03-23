@@ -113,19 +113,20 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
                 final Integer isCancel = ja.getInteger(0);
                 Long ms = ja.getLong(1);
                 long endMs = TimeUnit.MINUTES.toMillis(TimeUnit.MILLISECONDS.toMinutes(ms) + 1) - 1;
-                if (isCancel == 1) {
-                    List<BbRepairTradeVo> trades = buildTradeList(ja, asset, symbol, ms, IntBool.YES);
-                    // 批量更新修正的交易记录表
-                    bbRepairTradeMapper.batchUpdate(trades, ms, endMs,bbKlineRepairTradePattern);
-                    // 批量保存
-                    bbRepairTradeMapper.batchSave(trades,bbKlineRepairTradePattern);
-
-                }else {
-                    // 批量取消
-                    bbRepairTradeMapper.batchCancel(asset, symbol,ms,endMs,bbKlineRepairTradePattern);
-
+                try {
+                    if (isCancel == 1) {
+                        List<BbRepairTradeVo> trades = buildTradeList(ja, asset, symbol, ms, IntBool.YES);
+                        // 批量更新修正的交易记录表
+                        bbRepairTradeMapper.batchUpdate(trades, ms, endMs, bbKlineRepairTradePattern);
+                        // 批量保存
+                        bbRepairTradeMapper.batchSave(trades, bbKlineRepairTradePattern);
+                    } else {
+                        // 批量取消
+                        bbRepairTradeMapper.batchCancel(asset, symbol, ms, endMs, bbKlineRepairTradePattern);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
                 //updateNotify
                 HashMap<String, Double> scoreMembers = new HashMap<>();
                 scoreMembers.put(ms + "", Long.valueOf(ms).doubleValue());
