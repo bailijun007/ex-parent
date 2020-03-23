@@ -4,6 +4,7 @@
  */
 package com.hp.sh.expv3.match.match.core.match.task;
 
+import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.match.core.match.task.service.PcOrderBookEventService;
 import com.hp.sh.expv3.match.match.core.match.thread.PcMatchHandlerContext;
 import com.hp.sh.expv3.match.match.core.matched.task.def.PcMatchedTaskService;
@@ -64,13 +65,16 @@ public class PcOrderBookResetTask extends PcOrderBaseTask implements ITask {
         if (this.getCurrentMsgOffset() > context.getSentMqOffset()) {
             long now = System.currentTimeMillis();
             if (context.lastBookResetTimeInMs == null || context.lastBookResetTimeInMs + 30000 < now) {
-                BigDecimal maxBidPrice = context.limitBidQueue.peek().getPrice();
-                BigDecimal minAskPrice = context.limitAskQueue.peek().getPrice();
-                logger.info("{},currentOffset:{},contextOffset:{},limitBid:{},limitAsk:{},maxBidPrice:{},minAskPrice:{}",
+                PcOrder4MatchBo maxBidLimit = context.limitBidQueue.peek();
+                BigDecimal maxBidPrice = (null == maxBidLimit) ? null : maxBidLimit.getPrice();
+                PcOrder4MatchBo minAskLimit = context.limitAskQueue.peek();
+                BigDecimal minAskPrice = (null == minAskLimit) ? null : minAskLimit.getPrice();
+                logger.info("{},currentOffset:{},contextOffset:{},limitBid:{},limitAsk:{},maxBidPrice:{},minAskPrice:{},lastBookResetMs:{},now:{}",
                         now, this.getCurrentMsgOffset(), context.getSentMqOffset(),
                         context.limitBidQueue.size(), context.limitAskQueue.size(),
                         DecimalUtil.toTrimLiteral(maxBidPrice),
-                        DecimalUtil.toTrimLiteral(minAskPrice)
+                        DecimalUtil.toTrimLiteral(minAskPrice),
+                        context.lastBookResetTimeInMs, now
                 );
                 if (maxBidPrice.compareTo(minAskPrice) >= 0) {
                     logger.error("bid ask price cross:maxBidPrice:{},minAskPrice:{}",

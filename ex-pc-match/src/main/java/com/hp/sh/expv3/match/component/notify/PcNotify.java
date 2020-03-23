@@ -31,15 +31,15 @@ public class PcNotify {
 
     public boolean safeNotify(String asset, String symbol, BookMsgDto msg) {
         String channel = RedisKeyUtil.buildPcBookChannelRedisKey(pcmatchRedisKeySetting.getPcBookChannelRedisKeyPattern(), asset, symbol);
-        logger.info("{} {} send book:{}", asset, symbol, JsonUtil.toJsonString(msg));
         RedisPublisher.safeNotify(pcRedisUtil, channel, msg);
+        logger.info("{} {} send book:{}", asset, symbol, JsonUtil.toJsonString(msg));
         return true;
     }
 
     public boolean safeNotify(String asset, String symbol, TradeListMsgDto msg) {
         String channel = RedisKeyUtil.buildPcTradeChannelRedisKey(pcmatchRedisKeySetting.getPcTradeChannelRedisKeyPattern(), asset, symbol);
-        logger.info("{} {} send trade list:{}", asset, symbol, JsonUtil.toJsonString(msg));
         RedisPublisher.safeNotify(pcRedisUtil, channel, msg);
+        logger.info("{} {} send trade list:{}", asset, symbol, JsonUtil.toJsonString(msg));
         return true;
     }
 
