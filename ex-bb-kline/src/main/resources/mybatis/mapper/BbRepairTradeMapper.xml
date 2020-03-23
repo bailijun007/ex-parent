@@ -18,8 +18,6 @@
         <result column="price" property="price"/>
         <result column="number" property="number"/>
         <result column="trade_time" property="tradeTime"/>
-        <result column="maker_handle_status" property="makerHandleStatus"/>
-        <result column="taker_handle_status" property="takerHandleStatus"/>
         <result column="created" property="created"/>
         <result column="modified" property="modified"/>
     </resultMap>
