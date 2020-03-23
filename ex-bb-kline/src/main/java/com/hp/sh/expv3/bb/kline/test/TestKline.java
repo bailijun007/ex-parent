@@ -27,16 +27,16 @@ public class TestKline {
     @Autowired
     private BbKlineHistoryCalcByTradeFromExpServiceImpl bbKlineHistoryCalcByTradeFromExpService;
 
-    @Test
-    public void test(){
-        String asset="USDT";
-        String symbol="BTC_USDT";
-        long ms=1584671231527L;
-        long maxMs=1584674891000L;
-        final List<BbTradeVo> list = bbKlineHistoryCalcByTradeFromExpService.listTrade(asset, symbol, ms, maxMs);
-
-        System.out.println(list.size());
-
-    }
+//    @Test
+//    public void test(){
+//        String asset="USDT";
+//        String symbol="BTC_USDT";
+//        long ms=1584671231527L;
+//        long maxMs=1584674891000L;
+//        final List<BbTradeVo> list = bbKlineHistoryCalcByTradeFromExpService.listTrade(asset, symbol, ms, maxMs);
+//
+//        System.out.println(list.size());
+//
+//    }
 
 }
