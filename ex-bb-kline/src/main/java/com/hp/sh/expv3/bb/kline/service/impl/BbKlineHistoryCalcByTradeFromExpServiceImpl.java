@@ -11,6 +11,7 @@ import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
 import com.hp.sh.expv3.config.redis.RedisUtil;
+import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -99,7 +100,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
 //            while (true) {
                 threadPool.execute(() -> repairKlineFromExp());
             } catch (Exception e) {
-                logger.error("EXP平台历史计算k线发生错误，{}", e.getMessage());
+                logger.error("EXP平台历史恢复k线发生错误，{}", e.getMessage());
             }
 //            }
 
@@ -156,16 +157,13 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
                         saveKline(repairkey, kline);
                         notifyUpdate(notifyUpdateKey, ms);
                     } else {
-                        //如果最终sortedList==null，说明修复表，平台交易表中都没有数据，则直接将这条kline数据删除（如果需要修复可以走手动修复
-                        // 或者第三方数据覆盖）
-
+                        /*如果最终sortedList==null，说明修复表，平台交易表中都没有数据，
+                        则直接将这条kline数据删除（如果需要修复可以走手动修复或者第三方数据覆盖*/
 
                         //删除数据
                         final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
                         bbKlineExpHistoryRedisUtil.zremrangeByScore(klineDataRedisKey, ms, ms);
-
                     }
-
                 }
             }
         }
@@ -209,24 +207,23 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
      * @param maxMs
      * @return
      */
-    public List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {// TODO xb,一分钟内成交太多，会引入性能问题。
-        /**
-         * 首次查询：
-         * sql: select *(具体的列，不需要所有列)
-         * from table
-         *  where trade_time >= ms and trade_time <= maxMs
-         *  and id > ? (第一次不需要加这个条件，第二次才需要)
-         *  order by id
-         *  limit N
-         *
-         * 将本次查询的结果最后一条 BbTradeVo.id 作为参数，查询第二次
-         *
-         * 跳出循环条件：返回结果 < N
-         */
+    public List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {
         List<BbTradeVo> list = new ArrayList<>();
-        int endLimit = 999999;
+        final int endLimit = 9999;
         List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(null, asset, symbol, ms, maxMs, endLimit);
         list.addAll(voList);
+        if (voList.size() < endLimit) {
+            return list;
+        }else {
+            do {
+                if (!CollectionUtils.isEmpty(voList)) {
+                    BbTradeVo bbTradeVo = voList.get(voList.size() - 1);
+                    Long id = bbTradeVo.getId();
+                    voList = bbTradeExtService.queryByTimeInterval(id, asset, symbol, ms, maxMs, endLimit);
+                    list.addAll(voList);
+                }
+            } while (!(voList.size() < endLimit));
+        }
 
         return list;
     }
