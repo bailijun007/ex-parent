@@ -68,6 +68,12 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
     @Value("${bb.kline.bbRepairTrade.enable}")
     private Integer bbRepairTradeEnable;
 
+    @Value("${kline.bb.trade}")
+    private String bbKlineTradePattern;
+
+    @Value("${kline.bb.repair.trade}")
+    private String bbKlineRepairTradePattern;
+
     @Autowired
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
@@ -110,13 +116,13 @@ public class BbKlineRepairDataFromBbRepairTradeServiceImpl implements BbKlineRep
                 if (isCancel == 1) {
                     List<BbRepairTradeVo> trades = buildTradeList(ja, asset, symbol, ms, IntBool.YES);
                     // 批量更新修正的交易记录表
-                    bbRepairTradeMapper.batchUpdate(trades, ms, endMs);
+                    bbRepairTradeMapper.batchUpdate(trades, ms, endMs,bbKlineRepairTradePattern);
                     // 批量保存
-                    bbRepairTradeMapper.batchSave(trades);
+                    bbRepairTradeMapper.batchSave(trades,bbKlineRepairTradePattern);
 
                 }else {
                     // 批量取消
-                    bbRepairTradeMapper.batchCancel(asset, symbol,ms,endMs);
+                    bbRepairTradeMapper.batchCancel(asset, symbol,ms,endMs,bbKlineRepairTradePattern);
 
                 }
 

@@ -37,7 +37,7 @@
     <select id="queryByTimeInterval" resultMap="BbTradeVo">
         select
         id,asset,symbol,price,trade_time,`number`
-        from bb_trade
+        from ${table}
       <where>
           <if test="id!=null">
               id>#{id}
@@ -55,7 +55,7 @@
 
     <update id="update">
 		update
-			bb_trade
+			${table}
 		set
 			enable_flag=#{enableFlag}
 		where

@@ -80,6 +80,12 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     @Value("${bb.kline}")
     private String bbKlinePattern;
 
+    @Value("${kline.bb.trade}")
+    private String bbKlineTradePattern;
+
+    @Value("${kline.bb.repair.trade}")
+    private String bbKlineRepairTradePattern;
+
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             1,
             1,
@@ -140,10 +146,10 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
                         continue;
                     }
 
-                    List<BbTradeVo> trades = listTradeFromRepaired(asset, symbol, ms, maxMs);
+                    List<BbTradeVo> trades = listTradeFromRepaired(asset, symbol, ms, maxMs,bbKlineTradePattern);
                     if (null == trades || trades.isEmpty()) {
                         //如果修复表中没有数据就从平台交易表中查询数据
-                        trades = listTrade(asset, symbol, ms, maxMs);
+                        trades = listTrade(asset, symbol, ms, maxMs,bbKlineRepairTradePattern);
                     }
                     //返回 对象集合以时间升序 再以id升序
                     List<BbTradeVo> sortedList = null;
@@ -169,9 +175,9 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
         }
     }
 
-    private List<BbTradeVo> listTradeFromRepaired(String asset, String symbol, long ms, long maxMs) {
+    private List<BbTradeVo> listTradeFromRepaired(String asset, String symbol, long ms, long maxMs,String bbKlineTradePattern) {
         List<BbTradeVo> result = new ArrayList<>();
-        List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, ms, maxMs);
+        List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, ms, maxMs,bbKlineTradePattern);
         if (!CollectionUtils.isEmpty(list)) {
             for (BbRepairTradeVo tradeVo : list) {
                 BbTradeVo bbTradeVo = new BbTradeVo();
@@ -207,10 +213,10 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
      * @param maxMs
      * @return
      */
-    public List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {
+    public List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs,String bbKlineRepairTradePattern) {
         List<BbTradeVo> list = new ArrayList<>();
         final int endLimit = 9999;
-        List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(null, asset, symbol, ms, maxMs, endLimit);
+        List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(null, asset, symbol, ms, maxMs, endLimit,bbKlineRepairTradePattern);
         list.addAll(voList);
         if (voList.size() < endLimit) {
             return list;
@@ -219,7 +225,7 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
                 if (!CollectionUtils.isEmpty(voList)) {
                     BbTradeVo bbTradeVo = voList.get(voList.size() - 1);
                     Long id = bbTradeVo.getId();
-                    voList = bbTradeExtService.queryByTimeInterval(id, asset, symbol, ms, maxMs, endLimit);
+                    voList = bbTradeExtService.queryByTimeInterval(id, asset, symbol, ms, maxMs, endLimit,bbKlineRepairTradePattern);
                     list.addAll(voList);
                 }
             } while (!(voList.size() < endLimit));

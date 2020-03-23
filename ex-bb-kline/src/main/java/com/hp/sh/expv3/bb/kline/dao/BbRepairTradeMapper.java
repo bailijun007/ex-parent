@@ -10,13 +10,13 @@ import java.util.List;
  */
 public interface BbRepairTradeMapper {
 
-    void save(BbRepairTradeVo tradeVo);
+    void save(@Param("tradeVo") BbRepairTradeVo tradeVo,@Param("table") String table);
 
-    void batchSave(@Param("trades") List<BbRepairTradeVo> trades);
+    void batchSave(@Param("trades") List<BbRepairTradeVo> trades,@Param("table") String table);
 
-    void batchUpdate(@Param("trades") List<BbRepairTradeVo> trades,@Param("tradeTimeBegin") Long tradeTimeBegin, @Param("tradeTimeEnd") long tradeTimeEnd);
+    void batchUpdate(@Param("trades") List<BbRepairTradeVo> trades,@Param("tradeTimeBegin") Long tradeTimeBegin, @Param("tradeTimeEnd") long tradeTimeEnd,@Param("table") String table);
 
-    List<BbRepairTradeVo> listRepairTrades(@Param("asset") String asset,@Param("symbol") String symbol, @Param("tradeTimeBegin")long tradeTimeBegin, @Param("tradeTimeEnd")long tradeTimeEnd);
+    List<BbRepairTradeVo> listRepairTrades(@Param("asset") String asset,@Param("symbol") String symbol, @Param("tradeTimeBegin")long tradeTimeBegin, @Param("tradeTimeEnd")long tradeTimeEnd,@Param("table") String table);
 
-    void batchCancel(@Param("asset") String asset,@Param("symbol") String symbol, @Param("tradeTimeBegin")long tradeTimeBegin, @Param("tradeTimeEnd")long tradeTimeEnd);
+    void batchCancel(@Param("asset") String asset,@Param("symbol") String symbol, @Param("tradeTimeBegin")long tradeTimeBegin, @Param("tradeTimeEnd")long tradeTimeEnd,@Param("table") String table);
 }

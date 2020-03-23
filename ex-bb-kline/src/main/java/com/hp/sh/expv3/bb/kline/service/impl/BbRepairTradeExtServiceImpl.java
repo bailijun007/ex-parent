@@ -28,8 +28,8 @@ public class BbRepairTradeExtServiceImpl implements BbRepairTradeExtService {
      * @return
      */
     @Override
-    public List<BbRepairTradeVo> listRepairTrades(String asset, String symbol, long ms, long maxMs) {
-         List<BbRepairTradeVo> voList = bbRepairTradeMapper.listRepairTrades(asset, symbol, ms, maxMs);
+    public List<BbRepairTradeVo> listRepairTrades(String asset, String symbol, long ms, long maxMs,String bbKlineTradePattern) {
+         List<BbRepairTradeVo> voList = bbRepairTradeMapper.listRepairTrades(asset, symbol, ms, maxMs,bbKlineTradePattern);
          return voList;
     }
 }

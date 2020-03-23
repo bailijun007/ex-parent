@@ -26,14 +26,14 @@
 
 
     <insert id="save">
-        insert into bb_repair_trade (
+        insert into ${table} (
 			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,enable_flag,created,modified
 			)values(
-			#{asset},#{symbol},#{matchTxId},#{tkBidFlag},#{tkAccountId},#{tkOrderId},#{mkAccountId},#{mkOrderId},#{price},#{number},#{tradeTime},#{makerHandleStatus},#{takerHandleStatus},#{enableFlag},#{created},#{modified})
+			#{tradeVo.asset},#{tradeVo.symbol},#{tradeVo.matchTxId},#{tradeVo.tkBidFlag},#{tradeVo.tkAccountId},#{tradeVo.tkOrderId},#{tradeVo.mkAccountId},#{tradeVo.mkOrderId},#{tradeVo.price},#{tradeVo.number},#{tradeVo.tradeTime},#{tradeVo.makerHandleStatus},#{tradeVo.takerHandleStatus},#{tradeVo.enableFlag},#{tradeVo.created},#{tradeVo.modified})
     </insert>
 
     <insert id="batchSave">
-        insert into bb_repair_trade (
+        insert into ${table} (
 			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,enable_flag,created,modified
 			)values
         <foreach collection="trades" item="item" index="index" separator=",">
@@ -44,7 +44,7 @@
     </insert>
 
     <update id="batchCancel">
-            UPDATE bb_repair_trade
+            UPDATE ${table}
             <set>
                 enable_flag=0
             </set>
@@ -59,7 +59,7 @@
 
     <update id="batchUpdate">
         <foreach collection="trades" item="item" index="index" open="" close="" separator=";">
-            UPDATE bb_repair_trade
+            UPDATE ${table}
             <set>
                 enable_flag=0
             </set>
@@ -75,7 +75,7 @@
     <select id="listRepairTrades" resultMap="BbRepairTradeVo">
         select
        id,asset,symbol,price,trade_time,`number`
-        from bb_repair_trade
+        from ${table}
         where
         enable_flag=1
         and   asset=#{asset}
