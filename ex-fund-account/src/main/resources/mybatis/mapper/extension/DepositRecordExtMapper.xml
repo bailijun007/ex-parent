@@ -4,7 +4,7 @@
 <mapper namespace="com.hp.sh.expv3.fund.extension.dao.DepositRecordExtMapper">
 
     <select id="queryHistory" resultType="com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo">
-        select id,asset,tx_hash txHash,amount volume, pay_status status,created  ctime, modified ,pay_time payTime,user_id userId
+        select id,asset,tx_hash txHash,amount volume, pay_status status,created  ctime, modified ,pay_time payTime,user_id userId,account address
         FROM deposit_record
         <where>
             <if test="userId!=null">
@@ -36,7 +36,7 @@
     </select>
 
     <select id="queryByUserIdAndAsset" resultType="com.hp.sh.expv3.fund.extension.vo.DepositRecordHistoryVo">
-        select id,asset,tx_hash txHash,amount volume, pay_status status,created ctime,modified ,pay_time payTime,user_id userId,pay_finish_time depositTime
+        select id,asset,tx_hash txHash,amount volume, pay_status status,created ctime,modified ,pay_time payTime,user_id userId,pay_finish_time depositTime,account address
         FROM deposit_record
         <where>
             <if test="userId!=null">

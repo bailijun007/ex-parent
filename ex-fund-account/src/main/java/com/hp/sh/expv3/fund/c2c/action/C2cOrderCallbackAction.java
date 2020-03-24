@@ -90,7 +90,7 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
                 c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
                 c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
                 c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_TRUE);
-                c2cOrder.setApprovalStatus(ApprovalStatus.APPROVED);
+                c2cOrder.setApprovalStatus(C2cConst.C2C_APPROVAL_STATUS_PASS);
                 c2cOrder.setModified(Instant.now().toEpochMilli());
                 c2cOrder.setSn(orderNo);
                 c2cOrder.setUserId(userId);
