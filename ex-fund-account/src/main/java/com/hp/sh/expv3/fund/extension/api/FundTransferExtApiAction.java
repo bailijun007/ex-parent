@@ -20,12 +20,12 @@ public class FundTransferExtApiAction implements FundTransferExtApi {
     private FundTransferExtService fundTransferExtService;
 
     @Override
-    public List<FundTransferExtVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
+    public PageResult<FundTransferExtVo> queryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         if (userId == null || pageSize == null || pageStatus == null) {
             throw new ExException(ExFundError.PARAM_EMPTY);
         }
 
-        return fundTransferExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
+        return fundTransferExtService.pageQueryHistory(userId, asset, queryId, pageSize, pageStatus);
     }
 
     @Override

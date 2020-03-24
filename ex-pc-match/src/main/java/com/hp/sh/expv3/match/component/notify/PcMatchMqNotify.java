@@ -199,7 +199,7 @@ public class PcMatchMqNotify {
             );
             safeSend2MatchTopic(message, dto.getAccountId());
             if (logger.isDebugEnabled()) {
-                logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+                logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(dto));
             }
         } else {
             List<List<PcOrderCancelMqMsgDto>> partitions = Lists.partition(cancelMqMsgs, 10);
@@ -218,7 +218,7 @@ public class PcMatchMqNotify {
                 );
                 safeSend2MatchTopic(message, dto.getAccountId());
                 if (logger.isDebugEnabled()) {
-                    logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+                    logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(dto));
                 }
             }
         }

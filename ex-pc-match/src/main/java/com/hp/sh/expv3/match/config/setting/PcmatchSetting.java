@@ -13,6 +13,15 @@ import org.springframework.context.annotation.Configuration;
 public class PcmatchSetting {
 
     private Integer matchGroupId;
+    private int saveTradeBatchSize;
+
+    public int getSaveTradeBatchSize() {
+        return saveTradeBatchSize;
+    }
+
+    public void setSaveTradeBatchSize(int saveTradeBatchSize) {
+        this.saveTradeBatchSize = saveTradeBatchSize;
+    }
 
     public Integer getMatchGroupId() {
         return matchGroupId;
