@@ -11,6 +11,18 @@ import io.swagger.annotations.ApiModelProperty;
  */
 public class CurPositionVo {
 
+	@ApiModelProperty("仓位Id")
+	private Long id;
+	
+	@ApiModelProperty("用户Id")
+	private Long userId;
+	
+	@ApiModelProperty("保证金模式")
+	private Integer marginMode;
+	
+	@ApiModelProperty("创建时间")
+	private Long created;
+
 	@ApiModelProperty("资产")
 	private String asset;
 	
@@ -74,6 +86,38 @@ public class CurPositionVo {
 	int ________________________________________;
 
 	public CurPositionVo() {
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public Integer getMarginMode() {
+		return marginMode;
+	}
+
+	public void setMarginMode(Integer marginMode) {
+		this.marginMode = marginMode;
+	}
+
+	public Long getCreated() {
+		return created;
+	}
+
+	public void setCreated(Long created) {
+		this.created = created;
 	}
 
 	public String getAsset() {

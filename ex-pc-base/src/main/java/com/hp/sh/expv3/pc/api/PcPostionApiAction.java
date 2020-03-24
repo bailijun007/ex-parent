@@ -86,6 +86,12 @@ public class PcPostionApiAction implements PcPostionApi {
 		BigDecimal pnlRatio = pos.getRealisedPnl().divide(pos.getInitMargin(), Precision.PERCENT_PRECISION, Precision.LESS);
 		
 		CurPositionVo curPositionVo = new CurPositionVo();
+		
+		curPositionVo.setId(pos.getId());
+		curPositionVo.setUserId(pos.getUserId());
+		curPositionVo.setMarginMode(pos.getMarginMode());
+		curPositionVo.setCreated(pos.getCreated());
+		
 		curPositionVo.setAsset(pos.getAsset());
 		curPositionVo.setSymbol(pos.getSymbol());
 		curPositionVo.setLongFlag(pos.getLongFlag());

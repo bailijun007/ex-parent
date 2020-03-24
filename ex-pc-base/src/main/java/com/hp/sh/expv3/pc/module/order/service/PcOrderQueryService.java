@@ -96,6 +96,7 @@ public class PcOrderQueryService {
 			activeOrderVo.setCloseFlag(order.getCloseFlag());
 			activeOrderVo.setLongFlag(order.getLongFlag());
 			activeOrderVo.setLeverage(order.getLeverage());
+			activeOrderVo.setVolume(order.getVolume());
 			activeOrderVo.setFilledVolume(order.getFilledVolume());
 			activeOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
 			
@@ -107,6 +108,9 @@ public class PcOrderQueryService {
 			activeOrderVo.setOrderMargin(order.getOrderMargin());
 			activeOrderVo.setFeeCost(order.getFeeCost());
 			activeOrderVo.setStatus(order.getStatus());
+			
+			activeOrderVo.setOrderType(order.getOrderType());
+			activeOrderVo.setClientOrderId(order.getClientOrderId());
 			
 			result.add(activeOrderVo);
 		}
