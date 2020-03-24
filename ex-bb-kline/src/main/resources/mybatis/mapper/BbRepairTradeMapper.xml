@@ -27,7 +27,7 @@
         insert into ${table} (
 			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,enable_flag,created,modified
 			)values(
-			#{tradeVo.asset},#{tradeVo.symbol},#{tradeVo.matchTxId},#{tradeVo.tkBidFlag},#{tradeVo.tkAccountId},#{tradeVo.tkOrderId},#{tradeVo.mkAccountId},#{tradeVo.mkOrderId},#{tradeVo.price},#{tradeVo.number},#{tradeVo.tradeTime},#{tradeVo.makerHandleStatus},#{tradeVo.takerHandleStatus},#{tradeVo.enableFlag},#{tradeVo.created},#{tradeVo.modified})
+			#{tradeVo.asset},#{tradeVo.symbol},#{tradeVo.matchTxId},#{tradeVo.tkBidFlag},#{tradeVo.tkAccountId},#{tradeVo.tkOrderId},#{tradeVo.mkAccountId},#{tradeVo.mkOrderId},#{tradeVo.price},#{tradeVo.number},#{tradeVo.tradeTime},#{tradeVo.enableFlag},#{tradeVo.created},#{tradeVo.modified})
     </insert>
 
     <insert id="batchSave">
@@ -36,7 +36,7 @@
 			)values
         <foreach collection="trades" item="item" index="index" separator=",">
             (#{item.asset},#{item.symbol},#{item.matchTxId},#{item.tkBidFlag},#{item.tkAccountId},#{item.tkOrderId},#{item.mkAccountId},#{item.mkOrderId},#{item.price},
-            #{item.number},#{item.tradeTime},#{item.makerHandleStatus},#{item.takerHandleStatus},#{item.enableFlag},#{item.created},#{item.modified})
+            #{item.number},#{item.tradeTime},#{item.enableFlag},#{item.created},#{item.modified})
         </foreach>
 
     </insert>
