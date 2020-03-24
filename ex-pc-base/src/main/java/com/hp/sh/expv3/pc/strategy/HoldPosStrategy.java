@@ -32,7 +32,7 @@ public interface HoldPosStrategy {
 	 * 保证金率 =（保证金+未实现盈亏) / (合约面值*持仓张数／最新标记价格）
 	 * @return
 	 */
-	public BigDecimal calPosMarginRatio(BigDecimal posMargin, BigDecimal posPnl, BigDecimal faceValue, BigDecimal volume, BigDecimal markPrice);
+	public BigDecimal calPosMarginRatio(BigDecimal posMargin, BigDecimal faceValue, BigDecimal volume, BigDecimal posPnl, BigDecimal markPrice);
 
 	/**
 	 * 计算收益

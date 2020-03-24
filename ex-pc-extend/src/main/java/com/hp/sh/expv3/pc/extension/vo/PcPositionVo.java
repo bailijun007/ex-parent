@@ -5,13 +5,14 @@
 package com.hp.sh.expv3.pc.extension.vo;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
+import com.hp.sh.expv3.pc.strategy.data.PosData;
 
 import java.math.BigDecimal;
 
 /**
  * 永续合约_仓位
  */
-public class PcPositionVo extends UserDataEntity {
+public class PcPositionVo extends UserDataEntity implements PosData {
 
 	private static final long serialVersionUID = 1L;
 
