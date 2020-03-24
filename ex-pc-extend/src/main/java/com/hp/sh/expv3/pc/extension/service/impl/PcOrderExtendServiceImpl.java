@@ -10,7 +10,7 @@ import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
-import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
@@ -35,7 +35,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     private PcOrderDAO pcOrderDAO;
 
     @Autowired
-    private PositionStrategyContext positionStrategyContext;
+    private PcStrategyContext positionStrategyContext;
 
 
     @Override

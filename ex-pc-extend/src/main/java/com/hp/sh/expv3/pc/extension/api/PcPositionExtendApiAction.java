@@ -24,7 +24,7 @@ import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
 import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionStatVo;
 import com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionTotalVo;
 import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
-import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.utils.math.Precision;
 
 /**
@@ -47,7 +47,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
     private PcOrderTradeExtendService pcOrderTradeService;
 
     @Autowired
-    private PositionStrategyContext positionStrategyContext;
+    private PcStrategyContext positionStrategyContext;
 
     @Autowired
     private MarkPriceService markPriceService;
@@ -127,7 +127,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
                 HoldPosStrategy ps = positionStrategyContext.getHoldPosStrategy(positionVo.getAsset(), positionVo.getSymbol());
                 BigDecimal markPrice = markPriceService.getCurrentMarkPrice(positionVo.getAsset(), positionVo.getSymbol());
                 //未实现盈亏
-                BigDecimal pnl = ps.calcPnl(positionVo.getLongFlag(), positionVo.getVolume().multiply(positionVo.getFaceValue()), positionVo.getMeanPrice(), markPrice);
+                BigDecimal pnl = ps.calcPnl(positionVo.getLongFlag(), positionVo.getVolume(), positionVo.getFaceValue(), positionVo.getMeanPrice(), markPrice);
                 currentPositionVo.setPnl(pnl);
 
                 if (positionVo.getVolume().compareTo(BigDecimal.ZERO) != 0 && positionVo.getFaceValue().compareTo(BigDecimal.ZERO) != 0) {

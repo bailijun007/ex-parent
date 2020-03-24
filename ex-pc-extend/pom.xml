@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>com.hp.sh.expv3</groupId>
 			<artifactId>ex-pc-base-jar</artifactId>
-			<version>3.0.0-SNAPSHOT</version>
+			<version>3.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
