@@ -62,6 +62,7 @@ public interface PcOrderApi {
 
 	@ApiOperation(value = "获取活动委托")
 	@GetMapping(value = "/api/pc/order/queryActiveList")
-	List<ActiveOrderVo> queryActiveList(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
+	List<ActiveOrderVo> queryActiveList(@RequestParam("pageSize") Integer pageSize, @RequestParam("userId") Long userId,
+			@RequestParam("asset") String asset, @RequestParam("symbol") String symbol, @RequestParam("startId") Long startId);
 
 }

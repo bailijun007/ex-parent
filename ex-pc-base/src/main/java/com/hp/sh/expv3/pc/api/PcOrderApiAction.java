@@ -96,8 +96,8 @@ public class PcOrderApiAction implements PcOrderApi {
 	}
 
 	@Override
-	public List<ActiveOrderVo> queryActiveList(Long userId, String asset, String symbol){
-		List<ActiveOrderVo> list = orderQueryService.queryUserActiveList(userId, asset, symbol);
+	public List<ActiveOrderVo> queryActiveList(Integer pageSize, Long userId, String asset, String symbol, Long startId){
+		List<ActiveOrderVo> list = orderQueryService.queryUserActiveList(pageSize, userId, asset, symbol, startId);
 		return list;
 	}
 }

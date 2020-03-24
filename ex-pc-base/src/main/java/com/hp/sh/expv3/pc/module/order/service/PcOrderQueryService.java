@@ -73,9 +73,10 @@ public class PcOrderQueryService {
 		return count>0;
 	}
 	
-	public List<ActiveOrderVo> queryUserActiveList(long userId, String asset, String symbol){
+	public List<ActiveOrderVo> queryUserActiveList(Integer pageSize, long userId, String asset, String symbol, Long startId){
 		List<ActiveOrderVo> result = new ArrayList<ActiveOrderVo>();
-		List<PcOrder> list = this.pcOrderDAO.queryUserActiveOrderList(userId, asset, symbol, null, IntBool.NO);
+		Page page = new Page(1, pageSize, 1000L);
+		List<PcOrder> list = this.pcOrderDAO.queryUserActiveOrderList(page, userId, asset, symbol, null, IntBool.NO, startId);
 		
 		if(list==null||list.isEmpty()){
 			return Collections.emptyList();
