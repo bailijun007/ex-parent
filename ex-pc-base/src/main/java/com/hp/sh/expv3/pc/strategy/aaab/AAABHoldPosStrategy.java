@@ -21,7 +21,7 @@ public class AAABHoldPosStrategy implements HoldPosStrategy{
 	 * @return
 	 */
 	@Override
-	public BigDecimal calPosMarginRatio(BigDecimal posMargin, BigDecimal posPnl, BigDecimal faceValue, BigDecimal volume, BigDecimal markPrice){
+	public BigDecimal calPosMarginRatio(BigDecimal posMargin, BigDecimal faceValue, BigDecimal volume, BigDecimal posPnl, BigDecimal markPrice){
 		BigDecimal marginRatio = posMargin.add(posPnl).divide(faceValue.multiply(volume).multiply(markPrice), Precision.COMMON_PRECISION, DecimalUtil.LESS);
 		return marginRatio;
 	}

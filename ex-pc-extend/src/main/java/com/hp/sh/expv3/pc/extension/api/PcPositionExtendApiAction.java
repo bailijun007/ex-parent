@@ -47,7 +47,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
     private PcOrderTradeExtendService pcOrderTradeService;
 
     @Autowired
-    private PcStrategyContext positionStrategyContext;
+    private PcStrategyContext pcStrategyContext;
 
     @Autowired
     private MarkPriceService markPriceService;
@@ -124,14 +124,13 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
                 currentPositionVo.setPosPnlRatio(realisedPnl.divide(positionVo.getInitMargin(), Precision.PERCENT_PRECISION, Precision.LESS));
                 currentPositionVo.setCtime(positionVo.getCreated());
 
-                HoldPosStrategy ps = positionStrategyContext.getHoldPosStrategy(positionVo.getAsset(), positionVo.getSymbol());
                 BigDecimal markPrice = markPriceService.getCurrentMarkPrice(positionVo.getAsset(), positionVo.getSymbol());
                 //未实现盈亏
-                BigDecimal pnl = ps.calcPnl(positionVo.getLongFlag(), positionVo.getVolume(), positionVo.getFaceValue(), positionVo.getMeanPrice(), markPrice);
+                BigDecimal pnl = pcStrategyContext.calcFloatingPnl(positionVo);
                 currentPositionVo.setPnl(pnl);
 
                 if (positionVo.getVolume().compareTo(BigDecimal.ZERO) != 0 && positionVo.getFaceValue().compareTo(BigDecimal.ZERO) != 0) {
-                    BigDecimal posMarginRatio = ps.calPosMarginRatio(positionVo.getPosMargin(), pnl, positionVo.getFaceValue(), positionVo.getVolume(), markPrice);
+                    BigDecimal posMarginRatio = pcStrategyContext.calPosMarginRatio(positionVo, pnl, markPrice);
                     currentPositionVo.setPosMarginRatio(posMarginRatio);
                 }
 
