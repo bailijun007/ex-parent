@@ -146,10 +146,10 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
                         continue;
                     }
 
-                    List<BbTradeVo> trades = listTradeFromRepaired(asset, symbol, ms, maxMs,bbKlineTradePattern);
+                    List<BbTradeVo> trades = listTradeFromRepaired(asset, symbol, ms, maxMs,bbKlineRepairTradePattern);
                     if (null == trades || trades.isEmpty()) {
                         //如果修复表中没有数据就从平台交易表中查询数据
-                        trades = listTrade(asset, symbol, ms, maxMs,bbKlineRepairTradePattern);
+                        trades = listTrade(asset, symbol, ms, maxMs,bbKlineTradePattern);
                     }
                     //返回 对象集合以时间升序 再以id升序
                     List<BbTradeVo> sortedList = null;
