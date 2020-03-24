@@ -57,24 +57,11 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
             throw new ExException(ExFundError.PARAM_EMPTY);
         }
         PageResult<DepositRecordHistoryVo> result = depositRecordExtService.pageQueryDepositRecordHistory(userId, asset, pageNo, pageSize);
-        if(!CollectionUtils.isEmpty(result.getList())){
-            for (DepositRecordHistoryVo historyVo : result.getList()) {
-                String addr = depositAddrExtService.getAddressByUserIdAndAsset(historyVo.getUserId(), historyVo.getAsset());
-                historyVo.setAddress(addr);
-            }
-        }
-
-
         return result;
     }
 
     private List<DepositRecordHistoryVo> getDepositRecordHistoryVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
         List<DepositRecordHistoryVo> list = depositRecordExtService.queryHistory(userId, asset, queryId, pageSize, pageStatus);
-        for (DepositRecordHistoryVo historyVo : list) {
-            String addr = depositAddrExtService.getAddressByUserIdAndAsset(userId, asset);
-
-            historyVo.setAddress(addr);
-        }
         return list;
     }
 
