@@ -112,7 +112,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("lastOrderId", lastOrderId);
 
         //总条数
-      Long count= bbOrderExtMapper.queryCount(map);
+      Long count= bbOrderExtMapper.queryActiveOrderCount(map);
 
         map.put("limit", pageSize);
         List<BbOrderVo> list = null;

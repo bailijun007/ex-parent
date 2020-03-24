@@ -146,10 +146,14 @@
     </select>
 
 
-    <select id="queryCount" resultType="java.lang.Long">
+    <select id="queryActiveOrderCount" resultType="java.lang.Long">
         select count(1)
-        from bb_order
-        <include refid="simple_where"/>
+        from bb_active_order
+        <where>
+            <if test="userId!=null"> user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null  and symbol!=''">and symbol=#{symbol}</if>
+        </where>
     </select>
 
     <select id="queryOrderList" resultMap="BbOrderVo">
