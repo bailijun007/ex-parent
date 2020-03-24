@@ -116,7 +116,7 @@ public class PcAccountCoreService{
 		
 		//金额必须是正数
 		if(BigUtils.leZero(record.getAmount())){
-			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE);
+			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE, record);
 		}
 		
 		if(this.checkExist(record)){

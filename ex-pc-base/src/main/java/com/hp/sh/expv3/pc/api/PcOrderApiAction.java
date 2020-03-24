@@ -14,6 +14,7 @@ import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.match.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
+import com.hp.sh.expv3.pc.vo.ExPageResult;
 import com.hp.sh.expv3.pc.vo.response.ActiveOrderVo;
 
 @RestController
@@ -96,8 +97,12 @@ public class PcOrderApiAction implements PcOrderApi {
 	}
 
 	@Override
-	public List<ActiveOrderVo> queryActiveList(Integer pageSize, Long userId, String asset, String symbol, Long startId){
-		List<ActiveOrderVo> list = orderQueryService.queryUserActiveList(pageSize, userId, asset, symbol, startId);
-		return list;
+	public ExPageResult<ActiveOrderVo> queryActiveList(Integer pageSize, Long userId, String asset, String symbol, Long startId){
+		ExPageResult<ActiveOrderVo> page = new ExPageResult<ActiveOrderVo>();
+		page.setPageNo(1);
+		page.setPageSize(pageSize);
+		List<ActiveOrderVo> list = orderQueryService.queryUserActiveList(page, userId, asset, symbol, startId);
+		page.setList(list);
+		return page;
 	}
 }

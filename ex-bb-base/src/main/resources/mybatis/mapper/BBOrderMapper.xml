@@ -165,7 +165,7 @@
 		SELECT
 			o.*
 		FROM
-			pc_active_order ao
+			bb_active_order ao
 		LEFT JOIN 
 			bb_order o ON o.id = ao.id
 		<where> 

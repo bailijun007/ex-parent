@@ -146,17 +146,11 @@
     
     <springProfile name="dev">
         <root level="INFO">
-	        <!-- 控制台输出 -->
-	        <appender-ref ref="STDOUT"/>
-	        <!-- 文件输出 -->
 	        <appender-ref ref="ERROR"/>
 	        <appender-ref ref="WARN"/>
 	        <appender-ref ref="INFO"/>
 	        <appender-ref ref="DEBUG"/>
         </root>
-        
-		<logger name="com.hp.sh.expv3" level="debug"></logger>
-		<logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
         
     </springProfile>
     
