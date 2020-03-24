@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.fund.transfer.dao.FundTransferDAO;
 import com.hp.sh.expv3.fund.transfer.entity.FundTransfer;
@@ -62,7 +63,7 @@ public class FundTransferCoreService {
 	void changeStatus(Long userId, Long id, Integer newStatsus, Integer oldStatsus, String errorInfo, Long modified) {
 		int n = this.fundTransferDAO.changeStatus(userId, id, newStatsus, oldStatsus, errorInfo, modified);
 		if(n==0){
-			throw new RuntimeException("更新失败");
+			throw new UpdateException("更新失败");
 		}
 	}
 

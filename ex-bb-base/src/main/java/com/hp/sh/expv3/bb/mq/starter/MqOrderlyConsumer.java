@@ -46,7 +46,7 @@ public class MqOrderlyConsumer {
 	@Autowired
 	private EndpointContext endpointContext;
 	
-	@Value("${pc.mq.consumer.bbGroupId}")
+	@Value("${bb.mq.consumer.bbGroupId:1}")
 	private Integer bbGroupId;
 	
 	private Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();

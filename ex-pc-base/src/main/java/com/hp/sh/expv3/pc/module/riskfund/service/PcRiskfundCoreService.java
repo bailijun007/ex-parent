@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.constant.FundFlowDirection;
@@ -112,7 +113,7 @@ public class PcRiskfundCoreService{
 	private void updateAccount(PcRiskfundAccount bBCollectorAccount){
 		int updatedRows = this.accountDAO.update(bBCollectorAccount);
 		if(updatedRows==0){
-			throw new RuntimeException("更新失败");
+			throw new UpdateException("更新失败");
 		}
 	}
 	

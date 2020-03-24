@@ -67,7 +67,7 @@ public class BBTradeService {
 		BBOrder order = this.orderQueryService.getOrder(trade.getAccountId(), trade.getOrderId());
 		boolean yes = this.canTrade(order, trade);
 		if(!yes){
-			logger.error("成交已处理过了");
+			logger.error("成交已处理过了,trade={}", trade);
 			return;
 		}
 		

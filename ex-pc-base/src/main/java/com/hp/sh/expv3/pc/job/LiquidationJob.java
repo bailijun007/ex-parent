@@ -63,6 +63,9 @@ public class LiquidationJob {
 
     @Autowired
     private MatchMqSender liqMqSender;
+
+    @Autowired
+	private LiquidationJob self;
     
     private final long startTime = DbDateUtils.now()-1000*3600;
     
@@ -102,7 +105,7 @@ public class LiquidationJob {
 	public void hanleLiqOrder(){
 		this.synchLiqFund();
 		this.createBankruptOrder();
-		this.cutPosition();
+		self.cutPosition();
 	}
 
 	@TransWarn
@@ -171,7 +174,7 @@ public class LiquidationJob {
 	 */
 	@TransWarn
 	@Transactional(rollbackFor=Exception.class)
-	private void cutPosition(){
+	public void cutPosition(){
 		Page page = new Page(1, 50, 1000L);
 		Long startId = null;
 		while(true){

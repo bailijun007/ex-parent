@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.component.vo.PcContractVO;
@@ -81,6 +82,10 @@ public class OrderlyConsumer {
         		}catch(ExException e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
         			logger.error(e.toString(), cause);
+        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
+        		}catch(UpdateException e){
+        			Throwable cause = ExceptionUtils.getRootCause(e);
+        			logger.warn(cause.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);

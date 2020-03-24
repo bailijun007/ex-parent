@@ -228,6 +228,7 @@ public class PcLiqService {
 	}
 	
 	//3、创建强平委托
+	@LockIt(key="${record.userId}-${record.asset}-${record.symbol}")
 	public PcOrder createLiqOrder(PcLiqRecord record){
 		PcPosition pos = positionDataService.getPosition(record.getUserId(), record.getAsset(), record.getSymbol(), record.getPosId());
 		PcOrder order = this.pcOrderService.createLiqOrder(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), record.getLongFlag(), record.getBankruptPrice(), record.getVolume(), pos);

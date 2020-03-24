@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.error.BBCollectorAccountError;
 import com.hp.sh.expv3.bb.module.collector.dao.BBCollectorAccountDAO;
 import com.hp.sh.expv3.bb.module.collector.dao.BBCollectorAccountRecordDAO;
@@ -111,7 +112,7 @@ public class BBCollectorCoreService{
 	private void updateAccount(BBCollectorAccount bBCollectorAccount){
 		int updatedRows = this.collectorAccountDAO.update(bBCollectorAccount);
 		if(updatedRows==0){
-			throw new RuntimeException("更新失败");
+			throw new UpdateException("更新失败");
 		}
 	}
 	
