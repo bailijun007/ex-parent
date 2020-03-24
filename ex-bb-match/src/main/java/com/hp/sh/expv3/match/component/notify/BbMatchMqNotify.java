@@ -4,13 +4,13 @@
  */
 package com.hp.sh.expv3.match.component.notify;
 
+import com.google.common.collect.Lists;
 import com.hp.sh.expv3.match.bo.BbTradeBo;
-import com.hp.sh.expv3.match.component.id.SnowflakeIdWorker;
 import com.hp.sh.expv3.match.component.rocketmq.BbMatchProducer;
 import com.hp.sh.expv3.match.config.setting.BbmatchRocketMqSetting;
+import com.hp.sh.expv3.match.config.setting.BbmatchSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
 import com.hp.sh.expv3.match.mqmsg.BbOrderCancelMqMsgDto;
-import com.hp.sh.expv3.match.mqmsg.BbOrderMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.BbOrderNotMatchedMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.BbTradeMqMsgDto;
 import com.hp.sh.expv3.match.util.BbRocketMqUtil;
@@ -37,6 +37,8 @@ public class BbMatchMqNotify {
 
     @Autowired
     private BbmatchRocketMqSetting bbmatchRocketMqSetting;
+    @Autowired
+    private BbmatchSetting bbmatchSetting;
 
     public boolean sendOrderNotMatched(String asset, String symbol, long accountId, long orderId) {
         String topic = BbRocketMqUtil.buildBbAccountContractMqTopicName(bbmatchRocketMqSetting.getBbMatchTopicNamePattern(), asset, symbol);
@@ -53,7 +55,7 @@ public class BbMatchMqNotify {
                 msg// body
         );
 //        SendResult send =
-        safeSend2MatchTopic(message, accountId);
+        safeSend2MatchTopic(message, 0L);
 
         if (logger.isDebugEnabled()) {
             logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
@@ -75,7 +77,7 @@ public class BbMatchMqNotify {
                 "" + orderId,
                 msg // body
         );
-        safeSend2MatchTopic(message, accountId);
+        safeSend2MatchTopic(message, 0L);
 
         if (logger.isDebugEnabled()) {
             logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
@@ -83,32 +85,49 @@ public class BbMatchMqNotify {
         return true;
     }
 
-    public boolean sendTrade(String asset, String symbol, List<BbTradeBo> tradeList) {
 
+    public boolean sendTradeBatch(String asset, String symbol, List<BbTradeBo> tradeList) {
         if (null == tradeList || tradeList.isEmpty()) {
         } else {
             String topic = BbRocketMqUtil.buildBbAccountContractMqTopicName(bbmatchRocketMqSetting.getBbMatchTopicNamePattern(), asset, symbol);
+            List<List<BbTradeBo>> tradeLists = Lists.partition(tradeList, bbmatchSetting.getTradeBatchSize());
 
-            for (BbTradeBo bbTradeBo : tradeList) {
-
-                BbTradeMqMsgDto msgDto = new BbTradeMqMsgDto();
-                BeanUtils.copyProperties(bbTradeBo, msgDto);
-
-                Message msg = buildMessage(
+            for (List<BbTradeBo> trades : tradeLists) {
+                Long tkOrderId = trades.get(0).getTkOrderId();
+                Message message = buildMessage(
                         topic,// topic
                         "" + RmqTagEnum.BB_MATCH_ORDER_MATCHED.getConstant(),// tag
-                        "" + msgDto.getTkOrderId(),
-                        msgDto// body
+                        "" + tkOrderId,
+                        trades// body
                 );
-                safeSend2MatchTopic(msg, msgDto.getTkAccountId());
-
+                safeSend2MatchTopic(message, 0L); // 此处要保证下游数据时有序的，因此放在一个queue里
                 if (logger.isDebugEnabled()) {
-                    logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, msg.getTopic(), msg.getTags(), msg.getKeys(), JsonUtil.toJsonString(msg));
+                    logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(trades));
                 }
             }
-
         }
+        return true;
+    }
 
+    public boolean sendTrade(String asset, String symbol, List<BbTradeBo> tradeList) {
+        if (null == tradeList || tradeList.isEmpty()) {
+        } else {
+            String topic = BbRocketMqUtil.buildBbAccountContractMqTopicName(bbmatchRocketMqSetting.getBbMatchTopicNamePattern(), asset, symbol);
+            for (BbTradeBo bbTradeBo : tradeList) {
+                BbTradeMqMsgDto msg = new BbTradeMqMsgDto();
+                BeanUtils.copyProperties(bbTradeBo, msg);
+                Message message = buildMessage(
+                        topic,// topic
+                        "" + RmqTagEnum.BB_MATCH_ORDER_MATCHED.getConstant(),// tag
+                        "" + msg.getTkOrderId(),
+                        msg// body
+                );
+                safeSend2MatchTopic(message, 0L); // 此处要保证下游数据时有序的，因此放在一个queue里
+                if (logger.isDebugEnabled()) {
+                    logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+                }
+            }
+        }
         return true;
     }
 
@@ -130,8 +149,10 @@ public class BbMatchMqNotify {
         boolean first = true;
         while (true) {
             try {
+                // 下单，撤单，未成交，都要顺序执行
                 bbmatchProducer.send(message,
-                        (mqs, msg1, arg) -> mqs.get(Math.abs(Long.valueOf(SnowflakeIdWorker.getTimeInMs(accountId)).intValue()) % mqs.size()),
+//                        (mqs, msg1, id) -> mqs.get(Math.abs(Long.valueOf(SnowflakeIdWorker.getTimeInMs(id)).intValue()) % mqs.size()),
+                        (mqs, msg1, id) -> mqs.get(0),
                         accountId);
                 first = false;
                 break;

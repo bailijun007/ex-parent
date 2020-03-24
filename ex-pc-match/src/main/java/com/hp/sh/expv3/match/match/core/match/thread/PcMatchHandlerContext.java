@@ -18,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PcMatchHandlerContext {
 
+    public Long lastBookResetTimeInMs = null;
+
     public IThreadWorker matchedThreadWorker;
 
     private PcOrderMatchResultVo matchResult = new PcOrderMatchResultVo();

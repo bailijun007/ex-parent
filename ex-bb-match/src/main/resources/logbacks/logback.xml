@@ -127,7 +127,7 @@
     </appender>
 
     <!-- DEBUG级别日志 appender -->
-    <appender name="pcNotify" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="bbNotify" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log_dir}/pcNotify.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
@@ -144,7 +144,7 @@
         </encoder>
     </appender>
 
-    <appender name="pcSnapshot" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="bbSnapshot" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log_dir}/pcSnapshot.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
@@ -167,15 +167,15 @@
     <logger name="org.mybatis.spring" value="INFO" additivity="false"/>
     <logger name="org.apache.skywalking" value="INFO" additivity="false"/>
 
-    <logger name="com.hp.sh.expv3.match.component.notify.BbNotify" level="DEBUG" additivity="false">
-        <appender-ref ref="pcNotify"/>
+    <logger name="com.hp.sh.expv3.match.component.notify.BbNotify" level="info" additivity="false">
+        <appender-ref ref="bbNotify"/>
     </logger>
     <logger name="com.hp.sh.expv3.match.match.core.matched.task.BbMatchedBookSnapshotTask" level="INFO" additivity="false">
-        <appender-ref ref="pcSnapshot"/>
+        <appender-ref ref="bbSnapshot"/>
     </logger>
 
     <!-- root级别   DEBUG -->
-    <root level="debug">
+    <root level="info">
         <!-- 控制台输出 -->
         <appender-ref ref="STDOUT"/>
         <!-- 文件输出 -->

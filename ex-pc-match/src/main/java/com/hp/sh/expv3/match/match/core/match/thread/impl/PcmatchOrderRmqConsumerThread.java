@@ -193,8 +193,9 @@ public class PcmatchOrderRmqConsumerThread extends Thread {
                     }
                 } else {
 
+                    MessageExt messageExtLast = msgFoundList.get(msgFoundList.size() - 1);
+
                     if (logger.isDebugEnabled()) {
-                        MessageExt messageExtLast = msgFoundList.get(msgFoundList.size() - 1);
                         logger.debug("{}:size:{} {}-》{},last {},{}", topicName, msgFoundList.size(), offset, pullResult.getNextBeginOffset(), messageExtLast.getQueueOffset(), messageExtLast.getMsgId());
                     }
 

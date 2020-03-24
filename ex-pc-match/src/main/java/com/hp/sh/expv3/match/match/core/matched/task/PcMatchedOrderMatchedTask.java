@@ -9,6 +9,7 @@ import com.hp.sh.expv3.match.bo.PcOrder4MatchBo;
 import com.hp.sh.expv3.match.bo.PcTradeBo;
 import com.hp.sh.expv3.match.component.notify.PcMatchMqNotify;
 import com.hp.sh.expv3.match.component.notify.PcNotify;
+import com.hp.sh.expv3.match.config.setting.PcmatchSetting;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.enums.EventEnum;
 import com.hp.sh.expv3.match.enums.PcOrderTimeInForceEnum;
@@ -21,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -83,6 +83,8 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
         this.matchTxId = matchTxId;
     }
 
+    @Autowired
+    private PcmatchSetting pcmatchSetting;
     @Autowired
     private PcTradeDAO pcTradeDAO;
     @Autowired
@@ -186,11 +188,8 @@ public class PcMatchedOrderMatchedTask extends PcMatchedBaseTask {
         return msg;
     }
 
-    @Value("${pcmatch.trade.batchSize:10}")
-    private int batchSize;
-
     private void saveTradeList(List<PcTradeBo> tradeList) {
-        List<List<PcTradeBo>> batchTrade = Lists.partition(tradeList, batchSize);
+        List<List<PcTradeBo>> batchTrade = Lists.partition(tradeList, pcmatchSetting.getSaveTradeBatchSize());
         batchTrade.forEach(pcTradeDAO::batchSave);
     }
 

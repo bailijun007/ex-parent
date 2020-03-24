@@ -104,7 +104,7 @@ public class ExBbMatchApplication extends Application implements ApplicationCont
         }
 
         switch (command[0]) {
-            case "triggerSnapshot":
+            case "snapshot":
                 executor.execute(() -> {
                     try {
                         long now = System.currentTimeMillis();
