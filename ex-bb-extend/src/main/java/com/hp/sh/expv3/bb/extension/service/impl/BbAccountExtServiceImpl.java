@@ -55,16 +55,24 @@ public class BbAccountExtServiceImpl implements BbAccountExtService {
 
     @Override
     public BbAccountExtVo getBBAccount(Long userId, String asset) {
-        BbAccountExtVo vo = null;
+        BbAccountExtVo vo  = new BbAccountExtVo();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
         BbAccountVo bbAccountVo = bbAccountExtMapper.queryOne(map);
-        if (bbAccountVo != null) {
-            vo = new BbAccountExtVo();
+        if (bbAccountVo == null) {
+            vo =new BbAccountExtVo();
+            vo.setAsset(asset);
+            vo.setUserId(userId);
+            vo.setBalance(BigDecimal.ZERO);
+            vo.setAvailable(BigDecimal.ZERO);
+            vo.setLock(BigDecimal.ZERO);
+            vo.setTotal(BigDecimal.ZERO);
+        }else {
             BeanUtils.copyProperties(bbAccountVo, vo);
             vo.setAvailable(bbAccountVo.getBalance());
         }
+
         return vo;
     }
 }

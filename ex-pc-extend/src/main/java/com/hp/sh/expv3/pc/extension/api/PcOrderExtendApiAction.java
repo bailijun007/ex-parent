@@ -89,7 +89,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         if (lastOrderId == null) {
             voList =pcOrderExtendService.queryActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber);
         } else {
-            voList = pcOrderExtendService.queryUserActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber);
+            voList = pcOrderExtendService.queryActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber);
         }
         convertOrderList(userId, asset, symbol, list, voList.getList());
 

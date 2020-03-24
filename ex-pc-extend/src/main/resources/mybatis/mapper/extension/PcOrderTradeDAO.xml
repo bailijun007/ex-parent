@@ -64,7 +64,6 @@
         <if test="feeRatio!=null">and fee_ratio=#{feeRatio}</if>
         <if test="fee!=null">and fee=#{fee}</if>
         <if test="pnl!=null">and pnl=#{pnl}</if>
-        <if test="userId!=null">and user_id=#{userId}</if>
         <if test="remainVolume!=null">and remain_volume=#{remainVolume}</if>
         <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
         <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>

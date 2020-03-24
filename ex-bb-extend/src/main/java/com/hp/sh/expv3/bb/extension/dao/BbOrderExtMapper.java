@@ -30,5 +30,5 @@ public interface BbOrderExtMapper {
 
     List<BbOrderVo> queryOrderList(Map<String, Object> map);
 
-    Long queryCount(Map<String, Object> map);
+    Long queryActiveOrderCount(Map<String, Object> map);
 }

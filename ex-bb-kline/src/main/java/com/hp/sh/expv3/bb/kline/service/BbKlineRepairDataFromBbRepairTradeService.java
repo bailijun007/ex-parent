@@ -7,6 +7,6 @@ import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
  */
 public interface BbKlineRepairDataFromBbRepairTradeService {
 
-
+     void execute();
 
 }

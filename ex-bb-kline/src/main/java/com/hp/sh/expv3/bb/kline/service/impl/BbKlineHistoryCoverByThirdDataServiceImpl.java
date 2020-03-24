@@ -69,9 +69,9 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
-            2,
-            Runtime.getRuntime().availableProcessors() + 1,
-            2L, TimeUnit.SECONDS,
+            1,
+            1,
+            0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(10000000),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
@@ -81,7 +81,7 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
 
     @Override
     @Scheduled(cron = "*/1 * * * * *")
-    public void updateKlineByThirdData() {
+    public void updateKlineByThirdData() {//bbKlineThirdCoverEnable=1;
         if (bbKlineThirdCoverEnable!=1){
             return;
         }
@@ -172,6 +172,7 @@ public class BbKlineHistoryCoverByThirdDataServiceImpl implements BbKlineHistory
                 list.add(bbkLine1);
             }
         }
+        bbKlineOngoingRedisUtil.zremrangeByScore(thirdDataKey,minMs.doubleValue(),maxMs.doubleValue());
         return list;
     }
 

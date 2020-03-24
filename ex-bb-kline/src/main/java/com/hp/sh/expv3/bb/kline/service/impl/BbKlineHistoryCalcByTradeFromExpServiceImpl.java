@@ -11,6 +11,7 @@ import com.hp.sh.expv3.bb.kline.util.BBKlineUtil;
 import com.hp.sh.expv3.bb.kline.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.bb.kline.vo.BbRepairTradeVo;
 import com.hp.sh.expv3.config.redis.RedisUtil;
+import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -76,11 +77,20 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
     @Autowired
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
+    @Value("${bb.kline}")
+    private String bbKlinePattern;
+
+    @Value("${kline.bb.trade}")
+    private String bbKlineTradePattern;
+
+    @Value("${kline.bb.repair.trade}")
+    private String bbKlineRepairTradePattern;
+
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
-            2,
-            Runtime.getRuntime().availableProcessors() + 1,
-            2L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(10000000),
+            1,
+            1,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(20000000),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
@@ -92,12 +102,11 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
         if (1 != bbKlineFromExpCalcEnable) { // bbKlineFromExpCalcEnable=1
             return;
         } else {
-
-//            while (true) {
-            threadPool.execute(() -> repairKlineFromExp());
             try {
-                Thread.sleep(1L);
-            } catch (InterruptedException e) {
+//            while (true) {
+                threadPool.execute(() -> repairKlineFromExp());
+            } catch (Exception e) {
+                logger.error("EXP平台历史恢复k线发生错误，{}", e.getMessage());
             }
 //            }
 
@@ -137,37 +146,38 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
                         continue;
                     }
 
-                    // 若修复数据已存在，忽略 从redis kline:from_exp:repair:BB:${asset}:${symbol}:${minute}中取
-//                    final Set<String> set = bbKlineExpHistoryRedisUtil.zrangeByScore(repairkey, ms + "", maxMs + "", 0, Long.valueOf(maxMs - ms).intValue() + 1);
-//
-//                    if (!set.isEmpty()) {
-//                        continue;
-//                    }
-//                    if (null != set || !set.isEmpty()) {
-//                        continue;
-//                    }
-
-                    List<BbTradeVo> trades = listTradeFromRepaired(asset, symbol, ms, maxMs);
-
+                    List<BbTradeVo> trades = listTradeFromRepaired(asset, symbol, ms, maxMs,bbKlineTradePattern);
                     if (null == trades || trades.isEmpty()) {
-                        trades = listTrade(asset, symbol, ms, maxMs);
+                        //如果修复表中没有数据就从平台交易表中查询数据
+                        trades = listTrade(asset, symbol, ms, maxMs,bbKlineRepairTradePattern);
+                    }
+                    //返回 对象集合以时间升序 再以id升序
+                    List<BbTradeVo> sortedList = null;
+                    if (!CollectionUtils.isEmpty(trades)) {
+                        sortedList = trades.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
                     }
 
-                    if (null == trades || trades.isEmpty()) {
-                    } else {
-                        BBKLine kline = buildKline(trades, asset, symbol, ms, freq);
+                    if (!CollectionUtils.isEmpty(sortedList)) {
+                        BBKLine kline = buildKline(sortedList, asset, symbol, ms, freq);
                         logger.info("build kline data:{}", kline.toString());
                         saveKline(repairkey, kline);
                         notifyUpdate(notifyUpdateKey, ms);
+                    } else {
+                        /*如果最终sortedList==null，说明修复表，平台交易表中都没有数据，
+                        则直接将这条kline数据删除（如果需要修复可以走手动修复或者第三方数据覆盖*/
+
+                        //删除数据
+                        final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
+                        bbKlineExpHistoryRedisUtil.zremrangeByScore(klineDataRedisKey, ms, ms);
                     }
                 }
             }
         }
     }
 
-    private List<BbTradeVo> listTradeFromRepaired(String asset, String symbol, long ms, long maxMs) {
+    private List<BbTradeVo> listTradeFromRepaired(String asset, String symbol, long ms, long maxMs,String bbKlineTradePattern) {
         List<BbTradeVo> result = new ArrayList<>();
-        List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, ms, maxMs);
+        List<BbRepairTradeVo> list = bbRepairTradeExtService.listRepairTrades(asset, symbol, ms, maxMs,bbKlineTradePattern);
         if (!CollectionUtils.isEmpty(list)) {
             for (BbRepairTradeVo tradeVo : list) {
                 BbTradeVo bbTradeVo = new BbTradeVo();
@@ -203,24 +213,25 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
      * @param maxMs
      * @return
      */
-    private List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs) {// TODO xb,一分钟内成交太多，会引入性能问题。
-        /**
-         * 首次查询：
-         * sql: select *(具体的列，不需要所有列)
-         * from table
-         *  where trade_time >= ms and trade_time <= maxMs
-         *  and id > ? (第一次不需要加这个条件，第二次才需要)
-         *  order by id
-         *  limit N
-         *
-         * 将本次查询的结果最后一条 BbTradeVo.id 作为参数，查询第二次
-         *
-         * 跳出循环条件：返回结果 < N
-         */
-        List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(asset, symbol, ms, maxMs);
-        //返回 对象集合以时间升序 再以id升序
-        List<BbTradeVo> sortedList = voList.stream().sorted(Comparator.comparing(BbTradeVo::getTradeTime).thenComparing(BbTradeVo::getId)).collect(Collectors.toList());
-        return sortedList;
+    public List<BbTradeVo> listTrade(String asset, String symbol, long ms, long maxMs,String bbKlineRepairTradePattern) {
+        List<BbTradeVo> list = new ArrayList<>();
+        final int endLimit = 9999;
+        List<BbTradeVo> voList = bbTradeExtService.queryByTimeInterval(null, asset, symbol, ms, maxMs, endLimit,bbKlineRepairTradePattern);
+        list.addAll(voList);
+        if (voList.size() < endLimit) {
+            return list;
+        }else {
+            do {
+                if (!CollectionUtils.isEmpty(voList)) {
+                    BbTradeVo bbTradeVo = voList.get(voList.size() - 1);
+                    Long id = bbTradeVo.getId();
+                    voList = bbTradeExtService.queryByTimeInterval(id, asset, symbol, ms, maxMs, endLimit,bbKlineRepairTradePattern);
+                    list.addAll(voList);
+                }
+            } while (!(voList.size() < endLimit));
+        }
+
+        return list;
     }
 
 

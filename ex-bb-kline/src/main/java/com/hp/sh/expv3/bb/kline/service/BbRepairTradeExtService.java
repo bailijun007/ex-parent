@@ -8,5 +8,5 @@ import java.util.List;
  * @author BaiLiJun  on 2020/3/16
  */
 public interface BbRepairTradeExtService {
-    List<BbRepairTradeVo> listRepairTrades(String asset, String symbol, long ms, long maxMs);
+    List<BbRepairTradeVo> listRepairTrades(String asset, String symbol, long ms, long maxMs,String bbKlineTradePattern);
 }

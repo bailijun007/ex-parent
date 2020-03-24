@@ -59,9 +59,9 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
-            2,
-            Runtime.getRuntime().availableProcessors() + 1,
-            2L, TimeUnit.SECONDS,
+            1,
+            1,
+            0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(10000000),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()

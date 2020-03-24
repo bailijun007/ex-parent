@@ -48,9 +48,7 @@ public class BbTradeVo implements Serializable {
     @ApiModelProperty("成交时间")
     private Long tradeTime;
 
-    private Integer makerHandleStatus;
 
-    private Integer takerHandleStatus;
 
 
 
@@ -83,8 +81,6 @@ public class BbTradeVo implements Serializable {
                 ", price=" + price +
                 ", number=" + number +
                 ", tradeTime=" + tradeTime +
-                ", makerHandleStatus=" + makerHandleStatus +
-                ", takerHandleStatus=" + takerHandleStatus +
                 ", tkBidFlag=" + tkBidFlag +
                 ", modified=" + modified +
                 ", created=" + created +
@@ -180,22 +176,6 @@ public class BbTradeVo implements Serializable {
 
     public void setTradeTime(Long tradeTime) {
         this.tradeTime = tradeTime;
-    }
-
-    public Integer getMakerHandleStatus() {
-        return makerHandleStatus;
-    }
-
-    public void setMakerHandleStatus(Integer makerHandleStatus) {
-        this.makerHandleStatus = makerHandleStatus;
-    }
-
-    public Integer getTakerHandleStatus() {
-        return takerHandleStatus;
-    }
-
-    public void setTakerHandleStatus(Integer takerHandleStatus) {
-        this.takerHandleStatus = takerHandleStatus;
     }
 
 
