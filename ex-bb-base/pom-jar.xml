@@ -45,10 +45,8 @@
 				<version>3.2.0</version>
 				<configuration>
 					<includes>
-						<include>/com/hp/sh/expv3/bb/calc/**</include>
-						<include>/com/hp/sh/expv3/bb/constant/**</include>
-						<include>/com/hp/sh/expv3/bb/error/**</include>
 						<include>/com/hp/sh/expv3/bb/component/**</include>
+						<include>/com/hp/sh/expv3/bb/constant/**</include>
 						<include>/com/hp/sh/expv3/bb/strategy/**</include>
 						<include>**/entity/**</include>
 					</includes>
