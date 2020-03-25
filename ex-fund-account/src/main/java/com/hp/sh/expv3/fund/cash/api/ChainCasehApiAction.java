@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
@@ -61,6 +62,7 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	int _____充值______;
 	
 	@ApiOperation(value = "1、获取充币地址")
+	@LockIt(key="dpositAddress-${userId}-${asset}")
 	public String getDepositAddress(Long userId, String asset){
 		DepositAddr addr = depositAddrService.getDepositAddress(userId, asset);
 		if(addr==null){

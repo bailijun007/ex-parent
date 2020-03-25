@@ -325,5 +325,11 @@ public class BBOrder extends UserDataEntity implements OrderData{
 	public void setCancelOperator(String cancelOperator) {
 		this.cancelOperator = cancelOperator;
 	}
+
+	@Override
+	public String toString() {
+		return "BBOrder [asset=" + asset + ", symbol=" + symbol + ", bidFlag=" + bidFlag + ", volume=" + volume
+				+ ", price=" + price + ", status=" + status + ", userId=" + userId + ", id=" + id + "]";
+	}
     
 }

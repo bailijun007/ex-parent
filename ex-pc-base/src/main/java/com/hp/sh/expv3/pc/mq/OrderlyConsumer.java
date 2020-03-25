@@ -47,13 +47,14 @@ public class OrderlyConsumer {
 	@Autowired
 	private EndpointContext endpointContext;
 	
-	@Value("${pc.mq.consumer.contractGroup:1}")
-	private Integer contractGroup;
+	@Value("${pc.mq.consumer.groupId:1}")
+	private Integer contractGroupId;
 
 	private Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
 	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic);
+//        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic, null, new PcAllocateMessageQueueStrategy());
         
         consumer.setNamesrvAddr(setting.getNamesrvAddr());
         consumer.setNamespace(setting.getNamespace());
@@ -107,7 +108,7 @@ public class OrderlyConsumer {
 	public void start123() throws MQClientException{
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 
-		logger.info("更新MQ监听,{}", pcList.size());
+		logger.info("更新MQ监听,{},{},{}", pcList.size(), this.contractGroupId, this.setting.getInstanceName());
 		
 		Map<String, PcContractVO> symbolMap = new HashMap<String, PcContractVO>();
 		for(PcContractVO bbvo : pcList){
@@ -129,12 +130,17 @@ public class OrderlyConsumer {
 			String topic = entry.getKey();
 			PcContractVO symbolVO = entry.getValue();
 			if(!mqMap.containsKey(topic)){
-				logger.info("启动监听. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
-				DefaultMQPushConsumer mq = this.buildConsumer(topic);
-				this.mqMap.put(topic, mq);
+				if(symbolVO.getContractGroup().equals(contractGroupId)){
+					logger.info("启动监听. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
+					DefaultMQPushConsumer mq = this.buildConsumer(topic);
+					this.mqMap.put(topic, mq);
+				}
 			}
 		}
 
+		int n = this.mqMap.size();
+		logger.info("mq:{},{}", n, this.mqMap);
+		return;
 	}
 
 }

@@ -72,6 +72,10 @@ public class PcLiqService {
     	PcPosition pcPosition = this.positionDataService.getPosition(pos.getUserId(), pos.getId());
 		LiqHandleResult liqResult = new LiqHandleResult();
 		
+    	if(BigUtils.isZero(pcPosition.getVolume())){
+    		return liqResult;
+    	}
+		
 		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pcPosition.getAsset(), pcPosition.getSymbol());
 		//检查触发强平
 		if(!this.checkAndResetLiqStatus(pcPosition, markPriceVo.getMarkPrice())){
