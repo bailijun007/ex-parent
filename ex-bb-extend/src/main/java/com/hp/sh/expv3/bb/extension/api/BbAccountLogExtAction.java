@@ -9,6 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author BaiLiJun  on 2020/3/24
  */
@@ -19,17 +22,22 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
     private BbAccountLogExtService bbAccountLogExtService;
 
     @Override
-    public PageResult<BbAccountLogExtVo> query(Long userId, String asset, String symbol, Integer tradeType, Long startDate, Long endDate, Integer pageNo, Integer pageSize) {
-        PageResult<BbAccountLogExtVo> result = new PageResult<BbAccountLogExtVo>();
-       this.checkParam(userId,asset,symbol,tradeType,startDate,endDate,pageNo,pageSize);
-
-        return null;
+    public List<BbAccountLogExtVo> query(Long userId, String asset, String symbol, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Integer lastOrderId, Integer pageSize) {
+        List<BbAccountLogExtVo> list = new ArrayList<>();
+        this.checkParam(userId, asset, symbol, tradeType, startDate, endDate, nextPage, pageSize);
+        List<BbAccountLogExtVo> voList =null;
+        if (null == lastOrderId) {
+            voList =bbAccountLogExtService.listBbAccountLogs(userId, asset, symbol, tradeType, startDate, endDate, nextPage,lastOrderId, pageSize);
+        } else {
+            voList =bbAccountLogExtService.listBbAccountLogs(userId, asset, symbol, tradeType, startDate, endDate, nextPage,lastOrderId, pageSize);
+        }
+        return list;
     }
 
     private void checkParam(Long userId, String asset, String symbol, Integer tradeType, Long startDate,
                             Long endDate, Integer pageNo, Integer pageSize) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || tradeType == null || null == userId||
-                startDate == null || endDate == null || pageNo == null || pageSize == null){
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || tradeType == null || null == userId ||
+                startDate == null || endDate == null || pageNo == null || pageSize == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
 

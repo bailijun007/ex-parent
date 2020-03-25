@@ -10,6 +10,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 /**
  * @author BaiLiJun  on 2020/3/24
  */
@@ -25,15 +27,17 @@ public interface BbAccountLogExtApi {
             @ApiImplicitParam(name = "tradeType",value = "类型 " , example = "0", required = true),
             @ApiImplicitParam(name = "startDate", value = "开始时间", required = true),
             @ApiImplicitParam(name = "endDate", value = "结束时间", required = true),
-            @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
+            @ApiImplicitParam(name = "nextPage", value = "翻页标记,-1 上一页,1.下一页", example = "1", required = true),
+            @ApiImplicitParam(name = "lastOrderId", value = "当前页最后一张委托的id", example = "1", required = false),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "20", required = true)
     })
-    PageResult<BbAccountLogExtVo> query(@RequestParam(value = "userId", required = true) Long userId,
-                                        @RequestParam(value = "asset", required = true) String asset,
-                                        @RequestParam(value = "symbol", required = true) String symbol,
-                                        @RequestParam(value = "tradeType", required = true) Integer tradeType,
-                                        @RequestParam(value = "startDate", required = true) Long startDate,
-                                        @RequestParam(value = "endDate", required = true) Long endDate,
-                                        @RequestParam(value = "pageNo", required = true) Integer pageNo,
-                                        @RequestParam(value = "pageSize", required = true, defaultValue = "20") Integer pageSize );
+    List<BbAccountLogExtVo> query(@RequestParam(value = "userId", required = true) Long userId,
+                                  @RequestParam(value = "asset", required = true) String asset,
+                                  @RequestParam(value = "symbol", required = true) String symbol,
+                                  @RequestParam(value = "tradeType", required = true) Integer tradeType,
+                                  @RequestParam(value = "startDate", required = true) Long startDate,
+                                  @RequestParam(value = "endDate", required = true) Long endDate,
+                                  @RequestParam(value = "nextPage", required = true) Integer nextPage,
+                                  @RequestParam(value = "lastOrderId", required = false) Integer lastOrderId,
+                                  @RequestParam(value = "pageSize", required = true, defaultValue = "20") Integer pageSize );
 }
