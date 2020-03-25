@@ -317,7 +317,8 @@ public class PcStrategyContext {
 
 	int ____________________________;
 	
-	private HoldPosStrategy getHoldPosStrategy(String asset, String symbol){
+	@Deprecated
+	public HoldPosStrategy getHoldPosStrategy(String asset, String symbol){
 		Integer strategyId = this.genStrategyId(asset, symbol);
 		StrategyBundle sb = strategyBundleMap.get(strategyId);
 		return sb.getHoldPosStrategy();

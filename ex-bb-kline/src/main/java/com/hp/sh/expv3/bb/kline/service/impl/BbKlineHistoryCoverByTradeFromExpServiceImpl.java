@@ -92,12 +92,11 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
     }
 
 
-
     public void updateKlineByExpHistory() {
 
 //        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
 //        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols, supportBbGroupIds);
-        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService,supportBbGroupIds);
+        List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService, supportBbGroupIds);
 
         for (BBSymbol bbSymbol : targetBbSymbols) {
 
@@ -115,14 +114,25 @@ public class BbKlineHistoryCoverByTradeFromExpServiceImpl implements BbKlineHist
             } else {
                 final Long minMs = minAndMaxMs[0];
                 final Long maxMs = minAndMaxMs[1];
-                List<BBKLine>  klines = listBbKline(asset, symbol, minMs, maxMs, freq);
+                List<BBKLine> klines = listBbKline(asset, symbol, minMs, maxMs, freq);
                 if (null == klines || klines.isEmpty()) {
+                    final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
+                    bbKlineExpHistoryRedisUtil.zremrangeByScore(klineDataRedisKey, minMs, maxMs);
+                    emptyNotify(asset,symbol,freq,minMs);
                     continue;
                 }
                 coverData(asset, symbol, minMs, maxMs, freq, klines);
                 notifyKlineUpdate(asset, symbol, minMs, maxMs, freq, klines);
             }
         }
+    }
+
+    private void emptyNotify(String asset,String symbol,int freq,Long minMs){
+        String key = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, freq);
+        HashMap<String, Double> scoreMembers = new HashMap<String, Double>();
+        final String member = BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, freq, minMs);
+        scoreMembers.put(member, Long.valueOf(minMs).doubleValue());
+        bbKlineExpHistoryRedisUtil.zadd(key, scoreMembers);
     }
 
     /**

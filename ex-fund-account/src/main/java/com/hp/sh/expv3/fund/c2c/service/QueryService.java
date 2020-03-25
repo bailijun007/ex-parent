@@ -83,8 +83,8 @@ public class QueryService {
                 put("userId", userId);
                 put("payCurrency", asset);
                 put("type", C2cConst.C2C_SELL);
-                put("approvalStatus", C2cConst.C2C_APPROVAL_STATUS_PASS);
-                put("payStatus", C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
+                put("approvalStatus", C2cConst.C2C_APPROVAL_STATUS_IN_AUDIT);
+                put("payStatus", C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
 
             }
         });

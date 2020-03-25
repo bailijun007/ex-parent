@@ -12,7 +12,7 @@ import com.hp.sh.expv3.pc.extension.service.impl.PcAccountExtendServiceImpl;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
-import com.hp.sh.expv3.pc.strategy.PositionStrategyContext;
+import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
@@ -44,7 +44,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     private PcOrderTradeExtendService pcOrderTradeService;
 
     @Autowired
-    private PositionStrategyContext positionStrategyContext;
+    private PcStrategyContext positionStrategyContext;
 
     @Override
     public List<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status) {

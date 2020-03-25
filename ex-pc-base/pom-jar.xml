@@ -5,6 +5,7 @@
 
 	<artifactId>ex-pc-base-jar</artifactId>
 	<packaging>jar</packaging>
+	<version>3.0.1-SNAPSHOT</version>
     <description>永续合约基础服务</description>
 
 	<parent>

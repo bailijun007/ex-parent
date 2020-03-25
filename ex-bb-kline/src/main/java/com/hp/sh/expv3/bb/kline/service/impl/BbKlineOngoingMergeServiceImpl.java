@@ -70,7 +70,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             1,
-             1,
+            1,
             0, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(20000000),
             Executors.defaultThreadFactory(),
@@ -113,8 +113,6 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
                     continue;
                 }
 
-
-
                 Map<Integer, Set<Long>> targetFreq2StartMsSet = new HashMap<>(targetFreqs.size());
 
                 for (Tuple trigger : triggers) {
@@ -142,7 +140,11 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
                         final List<BBKLine> bbkLines = listKlineResource(asset, symbol, triggerFreq, startAndEndMs[0], startAndEndMs[1]);
 
                         if (null == bbkLines || bbkLines.isEmpty()) {
-                            logger.debug("freq {},{},data empty,ignore", targetFreq, startAndEndMs[0]);
+                            //收到空通知，则直接删除其对应的数据（说明这条数据的手动修复的，并且后来取消手动修复的）
+                            final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, targetFreq);
+                            bbKlineOngoingRedisUtil.zremrangeByScore(klineDataRedisKey, ms, ms);
+                            notifyKlineUpdate(asset, symbol, targetFreq, startAndEndMs[0]);
+//                            logger.debug("freq {},{},data empty,ignore", targetFreq, startAndEndMs[0]);
                             continue;
                         } else {
                             BBKLine newKline = merge(asset, symbol, targetFreq, startAndEndMs[0], bbkLines);
@@ -214,6 +216,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     private List<BBKLine> listKlineResource(String asset, String symbol, Integer triggerFreq, Long startMs, Long endMs) {
         final String triggerFreqRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, triggerFreq);
         final Set<String> klines = bbKlineOngoingRedisUtil.zrangeByScore(triggerFreqRedisKey, startMs + "", endMs + "", 0, Long.valueOf(endMs - startMs + 1).intValue());
+        List<BBKLine> sortedList = null;
         List<BBKLine> list = new ArrayList<>();
         // 按照时间minute升序
         if (!klines.isEmpty()) {
@@ -223,8 +226,8 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
                 bbkLine1.setSymbol(symbol);
                 list.add(bbkLine1);
             }
+            sortedList = list.stream().sorted(Comparator.comparing(BBKLine::getMinute)).collect(Collectors.toList());
         }
-        List<BBKLine> sortedList = list.stream().sorted(Comparator.comparing(BBKLine::getMinute)).collect(Collectors.toList());
 
         return sortedList;
     }
