@@ -19,6 +19,7 @@ import com.hp.sh.expv3.match.util.BbOrder4MatchBoUtil;
 import com.hp.sh.expv3.match.util.BbRocketMqUtil;
 import com.hp.sh.expv3.match.util.BbUtil;
 import com.hp.sh.expv3.match.util.Tuple2;
+import org.apache.rocketmq.client.ClientConfig;
 import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
 import org.apache.rocketmq.client.consumer.PullResult;
 import org.apache.rocketmq.client.consumer.PullStatus;

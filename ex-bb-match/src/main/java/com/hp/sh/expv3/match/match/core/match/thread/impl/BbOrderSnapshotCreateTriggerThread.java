@@ -41,4 +41,20 @@ public class BbOrderSnapshotCreateTriggerThread {
         }
     }
 
+    public void triggerBookReset(String asset, String symbol) {
+        String assetAndSymbol = BbUtil.concatAssetAndSymbol(null, asset, symbol);
+        boolean ok = false;
+        if (null != iThreadManager.getWorkerKeys() && iThreadManager.getWorkerKeys().size() > 0) {
+            for (String assetSymbol : iThreadManager.getWorkerKeys()) {
+                if (assetAndSymbol.equalsIgnoreCase(assetSymbol)) {
+                    bbOrderMqNotify.sendOrderBookResetTrigger(asset, symbol);
+                    ok = true;
+                }
+            }
+        }
+        if (!ok) {
+            logger.warn("book reset not matched {},{}", asset, symbol);
+        }
+    }
+
 }
