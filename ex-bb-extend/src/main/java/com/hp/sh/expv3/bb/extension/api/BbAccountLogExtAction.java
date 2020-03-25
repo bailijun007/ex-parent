@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.bb.extension.api;
 
 import com.gitee.hupadev.base.api.PageResult;
+import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbAccountLogExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountLogExtVo;
@@ -27,9 +28,9 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
         this.checkParam(userId, asset, symbol, historyType, tradeType, startDate, endDate, nextPage, pageSize);
         List<BbAccountLogExtVo> voList = null;
         if (null == lastId) {
-            voList = bbAccountLogExtService.listBbAccountLogs(userId, asset, symbol, tradeType, startDate, endDate, nextPage, lastId, pageSize);
-        } else {
-            voList = bbAccountLogExtService.listBbAccountLogs(userId, asset, symbol, tradeType, startDate, endDate, nextPage, lastId, pageSize);
+            voList = bbAccountLogExtService.listBbAccountLogs(userId, asset, symbol, historyType,tradeType, startDate, endDate,  pageSize);
+        }else {
+            voList = bbAccountLogExtService.listBbAccountLogsByPage(userId, asset, symbol, historyType,tradeType, lastId,nextPage, startDate, endDate,  pageSize);
         }
         return list;
     }
@@ -40,7 +41,7 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
                 pageNo == null || pageSize == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        if (2 == historyType) {
+        if (BbextendConst.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
             if (startDate == null || endDate == null) {
                 throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
             }

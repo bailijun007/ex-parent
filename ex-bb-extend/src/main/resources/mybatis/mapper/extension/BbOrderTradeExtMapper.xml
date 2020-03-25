@@ -137,6 +137,9 @@
                 b.asset=#{asset}
                 and b.symbol=#{symbol}
                 and b.user_id=#{userId}
+                <if test="id!=null">
+                    and id>#{id}
+                </if>
                 <if test="tradeTimeBegin!=null">
                     and  unix_timestamp(b.trade_time)&gt;=unix_timestamp(#{tradeTimeBegin})
                 </if>

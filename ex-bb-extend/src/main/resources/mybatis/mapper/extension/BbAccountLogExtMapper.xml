@@ -3,4 +3,57 @@
 <mapper namespace="com.hp.sh.expv3.bb.extension.dao.BbAccountLogExtMapper">
 
 
+    <select id="queryByLimit" resultType="com.hp.sh.expv3.bb.extension.vo.BbAccountLogExtVo">
+        select id,`type` tradeType ,user_id,asset,symbol,ref_id,`time`
+        from bb_account_log
+        <where>
+            <if test="types!=null">type in
+                <foreach item="item" index="i" collection="types" open="(" separator="," close=")">
+                    #{types[${i}]}
+                </foreach>
+            </if>
+            <if test="type!=null">and `type`=#{type}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="refId!=null">and ref_id=#{refId}</if>
+            <if test="timeBegin!=null">and `time` &gt;= #{timeBegin}</if>
+            <if test="timeEnd!=null">and `time` &lt;= #{timeEnd}</if>
+        </where>
+        order by id desc
+        LIMIT 0,${limit}
+    </select>
+
+    <select id="listBbAccountLogsByPage" resultType="com.hp.sh.expv3.bb.extension.vo.BbAccountLogExtVo">
+        select id,`type` tradeType,user_id,asset,symbol,ref_id,`time`
+        from bb_account_log
+        <where>
+            <if test="types!=null">type in
+                <foreach item="item" index="i" collection="types" open="(" separator="," close=")">
+                    #{types[${i}]}
+                </foreach>
+            </if>
+
+            <if test="type!=null">and `type`=#{type}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="refId!=null">and ref_id=#{refId}</if>
+            <if test="timeBegin!=null">and `time` &gt;= #{timeBegin}</if>
+            <if test="timeEnd!=null">and `time` &lt;= #{timeEnd}</if>
+            <choose>
+                <when test="nextPage==1 and  lastId!=null">
+                    and id &lt; #{lastId}
+                    ORDER BY id desc
+                    LIMIT 0,${limit}
+                </when>
+                <when test="nextPage==-1 and lastId!=null">
+                    and id &gt;= #{lastId}
+                    ORDER BY id asc
+                </when>
+            </choose>
+        </where>
+        LIMIT 0,${limit}
+    </select>
+
 </mapper>
