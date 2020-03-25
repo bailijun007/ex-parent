@@ -148,7 +148,7 @@
                 </if>
             </where>
             ORDER BY b.id ASC
-
+            limit 0,10000
     </select>
 
     <select id="queryOrderTrade" resultMap="BBOrderTrade">

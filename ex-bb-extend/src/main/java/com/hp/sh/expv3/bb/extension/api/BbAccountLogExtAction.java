@@ -8,10 +8,13 @@ import com.hp.sh.expv3.bb.extension.vo.BbAccountLogExtVo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2020/3/24
@@ -31,6 +34,9 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
             voList = bbAccountLogExtService.listBbAccountLogs(userId, asset, symbol, historyType,tradeType, startDate, endDate,  pageSize);
         }else {
             voList = bbAccountLogExtService.listBbAccountLogsByPage(userId, asset, symbol, historyType,tradeType, lastId,nextPage, startDate, endDate,  pageSize);
+        }
+        if(!CollectionUtils.isEmpty(voList)){
+             Map<Integer, List<BbAccountLogExtVo>> map = voList.stream().collect(Collectors.groupingBy(BbAccountLogExtVo::getTradeType));
         }
         return list;
     }
