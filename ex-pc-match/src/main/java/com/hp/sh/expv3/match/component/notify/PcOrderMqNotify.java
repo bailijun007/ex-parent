@@ -7,6 +7,7 @@ package com.hp.sh.expv3.match.component.notify;
 import com.hp.sh.expv3.match.component.rocketmq.BasePcOrderProducer;
 import com.hp.sh.expv3.match.config.setting.PcmatchRocketMqSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
+import com.hp.sh.expv3.match.mqmsg.BookResetMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.PcMatchOrderRebaseMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.PcMatchOrderSnapshotMqMsgDto;
 import com.hp.sh.expv3.match.util.JsonUtil;
@@ -47,10 +48,25 @@ public class PcOrderMqNotify {
                 msg// body
         );
         safeSend2OrderTopic(message);
+        logger.info("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+        return true;
+    }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
-        }
+    public boolean sendOrderBookResetTrigger(String asset, String symbol) {
+        String topic = PcRocketMqUtil.buildPcOrderTopicName(pcmatchRocketMqSetting.getPcOrderTopicNamePattern(), asset, symbol);
+
+        BookResetMqMsgDto msg = new BookResetMqMsgDto();
+        msg.setAsset(asset);
+        msg.setSymbol(symbol);
+
+        Message message = buildMessage(
+                topic,// topic
+                "" + RmqTagEnum.PC_BOOK_RESET.getConstant(),// tag
+                "" + RmqTagEnum.PC_BOOK_RESET.getConstant(),// tag
+                msg// body
+        );
+        safeSend2OrderTopic(message);
+        logger.info("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
         return true;
     }
 
