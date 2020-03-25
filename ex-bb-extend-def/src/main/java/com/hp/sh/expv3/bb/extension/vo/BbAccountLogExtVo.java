@@ -9,6 +9,9 @@ import java.math.BigDecimal;
  * @author BaiLiJun  on 2020/3/24
  */
 public class BbAccountLogExtVo implements Serializable {
+    @ApiModelProperty("自增主键")
+    private Long id;
+
     @ApiModelProperty("用户id")
     private Long userId;
 
@@ -39,7 +42,8 @@ public class BbAccountLogExtVo implements Serializable {
     @Override
     public String toString() {
         return "BbAccountLogExtVo{" +
-                "userId=" + userId +
+                "id=" + id +
+                ", userId=" + userId +
                 ", asset='" + asset + '\'' +
                 ", tradeTime=" + tradeTime +
                 ", tradeType=" + tradeType +
@@ -49,6 +53,14 @@ public class BbAccountLogExtVo implements Serializable {
                 ", refId=" + refId +
                 ", time=" + time +
                 '}';
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public BbAccountLogExtVo() {

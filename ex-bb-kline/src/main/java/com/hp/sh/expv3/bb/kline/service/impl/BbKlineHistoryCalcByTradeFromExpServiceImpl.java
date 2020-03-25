@@ -167,8 +167,8 @@ public class BbKlineHistoryCalcByTradeFromExpServiceImpl implements BbKlineHisto
                         则直接将这条kline数据删除（如果需要修复可以走手动修复或者第三方数据覆盖*/
 
                         //删除数据
-                        final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, freq);
-                        bbKlineExpHistoryRedisUtil.zremrangeByScore(klineDataRedisKey, ms, ms);
+                        bbKlineExpHistoryRedisUtil.zremrangeByScore(repairkey, ms, ms);
+                        notifyUpdate(notifyUpdateKey, ms);
                     }
                 }
             }

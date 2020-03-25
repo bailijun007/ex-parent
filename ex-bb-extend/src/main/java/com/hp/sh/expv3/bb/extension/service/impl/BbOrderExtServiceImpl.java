@@ -79,9 +79,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         if (list == null || list.isEmpty()) {
             return result;
         }
-        if (list == null || list.isEmpty()) {
-            return result;
-        }
+
         this.convertOrderList(userId, bbHistoryOrderVos, list);
 
         result.setList(bbHistoryOrderVos);
