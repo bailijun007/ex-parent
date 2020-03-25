@@ -173,7 +173,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         if (ExtCommonConstant.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
-            if (startDate == null && endDate == null) {
+            if (startDate == null || endDate == null) {
                 throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
             }
         }

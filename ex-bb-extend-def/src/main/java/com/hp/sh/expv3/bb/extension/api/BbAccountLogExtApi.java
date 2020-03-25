@@ -24,20 +24,22 @@ public interface BbAccountLogExtApi {
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
-            @ApiImplicitParam(name = "tradeType",value = "类型 " , example = "0", required = true),
+            @ApiImplicitParam(name = "historyType", value = "1.最近两天,2.两天到三个月", example = "1", required = true),
+            @ApiImplicitParam(name = "tradeType",value = "类型0.全部,1.买入,2.卖出,3.转出至资金账户,4.转出至永续合约,5.资金账户转入,6.永续合约转入 " , example = "0", required = true),
             @ApiImplicitParam(name = "startDate", value = "开始时间", required = true),
             @ApiImplicitParam(name = "endDate", value = "结束时间", required = true),
             @ApiImplicitParam(name = "nextPage", value = "翻页标记,-1 上一页,1.下一页", example = "1", required = true),
-            @ApiImplicitParam(name = "lastOrderId", value = "当前页最后一张委托的id", example = "1", required = false),
+            @ApiImplicitParam(name = "lastId", value = "当前页最后一条数据的id", example = "1", required = false),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "20", required = true)
     })
     List<BbAccountLogExtVo> query(@RequestParam(value = "userId", required = true) Long userId,
                                   @RequestParam(value = "asset", required = true) String asset,
                                   @RequestParam(value = "symbol", required = true) String symbol,
+                                  @RequestParam(value = "historyType", required = true) Integer historyType,
                                   @RequestParam(value = "tradeType", required = true) Integer tradeType,
                                   @RequestParam(value = "startDate", required = true) Long startDate,
                                   @RequestParam(value = "endDate", required = true) Long endDate,
                                   @RequestParam(value = "nextPage", required = true) Integer nextPage,
-                                  @RequestParam(value = "lastOrderId", required = false) Integer lastOrderId,
+                                  @RequestParam(value = "lastId", required = false) Integer lastId,
                                   @RequestParam(value = "pageSize", required = true, defaultValue = "20") Integer pageSize );
 }

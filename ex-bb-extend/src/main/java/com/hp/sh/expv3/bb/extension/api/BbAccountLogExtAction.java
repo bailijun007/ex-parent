@@ -22,24 +22,30 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
     private BbAccountLogExtService bbAccountLogExtService;
 
     @Override
-    public List<BbAccountLogExtVo> query(Long userId, String asset, String symbol, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Integer lastOrderId, Integer pageSize) {
+    public List<BbAccountLogExtVo> query(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Integer lastId, Integer pageSize) {
         List<BbAccountLogExtVo> list = new ArrayList<>();
-        this.checkParam(userId, asset, symbol, tradeType, startDate, endDate, nextPage, pageSize);
-        List<BbAccountLogExtVo> voList =null;
-        if (null == lastOrderId) {
-            voList =bbAccountLogExtService.listBbAccountLogs(userId, asset, symbol, tradeType, startDate, endDate, nextPage,lastOrderId, pageSize);
+        this.checkParam(userId, asset, symbol, historyType, tradeType, startDate, endDate, nextPage, pageSize);
+        List<BbAccountLogExtVo> voList = null;
+        if (null == lastId) {
+            voList = bbAccountLogExtService.listBbAccountLogs(userId, asset, symbol, tradeType, startDate, endDate, nextPage, lastId, pageSize);
         } else {
-            voList =bbAccountLogExtService.listBbAccountLogs(userId, asset, symbol, tradeType, startDate, endDate, nextPage,lastOrderId, pageSize);
+            voList = bbAccountLogExtService.listBbAccountLogs(userId, asset, symbol, tradeType, startDate, endDate, nextPage, lastId, pageSize);
         }
         return list;
     }
 
-    private void checkParam(Long userId, String asset, String symbol, Integer tradeType, Long startDate,
+    private void checkParam(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Long startDate,
                             Long endDate, Integer pageNo, Integer pageSize) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || tradeType == null || null == userId ||
-                startDate == null || endDate == null || pageNo == null || pageSize == null) {
+                pageNo == null || pageSize == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
+        if (2 == historyType) {
+            if (startDate == null || endDate == null) {
+                throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+            }
+        }
+
 
     }
 }
