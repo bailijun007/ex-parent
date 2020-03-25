@@ -16,6 +16,7 @@ import com.hp.sh.expv3.fund.extension.vo.C2cOrderVo;
 import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
+import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,6 +129,17 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
                 c2cOrder.setVolume(srcNum);
                 c2cOrder.setAmount(ratio.multiply(srcNum));
                 sellService.createC2cOut(c2cOrder);
+
+                //预扣体现金额
+                FundCutRequest request = new FundCutRequest();
+                request.setAsset(c2cOrder.getPayCurrency());
+                request.setAmount(c2cOrder.getVolume());
+                request.setTradeNo(c2cOrder.getSn());
+                request.setTradeType(TradeType.C2C_OUT);
+                request.setRemark(c2cOrder.getPayStatusDesc());
+                request.setUserId(c2cOrder.getUserId());
+                fundAccountCoreApi.cut(request);
+
             } catch (Exception e) {
                 logger.info("订单回调通知失败{}", e.getMessage());
                 e.printStackTrace();
@@ -154,16 +166,19 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         //更改订单状态 并返回该对象
         C2cOrder c2cOrder1 = sellService.updateById(order);
 
-        //如果审核通过需要调用减钱方法
-        if (c2cOrder1 != null && c2cOrder1.getApprovalStatus() == C2cConst.C2C_APPROVAL_STATUS_PASS) {
-            FundCutRequest request = new FundCutRequest();
+        if (c2cOrder1 == null){
+            throw new ExException(ExFundError.UPDATE_C2C_ORDER_FAIL);
+        }
+        //如果审核拒绝需要调用加钱方法
+        if (c2cOrder1.getApprovalStatus() == C2cConst.C2C_APPROVAL_STATUS_REJECTED) {
+            FundAddRequest request = new FundAddRequest();
             request.setAsset(c2cOrder1.getPayCurrency());
             request.setAmount(c2cOrder1.getVolume());
             request.setTradeNo(c2cOrder1.getSn());
             request.setTradeType(TradeType.C2C_OUT);
-            request.setRemark(c2cOrder1.getPayStatusDesc());
+            request.setRemark("c2c审核拒绝，增加余额");
             request.setUserId(c2cOrder1.getUserId());
-            fundAccountCoreApi.cut(request);
+            fundAccountCoreApi.add(request);
         }
 
         return "success";
