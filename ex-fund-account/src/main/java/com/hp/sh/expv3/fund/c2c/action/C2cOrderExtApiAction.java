@@ -175,7 +175,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
             request.setAsset(c2cOrder1.getPayCurrency());
             request.setAmount(c2cOrder1.getVolume());
             request.setTradeNo(c2cOrder1.getSn());
-            request.setTradeType(TradeType.C2C_OUT);
+            request.setTradeType(TradeType.C2C_IN);
             request.setRemark("c2c审核拒绝，增加余额");
             request.setUserId(c2cOrder1.getUserId());
             fundAccountCoreApi.add(request);
