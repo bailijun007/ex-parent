@@ -4,7 +4,6 @@
  */
 package com.hp.sh.expv3.match.match.core.match.thread.impl;
 
-import com.hp.sh.expv3.match.component.MatchSupportContractService;
 import com.hp.sh.expv3.match.component.notify.PcOrderMqNotify;
 import com.hp.sh.expv3.match.thread.def.IThreadManager;
 import com.hp.sh.expv3.match.util.PcUtil;
@@ -42,4 +41,19 @@ public class PcOrderSnapshotCreateTriggerThread {
         }
     }
 
+    public void triggerBookReset(String asset, String symbol) {
+        String assetAndSymbol = PcUtil.concatAssetAndSymbol(null, asset, symbol);
+        boolean ok = false;
+        if (null != iThreadManager.getWorkerKeys() && iThreadManager.getWorkerKeys().size() > 0) {
+            for (String assetSymbol : iThreadManager.getWorkerKeys()) {
+                if (assetAndSymbol.equalsIgnoreCase(assetSymbol)) {
+                    pcOrderMqNotify.sendOrderBookResetTrigger(asset, symbol);
+                    ok = true;
+                }
+            }
+        }
+        if (!ok) {
+            logger.warn("book reset not matched {},{}", asset, symbol);
+        }
+    }
 }

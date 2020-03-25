@@ -76,7 +76,7 @@ public class PcOrderBookResetTask extends PcOrderBaseTask implements ITask {
                         DecimalUtil.toTrimLiteral(minAskPrice),
                         context.lastBookResetTimeInMs, now
                 );
-                if (maxBidPrice.compareTo(minAskPrice) >= 0) {
+                if (null != maxBidLimit && null != minAskPrice && maxBidPrice.compareTo(minAskPrice) >= 0) {
                     logger.error("bid ask price cross:maxBidPrice:{},minAskPrice:{}",
                             DecimalUtil.toTrimLiteral(maxBidPrice),
                             DecimalUtil.toTrimLiteral(minAskPrice));
