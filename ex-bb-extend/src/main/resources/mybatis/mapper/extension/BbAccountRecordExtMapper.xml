@@ -80,6 +80,19 @@
         <include refid="simple_where"/>
     </select>
 
+    <select id="queryByIds" resultType="com.hp.sh.expv3.bb.extension.vo.BbAccountRecordVo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM bb_account_record
+        <where>
+            <if test="idList!=null"> id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+        </where>
+
+    </select>
 
 
 </mapper>

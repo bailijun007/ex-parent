@@ -4,17 +4,20 @@ import com.hp.sh.expv3.bb.extension.constant.BbAccountLogConst;
 import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbAccountLogExtService;
+import com.hp.sh.expv3.bb.extension.service.BbAccountRecordExtService;
+import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountLogExtVo;
+import com.hp.sh.expv3.bb.extension.vo.BbAccountRecordVo;
+import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +28,12 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
 
     @Autowired
     private BbAccountLogExtService bbAccountLogExtService;
+
+    @Autowired
+    private BbOrderExtService bbOrderExtService;
+
+    @Autowired
+    private BbAccountRecordExtService bbAccountRecordExtService;
 
     @Override
     public List<BbAccountLogExtVo> query(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Integer lastId, Integer pageSize) {
@@ -41,25 +50,19 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
             //买入
             if (map.containsKey(BbAccountLogConst.TYPE_BUY_IN)) {
                 List<BbAccountLogExtVo> logExtVoList = map.getOrDefault(BbAccountLogConst.TYPE_BUY_IN, Collections.emptyList());
-                //refIds 其他关联表的主键集合
-                List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
-                this.appendBuyInData(asset, symbol, userId, refIds);
+                this.appendBuyInOrSellOutData(logExtVoList);
                 list.addAll(logExtVoList);
             }
             //卖出
             if (map.containsKey(BbAccountLogConst.TYPE_SELL_OUT)) {
                 List<BbAccountLogExtVo> logExtVoList = map.getOrDefault(BbAccountLogConst.TYPE_SELL_OUT, Collections.emptyList());
-                //refIds 其他关联表的主键集合
-                List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
-                this.appendSellOutData(asset, symbol, userId, refIds);
+                this.appendBuyInOrSellOutData(logExtVoList);
                 list.addAll(logExtVoList);
             }
             //转出至资金账户
             if (map.containsKey(BbAccountLogConst.CHANGE_OUT_FUND_ACCOUNT)) {
                 List<BbAccountLogExtVo> logExtVoList = map.getOrDefault(BbAccountLogConst.CHANGE_OUT_FUND_ACCOUNT, Collections.emptyList());
-                //refIds 其他关联表的主键集合
-                List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
-                this.appendChangeToFundAcountData(asset, symbol, userId, refIds);
+                this.appendChangeToFundAcountData(logExtVoList);
                 list.addAll(logExtVoList);
             }
             //转出至合约账户
@@ -103,7 +106,22 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
 
     }
 
-    private void appendChangeToFundAcountData(String asset, String symbol, Long userId, List<Long> refIds) {
+    private void appendChangeToFundAcountData(List<BbAccountLogExtVo> logExtVoList) {
+        //refIds bb_account_record表的主键集合
+        List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
+        List<BbAccountRecordVo> recordVos = bbAccountRecordExtService.queryByIds(refIds);
+        if (!CollectionUtils.isEmpty(recordVos)) {
+            Map<Long, BbAccountRecordVo> id2Vo = recordVos.stream().collect(Collectors.toMap(BbAccountRecordVo::getId, Function.identity()));
+            for (BbAccountLogExtVo bbAccountLogExtVo : logExtVoList) {
+                BbAccountRecordVo recordVo = id2Vo.get(bbAccountLogExtVo.getRefId());
+                Optional<BbAccountRecordVo> recordOptional = Optional.ofNullable(recordVo);
+                bbAccountLogExtVo.setVolume(recordOptional.map(BbAccountRecordVo::getAmount).orElse(BigDecimal.ZERO));
+                bbAccountLogExtVo.setBalance(recordOptional.map(BbAccountRecordVo::getBalance).orElse(BigDecimal.ZERO));
+                bbAccountLogExtVo.setFee(BigDecimal.ZERO);
+            }
+
+        }
+
 
     }
 
@@ -111,8 +129,19 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
 
     }
 
-    private void appendBuyInData(String asset, String symbol, Long userId, List<Long> refIds) {
-
+    private void appendBuyInOrSellOutData(List<BbAccountLogExtVo> logExtVoList) {
+        //refIds order表的主键集合
+        List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
+        List<BbOrderVo> bbOrderVos = bbOrderExtService.queryByIds(refIds);
+        if (!CollectionUtils.isEmpty(bbOrderVos)) {
+            Map<Long, BbOrderVo> id2Vo = bbOrderVos.stream().collect(Collectors.toMap(BbOrderVo::getId, Function.identity()));
+            for (BbAccountLogExtVo bbAccountLogExtVo : logExtVoList) {
+                BbOrderVo bbOrderVo = id2Vo.get(bbAccountLogExtVo.getRefId());
+                Optional<BbOrderVo> bbOrderOptional = Optional.ofNullable(bbOrderVo);
+                bbAccountLogExtVo.setFee(bbOrderOptional.map(BbOrderVo::getFeeCost).orElse(BigDecimal.ZERO));
+                bbAccountLogExtVo.setVolume(bbOrderOptional.map(BbOrderVo::getVolume).orElse(BigDecimal.ZERO));
+            }
+        }
     }
 
     private void checkParam(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Long startDate,

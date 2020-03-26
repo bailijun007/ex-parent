@@ -41,4 +41,10 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
         pageResult.setRowTotal(info.getTotal());
          return pageResult;
     }
+
+    @Override
+    public List<BbAccountRecordVo> queryByIds(List<Long> refIds) {
+        return bbAccountRecordExtMapper.queryByIds(refIds);
+
+    }
 }
