@@ -141,13 +141,13 @@
                     and id>#{id}
                 </if>
                 <if test="tradeTimeBegin!=null">
-                    and  unix_timestamp(b.trade_time)&gt;=unix_timestamp(#{tradeTimeBegin})
+                    and  b.trade_time &gt;=#{tradeTimeBegin}
                 </if>
                 <if test="tradeTimeEnd!=null">
-                    and  unix_timestamp(b.trade_time)&lt;=unix_timestamp(#{tradeTimeEnd})
+                    and  b.trade_time &lt;=#{tradeTimeEnd}
                 </if>
             </where>
-            ORDER BY b.id ASC
+            ORDER BY b.trade_time ASC
             limit 0,10000
     </select>
 
