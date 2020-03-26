@@ -52,6 +52,7 @@ public interface BbOrderTradeExtApi {
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
             @ApiImplicitParam(name = "userId ", value = "用户id", required = true),
+            @ApiImplicitParam(name = "id ", value = "id", required = false),
             @ApiImplicitParam(name = "startTime ", value = "开始时间", required = false),
             @ApiImplicitParam(name = "endTime ", value = "结束时间", required = false)
     })
@@ -59,6 +60,7 @@ public interface BbOrderTradeExtApi {
             @RequestParam(value = "asset", required = true) String asset,
             @RequestParam(value = "symbol", required = true) String symbol,
             @RequestParam(value = "userId", required = true) Long userId,
+            @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "startTime", required = false) Long startTime,
             @RequestParam(value = "endTime", required = false) Long endTime
     );

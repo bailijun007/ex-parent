@@ -90,7 +90,7 @@ public class PcTradeService {
 		PcOrder order = this.orderQueryService.getOrder(trade.getAccountId(), trade.getOrderId());
 		boolean yes = this.canTrade(order, trade);
 		if(!yes){
-			logger.error("成交已处理过了,trade={}", trade);
+			logger.warn("成交已处理过了,trade={}", trade);
 			return;
 		}
 		

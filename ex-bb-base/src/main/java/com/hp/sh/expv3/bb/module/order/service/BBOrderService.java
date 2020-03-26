@@ -105,10 +105,10 @@ public class BBOrderService {
 		BBSymbol bs = new BBSymbol(symbol, bidFlag);
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
 			String remark = BigFormat.format("买,押金=%s%s，手续费=%s%s", order.getOrderMargin(), bs.getMarginCurrency(), order.getFee(), asset);
-			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getGrossMargin(), remark);
+			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getGrossMargin(), BBAccountTradeType.ORDER_BUY, remark);
 		}else{
 			String remark = BigFormat.format("卖,押金=%s%s，手续费=%s%s", order.getVolume(), bs.getMarginCurrency(), "无", "");
-			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getVolume(), remark);
+			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getVolume(), BBAccountTradeType.ORDER_SELL, remark);
 		}
 		
 		return order;
@@ -137,13 +137,13 @@ public class BBOrderService {
 		bBOrder.setCancelVolume(BigDecimal.ZERO);
 	}
 	
-	private void cutMargin(Long userId, String asset, Long orderId, BigDecimal amount, String remark){
+	private void cutMargin(Long userId, String asset, Long orderId, BigDecimal amount , int tradeType, String remark){
 		BBCutRequest request = new BBCutRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
 		request.setRemark("币币委托:"+remark);
 		request.setTradeNo(SnUtils.getOrderPaySn(""+orderId));
-		request.setTradeType(BBAccountTradeType.ORDER);
+		request.setTradeType(tradeType);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
 		this.bBAccountCoreService.cut(request);

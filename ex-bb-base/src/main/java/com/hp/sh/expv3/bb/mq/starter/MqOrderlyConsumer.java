@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.component.MetadataService;
 import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 import com.hp.sh.expv3.bb.constant.MqTopic;
@@ -46,7 +47,7 @@ public class MqOrderlyConsumer {
 	@Autowired
 	private EndpointContext endpointContext;
 	
-	@Value("${bb.mq.consumer.bbGroupId:1}")
+	@Value("${bb.mq.consumer.groupId:1}")
 	private Integer bbGroupId;
 	
 	private Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
@@ -82,6 +83,10 @@ public class MqOrderlyConsumer {
         			Throwable cause = ExceptionUtils.getRootCause(e);
         			logger.error(e.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
+        		}catch(UpdateException e){
+        			Throwable cause = ExceptionUtils.getRootCause(e);
+        			logger.warn(cause.toString(), cause);
+        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
         			logger.error("未知捕获"+cause.getMessage(), e);
@@ -101,12 +106,14 @@ public class MqOrderlyConsumer {
 	public void start123() throws MQClientException{
 		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
 
-		logger.info("更新MQ监听,{}", pcList.size());
+		logger.debug("更新MQ监听,{},{},{}", pcList.size(), this.bbGroupId, this.setting.getInstanceName());
 		
 		Map<String, BBSymbolVO> symbolMap = new HashMap<String, BBSymbolVO>();
 		for(BBSymbolVO bbvo : pcList){
-			String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
-			symbolMap.put(topic, bbvo);
+			if(bbvo.getBbGroupId().equals(this.bbGroupId)){
+				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
+				symbolMap.put(topic, bbvo);
+			}
 		}
 		
 		for(String topic : new ArrayList<String>(this.mqMap.keySet())){
@@ -123,12 +130,18 @@ public class MqOrderlyConsumer {
 			String topic = entry.getKey();
 			BBSymbolVO symbolVO = entry.getValue();
 			if(!mqMap.containsKey(topic)){
-				logger.info("启动监听MQConsumer. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
-				DefaultMQPushConsumer mq = this.buildConsumer(topic);
-				this.mqMap.put(topic, mq);
+				if(symbolVO.getBbGroupId().equals(this.bbGroupId)){
+					logger.info("启动监听MQConsumer. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
+					DefaultMQPushConsumer mq = this.buildConsumer(topic);
+					this.mqMap.put(topic, mq);
+				}
 			}
 		}
 
+		int n = this.mqMap.size();
+		logger.debug("mq:{},{}", n, this.mqMap);
+		return;
+		
 	}
 	
 

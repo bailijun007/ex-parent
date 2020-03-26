@@ -67,7 +67,7 @@ public class BBTradeService {
 		BBOrder order = this.orderQueryService.getOrder(trade.getAccountId(), trade.getOrderId());
 		boolean yes = this.canTrade(order, trade);
 		if(!yes){
-			logger.error("成交已处理过了,trade={}", trade);
+			logger.warn("成交已处理过了,trade={}", trade);
 			return;
 		}
 		
@@ -84,12 +84,12 @@ public class BBTradeService {
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
 			BigDecimal income = orderTrade.getVolume();
 			String remark = BigFormat.format("购买成交获得：%s", income);
-			this.addBalance(orderTrade.getUserId(), orderTrade.getId(), bs.getIncomeCurrency(), income, remark);
+			this.addBalance(orderTrade.getUserId(), orderTrade.getId(), bs.getIncomeCurrency(), income, BBAccountTradeType.TRADE_BUY_IN, remark);
 		}else{
 			BigDecimal amount = orderTrade.getVolume().multiply(orderTrade.getPrice());
 			BigDecimal income = amount.subtract(orderTrade.getFee());
 			String remark = BigFormat.format("销售成交收入：%s，手续费-%s", amount, orderTrade.getFee());
-			this.addBalance(orderTrade.getUserId(), orderTrade.getId(), bs.getIncomeCurrency(), income, remark);
+			this.addBalance(orderTrade.getUserId(), orderTrade.getId(), bs.getIncomeCurrency(), income, BBAccountTradeType.TRADE_SELL_INCOME, remark);
 		}
 		
 		//修改订单状态
@@ -112,23 +112,19 @@ public class BBTradeService {
 		request.setAsset(asset);
 		request.setRemark(BigFormat.format("剩余押金：%s，剩余手续费：%s", remainOrderMargin, remainFee));
 		request.setTradeNo(SnUtils.getRemainSn(orderId));
-		request.setTradeType(BBAccountTradeType.INCOME);
+		request.setTradeType(BBAccountTradeType.RETURN_ORDER_MARGIN);
 		request.setAssociatedId(orderId);
 		this.accountCoreService.add(request);
 	}
 
-	private int getLogType(int bidFlag){
-		return bidFlag;
-	}
-	
-	private void addBalance(Long userId, Long orderTradeId, String asset, BigDecimal amount, String remark) {
+	private void addBalance(Long userId, Long orderTradeId, String asset, BigDecimal amount, int tradeType, String remark) {
 		BBAddRequest request = new BBAddRequest();
 		request.setAmount(amount);
 		request.setUserId(userId);
 		request.setAsset(asset);
 		request.setRemark(remark);
 		request.setTradeNo(SnUtils.getIncomeSn(orderTradeId));
-		request.setTradeType(BBAccountTradeType.INCOME);
+		request.setTradeType(tradeType);
 		request.setAssociatedId(orderTradeId);
 		this.accountCoreService.add(request);
 	}
@@ -196,8 +192,6 @@ public class BBTradeService {
 		orderTrade.setFeeSynchStatus(IntBool.NO);
 		
 		this.orderTradeDAO.save(orderTrade);
-		
-		orderTrade.setLogType(this.getLogType(order.getBidFlag()));
 		
 		publisher.publishEvent(orderTrade);
 		

@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.mq;
+package com.hp.sh.expv3.pc.mq.starter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,13 +47,14 @@ public class OrderlyConsumer {
 	@Autowired
 	private EndpointContext endpointContext;
 	
-	@Value("${pc.mq.consumer.contractGroup:1}")
-	private Integer contractGroup;
+	@Value("${pc.mq.consumer.groupId:1}")
+	private Integer contractGroupId;
 
 	private Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
 	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic);
+//        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic, null, new PcAllocateMessageQueueStrategy());
         
         consumer.setNamesrvAddr(setting.getNamesrvAddr());
         consumer.setNamespace(setting.getNamespace());
@@ -107,12 +108,14 @@ public class OrderlyConsumer {
 	public void start123() throws MQClientException{
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 
-		logger.info("更新MQ监听,{}", pcList.size());
+		logger.debug("更新MQ监听,{},{},{}", pcList.size(), this.contractGroupId, this.setting.getInstanceName());
 		
 		Map<String, PcContractVO> symbolMap = new HashMap<String, PcContractVO>();
 		for(PcContractVO bbvo : pcList){
-			String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
-			symbolMap.put(topic, bbvo);
+			if(bbvo.getContractGroup().equals(contractGroupId)){
+				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
+				symbolMap.put(topic, bbvo);
+			}
 		}
 		
 		for(String topic : new ArrayList<String>(this.mqMap.keySet())){
@@ -135,6 +138,9 @@ public class OrderlyConsumer {
 			}
 		}
 
+		int n = this.mqMap.size();
+		logger.debug("mq:{},{}", n, this.mqMap);
+		return;
 	}
 
 }

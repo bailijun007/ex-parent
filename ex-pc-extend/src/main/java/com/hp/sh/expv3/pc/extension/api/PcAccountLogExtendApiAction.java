@@ -173,7 +173,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         if (ExtCommonConstant.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
-            if (startDate == null && endDate == null) {
+            if (startDate == null || endDate == null) {
                 throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
             }
         }
@@ -258,7 +258,6 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
     private void appendTransferMarginData(BigDecimal faceValue, String asset, String symbol, Long userId,
                                           List<PcAccountRecordLogVo> recordLogVos) {
         List<Long> refIds = recordLogVos.stream().map(PcAccountRecordLogVo::getRefId).collect(Collectors.toList());
-        // TODO xb，这里有风险：资金转入转出没问题，但是保证金是和symbol相关的，这里没有用到
         List<PcAccountRecordVo> pcLiqRecordVo = pcAccountRecordExtendService.listPcAccountRecord(refIds, asset, userId);
         if (null != pcLiqRecordVo) {
              Map<Long, PcAccountRecordVo> id2Vo = pcLiqRecordVo.stream()

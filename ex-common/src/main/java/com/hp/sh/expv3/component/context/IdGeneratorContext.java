@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.component.id.ZwIdGenerator;
 
 @Component
-public class ContextUtils implements ApplicationContextAware{
+public class IdGeneratorContext implements ApplicationContextAware{
 	private ApplicationContext ctx;
 	
 	private static ZwIdGenerator idGenerator;
@@ -21,7 +21,7 @@ public class ContextUtils implements ApplicationContextAware{
 	
 	@Autowired(required=false)
 	public void setIdGenerator(ZwIdGenerator idGenerator) {
-		ContextUtils.idGenerator = idGenerator;
+		IdGeneratorContext.idGenerator = idGenerator;
 	}
 
 	public static long getSnowIdTime(String className, Long id){

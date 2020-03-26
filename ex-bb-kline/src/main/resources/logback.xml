@@ -2,25 +2,25 @@
 <!-- if use spring,scan should be false see: https://docs.spring.io/spring-boot/docs/2.2.3.BUILD-SNAPSHOT/reference/html/spring-boot-features.html#boot-features-logback-extensions -->
 <configuration scan="false">
     <property name="maxHistory" value="60"/>
-    
+
     <property name="log_dir" value="/data/hupa/logs/bbkline"></property>
 
     <!-- ConsoleAppender 控制台输出日志 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- 对日志进行格式化 -->
-		<encoder>
-			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
-		</encoder>
+        <encoder>
+            <pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
+        </encoder>
     </appender>
 
     <!-- ERROR级别日志 -->
     <!-- 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 RollingFileAppender-->
     <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
-			<level>ERROR</level>  
-			<onMatch>ACCEPT</onMatch>  
-			<onMismatch>DENY</onMismatch>  
-		</filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
         <file>${log_dir}/error-log.log</file>
         <!-- 最常用的滚动策略，它根据时间来制定滚动策略.既负责滚动也负责出发滚动 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -35,18 +35,18 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
 
-		<encoder>
-			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
-		</encoder>
+        <encoder>
+            <pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
+        </encoder>
     </appender>
 
     <!-- WARN级别日志 appender -->
     <appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
-			<level>WARN</level>  
-			<onMatch>ACCEPT</onMatch>  
-			<onMismatch>DENY</onMismatch>  
-		</filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
         <file>${log_dir}/warn-log.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
@@ -58,9 +58,9 @@
                 <maxFileSize>256MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
-		<encoder>
-			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
-		</encoder>
+        <encoder>
+            <pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
+        </encoder>
     </appender>
 
     <!-- INFO级别日志 appender -->
@@ -80,19 +80,19 @@
                 <maxFileSize>256MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
-		<encoder>
-			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
-		</encoder>
+        <encoder>
+            <pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
+        </encoder>
     </appender>
 
     <!-- DEBUG级别日志 appender -->
     <appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- 过滤器，只记录DEBUG级别的日志 -->
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">  
-			<level>DEBUG</level>  
-			<onMatch>ACCEPT</onMatch>  
-			<onMismatch>DENY</onMismatch>  
-		</filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
         <file>${log_dir}/debug-log.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
@@ -104,9 +104,9 @@
                 <maxFileSize>256MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
-		<encoder>
-			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
-		</encoder>
+        <encoder>
+            <pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
+        </encoder>
     </appender>
 
     <!-- DEBUG级别日志 appender -->
@@ -122,11 +122,11 @@
                 <maxFileSize>256MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
-		<encoder>
-			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
-		</encoder>
+        <encoder>
+            <pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
+        </encoder>
     </appender>
-    
+
     <!-- 
     <logger name="com.hp.sh.expv3.bb.kline.mq" level="info" additivity="false">
         <appender-ref ref="mq"/>
@@ -136,50 +136,50 @@
         <appender-ref ref="mq"/>
     </logger>
  	-->
- 
-	<root level="info">
-		<appender-ref ref="STDOUT" />
-	</root>
-	
-	<logger name="springfox.documentation.spring" level="warn"></logger>
-	
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <logger name="springfox.documentation.spring" level="warn"></logger>
+
     <springProfile name="prod">
         <root level="INFO">
-	        <appender-ref ref="ERROR"/>
-	        <appender-ref ref="WARN"/>
-	        <appender-ref ref="INFO"/>
-	        <appender-ref ref="DEBUG"/>
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
         </root>
     </springProfile>
-    
+
     <springProfile name="dev">
         <root level="INFO">
-	        <!-- 控制台输出 -->
-	        <appender-ref ref="STDOUT"/>
-	        <!-- 文件输出 -->
-	        <appender-ref ref="ERROR"/>
-	        <appender-ref ref="WARN"/>
-	        <appender-ref ref="INFO"/>
-	        <appender-ref ref="DEBUG"/>
+            <!-- 控制台输出 -->
+            <appender-ref ref="STDOUT"/>
+            <!-- 文件输出 -->
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
         </root>
-        
-		<logger name="com.hp.sh.expv3" level="info"></logger>
-		<logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
-        
+
+        <logger name="com.hp.sh.expv3" level="info"></logger>
+        <logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
+
     </springProfile>
-    
+
     <springProfile name="local">
         <root level="INFO">
-	        <!-- 控制台输出 -->
-	        <appender-ref ref="STDOUT"/>
-	        <!-- 文件输出 -->
-	        <appender-ref ref="ERROR"/>
+            <!-- 控制台输出 -->
+            <appender-ref ref="STDOUT"/>
+            <!-- 文件输出 -->
+            <appender-ref ref="ERROR"/>
         </root>
-        
-		<logger name="com.hp.sh.expv3" level="debug"></logger>
-		<logger name="com.gitee.hupadev.base.spring.interceptor" level="info"></logger>
-        
+
+        <logger name="com.hp.sh.expv3" level="debug"></logger>
+        <logger name="com.gitee.hupadev.base.spring.interceptor" level="info"></logger>
+
     </springProfile>
-    
+
 
 </configuration>

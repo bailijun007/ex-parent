@@ -156,6 +156,17 @@
         </where>
     </select>
 
+    <select id="queryByIds" resultType="com.hp.sh.expv3.bb.extension.vo.BbOrderVo">
+      select   <include refid="Base_Column_List"/>   from bb_order
+      <where>
+          <if test="idList!=null"> id in
+              <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                  #{idList[${i}]}
+              </foreach>
+          </if>
+      </where>
+    </select>
+
     <select id="queryOrderList" resultMap="BbOrderVo">
         select
         <include refid="Base_Column_List"/>

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
-import com.hp.sh.expv3.bb.module.collector.entity.BBCollectorAccount;
 import com.hp.sh.expv3.bb.module.collector.entity.BBCollectorAccountRecord;
 import com.hp.sh.expv3.bb.module.log.entity.BBAccountLog;
 import com.hp.sh.expv3.bb.module.order.entity.BBActiveOrder;

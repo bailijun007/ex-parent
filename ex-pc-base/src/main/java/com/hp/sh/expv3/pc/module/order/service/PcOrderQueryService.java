@@ -73,9 +73,9 @@ public class PcOrderQueryService {
 		return count>0;
 	}
 	
-	public List<ActiveOrderVo> queryUserActiveList(long userId, String asset, String symbol){
+	public List<ActiveOrderVo> queryUserActiveList(Page page, long userId, String asset, String symbol, Long startId){
 		List<ActiveOrderVo> result = new ArrayList<ActiveOrderVo>();
-		List<PcOrder> list = this.pcOrderDAO.queryUserActiveOrderList(userId, asset, symbol, null, IntBool.NO);
+		List<PcOrder> list = this.pcOrderDAO.queryUserActiveOrderList(page, userId, asset, symbol, null, IntBool.NO, startId);
 		
 		if(list==null||list.isEmpty()){
 			return Collections.emptyList();
@@ -95,6 +95,7 @@ public class PcOrderQueryService {
 			activeOrderVo.setCloseFlag(order.getCloseFlag());
 			activeOrderVo.setLongFlag(order.getLongFlag());
 			activeOrderVo.setLeverage(order.getLeverage());
+			activeOrderVo.setVolume(order.getVolume());
 			activeOrderVo.setFilledVolume(order.getFilledVolume());
 			activeOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
 			
@@ -106,6 +107,9 @@ public class PcOrderQueryService {
 			activeOrderVo.setOrderMargin(order.getOrderMargin());
 			activeOrderVo.setFeeCost(order.getFeeCost());
 			activeOrderVo.setStatus(order.getStatus());
+			
+			activeOrderVo.setOrderType(order.getOrderType());
+			activeOrderVo.setClientOrderId(order.getClientOrderId());
 			
 			result.add(activeOrderVo);
 		}

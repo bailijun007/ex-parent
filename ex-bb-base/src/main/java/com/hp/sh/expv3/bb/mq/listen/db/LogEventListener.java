@@ -12,6 +12,7 @@ import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
 import com.hp.sh.expv3.bb.module.log.entity.BBAccountLog;
 import com.hp.sh.expv3.bb.module.log.service.BBAccountLogService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
+import com.hp.sh.expv3.utils.IntBool;
 
 /**
  * 发送事件消息
@@ -27,7 +28,7 @@ public class LogEventListener {
 	
 	@TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
 	public void afterCommit(BBAccountRecord bBAccountRecord) {
-		Integer type = this.getType(bBAccountRecord.getTradeType());
+		Integer type = this.getlogType(bBAccountRecord);
 		if(type==null){
 			return;
 		}
@@ -49,19 +50,26 @@ public class LogEventListener {
 		logMsg.setAsset(orderTrade.getAsset());
 		logMsg.setSymbol(orderTrade.getSymbol());
 		logMsg.setTime(orderTrade.getCreated());
-		logMsg.setType(orderTrade.getLogType());
+		logMsg.setType(this.getLogType(orderTrade));
 		logMsg.setRefId(orderTrade.getId());
 		
 		this.sendEventMsg(logMsg);
 	}
 
-	private Integer getType(int tradeType) {
-		if(tradeType==BBAccountTradeType.FUND_TO_BB){
-			return LogType.TYPE_ACCOUNT_FUND_TO_BB;
+	private Integer getLogType(BBOrderTrade orderTrade) {
+		if(IntBool.isTrue(orderTrade.getBidFlag())){
+			return LogType.TRADE_BUY_IN;
+		}else{
+			return LogType.TRADE_SELL_OUT;
 		}
-		if(tradeType==BBAccountTradeType.BB_TO_FUND){
-			return LogType.TYPE_ACCOUNT_BB_TO_FUND;
-		}
+	}
+
+	private Integer getlogType(BBAccountRecord bBAccountRecord) {
+		int tradeType = bBAccountRecord.getTradeType();
+		if(tradeType==BBAccountTradeType.ACCOUNT_FUND_TO_BB){return LogType.ACCOUNT_FUND_TO_BB;}
+		if(tradeType==BBAccountTradeType.ACCOUNT_BB_TO_FUND){return LogType.ACCOUNT_BB_TO_FUND;}
+		if(tradeType==BBAccountTradeType.ACCOUNT_PC_TO_BB){return LogType.ACCOUNT_PC_TO_BB;}
+		if(tradeType==BBAccountTradeType.ACCOUNT_BB_TO_PC){return LogType.ACCOUNT_BB_TO_PC;}
 		return null;
 	}
 

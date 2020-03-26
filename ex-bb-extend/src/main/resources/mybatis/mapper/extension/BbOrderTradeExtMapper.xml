@@ -92,7 +92,7 @@
         from bb_order_trade
         where asset=#{asset}
         and symbol=#{symbol}
-        and tradeTime &lt;#{tradeTime}
+        and tradeTime &lt; #{tradeTime}
         order by trade_time desc
         limit 0,1
     </select>
@@ -129,6 +129,20 @@
         ORDER BY id ASC
     </select>
 
+    <select id="queryByIds" resultType="com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_order_trade
+        <where>
+            <if test="idList!=null">
+                 id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
     <select id="selectTradeListByUserId" resultType="com.hp.sh.expv3.bb.extension.vo.BbUserOrderTrade">
             select
             id ,asset,symbol,user_id  tkAccountId,price,volume number,trade_time tradeTime,created,modified
@@ -137,15 +151,18 @@
                 b.asset=#{asset}
                 and b.symbol=#{symbol}
                 and b.user_id=#{userId}
+                <if test="id!=null">
+                    and id>#{id}
+                </if>
                 <if test="tradeTimeBegin!=null">
-                    and b.trade_time &gt;=#{tradeTimeBegin}
+                    and  b.trade_time &gt;=#{tradeTimeBegin}
                 </if>
                 <if test="tradeTimeEnd!=null">
-                    and b.trade_time &lt;#{tradeTimeEnd}
+                    and  b.trade_time &lt;=#{tradeTimeEnd}
                 </if>
             </where>
-            ORDER BY b.id ASC
-
+            ORDER BY b.trade_time ASC
+            limit 0,10000
     </select>
 
     <select id="queryOrderTrade" resultMap="BBOrderTrade">

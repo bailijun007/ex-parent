@@ -149,5 +149,12 @@ public class PcAccountRecord extends BaseRecordEntity	 {
 				+ tradeNo + ", tradeType=" + tradeType + ", remark=" + remark + ", userId=" + this.getUserId()
 				+ "]";
 	}
+
+	@Override
+	public String toString() {
+		return "PcAccountRecord [asset=" + asset + ", sn=" + sn + ", type=" + type + ", amount=" + amount + ", remark="
+				+ remark + ", balance=" + balance + ", tradeNo=" + tradeNo + ", tradeType=" + tradeType + ", serialNo="
+				+ serialNo + ", associatedId=" + associatedId + ", txId=" + txId + "]";
+	}
 	
 }

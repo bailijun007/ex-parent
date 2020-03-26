@@ -39,23 +39,23 @@ public class SnUtils {
 	
 	//Synch
 	public static String getSynchAddSn(String sn){
-		return "A-"+sn;
+		return "A"+sn;
 	}
 
 	public static String getSynchCutSn(String sn){
-		return "C-"+sn;
+		return "C"+sn;
 	}
 
 	public static String getSynchReturnSn(String sn){
-		return "R-"+sn;
+		return "R"+sn;
 	}
 	
 	//order
 	public static String getOrderPaySn(String sn){
-		return "O-"+sn;
+		return "O"+sn;
 	}
 	public static String getCancelOrderReturnSn(String sn){
-		return "CO-"+sn;
+		return "CO"+sn;
 	}
 
 	static String newTimeSn(){

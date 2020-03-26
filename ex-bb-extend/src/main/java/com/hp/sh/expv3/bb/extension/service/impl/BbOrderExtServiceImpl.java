@@ -174,4 +174,10 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         return result;
 
     }
+
+    @Override
+    public List<BbOrderVo> queryByIds(List<Long> refIds) {
+
+        return bbOrderExtMapper.queryByIds(refIds);
+    }
 }

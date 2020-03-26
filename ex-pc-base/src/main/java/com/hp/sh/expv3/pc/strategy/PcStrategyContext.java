@@ -300,14 +300,8 @@ public class PcStrategyContext {
 	 * 计算仓位保证金率
 	 */
 	public BigDecimal calPosMarginRatio(PosData pos, BigDecimal floatingPnl){
-		HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
 		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
-		return holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), pos.getFaceValue(), pos.getVolume(), floatingPnl, markPrice);
-	}
-	
-	public BigDecimal calcBankruptPrice(PosBaseData calcParam){
-		HoldPosStrategy hs = this.getHoldPosStrategy(calcParam.getAsset(), calcParam.getSymbol());
-		return hs.calcBankruptPrice(calcParam.getLongFlag(), calcParam.getVolume(), calcParam.getFaceValue(), calcParam.getPosMargin(), calcParam.getMeanPrice());
+		return this.calPosMarginRatio(pos, floatingPnl, markPrice);
 	}
 	
 	public BigDecimal calPosMarginRatio(PosData pos, BigDecimal posPnl, BigDecimal markPrice) {
@@ -315,6 +309,11 @@ public class PcStrategyContext {
 		 return holdPosStrategy.calPosMarginRatio(pos.getPosMargin(), pos.getFaceValue(), pos.getVolume(), posPnl, markPrice);
 	}
 
+	public BigDecimal calcBankruptPrice(PosBaseData calcParam){
+		HoldPosStrategy hs = this.getHoldPosStrategy(calcParam.getAsset(), calcParam.getSymbol());
+		return hs.calcBankruptPrice(calcParam.getLongFlag(), calcParam.getVolume(), calcParam.getFaceValue(), calcParam.getPosMargin(), calcParam.getMeanPrice());
+	}
+	
 	int ____________________________;
 	
 	@Deprecated

@@ -297,9 +297,9 @@ public class PcOrderService {
 		
 		BigDecimal amount = orderMargin.add(openFee).add(closeFee);
 		
-		if(BigUtils.ltZero(amount)){
-			logger.error("剩余保证金小于0,{}", orderMargin);
-			return InvokeResult.NOCHANGE;
+		if(BigUtils.leZero(amount)){
+			logger.error("剩余保证金<=0,{},{}", orderMargin, orderId);
+			return InvokeResult.SUCCESS;
 		}
 		
 		PcAddRequest request = new PcAddRequest();
@@ -339,7 +339,7 @@ public class PcOrderService {
 		PcOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
 		if(order.getStatus()!=OrderStatus.PENDING_NEW){
-			logger.error("NEW状态错误，orderId={}", orderId);
+			logger.warn("NEW状态错误，orderId={}", orderId);
 			return ;
 		}
 

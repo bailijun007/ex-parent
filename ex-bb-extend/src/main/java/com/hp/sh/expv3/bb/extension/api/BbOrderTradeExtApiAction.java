@@ -50,7 +50,7 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
     }
 
     @Override
-    public List<BbUserOrderTrade> selectTradeListByUserId(String asset, String symbol, Long userId, Long startTime, Long endTime) {
+    public List<BbUserOrderTrade> selectTradeListByUserId(String asset, String symbol, Long userId, Long id,Long startTime, Long endTime) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null ) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
@@ -58,7 +58,7 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
         if (startTime == null && endTime == null) {
             endTime = Instant.now().toEpochMilli();
         }
-        List<BbUserOrderTrade> tradeVo = bbOrderTradeExtService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId);
+        List<BbUserOrderTrade> tradeVo = bbOrderTradeExtService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId,id);
         return tradeVo;
     }
 

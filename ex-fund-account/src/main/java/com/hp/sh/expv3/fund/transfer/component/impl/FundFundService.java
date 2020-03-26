@@ -39,7 +39,7 @@ public class FundFundService implements FundService{
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
 		request.setTradeNo(record.getSn());
-		request.setTradeType(TradeType.TRANSFER_IN);
+		request.setTradeType(TradeType.TRANSFER_OUT);
 		request.setUserId(record.getUserId());
 		fundAccountCoreApi.cut(request);
 	}
