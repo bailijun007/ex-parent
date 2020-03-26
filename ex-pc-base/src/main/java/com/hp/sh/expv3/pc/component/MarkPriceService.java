@@ -20,15 +20,5 @@ public interface MarkPriceService{
 	 * @return
 	 */
     public BigDecimal getCurrentMarkPrice(String asset, String symbol);
-    
-    /**
-     * 获取最新成交价
-     * @param asset
-     * @param symbol
-     * @return
-     */
-    default public BigDecimal getLatestPrice(String asset, String symbol){
-    	return getCurrentMarkPrice(asset, symbol);
-    }
 
 }

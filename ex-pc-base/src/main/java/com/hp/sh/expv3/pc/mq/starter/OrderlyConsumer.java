@@ -108,7 +108,7 @@ public class OrderlyConsumer {
 	public void start123() throws MQClientException{
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 
-		logger.debug("更新MQ监听,{},{},{}", pcList.size(), this.contractGroupId, this.setting.getInstanceName());
+		logger.debug("更新MQ监听,{},{},{},{}", pcList.size(), this.contractGroupId, this.setting.getInstanceName(), pcList);
 		
 		Map<String, PcContractVO> symbolMap = new HashMap<String, PcContractVO>();
 		for(PcContractVO bbvo : pcList){
