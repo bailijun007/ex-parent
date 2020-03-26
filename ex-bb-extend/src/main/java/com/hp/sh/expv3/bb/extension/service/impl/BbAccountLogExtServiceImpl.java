@@ -45,7 +45,6 @@ public class BbAccountLogExtServiceImpl implements BbAccountLogExtService {
         Map<String, Object> map = new HashMap<>();
         simpleMap(userId, asset, symbol, historyType, startDate, endDate, pageSize, map);
         map.put("lastId", lastId);
-        map.put("type", tradeType);
         List<BbAccountLogExtVo> list = null;
         if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
             list = bbAccountLogExtMapper.listBbAccountLogsByPage(map);
