@@ -68,8 +68,8 @@ public class LogEventListener {
 		int tradeType = bBAccountRecord.getTradeType();
 		if(tradeType==BBAccountTradeType.ACCOUNT_FUND_TO_BB){return LogType.ACCOUNT_FUND_TO_BB;}
 		if(tradeType==BBAccountTradeType.ACCOUNT_BB_TO_FUND){return LogType.ACCOUNT_BB_TO_FUND;}
-		if(tradeType==BBAccountTradeType.ACCOUNT_FUND_TO_PC){return LogType.ACCOUNT_FUND_TO_PC;}
-		if(tradeType==BBAccountTradeType.ACCOUNT_PC_TO_FUND){return LogType.ACCOUNT_PC_TO_FUND;}
+		if(tradeType==BBAccountTradeType.ACCOUNT_PC_TO_BB){return LogType.ACCOUNT_PC_TO_BB;}
+		if(tradeType==BBAccountTradeType.ACCOUNT_BB_TO_PC){return LogType.ACCOUNT_BB_TO_PC;}
 		return null;
 	}
 

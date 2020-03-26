@@ -15,9 +15,9 @@ public class BBAccountTradeType {
 	
 	public static final int ACCOUNT_BB_TO_FUND = 4;		//转出至资金账户
 	
-	public static final int ACCOUNT_FUND_TO_PC = 5;		//从永续合约转入,
+	public static final int ACCOUNT_PC_TO_BB = 5;		//从永续合约转入,
 	
-	public static final int ACCOUNT_PC_TO_FUND = 6;		//转出至永续合约
+	public static final int ACCOUNT_BB_TO_PC = 6;		//转出至永续合约
 	
 	public static final int ORDER_CANCEL = 7;			//+撤单（退回押金）
 	
