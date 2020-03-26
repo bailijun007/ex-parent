@@ -39,8 +39,8 @@ public class BbOrderTradeExtServiceImpl implements BbOrderTradeExtService {
     }
 
     @Override
-    public List<BbUserOrderTrade> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId) {
-        List<BbUserOrderTrade> list = bbOrderTradeExtMapper.selectTradeListByUserId(asset,symbol,startTime,endTime,userId);
+    public List<BbUserOrderTrade> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId, Long id) {
+        List<BbUserOrderTrade> list = bbOrderTradeExtMapper.selectTradeListByUserId(asset,symbol,startTime,endTime,userId,id);
         return list;
     }
 

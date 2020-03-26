@@ -25,7 +25,7 @@ public class BbAccountLogExtVo implements Serializable {
     private Integer tradeType;
 
     @ApiModelProperty("数量")
-    private BigDecimal number;
+    private BigDecimal volume;
 
     @ApiModelProperty("余额")
     private BigDecimal balance;
@@ -39,6 +39,9 @@ public class BbAccountLogExtVo implements Serializable {
     @ApiModelProperty("时间")
     private  Long time;
 
+    @ApiModelProperty("创建时间")
+    private  Long ctime;
+
     @Override
     public String toString() {
         return "BbAccountLogExtVo{" +
@@ -47,12 +50,20 @@ public class BbAccountLogExtVo implements Serializable {
                 ", asset='" + asset + '\'' +
                 ", tradeTime=" + tradeTime +
                 ", tradeType=" + tradeType +
-                ", number=" + number +
+                ", volume=" + volume +
                 ", balance=" + balance +
                 ", fee=" + fee +
                 ", refId=" + refId +
                 ", time=" + time +
                 '}';
+    }
+
+    public Long getCtime() {
+        return ctime;
+    }
+
+    public void setCtime(Long ctime) {
+        this.ctime = ctime;
     }
 
     public Long getId() {
@@ -98,12 +109,12 @@ public class BbAccountLogExtVo implements Serializable {
         this.tradeType = tradeType;
     }
 
-    public BigDecimal getNumber() {
-        return number;
+    public BigDecimal getVolume() {
+        return volume;
     }
 
-    public void setNumber(BigDecimal number) {
-        this.number = number;
+    public void setVolume(BigDecimal volume) {
+        this.volume = volume;
     }
 
     public BigDecimal getBalance() {

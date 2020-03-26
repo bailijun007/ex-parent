@@ -137,15 +137,18 @@
                 b.asset=#{asset}
                 and b.symbol=#{symbol}
                 and b.user_id=#{userId}
+                <if test="id!=null">
+                    and id>#{id}
+                </if>
                 <if test="tradeTimeBegin!=null">
-                    and b.trade_time &gt;=#{tradeTimeBegin}
+                    and  unix_timestamp(b.trade_time)&gt;=unix_timestamp(#{tradeTimeBegin})
                 </if>
                 <if test="tradeTimeEnd!=null">
-                    and b.trade_time &lt;#{tradeTimeEnd}
+                    and  unix_timestamp(b.trade_time)&lt;=unix_timestamp(#{tradeTimeEnd})
                 </if>
             </where>
             ORDER BY b.id ASC
-
+            limit 0,10000
     </select>
 
     <select id="queryOrderTrade" resultMap="BBOrderTrade">

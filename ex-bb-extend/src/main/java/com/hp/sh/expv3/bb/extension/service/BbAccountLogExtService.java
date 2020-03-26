@@ -8,6 +8,8 @@ import java.util.List;
  * @author BaiLiJun  on 2020/3/24
  */
 public interface BbAccountLogExtService {
-    List<BbAccountLogExtVo> listBbAccountLogs(Long userId, String asset, String symbol, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Integer lastOrderId, Integer pageSize);
+    List<BbAccountLogExtVo> listBbAccountLogs(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Long startDate, Long endDate,  Integer pageSize);
+
+    List<BbAccountLogExtVo> listBbAccountLogsByPage(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Integer lastId, Integer nextPage, Long startDate, Long endDate, Integer pageSize);
 
 }

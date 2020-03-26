@@ -9,8 +9,9 @@ import com.hp.sh.expv3.match.config.setting.BbmatchRocketMqSetting;
 import com.hp.sh.expv3.match.enums.RmqTagEnum;
 import com.hp.sh.expv3.match.mqmsg.BbMatchOrderRebaseMqMsgDto;
 import com.hp.sh.expv3.match.mqmsg.BbMatchOrderSnapshotMqMsgDto;
-import com.hp.sh.expv3.match.util.JsonUtil;
+import com.hp.sh.expv3.match.mqmsg.BookResetMqMsgDto;
 import com.hp.sh.expv3.match.util.BbRocketMqUtil;
+import com.hp.sh.expv3.match.util.JsonUtil;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.apache.rocketmq.remoting.common.RemotingHelper;
@@ -47,10 +48,25 @@ public class BbOrderMqNotify {
                 msg// body
         );
         safeSend2OrderTopic(message);
+        logger.info("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
+        return true;
+    }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
-        }
+    public boolean sendOrderBookResetTrigger(String asset, String symbol) {
+        String topic = BbRocketMqUtil.buildBbOrderTopicName(bbmatchRocketMqSetting.getBbOrderTopicNamePattern(), asset, symbol);
+
+        BookResetMqMsgDto msg = new BookResetMqMsgDto();
+        msg.setAsset(asset);
+        msg.setSymbol(symbol);
+
+        Message message = buildMessage(
+                topic,// topic
+                "" + RmqTagEnum.BB_BOOK_RESET.getConstant(),// tag
+                "" + RmqTagEnum.BB_BOOK_RESET.getConstant(),// tag
+                msg// body
+        );
+        safeSend2OrderTopic(message);
+        logger.info("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
         return true;
     }
 
@@ -68,9 +84,7 @@ public class BbOrderMqNotify {
                 msg// body
         );
         safeSend2OrderTopic(message);
-        if (logger.isDebugEnabled()) {
-            logger.debug("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
-        }
+        logger.info("{} {} topic:{} tag:{},keys:{} {}", asset, symbol, message.getTopic(), message.getTags(), message.getKeys(), JsonUtil.toJsonString(msg));
         return true;
     }
 

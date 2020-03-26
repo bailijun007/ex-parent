@@ -115,6 +115,19 @@ public class ExBbMatchApplication extends Application implements ApplicationCont
                     }
                 });
                 break;
+            case "bookreset":
+                executor.execute(() -> {
+                    try {
+                        String asset = command[1];
+                        String symbol = command[2];
+                        long now = System.currentTimeMillis();
+                        bbOrderSnapshotCreateTriggerThread.triggerBookReset(asset, symbol);
+                        logger.info("trigger bookreset {},{},cost:{}", (System.currentTimeMillis() - now), asset, symbol);
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
+                    }
+                });
+                break;
             default:
                 String first = command[0];
                 if (StringUtils.isNotEmpty(StringUtils.trimToEmpty(first))) {

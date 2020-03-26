@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.bb.extension.service.impl;
 
+import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
 import com.hp.sh.expv3.bb.extension.dao.BbAccountLogExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbAccountLogExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountLogExtVo;
@@ -7,7 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -21,8 +26,54 @@ public class BbAccountLogExtServiceImpl implements BbAccountLogExtService {
     private BbAccountLogExtMapper bbAccountLogExtMapper;
 
     @Override
-    public List<BbAccountLogExtVo> listBbAccountLogs(Long userId, String asset, String symbol, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Integer lastOrderId, Integer pageSize) {
+    public List<BbAccountLogExtVo> listBbAccountLogs(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer pageSize) {
+        List<BbAccountLogExtVo> list = null;
+        Map<String, Object> map = new HashMap<>();
+        simpleMap(userId, asset, symbol, historyType, startDate, endDate, pageSize, map);
+        if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
+            list = bbAccountLogExtMapper.queryByLimit(map);
+        } else {
+            map.put("type", tradeType);
+            list = bbAccountLogExtMapper.queryByLimit(map);
+        }
+        return list;
+    }
 
-        return null;
+
+    @Override
+    public List<BbAccountLogExtVo> listBbAccountLogsByPage(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Integer lastId, Integer nextPage, Long startDate, Long endDate, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        simpleMap(userId, asset, symbol, historyType, startDate, endDate, pageSize, map);
+        map.put("lastId", lastId);
+        map.put("type", tradeType);
+        List<BbAccountLogExtVo> list = null;
+        if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
+            list = bbAccountLogExtMapper.listBbAccountLogsByPage(map);
+        } else {
+            map.put("type", tradeType);
+            list = bbAccountLogExtMapper.listBbAccountLogsByPage(map);
+        }
+        return list;
+    }
+
+
+    private void simpleMap(Long userId, String asset, String symbol, Integer historyType, Long startDate, Long endDate, Integer pageSize, Map<String, Object> map) {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        map.put("userId", userId);
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("limit", pageSize);
+        try {
+            if (BbextendConst.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {
+                LocalDateTime minusDays = localDateTime.minusDays(2L);
+                long timeBegin = minusDays.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+                map.put("timeBegin", timeBegin);
+            } else if (BbextendConst.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
+                map.put("timeBegin", startDate);
+                map.put("timeEnd", endDate);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
