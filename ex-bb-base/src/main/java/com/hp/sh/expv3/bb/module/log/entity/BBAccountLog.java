@@ -2,8 +2,6 @@ package com.hp.sh.expv3.bb.module.log.entity;
 
 import javax.persistence.Table;
 
-import com.hp.sh.expv3.bb.constant.LogType;
-
 /**
  * 账户日志
  *
@@ -11,9 +9,6 @@ import com.hp.sh.expv3.bb.constant.LogType;
  */
 @Table(name = "bb_account_log")
 public class BBAccountLog {
-    public static final int TYPE_FUND_TO_BB = LogType.TYPE_ACCOUNT_FUND_TO_BB;            //转入
-    
-    public static final int TYPE_BB_TO_FUND = LogType.TYPE_ACCOUNT_BB_TO_FUND;            //转出
 
     /**
      * 日志类型

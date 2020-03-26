@@ -27,7 +27,7 @@ public class BBFundService implements FundService{
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
 		request.setTradeNo(record.getSn());
-		request.setTradeType(BBAccountTradeType.FUND_TO_BB);
+		request.setTradeType(BBAccountTradeType.ACCOUNT_FUND_TO_BB);
 		request.setUserId(record.getUserId());
 		request.setAssociatedId(record.getId());
 		bbAccountCoreApi.add(request);
@@ -40,7 +40,7 @@ public class BBFundService implements FundService{
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
 		request.setTradeNo(record.getSn());
-		request.setTradeType(BBAccountTradeType.BB_TO_FUND);
+		request.setTradeType(BBAccountTradeType.ACCOUNT_BB_TO_FUND);
 		request.setUserId(record.getUserId());
 		bbAccountCoreApi.cut(request);
 	}

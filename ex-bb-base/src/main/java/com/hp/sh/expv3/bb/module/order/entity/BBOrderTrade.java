@@ -75,9 +75,6 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 	//手续费同步状态
 	private Integer feeSynchStatus;
 	
-	@Transient
-	private Integer logType;
-
 	public BBOrderTrade() {
 		super();
 	}
@@ -203,14 +200,6 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 		this.txId = txId;
 	}
 
-	public Integer getLogType() {
-		return logType;
-	}
-
-	public void setLogType(Integer tradType) {
-		this.logType = tradType;
-	}
-
 	public Integer getBidFlag() {
 		return bidFlag;
 	}
@@ -246,10 +235,11 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 	@Override
 	public String toString() {
 		return "BBOrderTrade [asset=" + asset + ", symbol=" + symbol + ", price=" + price + ", volume=" + volume
-				+ ", tradeSn=" + tradeSn + ", tradeId=" + tradeId + ", orderId=" + orderId + ", makerFlag=" + makerFlag
-				+ ", tradeTime=" + tradeTime + ", feeCollectorId=" + feeCollectorId + ", feeRatio=" + feeRatio
-				+ ", fee=" + fee + ", remainVolume=" + remainVolume + ", matchTxId=" + matchTxId + ", txId=" + txId
-				+ ", logType=" + logType + "]";
+				+ ", bidFlag=" + bidFlag + ", tradeSn=" + tradeSn + ", tradeId=" + tradeId + ", orderId=" + orderId
+				+ ", makerFlag=" + makerFlag + ", tradeTime=" + tradeTime + ", feeCollectorId=" + feeCollectorId
+				+ ", feeRatio=" + feeRatio + ", fee=" + fee + ", remainVolume=" + remainVolume + ", remainOrderMargin="
+				+ remainOrderMargin + ", remainFee=" + remainFee + ", matchTxId=" + matchTxId + ", txId=" + txId
+				+ ", feeSynchStatus=" + feeSynchStatus + "]";
 	}
 
 	public boolean isOrderCompleted() {
