@@ -198,7 +198,7 @@ public class LiquidationJob {
 						}else{
 							number = pos.getVolume();
 						}
-						PcOrder cutOrder = orderService.createLiqOrder(pos.getUserId(), "cut-"+pos.getId(), pos.getAsset(), pos.getSymbol(), pos.getLongFlag(), order.getPrice(), number, pos);
+						PcOrder cutOrder = orderService.createLiqOrder(pos.getUserId(), "LQ-"+pos.getId(), pos.getAsset(), pos.getSymbol(), pos.getLongFlag(), order.getPrice(), number, pos);
 						PcTradeMsg trade = new PcTradeMsg();
 						trade.setAccountId(pos.getUserId());
 						trade.setAsset(pos.getAsset());

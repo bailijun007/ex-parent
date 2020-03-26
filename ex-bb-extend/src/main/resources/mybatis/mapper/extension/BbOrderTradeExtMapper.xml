@@ -92,7 +92,7 @@
         from bb_order_trade
         where asset=#{asset}
         and symbol=#{symbol}
-        and tradeTime &lt;#{tradeTime}
+        and tradeTime &lt; #{tradeTime}
         order by trade_time desc
         limit 0,1
     </select>

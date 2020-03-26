@@ -9,6 +9,9 @@ import javax.persistence.Table;
  */
 @Table(name = "bb_account_log")
 public class BBAccountLog {
+	
+    //Id
+    private Long id;
 
     /**
      * 日志类型
@@ -34,7 +37,15 @@ public class BBAccountLog {
         return this.getType() + "";
     }
 
-    public Integer getType() {
+    public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Integer getType() {
         return type;
     }
 

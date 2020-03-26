@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50599
 File Encoding         : 65001
 
-Date: 2020-03-12 13:39:26
+Date: 2020-03-26 16:01:07
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -32,6 +32,7 @@ UNIQUE INDEX `un_user_asset` (`user_id`, `asset`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='用户资金账户'
+
 ;
 
 -- ----------------------------
@@ -47,11 +48,12 @@ CREATE TABLE `bb_account_log` (
 `ref_id`  bigint(20) NOT NULL COMMENT '引用对象Id' ,
 `time`  bigint(20) NOT NULL COMMENT '时间' ,
 PRIMARY KEY (`id`),
-INDEX `idx_user_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE 
+INDEX `idx_user_asset_symbol` (`user_id`, `asset`, `symbol`, `time`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='账户日志'
+AUTO_INCREMENT=10000
 ;
 
 -- ----------------------------
@@ -59,7 +61,7 @@ COMMENT='账户日志'
 -- ----------------------------
 DROP TABLE IF EXISTS `bb_account_record`;
 CREATE TABLE `bb_account_record` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint(20) NOT NULL COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `sn`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '流水号' ,
@@ -82,6 +84,7 @@ UNIQUE INDEX `un_trade_no` (`trade_no`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_账户明细'
+
 ;
 
 -- ----------------------------
@@ -101,6 +104,7 @@ INDEX `idx_symbol` (`symbol`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_活动订单（委托）'
+
 ;
 
 -- ----------------------------
@@ -114,11 +118,12 @@ CREATE TABLE `bb_collector_account` (
 `version`  bigint(20) NOT NULL COMMENT '版本' ,
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`)
+PRIMARY KEY (`id`, `asset`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='币币_币币手续费'
+
 ;
 
 -- ----------------------------
@@ -156,7 +161,7 @@ COMMENT='币币手续费_账户明细'
 -- ----------------------------
 DROP TABLE IF EXISTS `bb_order`;
 CREATE TABLE `bb_order` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint(20) NOT NULL COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
@@ -164,7 +169,7 @@ CREATE TABLE `bb_order` (
 `price`  decimal(50,30) NOT NULL COMMENT '委托价格' ,
 `order_type`  int(11) NOT NULL COMMENT '委托类型' ,
 `volume`  decimal(50,20) NOT NULL COMMENT '委托数量（个）' ,
-`status`  int(11) NOT NULL COMMENT '委托状态' ,
+`status`  int(11) NOT NULL COMMENT '委托状态：1-已创建未匹配,2-新建未成交,4-待取消,8-已取消,16-部分成交,32-全部成交,64-提交失败,128-已过期' ,
 `fee_ratio`  decimal(50,30) NOT NULL COMMENT '手续费率' ,
 `fee_cost`  decimal(50,30) NOT NULL COMMENT '实收手续费,成交后累加' ,
 `order_margin`  decimal(50,30) NOT NULL COMMENT '委托押金' ,
@@ -190,6 +195,7 @@ INDEX `idx_created` (`created`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='币币_订单（委托）'
+
 ;
 
 -- ----------------------------
@@ -212,6 +218,7 @@ INDEX `idx_order_id` (`order_id`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='订单日志'
+
 ;
 
 -- ----------------------------
@@ -219,7 +226,7 @@ COMMENT='订单日志'
 -- ----------------------------
 DROP TABLE IF EXISTS `bb_order_trade`;
 CREATE TABLE `bb_order_trade` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint(20) NOT NULL COMMENT '主键' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
 `bid_flag`  int(11) NULL DEFAULT NULL ,
@@ -245,11 +252,46 @@ CREATE TABLE `bb_order_trade` (
 PRIMARY KEY (`id`),
 UNIQUE INDEX `un_trade_no` (`trade_sn`) USING BTREE ,
 INDEX `idx_userid` (`user_id`) USING BTREE ,
-INDEX `idx_orderid` (`order_id`) USING BTREE 
+INDEX `idx_orderid` (`order_id`) USING BTREE ,
+INDEX `idx_trade_time` (`trade_time`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_用户订单成交记录'
+
+;
+
+-- ----------------------------
+-- Table structure for `bb_repair_trade`
+-- ----------------------------
+DROP TABLE IF EXISTS `bb_repair_trade`;
+CREATE TABLE `bb_repair_trade` (
+`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id' ,
+`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
+`symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '交易对' ,
+`match_tx_id`  bigint(20) NOT NULL COMMENT '事务Id' ,
+`tk_bid_flag`  int(11) NOT NULL COMMENT 'taker是否买：1-是，0-否' ,
+`tk_account_id`  bigint(20) NOT NULL COMMENT 'taker账户ID' ,
+`tk_order_id`  bigint(20) NOT NULL COMMENT 'taker订单ID' ,
+`mk_account_id`  bigint(20) NOT NULL COMMENT 'maker账户Id' ,
+`mk_order_id`  bigint(20) NOT NULL COMMENT 'maker订单ID' ,
+`price`  decimal(50,30) NOT NULL COMMENT '成交价格' ,
+`number`  decimal(50,30) NOT NULL COMMENT '数量' ,
+`trade_time`  bigint(20) NOT NULL COMMENT '成交时间' ,
+`maker_handle_status`  int(11) NULL DEFAULT 0 ,
+`taker_handle_status`  int(11) NULL DEFAULT 0 ,
+`enable_flag`  int(11) NOT NULL ,
+`created`  bigint(20) NULL DEFAULT NULL ,
+`modified`  bigint(20) NULL DEFAULT NULL ,
+PRIMARY KEY (`id`),
+INDEX `idx_trade_time` (`trade_time`) USING BTREE ,
+INDEX `idx_enable_flag_asset_symbol` (`enable_flag`, `asset`, `symbol`) USING BTREE 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+COMMENT='k线需要修复的交易表'
+AUTO_INCREMENT=10000
+
 ;
 
 -- ----------------------------
@@ -275,10 +317,11 @@ CREATE TABLE `bb_trade` (
 `modified`  bigint(20) NULL DEFAULT NULL ,
 PRIMARY KEY (`id`),
 INDEX `idx_trade_time` (`trade_time`) USING BTREE ,
-INDEX `idx_tk_account_id` (`tk_account_id`) USING BTREE ,
-INDEX `idx_mk_account_id` (`mk_account_id`) USING BTREE 
+INDEX `idx_tk_order_id` (`tk_order_id`) USING BTREE ,
+INDEX `idx_mk_order_id` (`mk_order_id`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_成交(撮合结果)'
+
 ;
