@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.hp.sh.expv3.pc.constant.MqTopic;
-import com.hp.sh.expv3.pc.mq.utils.OrderMessageQueueSelector;
+import com.hp.sh.expv3.pc.mq.starter.OrderMessageQueueSelector;
 import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 import com.hp.sh.rocketmq.codec.MsgCodec;
 
