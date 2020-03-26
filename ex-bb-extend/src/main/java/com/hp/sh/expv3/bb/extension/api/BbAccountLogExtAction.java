@@ -5,10 +5,10 @@ import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbAccountLogExtService;
 import com.hp.sh.expv3.bb.extension.service.BbAccountRecordExtService;
-import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
+import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountLogExtVo;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountRecordVo;
-import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
+import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +29,9 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
     @Autowired
     private BbAccountLogExtService bbAccountLogExtService;
 
+
     @Autowired
-    private BbOrderExtService bbOrderExtService;
+    private BbOrderTradeExtService bbOrderTradeExtService;
 
     @Autowired
     private BbAccountRecordExtService bbAccountRecordExtService;
@@ -62,51 +63,36 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
             //转出至资金账户
             if (map.containsKey(BbAccountLogConst.CHANGE_OUT_FUND_ACCOUNT)) {
                 List<BbAccountLogExtVo> logExtVoList = map.getOrDefault(BbAccountLogConst.CHANGE_OUT_FUND_ACCOUNT, Collections.emptyList());
-                this.appendChangeToFundAcountData(logExtVoList);
+                this.appendFundsTransferData(logExtVoList);
                 list.addAll(logExtVoList);
             }
             //转出至合约账户
             if (map.containsKey(BbAccountLogConst.CHANGE_OUT_PC_ACCOUNT)) {
                 List<BbAccountLogExtVo> logExtVoList = map.getOrDefault(BbAccountLogConst.CHANGE_OUT_PC_ACCOUNT, Collections.emptyList());
-                //refIds 其他关联表的主键集合
-                List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
-                this.appendChangeToPcAcountData(asset, symbol, userId, refIds);
+                this.appendFundsTransferData(logExtVoList);
                 list.addAll(logExtVoList);
             }
             //资金账户转入
             if (map.containsKey(BbAccountLogConst.CHANGE_INTO_FUND_ACCOUNT)) {
                 List<BbAccountLogExtVo> logExtVoList = map.getOrDefault(BbAccountLogConst.CHANGE_INTO_FUND_ACCOUNT, Collections.emptyList());
-                //refIds 其他关联表的主键集合
-                List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
-                this.appendIntoFundAcountData(asset, symbol, userId, refIds);
+                this.appendFundsTransferData(logExtVoList);
                 list.addAll(logExtVoList);
             }
             //永续合约转入
             if (map.containsKey(BbAccountLogConst.CHANGE_INTO_PC_ACCOUNT)) {
                 List<BbAccountLogExtVo> logExtVoList = map.getOrDefault(BbAccountLogConst.CHANGE_INTO_PC_ACCOUNT, Collections.emptyList());
-                //refIds 其他关联表的主键集合
-                List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
-                this.appendIntoPcAcountData(asset, symbol, userId, refIds);
+                this.appendFundsTransferData(logExtVoList);
                 list.addAll(logExtVoList);
             }
-
         }
         return list;
     }
 
-    private void appendIntoPcAcountData(String asset, String symbol, Long userId, List<Long> refIds) {
-
-    }
-
-    private void appendIntoFundAcountData(String asset, String symbol, Long userId, List<Long> refIds) {
-
-    }
-
-    private void appendChangeToPcAcountData(String asset, String symbol, Long userId, List<Long> refIds) {
-
-    }
-
-    private void appendChangeToFundAcountData(List<BbAccountLogExtVo> logExtVoList) {
+    //资金划转
+    private void appendFundsTransferData(List<BbAccountLogExtVo> logExtVoList) {
+       if(CollectionUtils.isEmpty(logExtVoList)){
+           return;
+       }
         //refIds bb_account_record表的主键集合
         List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
         List<BbAccountRecordVo> recordVos = bbAccountRecordExtService.queryByIds(refIds);
@@ -117,29 +103,32 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
                 Optional<BbAccountRecordVo> recordOptional = Optional.ofNullable(recordVo);
                 bbAccountLogExtVo.setVolume(recordOptional.map(BbAccountRecordVo::getAmount).orElse(BigDecimal.ZERO));
                 bbAccountLogExtVo.setBalance(recordOptional.map(BbAccountRecordVo::getBalance).orElse(BigDecimal.ZERO));
+                //资金划转没有手续费
                 bbAccountLogExtVo.setFee(BigDecimal.ZERO);
+                bbAccountLogExtVo.setTradeTime(recordOptional.map(BbAccountRecordVo::getCreated).orElse(null));
             }
-
         }
-
-
     }
 
-    private void appendSellOutData(String asset, String symbol, Long userId, List<Long> refIds) {
-
-    }
 
     private void appendBuyInOrSellOutData(List<BbAccountLogExtVo> logExtVoList) {
-        //refIds order表的主键集合
+        if(CollectionUtils.isEmpty(logExtVoList)){
+            return;
+        }
+        //refIds order_trade表的主键集合
         List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
-        List<BbOrderVo> bbOrderVos = bbOrderExtService.queryByIds(refIds);
-        if (!CollectionUtils.isEmpty(bbOrderVos)) {
-            Map<Long, BbOrderVo> id2Vo = bbOrderVos.stream().collect(Collectors.toMap(BbOrderVo::getId, Function.identity()));
+         List<BbOrderTradeVo> orderTradeVos = bbOrderTradeExtService.queryByIds(refIds);
+
+        if (!CollectionUtils.isEmpty(orderTradeVos)) {
+            Map<Long, BbOrderTradeVo> id2Vo = orderTradeVos.stream().collect(Collectors.toMap(BbOrderTradeVo::getId, Function.identity()));
             for (BbAccountLogExtVo bbAccountLogExtVo : logExtVoList) {
-                BbOrderVo bbOrderVo = id2Vo.get(bbAccountLogExtVo.getRefId());
-                Optional<BbOrderVo> bbOrderOptional = Optional.ofNullable(bbOrderVo);
-                bbAccountLogExtVo.setFee(bbOrderOptional.map(BbOrderVo::getFeeCost).orElse(BigDecimal.ZERO));
-                bbAccountLogExtVo.setVolume(bbOrderOptional.map(BbOrderVo::getVolume).orElse(BigDecimal.ZERO));
+                BbOrderTradeVo bbOrderVo = id2Vo.get(bbAccountLogExtVo.getRefId());
+                Optional<BbOrderTradeVo> bbOrderOptional = Optional.ofNullable(bbOrderVo);
+                bbAccountLogExtVo.setFee(bbOrderOptional.map(BbOrderTradeVo::getFee).orElse(BigDecimal.ZERO));
+                bbAccountLogExtVo.setVolume(bbOrderOptional.map(BbOrderTradeVo::getVolume).orElse(BigDecimal.ZERO));
+                bbAccountLogExtVo.setTradeTime(bbOrderOptional.map(BbOrderTradeVo::getTradeTime).orElse(null));
+                // TODO 买入卖出余额字段写死 ，后面优化
+                bbAccountLogExtVo.setBalance(BigDecimal.ZERO);
             }
         }
     }

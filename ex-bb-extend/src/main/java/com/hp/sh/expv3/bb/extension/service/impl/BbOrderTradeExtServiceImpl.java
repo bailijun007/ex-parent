@@ -58,4 +58,10 @@ public class BbOrderTradeExtServiceImpl implements BbOrderTradeExtService {
         }
         return list;
     }
+
+    @Override
+    public List<BbOrderTradeVo> queryByIds(List<Long> refIds) {
+
+        return bbOrderTradeExtMapper.queryByIds(refIds);
+    }
 }

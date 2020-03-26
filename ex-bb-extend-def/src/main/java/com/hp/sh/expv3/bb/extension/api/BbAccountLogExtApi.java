@@ -25,7 +25,7 @@ public interface BbAccountLogExtApi {
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
             @ApiImplicitParam(name = "historyType", value = "1.最近两天,2.两天到三个月", example = "1", required = true),
-            @ApiImplicitParam(name = "tradeType",value = "类型0.全部,1.买入,2.卖出,3.转出至资金账户,4.转出至永续合约,5.资金账户转入,6.永续合约转入 " , example = "0", required = true),
+            @ApiImplicitParam(name = "tradeType",value = "类型0.全部,1.买入,2.卖出,3.从资金账户转入,4.转出至资金账户,5.从永续合约转入,6.转出至永续合约" , example = "0", required = true),
             @ApiImplicitParam(name = "startDate", value = "开始时间", required = true),
             @ApiImplicitParam(name = "endDate", value = "结束时间", required = true),
             @ApiImplicitParam(name = "nextPage", value = "翻页标记,-1 上一页,1.下一页", example = "1", required = true),
