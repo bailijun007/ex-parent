@@ -12,6 +12,11 @@
                     #{types[${i}]}
                 </foreach>
             </if>
+            <if test="symbols!=null">and symbol in
+                <foreach item="item" index="i" collection="symbols" open="(" separator="," close=")">
+                    #{symbols[${i}]}
+                </foreach>
+            </if>
             <if test="type!=null">and `type`=#{type}</if>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
@@ -33,7 +38,11 @@
                     #{types[${i}]}
                 </foreach>
             </if>
-
+            <if test="symbols!=null">and symbol in
+                <foreach item="item" index="i" collection="symbols" open="(" separator="," close=")">
+                    #{symbols[${i}]}
+                </foreach>
+            </if>
             <if test="type!=null">and `type`=#{type}</if>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>

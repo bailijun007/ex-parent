@@ -114,6 +114,37 @@ public class BBSymbol implements Serializable {
     public BBSymbol() {
     }
 
+    @Override
+    public String toString() {
+        return "BBSymbol{" +
+                "id=" + id +
+                ", asset='" + asset + '\'' +
+                ", symbol='" + symbol + '\'' +
+                ", step=" + step +
+                ", status=" + status +
+                ", sort=" + sort +
+                ", precision=" + precision +
+                ", displayNameSplit='" + displayNameSplit + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", ctime=" + ctime +
+                ", mtime=" + mtime +
+                ", symbolType=" + symbolType +
+                ", bbSymbolType=" + bbSymbolType +
+                ", bbGroupId=" + bbGroupId +
+                ", bbSymbolName='" + bbSymbolName + '\'' +
+                ", bbSymbolNameSplit='" + bbSymbolNameSplit + '\'' +
+                ", defaultPrice=" + defaultPrice +
+                ", lastPrice=" + lastPrice +
+                ", faceValue=" + faceValue +
+                ", faceCurrency='" + faceCurrency + '\'' +
+                ", quoteCurrency='" + quoteCurrency + '\'' +
+                ", baseCurrency='" + baseCurrency + '\'' +
+                ", settleCurrency='" + settleCurrency + '\'' +
+                ", settlePrice=" + settlePrice +
+                ", privilege=" + privilege +
+                '}';
+    }
+
     public Long getId() {
         return id;
     }
