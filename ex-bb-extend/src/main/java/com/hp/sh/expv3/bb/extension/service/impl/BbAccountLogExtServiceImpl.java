@@ -32,6 +32,9 @@ public class BbAccountLogExtServiceImpl implements BbAccountLogExtService {
         simpleMap(userId, asset, symbol, historyType, startDate, endDate, pageSize, map);
         if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
             list = bbAccountLogExtMapper.queryByLimit(map);
+        } else {
+            map.put("type", tradeType);
+            list = bbAccountLogExtMapper.queryByLimit(map);
         }
         return list;
     }
@@ -42,7 +45,15 @@ public class BbAccountLogExtServiceImpl implements BbAccountLogExtService {
         Map<String, Object> map = new HashMap<>();
         simpleMap(userId, asset, symbol, historyType, startDate, endDate, pageSize, map);
         map.put("lastId", lastId);
-        return bbAccountLogExtMapper.listBbAccountLogsByPage(map);
+        map.put("type", tradeType);
+        List<BbAccountLogExtVo> list = null;
+        if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
+            list = bbAccountLogExtMapper.listBbAccountLogsByPage(map);
+        } else {
+            map.put("type", tradeType);
+            list = bbAccountLogExtMapper.listBbAccountLogsByPage(map);
+        }
+        return list;
     }
 
 
