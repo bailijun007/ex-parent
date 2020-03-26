@@ -4,7 +4,7 @@
 
 
     <select id="queryByLimit" resultType="com.hp.sh.expv3.bb.extension.vo.BbAccountLogExtVo">
-        select id,`type` tradeType ,user_id,asset,symbol,ref_id,`time`
+        select  id,`type` tradeType,user_id userId,asset,symbol,ref_id refId,`time`
         from bb_account_log
         <where>
             <if test="types!=null">type in
@@ -25,7 +25,7 @@
     </select>
 
     <select id="listBbAccountLogsByPage" resultType="com.hp.sh.expv3.bb.extension.vo.BbAccountLogExtVo">
-        select id,`type` tradeType,user_id,asset,symbol,ref_id,`time`
+        select id,`type` tradeType,user_id userId,asset,symbol,ref_id refId,`time`
         from bb_account_log
         <where>
             <if test="types!=null">type in

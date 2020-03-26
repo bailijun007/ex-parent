@@ -19,5 +19,7 @@ public interface BbOrderTradeExtService {
     List<BbUserOrderTrade> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId, Long id);
 
     List<BbOrderTradeDetailVo> selectPcFeeCollectByAccountId(String asset, String symbol, Long userId, Long statTime, Long endTime);
+
+    List<BbOrderTradeVo> queryByIds(List<Long> refIds);
 }
 

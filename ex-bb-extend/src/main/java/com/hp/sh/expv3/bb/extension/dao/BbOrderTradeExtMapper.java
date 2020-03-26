@@ -27,4 +27,6 @@ public interface BbOrderTradeExtMapper {
     List<BbUserOrderTrade> selectTradeListByUserId(@Param("asset") String asset,@Param("symbol") String symbol,@Param("tradeTimeBegin")  Long tradeTimeBegin,@Param("tradeTimeEnd") Long tradeTimeEnd,@Param("userId") Long userId, @Param("id") Long id);
 
     List<BbOrderTradeDetailVo> selectPcFeeCollectByAccountId(Map<String, Object> map);
+
+    List<BbOrderTradeVo> queryByIds(@Param("idList") List<Long> idList);
 }
