@@ -14,7 +14,7 @@ import com.gitee.hupadev.commons.mybatis.util.EntityUtil;
 import com.hp.sh.expv3.base.entity.BaseBizEntity;
 import com.hp.sh.expv3.commons.ctx.RequestContext;
 import com.hp.sh.expv3.commons.ctx.TxIdContext;
-import com.hp.sh.expv3.component.context.ContextUtils;
+import com.hp.sh.expv3.component.context.IdGeneratorContext;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 /**
@@ -60,7 +60,7 @@ public class ExpUpdateInterceptor extends AbstractInterceptor {
     private void setCreatedTime(final Object entity){
     	if(entity instanceof BaseBizEntity){
     		BaseBizEntity be = (BaseBizEntity)entity;
-    		long time = ContextUtils.getSnowIdTime(entity.getClass().getName(), be.getId());
+    		long time = IdGeneratorContext.getSnowIdTime(entity.getClass().getName(), be.getId());
     		be.setCreated(time);
     		be.setModified(time);
     	}
