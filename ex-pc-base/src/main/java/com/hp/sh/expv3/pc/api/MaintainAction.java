@@ -23,7 +23,6 @@ import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
-import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -166,8 +165,8 @@ public class MaintainAction{
 	@GetMapping(value = "/api/pc/maintain/liq/checkLiq")
 	public boolean checkLiq(Long userId, Long posId){
 		PcPosition pos = this.positionDataService.getPosition(userId, posId);
-		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pos.getAsset(), pos.getSymbol());
-		return liqService.checkLiqStatus(pos, markPriceVo.getMarkPrice());
+		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
+		return liqService.checkLiqStatus(pos, markPrice);
 	}
 
 	@ApiOperation(value = "forceClose")

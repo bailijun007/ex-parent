@@ -1,12 +1,12 @@
 package com.hp.sh.expv3.pc.api;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.hp.sh.expv3.pc.vo.ExPageResult;
 import com.hp.sh.expv3.pc.vo.response.ActiveOrderVo;
 
 import io.swagger.annotations.Api;
@@ -62,6 +62,7 @@ public interface PcOrderApi {
 
 	@ApiOperation(value = "获取活动委托")
 	@GetMapping(value = "/api/pc/order/queryActiveList")
-	List<ActiveOrderVo> queryActiveList(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
+	ExPageResult<ActiveOrderVo> queryActiveList(@RequestParam("pageSize") Integer pageSize, @RequestParam("userId") Long userId,
+			@RequestParam("asset") String asset, @RequestParam("symbol") String symbol, @RequestParam("startId") Long startId);
 
 }

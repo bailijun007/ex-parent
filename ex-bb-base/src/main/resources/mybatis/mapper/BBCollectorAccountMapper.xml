@@ -91,7 +91,7 @@
 		set 
 			asset=#{asset},balance=#{balance},version=${version}+1,created=#{created},modified=#{modified}
 		where 
-			id=#{id} and asset=#{asset} and version=#{version}
+			id=${id} and asset='${asset}' and version=${version}
 	</update>
 
     <delete id="condDelete">

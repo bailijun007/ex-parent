@@ -72,9 +72,13 @@ public class PcLiqService {
     	PcPosition pcPosition = this.positionDataService.getPosition(pos.getUserId(), pos.getId());
 		LiqHandleResult liqResult = new LiqHandleResult();
 		
-		MarkPriceVo markPriceVo = markPriceService.getLastMarkPrice(pcPosition.getAsset(), pcPosition.getSymbol());
+    	if(BigUtils.isZero(pcPosition.getVolume())){
+    		return liqResult;
+    	}
+		
+		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pcPosition.getAsset(), pcPosition.getSymbol());
 		//检查触发强平
-		if(!this.checkAndResetLiqStatus(pcPosition, markPriceVo.getMarkPrice())){
+		if(!this.checkAndResetLiqStatus(pcPosition, markPrice)){
 			return liqResult;
 		}
 		
@@ -84,7 +88,7 @@ public class PcLiqService {
 		}
 		
 		//检查触发强平
-		if(!this.checkAndResetLiqStatus(pcPosition, markPriceVo.getMarkPrice())){
+		if(!this.checkAndResetLiqStatus(pcPosition, markPrice)){
 			return liqResult;
 		}
 		
@@ -92,7 +96,7 @@ public class PcLiqService {
 		this.lockLiq(pcPosition);
 		
 		liqResult.setTrigger(true);
-		liqResult.setMarkPriceVo(markPriceVo);
+		liqResult.setMarkPriceVo(new MarkPriceVo(markPrice, System.currentTimeMillis()));
 		liqResult.setLiqPrice(pcPosition.getLiqPrice());
 		liqResult.setPcPosition(pcPosition);
 		return liqResult;

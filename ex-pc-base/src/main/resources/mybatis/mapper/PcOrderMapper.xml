@@ -196,6 +196,7 @@
 			pc_order o ON o.id = ao.id
 		<where>
 			ao.user_id=#{userId}
+			<if test="startId!=null"> and ao.id &lt; #{startId}</if>
 			<if test="asset!=null and asset!=''"> and ao.asset=#{asset}</if>
 			<if test="symbol!=null and symbol!=''"> and ao.symbol=#{symbol}</if>
 			<if test="status!=null"> and o.status=#{status}</if>

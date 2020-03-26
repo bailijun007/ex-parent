@@ -13,6 +13,7 @@ import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.utils.DbDateUtils;
+import com.xxl.job.core.handler.annotation.XxlJob;
 
 @Component
 public class SynchCollectorJob {
@@ -23,6 +24,7 @@ public class SynchCollectorJob {
 	@Autowired
 	private BBTradeService tradeService;
 	
+	@XxlJob("SynchCollectorJob-handleJob")
 	@Scheduled(cron = "0 0/1 * * * ?")
 	public void handleJob() {
 		Long now = DbDateUtils.now();

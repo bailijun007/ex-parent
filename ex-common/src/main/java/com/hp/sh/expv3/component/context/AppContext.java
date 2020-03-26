@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hp.sh.expv3.commons;
+package com.hp.sh.expv3.component.context;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

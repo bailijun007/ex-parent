@@ -3,7 +3,7 @@
 <configuration scan="false">
     <property name="maxHistory" value="60"/>
     
-    <property name="group" value="${pc.mq.consumer.contractGroup:-1}"></property>
+    <property name="group" value="${pc.mq.consumer.groupId:-1}"></property>
     <property name="log_home" value="${app.log.home:-/data/hupa/logs/pc}"></property>
     <property name="log_dir" value="${log_home}${group}"></property>
 
@@ -146,17 +146,11 @@
     
     <springProfile name="dev">
         <root level="INFO">
-	        <!-- 控制台输出 -->
-	        <appender-ref ref="STDOUT"/>
-	        <!-- 文件输出 -->
 	        <appender-ref ref="ERROR"/>
 	        <appender-ref ref="WARN"/>
 	        <appender-ref ref="INFO"/>
 	        <appender-ref ref="DEBUG"/>
         </root>
-        
-		<logger name="com.hp.sh.expv3" level="debug"></logger>
-		<logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
         
     </springProfile>
     

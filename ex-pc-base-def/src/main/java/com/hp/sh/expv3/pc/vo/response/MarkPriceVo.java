@@ -15,7 +15,15 @@ public class MarkPriceVo {
     @ApiModelProperty("时间戳")
     private Long time;
 
-    public BigDecimal getMarkPrice() {
+    public MarkPriceVo() {
+	}
+
+	public MarkPriceVo(BigDecimal markPrice, Long time) {
+		this.markPrice = markPrice;
+		this.time = time;
+	}
+
+	public BigDecimal getMarkPrice() {
         return markPrice;
     }
 

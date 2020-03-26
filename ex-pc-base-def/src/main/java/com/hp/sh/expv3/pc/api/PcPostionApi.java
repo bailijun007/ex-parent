@@ -22,7 +22,6 @@ import io.swagger.annotations.ApiOperation;
 @FeignClient(value="ex-pc-base")
 public interface PcPostionApi {
 
-
 	@ApiOperation(value = "显示修改保证金信息")
 	@GetMapping(value = "/api/pc/position/margin/showChangeMargin")
 	ChangeMarginVo showChangeMargin(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam("symbol") String symbol, @RequestParam("longFlag") Integer longFlag);

@@ -53,6 +53,21 @@ public class ActiveOrderVo {
 	
 	//委托状态，OrderStatus#*
 	private Integer status;
+	
+    /**
+	 * 合约张数
+	 */
+	private BigDecimal volume;
+	
+    /**
+     * 永续合约委托类型 @see PcOrderType#*
+     */
+    private Integer orderType;
+	
+	/**
+	 * 客户自定义委托ID，用于与客户系统关联 （open api）
+	 */
+	private String clientOrderId;
 
 	public ActiveOrderVo() {
 	}
@@ -175,6 +190,30 @@ public class ActiveOrderVo {
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public BigDecimal getVolume() {
+		return volume;
+	}
+
+	public void setVolume(BigDecimal volume) {
+		this.volume = volume;
+	}
+
+	public Integer getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(Integer orderType) {
+		this.orderType = orderType;
+	}
+
+	public String getClientOrderId() {
+		return clientOrderId;
+	}
+
+	public void setClientOrderId(String clientOrderId) {
+		this.clientOrderId = clientOrderId;
 	}
 
 	@Override

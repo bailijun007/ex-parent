@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.component.config;
+package com.hp.sh.expv3.commons.config;
 
 import java.math.BigDecimal;
 
