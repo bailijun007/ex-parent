@@ -70,7 +70,7 @@ public class LiquidationJob {
     private final long startTime = DbDateUtils.now()-1000*3600;
     
     
-//	@Scheduled(cron = "${cron.liq.check}")
+	@Scheduled(cron = "${cron.liq.check}")
 	public void checkLiqOrder() {
 		Page page = new Page(1, 200, 1000L);
 		while(true){
