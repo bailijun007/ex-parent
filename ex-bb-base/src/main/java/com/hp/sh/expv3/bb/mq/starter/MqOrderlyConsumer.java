@@ -110,8 +110,10 @@ public class MqOrderlyConsumer {
 		
 		Map<String, BBSymbolVO> symbolMap = new HashMap<String, BBSymbolVO>();
 		for(BBSymbolVO bbvo : pcList){
-			String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
-			symbolMap.put(topic, bbvo);
+			if(bbvo.getBbGroupId().equals(this.bbGroupId)){
+				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
+				symbolMap.put(topic, bbvo);
+			}
 		}
 		
 		for(String topic : new ArrayList<String>(this.mqMap.keySet())){

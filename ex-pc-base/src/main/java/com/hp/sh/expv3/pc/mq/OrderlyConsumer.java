@@ -112,8 +112,10 @@ public class OrderlyConsumer {
 		
 		Map<String, PcContractVO> symbolMap = new HashMap<String, PcContractVO>();
 		for(PcContractVO bbvo : pcList){
-			String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
-			symbolMap.put(topic, bbvo);
+			if(bbvo.getContractGroup().equals(contractGroupId)){
+				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
+				symbolMap.put(topic, bbvo);
+			}
 		}
 		
 		for(String topic : new ArrayList<String>(this.mqMap.keySet())){
@@ -130,11 +132,9 @@ public class OrderlyConsumer {
 			String topic = entry.getKey();
 			PcContractVO symbolVO = entry.getValue();
 			if(!mqMap.containsKey(topic)){
-				if(symbolVO.getContractGroup().equals(contractGroupId)){
-					logger.info("启动监听. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
-					DefaultMQPushConsumer mq = this.buildConsumer(topic);
-					this.mqMap.put(topic, mq);
-				}
+				logger.info("启动监听. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
+				DefaultMQPushConsumer mq = this.buildConsumer(topic);
+				this.mqMap.put(topic, mq);
 			}
 		}
 
