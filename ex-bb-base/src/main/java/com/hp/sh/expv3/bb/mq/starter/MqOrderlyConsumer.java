@@ -106,7 +106,7 @@ public class MqOrderlyConsumer {
 	public void start123() throws MQClientException{
 		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
 
-		logger.info("更新MQ监听,{},{},{}", pcList.size(), this.bbGroupId, this.setting.getInstanceName());
+		logger.debug("更新MQ监听,{},{},{}", pcList.size(), this.bbGroupId, this.setting.getInstanceName());
 		
 		Map<String, BBSymbolVO> symbolMap = new HashMap<String, BBSymbolVO>();
 		for(BBSymbolVO bbvo : pcList){
@@ -139,7 +139,7 @@ public class MqOrderlyConsumer {
 		}
 
 		int n = this.mqMap.size();
-		logger.info("mq:{},{}", n, this.mqMap);
+		logger.debug("mq:{},{}", n, this.mqMap);
 		return;
 		
 	}

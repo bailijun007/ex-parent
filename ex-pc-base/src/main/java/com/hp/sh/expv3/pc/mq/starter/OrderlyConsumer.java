@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.mq;
+package com.hp.sh.expv3.pc.mq.starter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -108,7 +108,7 @@ public class OrderlyConsumer {
 	public void start123() throws MQClientException{
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 
-		logger.info("更新MQ监听,{},{},{}", pcList.size(), this.contractGroupId, this.setting.getInstanceName());
+		logger.debug("更新MQ监听,{},{},{}", pcList.size(), this.contractGroupId, this.setting.getInstanceName());
 		
 		Map<String, PcContractVO> symbolMap = new HashMap<String, PcContractVO>();
 		for(PcContractVO bbvo : pcList){
@@ -139,7 +139,7 @@ public class OrderlyConsumer {
 		}
 
 		int n = this.mqMap.size();
-		logger.info("mq:{},{}", n, this.mqMap);
+		logger.debug("mq:{},{}", n, this.mqMap);
 		return;
 	}
 

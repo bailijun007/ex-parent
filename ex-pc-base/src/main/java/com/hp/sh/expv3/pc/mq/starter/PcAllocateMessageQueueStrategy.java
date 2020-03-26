@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.mq;
+package com.hp.sh.expv3.pc.mq.starter;
 
 import java.util.ArrayList;
 import java.util.List;
