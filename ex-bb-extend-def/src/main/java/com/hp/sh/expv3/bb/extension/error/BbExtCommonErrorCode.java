@@ -17,6 +17,9 @@ public class BbExtCommonErrorCode extends ErrorCode {
 
     public static final BbExtCommonErrorCode ACCOUNT_ALREADY_EXISTS= new BbExtCommonErrorCode(-17054, "账户已存在，请重新创建");
 
+    public static final BbExtCommonErrorCode SYMBOL_DOES_NOT_EXIST = new BbExtCommonErrorCode(-17055, "此交易对不存在");
+
+
     private BbExtCommonErrorCode(int code, String message) {
         super(code, message);
     }

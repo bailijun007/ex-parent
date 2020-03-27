@@ -2,6 +2,7 @@ package com.hp.sh.expv3.bb.extension.api;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.extension.constant.BbAccountLogConst;
+import com.hp.sh.expv3.bb.extension.constant.BbExtRedisKey;
 import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
@@ -52,6 +53,9 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
         this.checkParam(userId, asset, historyType, tradeType, startDate, endDate, nextPage, pageSize);
         List<BbAccountLogExtVo> list = new ArrayList<>();
         List<String> symbols=buildSymbols(asset);
+        if (CollectionUtils.isEmpty(symbols)){
+            throw  new ExException(BbExtCommonErrorCode.SYMBOL_DOES_NOT_EXIST);
+        }
         List<BbAccountLogExtVo> voList = null;
         if (null == lastId) {
             voList = bbAccountLogExtService.listBbAccountLogs(userId, asset, symbols, historyType, tradeType, startDate, endDate, pageSize);
@@ -102,7 +106,7 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
 
     private List<String> buildSymbols(String asset) {
         HashOperations opsForHash = templateDB0.opsForHash();
-        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(asset, ScanOptions.NONE);
+        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(BbExtRedisKey.BB_SYMBOL, ScanOptions.NONE);
 
         List<BBSymbol> list = new ArrayList<>();
         while (curosr.hasNext()) {
