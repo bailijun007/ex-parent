@@ -15,6 +15,11 @@
             </if>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="assets!=null">and asset in
+                <foreach item="item" index="i" collection="assets" open="(" separator="," close=")">
+                    #{assets[${i}]}
+                </foreach>
+            </if>
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
             <if test="symbols!=null">and symbol in
                 <foreach item="item" index="i" collection="symbols" open="(" separator="," close=")">
@@ -46,6 +51,11 @@
             <if test="type!=null">and `type`=#{type}</if>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="assets!=null">and asset in
+                <foreach item="item" index="i" collection="assets" open="(" separator="," close=")">
+                    #{assets[${i}]}
+                </foreach>
+            </if>
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
             <if test="refId!=null">and ref_id=#{refId}</if>
             <if test="timeBegin!=null">and `time` &gt;= #{timeBegin}</if>
@@ -54,7 +64,6 @@
                 <when test="nextPage==1 and  lastId!=null">
                     and id &lt; #{lastId}
                     ORDER BY id desc
-                    LIMIT 0,${limit}
                 </when>
                 <when test="nextPage==-1 and lastId!=null">
                     and id &gt;= #{lastId}
