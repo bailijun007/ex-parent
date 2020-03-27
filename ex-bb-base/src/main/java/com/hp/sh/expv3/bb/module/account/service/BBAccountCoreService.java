@@ -5,6 +5,7 @@ package com.hp.sh.expv3.bb.module.account.service;
 
 import java.math.BigDecimal;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,12 @@ import com.hp.sh.expv3.bb.module.account.dao.BBAccountDAO;
 import com.hp.sh.expv3.bb.module.account.dao.BBAccountRecordDAO;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccount;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
-import com.hp.sh.expv3.bb.vo.request.FundRequest;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.BBCutRequest;
+import com.hp.sh.expv3.bb.vo.request.FreezeRequest;
+import com.hp.sh.expv3.bb.vo.request.FundRequest;
+import com.hp.sh.expv3.bb.vo.request.ReleaseFrozenRequest;
+import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.constant.FundFlowDirection;
@@ -74,24 +78,73 @@ public class BBAccountCoreService{
 	 * 加钱
 	 */
 	public Integer add(@RequestBody BBAddRequest request){
+		this.checkRequest(request);
+		
 		BBAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.INCOME);
 		record.setSn(SnUtils.newRecordSn());
 		
-		return this.newRecord(record);
+		return this.changeBalance(record);
 	}
 	
 	/**
 	 * 减钱
 	 */
 	public Integer cut(@RequestBody BBCutRequest request){
+		this.checkRequest(request);
+		
 		BBAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.EXPENSES);
 		record.setSn(SnUtils.newRecordSn());
 		
-		return this.newRecord(record);
+		return this.changeBalance(record);
+	}
+
+	/**
+	 * 解冻
+	 * @param userId
+	 * @param asset
+	 * @param amount
+	 * @return
+	 */
+	public Integer freeze(FreezeRequest request){
+		//检查请求
+		this.checkRequest(request);
+		
+		BBAccountRecord record = this.req2record(request);
+		record.setType(FundFlowDirection.EXPENSES);
+		record.setSn(SnUtils.newRecordSn());
+		
+		return this.changeBalance(record);
+		
+	}
+	
+	/**
+	 * 
+	 * @param userId
+	 * @param asset
+	 * @param amount
+	 * @return
+	 */
+	public Integer unfreeze(UnFreezeRequest request){
+		this.checkRequest(request);
+		
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param userId
+	 * @param asset
+	 * @param amount
+	 * @return
+	 */
+	public Integer release(ReleaseFrozenRequest request){
+		this.checkRequest(request);
+		
+		return null;
 	}
 	
 	public Boolean checkTradNo(Long userId, String tradeNo) {
@@ -100,6 +153,34 @@ public class BBAccountCoreService{
 			return Boolean.FALSE;
 		}
 		return Boolean.TRUE;
+	}
+	
+	private void checkRequest(FundRequest request){
+		if(StringUtils.isBlank(request.getAsset())){
+			throw new ExException(ExCommonError.PARAM_EMPTY); 
+		}
+		if(StringUtils.isBlank(request.getRemark())){
+			throw new ExException(ExCommonError.PARAM_EMPTY); 
+		}
+		if(StringUtils.isBlank(request.getTradeNo())){
+			throw new ExException(ExCommonError.PARAM_EMPTY); 
+		}
+		if(request.getAmount()==null){
+			throw new ExException(ExCommonError.PARAM_EMPTY); 
+		}
+		if(request.getAssociatedId()==null){
+			throw new ExException(ExCommonError.PARAM_EMPTY); 
+		}
+		if(request.getTradeType()==null){
+			throw new ExException(ExCommonError.PARAM_EMPTY); 
+		}
+		if(request.getUserId()==null){
+			throw new ExException(ExCommonError.PARAM_EMPTY); 
+		}
+		//金额必须是正数
+		if(request.getAmount().compareTo(BigDecimal.ZERO)<0){
+			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE);
+		}
 	}
 
 	BBAccountRecord queryRecord(Long userId, String tradeNo){
@@ -110,12 +191,12 @@ public class BBAccountCoreService{
 		return record;
 	}
 
-	protected int newRecord(BBAccountRecord record){
+	protected int changeBalance(BBAccountRecord record){
 		Long now = DbDateUtils.now();
 		
 		//金额必须是正数
 		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
-			throw new ExSysException(ExCommonError.PARAM_EMPTY);
+			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE);
 		}
 		
 		if(this.checkExist(record)){
@@ -174,6 +255,8 @@ public class BBAccountCoreService{
 		BBAccount account = new BBAccount();
 		account.setAsset(asset);
 		account.setBalance(balance);
+		account.setFrozen(BigDecimal.ZERO);
+		account.setTotal(balance);
 		account.setUserId(userId);
 		account.setCreated(now);
 		account.setModified(now);
@@ -200,9 +283,6 @@ public class BBAccountCoreService{
 	}
 
 	private BBAccountRecord req2record(FundRequest request){
-		if(request.getAmount()==null){
-			throw new ExSysException(ExCommonError.PARAM_EMPTY);
-		}
 		BBAccountRecord record = new BBAccountRecord();
 		record.setAmount(request.getAmount());
 		record.setAsset(request.getAsset());

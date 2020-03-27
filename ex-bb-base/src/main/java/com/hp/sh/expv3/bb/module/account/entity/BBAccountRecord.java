@@ -37,6 +37,12 @@ public class BBAccountRecord extends BaseRecordEntity	 {
 	//本笔余额
 	private BigDecimal balance;
 	
+	//冻结余额
+	private BigDecimal frozen;
+	
+	//冻结余额
+	private BigDecimal total;
+	
 	//调用方支付单号
 	private String tradeNo;
 	
@@ -136,6 +142,22 @@ public class BBAccountRecord extends BaseRecordEntity	 {
 
 	public void setAssociatedId(Long associatedId) {
 		this.associatedId = associatedId;
+	}
+
+	public BigDecimal getFrozen() {
+		return frozen;
+	}
+
+	public void setFrozen(BigDecimal frozen) {
+		this.frozen = frozen;
+	}
+
+	public BigDecimal getTotal() {
+		return total;
+	}
+
+	public void setTotal(BigDecimal total) {
+		this.total = total;
 	}
 
 	@TxId

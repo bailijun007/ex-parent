@@ -23,8 +23,14 @@ public class BBAccount extends BaseAccountEntity {
 	//资产类型
 	private String asset;
 	
-	//余额
+	//余额(可用)
 	private BigDecimal balance;
+	
+	//冻结余额
+	private BigDecimal frozen;
+	
+	//冻结余额
+	private BigDecimal total;
 	
 	//版本
 	private Long version;
@@ -54,6 +60,22 @@ public class BBAccount extends BaseAccountEntity {
 
 	public void setBalance(BigDecimal balance) {
 		this.balance = balance;
+	}
+
+	public BigDecimal getFrozen() {
+		return frozen;
+	}
+
+	public void setFrozen(BigDecimal frozen) {
+		this.frozen = frozen;
+	}
+
+	public BigDecimal getTotal() {
+		return total;
+	}
+
+	public void setTotal(BigDecimal total) {
+		this.total = total;
 	}
 
 	@Version
