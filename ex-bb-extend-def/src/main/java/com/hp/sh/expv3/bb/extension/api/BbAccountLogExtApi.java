@@ -38,6 +38,6 @@ public interface BbAccountLogExtApi {
                                   @RequestParam(value = "startDate", required = false) Long startDate,
                                   @RequestParam(value = "endDate", required = false) Long endDate,
                                   @RequestParam(value = "nextPage", required = true) Integer nextPage,
-                                  @RequestParam(value = "lastId", required = false) Integer lastId,
+                                  @RequestParam(value = "lastId", required = false) Long lastId,
                                   @RequestParam(value = "pageSize", required = true, defaultValue = "20") Integer pageSize );
 }

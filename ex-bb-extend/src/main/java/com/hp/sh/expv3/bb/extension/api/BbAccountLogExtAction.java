@@ -49,7 +49,7 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
     private StringRedisTemplate templateDB0;
 
     @Override
-    public List<BbAccountLogExtVo> query(Long userId, String asset, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Integer lastId, Integer pageSize) {
+    public List<BbAccountLogExtVo> query(Long userId, String asset, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Long lastId, Integer pageSize) {
         this.checkParam(userId, asset, historyType, tradeType, startDate, endDate, nextPage, pageSize);
         List<BbAccountLogExtVo> list = new ArrayList<>();
         List<String> symbols=buildSymbols(asset);
