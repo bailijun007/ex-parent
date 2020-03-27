@@ -41,10 +41,11 @@ public class BbAccountLogExtServiceImpl implements BbAccountLogExtService {
 
 
     @Override
-    public List<BbAccountLogExtVo> listBbAccountLogsByPage(Long userId, String asset, List<String> symbols, Integer historyType, Integer tradeType, Integer lastId, Integer nextPage, Long startDate, Long endDate, Integer pageSize) {
+    public List<BbAccountLogExtVo> listBbAccountLogsByPage(Long userId, String asset, List<String> symbols, Integer historyType, Integer tradeType, Long lastId, Integer nextPage, Long startDate, Long endDate, Integer pageSize) {
         Map<String, Object> map = new HashMap<>();
         simpleMap(userId, asset, symbols, historyType, startDate, endDate, pageSize, map);
         map.put("lastId", lastId);
+        map.put("nextPage", nextPage);
         List<BbAccountLogExtVo> list = null;
         if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
             list = bbAccountLogExtMapper.listBbAccountLogsByPage(map);

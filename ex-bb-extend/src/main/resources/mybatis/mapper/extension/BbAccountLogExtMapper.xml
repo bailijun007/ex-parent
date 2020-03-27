@@ -60,6 +60,9 @@
                     and id &gt;= #{lastId}
                     ORDER BY id asc
                 </when>
+                <otherwise>
+                    order by id desc
+                </otherwise>
             </choose>
         </where>
         LIMIT 0,${limit}
