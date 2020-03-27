@@ -14,6 +14,7 @@ import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.mq.msg.out.TradeListMsg;
 import com.hp.sh.expv3.bb.msg.EventMsg;
 
+
 @Component
 public class BBSender {
 	private static final Logger logger = LoggerFactory.getLogger(BBSender.class);

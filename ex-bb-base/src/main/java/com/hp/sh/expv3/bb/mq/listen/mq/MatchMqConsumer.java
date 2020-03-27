@@ -16,11 +16,13 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.job.BBMatchedHandler;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
+import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBMatchNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
 import com.hp.sh.expv3.bb.mq.send.BBSender;
+import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
@@ -122,6 +124,16 @@ public class MatchMqConsumer {
 		matchedHandler.handleMatchedTrade(matchedTrade);
 		
 	}
+	
+	//取消订单
+	@MQListener(tags=MqTags.TAGS_TRADE)
+	public void handleTradeMsg(BBTradeVo msg){
+		logger.info("收到用户成交消息:{}", msg);
+		this.tradeService.handleTrade(msg);
+	}
+	
+	@Autowired
+	private BBTradeService tradeService;
 	
 	@Autowired
 	private BBMatchedHandler matchedHandler;
