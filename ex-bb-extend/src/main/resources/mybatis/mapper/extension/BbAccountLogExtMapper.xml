@@ -7,20 +7,20 @@
         select  id,`type` tradeType,user_id userId,asset,symbol,ref_id refId,`time`
         from bb_account_log
         <where>
+            <if test="type!=null">and `type`=#{type}</if>
             <if test="types!=null">type in
                 <foreach item="item" index="i" collection="types" open="(" separator="," close=")">
                     #{types[${i}]}
                 </foreach>
             </if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
             <if test="symbols!=null">and symbol in
                 <foreach item="item" index="i" collection="symbols" open="(" separator="," close=")">
                     #{symbols[${i}]}
                 </foreach>
             </if>
-            <if test="type!=null">and `type`=#{type}</if>
-            <if test="userId!=null">and user_id=#{userId}</if>
-            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
-            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
             <if test="refId!=null">and ref_id=#{refId}</if>
             <if test="timeBegin!=null">and `time` &gt;= #{timeBegin}</if>
             <if test="timeEnd!=null">and `time` &lt;= #{timeEnd}</if>
