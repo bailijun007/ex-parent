@@ -23,7 +23,7 @@ public class BBSender {
 	
 	public void sendEventMsg(EventMsg eventMsg) {
 		String channel = this.getChannel(eventMsg);
-		logger.debug("publish:{}", channel, eventMsg);
+		logger.debug("publish:{},{}", channel, eventMsg);
 		publisher.publish(channel, eventMsg);
 	}
 	

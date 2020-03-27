@@ -50,7 +50,7 @@ public class BBTradeVo {
 	}
 	
 	public String uniqueKey(){
-		return "TRADE-"+this.tradeId+"-"+opponentOrderId;
+		return "TRADE-"+this.matchTxId+"-"+opponentOrderId;
 	}
 
 	public String getAsset() {
