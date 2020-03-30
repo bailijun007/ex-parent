@@ -30,6 +30,7 @@ import com.hp.sh.expv3.bb.component.MetadataService;
 import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 import com.hp.sh.expv3.bb.constant.MqTopic;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.rocketmq.config.RocketmqServerSetting;
 import com.hp.sh.rocketmq.exceptions.ReSendException;
 import com.hp.sh.rocketmq.impl.EndpointContext;
@@ -83,13 +84,16 @@ public class MqOrderlyConsumer {
         			Throwable cause = ExceptionUtils.getRootCause(e);
         			logger.error(e.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
+        		}catch(ExSysException e){
+        			Throwable cause = ExceptionUtils.getRootCause(e);
+        			logger.error(e.toString(), cause);
+        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(UpdateException e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
         			logger.warn(cause.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
-        			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error("未知捕获:"+cause.getMessage(), e);
+        			logger.error("未知捕获,{}", e.getMessage(), e);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		

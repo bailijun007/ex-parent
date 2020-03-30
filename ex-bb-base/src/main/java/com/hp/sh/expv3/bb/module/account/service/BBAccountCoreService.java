@@ -394,7 +394,7 @@ public class BBAccountCoreService{
 		}
 		//金额必须是正数
 		if(request.getAmount().compareTo(BigDecimal.ZERO)<0){
-			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE);
+			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE, request);
 		}
 	}
 

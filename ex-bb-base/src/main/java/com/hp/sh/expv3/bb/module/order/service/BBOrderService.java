@@ -20,8 +20,6 @@ import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.vo.BBSymbol;
 import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderFeeData;
-import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
-import com.hp.sh.expv3.bb.vo.request.BBCutRequest;
 import com.hp.sh.expv3.bb.vo.request.FreezeRequest;
 import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.lock.LockIt;
