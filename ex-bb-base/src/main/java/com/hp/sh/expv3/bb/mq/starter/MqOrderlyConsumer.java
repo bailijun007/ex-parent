@@ -89,7 +89,7 @@ public class MqOrderlyConsumer {
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error("未知捕获"+cause.getMessage(), e);
+        			logger.error("未知捕获:"+cause.getMessage(), e);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		
