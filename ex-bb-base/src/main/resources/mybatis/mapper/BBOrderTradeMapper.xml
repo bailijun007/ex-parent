@@ -47,8 +47,10 @@
 		<if test="feeSynchStatus!=null"> and fee_synch_status=#{feeSynchStatus}</if>
 		<if test="userId!=null"> and user_id=#{userId}</if>
 		<if test="id!=null"> and id=#{id}</if>
-		<if test="created!=null"> and created=#{created}</if>
-		<if test="modified!=null"> and modified=#{modified}</if>
+		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
+		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
 		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(asset,''),IFNULL(symbol,''),IFNULL(trade_sn,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
 	</sql>
 

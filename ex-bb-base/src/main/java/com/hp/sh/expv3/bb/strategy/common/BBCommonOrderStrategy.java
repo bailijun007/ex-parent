@@ -115,7 +115,10 @@ public class BBCommonOrderStrategy implements OrderStrategy {
 		//手续费率
 		BigDecimal tradeFeeRatio = order.getFeeRatio();
 		if(TradeRoles.isMaker(tradeVo.getMakerFlag())){
-			tradeFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
+			BigDecimal makerFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
+			if(BigUtils.lt(makerFeeRatio, tradeFeeRatio)){
+				tradeFeeRatio = makerFeeRatio;
+			}
 		}
 		tradeResult.setTradeFeeRatio(tradeFeeRatio);
 		//手续费
