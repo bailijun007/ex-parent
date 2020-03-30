@@ -223,38 +223,7 @@ public class BBAccountCoreService{
 		}
 		return Boolean.TRUE;
 	}
-	
-	private int changeBalance(BBAccountRecord record){
-		Long now = DbDateUtils.now();
-		
-		if(this.checkExist(record)){
-			logger.warn("重复的请求！");
-			return InvokeResult.NOCHANGE;
-		}
-		
-		BBAccount account = this.accountDAO.getAndLock(record.getUserId(), record.getAsset());
-		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
-		if(account==null){
-			//检查余额
-			this.checkBalance(record, recordAmount);
-			
-			account = this.newPcAccount(record.getUserId(), record.getAsset(), recordAmount, now);
-		}else{
-			BigDecimal newBalance = account.getBalance().add(recordAmount);
-			//检查余额
-			this.checkBalance(record, newBalance);
-			//更新余额
-			account.setBalance(newBalance);
-			account.setModified(now);
-			this.updateAccount(account);
-		}
-		
-		//保存本笔明细
-		this.saveRecord(record, account);
-	
-		return InvokeResult.SUCCESS;
-	}
-	
+
 	private BBAccount getAccount(Long userId, String asset){
 		BBAccount account = this.accountDAO.getAndLock(userId, asset);
 		if(account==null){
@@ -267,18 +236,6 @@ public class BBAccountCoreService{
 			account.setVersion(0L);
 		}
 		return account;
-	}
-
-	private void updateAccount(BBAccount account){
-		this.checkBalance(account.getBalance());
-		this.checkBalance(account.getFrozen());
-		
-		account.setTotal(account.getBalance().add(account.getFrozen()));
-		
-		int updatedRows = this.accountDAO.update(account);
-		if(updatedRows==0){
-			throw new UpdateException("更新失败");
-		}
 	}
 	
 	private void updateAccount(BBAccount account, Long now){
@@ -317,13 +274,6 @@ public class BBAccountCoreService{
 		this.fundAccountRecordDAO.save(record);
 		
 		publisher.publishEvent(record);
-	}
-
-	private void checkBalance(BBAccountRecord record, BigDecimal newBalance){
-		//检查余额
-		if(newBalance.compareTo(BigDecimal.ZERO) < 0){
-			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, record.getUserId(), record, newBalance);
-		}
 	}
 	
 	private void checkBalance(BigDecimal newBalance){
