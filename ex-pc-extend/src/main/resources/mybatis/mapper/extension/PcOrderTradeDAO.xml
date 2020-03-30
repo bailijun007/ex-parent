@@ -245,5 +245,23 @@
         </where>
 
     </select>
+    <select id="queryPcTradeFee" resultType="java.math.BigDecimal">
+        SELECT
+        sum(t.fee)
+        FROM
+        pc_order_trade t
+        where
+        t.user_id=#{userId}
+        and t.asset=#{asset}
+        <if test="beginTime!=null">
+            and t.trade_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null">
+            and t.trade_time &lt;= #{endTime}
+        </if>
+        <if test="makerFlag!=null">
+            and t.maker_flag=#{makerFlag}
+        </if>
+    </select>
 
 </mapper>

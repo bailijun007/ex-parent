@@ -2,16 +2,14 @@
  * @author zw
  * @date 2019/8/23
  */
-package com.hp.sh.expv3.match.bo;
+package com.hp.sh.expv3.bb.module.trade.entity;
 
-
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * 现货_成交(撮合结果)
  */
-public class BbTradeBo implements Serializable {
+public class BbMatch {
 
     //id
     private Long id;
@@ -34,12 +32,19 @@ public class BbTradeBo implements Serializable {
     private Long mkAccountId;
     //maker订单ID
     private Long mkOrderId;
+
     //成交价格
     private BigDecimal price;
     //数量
     private BigDecimal number;
     //成交时间
     private Long tradeTime;
+
+    private Long created;
+    private Long modified;
+
+    public BbMatch() {
+    }
 
     public Long getId() {
         return id;
@@ -135,5 +140,21 @@ public class BbTradeBo implements Serializable {
 
     public void setTradeTime(Long tradeTime) {
         this.tradeTime = tradeTime;
+    }
+
+    public Long getCreated() {
+        return created;
+    }
+
+    public void setCreated(Long created) {
+        this.created = created;
+    }
+
+    public Long getModified() {
+        return modified;
+    }
+
+    public void setModified(Long modified) {
+        this.modified = modified;
     }
 }

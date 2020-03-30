@@ -5,7 +5,7 @@
 package com.hp.sh.expv3.match.match.core.match.handler;
 
 import com.hp.sh.expv3.match.bo.BbOrder4MatchBo;
-import com.hp.sh.expv3.match.bo.BbTradeBo;
+import com.hp.sh.expv3.match.bo.BbMatchBo;
 import com.hp.sh.expv3.match.component.id.def.IdService;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.enums.IdTypeEnum;
@@ -65,7 +65,7 @@ public class BbMarketOrderHandler extends BbOrderHandler {
             makerOrder.setFilledNumber(makerOrder.getFilledNumber().add(currentFillAmount));
 
             long tradeId = idService.getId(IdTypeEnum.BB_TRADE);
-            BbTradeBo trade = buildTrade(context.getAsset(), context.getSymbol(), tradeId, context.getMatchResult().getMatchTxId(), takerOrder, makerOrder, makerPrice, currentFillAmount, takerOrder.getOrderTime());
+            BbMatchBo trade = buildMatch(context.getAsset(), context.getSymbol(), tradeId, context.getMatchResult().getMatchTxId(), takerOrder, makerOrder, makerPrice, currentFillAmount, takerOrder.getOrderTime());
 
             appendMatchResult(context, trade);
 

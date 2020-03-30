@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -137,6 +138,14 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
 
         List<PcOrderTradeExtendVo> pcTradeVo = pcOrderTradeService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId);
         return pcTradeVo;
+    }
+
+    @Override
+    public BigDecimal queryPcTradeFee(Long userId, String asset, Integer makerFlag, Long beginTime, Long endTime) {
+        if (StringUtils.isEmpty(asset)  || userId == null ) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        return pcOrderTradeService.queryPcTradeFee(userId,asset,makerFlag,beginTime,endTime);
     }
 
     @Override

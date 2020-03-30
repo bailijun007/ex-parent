@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -26,13 +25,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.concurrent.Executor;
 
-//@EnableDiscoveryClient
-//@EnableFeignClients({"com.hp.sh.expv3"})
 @ComponentScan("com.hp.sh.expv3")
-//@SpringBootApplication
-
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@EnableAutoConfiguration
+@SpringBootApplication
 @EnableScheduling
 public class ExBbMatchApplication extends Application implements ApplicationContextAware {
 

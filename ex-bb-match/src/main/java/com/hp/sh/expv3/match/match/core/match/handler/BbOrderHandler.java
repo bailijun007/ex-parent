@@ -5,7 +5,7 @@
 package com.hp.sh.expv3.match.match.core.match.handler;
 
 import com.hp.sh.expv3.match.bo.BbOrder4MatchBo;
-import com.hp.sh.expv3.match.bo.BbTradeBo;
+import com.hp.sh.expv3.match.bo.BbMatchBo;
 import com.hp.sh.expv3.match.constant.CommonConst;
 import com.hp.sh.expv3.match.enums.BbOrderTimeInForceEnum;
 import com.hp.sh.expv3.match.enums.BbOrderTypeEnum;
@@ -181,15 +181,15 @@ public abstract class BbOrderHandler implements ApplicationContextAware {
     /**
      * 新增撮合结果至缓冲列表
      *
-     * @param trade
+     * @param match
      * @return
      */
-    protected void appendMatchResult(BbMatchHandlerContext context, BbTradeBo trade) {
-        if (null == context.getMatchResult().getTradeList()) {
-            context.getMatchResult().setTradeList(new ArrayList<>());
+    protected void appendMatchResult(BbMatchHandlerContext context, BbMatchBo match) {
+        if (null == context.getMatchResult().getMatchList()) {
+            context.getMatchResult().setMatchList(new ArrayList<>());
         }
-        context.getMatchResult().getTradeList().add(trade);
-        context.setLastPrice(trade.getPrice());
+        context.getMatchResult().getMatchList().add(match);
+        context.setLastPrice(match.getPrice());
     }
 
     /**
@@ -202,7 +202,7 @@ public abstract class BbOrderHandler implements ApplicationContextAware {
      */
     abstract void matchLimit(BbMatchHandlerContext context, PriorityQueue<BbOrder4MatchBo> queue, BbOrder4MatchBo taker);
 
-    public BbTradeBo buildTrade(
+    public BbMatchBo buildMatch(
             String asset,
             String symbol,
             long tradeId,
@@ -216,7 +216,7 @@ public abstract class BbOrderHandler implements ApplicationContextAware {
             long ctime
     ) {
 
-        BbTradeBo trade = new BbTradeBo();
+        BbMatchBo trade = new BbMatchBo();
         trade.setId(tradeId);
         trade.setAsset(asset);
         trade.setSymbol(symbol);
@@ -233,6 +233,10 @@ public abstract class BbOrderHandler implements ApplicationContextAware {
 
         trade.setMkAccountId(makerOrder.getAccountId());
         trade.setMkOrderId(makerOrder.getOrderId());
+
+        long now = System.currentTimeMillis();
+        trade.setCreated(now);
+        trade.setModified(now);
 
         return trade;
     }

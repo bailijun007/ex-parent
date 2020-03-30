@@ -56,7 +56,9 @@ public enum EventEnum implements EnumDescribe {
     /**
      * rebase
      */
-    BB_ORDER_REBASE(51, "BB_ORDER_REBASE"),;
+    BB_ORDER_REBASE(51, "BB_ORDER_REBASE"),
+    // 成交 ，单用户级别
+    BB_TRADE(52, "BB_TRADE"),;
 
     private int code;
     private String constant;

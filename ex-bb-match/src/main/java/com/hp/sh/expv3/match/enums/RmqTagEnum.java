@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 public enum RmqTagEnum implements EnumDescribe {
 
     // BB_MATCH
+    BB_MATCH(EventEnum.BB_MATCH.getCode(), EventEnum.BB_MATCH.getConstant()),
     // book reset
     BB_BOOK_RESET(EventEnum.BB_BOOK_RESET.getCode(), EventEnum.BB_BOOK_RESET.getConstant()),
 
@@ -32,6 +33,7 @@ public enum RmqTagEnum implements EnumDescribe {
 
     BB_MATCH_CONSUMER_START(EventEnum.BB_MATCH_CONSUMER_START.getCode(), EventEnum.BB_MATCH_CONSUMER_START.getConstant()),
     BB_ORDER_REBASE(EventEnum.BB_ORDER_REBASE.getCode(), EventEnum.BB_ORDER_REBASE.getConstant()),
+    BB_TRADE(EventEnum.BB_TRADE.getCode(), EventEnum.BB_TRADE.getConstant()),
     //
     ;
 

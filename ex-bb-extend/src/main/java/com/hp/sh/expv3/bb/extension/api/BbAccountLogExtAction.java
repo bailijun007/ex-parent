@@ -50,17 +50,25 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
 
     @Override
     public List<BbAccountLogExtVo> query(Long userId, String asset, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Long lastId, Integer pageSize) {
-        this.checkParam(userId, asset, historyType, tradeType, startDate, endDate, nextPage, pageSize);
+        this.checkParam(userId, historyType, tradeType, startDate, endDate, nextPage, pageSize);
         List<BbAccountLogExtVo> list = new ArrayList<>();
-        List<String> symbols=buildSymbols(asset);
-        if (CollectionUtils.isEmpty(symbols)){
-            throw  new ExException(BbExtCommonErrorCode.SYMBOL_DOES_NOT_EXIST);
+        Set<String> assets = new HashSet<>();
+        List<String> symbols = new ArrayList<>();
+        if (StringUtils.isNotEmpty(asset)) {
+            assets.add(asset);
+            symbols = buildSymbols(asset);
+        } else {
+            buildAsset2symbol(assets, symbols);
         }
+        if (CollectionUtils.isEmpty(assets) || CollectionUtils.isEmpty(symbols)) {
+            throw new ExException(BbExtCommonErrorCode.SYMBOL_DOES_NOT_EXIST);
+        }
+
         List<BbAccountLogExtVo> voList = null;
         if (null == lastId) {
-            voList = bbAccountLogExtService.listBbAccountLogs(userId, asset, symbols, historyType, tradeType, startDate, endDate, pageSize);
+            voList = bbAccountLogExtService.listBbAccountLogs(userId, assets, symbols, historyType, tradeType, startDate, endDate, pageSize);
         } else {
-            voList = bbAccountLogExtService.listBbAccountLogsByPage(userId, asset, symbols, historyType, tradeType, lastId, nextPage, startDate, endDate, pageSize);
+            voList = bbAccountLogExtService.listBbAccountLogsByPage(userId, assets, symbols, historyType, tradeType, lastId, nextPage, startDate, endDate, pageSize);
         }
         if (!CollectionUtils.isEmpty(voList)) {
             Map<Integer, List<BbAccountLogExtVo>> map = voList.stream().collect(Collectors.groupingBy(BbAccountLogExtVo::getTradeType));
@@ -104,10 +112,22 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
         return list;
     }
 
+    private void buildAsset2symbol(Set<String>  assets, List<String> symbols) {
+        HashOperations opsForHash = templateDB0.opsForHash();
+        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(BbExtRedisKey.BB_SYMBOL, ScanOptions.NONE);
+        while (curosr.hasNext()) {
+            Map.Entry<String, Object> entry = curosr.next();
+            Object o = entry.getValue();
+            BBSymbol bBSymbolVO = JSON.parseObject(o.toString(), BBSymbol.class);
+            assets.add(bBSymbolVO.getAsset());
+            symbols.add(bBSymbolVO.getSymbol());
+        }
+    }
+
+
     private List<String> buildSymbols(String asset) {
         HashOperations opsForHash = templateDB0.opsForHash();
         Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(BbExtRedisKey.BB_SYMBOL, ScanOptions.NONE);
-
         List<BBSymbol> list = new ArrayList<>();
         while (curosr.hasNext()) {
             Map.Entry<String, Object> entry = curosr.next();
@@ -115,8 +135,7 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
             BBSymbol bBSymbolVO = JSON.parseObject(o.toString(), BBSymbol.class);
             list.add(bBSymbolVO);
         }
-         List<String> symbolList = list.stream().filter(symbol -> symbol.getAsset().equals(asset)).map(BBSymbol::getSymbol).collect(Collectors.toList());
-
+        List<String> symbolList = list.stream().filter(symbol -> symbol.getAsset().equals(asset)).map(BBSymbol::getSymbol).collect(Collectors.toList());
         return symbolList;
     }
 
@@ -165,9 +184,9 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
         }
     }
 
-    private void checkParam(Long userId, String asset, Integer historyType, Integer tradeType, Long startDate,
+    private void checkParam(Long userId, Integer historyType, Integer tradeType, Long startDate,
                             Long endDate, Integer pageNo, Integer pageSize) {
-        if (StringUtils.isEmpty(asset) || tradeType == null || null == userId ||
+        if (tradeType == null || null == userId ||
                 pageNo == null || pageSize == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }

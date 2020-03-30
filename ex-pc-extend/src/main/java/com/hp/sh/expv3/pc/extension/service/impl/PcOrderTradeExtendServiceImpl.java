@@ -167,5 +167,10 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         return list;
     }
 
+    @Override
+    public BigDecimal queryPcTradeFee(Long userId, String asset, Integer makerFlag, Long beginTime, Long endTime) {
+        return pcOrderTradeDAO.queryPcTradeFee(userId,asset,makerFlag,beginTime,endTime);
+    }
+
 
 }
