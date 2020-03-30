@@ -3,7 +3,6 @@ package com.hp.sh.expv3.bb.module.order.entity;
 import java.math.BigDecimal;
 
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.bb.strategy.data.OrderTrade;

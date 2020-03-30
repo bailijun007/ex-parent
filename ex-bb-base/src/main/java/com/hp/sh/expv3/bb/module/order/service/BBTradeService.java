@@ -26,6 +26,8 @@ import com.hp.sh.expv3.bb.strategy.vo.TradeResult;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.CollectorAddRequest;
 import com.hp.sh.expv3.bb.vo.request.CollectorCutRequest;
+import com.hp.sh.expv3.bb.vo.request.ReleaseFrozenRequest;
+import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -95,9 +97,17 @@ public class BBTradeService {
 		//修改订单状态
 		this.updateOrder4Trade(order, orderTrade, now);
 		
+		//释放冻结的保证金，手续费
+		if(order.getBidFlag()==OrderFlag.BID_BUY){
+			this.releaseMargin(order.getUserId(), order.getOrderMarginCurrency(), order.getId(), orderTrade.getFee(), tradeResult.getTradeOrderMargin());
+		}else{
+			this.releaseMargin(order.getUserId(), order.getOrderMarginCurrency(), order.getId(), BigDecimal.ZERO, tradeResult.getTradeOrderMargin());
+		}
+		
 		//退还剩余押金和手续费
 		if(orderTrade.isOrderCompleted()){
 			if(BigUtils.gtZero(orderTrade.getRemainFee()) || BigUtils.gtZero(orderTrade.getRemainOrderMargin())){
+				logger.warn("剩余押金={}，手续费={}", orderTrade.getRemainOrderMargin(), orderTrade.getRemainFee());
 				this.returnRemaining(order.getUserId(), order.getAsset(), order.getId(), orderTrade.getRemainFee(), orderTrade.getRemainOrderMargin());
 			}
 		}
@@ -106,7 +116,7 @@ public class BBTradeService {
 
 	private void returnRemaining(Long userId, String asset, Long orderId, BigDecimal remainFee, BigDecimal remainOrderMargin) {
 		BigDecimal returnAmount = remainFee.add(remainOrderMargin);
-		BBAddRequest request = new BBAddRequest();
+		UnFreezeRequest request = new UnFreezeRequest();
 		request.setAmount(returnAmount);
 		request.setUserId(userId);
 		request.setAsset(asset);
@@ -114,7 +124,20 @@ public class BBTradeService {
 		request.setTradeNo(SnUtils.getRemainSn(orderId));
 		request.setTradeType(BBAccountTradeType.RETURN_ORDER_MARGIN);
 		request.setAssociatedId(orderId);
-		this.accountCoreService.add(request);
+		this.accountCoreService.unfreeze(request);
+	}
+
+	private void releaseMargin(Long userId, String asset, Long orderId, BigDecimal remainFee, BigDecimal remainOrderMargin) {
+		BigDecimal returnAmount = remainFee.add(remainOrderMargin);
+		ReleaseFrozenRequest request = new ReleaseFrozenRequest();
+		request.setAmount(returnAmount);
+		request.setUserId(userId);
+		request.setAsset(asset);
+		request.setRemark(BigFormat.format("剩余押金：%s，剩余手续费：%s", remainOrderMargin, remainFee));
+		request.setTradeNo(SnUtils.getRemainSn(orderId));
+		request.setTradeType(BBAccountTradeType.RETURN_ORDER_MARGIN);
+		request.setAssociatedId(orderId);
+		this.accountCoreService.release(request);
 	}
 
 	private void addBalance(Long userId, Long orderTradeId, String asset, BigDecimal amount, int tradeType, String remark) {
@@ -129,28 +152,29 @@ public class BBTradeService {
 		this.accountCoreService.add(request);
 	}
 
-	private void updateOrder4Trade(BBOrder order, BBOrderTrade tradeResult, Long now){
-        if(tradeResult.isOrderCompleted()){
+	private void updateOrder4Trade(BBOrder order, BBOrderTrade orderTrade, Long now){
+        if(orderTrade.isOrderCompleted()){
         	order.setOrderMargin(BigDecimal.ZERO);
         	order.setFee(BigDecimal.ZERO);
         }else{
         	//扣除押金
-            order.setOrderMargin(tradeResult.getRemainOrderMargin());
+            order.setOrderMargin(orderTrade.getRemainOrderMargin());
         	//扣除手续费
-        	order.setFee(tradeResult.getRemainFee());
+        	order.setFee(orderTrade.getRemainFee());
         }
         
         //增加已扣手续费
-		order.setFeeCost(order.getFeeCost().add(tradeResult.getFee()));
+		order.setFeeCost(order.getFeeCost().add(orderTrade.getFee()));
 		//增加已成交金额
-		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getVolume()));
+		order.setFilledVolume(order.getFilledVolume().add(orderTrade.getVolume()));
 		//全部成交/部分成交
-        order.setStatus(tradeResult.isOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
+        order.setStatus(orderTrade.isOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         //活动状态
-        order.setActiveFlag(tradeResult.isOrderCompleted()?BBOrder.NO:BBOrder.YES);
+        order.setActiveFlag(orderTrade.isOrderCompleted()?BBOrder.NO:BBOrder.YES);
         //修改时间
 		order.setModified(now);
 		this.orderUpdateService.updateOrder4Trad(order);
+		
 	}
 
 	private BBOrderTrade saveOrderTrade(BBTradeVo tradeMsg, BBOrder order, TradeResult tradeResult, Long now) {
@@ -191,6 +215,8 @@ public class BBTradeService {
 		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
 		orderTrade.setFeeSynchStatus(IntBool.NO);
 		
+		this.checkOrderTrade(orderTrade);
+		
 		this.orderTradeDAO.save(orderTrade);
 		
 		publisher.publishEvent(orderTrade);
@@ -217,9 +243,15 @@ public class BBTradeService {
 		return true;
 	}
 	
+	private void checkOrderTrade(BBOrderTrade orderTrade) {
+		if(BigUtils.gtZero(orderTrade.getRemainOrderMargin()) || BigUtils.gtZero(orderTrade.getRemainFee())){
+			throw new RuntimeException("剩余保证金:"+orderTrade.getRemainOrderMargin()+"剩余手续费:"+orderTrade.getRemainFee());
+		}
+	}
+	
 	@Autowired
 	private BBCollectorCoreService collectorCoreService;
-	
+
 	public void synchCollector(BBOrderTrade orderTrade){
 		if(BigUtils.gtZero(orderTrade.getFee())){
 			CollectorAddRequest request = new CollectorAddRequest();

@@ -118,12 +118,10 @@ public class BBCommonOrderStrategy implements OrderStrategy {
 			tradeFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
 		}
 		tradeResult.setTradeFeeRatio(tradeFeeRatio);
+		
 		//手续费
 		tradeResult.setTradeFee(tradeResult.getTradeAmount().multiply(tradeFeeRatio));
 
-		//剩余数量
-		tradeResult.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getTradeVolume()));
-		
 		//押金
 		if(bidFlag==OrderFlag.BID_BUY){
 			tradeResult.setTradeOrderMargin(tradeResult.getTradeAmount());

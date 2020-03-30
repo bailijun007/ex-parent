@@ -26,8 +26,6 @@ public class TradeResult {
 	
 	//订单是否完成(此次成交后，对应订单已全部成交)
 	private boolean isOrderCompleted;
-	//此次成交的成交量
-	private BigDecimal remainVolume;
 	
 	public TradeResult() {
 		super();
@@ -87,14 +85,6 @@ public class TradeResult {
 
 	public void setTradeAmount(BigDecimal amount) {
 		this.tradeAmount = amount;
-	}
-	
-	public BigDecimal getRemainVolume() {
-		return remainVolume;
-	}
-
-	public void setRemainVolume(BigDecimal remainVolume) {
-		this.remainVolume = remainVolume;
 	}
 
 }

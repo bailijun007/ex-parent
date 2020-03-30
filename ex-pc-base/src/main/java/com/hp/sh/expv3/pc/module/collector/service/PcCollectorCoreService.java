@@ -118,10 +118,8 @@ public class PcCollectorCoreService{
 	
 	private void checkBalance(PcCollectorAccountRecord record, BigDecimal newBalance){
 		//检查余额
-		if(FundFlowDirection.EXPENSES==record.getType()){
-			if(newBalance.compareTo(BigDecimal.ZERO) < 0){
-				throw new ExException(PcCollectorAccountError.BALANCE_NOT_ENOUGH);
-			}
+		if(newBalance.compareTo(BigDecimal.ZERO) < 0){
+			throw new ExException(PcCollectorAccountError.BALANCE_NOT_ENOUGH);
 		}
 	}
 	

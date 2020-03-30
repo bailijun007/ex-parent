@@ -25,7 +25,7 @@ public class BBAccountRecord extends BaseRecordEntity	 {
 	//流水号
 	private String sn;
 
-	//类型：1 收入,-1 支出
+	//记录类型：1 增加金额,-1 扣减金额, -2冻结, 2 解冻
 	private Integer type;
 	
 	//本笔金额

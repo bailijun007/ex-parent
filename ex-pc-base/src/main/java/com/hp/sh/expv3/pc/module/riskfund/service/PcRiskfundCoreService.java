@@ -119,10 +119,8 @@ public class PcRiskfundCoreService{
 	
 	private void checkBalance(PcRiskfundAccountRecord record, BigDecimal newBalance){
 		//检查余额
-		if(FundFlowDirection.EXPENSES==record.getType()){
-			if(newBalance.compareTo(BigDecimal.ZERO) < 0){
-				throw new ExException(PcRiskfundAccountError.BALANCE_NOT_ENOUGH);
-			}
+		if(newBalance.compareTo(BigDecimal.ZERO) < 0){
+			throw new ExException(PcRiskfundAccountError.BALANCE_NOT_ENOUGH);
 		}
 	}
 	

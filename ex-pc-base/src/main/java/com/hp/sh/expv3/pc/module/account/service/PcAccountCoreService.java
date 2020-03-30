@@ -163,10 +163,8 @@ public class PcAccountCoreService{
 	
 	private void checkBalance(PcAccountRecord record, BigDecimal newBalance){
 		//检查余额
-		if(FundFlowDirection.EXPENSES==record.getType()){
-			if(newBalance.compareTo(BigDecimal.ZERO) < 0){
-				throw new ExException(PcAccountError.BALANCE_NOT_ENOUGH);
-			}
+		if(newBalance.compareTo(BigDecimal.ZERO) < 0){
+			throw new ExException(PcAccountError.BALANCE_NOT_ENOUGH);
 		}
 	}
 	

@@ -22,6 +22,8 @@ import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.BBCutRequest;
+import com.hp.sh.expv3.bb.vo.request.FreezeRequest;
+import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -138,7 +140,7 @@ public class BBOrderService {
 	}
 	
 	private void cutMargin(Long userId, String asset, Long orderId, BigDecimal amount , int tradeType, String remark){
-		BBCutRequest request = new BBCutRequest();
+		FreezeRequest request = new FreezeRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
 		request.setRemark("币币委托:"+remark);
@@ -146,11 +148,11 @@ public class BBOrderService {
 		request.setTradeType(tradeType);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
-		this.bBAccountCoreService.cut(request);
+		this.bBAccountCoreService.freeze(request);
 	}
 	
 	private Integer returnCancelAmt(Long userId, String asset, Long orderId, BigDecimal orderMargin, BigDecimal fee, BigDecimal cancelVolume){
-		BBAddRequest request = new BBAddRequest();
+		UnFreezeRequest request = new UnFreezeRequest();
 		request.setAmount(orderMargin.add(fee));
 		request.setAsset(asset);
 		String remark = BigFormat.format("撤单:押金=%s,手续费=%s,撤销数量=%s", orderMargin, fee, cancelVolume);
@@ -159,7 +161,7 @@ public class BBOrderService {
 		request.setTradeType(BBAccountTradeType.ORDER_CANCEL);
 		request.setUserId(userId);
 		request.setAssociatedId(orderId);
-		return this.bBAccountCoreService.add(request);
+		return this.bBAccountCoreService.unfreeze(request);
 	}
 
 	//设置开仓订单的各种费率

@@ -95,4 +95,11 @@ public class FundRequest {
 		this.associatedId = associatedId;
 	}
 
+	@Override
+	public String toString() {
+		return "FundRequest [userId=" + userId + ", asset=" + asset + ", amount=" + amount + ", tradeType=" + tradeType
+				+ ", remark=" + remark + ", tradeNo=" + tradeNo + ", associatedId=" + associatedId + ", whole=" + whole
+				+ "]";
+	}
+
 }

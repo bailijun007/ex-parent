@@ -10,6 +10,8 @@
 		<result column="amount" property="amount" />
 		<result column="remark" property="remark" />
 		<result column="balance" property="balance" />
+		<result column="frozen" property="frozen" />
+		<result column="total" property="total" />
 		<result column="trade_no" property="tradeNo" />
 		<result column="trade_type" property="tradeType" />
 		<result column="serial_no" property="serialNo" />
@@ -23,7 +25,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		asset,sn,type,amount,remark,balance,trade_no,trade_type,serial_no,associated_id,tx_id,request_id,user_id,id,created,modified
+		asset,sn,type,amount,remark,balance,frozen,total,trade_no,trade_type,serial_no,associated_id,tx_id,request_id,user_id,id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -46,7 +48,6 @@
 		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
 		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
-		<if test="keyword!=null and keyword!=''"> and xxxxx like CONCAT('%',#{keyword},'%')</if>	
 		</where>
 	</sql>
 
@@ -106,9 +107,9 @@
 
 	<insert id="save">
 		insert into bb_account_record (
-			asset,sn,type,amount,remark,balance,trade_no,trade_type,serial_no,associated_id,tx_id,request_id,user_id,id,created,modified
+			asset,sn,type,amount,remark,balance,frozen,total,trade_no,trade_type,serial_no,associated_id,tx_id,request_id,user_id,id,created,modified
 		)values(
-			#{asset},#{sn},#{type},#{amount},#{remark},#{balance},#{tradeNo},#{tradeType},#{serialNo},#{associatedId},#{txId},#{requestId},#{userId},#{id},#{created},#{modified}
+			#{asset},#{sn},#{type},#{amount},#{remark},#{balance},#{frozen},#{total},#{tradeNo},#{tradeType},#{serialNo},#{associatedId},#{txId},#{requestId},#{userId},#{id},#{created},#{modified}
 		)
 	</insert>
 	
@@ -116,7 +117,7 @@
 		update 
 			bb_account_record
 		set 
-			asset=#{asset},sn=#{sn},type=#{type},amount=#{amount},remark=#{remark},balance=#{balance},trade_no=#{tradeNo},trade_type=#{tradeType},serial_no=#{serialNo},associated_id=#{associatedId},tx_id=#{txId},request_id=#{requestId},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+			asset=#{asset},sn=#{sn},type=#{type},amount=#{amount},remark=#{remark},balance=#{balance},frozen=#{frozen},total=#{total},trade_no=#{tradeNo},trade_type=#{tradeType},serial_no=#{serialNo},associated_id=#{associatedId},tx_id=#{txId},request_id=#{requestId},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>

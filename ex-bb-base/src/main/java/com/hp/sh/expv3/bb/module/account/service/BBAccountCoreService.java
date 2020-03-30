@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
+import com.hp.sh.expv3.bb.constant.BBAccountRecordType;
 import com.hp.sh.expv3.bb.error.BBAccountError;
 import com.hp.sh.expv3.bb.module.account.dao.BBAccountDAO;
 import com.hp.sh.expv3.bb.module.account.dao.BBAccountRecordDAO;
@@ -28,7 +29,6 @@ import com.hp.sh.expv3.bb.vo.request.ReleaseFrozenRequest;
 import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
-import com.hp.sh.expv3.constant.FundFlowDirection;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -43,7 +43,7 @@ public class BBAccountCoreService{
 	private static final Logger logger = LoggerFactory.getLogger(BBAccountCoreService.class);
 
 	@Autowired
-	private BBAccountDAO bBAccountDAO;
+	private BBAccountDAO accountDAO;
 
 	@Autowired
 	private BBAccountRecordDAO fundAccountRecordDAO;
@@ -52,12 +52,12 @@ public class BBAccountCoreService{
     private ApplicationEventPublisher publisher;
 	
 	public Boolean exist(Long userId, String asset){
-		BBAccount fa = this.bBAccountDAO.get(userId, asset);
+		BBAccount fa = this.accountDAO.get(userId, asset);
 		return fa!=null;
 	}
 
 	public int createAccount(Long userId, String asset){
-		BBAccount fa = this.bBAccountDAO.get(userId, asset);
+		BBAccount fa = this.accountDAO.get(userId, asset);
 		if(fa!=null){
 			return InvokeResult.NOCHANGE;
 		}
@@ -67,7 +67,7 @@ public class BBAccountCoreService{
 	}
 	
 	public BigDecimal getBalance(Long userId, String asset){
-		BBAccount fa = this.bBAccountDAO.get(userId, asset);
+		BBAccount fa = this.accountDAO.get(userId, asset);
 		if(fa==null){
 			return null;
 		}
@@ -78,32 +78,56 @@ public class BBAccountCoreService{
 	 * 加钱
 	 */
 	public Integer add(@RequestBody BBAddRequest request){
+		//检查请求
 		this.checkRequest(request);
 		
 		BBAccountRecord record = this.req2record(request);
+		record.setType(BBAccountRecordType.ADD);
 		
-		record.setType(FundFlowDirection.INCOME);
-		record.setSn(SnUtils.newRecordSn());
+		//检查重复
+		if(this.checkExist(record)){
+			logger.warn("重复的请求！");
+			return InvokeResult.NOCHANGE;
+		}
+		//保存总账
+		BBAccount account = this.getAccount(record.getUserId(), record.getAsset());
+		account.setBalance(account.getBalance().add(record.getAmount()));
+		this.updateAccount(account, null);
 		
-		return this.changeBalance(record);
+		//保存本笔明细
+		this.saveRecord(record, account);
+	
+		return InvokeResult.SUCCESS;
 	}
 	
 	/**
 	 * 减钱
 	 */
 	public Integer cut(@RequestBody BBCutRequest request){
+		//检查请求
 		this.checkRequest(request);
 		
 		BBAccountRecord record = this.req2record(request);
+		record.setType(BBAccountRecordType.CUT);
 		
-		record.setType(FundFlowDirection.EXPENSES);
-		record.setSn(SnUtils.newRecordSn());
+		//检查重复
+		if(this.checkExist(record)){
+			logger.warn("重复的请求！");
+			return InvokeResult.NOCHANGE;
+		}
+		//保存总账
+		BBAccount account = this.getAccount(record.getUserId(), record.getAsset());
+		account.setBalance(account.getBalance().subtract(record.getAmount()));
+		this.updateAccount(account, null);
 		
-		return this.changeBalance(record);
+		//保存本笔明细
+		this.saveRecord(record, account);
+	
+		return InvokeResult.SUCCESS;
 	}
 
 	/**
-	 * 解冻
+	 * 冻结
 	 * @param userId
 	 * @param asset
 	 * @param amount
@@ -114,37 +138,82 @@ public class BBAccountCoreService{
 		this.checkRequest(request);
 		
 		BBAccountRecord record = this.req2record(request);
-		record.setType(FundFlowDirection.EXPENSES);
-		record.setSn(SnUtils.newRecordSn());
+		record.setType(BBAccountRecordType.FROZEN);
 		
-		return this.changeBalance(record);
+		//检查重复
+		if(this.checkExist(record)){
+			logger.warn("重复的请求！");
+			return InvokeResult.NOCHANGE;
+		}
+		//保存总账
+		BBAccount account = this.getAccount(record.getUserId(), record.getAsset());
+		account.setBalance(account.getBalance().subtract(record.getAmount()));
+		account.setFrozen(account.getFrozen().add(record.getAmount()));
+		this.updateAccount(account, null);
 		
+		//保存本笔明细
+		this.saveRecord(record, account);
+	
+		return InvokeResult.SUCCESS;
 	}
 	
 	/**
-	 * 
-	 * @param userId
-	 * @param asset
-	 * @param amount
+	 * 解冻
+	 * @param request
 	 * @return
 	 */
 	public Integer unfreeze(UnFreezeRequest request){
+		//检查请求
 		this.checkRequest(request);
 		
-		return null;
+		BBAccountRecord record = this.req2record(request);
+		record.setType(BBAccountRecordType.FROZEN);
+		
+		//检查重复
+		if(this.checkExist(record)){
+			logger.warn("重复的请求！");
+			return InvokeResult.NOCHANGE;
+		}
+		
+		//保存总账
+		BBAccount account = this.getAccount(record.getUserId(), record.getAsset());
+		account.setBalance(account.getBalance().add(record.getAmount()));
+		account.setFrozen(account.getFrozen().subtract(record.getAmount()));
+		this.updateAccount(account, null);
+		
+		//保存本笔明细
+		this.saveRecord(record, account);
+	
+		return InvokeResult.SUCCESS;
 	}
 	
 	/**
-	 * 
-	 * @param userId
-	 * @param asset
-	 * @param amount
+	 * 释放冻结
+	 * @param request
 	 * @return
 	 */
 	public Integer release(ReleaseFrozenRequest request){
+		//检查请求
 		this.checkRequest(request);
 		
-		return null;
+		BBAccountRecord record = this.req2record(request);
+		record.setType(BBAccountRecordType.FROZEN);
+		
+		//检查重复
+		if(this.checkExist(record)){
+			logger.warn("重复的请求！");
+			return InvokeResult.NOCHANGE;
+		}
+		
+		//保存总账
+		BBAccount account = this.getAccount(record.getUserId(), record.getAsset());
+		account.setFrozen(account.getFrozen().subtract(record.getAmount()));
+		this.updateAccount(account, null);
+		
+		//保存本笔明细
+		this.saveRecord(record, account);
+	
+		return InvokeResult.SUCCESS;
 	}
 	
 	public Boolean checkTradNo(Long userId, String tradeNo) {
@@ -155,6 +224,152 @@ public class BBAccountCoreService{
 		return Boolean.TRUE;
 	}
 	
+	private int changeBalance(BBAccountRecord record){
+		Long now = DbDateUtils.now();
+		
+		if(this.checkExist(record)){
+			logger.warn("重复的请求！");
+			return InvokeResult.NOCHANGE;
+		}
+		
+		BBAccount account = this.accountDAO.getAndLock(record.getUserId(), record.getAsset());
+		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
+		if(account==null){
+			//检查余额
+			this.checkBalance(record, recordAmount);
+			
+			account = this.newPcAccount(record.getUserId(), record.getAsset(), recordAmount, now);
+		}else{
+			BigDecimal newBalance = account.getBalance().add(recordAmount);
+			//检查余额
+			this.checkBalance(record, newBalance);
+			//更新余额
+			account.setBalance(newBalance);
+			account.setModified(now);
+			this.updateAccount(account);
+		}
+		
+		//保存本笔明细
+		this.saveRecord(record, account);
+	
+		return InvokeResult.SUCCESS;
+	}
+	
+	private BBAccount getAccount(Long userId, String asset){
+		BBAccount account = this.accountDAO.getAndLock(userId, asset);
+		if(account==null){
+			account = new BBAccount();
+			account.setAsset(asset);
+			account.setBalance(BigDecimal.ZERO);
+			account.setFrozen(BigDecimal.ZERO);
+			account.setTotal(BigDecimal.ZERO);
+			account.setUserId(userId);
+			account.setVersion(0L);
+		}
+		return account;
+	}
+
+	private void updateAccount(BBAccount account){
+		this.checkBalance(account.getBalance());
+		this.checkBalance(account.getFrozen());
+		
+		account.setTotal(account.getBalance().add(account.getFrozen()));
+		
+		int updatedRows = this.accountDAO.update(account);
+		if(updatedRows==0){
+			throw new UpdateException("更新失败");
+		}
+	}
+	
+	private void updateAccount(BBAccount account, Long now){
+		if(now==null){
+			now = DbDateUtils.now();
+		}
+		
+		this.checkBalance(account.getBalance());
+		this.checkBalance(account.getFrozen());
+		
+		account.setTotal(account.getBalance().add(account.getFrozen()));
+		account.setModified(now);
+		
+		if(account.getCreated()==null){
+			account.setCreated(now);
+			this.accountDAO.save(account);
+		}else{
+			int updatedRows = this.accountDAO.update(account);
+			if(updatedRows==0){
+				throw new UpdateException("更新失败");
+			}
+		}
+	}
+	
+	private void saveRecord(BBAccountRecord record, BBAccount account){
+		//设置本笔余额
+		record.setSerialNo(account.getVersion());
+		record.setBalance(account.getBalance());
+		record.setFrozen(account.getFrozen());
+		record.setTotal(account.getTotal());
+		
+		//保存记录
+		record.setSn(SnUtils.newRecordSn());
+		record.setCreated(account.getModified());
+		record.setModified(account.getModified());
+		this.fundAccountRecordDAO.save(record);
+		
+		publisher.publishEvent(record);
+	}
+
+	private void checkBalance(BBAccountRecord record, BigDecimal newBalance){
+		//检查余额
+		if(newBalance.compareTo(BigDecimal.ZERO) < 0){
+			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, record.getUserId(), record, newBalance);
+		}
+	}
+	
+	private void checkBalance(BigDecimal newBalance){
+		//检查余额
+		if(newBalance.compareTo(BigDecimal.ZERO) < 0){
+			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, newBalance);
+		}
+	}
+	
+	private BBAccount newPcAccount(Long userId, String asset, BigDecimal balance, Long now){
+		BBAccount account = new BBAccount();
+		account.setAsset(asset);
+		account.setBalance(balance);
+		account.setFrozen(BigDecimal.ZERO);
+		account.setTotal(balance);
+		account.setUserId(userId);
+		account.setCreated(now);
+		account.setModified(now);
+		account.setVersion(0L);
+		this.accountDAO.save(account);
+		return account;
+	}
+
+	private boolean checkExist(BBAccountRecord record) {
+		
+		//金额必须是正数
+		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
+			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE);
+		}
+		
+		BBAccountRecord oldRcd = this.fundAccountRecordDAO.findByTradeNo(record.getUserId(), record.getTradeNo());
+		if(oldRcd == null){
+			return false;
+		}
+		
+		if(oldRcd!=null){
+			String ov = oldRcd.toValueString();
+			String nv = record.toValueString();
+			if(!ov.equals(nv)){
+				throw new ExSysException(BBAccountError.INCONSISTENT_REQUESTS, ov, nv);
+			}
+		}
+		
+		return true;
+	}
+
 	private void checkRequest(FundRequest request){
 		if(StringUtils.isBlank(request.getAsset())){
 			throw new ExException(ExCommonError.PARAM_EMPTY); 
@@ -181,105 +396,6 @@ public class BBAccountCoreService{
 		if(request.getAmount().compareTo(BigDecimal.ZERO)<0){
 			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE);
 		}
-	}
-
-	BBAccountRecord queryRecord(Long userId, String tradeNo){
-		BBAccountRecord record = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);
-		if(record==null){
-			throw new ExSysException(ExCommonError.OBJ_DONT_EXIST);
-		}
-		return record;
-	}
-
-	protected int changeBalance(BBAccountRecord record){
-		Long now = DbDateUtils.now();
-		
-		//金额必须是正数
-		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
-			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE);
-		}
-		
-		if(this.checkExist(record)){
-			logger.warn("重复的请求！");
-			return InvokeResult.NOCHANGE;
-		}
-		
-		BBAccount bBAccount = this.bBAccountDAO.getAndLock(record.getUserId(), record.getAsset());
-		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
-		if(bBAccount==null){
-			//检查余额
-			this.checkBalance(record, recordAmount);
-			
-			bBAccount = this.newPcAccount(record.getUserId(), record.getAsset(), recordAmount, now);
-		}else{
-			BigDecimal newBalance = bBAccount.getBalance().add(recordAmount);
-			//检查余额
-			this.checkBalance(record, newBalance);
-			//更新余额
-			bBAccount.setModified(now);
-			bBAccount.setBalance(newBalance);
-			this.updateAccount(bBAccount);
-		}
-		
-		//设置本比余额
-		record.setSerialNo(bBAccount.getVersion());
-		record.setBalance(bBAccount.getBalance());
-		
-		//保存记录
-		record.setCreated(now);
-		record.setModified(now);
-		this.fundAccountRecordDAO.save(record);
-		
-		publisher.publishEvent(record);
-	
-		return InvokeResult.SUCCESS;
-	}
-	
-	private void updateAccount(BBAccount bBAccount){
-		int updatedRows = this.bBAccountDAO.update(bBAccount);
-		if(updatedRows==0){
-			throw new UpdateException("更新失败");
-		}
-	}
-	
-	private void checkBalance(BBAccountRecord record, BigDecimal newBalance){
-		//检查余额
-		if(FundFlowDirection.EXPENSES==record.getType()){
-			if(newBalance.compareTo(BigDecimal.ZERO) < 0){
-				throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, record.getUserId(), record, newBalance);
-			}
-		}
-	}
-	
-	private BBAccount newPcAccount(Long userId, String asset, BigDecimal balance, Long now){
-		BBAccount account = new BBAccount();
-		account.setAsset(asset);
-		account.setBalance(balance);
-		account.setFrozen(BigDecimal.ZERO);
-		account.setTotal(balance);
-		account.setUserId(userId);
-		account.setCreated(now);
-		account.setModified(now);
-		account.setVersion(0L);
-		this.bBAccountDAO.save(account);
-		return account;
-	}
-
-	private boolean checkExist(BBAccountRecord record) {
-		BBAccountRecord oldRcd = this.fundAccountRecordDAO.findByTradeNo(record.getUserId(), record.getTradeNo());
-		if(oldRcd == null){
-			return false;
-		}
-		
-		if(oldRcd!=null){
-			String ov = oldRcd.toValueString();
-			String nv = record.toValueString();
-			if(!ov.equals(nv)){
-				throw new ExSysException(BBAccountError.INCONSISTENT_REQUESTS, ov, nv);
-			}
-		}
-		
-		return true;
 	}
 
 	private BBAccountRecord req2record(FundRequest request){
