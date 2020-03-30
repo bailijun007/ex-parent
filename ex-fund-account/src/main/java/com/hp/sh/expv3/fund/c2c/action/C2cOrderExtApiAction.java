@@ -18,6 +18,7 @@ import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.constant.TradeType;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundAddRequest;
 import com.hp.sh.expv3.fund.wallet.vo.request.FundCutRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,15 +57,15 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
     /**
      * 通过支付状态分页查询c2c订单，不传则查全部
      *
-     * @param payStatus 支付状态:0-待支付，1-支付成功，2-支付失败,3:已取消, 4-同步余额, 5-审核中, 6-审核通过
+     * @param payStatus 0-待支付，1-支付成功，2-支付失败,3:已取消, 4-审批中, 5-审批通过, 6-审批拒绝
      * @param nextPage  1:下一页，-1：上一页
      * @param pageSize  页大小
      * @param id        主键id
      * @return
      */
     @Override
-    public PageResult<C2cOrderVo> pageQueryByPayStatus(Integer payStatus, Integer nextPage, Integer pageSize, Long id, Long userId) {
-        if (pageSize == null || nextPage == null || pageSize == null || userId == null) {
+    public PageResult<C2cOrderVo> pageQueryByPayStatus(String payStatus, Integer nextPage, Integer pageSize, Long id, Long userId) {
+        if (pageSize == null || nextPage == null || StringUtils.isEmpty(payStatus) || userId == null) {
             throw new ExException(ExFundError.PARAM_EMPTY);
         }
         return queryService.pageQueryByPayStatus(payStatus, nextPage, pageSize, id, userId);
@@ -117,7 +118,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
                 c2cOrder.setExchangeCurrency(tarAsset);
                 c2cOrder.setPrice(ratio);
                 c2cOrder.setType(C2cConst.C2C_SELL);
-                c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
+                c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
                 c2cOrder.setPayStatusDesc(C2cConst.C2C_PAY_STATUS_DESC_WITHDRAWAL);
                 c2cOrder.setPayTime(Instant.now().toEpochMilli());
                 c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());

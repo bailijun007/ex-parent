@@ -82,7 +82,7 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
 
 
     @Override
-    @Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(cron = "*/1 * * * * *")
     public void trigger() {
         if (1 != ongoingAppendEnable) {
             return;

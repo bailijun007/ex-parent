@@ -46,6 +46,7 @@ public class BbmatchRmqBeans {
     BbMatchProducer buildAccountContractProducer() throws MQClientException {
         BbMatchProducer producer = new BbMatchProducer();
         producer.setNamespace(rocketMqSetting.getNameSpace());
+        producer.setDefaultTopicQueueNums(bbmatchRocketMqSetting.getMatchTopicQueueSize());
         producer.setProducerGroup(bbmatchRocketMqSetting.getBbMatchProducerGroupName());
         producer.setNamesrvAddr(rocketMqSetting.getNameSrvAddr());
         producer.setInstanceName(bbmatchRocketMqSetting.getBbMatchProducerInstanceName());

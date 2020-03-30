@@ -1,6 +1,6 @@
 package com.hp.sh.expv3.match.msg;
 
-import com.hp.sh.expv3.match.bo.BbTradeBo;
+import com.hp.sh.expv3.match.bo.BbMatchBo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 public class TradeListMsgDto extends BaseMessageDto {
 
     private long matchTxId;
-    private List<TradeMsgDto> Trades;
+    private List<MatchMsgDto> Trades;
     private BigDecimal lastPrice;
 
     public long getMatchTxId() {
@@ -19,11 +19,11 @@ public class TradeListMsgDto extends BaseMessageDto {
         this.matchTxId = matchTxId;
     }
 
-    public List<TradeMsgDto> getTrades() {
+    public List<MatchMsgDto> getTrades() {
         return Trades;
     }
 
-    public void setTrades(List<TradeMsgDto> trades) {
+    public void setTrades(List<MatchMsgDto> trades) {
         Trades = trades;
     }
 
@@ -35,6 +35,6 @@ public class TradeListMsgDto extends BaseMessageDto {
         this.lastPrice = lastPrice;
     }
 
-    public static class TradeMsgDto extends BbTradeBo {
+    public static class MatchMsgDto extends BbMatchBo {
     }
 }

@@ -157,7 +157,7 @@ public class BbMatchedTaskServiceImpl implements BbMatchedTaskService, Applicati
         BbOrderMatchResultVo matchResult = context.getMatchResult();
 
         task.setBookUpdateList(matchResult.getBookUpdateList());
-        task.setTradeList(matchResult.getTradeList());
+        task.setMatchList(matchResult.getMatchList());
         task.setMatchTxId(matchResult.getMatchTxId());
         task.setCancelFlag(matchResult.isCancelFlag());
         task.setCancelNumber(matchResult.getCancelNumber());

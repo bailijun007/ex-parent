@@ -35,8 +35,10 @@
 		<if test="txId!=null"> and tx_id=#{txId}</if>
 		<if test="riskfundAccountId!=null"> and riskfund_account_id=#{riskfundAccountId}</if>
 		<if test="id!=null"> and id=#{id}</if>
-		<if test="created!=null"> and created=#{created}</if>
-		<if test="modified!=null"> and modified=#{modified}</if>
+		<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
+		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
 		<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
 		</where>
 	</sql>

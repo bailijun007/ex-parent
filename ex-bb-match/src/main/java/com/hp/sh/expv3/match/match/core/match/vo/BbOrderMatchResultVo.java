@@ -4,7 +4,7 @@
  */
 package com.hp.sh.expv3.match.match.core.match.vo;
 
-import com.hp.sh.expv3.match.bo.BbTradeBo;
+import com.hp.sh.expv3.match.bo.BbMatchBo;
 import com.hp.sh.expv3.match.msg.BookMsgDto;
 
 import java.math.BigDecimal;
@@ -15,7 +15,7 @@ public class BbOrderMatchResultVo {
     // book list
     private List<BookMsgDto.BookEntry> bookUpdateList;
     // trade list
-    private List<BbTradeBo> tradeList;
+    private List<BbMatchBo> matchList;
     private Long matchTxId;
 
     private boolean cancelFlag;
@@ -45,12 +45,12 @@ public class BbOrderMatchResultVo {
         this.bookUpdateList = bookUpdateList;
     }
 
-    public List<BbTradeBo> getTradeList() {
-        return tradeList;
+    public List<BbMatchBo> getMatchList() {
+        return matchList;
     }
 
-    public void setTradeList(List<BbTradeBo> tradeList) {
-        this.tradeList = tradeList;
+    public void setMatchList(List<BbMatchBo> matchList) {
+        this.matchList = matchList;
     }
 
     public Long getMatchTxId() {

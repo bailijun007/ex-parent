@@ -130,16 +130,26 @@ public class PcStrategyContext {
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		
 		//手续费率
-		if(matchedVo.getMakerFlag()==TradingRoles.MAKER){
-			BigDecimal feeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
-			tradeResult.setFeeRatio(feeRatio);
-		}else{
-			if(closeFlag==OrderFlag.ACTION_OPEN){
+		if(closeFlag==OrderFlag.ACTION_OPEN){
+			if(matchedVo.getMakerFlag()==TradingRoles.MAKER){
+				BigDecimal makerFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
+				if(BigUtils.lt(makerFeeRatio, order.getOpenFeeRatio())){
+					tradeResult.setFeeRatio(makerFeeRatio);
+				}else{
+					tradeResult.setFeeRatio(order.getOpenFeeRatio());
+				}
+			}else{
 				tradeResult.setFeeRatio(order.getOpenFeeRatio());
+			}
+		}else{
+			if(matchedVo.getMakerFlag()==TradingRoles.MAKER){
+				BigDecimal feeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
+				tradeResult.setFeeRatio(feeRatio);
 			}else{
 				BigDecimal feeRatio = this.feeRatioService.getTakerFeeRatio(userId, asset, symbol);
 				tradeResult.setFeeRatio(feeRatio);
 			}
+			
 		}
 
 		// 手续费&保证金

@@ -56,9 +56,9 @@ public class OrderInitializer implements ApplicationContextAware {
 
     @Autowired
     private MatchSupportContractService matchSupportContractService;
-    @Autowired
-    @Qualifier("threadManagerPcMatchImpl")
-    private IThreadManager iThreadManager;
+//    @Autowired
+//    @Qualifier("threadManagerPcMatchImpl")
+//    private IThreadManager iThreadManager;
 
     @PostConstruct
     private void init() {
@@ -75,7 +75,7 @@ public class OrderInitializer implements ApplicationContextAware {
 
             for (String assetSymbol : supportAssetSymbol) {
 
-                if (iThreadManager.getWorkerKeys().contains(assetSymbol)) {
+                if (threadManagerPcMatchImpl.getWorkerKeys().contains(assetSymbol)) {
                     // 已启动的，忽略
                     continue;
                 }

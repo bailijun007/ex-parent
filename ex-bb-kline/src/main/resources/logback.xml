@@ -3,7 +3,7 @@
 <configuration scan="false">
     <property name="maxHistory" value="60"/>
 
-    <property name="log_dir" value="/data/hupa/logs/bbkline"></property>
+    <property name="log_dir" value="/data/hupa/logs/bbkline/group1"></property>
 
     <!-- ConsoleAppender 控制台输出日志 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -114,7 +114,7 @@
         <file>${log_dir}/mq.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
-            <fileNamePattern>${log_dir}/pcNotify/pcNotify-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <fileNamePattern>${log_dir}/klineNotify/klineNotify-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
             <!-- 日志最大的历史 60天 -->
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -127,15 +127,6 @@
         </encoder>
     </appender>
 
-    <!-- 
-    <logger name="com.hp.sh.expv3.bb.kline.mq" level="info" additivity="false">
-        <appender-ref ref="mq"/>
-    </logger>
-    
-    <logger name="com.hp.sh.rocketmq" level="info" additivity="false">
-        <appender-ref ref="mq"/>
-    </logger>
- 	-->
 
     <root level="info">
         <appender-ref ref="STDOUT" />
@@ -143,7 +134,7 @@
 
     <logger name="springfox.documentation.spring" level="warn"></logger>
 
-    <springProfile name="prod">
+    <springProfile name="bbprod1">
         <root level="INFO">
             <appender-ref ref="ERROR"/>
             <appender-ref ref="WARN"/>
@@ -152,7 +143,17 @@
         </root>
     </springProfile>
 
-    <springProfile name="dev">
+    <springProfile name="pcprod1">
+        <root level="INFO">
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+    </springProfile>
+
+
+    <springProfile name="bbdev">
         <root level="INFO">
             <!-- 控制台输出 -->
             <appender-ref ref="STDOUT"/>
@@ -168,7 +169,24 @@
 
     </springProfile>
 
-    <springProfile name="local">
+
+    <springProfile name="pcdev">
+        <root level="INFO">
+            <!-- 控制台输出 -->
+            <appender-ref ref="STDOUT"/>
+            <!-- 文件输出 -->
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+
+        <logger name="com.hp.sh.expv3" level="info"></logger>
+        <logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
+
+    </springProfile>
+
+    <springProfile name="bai">
         <root level="INFO">
             <!-- 控制台输出 -->
             <appender-ref ref="STDOUT"/>
