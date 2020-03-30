@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.bb.extension.dao;
 
+import com.hp.sh.expv3.bb.extension.vo.BbAccountRecordExtVo;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountRecordVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,4 +17,8 @@ public interface BbAccountRecordExtMapper {
    List<BbAccountRecordVo> queryList(Map<String,Object> map);
 
     List<BbAccountRecordVo> queryByIds(@Param("idList") List<Long> idList);
+
+    List<BbAccountRecordExtVo> queryByLimit(Map<String, Object> map);
+
+    List<BbAccountRecordExtVo> listBbAccountRecordsByPage(Map<String, Object> map);
 }
