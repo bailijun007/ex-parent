@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.bb.module.trade.dao.BbMatchDAO">
+
+    <resultMap type="com.hp.sh.expv3.bb.module.trade.entity.BbMatch" id="BbMatch">
+        <result column="id" property="id"/>
+        <result column="match_tx_id" property="matchTxId"/>
+        <result column="symbol" property="symbol"/>
+        <result column="asset" property="asset"/>
+        <result column="tk_bid_flag" property="tkBidFlag"/>
+        <result column="tk_account_id" property="tkAccountId"/>
+        <result column="tk_order_id" property="tkOrderId"/>
+        <result column="mk_account_id" property="mkAccountId"/>
+        <result column="mk_order_id" property="mkOrderId"/>
+        <result column="price" property="price"/>
+        <result column="number" property="number"/>
+        <result column="trade_time" property="tradeTime"/>
+        <result column="created" property="created"/>
+        <result column="modified" property="modified"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		id,match_tx_id,symbol,asset,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,created,modified
+	</sql>
+
+    <sql id="simple_where">
+        <where>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="matchTxId!=null">and match_tx_id=#{matchTxId}</if>
+            <if test="tkBidFlag!=null">and tk_bid_flag=#{tkBidFlag}</if>
+            <if test="tkAccountId!=null">and tk_account_id=#{tkAccountId}</if>
+            <if test="tkOrderId!=null">and tk_order_id=#{tkOrderId}</if>
+            <if test="mkAccountId!=null">and mk_account_id=#{mkAccountId}</if>
+            <if test="mkOrderId!=null">and mk_order_id=#{mkOrderId}</if>
+            <if test="tradeTime!=null">and trade_time=#{tradeTime}</if>
+            <if test="created!=null">and created=#{created}</if>
+            <if test="modified!=null">and modified=#{modified}</if>
+        </where>
+    </sql>
+
+    <sql id="simple_query">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_match
+        <include refid="simple_where"/>
+        <if test="orderBy!=null and orderBy!=''">
+            order by ${orderBy}
+            <if test="!asc">desc</if>
+        </if>
+    </sql>
+
+    <select id="queryList" resultMap="BbMatch">
+        <include refid="simple_query"/>
+    </select>
+
+    <insert id="batchSave">
+        insert into bb_match (
+        <include refid="Base_Column_List"/>
+        ) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},#{item.matchTxId},#{item.symbol},#{item.asset},#{item.tkBidFlag},
+            #{item.tkAccountId},#{item.tkOrderId},
+            #{item.mkAccountId},#{item.mkOrderId},
+            #{item.price},#{item.number},#{item.tradeTime},
+            #{item.created},#{item.modified}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

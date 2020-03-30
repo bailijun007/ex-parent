@@ -129,7 +129,7 @@ public class BbMatchHandlerContext {
 
     public void clear() {
         this.getMatchResult().setBookUpdateList(null);
-        this.getMatchResult().setTradeList(null);
+        this.getMatchResult().setMatchList(null);
         this.getMatchResult().setMatchTxId(null);
         this.getMatchResult().setCancelFlag(false);
         this.getMatchResult().setCancelNumber(null);

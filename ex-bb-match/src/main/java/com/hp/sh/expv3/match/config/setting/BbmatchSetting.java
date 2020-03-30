@@ -13,23 +13,14 @@ import org.springframework.context.annotation.Configuration;
 public class BbmatchSetting {
 
     private Integer matchGroupId;
-    private Integer sendMatchBatchEnable;
-    private Integer tradeBatchSize;
+    private Integer matchSaveBatchSize;
 
-    public Integer getTradeBatchSize() {
-        return tradeBatchSize;
+    public Integer getMatchSaveBatchSize() {
+        return matchSaveBatchSize;
     }
 
-    public void setTradeBatchSize(Integer tradeBatchSize) {
-        this.tradeBatchSize = tradeBatchSize;
-    }
-
-    public Integer getSendMatchBatchEnable() {
-        return sendMatchBatchEnable;
-    }
-
-    public void setSendMatchBatchEnable(Integer sendMatchBatchEnable) {
-        this.sendMatchBatchEnable = sendMatchBatchEnable;
+    public void setMatchSaveBatchSize(Integer matchSaveBatchSize) {
+        this.matchSaveBatchSize = matchSaveBatchSize;
     }
 
     public Integer getMatchGroupId() {

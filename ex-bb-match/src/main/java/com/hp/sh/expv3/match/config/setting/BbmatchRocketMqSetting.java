@@ -19,6 +19,7 @@ public class BbmatchRocketMqSetting {
     private String bbOrderConsumerGroupName;
     private String bbOrderConsumerInstanceName;
     private long matchPullTimeoutInMs;
+    private int matchTopicQueueSize;
 
     private String bbOrderTopicNamePattern;
     private String bbOrderProducerGroupName;
@@ -98,5 +99,13 @@ public class BbmatchRocketMqSetting {
 
     public void setBbMatchProducerInstanceName(String bbMatchProducerInstanceName) {
         this.bbMatchProducerInstanceName = bbMatchProducerInstanceName;
+    }
+
+    public int getMatchTopicQueueSize() {
+        return matchTopicQueueSize;
+    }
+
+    public void setMatchTopicQueueSize(int matchTopicQueueSize) {
+        this.matchTopicQueueSize = matchTopicQueueSize;
     }
 }

@@ -4,8 +4,11 @@
  */
 package com.hp.sh.expv3.match.match.core.matched.task;
 
+import com.google.common.collect.Lists;
+import com.hp.sh.expv3.bb.module.trade.dao.BbMatchDAO;
+import com.hp.sh.expv3.bb.module.trade.entity.BbMatch;
+import com.hp.sh.expv3.match.bo.BbMatchBo;
 import com.hp.sh.expv3.match.bo.BbOrder4MatchBo;
-import com.hp.sh.expv3.match.bo.BbTradeBo;
 import com.hp.sh.expv3.match.component.notify.BbMatchMqNotify;
 import com.hp.sh.expv3.match.component.notify.BbNotify;
 import com.hp.sh.expv3.match.config.setting.BbmatchSetting;
@@ -19,13 +22,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Scope("prototype")
@@ -33,7 +39,7 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public List<BbTradeBo> tradeList;
+    public List<BbMatchBo> matchList;
 
     // 市价订单若没有匹配完成，则撤单
     public BbOrder4MatchBo takerOrder;
@@ -82,12 +88,12 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
     @Autowired
     private BbNotify bbNotify;
 
-    public List<BbTradeBo> getTradeList() {
-        return tradeList;
+    public List<BbMatchBo> getMatchList() {
+        return matchList;
     }
 
-    public void setTradeList(List<BbTradeBo> tradeList) {
-        this.tradeList = tradeList;
+    public void setMatchList(List<BbMatchBo> tradeList) {
+        this.matchList = tradeList;
     }
 
     public List<BookMsgDto.BookEntry> getBookUpdateList() {
@@ -114,13 +120,12 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
     }
 
     private void doLimit() {
-        if (null == tradeList || tradeList.isEmpty()) {
-        } else {
-            if (1 == bbmatchSetting.getSendMatchBatchEnable()) {
-                bbMatchMqNotify.sendTradeBatch(this.getAsset(), this.getSymbol(), this.tradeList);
-            } else {
-                bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
+        if (null != matchList && (!matchList.isEmpty())) {
+            List<BbMatchBo> notSavedTrade = filterNotSavedTrade(this.matchList, this.takerOrder);
+            if (null != notSavedTrade && !notSavedTrade.isEmpty()) {
+                saveTradeList(notSavedTrade);
             }
+            bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.matchList);
         }
 
         Long tkOrderId = takerOrder.getOrderId();
@@ -151,13 +156,12 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
     private void doMarket() {
 
         // 先发成交消息
-        if (null == tradeList || tradeList.isEmpty()) {
-        } else {
-            if (1 == bbmatchSetting.getSendMatchBatchEnable()) {
-                bbMatchMqNotify.sendTradeBatch(this.getAsset(), this.getSymbol(), this.tradeList);
-            } else {
-                bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.tradeList);
+        if (null != matchList && (!matchList.isEmpty())) {
+            List<BbMatchBo> notSavedTrade = filterNotSavedTrade(this.matchList, this.takerOrder);
+            if (null != notSavedTrade && !notSavedTrade.isEmpty()) {
+                saveTradeList(notSavedTrade);
             }
+            bbMatchMqNotify.sendTrade(this.getAsset(), this.getSymbol(), this.matchList);
         }
 
         if (isCancelFlag()) {
@@ -172,14 +176,11 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
         sendTradeMsg();
     }
 
-    private TradeListMsgDto.TradeMsgDto buildTrade(BbTradeBo trade) {
-        TradeListMsgDto.TradeMsgDto msg = new TradeListMsgDto.TradeMsgDto();
+    private TradeListMsgDto.MatchMsgDto buildTrade(BbMatchBo trade) {
+        TradeListMsgDto.MatchMsgDto msg = new TradeListMsgDto.MatchMsgDto();
         BeanUtils.copyProperties(trade, msg);
         return msg;
     }
-
-    @Value("${bbmatch.trade.batchSize:10}")
-    private int batchSize;
 
     private void sendBookMsg() {
         if (null == bookUpdateList || bookUpdateList.isEmpty()) {
@@ -202,7 +203,7 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
     }
 
     private void sendTradeMsg() {
-        if (null == tradeList || tradeList.isEmpty()) {
+        if (null == matchList || matchList.isEmpty()) {
         } else {
 
             TradeListMsgDto tradeListMsgDto = new TradeListMsgDto();
@@ -211,13 +212,55 @@ public class BbMatchedOrderMatchedTask extends BbMatchedBaseTask {
             tradeListMsgDto.setMsgType(EventEnum.BB_MATCH.getCode());
 
             // send match as trade
-            List<TradeListMsgDto.TradeMsgDto> trades = new ArrayList<>();
-            tradeList.forEach(bbMatchBo -> trades.add(buildTrade(bbMatchBo)));
+            List<TradeListMsgDto.MatchMsgDto> trades = new ArrayList<>();
+            matchList.forEach(bbMatchBo -> trades.add(buildTrade(bbMatchBo)));
 
             tradeListMsgDto.setTrades(trades);
 
             bbNotify.safeNotify(this.getAsset(), this.getSymbol(), tradeListMsgDto);
         }
+    }
+
+    @Autowired
+    private BbMatchDAO bbMatchDAO;
+
+    private void saveTradeList(List<BbMatchBo> tradeList) {
+        List<List<BbMatchBo>> batchTrade = Lists.partition(tradeList, bbmatchSetting.getMatchSaveBatchSize());
+        batchTrade.forEach(bbMatchDAO::batchSave);
+    }
+
+    /**
+     * 查询匹配结果是否已经入库，若已经入库，则使用已入库的记录的matchId 作为本批次入库的matchId。同时返回未入库的成交记录
+     *
+     * @param tradeList
+     * @return
+     */
+    private List<BbMatchBo> filterNotSavedTrade(List<BbMatchBo> tradeList, BbOrder4MatchBo takerOrder) {
+
+        List<BbMatch> existMatches = bbMatchDAO.queryList(new HashMap<String, Object>() {
+            {
+                put("tkAccountId", takerOrder.getAccountId());
+                put("tkOrderId", takerOrder.getOrderId());
+            }
+        });
+
+        List<BbMatchBo> needSave;
+
+        if (null == existMatches || existMatches.isEmpty()) {
+            needSave = tradeList;
+        } else {
+            // 使用上次的matchTxId覆盖
+            Long existMatchTxId = existMatches.get(0).getMatchTxId();
+            tradeList.forEach(pcMatchBo -> pcMatchBo.setMatchTxId(existMatchTxId));
+            needSave = new ArrayList<>(tradeList.size());
+            Map<Long, BbMatch> id2Match = existMatches.stream().collect(Collectors.toMap(BbMatch::getMkOrderId, Function.identity()));
+            for (BbMatchBo match : tradeList) {
+                if (!id2Match.containsKey(match.getMkOrderId())) {
+                    needSave.add(match);
+                }
+            }
+        }
+        return needSave;
     }
 
 }

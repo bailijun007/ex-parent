@@ -118,8 +118,11 @@ public class BbOrderInitTask extends BbOrderBaseTask implements ApplicationConte
         orderConsumer.setName("BbMatchConsumer_" + getAsset() + "__" + this.getSymbol());
         orderConsumer.start();
         setSentMqOffset(context, sentMqOffset);
-
         logger.info("{} {} match start.", this.getAsset(), this.getSymbol());
+
+        bbOrderMqNotify.sendOrderBookResetTrigger(this.getAsset(), this.getSymbol());
+        logger.info("{} {} book reset trigger send.", this.getAsset(), this.getSymbol());
+
     }
 
     private void setSentMqOffset(BbMatchHandlerContext context, long matchedMqOffset) {

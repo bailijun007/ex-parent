@@ -128,10 +128,10 @@
 
     <!-- DEBUG级别日志 appender -->
     <appender name="bbNotify" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log_dir}/pcNotify.log</file>
+        <file>${log_dir}/bbNotify.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
-            <fileNamePattern>${log_dir}/pcNotify/pcNotify-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <fileNamePattern>${log_dir}/pcNotify/bbNotify-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
             <!-- 日志最大的历史 60天 -->
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -145,10 +145,10 @@
     </appender>
 
     <appender name="bbSnapshot" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log_dir}/pcSnapshot.log</file>
+        <file>${log_dir}/bbSnapshot.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
-            <fileNamePattern>${log_dir}/pcSnapshot/pcSnapshot-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <fileNamePattern>${log_dir}/pcSnapshot/bbSnapshot-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
             <!-- 日志最大的历史 60天 -->
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
