@@ -31,4 +31,6 @@ public interface C2cOrderDAO extends BaseUserDataMapper<C2cOrder, Long> {
     List<C2cOrderVo> pageQueryByApprovalStatus(@Param("approvalStatus") Integer approvalStatus, @Param("userId") Long userId, @Param("type") Integer type);
 
     List<C2cOrderVo> queryByPayStatus(@Param("payStatus") Integer payStatus);
+
+    List<C2cOrderVo> queryByStatus(Map<String, Object> map);
 }

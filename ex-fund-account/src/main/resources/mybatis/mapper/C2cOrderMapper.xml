@@ -251,6 +251,36 @@
         where id=#{id}
     </update>
 
+    <select id="queryByStatus" resultType="com.hp.sh.expv3.fund.extension.vo.C2cOrderVo">
+        select
+        <include refid="Base_Column_List"/>
+        from c2c_order
+        <where>
+            <if test="userId!=null">
+                 user_id=#{userId}
+            </if>
+            <if test="payStatus!=null">
+                and pay_status=#{payStatus}
+            </if>
+            <if test="approvalStatus!=null">
+                and approval_status=#{approvalStatus}
+            </if>
+            <choose>
+                <when test="nextPage==1 and id!=null">
+                    and id &lt;  #{id}
+                    ORDER BY id desc
+                </when>
+                <when test="nextPage==-1 and id!=null">
+                    and id &gt;= #{id}
+                    ORDER BY id asc
+                </when>
+                <otherwise>
+                    ORDER BY id desc
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
     <select id="pageQueryByPayStatus" resultType="com.hp.sh.expv3.fund.extension.vo.C2cOrderVo">
         select
         <include refid="Base_Column_List"/>
@@ -269,12 +299,7 @@
             <if test="approvalStatus!=null">
                 and approval_status=#{approvalStatus}
             </if>
-            <!--<if test="payStatusList!=null">-->
-                <!--and pay_status in-->
-                <!--<foreach item="item" index="i" collection="payStatusList" open="(" separator="," close=")">-->
-                    <!--#{payStatusList[${i}]}-->
-                <!--</foreach>-->
-            <!--</if>-->
+
             <choose>
                 <when test="nextPage==1 and id!=null">
                     and id &lt;  #{id}
