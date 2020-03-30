@@ -37,4 +37,5 @@ public interface PcOrderTradeDAO {
 
     List<PcOrderTradeExtendVo> selectTradeListByUserId(@Param("asset") String asset, @Param("symbol") String symbol, @Param("tradeTimeBegin")  Long tradeTimeBegin, @Param("tradeTimeEnd") Long tradeTimeEnd, @Param("userId") Long userId);
 
+    BigDecimal queryPcTradeFee(@Param("userId") Long userId, @Param("asset")String asset,@Param("makerFlag") Integer makerFlag,@Param("beginTime") Long beginTime, @Param("endTime") Long endTime);
 }
