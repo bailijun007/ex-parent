@@ -128,14 +128,14 @@
 	</insert>
 
 	<update id="update">
-		update 
+		update
 			pc_trade
-		set 
+		set
 			id=#{id},match_tx_id=#{matchTxId},symbol=#{symbol},asset=#{asset},tk_bid_flag=#{tkBidFlag},
 			tk_account_id=#{tkAccountId},tk_order_id=#{tkOrderId},tk_close_flag=#{tkCloseFlag},
 			mk_account_id=#{mkAccountId},mk_order_id=#{mkOrderId},mk_close_flag=#{mkCloseFlag},
-			price=#{price},`number`=#{number},trade_time=#{tradeTime},created=#{created}
-		where 
+			price=#{price},`number`=#{number},trade_time=#{tradeTime},modified=#{modified}
+		where
 			id=#{id}
 	</update>
 

@@ -126,6 +126,9 @@ public class PcOrderInitTask extends PcOrderBaseTask implements ApplicationConte
         setSentMqOffset(context, sentMqOffset);
 
         logger.info("{} {} match start.", this.getAsset(), this.getSymbol());
+
+        pcOrderMqNotify.sendOrderBookResetTrigger(this.getAsset(), this.getSymbol());
+        logger.info("{} {} book reset trigger send.", this.getAsset(), this.getSymbol());
     }
 
     private void setSentMqOffset(PcMatchHandlerContext context, long matchedMqOffset) {
