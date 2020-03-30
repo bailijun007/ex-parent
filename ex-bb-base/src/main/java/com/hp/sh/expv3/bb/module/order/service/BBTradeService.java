@@ -135,7 +135,7 @@ public class BBTradeService {
 		request.setAsset(asset);
 		request.setRemark(BigFormat.format("剩余押金：%s，剩余手续费：%s", remainOrderMargin, remainFee));
 		request.setTradeNo(SnUtils.getRemainSn(orderId));
-		request.setTradeType(BBAccountTradeType.RETURN_ORDER_MARGIN);
+		request.setTradeType(BBAccountTradeType.TRADE_RELEASE);
 		request.setAssociatedId(orderId);
 		this.accountCoreService.release(request);
 	}
