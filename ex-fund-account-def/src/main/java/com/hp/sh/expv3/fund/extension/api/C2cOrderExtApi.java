@@ -24,13 +24,13 @@ public interface C2cOrderExtApi {
     @ApiOperation("通过支付状态分页查询c2c充值订单，不传则查全部")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "主键编号", example = "1", required = false),
-            @ApiImplicitParam(name = "payStatus", value = "支付状态:0-待支付，1-支付成功，2-支付失败,3:已取消, 4-审批中, 5-审批通过, 6-审批拒绝", example = "1", required = true),
+            @ApiImplicitParam(name = "payStatus", value = "当前订单（0,4），已完成订单（1,5），已取消订单（3,6）", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true),
             @ApiImplicitParam(name = "userId", value = "用户id", example = "0", required = true),
             @ApiImplicitParam(name = "nextPage", value = "1:下一页，-1：上一页", example = "1", required = true)
     })
     @GetMapping(value = "/api/extension/c2c/order/pageQueryByPayStatus")
-    public PageResult<C2cOrderVo> pageQueryByPayStatus(@RequestParam("payStatus") Integer payStatus, @RequestParam("nextPage") Integer nextPage,
+    public PageResult<C2cOrderVo> pageQueryByPayStatus(@RequestParam("payStatus") String payStatus, @RequestParam("nextPage") Integer nextPage,
                                                        @RequestParam("pageSize") Integer pageSize, @RequestParam(value = "id", required = false) Long id,
                                                        @RequestParam("userId") Long userId);
 

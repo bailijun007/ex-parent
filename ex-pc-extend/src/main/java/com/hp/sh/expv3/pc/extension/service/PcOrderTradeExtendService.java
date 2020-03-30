@@ -49,4 +49,6 @@ public interface PcOrderTradeExtendService {
     List<PcOrderTradeVo> selectPcFeeCollectByAccountId(String asset, String symbol, Long userId, Long statTime, Long endTime);
 
     List<PcOrderTradeExtendVo> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId);
+
+    BigDecimal queryPcTradeFee(Long userId, String asset, Integer makerFlag, Long beginTime, Long endTime);
 }

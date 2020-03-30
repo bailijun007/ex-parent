@@ -43,10 +43,4 @@ public class MarkPriceServiceImpl implements MarkPriceService {
         return new BigDecimal(s);
     }
 
-    public BigDecimal getLatestPrice(String asset, String symbol){
-        String key = "lastPrice:pc:";
-        String s = templateDB5.opsForValue().get(key + asset + ":" + symbol);
-        return new BigDecimal(s);
-    }
-
 }

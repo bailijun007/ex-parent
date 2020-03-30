@@ -127,6 +127,8 @@ public class PcAccountCoreService{
 		PcAccount pcAccount = this.pcAccountDAO.getAndLock(record.getUserId(), record.getAsset());
 		BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
 		if(pcAccount==null){
+			//检查余额
+			this.checkBalance(record, recordAmount);
 			pcAccount = this.newPcAccount(record.getUserId(), record.getAsset(), recordAmount, now);
 		}else{
 			BigDecimal newBalance = pcAccount.getBalance().add(recordAmount);

@@ -1,7 +1,7 @@
 //package com.hp.sh.expv3.bb.extension.job;
 //
 //import com.alibaba.fastjson.JSON;
-//import com.hp.sh.expv3.bb.extension.constant.BbKLineKey;
+//import com.hp.sh.expv3.bb.extension.constant.BbExtRedisKey;
 //import com.hp.sh.expv3.bb.extension.pojo.BBKLine;
 //import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
 //import com.hp.sh.expv3.bb.extension.service.BbTradeExtService;
@@ -48,7 +48,7 @@
 //            String symbol = bbSymbol.getSymbol();
 //            while (true) {
 //                //返回集合内元素的排名，以及分数（从小到大）
-//                String taskKey = BbKLineKey.KLINE_BB_TASK_FROM_EXP + asset + ":" + symbol;
+//                String taskKey = BbExtRedisKey.KLINE_BB_TASK_FROM_EXP + asset + ":" + symbol;
 //                Set<ZSetOperations.TypedTuple<String>> task = templateDB0.opsForZSet().rangeWithScores(taskKey, 0, -1);
 //                if (CollectionUtils.isEmpty(task)) {
 //                    continue;
@@ -63,7 +63,7 @@
 //                    }
 //
 //                    // 若修复数据已存在，忽略 从redis kline:from_exp:repair:BB:${asset}:${symbol}:${minute}中取
-//                    String repairkey = BbKLineKey.KLINE_BB_REPAIR_FROM_EXP + asset + ":" + symbol + ":" + 1;
+//                    String repairkey = BbExtRedisKey.KLINE_BB_REPAIR_FROM_EXP + asset + ":" + symbol + ":" + 1;
 //                    Set<ZSetOperations.TypedTuple<String>> repaired = templateDB0.opsForZSet().rangeWithScores(repairkey, 0, -1);
 //
 //                    if (null != repaired || !repaired.isEmpty()) {
@@ -95,7 +95,7 @@
 //
 //    private List<BBSymbol> listSymbol() {
 //        HashOperations opsForHash = templateDB0.opsForHash();
-//        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(BbKLineKey.BB_SYMBOL, ScanOptions.NONE);
+//        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(BbExtRedisKey.BB_SYMBOL, ScanOptions.NONE);
 //
 //        List<BBSymbol> list = new ArrayList<>();
 //        while (curosr.hasNext()) {
@@ -110,13 +110,13 @@
 //    // kline:from_exp:repair:BB:${asset}:${symbol}:${interval}:${minute}
 //    private void saveKline(BBKLine kline, String asset, String symbol,int interval,long minute) {
 //        //向集合中插入元素，并设置分数
-//        templateDB0.opsForZSet().add(BbKLineKey.KLINE_BB_REPAIR_FROM_EXP + asset + ":" + symbol+":"+interval+":"+minute, JSON.toJSONString(kline), minute);
+//        templateDB0.opsForZSet().add(BbExtRedisKey.KLINE_BB_REPAIR_FROM_EXP + asset + ":" + symbol+":"+interval+":"+minute, JSON.toJSONString(kline), minute);
 //    }
 //
 //    // kline:from_exp:update:BB:${asset}:${symbol}:${interval}:${minute}
 //    private void notifyUpdate(String asset, String symbol,int interval,long minute) {
 //        //向集合中插入元素，并设置分数
-//        templateDB0.opsForZSet().add(BbKLineKey.BB_KLINE_UPDATE + asset + ":" + symbol + ":" +interval+":"+ minute, asset + "#" + symbol + "#" + minute, minute);
+//        templateDB0.opsForZSet().add(BbExtRedisKey.BB_KLINE_UPDATE + asset + ":" + symbol + ":" +interval+":"+ minute, asset + "#" + symbol + "#" + minute, minute);
 //
 //    }
 //

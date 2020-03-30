@@ -1,7 +1,7 @@
 //package com.hp.sh.expv3.bb.extension.job;
 //
 //import com.alibaba.fastjson.JSON;
-//import com.hp.sh.expv3.bb.extension.constant.BbKLineKey;
+//import com.hp.sh.expv3.bb.extension.constant.BbExtRedisKey;
 //import com.hp.sh.expv3.bb.extension.pojo.BBKLine;
 //import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
 //import com.hp.sh.expv3.bb.extension.pubsub.BBKlineBuild;
@@ -95,7 +95,7 @@
 //
 //    private List<BBSymbol> listSymbol() {
 //        HashOperations opsForHash = templateDB0.opsForHash();
-//        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(BbKLineKey.BB_SYMBOL, ScanOptions.NONE);
+//        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(BbExtRedisKey.BB_SYMBOL, ScanOptions.NONE);
 //
 //        List<BBSymbol> list = new ArrayList<>();
 //        while (curosr.hasNext()) {
@@ -117,7 +117,7 @@
 //            }
 //        });
 //
-////        return BbKLineKey.KLINE_BB_UPDATE + asset + ":" + symbol + ":" + interval;
+////        return BbExtRedisKey.KLINE_BB_UPDATE + asset + ":" + symbol + ":" + interval;
 //    }
 //
 //    private String buildKlineSaveRedisKey(String asset, String symbol, int frequency) {

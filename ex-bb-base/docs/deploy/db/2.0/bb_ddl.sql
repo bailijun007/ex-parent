@@ -325,3 +325,24 @@ DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_成交(撮合结果)'
 
 ;
+
+CREATE TABLE `bb_match` (
+  `id` bigint(20) NOT NULL COMMENT 'id',
+  `asset` varchar(20) NOT NULL COMMENT '资产',
+  `symbol` varchar(20) NOT NULL COMMENT '交易对',
+  `match_tx_id` bigint(20) NOT NULL COMMENT '事务Id',
+  `tk_bid_flag` int(11) NOT NULL COMMENT 'taker是否买：1-是，0-否',
+  `tk_account_id` bigint(20) NOT NULL COMMENT 'taker账户ID',
+  `tk_order_id` bigint(20) NOT NULL COMMENT 'taker订单ID',
+  `mk_account_id` bigint(20) NOT NULL COMMENT 'maker账户Id',
+  `mk_order_id` bigint(20) NOT NULL COMMENT 'maker订单ID',
+  `price` decimal(50,30) NOT NULL COMMENT '成交价格',
+  `number` decimal(50,30) NOT NULL COMMENT '数量',
+  `trade_time` bigint(20) NOT NULL COMMENT '成交时间',
+  `created` bigint(20) DEFAULT NULL,
+  `modified` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_trade_time_symbol` (`trade_time`,`symbol`) USING BTREE,
+  KEY `idx_tk_account_id_tk_order_id` (`tk_account_id`,`tk_order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='永续合约_成交(撮合结果)';
+

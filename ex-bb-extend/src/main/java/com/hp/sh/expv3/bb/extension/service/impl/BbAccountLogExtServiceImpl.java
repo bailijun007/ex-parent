@@ -13,6 +13,7 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -26,10 +27,10 @@ public class BbAccountLogExtServiceImpl implements BbAccountLogExtService {
     private BbAccountLogExtMapper bbAccountLogExtMapper;
 
     @Override
-    public List<BbAccountLogExtVo> listBbAccountLogs(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer pageSize) {
+    public List<BbAccountLogExtVo> listBbAccountLogs(Long userId, Set<String> assets, List<String> symbols, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer pageSize) {
         List<BbAccountLogExtVo> list = null;
         Map<String, Object> map = new HashMap<>();
-        simpleMap(userId, asset, symbol, historyType, startDate, endDate, pageSize, map);
+        simpleMap(userId, assets, symbols, historyType, startDate, endDate, pageSize, map);
         if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
             list = bbAccountLogExtMapper.queryByLimit(map);
         } else {
@@ -41,10 +42,11 @@ public class BbAccountLogExtServiceImpl implements BbAccountLogExtService {
 
 
     @Override
-    public List<BbAccountLogExtVo> listBbAccountLogsByPage(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Integer lastId, Integer nextPage, Long startDate, Long endDate, Integer pageSize) {
+    public List<BbAccountLogExtVo> listBbAccountLogsByPage(Long userId,Set<String> assets, List<String> symbols, Integer historyType, Integer tradeType, Long lastId, Integer nextPage, Long startDate, Long endDate, Integer pageSize) {
         Map<String, Object> map = new HashMap<>();
-        simpleMap(userId, asset, symbol, historyType, startDate, endDate, pageSize, map);
+        simpleMap(userId, assets, symbols, historyType, startDate, endDate, pageSize, map);
         map.put("lastId", lastId);
+        map.put("nextPage", nextPage);
         List<BbAccountLogExtVo> list = null;
         if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
             list = bbAccountLogExtMapper.listBbAccountLogsByPage(map);
@@ -56,11 +58,11 @@ public class BbAccountLogExtServiceImpl implements BbAccountLogExtService {
     }
 
 
-    private void simpleMap(Long userId, String asset, String symbol, Integer historyType, Long startDate, Long endDate, Integer pageSize, Map<String, Object> map) {
+    private void simpleMap(Long userId,Set<String> assets,  List<String> symbols, Integer historyType, Long startDate, Long endDate, Integer pageSize, Map<String, Object> map) {
         LocalDateTime localDateTime = LocalDateTime.now();
         map.put("userId", userId);
-        map.put("asset", asset);
-        map.put("symbol", symbol);
+        map.put("assets", assets);
+        map.put("symbols", symbols);
         map.put("limit", pageSize);
         try {
             if (BbextendConst.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {

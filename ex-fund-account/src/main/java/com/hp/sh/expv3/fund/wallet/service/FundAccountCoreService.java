@@ -125,6 +125,8 @@ public class FundAccountCoreService {
         FundAccount fundAccount = this.fundAccountDAO.getAndLock(record.getUserId(), record.getAsset());
         BigDecimal recordAmount = record.getAmount().multiply(new BigDecimal(record.getType()));
         if (fundAccount == null) {
+			//检查余额
+			this.checkBalance(record, recordAmount);
             fundAccount = this.createFundAccount(record.getUserId(), record.getAsset(), recordAmount, now);
         } else {
             BigDecimal newBalance = fundAccount.getBalance().add(recordAmount);

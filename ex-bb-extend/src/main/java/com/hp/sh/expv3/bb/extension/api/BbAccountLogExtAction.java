@@ -1,8 +1,11 @@
 package com.hp.sh.expv3.bb.extension.api;
 
+import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.extension.constant.BbAccountLogConst;
+import com.hp.sh.expv3.bb.extension.constant.BbExtRedisKey;
 import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
+import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.extension.service.BbAccountLogExtService;
 import com.hp.sh.expv3.bb.extension.service.BbAccountRecordExtService;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
@@ -12,9 +15,15 @@ import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
+import sun.awt.Symbol;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
@@ -36,15 +45,30 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
     @Autowired
     private BbAccountRecordExtService bbAccountRecordExtService;
 
+    @Resource(name = "templateDB0")
+    private StringRedisTemplate templateDB0;
+
     @Override
-    public List<BbAccountLogExtVo> query(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Integer lastId, Integer pageSize) {
+    public List<BbAccountLogExtVo> query(Long userId, String asset, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Long lastId, Integer pageSize) {
+        this.checkParam(userId, historyType, tradeType, startDate, endDate, nextPage, pageSize);
         List<BbAccountLogExtVo> list = new ArrayList<>();
-        this.checkParam(userId, asset, symbol, historyType, tradeType, startDate, endDate, nextPage, pageSize);
+        Set<String> assets = new HashSet<>();
+        List<String> symbols = new ArrayList<>();
+        if (StringUtils.isNotEmpty(asset)) {
+            assets.add(asset);
+            symbols = buildSymbols(asset);
+        } else {
+            buildAsset2symbol(assets, symbols);
+        }
+        if (CollectionUtils.isEmpty(assets) || CollectionUtils.isEmpty(symbols)) {
+            throw new ExException(BbExtCommonErrorCode.SYMBOL_DOES_NOT_EXIST);
+        }
+
         List<BbAccountLogExtVo> voList = null;
         if (null == lastId) {
-            voList = bbAccountLogExtService.listBbAccountLogs(userId, asset, symbol, historyType, tradeType, startDate, endDate, pageSize);
+            voList = bbAccountLogExtService.listBbAccountLogs(userId, assets, symbols, historyType, tradeType, startDate, endDate, pageSize);
         } else {
-            voList = bbAccountLogExtService.listBbAccountLogsByPage(userId, asset, symbol, historyType, tradeType, lastId, nextPage, startDate, endDate, pageSize);
+            voList = bbAccountLogExtService.listBbAccountLogsByPage(userId, assets, symbols, historyType, tradeType, lastId, nextPage, startDate, endDate, pageSize);
         }
         if (!CollectionUtils.isEmpty(voList)) {
             Map<Integer, List<BbAccountLogExtVo>> map = voList.stream().collect(Collectors.groupingBy(BbAccountLogExtVo::getTradeType));
@@ -88,11 +112,38 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
         return list;
     }
 
+    private void buildAsset2symbol(Set<String>  assets, List<String> symbols) {
+        HashOperations opsForHash = templateDB0.opsForHash();
+        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(BbExtRedisKey.BB_SYMBOL, ScanOptions.NONE);
+        while (curosr.hasNext()) {
+            Map.Entry<String, Object> entry = curosr.next();
+            Object o = entry.getValue();
+            BBSymbol bBSymbolVO = JSON.parseObject(o.toString(), BBSymbol.class);
+            assets.add(bBSymbolVO.getAsset());
+            symbols.add(bBSymbolVO.getSymbol());
+        }
+    }
+
+
+    private List<String> buildSymbols(String asset) {
+        HashOperations opsForHash = templateDB0.opsForHash();
+        Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(BbExtRedisKey.BB_SYMBOL, ScanOptions.NONE);
+        List<BBSymbol> list = new ArrayList<>();
+        while (curosr.hasNext()) {
+            Map.Entry<String, Object> entry = curosr.next();
+            Object o = entry.getValue();
+            BBSymbol bBSymbolVO = JSON.parseObject(o.toString(), BBSymbol.class);
+            list.add(bBSymbolVO);
+        }
+        List<String> symbolList = list.stream().filter(symbol -> symbol.getAsset().equals(asset)).map(BBSymbol::getSymbol).collect(Collectors.toList());
+        return symbolList;
+    }
+
     //资金划转
     private void appendFundsTransferData(List<BbAccountLogExtVo> logExtVoList) {
-       if(CollectionUtils.isEmpty(logExtVoList)){
-           return;
-       }
+        if (CollectionUtils.isEmpty(logExtVoList)) {
+            return;
+        }
         //refIds bb_account_record表的主键集合
         List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
         List<BbAccountRecordVo> recordVos = bbAccountRecordExtService.queryByIds(refIds);
@@ -112,12 +163,12 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
 
 
     private void appendBuyInOrSellOutData(List<BbAccountLogExtVo> logExtVoList) {
-        if(CollectionUtils.isEmpty(logExtVoList)){
+        if (CollectionUtils.isEmpty(logExtVoList)) {
             return;
         }
         //refIds order_trade表的主键集合
         List<Long> refIds = logExtVoList.stream().map(BbAccountLogExtVo::getRefId).collect(Collectors.toList());
-         List<BbOrderTradeVo> orderTradeVos = bbOrderTradeExtService.queryByIds(refIds);
+        List<BbOrderTradeVo> orderTradeVos = bbOrderTradeExtService.queryByIds(refIds);
 
         if (!CollectionUtils.isEmpty(orderTradeVos)) {
             Map<Long, BbOrderTradeVo> id2Vo = orderTradeVos.stream().collect(Collectors.toMap(BbOrderTradeVo::getId, Function.identity()));
@@ -133,9 +184,9 @@ public class BbAccountLogExtAction implements BbAccountLogExtApi {
         }
     }
 
-    private void checkParam(Long userId, String asset, String symbol, Integer historyType, Integer tradeType, Long startDate,
+    private void checkParam(Long userId, Integer historyType, Integer tradeType, Long startDate,
                             Long endDate, Integer pageNo, Integer pageSize) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || tradeType == null || null == userId ||
+        if (tradeType == null || null == userId ||
                 pageNo == null || pageSize == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }

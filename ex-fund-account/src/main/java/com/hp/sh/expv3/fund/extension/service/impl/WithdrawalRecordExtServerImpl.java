@@ -56,7 +56,10 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
             }else if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()== PaymentStatus.FAIL){
               //审核通过，支付失败 状态也是失败
                 historyVo.setStatus(WithdrawalStatus.FAIL);
-            }else{
+            }else if(historyVo.getStatus()== ApprovalStatus.REJECTED){
+                //审核拒绝  状态也是失败
+                historyVo.setStatus(WithdrawalStatus.FAIL);
+            }else {
                 //审核中
                 historyVo.setStatus(WithdrawalStatus.IN_APPROVAL);
             }

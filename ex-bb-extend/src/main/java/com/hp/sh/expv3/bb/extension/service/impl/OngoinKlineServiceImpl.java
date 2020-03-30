@@ -1,7 +1,7 @@
 //package com.hp.sh.expv3.bb.extension.service.impl;
 //
 //import com.alibaba.fastjson.JSON;
-//import com.hp.sh.expv3.bb.extension.constant.BbKLineKey;
+//import com.hp.sh.expv3.bb.extension.constant.BbExtRedisKey;
 //import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
 //import com.hp.sh.expv3.bb.extension.pojo.BBKLine;
 //import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
@@ -282,7 +282,7 @@
 //    }
 //
 //    private List<BBSymbol> listSymbol() {
-//        final Map<String, BBSymbol> key2Value = metadataRedisUtil.hgetAll(BbKLineKey.BB_SYMBOL, BBSymbol.class);
+//        final Map<String, BBSymbol> key2Value = metadataRedisUtil.hgetAll(BbExtRedisKey.BB_SYMBOL, BBSymbol.class);
 //        List<BBSymbol> list = key2Value.values().stream().collect(Collectors.toList());
 //        return list;
 //    }

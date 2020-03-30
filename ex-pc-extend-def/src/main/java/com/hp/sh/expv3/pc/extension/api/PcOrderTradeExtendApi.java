@@ -12,6 +12,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -107,4 +108,18 @@ public interface PcOrderTradeExtendApi {
             @RequestParam(value = "startTime", required = false) Long startTime,
             @RequestParam(value = "endTime", required = false) Long endTime
     );
+
+    @ApiOperation(value = "查询交易手续费")
+    @GetMapping(value = "/api/extension/pc/orderTrade/queryPcTradeFee")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId ", value = "用户id", required = true),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "makerFlag", value = "1-marker， 0-taker", example = "1", required = false),
+            @ApiImplicitParam(name = "beginTime ", value = "开始时间", required = false),
+            @ApiImplicitParam(name = "endTime ", value = "结束时间", required = false)
+    })
+    BigDecimal queryPcTradeFee(@RequestParam(value = "userId", required = true) Long userId,  @RequestParam(value = "asset", required = true) String asset,
+                               @RequestParam(value = "makerFlag", required = false)  Integer makerFlag,@RequestParam(value = "beginTime", required = false) Long beginTime,
+                               @RequestParam(value = "endTime", required = false) Long endTime);
+
 }

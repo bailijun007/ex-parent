@@ -210,7 +210,7 @@ public class PcStrategyContext {
 	}
 	
 	public BigDecimal calcMaxOpenVolume(Long userId, String asset, String symbol, Long longFlag, BigDecimal leverage, BigDecimal balance){
-		BigDecimal latestPrice = this.markPriceService.getLatestPrice(asset, symbol);
+		BigDecimal latestPrice = this.markPriceService.getCurrentMarkPrice(asset, symbol);
 		
 		BigDecimal faceValue = this.metadataService.getFaceValue(asset, symbol);
 		BigDecimal initedMarginRatio = feeRatioService.getInitedMarginRatio(leverage);

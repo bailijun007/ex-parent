@@ -103,17 +103,17 @@
         select
         <include refid="Base_Column_List"/>
         from pc_order_trade
-       <where>
-           <if test="asset!=null and asset!=''">
-               and asset=#{asset}
-           </if>
-           <if test="symbol!=null and symbol!=''">
-               and symbol=#{symbol}
-           </if>
-           <if test="tradeTime!=null">
-               and trade_time &lt; #{tradeTime}
-           </if>
-       </where>
+        <where>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+            <if test="symbol!=null and symbol!=''">
+                and symbol=#{symbol}
+            </if>
+            <if test="tradeTime!=null">
+                and trade_time &lt; #{tradeTime}
+            </if>
+        </where>
         order by trade_time desc
         limit 0,1
     </select>
@@ -212,7 +212,8 @@
           select id,asset,symbol,price,volume `number`,trade_time tradeTime,maker_flag makerFlag
           from pc_order_trade  p where p.user_id=#{userId} and p.asset=#{asset} AND p.symbol=#{symbol}
         and p.trade_time&gt;=#{tradeTimeBegin} and p.trade_time &lt;#{tradeTimeEnd}
-        ORDER BY p.id ASC
+        ORDER BY p.trade_time ASC
+        limit 0,10000
     </select>
 
     <select id="selectPcFeeCollectByAccountId" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
@@ -220,7 +221,7 @@
         <include refid="Base_Column_List"/>
         from pc_order_trade
         <where>
-            <if test="userId!=null"> user_id=#{userId}</if>
+            <if test="userId!=null">user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
             <if test="tradeTimeBegin!=null and tradeTimeBegin!=''">and trade_time &gt;= #{tradeTimeBegin}</if>
@@ -235,7 +236,7 @@
         from pc_order_trade
         <where>
             <if test="posId!=null">
-             and  pos_id =#{posId}
+                and pos_id =#{posId}
             </if>
             <if test="orderId!=null">
                 and order_id=#{orderId}
@@ -243,6 +244,24 @@
             and user_id = #{userId}
         </where>
 
+    </select>
+    <select id="queryPcTradeFee" resultType="java.math.BigDecimal">
+        SELECT
+        sum(t.fee)
+        FROM
+        pc_order_trade t
+        where
+        t.user_id=#{userId}
+        and t.asset=#{asset}
+        <if test="beginTime!=null">
+            and t.trade_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null">
+            and t.trade_time &lt;= #{endTime}
+        </if>
+        <if test="makerFlag!=null">
+            and t.maker_flag=#{makerFlag}
+        </if>
     </select>
 
 </mapper>
