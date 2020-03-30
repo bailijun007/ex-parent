@@ -35,6 +35,12 @@
         <where>
             <if test="type!=null">and type=#{type}</if>
             <if test="payStatus!=null">and pay_status=#{payStatus}</if>
+            <if test="payStatusList!=null">
+                and pay_status in
+                <foreach item="item" index="i" collection="payStatusList" open="(" separator="," close=")">
+                    #{payStatusList[${i}]}
+                </foreach>
+            </if>
             <if test="payTime!=null">and pay_time=#{payTime}</if>
             <if test="payFinishTime!=null">and pay_finish_time=#{payFinishTime}</if>
             <if test="synchStatus!=null">and synch_status=#{synchStatus}</if>
@@ -259,6 +265,16 @@
             <if test="payStatus!=null">
                 and pay_status=#{payStatus}
             </if>
+
+            <if test="approvalStatus!=null">
+                and approval_status=#{approvalStatus}
+            </if>
+            <!--<if test="payStatusList!=null">-->
+                <!--and pay_status in-->
+                <!--<foreach item="item" index="i" collection="payStatusList" open="(" separator="," close=")">-->
+                    <!--#{payStatusList[${i}]}-->
+                <!--</foreach>-->
+            <!--</if>-->
             <choose>
                 <when test="nextPage==1 and id!=null">
                     and id &lt;  #{id}
