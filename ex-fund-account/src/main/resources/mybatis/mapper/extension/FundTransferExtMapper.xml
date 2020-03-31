@@ -75,7 +75,7 @@
                 and asset=#{asset}
             </if>
         </where>
-
+        ORDER BY id desc
     </select>
 
 </mapper>
