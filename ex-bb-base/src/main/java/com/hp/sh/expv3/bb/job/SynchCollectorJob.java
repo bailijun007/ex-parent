@@ -13,6 +13,7 @@ import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.utils.DbDateUtils;
+import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.XxlJob;
 
 @Component
@@ -23,12 +24,17 @@ public class SynchCollectorJob {
 	private BBOrderQueryService orderQueryService;
 	@Autowired
 	private BBTradeService tradeService;
+
 	
-	@XxlJob("SynchCollectorJob-handleJob")
+	@XxlJob("synchCollector")
+    public ReturnT<String> xxlJobHandler(String param) throws Exception {
+    	this.handleJob();
+        return ReturnT.SUCCESS;
+    }
+	
 	@Scheduled(cron = "0 0/1 * * * ?")
 	public void handleJob() {
-		Long now = DbDateUtils.now();
-		Long startTime = now-1000*3600*20000;
+		Long startTime = DbDateUtils.now()-1000*3600;
 		Page page = new Page(1, 100, 1000L);
 		while(true){
 			List<BBOrderTrade> list = orderQueryService.querySynchFee(page, startTime);

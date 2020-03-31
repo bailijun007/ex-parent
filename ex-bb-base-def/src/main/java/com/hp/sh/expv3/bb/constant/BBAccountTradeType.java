@@ -23,9 +23,9 @@ public class BBAccountTradeType {
 	
 	public static final int RETURN_ORDER_MARGIN = 8;	//+退回多收的手续费 taker fee - maker fee
 	
-	public static final int TRADE_RELEASE = 9;			//成交释放冻结资金
+	public static final int TRADE_BUY_IN = 9;			//买入
 	
-	public static final int TRADE_BUY_IN = 10;			//买入
+	public static final int TRADE_RELEASE = 10;			//成交释放冻结资金
 	
 	public static final int TRADE_SELL_INCOME = 11;		//卖出收入
 

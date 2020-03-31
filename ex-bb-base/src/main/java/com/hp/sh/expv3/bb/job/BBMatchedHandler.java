@@ -38,10 +38,9 @@ public class BBMatchedHandler {
 	@Autowired
 	private OrderlyExecutors tradeExecutors;
 	
-	private Long startTime = DbDateUtils.now()-1000*3600;
-	
 	@LimitTimeHandle
 	public void handlePending() {
+		Long startTime = DbDateUtils.now()-1000*3600;
 		Page page = new Page(1, 50, 1000L);
 		Long startId = null;
 		while(true){

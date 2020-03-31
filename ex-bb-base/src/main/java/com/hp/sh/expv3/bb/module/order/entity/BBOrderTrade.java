@@ -58,6 +58,9 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 	//手续费
 	private BigDecimal fee;
 	
+	//押金
+	private BigDecimal orderMargin;
+	
 	//未成交数量
 	private BigDecimal remainVolume;
 	//订单剩余保证金
@@ -229,6 +232,14 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 
 	public void setFeeSynchStatus(Integer feeSynchStatus) {
 		this.feeSynchStatus = feeSynchStatus;
+	}
+
+	public BigDecimal getOrderMargin() {
+		return orderMargin;
+	}
+
+	public void setOrderMargin(BigDecimal orderMargin) {
+		this.orderMargin = orderMargin;
 	}
 
 	@Override

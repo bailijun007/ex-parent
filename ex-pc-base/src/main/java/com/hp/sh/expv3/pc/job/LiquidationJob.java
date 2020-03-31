@@ -67,8 +67,6 @@ public class LiquidationJob {
     @Autowired
 	private LiquidationJob self;
     
-    private final long startTime = DbDateUtils.now()-1000*3600;
-    
     
 	@Scheduled(cron = "${cron.liq.check}")
 	public void checkLiqOrder() {
@@ -103,13 +101,14 @@ public class LiquidationJob {
 	@LimitTimeHandle
 //	@Scheduled(cron = "${cron.liq.handle}")
 	public void hanleLiqOrder(){
-		this.synchLiqFund();
-		this.createBankruptOrder();
-		self.cutPosition();
+		Long startTime = DbDateUtils.now()-1000*3600;
+		this.synchLiqFund(startTime);
+		this.createBankruptOrder(startTime);
+		self.cutPosition(startTime);
 	}
 
 	@TransWarn
-	private void createBankruptOrder(){
+	private void createBankruptOrder(Long startTime){
 		Page page = new Page(1, 50, 1000L);
 		Long startId = null;
 		while(true){
@@ -135,7 +134,7 @@ public class LiquidationJob {
 
 	@CrossDB("queryPendingFund")
 	@TransWarn
-	private void synchLiqFund(){
+	private void synchLiqFund(Long startTime){
 		Page page = new Page(1, 50, 1000L);
 		Long startId = null;
 		List<PcLiqRecord> list = null;
@@ -174,7 +173,7 @@ public class LiquidationJob {
 	 */
 	@TransWarn
 	@Transactional(rollbackFor=Exception.class)
-	public void cutPosition(){
+	public void cutPosition(Long startTime){
 		Page page = new Page(1, 50, 1000L);
 		Long startId = null;
 		while(true){

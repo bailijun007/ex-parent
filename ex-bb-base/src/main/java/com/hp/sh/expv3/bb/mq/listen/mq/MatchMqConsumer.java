@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.bb.mq.listen.mq;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
