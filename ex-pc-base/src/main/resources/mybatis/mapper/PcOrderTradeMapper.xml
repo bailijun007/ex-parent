@@ -55,6 +55,8 @@
 		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
 		<if test="feeSynchStatus!=null"> and fee_synch_status=#{feeSynchStatus}</if>
 		<if test="keyword!=null and keyword!=''"> and symbol like CONCAT('%',#{keyword},'%')</if>	</where>
+		
+		<if test="tradeTimeStart!=null"> and trade_time &gt;= #{tradeTimeStart}</if>
 	</sql>
 
 	<sql id="simple_query" >

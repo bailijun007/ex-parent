@@ -203,6 +203,8 @@ public class BBTradeService {
 		
 		orderTrade.setMatchTxId(tradeMsg.getMatchTxId());
 		
+		orderTrade.setOrderMargin(tradeResult.getTradeOrderMargin());
+		
 		orderTrade.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getTradeVolume()));
 		orderTrade.setRemainOrderMargin(BigCalc.subtract(order.getOrderMargin(), tradeResult.getTradeOrderMargin()));
 		

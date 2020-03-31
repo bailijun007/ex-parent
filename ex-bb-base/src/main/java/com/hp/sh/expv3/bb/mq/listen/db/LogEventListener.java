@@ -15,12 +15,12 @@ import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.utils.IntBool;
 
 /**
- * 发送事件消息
+ * 账户日志
  * 
  * @author wangjg
  * 
  */
-@Component
+//@Component
 public class LogEventListener {
 	
 	@Autowired
