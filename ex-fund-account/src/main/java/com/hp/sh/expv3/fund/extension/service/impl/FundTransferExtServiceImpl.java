@@ -28,7 +28,7 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
 
     @Override
     public PageResult<FundTransferExtVo> pageQueryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {
-        PageResult<FundTransferExtVo> pageResult=new PageResult<>();
+        PageResult<FundTransferExtVo> pageResult = new PageResult<>();
         List<FundTransferExtVo> voList = fundTransferExtMapper.queryHistory(userId, asset, queryId, pageSize, pageStatus);
         if (CollectionUtils.isEmpty(voList)) {
             return null;
@@ -43,7 +43,7 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
                 transferExtVo.setStatus(1);
             }
         }
-         Long count = fundTransferExtMapper.queryCount(userId, asset, queryId, pageStatus);
+        Long count = fundTransferExtMapper.queryCount(userId, asset, queryId, pageStatus);
 
         pageResult.setRowTotal(count);
         pageResult.setList(voList);
@@ -51,23 +51,18 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
     }
 
     @Override
-    public PageResult<FundTransferExtVo> queryAllUserHistory(Long userId, String asset, Integer pageNo,Integer pageSize) {
-        PageResult<FundTransferExtVo> pageResult=new PageResult<>();
-        Map<String, Object> map=new HashMap<>();
-        map.put("userId",userId);
-        map.put("asset",asset);
-        PageHelper.startPage(pageNo,pageSize);
+    public PageResult<FundTransferExtVo> queryAllUserHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
+        PageResult<FundTransferExtVo> pageResult = new PageResult<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("asset", asset);
+        PageHelper.startPage(pageNo, pageSize);
         List<FundTransferExtVo> voList = fundTransferExtMapper.queryList(map);
         if (!CollectionUtils.isEmpty(voList)) {
             for (FundTransferExtVo transferExtVo : voList) {
                 Optional<FundTransferExtVo> vo = Optional.ofNullable(transferExtVo);
                 transferExtVo.setCtime(vo.map(t -> t.getCreated()).orElse(null));
-                int status = vo.filter(t -> t.getStatus() == 8).map(t -> t.getStatus()).orElse(2);
-                if (status == 2) {
-                    transferExtVo.setStatus(status);
-                } else {
-                    transferExtVo.setStatus(1);
-                }
+                transferExtVo.setStatus(transferExtVo.getStatus() == 15 ? 1 : 2);
             }
         }
 
