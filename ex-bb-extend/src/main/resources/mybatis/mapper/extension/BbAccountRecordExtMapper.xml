@@ -103,6 +103,12 @@
                     #{idList[${i}]}
                 </foreach>
             </if>
+            <if test="createdBegin!=null">
+                and created &gt;= #{createdBegin}
+            </if>
+            <if test="createdEnd!=null">
+                and created &lt;= #{createdEnd}
+            </if>
             <if test="userId!=null">
                 and user_id=#{userId}
             </if>
@@ -117,12 +123,7 @@
                     #{tradeTypes[${i}]}
                 </foreach>
             </if>
-            <if test="createdBegin!=null">
-                and created &gt;= #{createdBegin}
-            </if>
-            <if test="createdEnd!=null">
-                and created &lt;= #{createdEnd}
-            </if>
+
         </where>
         order by id desc
         LIMIT 0,${limit}
@@ -138,6 +139,12 @@
                     #{idList[${i}]}
                 </foreach>
             </if>
+            <if test="createdBegin!=null">
+                and created &gt;= #{createdBegin}
+            </if>
+            <if test="createdEnd!=null">
+                and created &lt;= #{createdEnd}
+            </if>
             <if test="userId!=null">
                 and user_id=#{userId}
             </if>
@@ -152,12 +159,7 @@
                     #{tradeTypes[${i}]}
                 </foreach>
             </if>
-            <if test="createdBegin!=null">
-                and created &gt;= #{createdBegin}
-            </if>
-            <if test="createdEnd!=null">
-                and created &lt;= #{createdEnd}
-            </if>
+
             <choose>
                 <when test="nextPage==1 and  lastId!=null">
                     and id &lt; #{lastId}
