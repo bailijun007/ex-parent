@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.job;
+package com.hp.sh.expv3.pc.job;
 
 import java.util.List;
 
@@ -10,9 +10,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.page.Page;
-import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
-import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
-import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
+import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
+import com.hp.sh.expv3.pc.module.position.service.PcTradeService;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -22,12 +22,12 @@ public class SynchCollectorJob {
     private static final Logger logger = LoggerFactory.getLogger(SynchCollectorJob.class);
 
 	@Autowired
-	private BBOrderQueryService orderQueryService;
+	private PcOrderQueryService orderQueryService;
 	@Autowired
-	private BBTradeService tradeService;
+	private PcTradeService tradeService;
 
 	
-	@XxlJob("bbSynchCollector")
+	@XxlJob("pcSynchCollector")
     public ReturnT<String> xxlJobHandler(String param) throws Exception {
 		logger.info("同步手续费...，{}", param);
 		Long startTime = DbDateUtils.now()-1000*60*5;
@@ -48,13 +48,13 @@ public class SynchCollectorJob {
 	private void handleJob(Long startTime, Integer pageSize) {
 		Page page = new Page(1, pageSize, 1000L);
 		while(true){
-			List<BBOrderTrade> list = orderQueryService.querySynchFee(page, startTime);
+			List<PcOrderTrade> list = orderQueryService.querySynchFee(page, startTime);
 			
 			if(list==null || list.isEmpty()){
 				break;
 			}
 			
-			for(BBOrderTrade orderTrade : list){
+			for(PcOrderTrade orderTrade : list){
 				try{
 					handleOrderTrade(orderTrade);
 				}catch(Exception e){
@@ -65,7 +65,7 @@ public class SynchCollectorJob {
 		}
 	}
 
-	private void handleOrderTrade(BBOrderTrade orderTrade) {
+	private void handleOrderTrade(PcOrderTrade orderTrade) {
 		tradeService.synchCollector(orderTrade);
 		tradeService.setSynchStatus(orderTrade);
 	}
