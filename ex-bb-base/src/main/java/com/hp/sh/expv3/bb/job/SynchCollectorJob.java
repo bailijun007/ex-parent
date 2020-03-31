@@ -2,6 +2,7 @@ package com.hp.sh.expv3.bb.job;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +29,24 @@ public class SynchCollectorJob {
 	
 	@XxlJob("synchCollector")
     public ReturnT<String> xxlJobHandler(String param) throws Exception {
-		logger.info("同步手续费...");
-    	this.handleJob();
+		logger.info("同步手续费...，{}", param);
+		Long startTime = DbDateUtils.now()-1000*60*5;
+		if(StringUtils.isNotBlank(param)){
+			startTime = Long.parseLong(param);
+		}
+    	this.handleJob(startTime, 100);
     	logger.info("同步手续费结束");
         return ReturnT.SUCCESS;
     }
 	
 	@Scheduled(cron = "0 0/1 * * * ?")
-	public void handleJob() {
+	public void scheduledHandleJob() {
 		Long startTime = DbDateUtils.now()-1000*60*5;
-		Page page = new Page(1, 100, 1000L);
+		this.handleJob(startTime, 100);
+	}
+	
+	private void handleJob(Long startTime, Integer pageSize) {
+		Page page = new Page(1, pageSize, 1000L);
 		while(true){
 			List<BBOrderTrade> list = orderQueryService.querySynchFee(page, startTime);
 			

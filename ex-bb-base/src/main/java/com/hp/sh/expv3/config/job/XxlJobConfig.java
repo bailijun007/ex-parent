@@ -1,20 +1,19 @@
 package com.hp.sh.expv3.config.job;
 
-import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
+
+import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 
 /**
  * xxl-job config
  *
  * @author xuxueli 2017-04-28
  */
-@EnableScheduling
 @Configuration
 @ConditionalOnProperty(name="xxl.job.enable", havingValue="true")
 public class XxlJobConfig {
