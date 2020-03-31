@@ -5,6 +5,7 @@
 <mapper namespace="com.hp.sh.expv3.bb.module.log.dao.BBAccountLogDAO">
 
 	<resultMap type="com.hp.sh.expv3.bb.module.log.entity.BBAccountLog" id="BBAccountLog">
+		<result column="id" property="id" />
 		<result column="type" property="type" />
 		<result column="user_id" property="userId" />
 		<result column="asset" property="asset" />
@@ -14,7 +15,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		type,user_id,asset,symbol,ref_id,time
+		id,type,user_id,asset,symbol,ref_id,time
 	</sql>
 
 	<sql id="simple_where" >
@@ -84,9 +85,9 @@
 
 	<insert id="save">
 		insert into bb_account_log (
-			type,user_id,asset,symbol,ref_id,time
+			id,type,user_id,asset,symbol,ref_id,time
 		)values(
-			#{type},#{userId},#{asset},#{symbol},#{refId},#{time}
+			#{id},#{type},#{userId},#{asset},#{symbol},#{refId},#{time}
 		)
 	</insert>
 	
@@ -94,13 +95,13 @@
 		update 
 			bb_account_log
 		set 
-			type=#{type},user_id=#{userId},asset=#{asset},symbol=#{symbol},ref_id=#{refId},time=#{time}
+			id=#{id},type=#{type},user_id=#{userId},asset=#{asset},symbol=#{symbol},ref_id=#{refId},time=#{time}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>
 
 	<delete id="delete">
-        delete from bb_account_log where id=#{id}
+        delete from bb_account_log where id=#{id} and user_id=#{userId}
     </delete>
 
     <delete id="condDelete">

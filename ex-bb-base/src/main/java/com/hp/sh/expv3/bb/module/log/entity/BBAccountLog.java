@@ -1,6 +1,10 @@
 package com.hp.sh.expv3.bb.module.log.entity;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
+
+import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 /**
  * 账户日志
@@ -37,6 +41,8 @@ public class BBAccountLog {
         return this.getType() + "";
     }
 
+	@Id
+	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
     public Long getId() {
 		return id;
 	}

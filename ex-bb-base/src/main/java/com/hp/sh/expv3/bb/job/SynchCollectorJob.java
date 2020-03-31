@@ -28,13 +28,15 @@ public class SynchCollectorJob {
 	
 	@XxlJob("synchCollector")
     public ReturnT<String> xxlJobHandler(String param) throws Exception {
+		logger.info("同步手续费...");
     	this.handleJob();
+    	logger.info("同步手续费结束");
         return ReturnT.SUCCESS;
     }
 	
 	@Scheduled(cron = "0 0/1 * * * ?")
 	public void handleJob() {
-		Long startTime = DbDateUtils.now()-1000*3600;
+		Long startTime = DbDateUtils.now()-1000*60*5;
 		Page page = new Page(1, 100, 1000L);
 		while(true){
 			List<BBOrderTrade> list = orderQueryService.querySynchFee(page, startTime);

@@ -215,6 +215,7 @@ public class BBTradeService {
 		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
 		orderTrade.setFeeSynchStatus(IntBool.NO);
 		
+		//检查结果
 		this.checkOrderTrade(orderTrade);
 		
 		this.orderTradeDAO.save(orderTrade);

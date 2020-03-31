@@ -24,9 +24,6 @@ public class WorkerConfigBuilder {
 	public static final String TX = "tx";
 	private static final int TX_ID = IdTypeEnum.BB_TX_ID.getValue();
 
-	private static final String BB_ACCOUNT_LOG = BBAccountLog.class.getName();
-	private static final int BB_ACCOUNT_LOG_ID = IdTypeEnum.BB_ACCOUNT_LOG_ID.getValue();
-
 	private static final String BB_ACCOUNT_RECORD = BBAccountRecord.class.getName();
 	private static final int BB_ACCOUNT_RECORD_ID = IdTypeEnum.BB_ACCOUNT_RECORD_ID.getValue();
 
@@ -47,6 +44,9 @@ public class WorkerConfigBuilder {
 
 	private static final String BB_COLLECTOR_ACCOUNT_RECORD = BBCollectorAccountRecord.class.getName();
 	private static final int BB_COLLECTOR_ACCOUNT_RECORD_ID = IdTypeEnum.BB_COLLECTOR_ACCOUNT_RECORD_ID.getValue();
+
+	private static final String BB_ACCOUNT_LOG = BBAccountLog.class.getName();
+	private static final int BB_ACCOUNT_LOG_ID = IdTypeEnum.BB_ACCOUNT_LOG_ID.getValue();
 	
 	
 	@Value("${id.generator.dataCenterId}")

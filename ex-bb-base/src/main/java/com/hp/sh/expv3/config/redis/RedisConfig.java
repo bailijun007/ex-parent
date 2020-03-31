@@ -70,7 +70,7 @@ public class RedisConfig {
 		return rp;
 	}
 	
-	@ConditionalOnProperty(name="swagger.host")
+	@ConditionalOnProperty(name="redis.subscriber.enable", havingValue="true")
 	@Bean
 	public RedisSubscriber testRs(RedisPool redisPool){
 		this.testRs(redisPool, "bb:account:USDT");
