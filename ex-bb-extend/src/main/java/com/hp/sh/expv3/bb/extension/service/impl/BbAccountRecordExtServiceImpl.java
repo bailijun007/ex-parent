@@ -3,17 +3,20 @@ package com.hp.sh.expv3.bb.extension.service.impl;
 import com.gitee.hupadev.base.api.PageResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hp.sh.expv3.bb.extension.constant.BbAccountRecordConst;
+import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
 import com.hp.sh.expv3.bb.extension.dao.BbAccountRecordExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbAccountRecordExtService;
+import com.hp.sh.expv3.bb.extension.vo.BbAccountRecordExtVo;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountRecordVo;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
 
 /**
  * @author BaiLiJun  on 2020/2/14
@@ -46,5 +49,57 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
     public List<BbAccountRecordVo> queryByIds(List<Long> refIds) {
         return bbAccountRecordExtMapper.queryByIds(refIds);
 
+    }
+
+    @Override
+    public List<BbAccountRecordExtVo> listBbAccountRecords(Long userId, String asset, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer pageSize) {
+        List<BbAccountRecordExtVo> list = null;
+        Map<String, Object> map = new HashMap<>();
+        simpleMap(userId, asset,  historyType, startDate, endDate, pageSize, map);
+        if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
+            map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_TYPE);
+            list = bbAccountRecordExtMapper.queryByLimit(map);
+        } else {
+            map.put("tradeType", tradeType);
+            list = bbAccountRecordExtMapper.queryByLimit(map);
+        }
+        return list;
+    }
+
+    @Override
+    public List<BbAccountRecordExtVo> listBbAccountRecordsByPage(Long userId, String asset, Integer historyType, Integer tradeType, Long lastId, Integer nextPage, Long startDate, Long endDate, Integer pageSize) {
+                Map<String, Object> map = new HashMap<>();
+        simpleMap(userId, asset, historyType, startDate, endDate, pageSize, map);
+        map.put("lastId", lastId);
+        map.put("nextPage", nextPage);
+        List<BbAccountRecordExtVo> list = null;
+        if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
+            map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_TYPE);
+            list = bbAccountRecordExtMapper.listBbAccountRecordsByPage(map);
+        } else {
+            map.put("tradeType", tradeType);
+            list = bbAccountRecordExtMapper.listBbAccountRecordsByPage(map);
+        }
+        return list;
+    }
+
+
+        private void simpleMap(Long userId, String asset, Integer historyType, Long startDate, Long endDate, Integer pageSize, Map<String, Object> map) {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        map.put("userId", userId);
+        map.put("asset", asset);
+        map.put("limit", pageSize);
+        try {
+            if (BbextendConst.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {
+                LocalDateTime minusDays = localDateTime.minusDays(2L);
+                long timeBegin = minusDays.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+                map.put("createdBegin", timeBegin);
+            } else if (BbextendConst.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
+                map.put("createdBegin", startDate);
+                map.put("createdEnd", endDate);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

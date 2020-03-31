@@ -12,5 +12,5 @@ public interface FundTransferExtService {
 
     PageResult<FundTransferExtVo> pageQueryHistory(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus);
 
-    PageResult<FundTransferExtVo> queryAllUserHistory(Long userId, String asset, Integer pageNo,Integer pageSize);
+    PageResult<FundTransferExtVo> queryAllUserHistory(Long userId, String asset, Integer status,Integer pageNo,Integer pageSize);
 }

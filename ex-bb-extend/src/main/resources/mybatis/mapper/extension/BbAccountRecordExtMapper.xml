@@ -65,7 +65,6 @@
 	</sql>
 
 
-
     <select id="queryOne" resultMap="BbAccountRecordVo">
         SELECT
         <include refid="Base_Column_List"/>
@@ -85,13 +84,95 @@
         <include refid="Base_Column_List"/>
         FROM bb_account_record
         <where>
-            <if test="idList!=null"> id in
+            <if test="idList!=null">id in
                 <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
                     #{idList[${i}]}
                 </foreach>
             </if>
         </where>
+    </select>
 
+    <select id="queryByLimit" resultType="com.hp.sh.expv3.bb.extension.vo.BbAccountRecordExtVo">
+        SELECT
+        asset,created tradeTime,trade_type tradeType,amount volume ,balance
+        FROM bb_account_record
+        <where>
+
+            <if test="idList!=null">id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+            <if test="tradeType!=null">
+                and trade_type=#{tradeType}
+            </if>
+            <if test="tradeTypes!=null">and trade_type in
+                <foreach item="item" index="i" collection="tradeTypes" open="(" separator="," close=")">
+                    #{tradeTypes[${i}]}
+                </foreach>
+            </if>
+            <if test="createdBegin!=null">
+                and created &gt;= #{createdBegin}
+            </if>
+            <if test="createdEnd!=null">
+                and created &lt;= #{createdEnd}
+            </if>
+        </where>
+        order by id desc
+        LIMIT 0,${limit}
+    </select>
+
+    <select id="listBbAccountRecordsByPage" resultType="com.hp.sh.expv3.bb.extension.vo.BbAccountRecordExtVo">
+        SELECT
+        asset,created tradeTime,trade_type tradeType,amount volume ,balance,associated_id associatedId
+        FROM bb_account_record
+        <where>
+            <if test="idList!=null">id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
+            <if test="asset!=null and asset!=''">
+                and asset=#{asset}
+            </if>
+            <if test="tradeType!=null">
+                and trade_type=#{tradeType}
+            </if>
+            <if test="tradeTypes!=null">and trade_type in
+                <foreach item="item" index="i" collection="tradeTypes" open="(" separator="," close=")">
+                    #{tradeTypes[${i}]}
+                </foreach>
+            </if>
+            <if test="createdBegin!=null">
+                and created &gt;= #{createdBegin}
+            </if>
+            <if test="createdEnd!=null">
+                and created &lt;= #{createdEnd}
+            </if>
+            <choose>
+                <when test="nextPage==1 and  lastId!=null">
+                    and id &lt; #{lastId}
+                    ORDER BY id desc
+                </when>
+                <when test="nextPage==-1 and lastId!=null">
+                    and id &gt;= #{lastId}
+                    ORDER BY id asc
+                </when>
+                <otherwise>
+                    order by id desc
+                </otherwise>
+            </choose>
+        </where>
+        LIMIT 0,${limit}
     </select>
 
 

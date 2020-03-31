@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 /**
  * @author BaiLiJun  on 2020/3/24
  */
-public class BbAccountLogExtVo implements Serializable {
+public class BbAccountRecordExtVo implements Serializable {
     @ApiModelProperty("自增主键")
     private Long id;
 
@@ -33,18 +33,15 @@ public class BbAccountLogExtVo implements Serializable {
     @ApiModelProperty("手续费")
     private BigDecimal fee;
 
-    @ApiModelProperty("关联其他表的主键id")
-    private  Long refId;
-
-    @ApiModelProperty("时间")
-    private  Long time;
+    @ApiModelProperty("关联对象的ID")
+    private Long associatedId;
 
     @ApiModelProperty("创建时间")
     private  Long ctime;
 
     @Override
     public String toString() {
-        return "BbAccountLogExtVo{" +
+        return "BbAccountRecordExtVo{" +
                 "id=" + id +
                 ", userId=" + userId +
                 ", asset='" + asset + '\'' +
@@ -53,9 +50,15 @@ public class BbAccountLogExtVo implements Serializable {
                 ", volume=" + volume +
                 ", balance=" + balance +
                 ", fee=" + fee +
-                ", refId=" + refId +
-                ", time=" + time +
                 '}';
+    }
+
+    public Long getAssociatedId() {
+        return associatedId;
+    }
+
+    public void setAssociatedId(Long associatedId) {
+        this.associatedId = associatedId;
     }
 
     public Long getCtime() {
@@ -74,7 +77,7 @@ public class BbAccountLogExtVo implements Serializable {
         this.id = id;
     }
 
-    public BbAccountLogExtVo() {
+    public BbAccountRecordExtVo() {
     }
 
     public Long getUserId() {
@@ -133,19 +136,4 @@ public class BbAccountLogExtVo implements Serializable {
         this.fee = fee;
     }
 
-    public Long getRefId() {
-        return refId;
-    }
-
-    public void setRefId(Long refId) {
-        this.refId = refId;
-    }
-
-    public Long getTime() {
-        return time;
-    }
-
-    public void setTime(Long time) {
-        this.time = time;
-    }
 }

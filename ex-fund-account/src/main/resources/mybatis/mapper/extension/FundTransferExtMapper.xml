@@ -63,7 +63,7 @@
     </select>
 
     <select id="queryList" resultType="com.hp.sh.expv3.fund.extension.vo.FundTransferExtVo">
-         SELECT id transferId,asset,  amount qty,created,status,src_account_type  fromAccount,target_account_type toAccount
+         SELECT id transferId,asset,  amount qty,created,status,src_account_id  fromAccount,target_account_id toAccount
          FROM fund_transfer
         <where>
 
@@ -74,8 +74,11 @@
             <if test="asset!=null and asset!=''">
                 and asset=#{asset}
             </if>
+            <if test="status!=null">
+                status=#{status}
+            </if>
         </where>
-
+        ORDER BY id desc
     </select>
 
 </mapper>
