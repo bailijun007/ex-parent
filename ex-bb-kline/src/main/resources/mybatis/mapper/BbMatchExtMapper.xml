@@ -4,6 +4,15 @@
 
 <mapper namespace="com.hp.sh.expv3.bb.kline.dao.BbMatchExtMapper">
 
+    <insert id="batchSave">
+        insert into bb_match (
+        asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,enable_flag,created,modified
+        )values
+        <foreach collection="trades" item="item" index="index" separator=",">
+            (#{item.asset},#{item.symbol},#{item.matchTxId},#{item.tkBidFlag},#{item.tkAccountId},#{item.tkOrderId},#{item.mkAccountId},#{item.mkOrderId},#{item.price},
+            #{item.number},#{item.tradeTime},#{item.enableFlag},#{item.created},#{item.modified})
+        </foreach>
 
+    </insert>
 
 </mapper>

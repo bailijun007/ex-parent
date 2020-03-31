@@ -1,4 +1,5 @@
 package com.hp.sh.expv3.bb.kline.mq;
+
 import com.hp.sh.expv3.bb.kline.constant.MsgConstant;
 import com.hp.sh.expv3.bb.kline.service.BbMatchExtService;
 import org.slf4j.Logger;
@@ -14,8 +15,8 @@ public class BbMatchMqConsumer {
     private BbMatchExtService bbMatchExtService;
 
     @MQListener(topic = MsgConstant.EVENT_TOPIC, orderly = MQListener.ORDERLY_YES)
-    public void handleMsg(/*PcAccountLog msg*/) {
-//        logger.info("收到消息:{}", msg);
+    public void handleMsg(Object msg) {
+        logger.info("收到消息:{}", msg.toString());
 //        PcAccountLogVo vo = new PcAccountLogVo();
 //        BeanUtils.copyProperties(msg,vo);
 //        PcAccountLogVo pcAccountLogVo = pcAccountLogExtendService.getPcAccountLog(vo);
