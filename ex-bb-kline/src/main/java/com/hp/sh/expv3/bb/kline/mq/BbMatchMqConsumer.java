@@ -16,7 +16,7 @@ public class BbMatchMqConsumer {
 
     @MQListener(topic = MsgConstant.EVENT_TOPIC, orderly = MQListener.ORDERLY_YES)
     public void handleMsg(Object msg) {
-        logger.info("收到消息:{}", msg.toString());
+        logger.info("收到bb_match撮合推送消息:{}", msg.toString());
 //        PcAccountLogVo vo = new PcAccountLogVo();
 //        BeanUtils.copyProperties(msg,vo);
 //        PcAccountLogVo pcAccountLogVo = pcAccountLogExtendService.getPcAccountLog(vo);

@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,8 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
     @Value("${bb.kline.symbols}")
     private String symbols;
 
+    Map<Integer, List<BBSymbol>> map = new ConcurrentHashMap<>();
+
     @Override
     @Scheduled(cron = "*/1 * * * * *")
     public Map<Integer, List<BBSymbol>> listSymbols() {
@@ -38,7 +42,7 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
             Map<String, BBSymbol> symbolMap = metadataRedisUtil.hgetAll(symbols, BBSymbol.class);
             if (!CollectionUtils.isEmpty(symbolMap)) {
                 List<BBSymbol> list = symbolMap.values().stream().collect(Collectors.toList());
-                Map<Integer, List<BBSymbol>> map = list.stream().collect(Collectors.groupingBy(bbSymbol -> bbSymbol.getBbGroupId()));
+                map = list.stream().collect(Collectors.groupingBy(bbSymbol -> bbSymbol.getBbGroupId()));
                 return map;
             }
         } else if (symbols.equals("pc_contract")) {
@@ -46,11 +50,28 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
             if (!CollectionUtils.isEmpty(symbolMap)) {
                 List<PcSymbol> pcSymbols = symbolMap.values().stream().collect(Collectors.toList());
                 List<BBSymbol> bbSymbols = this.converPcSymbols(pcSymbols);
-                Map<Integer, List<BBSymbol>> map = bbSymbols.stream().collect(Collectors.groupingBy(bbSymbol -> bbSymbol.getBbGroupId()));
+                map = bbSymbols.stream().collect(Collectors.groupingBy(bbSymbol -> bbSymbol.getBbGroupId()));
                 return map;
             }
         }
         return null;
+    }
+
+
+    /**
+     * @return USDT__ETC_USDT
+     */
+    public List<BBSymbol> getSymbols() {
+        List<BBSymbol> list = new CopyOnWriteArrayList<>();
+        if (!CollectionUtils.isEmpty(map)) {
+            for (Integer integer : map.keySet()) {
+                List<BBSymbol> bbSymbols = map.get(integer);
+                for (BBSymbol bbSymbol : bbSymbols) {
+                    list.add(bbSymbol);
+                }
+            }
+        }
+        return list;
     }
 
     private List<BBSymbol> converPcSymbols(List<PcSymbol> pcSymbols) {
