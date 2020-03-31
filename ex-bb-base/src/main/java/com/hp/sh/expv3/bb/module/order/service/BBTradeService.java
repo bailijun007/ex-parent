@@ -99,9 +99,9 @@ public class BBTradeService {
 		
 		//释放冻结的保证金，手续费
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
-			this.releaseMargin(order.getUserId(), order.getOrderMarginCurrency(), order.getId(), orderTrade.getFee(), tradeResult.getTradeOrderMargin());
+			this.releaseMargin(order.getUserId(), order.getOrderMarginCurrency(), orderTrade.getId(), orderTrade.getFee(), tradeResult.getTradeOrderMargin());
 		}else{
-			this.releaseMargin(order.getUserId(), order.getOrderMarginCurrency(), order.getId(), BigDecimal.ZERO, tradeResult.getTradeOrderMargin());
+			this.releaseMargin(order.getUserId(), order.getOrderMarginCurrency(), orderTrade.getId(), BigDecimal.ZERO, tradeResult.getTradeOrderMargin());
 		}
 		
 		//退还剩余押金和手续费
@@ -127,16 +127,16 @@ public class BBTradeService {
 		this.accountCoreService.unfreeze(request);
 	}
 
-	private void releaseMargin(Long userId, String asset, Long orderId, BigDecimal remainFee, BigDecimal remainOrderMargin) {
+	private void releaseMargin(Long userId, String asset, Long orderTradeId, BigDecimal remainFee, BigDecimal remainOrderMargin) {
 		BigDecimal returnAmount = remainFee.add(remainOrderMargin);
 		ReleaseFrozenRequest request = new ReleaseFrozenRequest();
 		request.setAmount(returnAmount);
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(BigFormat.format("剩余押金：%s，剩余手续费：%s", remainOrderMargin, remainFee));
-		request.setTradeNo(SnUtils.getRemainSn(orderId));
+		request.setRemark(BigFormat.format("释放冻结的押金：%s，手续费：%s", remainOrderMargin, remainFee));
+		request.setTradeNo(SnUtils.getReleaseSn(orderTradeId));
 		request.setTradeType(BBAccountTradeType.TRADE_RELEASE);
-		request.setAssociatedId(orderId);
+		request.setAssociatedId(orderTradeId);
 		this.accountCoreService.release(request);
 	}
 
@@ -244,7 +244,7 @@ public class BBTradeService {
 	}
 	
 	private void checkOrderTrade(BBOrderTrade orderTrade) {
-		if(BigUtils.gtZero(orderTrade.getRemainOrderMargin()) || BigUtils.gtZero(orderTrade.getRemainFee())){
+		if(BigUtils.ltZero(orderTrade.getRemainOrderMargin()) || BigUtils.ltZero(orderTrade.getRemainFee())){
 			throw new RuntimeException("剩余保证金:"+orderTrade.getRemainOrderMargin()+"剩余手续费:"+orderTrade.getRemainFee());
 		}
 	}

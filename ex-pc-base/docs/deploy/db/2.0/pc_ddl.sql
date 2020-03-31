@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50599
 File Encoding         : 65001
 
-Date: 2020-03-26 16:28:06
+Date: 2020-03-30 19:48:47
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -195,7 +195,9 @@ CREATE TABLE `pc_collector_account_record` (
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`)
+PRIMARY KEY (`id`),
+UNIQUE INDEX `un_trade_no` (`trade_no`) USING BTREE ,
+UNIQUE INDEX `un_sn` (`sn`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
@@ -227,7 +229,8 @@ CREATE TABLE `pc_liq_record` (
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`)
+PRIMARY KEY (`id`),
+INDEX `idx_created` (`created`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci

@@ -72,4 +72,8 @@ public class SnUtils {
 		return "R"+orderId;
 	}
 
+	public static String getReleaseSn(Long orderId) {
+		return "RL"+orderId;
+	}
+
 }

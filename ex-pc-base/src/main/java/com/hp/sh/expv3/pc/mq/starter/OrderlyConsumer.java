@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.commons.exception.ExException;
+import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 import com.hp.sh.expv3.pc.constant.MqTopic;
@@ -81,6 +82,10 @@ public class OrderlyConsumer {
         			logger.error(cause.getMessage(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(ExException e){
+        			Throwable cause = ExceptionUtils.getRootCause(e);
+        			logger.error(e.toString(), cause);
+        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
+        		}catch(ExSysException e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
         			logger.error(e.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;

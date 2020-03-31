@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50599
 File Encoding         : 65001
 
-Date: 2020-03-26 16:01:07
+Date: 2020-03-30 19:42:34
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -23,6 +23,8 @@ CREATE TABLE `bb_account` (
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产类型' ,
 `balance`  decimal(50,30) NOT NULL COMMENT '余额' ,
+`frozen`  decimal(50,30) NOT NULL DEFAULT 0.000000000000000000000000000000 COMMENT '冻结余额' ,
+`total`  decimal(50,30) NOT NULL DEFAULT 0.000000000000000000000000000000 COMMENT '总额' ,
 `version`  bigint(20) NOT NULL COMMENT '版本' ,
 `modified`  bigint(20) NOT NULL COMMENT '创建时间' ,
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
@@ -54,6 +56,7 @@ ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='账户日志'
 AUTO_INCREMENT=10000
+
 ;
 
 -- ----------------------------
@@ -69,6 +72,8 @@ CREATE TABLE `bb_account_record` (
 `amount`  decimal(50,30) NOT NULL COMMENT '本笔金额' ,
 `remark`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注' ,
 `balance`  decimal(50,30) NOT NULL COMMENT '本笔余额' ,
+`frozen`  decimal(50,30) NOT NULL DEFAULT 0.000000000000000000000000000000 COMMENT '冻结余额' ,
+`total`  decimal(50,30) NOT NULL DEFAULT 0.000000000000000000000000000000 COMMENT '总额' ,
 `trade_no`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '调用方支付单号' ,
 `trade_type`  int(11) NOT NULL COMMENT '交易类型：1-资金转入，2-资金转出，3-下订单，4-撤单，4-追加保证金，5-平仓收益' ,
 `serial_no`  bigint(20) NOT NULL COMMENT '序号:' ,
@@ -148,11 +153,43 @@ CREATE TABLE `bb_collector_account_record` (
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`)
+PRIMARY KEY (`id`),
+UNIQUE INDEX `un_trade_no` (`trade_no`) USING BTREE ,
+UNIQUE INDEX `un_sn` (`sn`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='币币手续费_账户明细'
+
+;
+
+-- ----------------------------
+-- Table structure for `bb_match`
+-- ----------------------------
+DROP TABLE IF EXISTS `bb_match`;
+CREATE TABLE `bb_match` (
+`id`  bigint(20) NOT NULL COMMENT 'id' ,
+`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
+`symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '交易对' ,
+`match_tx_id`  bigint(20) NOT NULL COMMENT '事务Id' ,
+`tk_bid_flag`  int(11) NOT NULL COMMENT 'taker是否买：1-是，0-否' ,
+`tk_account_id`  bigint(20) NOT NULL COMMENT 'taker账户ID' ,
+`tk_order_id`  bigint(20) NOT NULL COMMENT 'taker订单ID' ,
+`mk_account_id`  bigint(20) NOT NULL COMMENT 'maker账户Id' ,
+`mk_order_id`  bigint(20) NOT NULL COMMENT 'maker订单ID' ,
+`price`  decimal(50,30) NOT NULL COMMENT '成交价格' ,
+`number`  decimal(50,30) NOT NULL COMMENT '数量' ,
+`trade_time`  bigint(20) NOT NULL COMMENT '成交时间' ,
+`created`  bigint(20) NULL DEFAULT NULL ,
+`modified`  bigint(20) NULL DEFAULT NULL ,
+PRIMARY KEY (`id`),
+UNIQUE INDEX `uk_tk_order_id_mk_order_id` (`tk_order_id`, `mk_order_id`) USING BTREE ,
+INDEX `idx_trade_time_symbol` (`trade_time`, `symbol`) USING BTREE ,
+INDEX `idx_match_tx_id` (`match_tx_id`) USING BTREE 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+COMMENT='永续合约_成交(撮合结果)'
 
 ;
 
@@ -325,24 +362,3 @@ DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_成交(撮合结果)'
 
 ;
-
-CREATE TABLE `bb_match` (
-  `id` bigint(20) NOT NULL COMMENT 'id',
-  `asset` varchar(20) NOT NULL COMMENT '资产',
-  `symbol` varchar(20) NOT NULL COMMENT '交易对',
-  `match_tx_id` bigint(20) NOT NULL COMMENT '事务Id',
-  `tk_bid_flag` int(11) NOT NULL COMMENT 'taker是否买：1-是，0-否',
-  `tk_account_id` bigint(20) NOT NULL COMMENT 'taker账户ID',
-  `tk_order_id` bigint(20) NOT NULL COMMENT 'taker订单ID',
-  `mk_account_id` bigint(20) NOT NULL COMMENT 'maker账户Id',
-  `mk_order_id` bigint(20) NOT NULL COMMENT 'maker订单ID',
-  `price` decimal(50,30) NOT NULL COMMENT '成交价格',
-  `number` decimal(50,30) NOT NULL COMMENT '数量',
-  `trade_time` bigint(20) NOT NULL COMMENT '成交时间',
-  `created` bigint(20) DEFAULT NULL,
-  `modified` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_trade_time_symbol` (`trade_time`,`symbol`) USING BTREE,
-  KEY `idx_tk_account_id_tk_order_id` (`tk_account_id`,`tk_order_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='永续合约_成交(撮合结果)';
-
