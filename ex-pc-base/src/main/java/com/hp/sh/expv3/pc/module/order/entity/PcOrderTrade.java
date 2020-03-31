@@ -48,6 +48,9 @@ public class PcOrderTrade extends UserDataEntity implements OrderTrade {
 	private Long tradeTime;
 	
 //	int ______________;
+	
+	//对手订单ID
+	private Long opponentOrderId;
 
 	//手续费收取人
 	private Long feeCollectorId;
@@ -57,6 +60,9 @@ public class PcOrderTrade extends UserDataEntity implements OrderTrade {
 	
 	//手续费
 	private BigDecimal fee;
+	
+	//押金
+	private BigDecimal orderMargin;
 	
 	//盈亏(此次成交的盈亏)
 	@Question(ask="没有用到，老项目里也没这个字段", answer="老杜用")
@@ -241,6 +247,22 @@ public class PcOrderTrade extends UserDataEntity implements OrderTrade {
 
 	public void setFeeSynchStatus(Integer feeSynchStatus) {
 		this.feeSynchStatus = feeSynchStatus;
+	}
+
+	public Long getOpponentOrderId() {
+		return opponentOrderId;
+	}
+
+	public void setOpponentOrderId(Long opponentOrderId) {
+		this.opponentOrderId = opponentOrderId;
+	}
+
+	public BigDecimal getOrderMargin() {
+		return orderMargin;
+	}
+
+	public void setOrderMargin(BigDecimal orderMargin) {
+		this.orderMargin = orderMargin;
 	}
 
 }

@@ -15,9 +15,11 @@
 		<result column="order_id" property="orderId" />
 		<result column="maker_flag" property="makerFlag" />
 		<result column="trade_time" property="tradeTime" />
+		<result column="opponent_order_id" property="opponentOrderId" />
 		<result column="fee_collector_id" property="feeCollectorId" />
 		<result column="fee_ratio" property="feeRatio" />
 		<result column="fee" property="fee" />
+		<result column="order_margin" property="orderMargin" />
 		<result column="pnl" property="pnl" />
 		<result column="remain_volume" property="remainVolume" />
 		<result column="match_tx_id" property="matchTxId" />
@@ -30,7 +32,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		asset,symbol,price,volume,trade_sn,trade_id,pos_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,pnl,remain_volume,match_tx_id,tx_id,fee_synch_status,user_id,id,created,modified
+		asset,symbol,price,volume,trade_sn,trade_id,pos_id,order_id,maker_flag,trade_time,opponent_order_id,fee_collector_id,fee_ratio,fee,order_margin,pnl,remain_volume,match_tx_id,tx_id,fee_synch_status,user_id,id,created,modified
 	</sql>
 
 	<sql id="simple_where" >
@@ -118,9 +120,9 @@
 
 	<insert id="save">
 		insert into pc_order_trade (
-			asset,symbol,price,volume,trade_sn,trade_id,pos_id,order_id,maker_flag,trade_time,fee_collector_id,fee_ratio,fee,pnl,remain_volume,match_tx_id,tx_id,fee_synch_status,user_id,id,created,modified
+			asset,symbol,price,volume,trade_sn,trade_id,pos_id,order_id,maker_flag,trade_time,opponent_order_id,fee_collector_id,fee_ratio,fee,order_margin,pnl,remain_volume,match_tx_id,tx_id,fee_synch_status,user_id,id,created,modified
 		)values(
-			#{asset},#{symbol},#{price},#{volume},#{tradeSn},#{tradeId},#{posId},#{orderId},#{makerFlag},#{tradeTime},#{feeCollectorId},#{feeRatio},#{fee},#{pnl},#{remainVolume},#{matchTxId},#{txId},#{feeSynchStatus},#{userId},#{id},#{created},#{modified}
+			#{asset},#{symbol},#{price},#{volume},#{tradeSn},#{tradeId},#{posId},#{orderId},#{makerFlag},#{tradeTime},#{opponentOrderId},#{feeCollectorId},#{feeRatio},#{fee},#{orderMargin},#{pnl},#{remainVolume},#{matchTxId},#{txId},#{feeSynchStatus},#{userId},#{id},#{created},#{modified}
 		)
 	</insert>
 	
@@ -128,7 +130,7 @@
 		update 
 			pc_order_trade
 		set 
-			asset=#{asset},symbol=#{symbol},price=#{price},volume=#{volume},trade_sn=#{tradeSn},trade_id=#{tradeId},pos_id=#{posId},order_id=#{orderId},maker_flag=#{makerFlag},trade_time=#{tradeTime},fee_collector_id=#{feeCollectorId},fee_ratio=#{feeRatio},fee=#{fee},pnl=#{pnl},remain_volume=#{remainVolume},match_tx_id=#{matchTxId},tx_id=#{txId},fee_synch_status=#{feeSynchStatus},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},price=#{price},volume=#{volume},trade_sn=#{tradeSn},trade_id=#{tradeId},pos_id=#{posId},order_id=#{orderId},maker_flag=#{makerFlag},trade_time=#{tradeTime},opponent_order_id=#{opponentOrderId},fee_collector_id=#{feeCollectorId},fee_ratio=#{feeRatio},fee=#{fee},order_margin=#{orderMargin},pnl=#{pnl},remain_volume=#{remainVolume},match_tx_id=#{matchTxId},tx_id=#{txId},fee_synch_status=#{feeSynchStatus},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>

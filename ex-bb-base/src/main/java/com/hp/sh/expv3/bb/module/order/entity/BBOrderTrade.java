@@ -48,6 +48,9 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 	private Long tradeTime;
 	
 //	int ______________;
+	
+	//对手订单ID
+	private Long opponentOrderId;
 
 	//手续费收取人
 	private Long feeCollectorId;
@@ -240,6 +243,14 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 
 	public void setOrderMargin(BigDecimal orderMargin) {
 		this.orderMargin = orderMargin;
+	}
+
+	public Long getOpponentOrderId() {
+		return opponentOrderId;
+	}
+
+	public void setOpponentOrderId(Long opponentOrderId) {
+		this.opponentOrderId = opponentOrderId;
 	}
 
 	@Override

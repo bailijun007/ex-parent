@@ -295,6 +295,7 @@ public class PcTradeService {
 		orderTrade.setPrice(tradeMsg.getPrice());
 		orderTrade.setMakerFlag(tradeMsg.getMakerFlag());
 
+		orderTrade.setOrderMargin(tradeResult.getOrderMargin());
 		orderTrade.setFee(tradeResult.getFee());
 		orderTrade.setFeeRatio(tradeResult.getFeeRatio());
 		orderTrade.setPnl(tradeResult.getPnl());
@@ -315,6 +316,8 @@ public class PcTradeService {
 		orderTrade.setRemainVolume(order.getVolume().subtract(order.getFilledVolume()));
 		
 		orderTrade.setMatchTxId(tradeMsg.getMatchTxId());
+		
+		orderTrade.setOpponentOrderId(tradeMsg.getOpponentOrderId());
 		
 		orderTrade.setFeeSynchStatus(IntBool.NO);
 		
