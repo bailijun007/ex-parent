@@ -51,17 +51,19 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
     }
 
     @Override
-    public PageResult<FundTransferExtVo> queryAllUserHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
+    public PageResult<FundTransferExtVo> queryAllUserHistory(Long userId, String asset, Integer status,Integer pageNo, Integer pageSize) {
         PageResult<FundTransferExtVo> pageResult = new PageResult<>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
+        map.put("status", status);
         PageHelper.startPage(pageNo, pageSize);
         List<FundTransferExtVo> voList = fundTransferExtMapper.queryList(map);
         if (!CollectionUtils.isEmpty(voList)) {
             for (FundTransferExtVo transferExtVo : voList) {
                 Optional<FundTransferExtVo> vo = Optional.ofNullable(transferExtVo);
                 transferExtVo.setCtime(vo.map(t -> t.getCreated()).orElse(null));
+                //状态(15=>成功，16=>失败)
                 transferExtVo.setStatus(transferExtVo.getStatus() == 15 ? 1 : 2);
             }
         }

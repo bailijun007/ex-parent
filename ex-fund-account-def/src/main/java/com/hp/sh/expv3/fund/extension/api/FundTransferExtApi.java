@@ -38,12 +38,13 @@ public interface FundTransferExtApi {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "status", value = "状态（15：成功，16：失败）", example = "15", required = false),
             @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
     @GetMapping(value = "/api/extension/account/transfer/queryAllUserHistory")
     public PageResult<FundTransferExtVo> queryAllUserHistory(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "asset", required = false) String asset,
-                                                             @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize, @RequestParam(value = "pageNo") Integer pageNo);
+                                                             @RequestParam(value = "status", required = false) Integer status, @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize, @RequestParam(value = "pageNo") Integer pageNo);
 
 
 }

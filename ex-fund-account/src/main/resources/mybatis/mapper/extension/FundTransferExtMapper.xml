@@ -74,6 +74,9 @@
             <if test="asset!=null and asset!=''">
                 and asset=#{asset}
             </if>
+            <if test="status!=null">
+                status=#{status}
+            </if>
         </where>
         ORDER BY id desc
     </select>
