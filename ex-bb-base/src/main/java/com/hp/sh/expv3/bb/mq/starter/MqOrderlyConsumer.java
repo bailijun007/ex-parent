@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyContext;
@@ -29,6 +30,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.component.MetadataService;
 import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
+import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.constant.MqTopic;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
@@ -63,7 +65,7 @@ public class MqOrderlyConsumer {
         consumer.setInstanceName(setting.getInstanceName());
         
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
-        consumer.subscribe(topic, "*");
+        consumer.subscribe(topic, subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE));
         
         consumer.registerMessageListener(new MessageListenerOrderly() {
 
@@ -151,6 +153,9 @@ public class MqOrderlyConsumer {
 		return;
 		
 	}
-	
 
+	private String subExpression(String...tags) {
+		return StringUtils.join(tags, "||");
+	}
+	
 }

@@ -18,8 +18,4 @@ public class MqTags {
 	
 	public static final String TAGS_TRADE = "BB_TRADE";
 	
-	public static final String TAGS_POS_LIQ_LOCKED = "BB_POS_LIQ_LOCKED";
-	
-	public static final String TAGS_ORDER_ALL_CANCELLED = "BB_MATCH_SAME_SIDE_CLOSE_ORDER_ALL_CANCELLED";
-
 }
