@@ -9,8 +9,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 //@Component
-public class BBMatchedHandleThread extends Thread {
-    private static final Logger logger = LoggerFactory.getLogger(BBMatchedHandleThread.class);
+public class BBMatchedHandleThreadJob extends Thread {
+    private static final Logger logger = LoggerFactory.getLogger(BBMatchedHandleThreadJob.class);
 
 	@Autowired
 	private BBMatchedHandler matchedHandler;

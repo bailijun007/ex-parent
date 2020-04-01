@@ -13,6 +13,7 @@ import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
+import com.hp.sh.expv3.dev.LimitTimeHandle;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -45,6 +46,7 @@ public class SynchCollectorJob {
 		this.handleJob(startTime, 100);
 	}
 	
+	@LimitTimeHandle
 	private void handleJob(Long startTime, Integer pageSize) {
 		Page page = new Page(1, pageSize, 1000L);
 		while(true){
