@@ -22,9 +22,9 @@ public class BbMatchExtServiceImpl implements BbMatchExtService {
 
 
     @Override
-    public void batchSave(List<BbMatchExtVo> trades){
+    public void batchSave(List<BbMatchExtVo> trades,String table){
 
-        bbMatchExtMapper.batchSave(trades);
+        bbMatchExtMapper.batchSave(trades,table);
 //        if(!CollectionUtils.isEmpty(trades)){
 //            for (BbMatchExtVo trade : trades) {
 //                bbMatchExtMapper.save(trade);

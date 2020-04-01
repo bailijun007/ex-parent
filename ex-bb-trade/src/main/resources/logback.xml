@@ -143,6 +143,24 @@
         </root>
     </springProfile>
 
+    <springProfile name="bbprod2">
+        <root level="INFO">
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="bbprod3">
+        <root level="INFO">
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+    </springProfile>
+
     <springProfile name="bbdev">
         <root level="INFO">
             <!-- 控制台输出 -->

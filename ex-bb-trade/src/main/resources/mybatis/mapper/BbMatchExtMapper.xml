@@ -5,7 +5,7 @@
 <mapper namespace="com.hp.sh.expv3.bb.trade.dao.BbMatchExtMapper">
 
     <insert id="batchSave">
-        insert into bb_match (
+        insert into ${table} (
         id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,created,modified
         )values
         <foreach collection="trades" item="item" index="index" separator=",">

@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface BbMatchExtMapper {
 
-    void batchSave(@Param("trades") List<BbMatchExtVo> trades);
+    void batchSave(@Param("trades") List<BbMatchExtVo> trades,@Param("table")String table);
 
 
     void save(@Param("tradeVo") BbMatchExtVo tradeVo);
