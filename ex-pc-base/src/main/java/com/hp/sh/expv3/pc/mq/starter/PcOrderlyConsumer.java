@@ -1,16 +1,16 @@
-package com.hp.sh.expv3.bb.mq.starter;
+package com.hp.sh.expv3.pc.mq.starter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyContext;
@@ -23,25 +23,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
-import com.hp.sh.expv3.bb.component.MetadataService;
-import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
-import com.hp.sh.expv3.bb.constant.MqTags;
-import com.hp.sh.expv3.bb.constant.MqTopic;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
+import com.hp.sh.expv3.pc.component.MetadataService;
+import com.hp.sh.expv3.pc.component.vo.PcContractVO;
+import com.hp.sh.expv3.pc.constant.MqTopic;
 import com.hp.sh.rocketmq.config.RocketmqServerSetting;
 import com.hp.sh.rocketmq.exceptions.ReSendException;
 import com.hp.sh.rocketmq.impl.EndpointContext;
 
-@ConditionalOnProperty(name="mq.orderly.consumer.enable", havingValue="true")
+@Order
 @Configuration
-public class MqOrderlyConsumer {
-	private static final Logger logger = LoggerFactory.getLogger(MqOrderlyConsumer.class);
+public class PcOrderlyConsumer {
+	private final Logger logger = LoggerFactory.getLogger(PcOrderlyConsumer.class);
 	
 	@Autowired
 	private RocketmqServerSetting setting;
@@ -52,20 +52,61 @@ public class MqOrderlyConsumer {
 	@Autowired
 	private EndpointContext endpointContext;
 	
-	@Value("${bb.mq.consumer.groupId:1}")
-	private Integer bbGroupId;
+	@Value("${pc.mq.consumer.groupId:1}")
+	private Integer contractGroupId;
+
+	private final Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
-	private Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
+	@Scheduled(cron = "0 * * * * ?")
+	@PostConstruct
+	public void start123() throws MQClientException{
+		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 	
+		logger.debug("更新MQ监听,{},{},{},{}", pcList.size(), this.contractGroupId, this.setting.getInstanceName(), pcList);
+		
+		Map<String, PcContractVO> symbolMap = new HashMap<String, PcContractVO>();
+		for(PcContractVO bbvo : pcList){
+			if(bbvo.getContractGroup().equals(contractGroupId)){
+				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
+				symbolMap.put(topic, bbvo);
+			}
+		}
+		
+		for(String topic : new ArrayList<String>(this.mqMap.keySet())){
+			DefaultMQPushConsumer mq = this.mqMap.get(topic);
+			if(!symbolMap.containsKey(topic)){
+				logger.info("关闭监听. topic={}", topic);
+				mq.shutdown();
+				this.mqMap.remove(topic);
+			}
+		}
+		
+		Set<Entry<String, PcContractVO>> entrySet = symbolMap.entrySet();
+		for(Entry<String, PcContractVO> entry : entrySet){
+			String topic = entry.getKey();
+			PcContractVO symbolVO = entry.getValue();
+			if(!mqMap.containsKey(topic)){
+				logger.info("启动监听. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
+				DefaultMQPushConsumer mq = this.buildConsumer(topic);
+				this.mqMap.put(topic, mq);
+			}
+		}
+	
+		int n = this.mqMap.size();
+		logger.debug("mq:{},{}", n, this.mqMap);
+		return;
+	}
+
 	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic);
+//        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic, null, new PcAllocateMessageQueueStrategy());
         
         consumer.setNamesrvAddr(setting.getNamesrvAddr());
         consumer.setNamespace(setting.getNamespace());
         consumer.setInstanceName(setting.getInstanceName());
         
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
-        consumer.subscribe(topic, subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE));
+        consumer.subscribe(topic, subExpression());
         
         consumer.registerMessageListener(new MessageListenerOrderly() {
 
@@ -98,8 +139,8 @@ public class MqOrderlyConsumer {
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error("未知捕获,{}", e.toString(), e);
-        			logger.error("未知捕获,{}", cause.getMessage(), cause);
+        			logger.error(e.getMessage(), e);
+        			logger.error(cause.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		
@@ -111,51 +152,10 @@ public class MqOrderlyConsumer {
         return consumer;
 	}
 	
-	@Scheduled(cron = "0 * * * * ?")
-	@PostConstruct
-	public void start123() throws MQClientException{
-		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
-
-		logger.debug("更新MQ监听,{},{},{}", pcList.size(), this.bbGroupId, this.setting.getInstanceName());
-		
-		Map<String, BBSymbolVO> symbolMap = new HashMap<String, BBSymbolVO>();
-		for(BBSymbolVO bbvo : pcList){
-			if(bbvo.getBbGroupId().equals(this.bbGroupId)){
-				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
-				symbolMap.put(topic, bbvo);
-			}
-		}
-		
-		for(String topic : new ArrayList<String>(this.mqMap.keySet())){
-			DefaultMQPushConsumer mq = this.mqMap.get(topic);
-			if(!symbolMap.containsKey(topic)){
-				logger.info("关闭监听. topic={}", topic);
-				mq.shutdown();
-				this.mqMap.remove(topic);
-			}
-		}
-		
-		Set<Entry<String, BBSymbolVO>> entrySet = symbolMap.entrySet();
-		for(Entry<String, BBSymbolVO> entry : entrySet){
-			String topic = entry.getKey();
-			BBSymbolVO symbolVO = entry.getValue();
-			if(!mqMap.containsKey(topic)){
-				if(symbolVO.getBbGroupId().equals(this.bbGroupId)){
-					logger.info("启动监听MQConsumer. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
-					DefaultMQPushConsumer mq = this.buildConsumer(topic);
-					this.mqMap.put(topic, mq);
-				}
-			}
-		}
-
-		int n = this.mqMap.size();
-		logger.debug("mq:{},{}", n, this.mqMap);
-		return;
-		
+	private String subExpression() {
+		List<String> list = BeanHelper.getDistinctPropertyList(this.endpointContext.getConfigList(), "tags");
+		String exp = StringUtils.join(list, "||");
+		return exp;
 	}
 
-	private String subExpression(String...tags) {
-		return StringUtils.join(tags, "||");
-	}
-	
 }
