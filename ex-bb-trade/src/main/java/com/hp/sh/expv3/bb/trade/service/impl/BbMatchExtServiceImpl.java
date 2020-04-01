@@ -6,6 +6,7 @@ import com.hp.sh.expv3.bb.trade.service.BbMatchExtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -22,7 +23,13 @@ public class BbMatchExtServiceImpl implements BbMatchExtService {
 
     @Override
     public void batchSave(List<BbMatchExtVo> trades){
+
         bbMatchExtMapper.batchSave(trades);
+//        if(!CollectionUtils.isEmpty(trades)){
+//            for (BbMatchExtVo trade : trades) {
+//                bbMatchExtMapper.save(trade);
+//            }
+//        }
     }
 
 }

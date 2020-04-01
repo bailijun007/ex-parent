@@ -125,7 +125,7 @@
             </if>
 
         </where>
-        order by id desc
+        order by created desc
         LIMIT 0,${limit}
     </select>
 
@@ -170,7 +170,7 @@
                     ORDER BY id asc
                 </when>
                 <otherwise>
-                    order by id desc
+                    order by created desc
                 </otherwise>
             </choose>
         </where>

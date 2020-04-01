@@ -6,13 +6,20 @@
 
     <insert id="batchSave">
         insert into bb_match (
-        asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,created,modified
+        id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,created,modified
         )values
         <foreach collection="trades" item="item" index="index" separator=",">
-            (#{item.asset},#{item.symbol},#{item.matchTxId},#{item.tkBidFlag},#{item.tkAccountId},#{item.tkOrderId},#{item.mkAccountId},#{item.mkOrderId},#{item.price},
+            (#{item.id},#{item.asset},#{item.symbol},#{item.matchTxId},#{item.tkBidFlag},#{item.tkAccountId},#{item.tkOrderId},#{item.mkAccountId},#{item.mkOrderId},#{item.price},
             #{item.number},#{item.tradeTime},#{item.created},#{item.modified})
         </foreach>
 
+    </insert>
+
+    <insert id="save">
+        insert into bb_match (
+			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,created,modified
+			)values(
+			#{tradeVo.asset},#{tradeVo.symbol},#{tradeVo.matchTxId},#{tradeVo.tkBidFlag},#{tradeVo.tkAccountId},#{tradeVo.tkOrderId},#{tradeVo.mkAccountId},#{tradeVo.mkOrderId},#{tradeVo.price},#{tradeVo.number},#{tradeVo.tradeTime},#{tradeVo.created},#{tradeVo.modified})
     </insert>
 
 </mapper>

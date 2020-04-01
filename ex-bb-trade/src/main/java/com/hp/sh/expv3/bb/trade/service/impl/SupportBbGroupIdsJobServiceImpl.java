@@ -32,6 +32,9 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
     @Value("${bb.trade.symbols}")
     private String symbols;
 
+    @Value("${bb.trade.bbGroupIds}")
+    private Integer bbGroupId;
+
     Map<Integer, List<BBSymbol>> map = new ConcurrentHashMap<>();
 
     @Override
@@ -64,9 +67,11 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
         List<BBSymbol> list = new CopyOnWriteArrayList<>();
         if (!CollectionUtils.isEmpty(map)) {
             for (Integer integer : map.keySet()) {
-                List<BBSymbol> bbSymbols = map.get(integer);
-                for (BBSymbol bbSymbol : bbSymbols) {
-                    list.add(bbSymbol);
+                if(bbGroupId.equals(integer)){
+                    List<BBSymbol> bbSymbols = map.get(integer);
+                    for (BBSymbol bbSymbol : bbSymbols) {
+                        list.add(bbSymbol);
+                    }
                 }
             }
         }

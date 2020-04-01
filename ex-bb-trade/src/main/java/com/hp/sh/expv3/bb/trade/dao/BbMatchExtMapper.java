@@ -13,4 +13,7 @@ import java.util.List;
 public interface BbMatchExtMapper {
 
     void batchSave(@Param("trades") List<BbMatchExtVo> trades);
+
+
+    void save(@Param("tradeVo") BbMatchExtVo tradeVo);
 }
