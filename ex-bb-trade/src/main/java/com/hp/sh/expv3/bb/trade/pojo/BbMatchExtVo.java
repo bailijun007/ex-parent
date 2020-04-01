@@ -5,6 +5,11 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+import com.hp.sh.expv3.component.id.utils.GeneratorName;
+
 /**
  * @author BaiLiJun  on 2020/3/31
  */
@@ -77,6 +82,8 @@ public class BbMatchExtVo implements Serializable {
                 '}';
     }
 
+	@Id
+	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
     public Long getId() {
         return id;
     }
