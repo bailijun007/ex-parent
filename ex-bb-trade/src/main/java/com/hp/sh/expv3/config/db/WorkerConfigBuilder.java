@@ -15,7 +15,7 @@ import com.hp.sh.expv3.enums.IdTypeEnum;
 public class WorkerConfigBuilder {
 	
 	private static final String BB_MATCH = BbMatchExtVo.class.getName();
-	private static final int BB_MATCH_ID = IdTypeEnum.BB_ACCOUNT_RECORD_ID.getValue();
+//	private static final int BB_MATCH_ID = IdTypeEnum.BB_MATCH_ID.getValue();
 	
 	
 	@Value("${id.generator.dataCenterId}")
@@ -35,7 +35,7 @@ public class WorkerConfigBuilder {
 	}
 	
 	private void set(WorkerConfig workerConfig){
-		this.set(workerConfig, BB_MATCH_ID, BB_MATCH);
+//		this.set(workerConfig, BB_MATCH_ID, BB_MATCH);
 	}
 	
 	private void set(WorkerConfig workerConfig, int seqId, String tableUUID){

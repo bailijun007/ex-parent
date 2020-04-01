@@ -3,9 +3,9 @@
 <configuration scan="false">
     <property name="maxHistory" value="60"/>
     
-    <property name="group" value="${pc.mq.consumer.groupId:-1}"></property>
+    <property name="serverId" value="${app.server.id:-1}"></property>
     <property name="log_home" value="${app.log.home:-/data/hupa/logs/pc}"></property>
-    <property name="log_dir" value="${log_home}${group}"></property>
+    <property name="log_dir" value="${log_home}${serverId}"></property>
 
     <!-- ConsoleAppender 控制台输出日志 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
