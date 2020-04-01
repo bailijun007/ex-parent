@@ -3,7 +3,7 @@
 <configuration scan="false">
     <property name="maxHistory" value="60"/>
 
-    <property name="log_dir" value="/data/hupa/logs/bbkline/group1"></property>
+    <property name="log_dir" value="/data/hupa/logs"></property>
 
     <!-- ConsoleAppender 控制台输出日志 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -143,6 +143,24 @@
         </root>
     </springProfile>
 
+    <springProfile name="bbprod2">
+        <root level="INFO">
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="bbprod3">
+        <root level="INFO">
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+    </springProfile>
+
     <springProfile name="pcprod1">
         <root level="INFO">
             <appender-ref ref="ERROR"/>
@@ -152,6 +170,23 @@
         </root>
     </springProfile>
 
+    <springProfile name="pcprod2">
+        <root level="INFO">
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="pcprod3">
+        <root level="INFO">
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+    </springProfile>
 
     <springProfile name="bbdev">
         <root level="INFO">
@@ -169,8 +204,55 @@
 
     </springProfile>
 
+    <springProfile name="bbdev2">
+        <root level="INFO">
+            <!-- 控制台输出 -->
+            <appender-ref ref="STDOUT"/>
+            <!-- 文件输出 -->
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+
+        <logger name="com.hp.sh.expv3" level="info"></logger>
+        <logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
+
+    </springProfile>
+
+    <springProfile name="bbdev3">
+        <root level="INFO">
+            <!-- 控制台输出 -->
+            <appender-ref ref="STDOUT"/>
+            <!-- 文件输出 -->
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+
+        <logger name="com.hp.sh.expv3" level="info"></logger>
+        <logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
+
+    </springProfile>
 
     <springProfile name="pcdev">
+        <root level="INFO">
+            <!-- 控制台输出 -->
+            <appender-ref ref="STDOUT"/>
+            <!-- 文件输出 -->
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+
+        <logger name="com.hp.sh.expv3" level="info"></logger>
+        <logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
+
+    </springProfile>
+
+    <springProfile name="pcdev2">
         <root level="INFO">
             <!-- 控制台输出 -->
             <appender-ref ref="STDOUT"/>
