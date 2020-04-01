@@ -33,6 +33,12 @@ public interface BbAccountExtendApi {
     @GetMapping(value = "/api/bb/trade/ext/getBBAccount")
     public BbAccountExtVo getBBAccount(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset);
 
+
+    @ApiOperation(value = "获取BB账户(新接口)")
+    @GetMapping(value = "/api/bb/trade/ext/getNewBBAccount")
+    public BbAccountExtVo getNewBBAccount(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset);
+
+
     @ApiOperation(value = "获取BB账户余额")
     @GetMapping(value = "/api/bb/trade/ext/getBalance")
     BigDecimal getBalance(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset);

@@ -12,4 +12,6 @@ public interface BbAccountExtService {
     Boolean bbAccountExist(Long userId, String asset);
 
     BbAccountExtVo getBBAccount(Long userId, String asset);
+
+    BbAccountExtVo getNewBBAccount(Long userId, String asset);
 }

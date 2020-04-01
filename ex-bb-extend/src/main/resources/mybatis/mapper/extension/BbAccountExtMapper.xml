@@ -60,6 +60,10 @@
         <include refid="simple_where"/>
     </select>
 
+    <select id="getBBAccount" resultType="com.hp.sh.expv3.bb.extension.vo.BbAccountExtVo">
+        SELECT balance available,frozen lock,total   FROM bb_account
+        where user_id=#{userId} and asset=#{asset}
+    </select>
 
 
 </mapper>
