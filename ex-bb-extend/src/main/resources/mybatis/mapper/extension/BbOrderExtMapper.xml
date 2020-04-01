@@ -297,7 +297,6 @@
 			bb_order o ON o.id = ao.id
 		where
 			ao.user_id=#{userId}
-			and ao.asset=#{asset}
             and o.order_margin_currency=#{asset}
     </select>
 
