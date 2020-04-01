@@ -3,7 +3,7 @@
 <configuration scan="false">
     <property name="maxHistory" value="60"/>
 
-    <property name="log_dir" value="/data/hupa/logs/bb-trade"></property>
+    <property name="log_dir" value="/data/hupa/logs/pc-trade"></property>
 
     <!-- ConsoleAppender 控制台输出日志 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -134,7 +134,7 @@
 
     <logger name="springfox.documentation.spring" level="warn"></logger>
 
-    <springProfile name="bbprod">
+    <springProfile name="pcprod">
         <root level="INFO">
             <appender-ref ref="ERROR"/>
             <appender-ref ref="WARN"/>
@@ -143,7 +143,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="bbprod2">
+    <springProfile name="pcprod2">
         <root level="INFO">
             <appender-ref ref="ERROR"/>
             <appender-ref ref="WARN"/>
@@ -152,7 +152,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="bbprod3">
+    <springProfile name="pcprod3">
         <root level="INFO">
             <appender-ref ref="ERROR"/>
             <appender-ref ref="WARN"/>
@@ -161,23 +161,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="bbdev">
-        <root level="INFO">
-            <!-- 控制台输出 -->
-            <appender-ref ref="STDOUT"/>
-            <!-- 文件输出 -->
-            <appender-ref ref="ERROR"/>
-            <appender-ref ref="WARN"/>
-            <appender-ref ref="INFO"/>
-            <appender-ref ref="DEBUG"/>
-        </root>
-
-        <logger name="com.hp.sh.expv3" level="info"></logger>
-        <logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
-
-    </springProfile>
-
-    <springProfile name="bbdev2">
+    <springProfile name="pcdev">
         <root level="INFO">
             <!-- 控制台输出 -->
             <appender-ref ref="STDOUT"/>
@@ -193,7 +177,23 @@
 
     </springProfile>
 
-    <springProfile name="bbdev3">
+    <springProfile name="pcdev2">
+        <root level="INFO">
+            <!-- 控制台输出 -->
+            <appender-ref ref="STDOUT"/>
+            <!-- 文件输出 -->
+            <appender-ref ref="ERROR"/>
+            <appender-ref ref="WARN"/>
+            <appender-ref ref="INFO"/>
+            <appender-ref ref="DEBUG"/>
+        </root>
+
+        <logger name="com.hp.sh.expv3" level="info"></logger>
+        <logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
+
+    </springProfile>
+
+    <springProfile name="pcdev3">
         <root level="INFO">
             <!-- 控制台输出 -->
             <appender-ref ref="STDOUT"/>
