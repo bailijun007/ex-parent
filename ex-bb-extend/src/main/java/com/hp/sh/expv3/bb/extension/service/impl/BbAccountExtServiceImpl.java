@@ -75,4 +75,20 @@ public class BbAccountExtServiceImpl implements BbAccountExtService {
 
         return vo;
     }
+
+    @Override
+    public BbAccountExtVo getNewBBAccount(Long userId, String asset) {
+        BbAccountExtVo bbAccountExtVo= bbAccountExtMapper.getBBAccount(userId,asset);
+        if (bbAccountExtVo == null) {
+            bbAccountExtVo =new BbAccountExtVo();
+            bbAccountExtVo.setAsset(asset);
+            bbAccountExtVo.setUserId(userId);
+            bbAccountExtVo.setBalance(BigDecimal.ZERO);
+            bbAccountExtVo.setAvailable(BigDecimal.ZERO);
+            bbAccountExtVo.setLock(BigDecimal.ZERO);
+            bbAccountExtVo.setTotal(BigDecimal.ZERO);
+            return bbAccountExtVo;
+        }
+        return bbAccountExtVo;
+    }
 }

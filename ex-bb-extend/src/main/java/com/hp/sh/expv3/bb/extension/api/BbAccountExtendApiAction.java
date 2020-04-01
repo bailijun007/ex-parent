@@ -67,6 +67,13 @@ public class BbAccountExtendApiAction implements BbAccountExtendApi {
     }
 
     @Override
+    public BbAccountExtVo getNewBBAccount(Long userId, String asset) {
+        checkParam(userId, asset);
+        BbAccountExtVo bbAccount = bbAccountExtService.getNewBBAccount(userId, asset);
+        return bbAccount;
+    }
+
+    @Override
     public BigDecimal getBalance(Long userId, String asset) {
         checkParam(userId, asset);
         BbAccountVo bbAccount = bbAccountExtService.getBBAccount(userId, asset);

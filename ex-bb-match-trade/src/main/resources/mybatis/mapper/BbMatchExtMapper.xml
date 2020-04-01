@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.trade.dao.BbMatchExtMapper">
+
+    <insert id="batchSave">
+        insert into ${table} (
+        id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,created,modified
+        )values
+        <foreach collection="trades" item="item" index="index" separator=",">
+            (#{item.id},#{item.asset},#{item.symbol},#{item.matchTxId},#{item.tkBidFlag},#{item.tkAccountId},#{item.tkOrderId},#{item.mkAccountId},#{item.mkOrderId},#{item.price},
+            #{item.number},#{item.tradeTime},#{item.created},#{item.modified})
+        </foreach>
+
+    </insert>
+
+    <insert id="save">
+        insert into bb_match (
+			asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,mk_order_id,price,`number`,trade_time,created,modified
+			)values(
+			#{tradeVo.asset},#{tradeVo.symbol},#{tradeVo.matchTxId},#{tradeVo.tkBidFlag},#{tradeVo.tkAccountId},#{tradeVo.tkOrderId},#{tradeVo.mkAccountId},#{tradeVo.mkOrderId},#{tradeVo.price},#{tradeVo.number},#{tradeVo.tradeTime},#{tradeVo.created},#{tradeVo.modified})
+    </insert>
+
+</mapper>
