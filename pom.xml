@@ -37,7 +37,7 @@
 		<module>ex-bb-extend-def</module>
 
 		<module>ex-bb-kline</module>
-        <module>ex-bb-trade</module>
+        <module>ex-bb-match-trade</module>
     </modules>
 
     <dependencies>

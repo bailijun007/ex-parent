@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ex-bb-trade</artifactId>
+    <artifactId>ex-bb-match-trade</artifactId>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
         <dependency>

@@ -16,11 +16,11 @@ import javax.annotation.PostConstruct;
 @EnableDiscoveryClient
 @ComponentScan("com.hp.sh.expv3")
 @SpringBootApplication
-public class ExBBTradeApplication {
-    private static final Logger logger = LoggerFactory.getLogger(ExBBTradeApplication.class);
+public class ExBBMatchTradeApplication {
+    private static final Logger logger = LoggerFactory.getLogger(ExBBMatchTradeApplication.class);
 
     public static void main(String[] args) throws Exception {
-        final ConfigurableApplicationContext ac = SpringApplication.run(ExBBTradeApplication.class, args);
+        final ConfigurableApplicationContext ac = SpringApplication.run(ExBBMatchTradeApplication.class, args);
 
 //        final BbKlineHistoryCalcByTradeFromExpService bbKlineHistoryCalcByTradeFromExpService = ac.getBean(BbKlineHistoryCalcByTradeFromExpService.class);
 //        bbKlineHistoryCalcByTradeFromExpService.execute();
