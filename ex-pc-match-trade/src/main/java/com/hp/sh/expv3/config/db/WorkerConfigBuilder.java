@@ -1,19 +1,19 @@
 package com.hp.sh.expv3.config.db;
 
-import java.util.ArrayList;
 
+import com.hp.sh.expv3.component.id.config.SequencConfig;
+import com.hp.sh.expv3.component.id.config.WorkerConfig;
+import com.hp.sh.expv3.pc.trade.pojo.PcMatchExtVo;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.hp.sh.expv3.pc.trade.pojo.BbMatchExtVo;
-import com.hp.sh.expv3.component.id.config.SequencConfig;
-import com.hp.sh.expv3.component.id.config.WorkerConfig;
+import java.util.ArrayList;
 
 @Component
 public class WorkerConfigBuilder {
 	
-	private static final String BB_MATCH = BbMatchExtVo.class.getName();
+	private static final String BB_MATCH = PcMatchExtVo.class.getName();
 //	private static final int BB_MATCH_ID = IdTypeEnum.BB_MATCH_ID.getValue();
 	
 	
