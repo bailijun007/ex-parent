@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -24,7 +23,6 @@ import com.gitee.hupadev.commons.cache.JsonCacheSerializer;
 import com.gitee.hupadev.commons.cache.RedisCache;
 import com.gitee.hupadev.commons.cache.RedisPool;
 import com.gitee.hupadev.commons.cache.RedisPublisher;
-import com.gitee.hupadev.commons.cache.RedisSubscriber;
 
 @EnableCaching
 @Configuration
@@ -69,29 +67,5 @@ public class RedisConfig {
 		rp.setCacheSerializer(jsonCs);
 		return rp;
 	}
-	
-	@ConditionalOnProperty(name="redis.subscriber.enable", havingValue="true")
-	@Bean
-	public RedisSubscriber testRs(RedisPool redisPool){
-		this.testRs(redisPool, "bb:account:USDT");
-		
-		this.testRs(redisPool, "bb:account:BTC");
-		this.testRs(redisPool, "bb:order:USDT:BTC_USDT");
-		this.testRs(redisPool, "bb:pos:USDT:BTC_USDT");
-		this.testRs(redisPool, "bb:user:symbol:USDT:BTC_USDT");
-		
-		this.testRs(redisPool, "bb:account:ETH");
-		this.testRs(redisPool, "bb:order:USDT:ETH_USDT");
-		this.testRs(redisPool, "bb:pos:USDT:ETH_USDT");
-		this.testRs(redisPool, "bb:symbol:USDT:ETH_USDT");
-		return null;
-	}
-	
-	private void testRs(RedisPool redisPool, String...channels){
-		for(String channel:channels){
-			RedisSubscriberTest pos = new RedisSubscriberTest(channel, redisPool);
-			pos.start();
-		}
-	}
-	
+
 }
