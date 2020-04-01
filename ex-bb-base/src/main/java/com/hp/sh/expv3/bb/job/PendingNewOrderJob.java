@@ -17,8 +17,8 @@ import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 //@Component
-public class OrderJob {
-    private static final Logger logger = LoggerFactory.getLogger(OrderJob.class);
+public class PendingNewOrderJob {
+    private static final Logger logger = LoggerFactory.getLogger(PendingNewOrderJob.class);
 
     @Autowired
     private BBOrderService orderService;
