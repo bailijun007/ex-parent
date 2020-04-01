@@ -179,14 +179,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="pcprod3">
-        <root level="INFO">
-            <appender-ref ref="ERROR"/>
-            <appender-ref ref="WARN"/>
-            <appender-ref ref="INFO"/>
-            <appender-ref ref="DEBUG"/>
-        </root>
-    </springProfile>
+
 
     <springProfile name="bbdev">
         <root level="INFO">
