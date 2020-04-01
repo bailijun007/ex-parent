@@ -94,7 +94,7 @@
 
     <select id="queryByLimit" resultType="com.hp.sh.expv3.bb.extension.vo.BbAccountRecordExtVo">
         SELECT
-        asset,created tradeTime,trade_type tradeType,amount volume ,balance
+        id,asset,created tradeTime,trade_type tradeType,amount volume ,balance
         FROM bb_account_record
         <where>
 
@@ -131,7 +131,7 @@
 
     <select id="listBbAccountRecordsByPage" resultType="com.hp.sh.expv3.bb.extension.vo.BbAccountRecordExtVo">
         SELECT
-        asset,created tradeTime,trade_type tradeType,amount volume ,balance,associated_id associatedId
+        id,asset,created tradeTime,trade_type tradeType,amount volume ,balance,associated_id associatedId
         FROM bb_account_record
         <where>
             <if test="idList!=null">id in
