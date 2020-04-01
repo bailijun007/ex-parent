@@ -124,7 +124,7 @@ public class MatchMqConsumer {
 		
 	}
 	
-	//取消订单
+	//成交
 	@MQListener(tags=MqTags.TAGS_TRADE)
 	public void handleTradeMsg(BBTradeVo msg){
 		logger.info("收到用户成交消息:{}", msg);

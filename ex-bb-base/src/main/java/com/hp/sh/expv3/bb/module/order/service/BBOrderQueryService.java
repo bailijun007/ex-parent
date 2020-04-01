@@ -127,11 +127,11 @@ public class BBOrderQueryService {
 	}
 	
 	@CrossDB
-	public List<BBOrderTrade> querySynchFee(Page page, Long created){
+	public List<BBOrderTrade> querySynchFee(Page page, Long tradeTimeStart){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", page);
 		params.put("feeSynchStatus", IntBool.NO);
-		params.put("createdEnd", created);
+		params.put("tradeTimeStart", tradeTimeStart);
 		params.put("orderBy", "created");
 		List<BBOrderTrade> list = this.bBOrderTradeDAO.queryList(params);
 		return list;

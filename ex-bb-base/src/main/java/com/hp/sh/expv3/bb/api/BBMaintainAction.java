@@ -10,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gitee.hupadev.base.spring.interceptor.LimitInterceptor;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.job.BBMatchedHandler;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
+import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.component.executor.OrderlyExecutors;
@@ -39,6 +41,36 @@ public class BBMaintainAction{
 	
 	@Autowired
 	private OrderlyExecutors tradeExecutors;
+	
+	@ApiOperation(value = "querySynchFee")
+	@GetMapping(value = "/api/bb/maintain/querySynchFee")
+	public List<BBOrderTrade> querySynchFee(){
+		Long startTime = DbDateUtils.now()-1000*60*10;
+		Page page = new Page(1, 100, 1000L);
+		List<BBOrderTrade> list = orderQueryService.querySynchFee(page, startTime);
+		return list;
+	}
+	
+	@ApiOperation(value = "urlSets")
+	@GetMapping(value = "/api/bb/maintain/urlSets")
+	public Map urlSets(){
+		Map map = new HashMap();
+		map.put("isSysClose", LimitInterceptor.isSysClose());
+		map.put("urlsets", LimitInterceptor.getUrlsets());
+		return map;
+	}
+	
+	@ApiOperation(value = "sleepUrl")
+	@GetMapping(value = "/api/bb/maintain/sleepUrl")
+	public void sleepUrl(String url, long sleep){
+		LimitInterceptor.set(url, false, sleep);
+	}
+	
+	@ApiOperation(value = "unSleepUrl")
+	@GetMapping(value = "/api/bb/maintain/unSleepUrl")
+	public void unSleepUrl(String url){
+		LimitInterceptor.remove(url);
+	}
 
 	@ApiOperation(value = "version")
 	@GetMapping(value = "/api/bb/maintain/version")

@@ -145,7 +145,7 @@ public class PcOrderQueryService {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", page);
 		params.put("feeSynchStatus", IntBool.NO);
-		params.put("createdEnd", startTime);
+		params.put("tradeTimeStart", startTime);
 		params.put("orderBy", "created");
 		List<PcOrderTrade> list = this.pcOrderTradeDAO.queryList(params);
 		return list;

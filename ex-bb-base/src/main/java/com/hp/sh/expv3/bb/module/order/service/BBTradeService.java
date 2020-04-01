@@ -203,6 +203,10 @@ public class BBTradeService {
 		
 		orderTrade.setMatchTxId(tradeMsg.getMatchTxId());
 		
+		orderTrade.setOpponentOrderId(tradeMsg.getOpponentOrderId());
+		
+		orderTrade.setOrderMargin(tradeResult.getTradeOrderMargin());
+		
 		orderTrade.setRemainVolume(BigCalc.subtract(order.getVolume(), order.getFilledVolume(), tradeResult.getTradeVolume()));
 		orderTrade.setRemainOrderMargin(BigCalc.subtract(order.getOrderMargin(), tradeResult.getTradeOrderMargin()));
 		
@@ -215,6 +219,7 @@ public class BBTradeService {
 		orderTrade.setFeeCollectorId(feeCollectorSelector.getFeeCollectorId(order.getUserId(), order.getAsset(), order.getSymbol()));
 		orderTrade.setFeeSynchStatus(IntBool.NO);
 		
+		//检查结果
 		this.checkOrderTrade(orderTrade);
 		
 		this.orderTradeDAO.save(orderTrade);

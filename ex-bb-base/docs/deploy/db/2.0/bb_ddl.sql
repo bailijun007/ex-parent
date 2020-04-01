@@ -42,7 +42,7 @@ COMMENT='用户资金账户'
 -- ----------------------------
 DROP TABLE IF EXISTS `bb_account_log`;
 CREATE TABLE `bb_account_log` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT ,
+`id`  bigint(20) NOT NULL ,
 `type`  int(11) NOT NULL COMMENT '事件类型' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户Id' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,

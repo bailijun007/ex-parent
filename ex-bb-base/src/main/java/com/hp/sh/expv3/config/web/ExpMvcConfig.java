@@ -15,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gitee.hupadev.base.spring.interceptor.LimitInterceptor;
 import com.gitee.hupadev.base.spring.plugin.HpLocaleResolver;
 import com.hp.sh.expv3.commons.web.LogFilter;
 
@@ -36,7 +37,7 @@ public class ExpMvcConfig implements WebMvcConfigurer {
 
 	// 添加拦截器
 	public void addInterceptors(InterceptorRegistry registry) {
-        
+        registry.addInterceptor(new LimitInterceptor());
 	}
 
 	@Override
