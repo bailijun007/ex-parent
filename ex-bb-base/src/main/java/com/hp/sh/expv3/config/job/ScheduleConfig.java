@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author wangjg
  *
  */
-@ConditionalOnProperty(name="xxl.job.enable", havingValue="false")
+@ConditionalOnProperty(name="job.type", havingValue="schedule")
 @EnableScheduling
 @Configuration
 public class ScheduleConfig {
