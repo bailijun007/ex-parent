@@ -3,7 +3,10 @@
 <configuration scan="false">
     <property name="maxHistory" value="60"/>
 
-    <property name="log_dir" value="/data/hupa/logs"></property>
+
+    <property name="log_home" value="${app.log.home:-/data/hupa/logs/bb}"></property>
+    <property name="log_dir" value="${log_home}"></property>
+
 
     <!-- ConsoleAppender 控制台输出日志 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
