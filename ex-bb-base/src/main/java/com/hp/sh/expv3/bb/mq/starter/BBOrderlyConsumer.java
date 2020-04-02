@@ -145,7 +145,7 @@ public class BBOrderlyConsumer {
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
         			logger.error("未知捕获1,{}", e.toString(), e);
-        			logger.error("未知捕获2,{}", cause.getMessage(), cause);
+        			logger.error("未知捕获2,{},{}", cause.getMessage(), cause.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		
