@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50599
 File Encoding         : 65001
 
-Date: 2020-03-30 19:48:47
+Date: 2020-04-02 15:53:10
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -330,9 +330,11 @@ CREATE TABLE `pc_order_trade` (
 `pos_id`  bigint(20) NOT NULL COMMENT '仓位ID' ,
 `maker_flag`  int(11) NOT NULL COMMENT '1-marker， 0-taker' ,
 `trade_time`  bigint(20) NOT NULL COMMENT '成交时间' ,
+`opponent_order_id`  bigint(20) NULL DEFAULT NULL COMMENT '对手订单ID' ,
 `fee_collector_id`  bigint(20) NOT NULL COMMENT '手续费收取人' ,
 `fee_ratio`  decimal(50,30) NOT NULL COMMENT '手续费率' ,
 `fee`  decimal(50,30) NOT NULL COMMENT '手续费' ,
+`order_margin`  decimal(50,30) NULL DEFAULT NULL COMMENT '押金' ,
 `pnl`  decimal(50,30) NOT NULL COMMENT '盈亏(此次成交的盈亏)' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
@@ -393,39 +395,6 @@ INDEX `idx_volume` (`volume`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='永续合约_仓位'
-
-;
-
--- ----------------------------
--- Table structure for `pc_repair_trade`
--- ----------------------------
-DROP TABLE IF EXISTS `pc_repair_trade`;
-CREATE TABLE `pc_repair_trade` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id' ,
-`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
-`symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '交易对' ,
-`match_tx_id`  bigint(20) NOT NULL COMMENT '事务Id' ,
-`tk_bid_flag`  int(11) NOT NULL COMMENT 'taker是否买：1-是，0-否' ,
-`tk_account_id`  bigint(20) NOT NULL COMMENT 'taker账户ID' ,
-`tk_order_id`  bigint(20) NOT NULL COMMENT 'taker订单ID' ,
-`tk_close_flag`  int(11) NULL DEFAULT 0 COMMENT 'taker是否平仓' ,
-`mk_account_id`  bigint(20) NOT NULL COMMENT 'maker账户Id' ,
-`mk_order_id`  bigint(20) NOT NULL COMMENT 'maker订单ID' ,
-`mk_close_flag`  int(11) NULL DEFAULT 0 COMMENT 'maker是否平仓' ,
-`price`  decimal(50,30) NOT NULL COMMENT '成交价格' ,
-`number`  decimal(50,30) NOT NULL COMMENT '数量' ,
-`trade_time`  bigint(20) NOT NULL COMMENT '成交时间' ,
-`created`  bigint(20) NULL DEFAULT NULL ,
-`modified`  bigint(20) NULL DEFAULT NULL ,
-`enable_flag`  int(1) NOT NULL ,
-PRIMARY KEY (`id`),
-INDEX `idx_enable_flag_asset_symbol` (`enable_flag`, `asset`, `symbol`) USING BTREE ,
-INDEX `idx_trade_time` (`trade_time`) USING BTREE 
-)
-ENGINE=InnoDB
-DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='k线需要修复的交易表'
-AUTO_INCREMENT=10000
 
 ;
 
