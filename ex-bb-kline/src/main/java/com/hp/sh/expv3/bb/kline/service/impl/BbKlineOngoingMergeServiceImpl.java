@@ -57,6 +57,9 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     @Autowired
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
+    @Value("${kline.persistentData.updateEventPattern}")
+    private String persistentDataEventPattern;
+
     @PostConstruct
     private void init() {
         final String[] freqs = supportFrequenceString.split(",");
@@ -150,6 +153,8 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
                             BBKLine newKline = merge(asset, symbol, targetFreq, startAndEndMs[0], bbkLines);
                             saveOrUpdateKline(asset, symbol, targetFreq, newKline);
                             notifyKlineUpdate(asset, symbol, targetFreq, startAndEndMs[0]);
+                            //kline 持久化数据通知
+//                            notifyKlinePersistentData(asset, symbol, targetFreq, startAndEndMs[0]);
                         }
                         startMsSet.add(startAndEndMs[0]);
                     }
@@ -161,6 +166,15 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     private void notifyKlineUpdate(String asset, String symbol, Integer targetFreq, Long startMs) {
         //向集合中插入元素，并设置分数
         String key = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, targetFreq);
+        bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
+                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, targetFreq, startMs), Long.valueOf(startMs).doubleValue());
+                }}
+        );
+    }
+
+
+    private void notifyKlinePersistentData(String asset, String symbol, Integer targetFreq, Long startMs) {
+        String key = BbKlineRedisKeyUtil.buildKlinePersistentDataRedisKey(persistentDataEventPattern, asset, symbol, targetFreq);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
                     put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, targetFreq, startMs), Long.valueOf(startMs).doubleValue());
                 }}
