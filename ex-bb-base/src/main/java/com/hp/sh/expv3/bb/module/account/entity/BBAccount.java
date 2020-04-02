@@ -89,7 +89,9 @@ public class BBAccount extends BaseAccountEntity {
 
 	@Override
 	public String toString() {
-		return "BBAccount [asset=" + asset + ", balance=" + balance + ", version=" + version + "]";
+		return "BBAccount [userId=" + userId + ", asset=" + asset + ", balance=" + balance + ", frozen=" + frozen
+				+ ", total=" + total + ", version=" + version + "]";
 	}
+
 
 }
