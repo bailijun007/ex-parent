@@ -154,7 +154,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
                             saveOrUpdateKline(asset, symbol, targetFreq, newKline);
                             notifyKlineUpdate(asset, symbol, targetFreq, startAndEndMs[0]);
                             //kline 持久化数据通知
-                            notifyKlinePersistentData(asset, symbol, targetFreq, startAndEndMs[0]);
+//                            notifyKlinePersistentData(asset, symbol, targetFreq, startAndEndMs[0]);
                         }
                         startMsSet.add(startAndEndMs[0]);
                     }
