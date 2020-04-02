@@ -243,8 +243,7 @@ public class BBAccountCoreService{
 			now = DbDateUtils.now();
 		}
 		
-		this.checkBalance(account.getBalance());
-		this.checkBalance(account.getFrozen());
+		this.checkBalance(account);
 		
 		account.setTotal(account.getBalance().add(account.getFrozen()));
 		account.setModified(now);
@@ -276,10 +275,14 @@ public class BBAccountCoreService{
 		publisher.publishEvent(record);
 	}
 	
-	private void checkBalance(BigDecimal newBalance){
+	private void checkBalance(BBAccount account){
 		//检查余额
-		if(newBalance.compareTo(BigDecimal.ZERO) < 0){
-			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, newBalance);
+		if(account.getBalance().compareTo(BigDecimal.ZERO) < 0){
+			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, "balance", account);
+		}
+		//检查冻结
+		if(account.getFrozen().compareTo(BigDecimal.ZERO) < 0){
+			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, "frozen", account);
 		}
 	}
 	
