@@ -114,7 +114,7 @@ public class FundAccountCoreService {
 
         //金额必须是正数
         if (record.getAmount().compareTo(BigDecimal.ZERO) < 0) {
-            throw new ExException(WalletError.PARAM_REQUIRE_POSITIVE);
+            throw new ExException(WalletError.PARAM_REQUIRE_POSITIVE, record);
         }
 
         if (this.checkExist(record)) {

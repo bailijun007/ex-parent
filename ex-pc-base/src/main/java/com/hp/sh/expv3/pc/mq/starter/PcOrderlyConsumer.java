@@ -60,9 +60,10 @@ public class PcOrderlyConsumer {
 	@Scheduled(cron = "0 * * * * ?")
 	@PostConstruct
 	public void start123() throws MQClientException{
+		String subExpression = subExpression();
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 	
-		logger.debug("更新MQ监听,{},{},{},{}", pcList.size(), this.contractGroupId, this.setting.getInstanceName(), pcList);
+		logger.debug("更新MQ监听,{},{},{},{},{}", pcList.size(), this.contractGroupId, this.setting.getInstanceName(), pcList, subExpression);
 		
 		Map<String, PcContractVO> symbolMap = new HashMap<String, PcContractVO>();
 		for(PcContractVO bbvo : pcList){
@@ -86,8 +87,8 @@ public class PcOrderlyConsumer {
 			String topic = entry.getKey();
 			PcContractVO symbolVO = entry.getValue();
 			if(!mqMap.containsKey(topic)){
-				logger.info("启动监听. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
-				DefaultMQPushConsumer mq = this.buildConsumer(topic);
+				logger.info("启动监听. asset={}, symbol={},subExpression={}", symbolVO.getAsset(), symbolVO.getSymbol(),subExpression);
+				DefaultMQPushConsumer mq = this.buildConsumer(topic, subExpression);
 				this.mqMap.put(topic, mq);
 			}
 		}
@@ -97,7 +98,7 @@ public class PcOrderlyConsumer {
 		return;
 	}
 
-	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
+	private DefaultMQPushConsumer buildConsumer(String topic, String subExpression) throws MQClientException{
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic);
 //        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic, null, new PcAllocateMessageQueueStrategy());
         
@@ -106,7 +107,7 @@ public class PcOrderlyConsumer {
         consumer.setInstanceName(setting.getInstanceName());
         
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
-        consumer.subscribe(topic, subExpression());
+        consumer.subscribe(topic, subExpression);
         
         consumer.registerMessageListener(new MessageListenerOrderly() {
 

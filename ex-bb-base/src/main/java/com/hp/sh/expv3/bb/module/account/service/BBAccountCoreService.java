@@ -301,7 +301,7 @@ public class BBAccountCoreService{
 		
 		//金额必须是正数
 		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
-			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE);
+			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE, record);
 		}
 		
 		BBAccountRecord oldRcd = this.fundAccountRecordDAO.findByTradeNo(record.getUserId(), record.getTradeNo());
