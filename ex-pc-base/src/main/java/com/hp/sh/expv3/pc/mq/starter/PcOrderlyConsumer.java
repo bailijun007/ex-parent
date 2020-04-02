@@ -140,8 +140,12 @@ public class PcOrderlyConsumer {
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error(e.getMessage(), e);
-        			logger.error(cause.toString(), cause);
+        			if(cause instanceof UpdateException){
+        				logger.warn(cause.toString(), cause);
+        			}else{
+            			logger.error("未知捕获1,{}", e.toString(), e);
+            			logger.error("未知捕获2,{}", cause.getMessage(), cause);
+        			}
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		
