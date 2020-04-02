@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.config.redis;
+package com.hp.sh.expv3.pc.mq.starter.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,16 +13,19 @@ public class RedisSubscriberTest extends Thread{
 	
 	private String channel;
 	
-	private RedisPool redisPool;
+	private RedisSubscriber rs;
 
     public RedisSubscriberTest(String channel, RedisPool redisPool) {
 		this.channel = channel;
-		this.redisPool = redisPool;
+		this.rs = new RedisSubscriber(redisPool);
+	}
+
+	public String getChannel() {
+		return channel;
 	}
 
 	public void run(){
 		try{
-			final RedisSubscriber rs = new RedisSubscriber(redisPool);
 			rs.setCacheSerializer(new JsonCacheSerializer());
 			rs.setMsgListener(new MsgListener(){
 
@@ -37,6 +40,10 @@ public class RedisSubscriberTest extends Thread{
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	
+	public void shutdown(){
+		rs.shutdown();
 	}
     
 }

@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.job;
+package com.hp.sh.expv3.pc.job.liq;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,6 +30,7 @@ import com.hp.sh.expv3.pc.module.riskfund.service.PcRiskfundCoreService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.liq.msg.LiqLockMsg;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
+import com.hp.sh.expv3.pc.strategy.vo.LiqHandleResult;
 import com.hp.sh.expv3.pc.vo.request.RiskFundRequest;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -37,8 +38,8 @@ import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 @Component
-public class LiquidationJob {
-    private static final Logger logger = LoggerFactory.getLogger(LiquidationJob.class);
+public class LiquidationService {
+    private static final Logger logger = LoggerFactory.getLogger(LiquidationService.class);
     
 	@Autowired
 	private PcPositionDataService positionDataService;
@@ -65,7 +66,7 @@ public class LiquidationJob {
     private MatchMqSender liqMqSender;
 
     @Autowired
-	private LiquidationJob self;
+	private LiquidationService self;
     
     
 	@Scheduled(cron = "${cron.liq.check}")

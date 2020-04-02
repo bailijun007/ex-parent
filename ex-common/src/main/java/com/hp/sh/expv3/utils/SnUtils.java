@@ -60,7 +60,7 @@ public class SnUtils {
 
 	static String newTimeSn(){
 		String dstr = DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSS");
-		String nstr = RandomStringUtils.randomNumeric(4);
+		String nstr = RandomStringUtils.randomNumeric(6);
 		return dstr+nstr;
 	}
 

@@ -30,20 +30,22 @@ public class SynchCollectorJob {
 	
 	@XxlJob("bbSynchCollector")
     public ReturnT<String> xxlJobHandler(String param) throws Exception {
-		logger.info("同步手续费...，{}", param);
-		Long startTime = DbDateUtils.now()-1000*60*5;
+		Long startTime = DbDateUtils.now()-1000*60*2;
 		if(StringUtils.isNotBlank(param)){
 			startTime = Long.parseLong(param);
 		}
+		logger.info("XXL同步手续费...，{}", startTime);
     	this.handleJob(startTime, 100);
-    	logger.info("同步手续费结束");
+    	logger.info("XXL同步手续费结束。");
         return ReturnT.SUCCESS;
     }
 	
 	@Scheduled(cron = "0 0/1 * * * ?")
 	public void scheduledHandleJob() {
 		Long startTime = DbDateUtils.now()-1000*60*5;
+		logger.info("SCHEDULED同步手续费...，{}", startTime);
 		this.handleJob(startTime, 100);
+		logger.info("SCHEDULED同步手续费结束。");
 	}
 	
 	@LimitTimeHandle
