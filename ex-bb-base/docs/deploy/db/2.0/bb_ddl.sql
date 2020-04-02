@@ -225,7 +225,7 @@ CREATE TABLE `bb_order` (
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
 `version`  bigint(20) NOT NULL DEFAULT 0 ,
 `leverage`  decimal(6,2) NULL DEFAULT NULL ,
-`order_margin_currency`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`order_margin_currency`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '押金币种',
 PRIMARY KEY (`id`),
 INDEX `idx_userid_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE ,
 INDEX `idx_created` (`created`) USING BTREE 
