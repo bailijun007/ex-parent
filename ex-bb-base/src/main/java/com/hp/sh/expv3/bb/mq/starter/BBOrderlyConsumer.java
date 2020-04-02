@@ -1,3 +1,4 @@
+
 package com.hp.sh.expv3.bb.mq.starter;
 
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class BBOrderlyConsumer {
 		
 		Map<String, BBSymbolVO> symbolMap = new HashMap<String, BBSymbolVO>();
 		for(BBSymbolVO bbvo : pcList){
-			if(bbvo.getBbGroupId().equals(this.bbGroupId)){
+			if(bbGroupId==-1 || bbvo.getBbGroupId().equals(this.bbGroupId)){
 				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
 				symbolMap.put(topic, bbvo);
 			}

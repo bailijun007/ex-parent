@@ -52,7 +52,7 @@ public class PcOrderlyConsumer {
 	@Autowired
 	private EndpointContext endpointContext;
 	
-	@Value("${pc.mq.consumer.groupId:1}")
+	@Value("${pc.mq.consumer.groupId:-1}")
 	private Integer contractGroupId;
 
 	private final Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
@@ -67,7 +67,7 @@ public class PcOrderlyConsumer {
 		
 		Map<String, PcContractVO> symbolMap = new HashMap<String, PcContractVO>();
 		for(PcContractVO bbvo : pcList){
-			if(bbvo.getContractGroup().equals(contractGroupId)){
+			if(contractGroupId==-1 || bbvo.getContractGroup().equals(contractGroupId)){
 				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
 				symbolMap.put(topic, bbvo);
 			}

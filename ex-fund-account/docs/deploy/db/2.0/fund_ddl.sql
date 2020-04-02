@@ -1,20 +1,15 @@
 /*
 Navicat MySQL Data Transfer
-
 Source Server         : 192.168.0.190-ex
 Source Server Version : 50726
 Source Host           : 192.168.0.190:3306
 Source Database       : expv3-fund
-
 Target Server Type    : MYSQL
 Target Server Version : 50599
 File Encoding         : 65001
-
-Date: 2020-03-26 16:35:25
+Date: 2020-04-02 16:19:20
 */
-
 SET FOREIGN_KEY_CHECKS=0;
-
 -- ----------------------------
 -- Table structure for `c2c_order`
 -- ----------------------------
@@ -41,12 +36,12 @@ CREATE TABLE `c2c_order` (
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
 PRIMARY KEY (`id`),
-UNIQUE INDEX `un_sn` (`sn`) USING BTREE 
+UNIQUE INDEX `un_sn` (`sn`) USING BTREE ,
+INDEX `idx_userId_payStatus_approvalStatus` (`user_id`, `pay_status`, `approval_status`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='c2c订单'
-
 ;
 
 -- ----------------------------
@@ -54,7 +49,7 @@ COMMENT='c2c订单'
 -- ----------------------------
 DROP TABLE IF EXISTS `deposit_addr`;
 CREATE TABLE `deposit_addr` (
-`id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint(20) NOT NULL  COMMENT '主键' ,
 `asset`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `address`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '充值地址' ,
 `remark`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '备注' ,
@@ -68,7 +63,6 @@ UNIQUE INDEX `un_user_asset` (`user_id`, `asset`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='充值地址'
-AUTO_INCREMENT=163320806649102337
 
 ;
 
@@ -77,7 +71,7 @@ AUTO_INCREMENT=163320806649102337
 -- ----------------------------
 DROP TABLE IF EXISTS `deposit_record`;
 CREATE TABLE `deposit_record` (
-`id`  bigint(20) NOT NULL COMMENT '主键' ,
+`id`  bigint(20) NOT NULL  COMMENT '主键' ,
 `sn`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '支付单号' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `amount`  decimal(50,30) NOT NULL COMMENT '支付/收款金额' ,
@@ -118,7 +112,6 @@ UNIQUE INDEX `un_userid_asset` (`user_id`, `asset`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='用户资金账户'
-
 ;
 
 -- ----------------------------
@@ -126,7 +119,7 @@ COMMENT='用户资金账户'
 -- ----------------------------
 DROP TABLE IF EXISTS `fund_account_record`;
 CREATE TABLE `fund_account_record` (
-`id`  bigint(20) NOT NULL COMMENT '主键' ,
+`id`  bigint(20) NOT NULL  COMMENT '主键' ,
 `sn`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '流水号' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `type`  int(11) NOT NULL COMMENT '类型：1 收入,-1 支出' ,
@@ -156,7 +149,7 @@ COMMENT='账变明细'
 -- ----------------------------
 DROP TABLE IF EXISTS `fund_transfer`;
 CREATE TABLE `fund_transfer` (
-`id`  bigint(20) NOT NULL COMMENT '主键' ,
+`id`  bigint(20) NOT NULL  COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '成功' ,
 `sn`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '单号' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
@@ -186,7 +179,7 @@ COMMENT='资金划转'
 -- ----------------------------
 DROP TABLE IF EXISTS `withdrawal_addr`;
 CREATE TABLE `withdrawal_addr` (
-`id`  bigint(20) NOT NULL COMMENT '主键' ,
+`id`  bigint(20) NOT NULL  COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
 `address`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '充值地址' ,
@@ -209,7 +202,7 @@ COMMENT='提现地址'
 -- ----------------------------
 DROP TABLE IF EXISTS `withdrawal_record`;
 CREATE TABLE `withdrawal_record` (
-`id`  bigint(20) NOT NULL COMMENT '主键' ,
+`id`  bigint(20) NOT NULL  COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `sn`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '支付单号' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
@@ -233,6 +226,4 @@ INDEX `un_sn` (`sn`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='提现记录'
-
 ;
-
