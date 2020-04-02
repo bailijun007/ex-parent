@@ -89,11 +89,9 @@ public class BBOrderlyConsumer {
 			String topic = entry.getKey();
 			BBSymbolVO symbolVO = entry.getValue();
 			if(!mqMap.containsKey(topic)){
-				if(symbolVO.getBbGroupId().equals(this.bbGroupId)){
-					logger.info("启动监听MQConsumer. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
-					DefaultMQPushConsumer mq = this.buildConsumer(topic);
-					this.mqMap.put(topic, mq);
-				}
+				logger.info("启动监听MQConsumer. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
+				DefaultMQPushConsumer mq = this.buildConsumer(topic);
+				this.mqMap.put(topic, mq);
 			}
 		}
 	
@@ -145,7 +143,7 @@ public class BBOrderlyConsumer {
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
         			logger.error("未知捕获1,{}", e.toString(), e);
-        			logger.error("未知捕获2,{}", cause.getMessage(), cause);
+        			logger.error("未知捕获2,{},{}", cause.getMessage(), cause.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		
