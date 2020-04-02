@@ -67,7 +67,7 @@ public class PcOrderUpdateService {
 		long count = this.pcOrderDAO.updateStatus(OrderStatus.PENDING_CANCEL, modified, orderId, userId, version);
 		
 		if(count==0){
-			logger.error("撤单更新失败，orderId={}", orderId);
+			logger.warn("撤单更新失败，orderId={}", orderId);
 			return;
 		}
 		
