@@ -15,7 +15,7 @@ import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
  * @author xuxueli 2017-04-28
  */
 @Configuration
-@ConditionalOnProperty(name="xxl.job.enable", havingValue="true")
+@ConditionalOnProperty(name="job.type", havingValue="xxl")
 public class XxlJobConfig {
     private Logger logger = LoggerFactory.getLogger(XxlJobConfig.class);
 

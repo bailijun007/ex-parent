@@ -14,12 +14,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author wangjg
  *
  */
-@ConditionalOnProperty(name="xxl.job.enable", havingValue="false")
+@ConditionalOnProperty(name="job.type", havingValue="schedule")
 @EnableScheduling
 @Configuration
 public class ScheduleConfig {
     private Logger logger = LoggerFactory.getLogger(ScheduleConfig.class);
-
+    
 	@PostConstruct
 	public void init() throws MQClientException{
 		logger.info(">>>>>>>>>>> Scheduled config init.");
