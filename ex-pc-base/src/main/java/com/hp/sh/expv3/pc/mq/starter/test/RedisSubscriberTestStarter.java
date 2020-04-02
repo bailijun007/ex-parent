@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.mq.starter.test;
+package com.hp.sh.expv3.pc.mq.starter.test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,8 +17,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.gitee.hupadev.commons.cache.RedisPool;
-import com.hp.sh.expv3.bb.component.MetadataService;
-import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
+import com.hp.sh.expv3.pc.component.MetadataService;
+import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 
 @Configuration
 @ConditionalOnProperty(name="redis.subscriber.test", havingValue="true")
@@ -36,15 +36,15 @@ public class RedisSubscriberTestStarter {
 	@Scheduled(cron = "0 * * * * ?")
 	@PostConstruct
 	public void testRs(){
-		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
+		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 		
 		Set<String> channels = new HashSet<String>();
 		
-		for(BBSymbolVO bbvo : pcList){
-			channels.add("bb:account:"+bbvo.getAsset());
-			channels.add("bb:order:"+bbvo.getAsset()+":"+bbvo.getSymbol());
-			channels.add("bb:pos:"+bbvo.getAsset()+":"+bbvo.getSymbol());
-			channels.add("bb:user:symbol:"+bbvo.getAsset()+":"+bbvo.getSymbol());
+		for(PcContractVO bbvo : pcList){
+			channels.add("pc:account:"+bbvo.getAsset());
+			channels.add("pc:order:"+bbvo.getAsset()+":"+bbvo.getSymbol());
+			channels.add("pc:pos:"+bbvo.getAsset()+":"+bbvo.getSymbol());
+			channels.add("pc:user:symbol:"+bbvo.getAsset()+":"+bbvo.getSymbol());
 		}
 		
 		//del

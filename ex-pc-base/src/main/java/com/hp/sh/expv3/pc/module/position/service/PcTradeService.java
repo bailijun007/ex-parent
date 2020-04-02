@@ -482,7 +482,7 @@ public class PcTradeService {
 			collectorCoreService.add(request);
 		}else{
 			CollectorCutRequest request = new CollectorCutRequest();
-			request.setAmount(orderTrade.getFee());
+			request.setAmount(orderTrade.getFee().abs());
 			request.setAsset(orderTrade.getAsset());
 			request.setAssociatedId(orderTrade.getOrderId());
 			request.setRemark("倒贴手续费");
