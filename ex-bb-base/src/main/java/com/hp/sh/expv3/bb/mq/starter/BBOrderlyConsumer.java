@@ -89,11 +89,9 @@ public class BBOrderlyConsumer {
 			String topic = entry.getKey();
 			BBSymbolVO symbolVO = entry.getValue();
 			if(!mqMap.containsKey(topic)){
-				if(symbolVO.getBbGroupId().equals(this.bbGroupId)){
-					logger.info("启动监听MQConsumer. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
-					DefaultMQPushConsumer mq = this.buildConsumer(topic);
-					this.mqMap.put(topic, mq);
-				}
+				logger.info("启动监听MQConsumer. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
+				DefaultMQPushConsumer mq = this.buildConsumer(topic);
+				this.mqMap.put(topic, mq);
 			}
 		}
 	
