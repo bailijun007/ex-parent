@@ -142,10 +142,10 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
                         if (null == bbkLines || bbkLines.isEmpty()) {
                             //收到空通知，则直接删除其对应的数据（说明这条数据的手动修复的，并且后来取消手动修复的）
                             final String klineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, asset, symbol, targetFreq);
-                            bbKlineOngoingRedisUtil.zremrangeByScore(klineDataRedisKey, ms, ms);
+                            bbKlineOngoingRedisUtil.zremrangeByScore(klineDataRedisKey, startAndEndMs[0], startAndEndMs[0]);
                             notifyKlineUpdate(asset, symbol, targetFreq, startAndEndMs[0]);
 //                            logger.debug("freq {},{},data empty,ignore", targetFreq, startAndEndMs[0]);
-                            continue;
+//                            continue;
                         } else {
                             BBKLine newKline = merge(asset, symbol, targetFreq, startAndEndMs[0], bbkLines);
                             saveOrUpdateKline(asset, symbol, targetFreq, newKline);
