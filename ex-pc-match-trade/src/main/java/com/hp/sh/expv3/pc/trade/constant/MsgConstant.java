@@ -22,11 +22,11 @@ public class MsgConstant {
     public static final String getMatchTopic(String env,String asset, String symbol){
         logger.warn("env:{}", env);
         if (env.equals("bai")||env.equals("pcdev")||env.equals("pcdev2")||env.equals("pcdev3")) {
-            String namespacea = "exp_v3%bbMatch_" + asset + "__" + symbol;
+            String namespacea = "exp_v3%pcMatch_" + asset + "__" + symbol;
             logger.warn("namespacea:{}", namespacea);
             return namespacea;
         }else if (env.equals("pcprod")||env.equals("pcprod2")||env.equals("pcprod3")){
-            String namespacea = "exp%bbMatch_" + asset + "__" + symbol;
+            String namespacea = "exp%pcMatch_" + asset + "__" + symbol;
             logger.warn("namespacea:{}", namespacea);
             return namespacea;
         }
