@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Component
@@ -21,6 +22,7 @@ public class BbMatchMqConsumer {
 
     @Value("${bb.trade.table}")
     private String table;
+
 
     @MQListener(tags = MsgConstant.TAG_BB_MATCH)
     public void handleMsg(List<BbMatchExtVo> msg) {
