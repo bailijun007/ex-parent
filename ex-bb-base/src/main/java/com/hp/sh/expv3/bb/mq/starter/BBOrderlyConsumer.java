@@ -3,6 +3,7 @@ package com.hp.sh.expv3.bb.mq.starter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class BBOrderlyConsumer {
 	@Autowired
 	private EndpointContext endpointContext;
 	
-	@Value("${bb.mq.consumer.groupId:1}")
+	@Value("${bb.mq.consumer.groupId:-1}")
 	private Integer bbGroupId;
 	
 	private final Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
@@ -67,29 +68,27 @@ public class BBOrderlyConsumer {
 	
 		logger.debug("更新MQ监听,{},{},{}", pcList.size(), this.bbGroupId, this.setting.getInstanceName());
 		
-		Map<String, BBSymbolVO> symbolMap = new HashMap<String, BBSymbolVO>();
+		Set<String> topicSet = new HashSet<String>();
+		
 		for(BBSymbolVO bbvo : pcList){
 			if(bbGroupId==-1 || bbvo.getBbGroupId().equals(this.bbGroupId)){
 				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
-				symbolMap.put(topic, bbvo);
+				topicSet.add(topic);
 			}
 		}
 		
 		for(String topic : new ArrayList<String>(this.mqMap.keySet())){
 			DefaultMQPushConsumer mq = this.mqMap.get(topic);
-			if(!symbolMap.containsKey(topic)){
+			if(!topicSet.contains(topic)){
 				logger.info("关闭监听. topic={}", topic);
 				mq.shutdown();
 				this.mqMap.remove(topic);
 			}
 		}
 		
-		Set<Entry<String, BBSymbolVO>> entrySet = symbolMap.entrySet();
-		for(Entry<String, BBSymbolVO> entry : entrySet){
-			String topic = entry.getKey();
-			BBSymbolVO symbolVO = entry.getValue();
+		for(String topic : topicSet){
 			if(!mqMap.containsKey(topic)){
-				logger.info("启动监听MQConsumer. asset={}, symbol={}", symbolVO.getAsset(), symbolVO.getSymbol());
+				logger.info("启动监听MQConsumer. topic={}", topic);
 				DefaultMQPushConsumer mq = this.buildConsumer(topic);
 				this.mqMap.put(topic, mq);
 			}

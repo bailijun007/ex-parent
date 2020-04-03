@@ -33,6 +33,7 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.component.vo.PcContractVO;
+import com.hp.sh.expv3.pc.constant.MqTags;
 import com.hp.sh.expv3.pc.constant.MqTopic;
 import com.hp.sh.rocketmq.config.RocketmqServerSetting;
 import com.hp.sh.rocketmq.exceptions.ReSendException;
@@ -60,7 +61,7 @@ public class PcOrderlyConsumer {
 	@Scheduled(cron = "0 * * * * ?")
 	@PostConstruct
 	public void start123() throws MQClientException{
-		String subExpression = subExpression();
+		String subExpression = subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_PC_TRADE, MqTags.TAGS_ORDER_ALL_CANCELLED);
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 	
 		logger.debug("更新MQ监听,{},{},{},{},{}", pcList.size(), this.contractGroupId, this.setting.getInstanceName(), pcList, subExpression);
@@ -161,6 +162,10 @@ public class PcOrderlyConsumer {
 		List<String> list = BeanHelper.getDistinctPropertyList(this.endpointContext.getConfigList(), "tags");
 		String exp = StringUtils.join(list, "||");
 		return exp;
+	}
+	
+	private String subExpression(String...tags) {
+		return StringUtils.join(tags, "||");
 	}
 
 }
