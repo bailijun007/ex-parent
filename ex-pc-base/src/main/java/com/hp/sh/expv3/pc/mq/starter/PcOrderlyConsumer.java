@@ -1,12 +1,11 @@
 package com.hp.sh.expv3.pc.mq.starter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
@@ -54,41 +53,40 @@ public class PcOrderlyConsumer {
 	private EndpointContext endpointContext;
 	
 	@Value("${pc.mq.consumer.groupId:-1}")
-	private Integer contractGroupId;
+	private Integer groupId;
 
 	private final Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
 	@Scheduled(cron = "0 * * * * ?")
 	@PostConstruct
 	public void start123() throws MQClientException{
-		String subExpression = subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_PC_TRADE, MqTags.TAGS_ORDER_ALL_CANCELLED);
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
-	
-		logger.debug("更新MQ监听,{},{},{},{},{}", pcList.size(), this.contractGroupId, this.setting.getInstanceName(), pcList, subExpression);
 		
-		Map<String, PcContractVO> symbolMap = new HashMap<String, PcContractVO>();
+		String subExpression = subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_PC_TRADE, MqTags.TAGS_ORDER_ALL_CANCELLED);
+	
+		logger.debug("更新MQ监听,{},{},{},{}", pcList.size(), this.groupId, this.setting.getInstanceName(), subExpression);
+		
+		Set<String> topicSet = new HashSet<String>();
+		
 		for(PcContractVO bbvo : pcList){
-			if(contractGroupId==-1 || bbvo.getContractGroup().equals(contractGroupId)){
+			if(groupId==-1 || bbvo.getContractGroup().equals(this.groupId)){
 				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
-				symbolMap.put(topic, bbvo);
+				topicSet.add(topic);
 			}
 		}
 		
 		for(String topic : new ArrayList<String>(this.mqMap.keySet())){
 			DefaultMQPushConsumer mq = this.mqMap.get(topic);
-			if(!symbolMap.containsKey(topic)){
+			if(!topicSet.contains(topic)){
 				logger.info("关闭监听. topic={}", topic);
 				mq.shutdown();
 				this.mqMap.remove(topic);
 			}
 		}
 		
-		Set<Entry<String, PcContractVO>> entrySet = symbolMap.entrySet();
-		for(Entry<String, PcContractVO> entry : entrySet){
-			String topic = entry.getKey();
-			PcContractVO symbolVO = entry.getValue();
+		for(String topic : topicSet){
 			if(!mqMap.containsKey(topic)){
-				logger.info("启动监听. asset={}, symbol={},subExpression={}", symbolVO.getAsset(), symbolVO.getSymbol(),subExpression);
+				logger.info("启动监听MQConsumer. topic={}", topic);
 				DefaultMQPushConsumer mq = this.buildConsumer(topic, subExpression);
 				this.mqMap.put(topic, mq);
 			}
@@ -97,6 +95,7 @@ public class PcOrderlyConsumer {
 		int n = this.mqMap.size();
 		logger.debug("mq:{},{}", n, this.mqMap);
 		return;
+		
 	}
 
 	private DefaultMQPushConsumer buildConsumer(String topic, String subExpression) throws MQClientException{

@@ -2,12 +2,10 @@
 package com.hp.sh.expv3.bb.mq.starter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -65,8 +63,10 @@ public class BBOrderlyConsumer {
 	@PostConstruct
 	public void start123() throws MQClientException{
 		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
+		
+		String subExpression = this.subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE);
 	
-		logger.debug("更新MQ监听,{},{},{}", pcList.size(), this.bbGroupId, this.setting.getInstanceName());
+		logger.debug("更新MQ监听,{},{},{},{}", pcList.size(), this.bbGroupId, this.setting.getInstanceName(), subExpression);
 		
 		Set<String> topicSet = new HashSet<String>();
 		
@@ -89,7 +89,7 @@ public class BBOrderlyConsumer {
 		for(String topic : topicSet){
 			if(!mqMap.containsKey(topic)){
 				logger.info("启动监听MQConsumer. topic={}", topic);
-				DefaultMQPushConsumer mq = this.buildConsumer(topic);
+				DefaultMQPushConsumer mq = this.buildConsumer(topic, subExpression);
 				this.mqMap.put(topic, mq);
 			}
 		}
@@ -100,7 +100,7 @@ public class BBOrderlyConsumer {
 		
 	}
 
-	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
+	private DefaultMQPushConsumer buildConsumer(String topic, String subExpression) throws MQClientException{
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic);
         
         consumer.setNamesrvAddr(setting.getNamesrvAddr());
@@ -108,7 +108,7 @@ public class BBOrderlyConsumer {
         consumer.setInstanceName(setting.getInstanceName());
         
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
-        consumer.subscribe(topic, subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE));
+        consumer.subscribe(topic, subExpression);
         
         consumer.registerMessageListener(new MessageListenerOrderly() {
 
