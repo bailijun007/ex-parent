@@ -68,7 +68,7 @@ public class BaseMqSender {
 		        logger.info("sendMsg:{}->{}->{}->{},{}", mqMsg.getTags(), mqMsg.getTopic(), mqMsg.getKeys(),(n++) ,sendResult.toString());
 		        break;
 			} catch (Exception e) {
-				logger.error("发送失败:{}-{}-{}", mqMsg.getTags(), mqMsg.getKeys(), e);
+				logger.error("发送失败:{}-{}-{}", mqMsg.getTopic(), mqMsg.getTags(), mqMsg.getKeys());
 				try {
 					Thread.sleep(50);
 				} catch (InterruptedException e1) {
