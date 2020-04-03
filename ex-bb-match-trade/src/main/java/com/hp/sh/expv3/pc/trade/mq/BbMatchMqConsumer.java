@@ -24,7 +24,6 @@ public class BbMatchMqConsumer {
     private String table;
 
 
-    @PostConstruct
     @MQListener(tags = MsgConstant.TAG_BB_MATCH)
     public void handleMsg(List<BbMatchExtVo> msg) {
         logger.info("收到bb_match撮合推送消息:{}", msg);
