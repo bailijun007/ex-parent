@@ -40,10 +40,13 @@ public class MqOrderlyConsumer {
 
 	@Autowired
 	private EndpointContext endpointContext;
-	
+
+    @Value("${spring.profiles.active:}")
+    private String profile;
+
 	@Value("${bb.trade.bbGroupIds}")
 	private Integer bbGroupId;
-	
+
 	private Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
 	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
@@ -110,7 +113,8 @@ public class MqOrderlyConsumer {
 		Map<String, BBSymbol> symbolMap = new HashMap<String, BBSymbol>();
 		for(BBSymbol bbvo : pcList){
 			if(bbvo.getBbGroupId().equals(this.bbGroupId)){
-				String topic = MsgConstant.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
+                 String env = printEnv();
+                String topic = new MsgConstant().getMatchTopic(env,bbvo.getAsset(), bbvo.getSymbol());
 				symbolMap.put(topic, bbvo);
 			}
 		}
@@ -142,6 +146,9 @@ public class MqOrderlyConsumer {
 		return;
 		
 	}
-	
 
+    @PostConstruct
+    private String printEnv() {
+        return profile;
+    }
 }
