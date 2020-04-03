@@ -54,7 +54,7 @@ public class MqOrderlyConsumer {
         consumer.setInstanceName(setting.getInstanceName());
         
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
-        consumer.subscribe(topic, MsgConstant.TAG_BB_MATCH);
+        consumer.subscribe(topic, MsgConstant.TAG_PC_MATCH);
         
         consumer.registerMessageListener(new MessageListenerOrderly() {
 
