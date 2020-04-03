@@ -141,8 +141,12 @@ public class BBOrderlyConsumer {
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error("未知捕获1,{}", e.toString(), e);
-        			logger.error("未知捕获2,{},{}", cause.getMessage(), cause.toString(), cause);
+        			if(cause instanceof UpdateException){
+        				logger.warn("更新失败："+cause.toString());
+        			}else{
+            			logger.error("未知捕获1,{}", e.toString(), e);
+            			logger.error("未知捕获2,{}", cause.getMessage(), cause);
+        			}
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		

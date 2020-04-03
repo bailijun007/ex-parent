@@ -66,7 +66,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 				}catch(Exception e){
 					logger.error("处理转账失败", e);
 					if(record.getStatus()!=FundTransfer.STATUS_SUCCESS && record.getStatus()!=FundTransfer.STATUS_TARGET_COMPLETE){
-						this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_FAIL, e.getMessage());
+						this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_FAIL, record.getStatus()+":"+e.getMessage());
 					}
 				}
 			}

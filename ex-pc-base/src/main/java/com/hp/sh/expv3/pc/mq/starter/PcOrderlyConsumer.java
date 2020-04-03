@@ -141,7 +141,7 @@ public class PcOrderlyConsumer {
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
         			if(cause instanceof UpdateException){
-        				logger.warn(cause.toString(), cause);
+        				logger.warn("更新失败："+cause.toString());
         			}else{
             			logger.error("未知捕获1,{}", e.toString(), e);
             			logger.error("未知捕获2,{}", cause.getMessage(), cause);
