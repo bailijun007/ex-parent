@@ -21,7 +21,7 @@ public class BbMatchMqConsumer {
     @Value("${pc.trade.table}")
     private String table;
 
-    @MQListener(tags = MsgConstant.TAG_BB_MATCH)
+    @MQListener(tags = MsgConstant.TAG_PC_MATCH)
     public void handleMsg(List<PcMatchExtVo> msg) {
         logger.info("收到pc_match撮合推送消息:{}", msg);
         try {
