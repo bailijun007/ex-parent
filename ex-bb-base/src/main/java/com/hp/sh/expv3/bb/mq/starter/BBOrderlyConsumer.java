@@ -55,7 +55,7 @@ public class BBOrderlyConsumer {
 	private EndpointContext endpointContext;
 	
 	@Value("${bb.mq.consumer.groupId:-1}")
-	private Integer bbGroupId;
+	private Integer groupId;
 	
 	private final Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
@@ -66,12 +66,12 @@ public class BBOrderlyConsumer {
 		
 		String subExpression = this.subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE);
 	
-		logger.debug("更新MQ监听,{},{},{},{}", pcList.size(), this.bbGroupId, this.setting.getInstanceName(), subExpression);
+		logger.debug("更新MQ监听,{},{},{},{}", pcList.size(), this.groupId, this.setting.getInstanceName(), subExpression);
 		
 		Set<String> topicSet = new HashSet<String>();
 		
 		for(BBSymbolVO bbvo : pcList){
-			if(bbGroupId==-1 || bbvo.getBbGroupId().equals(this.bbGroupId)){
+			if(groupId==-1 || bbvo.getBbGroupId().equals(this.groupId)){
 				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
 				topicSet.add(topic);
 			}
