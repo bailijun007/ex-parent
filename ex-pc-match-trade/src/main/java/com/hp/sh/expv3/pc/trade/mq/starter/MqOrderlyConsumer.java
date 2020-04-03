@@ -40,7 +40,10 @@ public class MqOrderlyConsumer {
 
 	@Autowired
 	private EndpointContext endpointContext;
-	
+
+    @Value("${spring.profiles.active:}")
+    private String profile;
+
 	@Value("${pc.trade.bbGroupIds}")
 	private Integer bbGroupId;
 	
@@ -110,7 +113,7 @@ public class MqOrderlyConsumer {
 		Map<String, BBSymbol> symbolMap = new HashMap<String, BBSymbol>();
 		for(BBSymbol bbvo : pcList){
 			if(bbvo.getBbGroupId().equals(this.bbGroupId)){
-				String topic = MsgConstant.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
+				String topic = MsgConstant.getMatchTopic(printEnv(),bbvo.getAsset(), bbvo.getSymbol());
 				symbolMap.put(topic, bbvo);
 			}
 		}
@@ -142,6 +145,12 @@ public class MqOrderlyConsumer {
 		return;
 		
 	}
-	
+
+
+
+    @PostConstruct
+    private String printEnv() {
+        return profile;
+    }
 
 }
