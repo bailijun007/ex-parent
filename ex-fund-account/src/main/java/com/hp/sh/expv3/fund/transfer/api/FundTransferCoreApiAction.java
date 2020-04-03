@@ -64,10 +64,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 				try{
 					this.handleOne(record);
 				}catch(Exception e){
-					logger.error("处理转账失败", e);
-					if(record.getStatus()!=FundTransfer.STATUS_SUCCESS && record.getStatus()!=FundTransfer.STATUS_TARGET_COMPLETE){
-						this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_FAIL, record.getStatus()+":"+e.getMessage());
-					}
+					logger.error(e.getMessage(), e);
 				}
 			}
 		}
@@ -83,7 +80,13 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 		switch (record.getStatus()) {
 		case FundTransfer.STATUS_NEW:
 			//扣减源账户
-			fundServiceContext.cutSrcFund(record);
+			try{
+				fundServiceContext.cutSrcFund(record);
+			}catch(Exception e){
+				logger.error("处理转账失败", e);
+				this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_FAIL, record.getStatus()+":"+e.getMessage());
+				return;
+			}
 			//修改状态
 			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SRC_COMPLETE, null);
 		case FundTransfer.STATUS_SRC_COMPLETE:
