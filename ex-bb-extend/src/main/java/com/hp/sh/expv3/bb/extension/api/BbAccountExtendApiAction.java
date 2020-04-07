@@ -51,18 +51,18 @@ public class BbAccountExtendApiAction implements BbAccountExtendApi {
     @Override
     public BbAccountExtVo getBBAccount(Long userId, String asset) {
         checkParam(userId, asset);
-        BbAccountExtVo bbAccount = bbAccountExtService.getBBAccount(userId, asset);
-
-        if (bbAccount != null) {
-            //bb冻结资产
-            BigDecimal lock = bbOrderExtService.getLockAsset(userId, asset);
-            bbAccount.setLock(lock);
-
-            //总额=bb冻结资产+可用余额
-            BigDecimal total = bbAccount.getAvailable().add(lock);
-            bbAccount.setTotal(total);
-        }
-
+//        BbAccountExtVo bbAccount = bbAccountExtService.getBBAccount(userId, asset);
+//
+//        if (bbAccount != null) {
+//            //bb冻结资产
+//            BigDecimal lock = bbOrderExtService.getLockAsset(userId, asset);
+//            bbAccount.setLock(lock);
+//
+//            //总额=bb冻结资产+可用余额
+//            BigDecimal total = bbAccount.getAvailable().add(lock);
+//            bbAccount.setTotal(total);
+//        }
+        BbAccountExtVo bbAccount = bbAccountExtService.getNewBBAccount(userId, asset);
         return bbAccount;
     }
 

@@ -6,6 +6,8 @@ import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
 import com.hp.sh.expv3.bb.extension.vo.BbHistoryOrderVo;
 import com.hp.sh.expv3.commons.exception.ExException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -23,32 +25,37 @@ import java.util.stream.Collectors;
 @RestController
 public class BbOrderExtApiAction implements BbOrderExtApi {
 
+    private static final Logger logger = LoggerFactory.getLogger(BbOrderExtApiAction.class);
+
     @Autowired
     private BbOrderExtService bbOrderExtService;
 
     @Override
     public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, Integer pageSize, Integer pageNo) {
-        if ( pageSize==null||pageNo==null) {
+        if (pageSize == null || pageNo == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        return bbOrderExtService.queryAllBbOrederHistory(userId,asset,pageNo,pageSize);
+        return bbOrderExtService.queryAllBbOrederHistory(userId, asset, pageNo, pageSize);
     }
-
 
 
     @Override
     public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
+        long startTime = System.currentTimeMillis();
         checkParam(userId, asset, symbol, pageSize, nextPage);
-        return bbOrderExtService.queryHistoryOrderList(userId,asset,symbol,bidFlag,pageSize,lastOrderId,nextPage);
+        PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(userId, asset, symbol, bidFlag, pageSize, lastOrderId, nextPage);
+        long endTime = System.currentTimeMillis();
+        logger.info("查询历史委托接口耗时：{}毫秒,userId={},asset={},symbol={}", (endTime - startTime),asset,symbol);
+        return result;
     }
 
 
     @Override
     public PageResult<BbHistoryOrderVo> queryBbActiveOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
-        if (userId==null|| StringUtils.isEmpty(asset)||pageSize==null||nextPage==null) {
+        if (userId == null || StringUtils.isEmpty(asset) || pageSize == null || nextPage == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        return bbOrderExtService.queryBbActiveOrderList(userId,asset,symbol,bidFlag,pageSize,lastOrderId,nextPage);
+        return bbOrderExtService.queryBbActiveOrderList(userId, asset, symbol, bidFlag, pageSize, lastOrderId, nextPage);
     }
 
     @Override
@@ -83,7 +90,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
 
 
     private void checkParam(Long userId, String asset, String symbol, Integer pageSize, Integer nextPage) {
-        if (userId==null|| StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)||pageSize==null||nextPage==null) {
+        if (userId == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || pageSize == null || nextPage == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
     }
