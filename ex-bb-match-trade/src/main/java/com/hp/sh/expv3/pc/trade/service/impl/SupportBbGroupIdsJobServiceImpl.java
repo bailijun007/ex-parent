@@ -60,6 +60,7 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
     /**
      * @return USDT__ETC_USDT
      */
+    @Override
     public List<BBSymbol> getSymbols() {
         List<BBSymbol> list = new CopyOnWriteArrayList<>();
         if (!CollectionUtils.isEmpty(map)) {
