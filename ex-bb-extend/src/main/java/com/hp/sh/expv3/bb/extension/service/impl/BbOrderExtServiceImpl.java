@@ -173,7 +173,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
              list = bbOrderExtMapper.queryOrderList(map);
         }else {
             map.put("activeFlag", IntBool.YES);
-            list = bbOrderExtMapper.queryBbActiveOrderList(map);
+            list = bbOrderExtMapper.queryBbActiveOrders(map);
         }
 
         if (list == null || list.isEmpty()) {

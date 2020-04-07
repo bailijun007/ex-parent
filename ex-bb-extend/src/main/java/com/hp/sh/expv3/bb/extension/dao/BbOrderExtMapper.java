@@ -33,4 +33,6 @@ public interface BbOrderExtMapper {
     Long queryActiveOrderCount(Map<String, Object> map);
 
     List<BbOrderVo> queryByIds(@Param("idList") List<Long> idList);
+
+    List<BbOrderVo> queryBbActiveOrders(Map<String, Object> map);
 }

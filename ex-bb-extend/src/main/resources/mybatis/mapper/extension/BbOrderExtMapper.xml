@@ -150,21 +150,23 @@
         select count(1)
         from bb_active_order
         <where>
-            <if test="userId!=null"> user_id=#{userId}</if>
+            <if test="userId!=null">user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
             <if test="symbol!=null  and symbol!=''">and symbol=#{symbol}</if>
         </where>
     </select>
 
     <select id="queryByIds" resultType="com.hp.sh.expv3.bb.extension.vo.BbOrderVo">
-      select   <include refid="Base_Column_List"/>   from bb_order
-      <where>
-          <if test="idList!=null"> id in
-              <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
-                  #{idList[${i}]}
-              </foreach>
-          </if>
-      </where>
+        select
+        <include refid="Base_Column_List"/>
+        from bb_order
+        <where>
+            <if test="idList!=null">id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+        </where>
     </select>
 
     <select id="queryOrderList" resultMap="BbOrderVo">
@@ -216,39 +218,13 @@
         <where>
             <if test="userId!=null">ao.user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
-            <if test="assetList!=null">and ao.asset in
-                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
-                    #{assetList[${i}]}
-                </foreach>
-            </if>
             <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
-            <if test="symbolList!=null">and ao.symbol in
-                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
-                    #{symbolList[${i}]}
-                </foreach>
-            </if>
-            <if test="statusList!=null">and o.status in
-                <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
-                    #{statusList[${i}]}
-                </foreach>
-            </if>
             <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
             <if test="activeFlag!=null">and o.active_flag=#{activeFlag}</if>
             <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
-            <if test="gtOrderId!=null">
-                and id &gt;#{gtOrderId}
-                ORDER BY id asc
-            </if>
-
-            <if test="ltOrderId!=null">
-                and id &lt;#{ltOrderId}
-                ORDER BY id desc
-            </if>
         </where>
         ORDER BY ao.id desc
-        <if test="limit!=null">
-            LIMIT 0,${limit}
-        </if>
+        LIMIT 0,${limit}
     </select>
 
     <select id="queryHistoryOrderList" resultMap="BbOrderVo">
@@ -322,6 +298,50 @@
 		where
 			ao.user_id=#{userId}
             and o.order_margin_currency=#{asset}
+    </select>
+    <select id="queryBbActiveOrders" resultType="com.hp.sh.expv3.bb.extension.vo.BbOrderVo">
+        SELECT
+        o.*
+        FROM
+        bb_active_order ao
+        LEFT JOIN
+        bb_order o ON o.id = ao.id
+        <where>
+            <if test="userId!=null">ao.user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
+            <if test="assetList!=null">and ao.asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+            <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
+            <if test="symbolList!=null">and ao.symbol in
+                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
+                    #{symbolList[${i}]}
+                </foreach>
+            </if>
+            <if test="statusList!=null">and o.status in
+                <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
+                    #{statusList[${i}]}
+                </foreach>
+            </if>
+            <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
+            <if test="activeFlag!=null">and o.active_flag=#{activeFlag}</if>
+
+            <if test="gtOrderId!=null">
+                and ao.id &gt;#{gtOrderId}
+                ORDER BY ao.id asc
+            </if>
+
+            <if test="ltOrderId!=null">
+                and ao.id &lt;#{ltOrderId}
+                ORDER BY ao.id desc
+            </if>
+            <if test="ltOrderId==null and gtOrderId==null">
+                ORDER BY ao.id desc
+            </if>
+        </where>
+        LIMIT 0,${limit}
     </select>
 
 </mapper>
