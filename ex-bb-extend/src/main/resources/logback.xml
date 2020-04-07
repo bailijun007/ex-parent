@@ -140,6 +140,7 @@
 	        <appender-ref ref="INFO"/>
 	        <appender-ref ref="DEBUG"/>
         </root>
+        <logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
     </springProfile>
     
     <springProfile name="dev">
