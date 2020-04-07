@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.trade.pojo;
+package com.hp.sh.expv3.bb.grab3rdData.pojo;
 
 import io.swagger.annotations.ApiModelProperty;
 
