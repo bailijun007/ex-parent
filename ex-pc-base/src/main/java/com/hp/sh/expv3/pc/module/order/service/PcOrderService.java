@@ -325,7 +325,7 @@ public class PcOrderService {
 		
 		if(order.getCloseFlag()==OrderFlag.ACTION_CLOSE){
 			PcPosition pos = this.positionDataService.getPosition(userId, asset, symbol, order.getClosePosId());
-			this.checkLiqStatus(pos);	
+			this.checkLiqStatus(pos);
 		}
 		
 		Long now = DbDateUtils.now();

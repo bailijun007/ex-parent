@@ -64,13 +64,20 @@ public class BaseMqSender {
 		int n = 0;
 		while(true){
 			try {
+				n++;
 		        SendResult sendResult = producer.send(mqMsg, new MqOrderMessageQueueSelector(), 0);
-		        logger.info("sendMsg:topic={}, tags={}, keys={},times={},r={}", mqMsg.getTopic(), mqMsg.getTags(), mqMsg.getKeys(),(n++) ,sendResult.toString());
+		        logger.info("sendMsg:topic={}, tags={}, keys={},times={},r={}", mqMsg.getTopic(), mqMsg.getTags(), mqMsg.getKeys(),n ,sendResult.toString());
 		        break;
 			} catch (Exception e) {
-				logger.error("发送失败:{}-{}-{}", mqMsg.getTopic(), mqMsg.getTags(), mqMsg.getKeys());
+				if(n%100==0){
+					logger.error("发送失败:{} / {} / {} / {} / {}", mqMsg.getTopic(), mqMsg.getTags(), mqMsg.getKeys(), n, e.getMessage(), e);
+				}else{
+					logger.warn("发送失败:{} / {} / {} / {} / {}", mqMsg.getTopic(), mqMsg.getTags(), mqMsg.getKeys(), n, e.getMessage());
+				}
 				try {
-					Thread.sleep(50);
+					long sleepTime = n*100;
+					sleepTime = Math.min(sleepTime, 1000*5);
+					Thread.sleep(sleepTime);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}

@@ -86,7 +86,7 @@ public class PcOrderlyConsumer {
 		
 		for(String topic : topicSet){
 			if(!mqMap.containsKey(topic)){
-				logger.info("启动监听MQConsumer. topic={}", topic);
+				logger.info("启动监听MQConsumer. topic={},subExpression={}", topic, subExpression);
 				DefaultMQPushConsumer mq = this.buildConsumer(topic, subExpression);
 				this.mqMap.put(topic, mq);
 			}
