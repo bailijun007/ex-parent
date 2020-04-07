@@ -4,6 +4,7 @@ import com.gitee.hupadev.base.api.PageResult;
 import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hp.sh.expv3.bb.extension.constant.OrderStatus;
 import com.hp.sh.expv3.bb.extension.dao.BbOrderExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
@@ -166,10 +167,19 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("gtOrderId", gtOrderId);
         map.put("ltOrderId", ltOrderId);
         map.put("limit", count);
-        List<BbOrderVo> list = bbOrderExtMapper.queryOrderList(map);
+        List<BbOrderVo> list =null;
+        //如果状态为已取消 或者部分成交，则直接查bb_order表
+        if(statusList.contains(OrderStatus.CANCELED)||statusList.contains(OrderStatus.FILLED)){
+             list = bbOrderExtMapper.queryOrderList(map);
+        }else {
+            map.put("activeFlag", IntBool.YES);
+            list = bbOrderExtMapper.queryBbActiveOrderList(map);
+        }
+
         if (list == null || list.isEmpty()) {
             return result;
         }
+
         this.convertOrderList(userId, result, list);
         return result;
 

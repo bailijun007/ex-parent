@@ -216,10 +216,34 @@
         <where>
             <if test="userId!=null">ao.user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
+            <if test="assetList!=null">and ao.asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
             <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
+            <if test="symbolList!=null">and ao.symbol in
+                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
+                    #{symbolList[${i}]}
+                </foreach>
+            </if>
+            <if test="statusList!=null">and o.status in
+                <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
+                    #{statusList[${i}]}
+                </foreach>
+            </if>
             <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
             <if test="activeFlag!=null">and o.active_flag=#{activeFlag}</if>
             <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
+            <if test="gtOrderId!=null">
+                and id &gt;#{gtOrderId}
+                ORDER BY id asc
+            </if>
+
+            <if test="ltOrderId!=null">
+                and id &lt;#{ltOrderId}
+                ORDER BY id desc
+            </if>
         </where>
         ORDER BY ao.id desc
         <if test="limit!=null">
