@@ -2,6 +2,7 @@ package com.hp.sh.expv3.config.redis;
 import com.alibaba.fastjson.JSON;
 import com.hupa.exp.common.tool.format.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import redis.clients.jedis.*;
 import redis.clients.jedis.commands.JedisCommands;
 import redis.clients.jedis.commands.MultiKeyCommands;

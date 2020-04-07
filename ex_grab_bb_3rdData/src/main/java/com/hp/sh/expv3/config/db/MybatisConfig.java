@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@MapperScan({"com.hp.sh.expv3.bb.grab3rdData.**.dao"})
+@MapperScan({"com.hp.sh.expv3.bb.grab3rdData.**.dao","com.hp.sh.expv3.bb.grab3rdData.**.mapper"})
 public class MybatisConfig implements ApplicationContextAware {
 	private ApplicationContext ctx;
 
