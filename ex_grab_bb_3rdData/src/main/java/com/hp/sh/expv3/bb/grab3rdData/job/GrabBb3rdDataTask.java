@@ -72,17 +72,15 @@ public class GrabBb3rdDataTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-//    @PostConstruct
+    @PostConstruct
     public void startGrabBb3rdDataByCss() {
         WsClient client = new WsClient(wssUrl);
         client.connect();
         Map data = new TreeMap();
         data.put("event", "addChannel");
-//        data.put("channel", "btcusdt_ticker");
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
-//                        String asset = bbSymbol.getAsset().toLowerCase();
                 String[] symbols = bbSymbol.getSymbol().toLowerCase().split("_");
                 String channel = symbols[0] + symbols[1] + "_ticker";
                 logger.info("channel={}", channel);
@@ -99,11 +97,16 @@ public class GrabBb3rdDataTask {
                 }
                 TickerData tickerData = queue.poll();
                 String hashKey = tickerData.getChannel().split("_")[0];
-                Map<String, Ticker> map = new HashMap<>();
-                map.put(hashKey, tickerData.getTicker());
+//                Map<String, Ticker> map = new HashMap<>();
+//                map.put(hashKey, tickerData.getTicker());
                 String key = wssRedisKey + hashKey;
-                logger.info("wssKey={},hashKey={}", key, hashKey);
-                metadataDb5RedisUtil.hmset(key, map);
+//                logger.info("wssKey={},hashKey={}", key, hashKey);
+//                metadataDb5RedisUtil.hmset(key, map);
+                logger.info("wssKey={}", key);
+                Ticker ticker = tickerData.getTicker();
+                if (null != ticker) {
+                    metadataDb5RedisUtil.set(key, ticker, 60);
+                }
             }
         });
     }
@@ -125,14 +128,34 @@ public class GrabBb3rdDataTask {
                 TickerData tickerData = responseEntity.getBody();
                 String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
                 String key = httpsRedisKey + hashKey;
-                Map<String, Ticker> map = new HashMap<>();
-                map.put(hashKey, tickerData.getTicker());
-                logger.info("httpsKey={},hashKey={}", key, hashKey);
-                metadataDb5RedisUtil.hmset(key, map);
-
+//                Map<String, Ticker> map = new HashMap<>();
+//                map.put(hashKey, tickerData.getTicker());
+//                logger.info("httpsKey={},hashKey={}", key, hashKey);
+//                metadataDb5RedisUtil.hmset(key, map);
+                logger.info("httpsKey={}", key);
+                Ticker ticker = tickerData.getTicker();
+                if (null != ticker) {
+                    metadataDb5RedisUtil.set(key, ticker, 60);
+                }
             }
         }
-
     }
 
+
+//    @Scheduled(cron = "*/1 * * * * *")
+//    public void merge() {
+//        List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+//        if (!CollectionUtils.isEmpty(bbSymbolList)) {
+//            for (BBSymbol bbSymbol : bbSymbolList) {
+//                String symbol = bbSymbol.getSymbol().toLowerCase();
+//                String[] symbolSplit = symbol.split("_");
+//
+//
+//            }
+//        }
+//    }
+
+
 }
+
+
