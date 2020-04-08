@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.bb.grab3rdData.job;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hp.sh.expv3.bb.grab3rdData.component.WsClient;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.BBSymbol;
@@ -13,9 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2020/4/7
@@ -42,10 +42,16 @@ public class GrabBb3rdDataTask {
     );
 
     @Value("${zb.wss.url}")
-    private String url;
+    private String wssUrl;
+
+    @Value("${zb.https.url}")
+    private String httpsUrl;
 
     @Value("${zb.wss.redisKey.prefix}")
-    private String redisKey;
+    private String wssRedisKey;
+
+    @Value("${zb.https.redisKey.prefix}")
+    private String httpsRedisKey;
 
     @Value("${bb.trade.symbols}")
     private String symbols;
@@ -66,9 +72,9 @@ public class GrabBb3rdDataTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-    @PostConstruct
+//    @PostConstruct
     public void startGrabBb3rdDataByCss() {
-        WsClient client = new WsClient(url);
+        WsClient client = new WsClient(wssUrl);
         client.connect();
         Map data = new TreeMap();
         data.put("event", "addChannel");
@@ -95,23 +101,34 @@ public class GrabBb3rdDataTask {
                 String hashKey = tickerData.getChannel().split("_")[0];
                 Map<String, Ticker> map = new HashMap<>();
                 map.put(hashKey, tickerData.getTicker());
-                String key = redisKey + hashKey;
-                logger.info("key={},hashKey={}", key, hashKey);
+                String key = wssRedisKey + hashKey;
+                logger.info("wssKey={},hashKey={}", key, hashKey);
                 metadataDb5RedisUtil.hmset(key, map);
             }
         });
     }
+
 
     @Scheduled(cron = "*/1 * * * * *")
     public void startGrabBb3rdDataByHttps() {
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
-                String[] symbols = bbSymbol.getSymbol().toLowerCase().split("_");
-                String channel = symbols[0] + symbols[1] + "_ticker";
-
-                logger.info("channel={}", channel);
-
+                RestTemplate restTemplate = new RestTemplate();
+                String symbol = bbSymbol.getSymbol().toLowerCase();
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+                HttpEntity<String> entity = new HttpEntity<String>(headers);
+                String url = httpsUrl + symbol;
+                logger.info("https url={}", url);
+                ResponseEntity<TickerData> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, TickerData.class);
+                TickerData tickerData = responseEntity.getBody();
+                String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
+                String key = httpsRedisKey + hashKey;
+                Map<String, Ticker> map = new HashMap<>();
+                map.put(hashKey, tickerData.getTicker());
+                logger.info("httpsKey={},hashKey={}", key, hashKey);
+                metadataDb5RedisUtil.hmset(key, map);
 
             }
         }
