@@ -4,6 +4,8 @@
  */
 package com.hp.sh.expv3.component.id.utils;
 
+import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -354,25 +356,8 @@ public class SnowflakeIdWorker {
         int size = 0;
         Integer x = null;
         SnowflakeIdWorker idWorker = new SnowflakeIdWorker(2, 11, 0, 9).setId(3, 0, 0);
-        for (int i = 0; i <= 5000000; i++) {
-            long id = idWorker.nextId();
-//            System.out.println(Long.toBinaryString(id));
-            System.out.println(id);
-//            System.out.println("+++");
-//            if (size >= 2) {
-//                System.out.println(idWorker.getId64String(id) + ":id");
-//                System.out.println(idWorker.getTime64String(id) + ":time");
-//                System.out.println(idWorker.getDataCenter64String(id) + ":data center id");
-//                System.out.println(idWorker.getServer64String(id) + ":server id");
-//                System.out.println(idWorker.getIdType64String(id) + ":id type");
-//                System.out.println(idWorker.getSequence64String(id) + ": sequence id");
-//                System.out.println(idWorker.getDataCenter(id) + ": dataCenter id");
-//                break;
-//            }
-            size++;
-        }
-
-        System.out.println(System.currentTimeMillis() - now + "ms:" + size);
+        long time = idWorker.getTimeInMs(165788629711486976L);
+        System.out.println(new Date(time).toLocaleString());
 
     }
 }

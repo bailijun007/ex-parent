@@ -21,8 +21,10 @@ public class TradeResult {
 	private BigDecimal feeRatio ;
 	//此次成交的手续费
 	private BigDecimal fee;
-	//此次成交的保证金
+	//此次成交扣除的订单保证金
 	private BigDecimal orderMargin;
+	//此次成交扣除的订单开仓手续费
+	private BigDecimal orderOpenFee;
 	//此次成交的盈亏（平仓才有）
 	private BigDecimal pnl;
 	
@@ -148,6 +150,18 @@ public class TradeResult {
 
 	public void setOrderCloseFee(BigDecimal closeFee) {
 		this.orderCloseFee = closeFee;
+	}
+
+	public BigDecimal getOrderOpenFee() {
+		return orderOpenFee;
+	}
+
+	public void setOrderOpenFee(BigDecimal orderFee) {
+		this.orderOpenFee = orderFee;
+	}
+
+	public BigDecimal getFeeDiff() {
+		return orderOpenFee.subtract(this.fee);
 	}
 
 }

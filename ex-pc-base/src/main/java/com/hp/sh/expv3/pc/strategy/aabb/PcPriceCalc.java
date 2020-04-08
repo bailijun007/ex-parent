@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.pc.strategy.aabb;
 
+import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.DecimalUtil;
 import com.hp.sh.expv3.utils.math.Precision;
 
@@ -58,6 +59,9 @@ class PcPriceCalc {
              *  cp / (posHoldMarginRatio - 1) = amt / ( posMargin - (amt/op) )
              * cp = amt * (posHoldMarginRatio - 1) / (posMargin - v)
              */
+        	if(BigUtils.isZero(posMargin.subtract(holdVolume))){
+        		return new BigDecimal("999999");
+        	}
             BigDecimal lp = amt.multiply(posHoldMarginRatio.subtract(BigDecimal.ONE)).divide(posMargin.subtract(holdVolume), Precision.COMMON_PRECISION, DecimalUtil.MORE);
             if (lp.compareTo(BigDecimal.ZERO) < 0) {
                 lp = BigDecimal.valueOf(100000000L);

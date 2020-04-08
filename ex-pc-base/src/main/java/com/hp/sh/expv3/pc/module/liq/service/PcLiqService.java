@@ -149,7 +149,7 @@ public class PcLiqService {
 		PcPosition pos = this.positionDataService.getPosition(userId, asset, symbol, posId);
 		
 		if(pos==null){
-			logger.error("仓位不存在:asset={}, posId={}", asset, posId);
+			logger.error("强平仓位不存在:asset={}, posId={}", asset, posId);
 			return;
 		}
 		

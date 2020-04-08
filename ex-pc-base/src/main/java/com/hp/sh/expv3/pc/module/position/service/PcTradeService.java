@@ -143,19 +143,27 @@ public class PcTradeService {
 		
 		TradeResult tradeResult = this.positionStrategy.calcTradeResult(trade, order, pcPosition);
 		
-		/*  1、修改仓位数据  */
+		/* 1、修改仓位数据  */
 		pcPosition = this.modPositon(pcPosition, order, tradeResult, now);
 		
-		/*  2、修改订单数据和订单状态  */
+		/* 2、修改订单数据和订单状态  */
 		this.updateOrder4Trade(order, tradeResult, now);
 		
 		/* 3、生成成交流水 */
 		PcOrderTrade pcOrderTrade = this.saveOrderTrade(trade, order, tradeResult, pcPosition.getId(), now);
 		
 		/* 4、返开仓手续费 */
+		if(BigUtils.gtZero(tradeResult.getFeeDiff())){
+			String remark = String.format("返还MAKER手续费差额：%s", tradeResult.getFeeDiff());
+			this.returnRemainOpenfee(pcOrderTrade.getUserId(), pcOrderTrade.getId(), pcOrderTrade.getAsset(), tradeResult.getFeeDiff(), remark);
+		}
+		
+		/* 5、返订单剩余手续费 */
 		if(tradeResult.getOrderCompleted()){
 			if(BigUtils.gtZero(order.getOpenFee())){
-				this.returnRemainOpenfee(pcOrderTrade.getUserId(), pcOrderTrade.getId(), pcOrderTrade.getAsset(), order.getOpenFee());
+				logger.warn("订单已完成且包含剩余手续费,{}", pcOrderTrade.getId());
+				String remark = String.format("返还剩余开仓手续费：%s", order.getOpenFee());
+				this.returnRemainOpenfee(pcOrderTrade.getUserId(), pcOrderTrade.getId(), pcOrderTrade.getAsset(), order.getOpenFee(), remark);
 			}else if(BigUtils.ltZero(order.getOpenFee())){
 				logger.error("剩余手续费小于0,{}", pcOrderTrade.getId());
 			}
@@ -259,12 +267,12 @@ public class PcTradeService {
 		this.accountCoreService.add(request);
 	}
 	
-	private void returnRemainOpenfee(Long userId, Long orderTradeId, String asset, BigDecimal orderOpenFee) {
+	private void returnRemainOpenfee(Long userId, Long orderTradeId, String asset, BigDecimal orderOpenFee, String remark) {
 		PcAddRequest request = new PcAddRequest();
 		request.setAmount(orderOpenFee.add(orderOpenFee));
 		request.setUserId(userId);
 		request.setAsset(asset);
-		request.setRemark(String.format("返还剩余开仓手续费：%s", orderOpenFee, orderOpenFee));
+		request.setRemark(remark);
 		request.setTradeNo("CLOSE-"+orderTradeId);
 		request.setTradeType(PcAccountTradeType.RETURN_FEE_DIFF);
 		request.setAssociatedId(orderTradeId);
@@ -274,7 +282,7 @@ public class PcTradeService {
 	private void updateOrder4Trade(PcOrder order, TradeResult tradeResult, Long now){
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
-	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getFee()));
+	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getOrderOpenFee()));
 	        order.setCloseFee(order.getCloseFee().subtract(tradeResult.getOrderCloseFee()));
 		}
 		order.setFeeCost(order.getFeeCost().add(tradeResult.getFee()));

@@ -166,6 +166,7 @@ public class PcStrategyContext {
 				tradeResult.setFee(f);
 			}
 			
+			tradeResult.setOrderOpenFee(feeData.getOpenFee());
 			tradeResult.setOrderMargin(feeData.getOrderMargin()); //保证金
 			tradeResult.setOrderCloseFee(feeData.getCloseFee());
 		}else{
