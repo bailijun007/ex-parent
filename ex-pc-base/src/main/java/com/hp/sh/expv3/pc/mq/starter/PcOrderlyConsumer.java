@@ -143,8 +143,11 @@ public class PcOrderlyConsumer {
         			if(cause instanceof UpdateException){
         				logger.warn("更新失败："+cause.toString());
         			}else{
-            			logger.error("未知捕获1,{}", e.toString(), e);
-            			logger.error("未知捕获2,{}", cause.getMessage(), cause);
+            			logger.error("未知捕获异常1,{}", e.getMessage(), e);
+            			logger.error("未知捕获异常msg,{},{}", e.getMessage(), msgs);
+            			if(cause!=null){
+            				logger.error("未知捕获异常cause,{}", cause.getMessage(), cause);
+            			}
         			}
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}

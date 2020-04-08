@@ -144,8 +144,7 @@ public class BBOrderlyConsumer {
         			if(cause instanceof UpdateException){
         				logger.warn("更新失败："+cause.toString());
         			}else{
-            			logger.error("未知捕获1,{}", e.toString(), e);
-            			logger.error("未知捕获2,{}", cause.getMessage(), cause);
+            			logger.error("未知捕获1,{}", e.getMessage(), e);
         			}
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}

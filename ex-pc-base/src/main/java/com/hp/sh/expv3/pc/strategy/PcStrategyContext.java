@@ -26,6 +26,8 @@ import com.hp.sh.expv3.pc.strategy.vo.OrderFeeParamVo;
 import com.hp.sh.expv3.pc.strategy.vo.OrderMarginVo;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.IntBool;
+import com.hp.sh.expv3.utils.math.BigCalc;
+import com.hp.sh.expv3.utils.math.BigFormat;
 import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.Precision;
 
@@ -154,11 +156,14 @@ public class PcStrategyContext {
 
 		// 手续费&保证金
 		if(closeFlag==OrderFlag.ACTION_OPEN){
-			OrderFeeData feeData = orderStrategy.calcRaitoFee(order, order.getVolume(), matchedVo.getNumber());
+			OrderFeeData feeData = orderStrategy.calcRaitoFee(order, order.getVolume().subtract(order.getFilledVolume()), matchedVo.getNumber());
 			if(BigUtils.isZero(order.getOpenFeeRatio())){
 				tradeResult.setFee(BigDecimal.ZERO);
 			}else{
-				tradeResult.setFee(feeData.getOpenFee().multiply(tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE)));
+				BigDecimal fr = tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE);
+				BigDecimal f = feeData.getOpenFee().multiply(fr);
+				String s = BigFormat.plain(f);
+				tradeResult.setFee(f);
 			}
 			
 			tradeResult.setOrderMargin(feeData.getOrderMargin()); //保证金
@@ -168,7 +173,8 @@ public class PcStrategyContext {
 			if(BigUtils.isZero(order.getOpenFeeRatio())){
 				tradeResult.setFee(BigDecimal.ZERO);
 			}else{
-				tradeResult.setFee(tradeFee.multiply(tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE)));
+				BigDecimal fr = tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE);
+				tradeResult.setFee(tradeFee.multiply(fr));
 			}
 			
 			OrderMarginVo posMargin = new OrderMarginVo(pcPosition.getPosMargin(), BigDecimal.ZERO, pcPosition.getCloseFee());

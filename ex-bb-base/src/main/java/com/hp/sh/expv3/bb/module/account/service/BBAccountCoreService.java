@@ -29,6 +29,7 @@ import com.hp.sh.expv3.bb.vo.request.ReleaseFrozenRequest;
 import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
+import com.hp.sh.expv3.config.db.SnGenerator;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -47,6 +48,9 @@ public class BBAccountCoreService{
 
 	@Autowired
 	private BBAccountRecordDAO fundAccountRecordDAO;
+	
+	@Autowired
+	private SnGenerator generator;
     
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -267,7 +271,7 @@ public class BBAccountCoreService{
 		record.setTotal(account.getTotal());
 		
 		//保存记录
-		record.setSn(SnUtils.newRecordSn());
+		record.setSn( generator.genSn(record) );
 		record.setCreated(account.getModified());
 		record.setModified(account.getModified());
 		this.fundAccountRecordDAO.save(record);
