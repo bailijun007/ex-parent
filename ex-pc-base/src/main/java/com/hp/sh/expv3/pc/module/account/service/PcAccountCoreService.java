@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
+import com.hp.sh.expv3.config.db.SnGenerator;
 import com.hp.sh.expv3.constant.FundFlowDirection;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
@@ -28,7 +29,6 @@ import com.hp.sh.expv3.pc.vo.request.FundRequest;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
 import com.hp.sh.expv3.utils.DbDateUtils;
-import com.hp.sh.expv3.utils.SnUtils;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
@@ -44,6 +44,9 @@ public class PcAccountCoreService{
 
 	@Autowired
 	private PcAccountRecordDAO fundAccountRecordDAO;
+	
+	@Autowired
+	private SnGenerator generator;
     
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -78,7 +81,7 @@ public class PcAccountCoreService{
 		PcAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.INCOME);
-		record.setSn(SnUtils.newRecordSn());
+		record.setSn( generator.genSn(record) );
 		
 		return this.newRecord(record);
 	}
@@ -90,7 +93,7 @@ public class PcAccountCoreService{
 		PcAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.EXPENSES);
-		record.setSn(SnUtils.newRecordSn());
+		record.setSn( generator.genSn(record) );
 		
 		return this.newRecord(record);
 	}

@@ -64,5 +64,11 @@ public class OrderFeeData {
 	public void setGrossMargin(BigDecimal grossMargin) {
 		this.grossMargin = grossMargin;
 	}
+
+	@Override
+	public String toString() {
+		return "OrderFeeData [openFee=" + openFee + ", closeFee=" + closeFee + ", orderMargin=" + orderMargin
+				+ ", grossMargin=" + grossMargin + "]";
+	}
 	
 }
