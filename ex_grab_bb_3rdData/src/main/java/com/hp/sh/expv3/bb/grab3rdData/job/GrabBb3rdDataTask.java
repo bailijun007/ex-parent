@@ -72,7 +72,7 @@ public class GrabBb3rdDataTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-    @PostConstruct
+//    @PostConstruct
     public void startGrabBb3rdDataByCss() {
         WsClient client = new WsClient(wssUrl);
         client.connect();

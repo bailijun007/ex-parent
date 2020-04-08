@@ -4,7 +4,7 @@ server:
 
 spring:
   application:
-    name: ex-bb-kline
+    name: ex-bb-match-trade
   messages:
     fallbackToSystemLocale: false
     basename: i18n/errors, i18n/messages
