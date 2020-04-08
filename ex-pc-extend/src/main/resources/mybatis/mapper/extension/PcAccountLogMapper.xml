@@ -74,11 +74,34 @@
         SELECT
         <include refid="Base_Column_List"/>
         FROM pc_account_log
-        <include refid="simple_where"/>
-        order by `time` desc
-        <if test="limit!=null and limit!=''">
+        <where>
+            <if test="userIdList!=null">and user_id in
+                <foreach item="item" index="i" collection="userIdList" open="(" separator="," close=")">
+                    #{userIdList[${i}]}
+                </foreach>
+            </if>
+            <if test="assetList!=null">and asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+            <if test="types!=null">and type in
+                <foreach item="item" index="i" collection="types" open="(" separator="," close=")">
+                    #{types[${i}]}
+                </foreach>
+            </if>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="type!=null">and `type`=#{type}</if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="refId!=null">and ref_id=#{refId}</if>
+            <if test="timeBegin!=null">and `time` &gt;= #{timeBegin}</if>
+            <if test="timeEnd!=null">and `time` &lt;= #{timeEnd}</if>
+        </where>
+        order by id desc
             LIMIT 0,${limit}
-        </if>
+
     </select>
 
 </mapper>

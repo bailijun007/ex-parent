@@ -45,6 +45,7 @@ public interface PcAccountLogExtendApi {
             @ApiImplicitParam(name = "historyType ", value = "1.最近两天,2.两天到三个月", example = "1", required = true),
             @ApiImplicitParam(name = "startDate", value = "开始时间(当history_type是2时,填写)", required = false),
             @ApiImplicitParam(name = "endDate", value = "结束时间 (当history_type是2时,填写)", required = false),
+            @ApiImplicitParam(name = "queryId", value = "主键id", example = "1", required = false),
             @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
@@ -56,7 +57,8 @@ public interface PcAccountLogExtendApi {
                                            @RequestParam(value = "endDate", required = false) Long endDate,
                                            @RequestParam(value = "pageNo", required = true) Integer pageNo,
                                            @RequestParam(value = "pageSize", required = true, defaultValue = "20") Integer pageSize,
-                                           @RequestParam(value = "symbol", required = true) String symbol);
+                                           @RequestParam(value = "symbol", required = true) String symbol,
+                                           @RequestParam(value = "queryId", required = false) Long queryId);
 
 
 }

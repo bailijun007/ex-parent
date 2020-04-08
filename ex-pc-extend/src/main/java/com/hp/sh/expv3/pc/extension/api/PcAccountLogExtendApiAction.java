@@ -68,7 +68,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
      */
     @Override
     public PageResult<PcAccountRecordLogVo> query(Long userId, String asset, Integer tradeType, Integer historyType,
-                                                  Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol) {
+                                                  Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol,Long queryId) {
         this.checkParam(userId, asset, tradeType, historyType, startDate, endDate, pageNo, pageSize, symbol);
 
         // 获取面值
@@ -77,7 +77,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
         PageResult<PcAccountRecordLogVo> result = new PageResult<PcAccountRecordLogVo>();
 
         PageResult<PcAccountLogVo> pcAccountLogList = pcAccountLogExtendService.pageQueryPcAccountLogList(userId, asset,
-                tradeType, historyType, startDate, endDate, symbol, pageNo, pageSize);
+                tradeType, historyType, startDate, endDate, symbol, pageNo, pageSize,queryId);
         result.setPageNo(pcAccountLogList.getPageNo());
         result.setPageCount(pcAccountLogList.getPageCount());
         result.setRowTotal(pcAccountLogList.getRowTotal());
