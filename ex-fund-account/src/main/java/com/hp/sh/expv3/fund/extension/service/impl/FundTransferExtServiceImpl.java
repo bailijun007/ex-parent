@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.hp.sh.expv3.fund.transfer.constant.FundTransferStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,11 +37,10 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
         for (FundTransferExtVo transferExtVo : voList) {
             Optional<FundTransferExtVo> vo = Optional.ofNullable(transferExtVo);
             transferExtVo.setCtime(vo.map(t -> t.getCreated()).orElse(null));
-            int status = vo.filter(t -> t.getStatus() == 8).map(t -> t.getStatus()).orElse(2);
-            if (status == 2) {
-                transferExtVo.setStatus(status);
-            } else {
+            if (transferExtVo.getStatus() == FundTransferStatus.STATUS_SUCCESS) {
                 transferExtVo.setStatus(1);
+            } else if (transferExtVo.getStatus() == FundTransferStatus.STATUS_FAIL) {
+                transferExtVo.setStatus(2);
             }
         }
         Long count = fundTransferExtMapper.queryCount(userId, asset, queryId, pageStatus);
