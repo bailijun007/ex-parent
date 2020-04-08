@@ -60,13 +60,13 @@ public class LiqCancelledMsg extends BaseSymbolMsg{
 	public void setLastFlag(Integer lastFlag) {
 		this.lastFlag = lastFlag;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "LiqCancelledMsg [accountId=" + accountId + ", posId=" + posId + ", longFlag=" + longFlag + ", lastFlag="
-				+ lastFlag + ", cancelOrders=" + cancelOrders + "]";
+				+ lastFlag + ", cancelOrders=" + cancelOrders + ", asset=" + asset + ", symbol=" + symbol + "]";
 	}
-	
+
 	public static void main(String[] args) {
 		LiqCancelledMsg msg = new LiqCancelledMsg();
 		msg.setAccountId(138379937823358976L);
