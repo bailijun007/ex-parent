@@ -148,6 +148,11 @@ public class PcLiqService {
 	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list, Integer lastFlag) {
 		PcPosition pos = this.positionDataService.getPosition(userId, asset, symbol, posId);
 		
+		if(pos==null){
+			logger.error("强平仓位不存在:asset={}, posId={}", asset, posId);
+			return;
+		}
+		
 		if(pos.getLiqStatus()==LiqStatus.FORCE_CLOSE){
 			logger.warn("仓位已经被强平：posId={}", posId);
 			return;

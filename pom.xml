@@ -39,7 +39,6 @@
 		<module>ex-bb-kline</module>
         <module>ex-bb-match-trade</module>
         <module>ex-pc-match-trade</module>
-        <module>ex_grab_bb_3rdData</module>
     </modules>
 
     <dependencies>

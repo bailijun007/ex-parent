@@ -20,6 +20,10 @@ public class ExException extends BizException {
 		super(errorCode);
 		super.setErrorData(errorData);
 	}
+	
+    public String getMessage() {
+        return super.getMessage()+". "+Arrays.toString(getErrorData());
+    }
 
 	@Override
 	public String toString() {
