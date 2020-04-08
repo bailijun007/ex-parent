@@ -46,7 +46,7 @@ public interface PcAccountLogExtendApi {
             @ApiImplicitParam(name = "startDate", value = "开始时间(当history_type是2时,填写)", required = false),
             @ApiImplicitParam(name = "endDate", value = "结束时间 (当history_type是2时,填写)", required = false),
             @ApiImplicitParam(name = "queryId", value = "主键id", example = "167958542689533952", required = false),
-            @ApiImplicitParam(name = "nextPage", value = "-1:上一页，1：下一页", example = "1", required = true),
+            @ApiImplicitParam(name = "nextPage", value = "-1:上一页,1:下一页", example = "1", required = true),
             @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = false),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })

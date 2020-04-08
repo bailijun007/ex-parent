@@ -67,8 +67,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
      * @return
      */
     @Override
-    public PageResult<PcAccountRecordLogVo> query(Long userId, String asset, Integer tradeType, Integer historyType,
-                                                  Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol,Long queryId,Integer nextPage) {
+    public PageResult<PcAccountRecordLogVo> query(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol,Long queryId,Integer nextPage) {
         this.checkParam(userId, asset, tradeType, historyType, startDate, endDate, nextPage, pageSize, symbol);
 
         // 获取面值

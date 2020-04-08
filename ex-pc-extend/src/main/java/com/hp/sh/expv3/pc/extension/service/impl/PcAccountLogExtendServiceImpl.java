@@ -40,7 +40,6 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         map.put("asset", asset);
         map.put("symbol", symbol);
         map.put("limit", pageSize);
-
         try {
             if (ExtCommonConstant.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {
                 LocalDateTime minusDays = localDateTime.minusDays(2L);
