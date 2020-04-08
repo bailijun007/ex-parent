@@ -9,6 +9,9 @@ import java.math.BigDecimal;
  * @author BaiLiJun  on 2019/12/24
  */
 public class PcAccountRecordLogVo implements Serializable {
+    @ApiModelProperty("id")
+    private Long id;
+
     @ApiModelProperty("金额") // baseValue
     private BigDecimal volume;
 
@@ -52,6 +55,14 @@ public class PcAccountRecordLogVo implements Serializable {
     private Long refId;
 
     public PcAccountRecordLogVo() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getTime() {

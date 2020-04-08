@@ -10,4 +10,7 @@ import java.util.Map;
  */
 public interface SupportBbGroupIdsJobService {
     public Map<Integer, List<BBSymbol>> listSymbols();
+
+    List<BBSymbol> getSymbols();
+
 }

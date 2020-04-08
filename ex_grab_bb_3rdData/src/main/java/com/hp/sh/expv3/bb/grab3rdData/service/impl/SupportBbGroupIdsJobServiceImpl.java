@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
     @Value("${bb.trade.bbGroupIds}")
     private Integer bbGroupId;
 
-    Map<Integer, List<BBSymbol>> map = new ConcurrentHashMap<>();
+  static    Map<Integer, List<BBSymbol>> map = new ConcurrentHashMap<>();
 
     @Override
     @Scheduled(cron = "*/1 * * * * *")
@@ -46,14 +47,6 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
                 map = list.stream().collect(Collectors.groupingBy(bbSymbol -> bbSymbol.getBbGroupId()));
                 return map;
             }
-        } else if (symbols.equals("pc_contract")) {
-            Map<String, PcSymbol> symbolMap = metadataRedisUtil.hgetAll(symbols, PcSymbol.class);
-            if (!CollectionUtils.isEmpty(symbolMap)) {
-                List<PcSymbol> pcSymbols = symbolMap.values().stream().collect(Collectors.toList());
-                List<BBSymbol> bbSymbols = this.converPcSymbols(pcSymbols);
-                map = bbSymbols.stream().collect(Collectors.groupingBy(bbSymbol -> bbSymbol.getBbGroupId()));
-                return map;
-            }
         }
         return null;
     }
@@ -62,11 +55,16 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
     /**
      * @return USDT__ETC_USDT
      */
+    @Override
+    @PostConstruct
     public List<BBSymbol> getSymbols() {
         List<BBSymbol> list = new CopyOnWriteArrayList<>();
+        if (CollectionUtils.isEmpty(map)){
+            map = listSymbols();
+        }
         if (!CollectionUtils.isEmpty(map)) {
             for (Integer integer : map.keySet()) {
-                if(bbGroupId.equals(integer)){
+                if (bbGroupId.equals(integer)) {
                     List<BBSymbol> bbSymbols = map.get(integer);
                     for (BBSymbol bbSymbol : bbSymbols) {
                         list.add(bbSymbol);
@@ -77,16 +75,16 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
         return list;
     }
 
-    private List<BBSymbol> converPcSymbols(List<PcSymbol> pcSymbols) {
-        List<BBSymbol> list = new ArrayList<>();
-        for (PcSymbol pcSymbol : pcSymbols) {
-            BBSymbol bbSymbol = new BBSymbol();
-            BeanUtils.copyProperties(pcSymbol, bbSymbol);
-            bbSymbol.setBbGroupId(pcSymbol.getContractGroup());
-            list.add(bbSymbol);
-        }
-        return list;
-    }
+//    private List<BBSymbol> converPcSymbols(List<PcSymbol> pcSymbols) {
+//        List<BBSymbol> list = new ArrayList<>();
+//        for (PcSymbol pcSymbol : pcSymbols) {
+//            BBSymbol bbSymbol = new BBSymbol();
+//            BeanUtils.copyProperties(pcSymbol, bbSymbol);
+//            bbSymbol.setBbGroupId(pcSymbol.getContractGroup());
+//            list.add(bbSymbol);
+//        }
+//        return list;
+//    }
 
 
 }
