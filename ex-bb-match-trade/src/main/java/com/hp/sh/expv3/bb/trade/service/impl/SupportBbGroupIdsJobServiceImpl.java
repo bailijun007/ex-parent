@@ -1,8 +1,8 @@
-package com.hp.sh.expv3.pc.trade.service.impl;
+package com.hp.sh.expv3.bb.trade.service.impl;
 
-import com.hp.sh.expv3.pc.trade.service.SupportBbGroupIdsJobService;
-import com.hp.sh.expv3.pc.trade.pojo.BBSymbol;
-import com.hp.sh.expv3.pc.trade.pojo.PcSymbol;
+import com.hp.sh.expv3.bb.trade.pojo.BBSymbol;
+import com.hp.sh.expv3.bb.trade.pojo.PcSymbol;
+import com.hp.sh.expv3.bb.trade.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -28,10 +26,10 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
     @Qualifier("metadataRedisUtil")
     private RedisUtil metadataRedisUtil;
 
-    @Value("${pc.trade.symbols}")
+    @Value("${bb.trade.symbols}")
     private String symbols;
 
-    @Value("${pc.trade.bbGroupIds}")
+    @Value("${bb.trade.bbGroupIds}")
     private Integer bbGroupId;
 
     Map<Integer, List<BBSymbol>> map = new ConcurrentHashMap<>();
@@ -62,6 +60,7 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
     /**
      * @return USDT__ETC_USDT
      */
+    @Override
     public List<BBSymbol> getSymbols() {
         List<BBSymbol> list = new CopyOnWriteArrayList<>();
         if (!CollectionUtils.isEmpty(map)) {

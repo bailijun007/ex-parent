@@ -6,7 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.hp.sh.expv3.pc.trade.pojo.BbMatchExtVo;
+import com.hp.sh.expv3.bb.trade.pojo.BbMatchExtVo;
 import com.hp.sh.expv3.component.id.config.SequencConfig;
 import com.hp.sh.expv3.component.id.config.WorkerConfig;
 

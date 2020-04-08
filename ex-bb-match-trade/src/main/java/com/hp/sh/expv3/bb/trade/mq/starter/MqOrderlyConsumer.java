@@ -1,11 +1,11 @@
-package com.hp.sh.expv3.pc.trade.mq.starter;
+package com.hp.sh.expv3.bb.trade.mq.starter;
 
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
+import com.hp.sh.expv3.bb.trade.pojo.BBSymbol;
+import com.hp.sh.expv3.bb.trade.constant.MsgConstant;
+import com.hp.sh.expv3.bb.trade.service.impl.SupportBbGroupIdsJobServiceImpl;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
-import com.hp.sh.expv3.pc.trade.constant.MsgConstant;
-import com.hp.sh.expv3.pc.trade.pojo.BBSymbol;
-import com.hp.sh.expv3.pc.trade.service.impl.SupportBbGroupIdsJobServiceImpl;
 import com.hp.sh.rocketmq.config.RocketmqServerSetting;
 import com.hp.sh.rocketmq.exceptions.ReSendException;
 import com.hp.sh.rocketmq.impl.EndpointContext;
@@ -44,9 +44,9 @@ public class MqOrderlyConsumer {
     @Value("${spring.profiles.active:}")
     private String profile;
 
-	@Value("${pc.trade.bbGroupIds}")
+	@Value("${bb.trade.bbGroupIds}")
 	private Integer bbGroupId;
-	
+
 	private Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
 	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
@@ -57,7 +57,7 @@ public class MqOrderlyConsumer {
         consumer.setInstanceName(setting.getInstanceName());
         
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
-        consumer.subscribe(topic, MsgConstant.TAG_PC_MATCH);
+        consumer.subscribe(topic, MsgConstant.TAG_BB_MATCH);
         
         consumer.registerMessageListener(new MessageListenerOrderly() {
 
@@ -113,7 +113,8 @@ public class MqOrderlyConsumer {
 		Map<String, BBSymbol> symbolMap = new HashMap<String, BBSymbol>();
 		for(BBSymbol bbvo : pcList){
 			if(bbvo.getBbGroupId().equals(this.bbGroupId)){
-				String topic = MsgConstant.getMatchTopic(printEnv(),bbvo.getAsset(), bbvo.getSymbol());
+                 String env = printEnv();
+                String topic = new MsgConstant().getMatchTopic(env,bbvo.getAsset(), bbvo.getSymbol());
 				symbolMap.put(topic, bbvo);
 			}
 		}
@@ -146,11 +147,8 @@ public class MqOrderlyConsumer {
 		
 	}
 
-
-
     @PostConstruct
     private String printEnv() {
         return profile;
     }
-
 }

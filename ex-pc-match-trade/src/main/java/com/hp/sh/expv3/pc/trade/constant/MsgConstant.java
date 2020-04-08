@@ -1,11 +1,9 @@
 package com.hp.sh.expv3.pc.trade.constant;
 
-import com.hp.sh.expv3.pc.trade.mq.BbMatchMqConsumer;
 import com.hp.sh.expv3.pc.trade.service.impl.SupportBbGroupIdsJobServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * @author BaiLiJun  on 2020/3/31

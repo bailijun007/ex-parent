@@ -10,6 +10,7 @@ import com.hp.sh.expv3.bb.grab3rdData.job.GrabBb3rdDataTask;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.Ticker;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.TickerData;
 import com.hp.sh.expv3.config.redis.RedisUtil;
+import com.hp.sh.expv3.config.redis.RedisUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +21,10 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+
 
 public class WsClient extends WebSocketListener {
     private static final Logger logger = LoggerFactory.getLogger(WsClient.class);
@@ -29,7 +32,6 @@ public class WsClient extends WebSocketListener {
     private String wsurl = "wss://api.zb.live/websocket";
 
     private WebSocket ws;
-
 
 
     public WsClient(String wsurl) {
@@ -79,8 +81,8 @@ public class WsClient extends WebSocketListener {
             logger.info("key={}", key);
 //             RedisUtil redisUtil = grabBb3rdDataTask.getRedisUtil();
 //            redisUtil.hmset(key,map);
-//            metadataRedisUtil
-
+//            metadataRedisUtil.hmset(key,map);
+//            RedisUtils.open("",);
 
         }
     }
