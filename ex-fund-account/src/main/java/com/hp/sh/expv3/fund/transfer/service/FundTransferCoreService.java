@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.fund.transfer.constant.FundTransferStatus;
 import com.hp.sh.expv3.fund.transfer.dao.FundTransferDAO;
 import com.hp.sh.expv3.fund.transfer.entity.FundTransfer;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -48,7 +49,7 @@ public class FundTransferCoreService {
 		transfer.setUserId(userId);
 		transfer.setCreated(now);
 		transfer.setModified(now);
-		transfer.setStatus(FundTransfer.STATUS_NEW);
+		transfer.setStatus(FundTransferStatus.STATUS_NEW);
 		
 		fundTransferDAO.save(transfer);
 		
@@ -68,7 +69,7 @@ public class FundTransferCoreService {
 	}
 
 	public List<FundTransfer> findPending(Page page) {
-		List<FundTransfer> list = this.fundTransferDAO.queryPending(page, FundTransfer.STATUS_SUCCESS, FundTransfer.STATUS_FAIL);
+		List<FundTransfer> list = this.fundTransferDAO.queryPending(page, FundTransferStatus.STATUS_SUCCESS, FundTransferStatus.STATUS_FAIL);
 		return list;
 	}
 

@@ -12,6 +12,7 @@ import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.fund.transfer.component.FundServiceContext;
+import com.hp.sh.expv3.fund.transfer.constant.FundTransferStatus;
 import com.hp.sh.expv3.fund.transfer.entity.FundTransfer;
 import com.hp.sh.expv3.fund.transfer.error.TransferError;
 import com.hp.sh.expv3.fund.transfer.mq.MqSender;
@@ -78,24 +79,24 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	
 	private void handleOne(FundTransfer record){
 		switch (record.getStatus()) {
-		case FundTransfer.STATUS_NEW:
+		case FundTransferStatus.STATUS_NEW:
 			//扣减源账户
 			try{
 				fundServiceContext.cutSrcFund(record);
 			}catch(Exception e){
 				logger.error("处理转账失败", e);
-				this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_FAIL, record.getStatus()+":"+e.getMessage());
+				this.fundTransferCoreService.changeStatus(record, FundTransferStatus.STATUS_FAIL, record.getStatus()+":"+e.getMessage());
 				return;
 			}
 			//修改状态
-			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SRC_COMPLETE, null);
-		case FundTransfer.STATUS_SRC_COMPLETE:
+			this.fundTransferCoreService.changeStatus(record, FundTransferStatus.STATUS_SRC_COMPLETE, null);
+		case FundTransferStatus.STATUS_SRC_COMPLETE:
 			//增加目标账户
 			fundServiceContext.addTargetFund(record);
 			//修改状态
 //			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_TARGET_COMPLETE);
-		case FundTransfer.STATUS_TARGET_COMPLETE:
-			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_SUCCESS, null);
+		case FundTransferStatus.STATUS_TARGET_COMPLETE:
+			this.fundTransferCoreService.changeStatus(record, FundTransferStatus.STATUS_SUCCESS, null);
 		}
 	}
 

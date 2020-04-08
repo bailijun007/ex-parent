@@ -13,16 +13,6 @@ public class FundTransfer extends BaseRecordEntity {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public static final int STATUS_NEW = 1; // 创建
-	
-	public static final int STATUS_SRC_COMPLETE = 3; // 源账号完成
-	
-	public static final int STATUS_TARGET_COMPLETE = 7; // 目标账号完成
-	
-	public static final int STATUS_SUCCESS = 15; // 成功
-	
-	public static final int STATUS_FAIL = 16; // 失败
-	
 	//单号
 	protected String sn;
 	
