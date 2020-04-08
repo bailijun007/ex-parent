@@ -79,7 +79,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	
 	private void handleOne(FundTransfer record){
 		switch (record.getStatus()) {
-		case FundTransferStatus.STATUS_NEW:
+		case FundTransferStatus.STATUS_NEW : 
 			//扣减源账户
 			try{
 				fundServiceContext.cutSrcFund(record);
@@ -90,12 +90,12 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			}
 			//修改状态
 			this.fundTransferCoreService.changeStatus(record, FundTransferStatus.STATUS_SRC_COMPLETE, null);
-		case FundTransferStatus.STATUS_SRC_COMPLETE:
+		case FundTransferStatus.STATUS_SRC_COMPLETE : 
 			//增加目标账户
 			fundServiceContext.addTargetFund(record);
 			//修改状态
 //			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_TARGET_COMPLETE);
-		case FundTransferStatus.STATUS_TARGET_COMPLETE:
+		case FundTransferStatus.STATUS_TARGET_COMPLETE : 
 			this.fundTransferCoreService.changeStatus(record, FundTransferStatus.STATUS_SUCCESS, null);
 		}
 	}
