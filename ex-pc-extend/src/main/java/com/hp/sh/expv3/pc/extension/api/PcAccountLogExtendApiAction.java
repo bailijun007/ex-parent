@@ -68,8 +68,8 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
      */
     @Override
     public PageResult<PcAccountRecordLogVo> query(Long userId, String asset, Integer tradeType, Integer historyType,
-                                                  Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol,Long queryId) {
-        this.checkParam(userId, asset, tradeType, historyType, startDate, endDate, pageNo, pageSize, symbol);
+                                                  Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol,Long queryId,Integer nextPage) {
+        this.checkParam(userId, asset, tradeType, historyType, startDate, endDate, nextPage, pageSize, symbol);
 
         // 获取面值
         BigDecimal faceValue = this.getFaceValue(asset, symbol);
@@ -77,12 +77,15 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
         PageResult<PcAccountRecordLogVo> result = new PageResult<PcAccountRecordLogVo>();
 
         PageResult<PcAccountLogVo> pcAccountLogList = pcAccountLogExtendService.pageQueryPcAccountLogList(userId, asset,
-                tradeType, historyType, startDate, endDate, symbol, pageNo, pageSize,queryId);
+                tradeType, historyType, startDate, endDate, symbol, pageNo, pageSize,queryId,nextPage);
+        if(CollectionUtils.isEmpty(pcAccountLogList.getList())){
+           return null;
+        }
+        List<PcAccountRecordLogVo> recordLogs = new ArrayList<>(pcAccountLogList.getList().size());
+        result.setList(recordLogs);
         result.setPageNo(pcAccountLogList.getPageNo());
         result.setPageCount(pcAccountLogList.getPageCount());
         result.setRowTotal(pcAccountLogList.getRowTotal());
-        List<PcAccountRecordLogVo> recordLogs = new ArrayList<>(pcAccountLogList.getList().size());
-        result.setList(recordLogs);
 
         if (!CollectionUtils.isEmpty(pcAccountLogList.getList())) {
             for (PcAccountLogVo pcAccountLogVo : pcAccountLogList.getList()) {
@@ -167,9 +170,9 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
     }
 
     private void checkParam(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate,
-                            Long endDate, Integer pageNo, Integer pageSize, String symbol) {
+                            Long endDate, Integer nextPage, Integer pageSize, String symbol) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || tradeType == null || null == userId
-                || historyType == null || pageNo == null || pageSize == null) {
+                || historyType == null || nextPage == null || pageSize == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         if (ExtCommonConstant.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {

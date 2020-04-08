@@ -8,6 +8,7 @@ import com.hp.sh.expv3.pc.extension.dao.PcAccountLogDAO;
 import com.hp.sh.expv3.pc.extension.service.PcAccountLogExtendService;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountLogVo;
 import com.hp.sh.expv3.pc.extension.vo.PcAccountRecordLogVo;
+import com.hp.sh.expv3.utils.IntBool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
 
 
     @Override
-    public PageResult<PcAccountLogVo> pageQueryPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize,Long queryId) {
+    public PageResult<PcAccountLogVo> pageQueryPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize,Long queryId,Integer nextPage) {
         PageResult<PcAccountLogVo> result = new PageResult<>();
         LocalDateTime localDateTime = LocalDateTime.now();
         Map<String, Object> map = new HashMap<>();
@@ -39,7 +40,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         map.put("asset", asset);
         map.put("symbol", symbol);
         map.put("limit", pageSize);
-        map.put("queryId", queryId);
+
         try {
             if (ExtCommonConstant.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {
                 LocalDateTime minusDays = localDateTime.minusDays(2L);
@@ -52,46 +53,30 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        List<PcAccountLogVo> list =null;
         if(null==queryId){
             if (ExtCommonConstant.TRADE_TYPE_ALL.equals(tradeType)) {
-                List<PcAccountLogVo> list = pcAccountLogDAO.queryByLimit(map);
-                result.setList(list);
+                list = pcAccountLogDAO.queryByLimit(map);
             } else if (ExtCommonConstant.TRADE_TYPE_MAP.containsKey(tradeType)) {
                 List<Integer> typeList = ExtCommonConstant.TRADE_TYPE_MAP.get(tradeType);
                 map.put("types", typeList);
-                List<PcAccountLogVo> list = pcAccountLogDAO.queryByLimit(map);
-                result.setList(list);
+                 list = pcAccountLogDAO.queryByLimit(map);
             }
         }else {
-//            List<PcAccountLogVo> list = pcAccountLogDAO.queryByNext(map);
-//            result.setList(list);
+            map.put("queryId", queryId);
+            map.put("nextPage", nextPage);
+            if (ExtCommonConstant.TRADE_TYPE_ALL.equals(tradeType)) {
+               list = pcAccountLogDAO.queryByNextPage(map);
+            }else if (ExtCommonConstant.TRADE_TYPE_MAP.containsKey(tradeType)) {
+                List<Integer> typeList = ExtCommonConstant.TRADE_TYPE_MAP.get(tradeType);
+                map.put("types", typeList);
+                list = pcAccountLogDAO.queryByNextPage(map);
+            }
         }
-
-//        if (ExtCommonConstant.TRADE_TYPE_ALL.equals(tradeType)) {
-//            Long count = pcAccountLogDAO.queryCount(map);
-////            map.put("queryId", queryId);
-//            List<PcAccountLogVo> list = pcAccountLogDAO.queryByLimit(map);
-//            result.setList(list);
-////            rePage(pageNo, pageSize, result, count, list);
-//        } else if (ExtCommonConstant.TRADE_TYPE_MAP.containsKey(tradeType)) {
-//            List<Integer> typeList = ExtCommonConstant.TRADE_TYPE_MAP.get(tradeType);
-//            map.put("types", typeList);
-//            Long count = pcAccountLogDAO.queryCount(map);
-//            List<PcAccountLogVo> list = pcAccountLogDAO.queryByLimit(map);
-//            result.setList(list);
-//            rePage(pageNo, pageSize, result, count, list);
-//        } else {
-//            PageHelper.startPage(pageNo, pageSize);
-//            map.put("type", tradeType);
-//            List<PcAccountLogVo> list = pcAccountLogDAO.queryList(map);
-//            PageInfo<PcAccountLogVo> info = new PageInfo<>(list);
-//            result.setList(list);
-//            result.setRowTotal(info.getTotal());
-//            result.setPageNo(info.getPageNum());
-//            result.setPageCount(info.getPages());
-//        }
-
+        result.setPageNo(0);
+        result.setRowTotal(0L);
+        result.setPageCount(0);
+        result.setList(list);
         return result;
     }
 

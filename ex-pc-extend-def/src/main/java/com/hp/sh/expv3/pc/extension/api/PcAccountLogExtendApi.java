@@ -20,9 +20,9 @@ public interface PcAccountLogExtendApi {
     @ApiOperation(value = "查询pc永续合约账户")
     @GetMapping(value = "/api/extension/pc/account/record/query")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
-            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
-            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "163595781968756736", required = true),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "ETH", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "ETH_USDT", required = true),
             @ApiImplicitParam(name = "tradeType",
                     value = "类型 " +
                             "0.全部," +
@@ -45,8 +45,9 @@ public interface PcAccountLogExtendApi {
             @ApiImplicitParam(name = "historyType ", value = "1.最近两天,2.两天到三个月", example = "1", required = true),
             @ApiImplicitParam(name = "startDate", value = "开始时间(当history_type是2时,填写)", required = false),
             @ApiImplicitParam(name = "endDate", value = "结束时间 (当history_type是2时,填写)", required = false),
-            @ApiImplicitParam(name = "queryId", value = "主键id", example = "1", required = false),
-            @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
+            @ApiImplicitParam(name = "queryId", value = "主键id", example = "167958542689533952", required = false),
+            @ApiImplicitParam(name = "nextPage", value = "-1:上一页，1：下一页", example = "1", required = true),
+            @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = false),
             @ApiImplicitParam(name = "pageSize", value = "页行数", example = "10", required = true)
     })
     PageResult<PcAccountRecordLogVo> query(@RequestParam(value = "userId", required = true) Long userId,
@@ -55,10 +56,11 @@ public interface PcAccountLogExtendApi {
                                            @RequestParam(value = "historyType", required = true) Integer historyType,
                                            @RequestParam(value = "startDate", required = false) Long startDate,
                                            @RequestParam(value = "endDate", required = false) Long endDate,
-                                           @RequestParam(value = "pageNo", required = true) Integer pageNo,
+                                           @RequestParam(value = "pageNo", required = false) Integer pageNo,
                                            @RequestParam(value = "pageSize", required = true, defaultValue = "20") Integer pageSize,
                                            @RequestParam(value = "symbol", required = true) String symbol,
-                                           @RequestParam(value = "queryId", required = false) Long queryId);
+                                           @RequestParam(value = "queryId", required = false) Long queryId,
+                                           @RequestParam(value = "nextPage", required = true) Integer nextPage);
 
 
 }
