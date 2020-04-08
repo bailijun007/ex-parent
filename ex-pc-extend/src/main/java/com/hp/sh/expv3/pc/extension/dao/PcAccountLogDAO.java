@@ -21,4 +21,5 @@ public interface PcAccountLogDAO {
     List<PcAccountLogVo> queryByLimit(Map<String, Object> map);
 
 
+    List<PcAccountLogVo> queryByNextPage(Map<String, Object> map);
 }
