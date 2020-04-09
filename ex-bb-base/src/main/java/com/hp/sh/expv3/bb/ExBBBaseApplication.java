@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 
+import com.hp.sh.expv3.error.ExCommonError;
+
 @EnableDiscoveryClient
 @ComponentScan("com.hp.sh.expv3")
 @SpringBootApplication
@@ -26,6 +28,11 @@ public class ExBBBaseApplication {
 	@PostConstruct
 	private Object printEnv() {
 		logger.warn("===========profile:{}============", profile);
+		try{
+			logger.warn("{}",ExCommonError.REQUIRE_POSITIVE.getMessage());
+		}catch(Exception e){
+			logger.equals(e.getMessage(), e);
+		}
 		return null;
 	}
 }
