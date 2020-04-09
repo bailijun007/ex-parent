@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.bb.grab3rdData.job;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hp.sh.expv3.bb.grab3rdData.component.WsClient;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.BBSymbol;
@@ -19,6 +20,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +75,7 @@ public class GrabBb3rdDataTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-    @PostConstruct
+        @PostConstruct
     public void startGrabBb3rdDataByCss() {
         WsClient client = new WsClient(wssUrl);
         client.connect();
@@ -112,7 +115,7 @@ public class GrabBb3rdDataTask {
     }
 
 
-    @Scheduled(cron = "*/1 * * * * *")
+        @Scheduled(cron = "*/1 * * * * *")
     public void startGrabBb3rdDataByHttps() {
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
@@ -142,18 +145,40 @@ public class GrabBb3rdDataTask {
     }
 
 
-//    @Scheduled(cron = "*/1 * * * * *")
-//    public void merge() {
-//        List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-//        if (!CollectionUtils.isEmpty(bbSymbolList)) {
-//            for (BBSymbol bbSymbol : bbSymbolList) {
-//                String symbol = bbSymbol.getSymbol().toLowerCase();
-//                String[] symbolSplit = symbol.split("_");
-//
-//
-//            }
-//        }
-//    }
+    @Scheduled(cron = "*/1 * * * * *")
+    public void merge() {
+        List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+        if (!CollectionUtils.isEmpty(bbSymbolList)) {
+            for (BBSymbol bbSymbol : bbSymbolList) {
+                String symbol = bbSymbol.getSymbol().toLowerCase();
+                String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
+                String httpsKey = httpsRedisKey + hashKey;
+                String strHttpsTicker = metadataDb5RedisUtil.get(httpsKey);
+                Ticker httpsTicker = JSON.parseObject(strHttpsTicker, Ticker.class);
+
+                String wssKey = httpsRedisKey + hashKey;
+                String strWssTicker = metadataDb5RedisUtil.get(wssKey);
+                Ticker wssTicker = JSON.parseObject(strWssTicker, Ticker.class);
+                if (null == httpsTicker && null == wssTicker) {
+                    continue;
+                }
+                BigDecimal httpLast = BigDecimal.ZERO;
+                BigDecimal wssLast = BigDecimal.ZERO;
+                if (null != httpsTicker) {
+                    httpLast = httpsTicker.getLast();
+                } else if (null != httpsTicker) {
+                    wssLast = wssTicker.getLast();
+                }
+
+                BigDecimal avgLastPrice = httpLast.add(wssLast).divide(new BigDecimal(2), 4, RoundingMode.DOWN);
+                logger.info("{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
+                String key = "bb:" + hashKey + "lastPrice";
+                HashMap<String, BigDecimal> map = new HashMap<>();
+                map.put(hashKey, avgLastPrice);
+                metadataDb5RedisUtil.hmset(key, map);
+            }
+        }
+    }
 
 
 }
