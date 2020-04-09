@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hp.sh.expv3.bb.grab3rdData.component.WsClient;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.BBSymbol;
-import com.hp.sh.expv3.bb.grab3rdData.pojo.Ticker;
-import com.hp.sh.expv3.bb.grab3rdData.pojo.TickerData;
+import com.hp.sh.expv3.bb.grab3rdData.pojo.ZbTickerData;
+import com.hp.sh.expv3.bb.grab3rdData.pojo.ZbResponseEntity;
 import com.hp.sh.expv3.bb.grab3rdData.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import org.slf4j.Logger;
@@ -32,8 +32,8 @@ import java.util.concurrent.*;
  * @author BaiLiJun  on 2020/4/7
  */
 @Component
-public class GrabBb3rdDataTask {
-    private static final Logger logger = LoggerFactory.getLogger(WsClient.class);
+public class GrabBb3rdDataByZbTask {
+    private static final Logger logger = LoggerFactory.getLogger(GrabBb3rdDataByZbTask.class);
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             1,
@@ -45,10 +45,10 @@ public class GrabBb3rdDataTask {
     );
 
     @Value("${zb.wss.url}")
-    private String wssUrl;
+    private String zbWssUrl;
 
     @Value("${zb.https.url}")
-    private String httpsUrl;
+    private String zbHttpsUrl;
 
     @Value("${zb.wss.redisKey.prefix}")
     private String wssRedisKey;
@@ -75,9 +75,9 @@ public class GrabBb3rdDataTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-        @PostConstruct
-    public void startGrabBb3rdDataByCss() {
-        WsClient client = new WsClient(wssUrl);
+    @PostConstruct
+    public void startGrabBb3rdDataByZbWss() {
+        WsClient client = new WsClient(zbWssUrl);
         client.connect();
         Map data = new TreeMap();
         data.put("event", "addChannel");
@@ -94,19 +94,15 @@ public class GrabBb3rdDataTask {
 
         threadPool.execute(() -> {
             while (true) {
-                BlockingQueue<TickerData> queue = WsClient.getBlockingQueue();
+                BlockingQueue<ZbResponseEntity> queue = WsClient.getBlockingQueue();
                 if (CollectionUtils.isEmpty(queue)) {
                     continue;
                 }
-                TickerData tickerData = queue.poll();
+                ZbResponseEntity tickerData = queue.poll();
                 String hashKey = tickerData.getChannel().split("_")[0];
-//                Map<String, Ticker> map = new HashMap<>();
-//                map.put(hashKey, tickerData.getTicker());
                 String key = wssRedisKey + hashKey;
-//                logger.info("wssKey={},hashKey={}", key, hashKey);
-//                metadataDb5RedisUtil.hmset(key, map);
                 logger.info("wssKey={}", key);
-                Ticker ticker = tickerData.getTicker();
+                ZbTickerData ticker = tickerData.getTicker();
                 if (null != ticker) {
                     metadataDb5RedisUtil.set(key, ticker, 60);
                 }
@@ -115,8 +111,8 @@ public class GrabBb3rdDataTask {
     }
 
 
-        @Scheduled(cron = "*/1 * * * * *")
-    public void startGrabBb3rdDataByHttps() {
+    @Scheduled(cron = "*/1 * * * * *")
+    public void startGrabBb3rdDataByZbHttps() {
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
@@ -125,18 +121,14 @@ public class GrabBb3rdDataTask {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
                 HttpEntity<String> entity = new HttpEntity<String>(headers);
-                String url = httpsUrl + symbol;
+                String url = zbHttpsUrl + symbol;
                 logger.info("https url={}", url);
-                ResponseEntity<TickerData> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, TickerData.class);
-                TickerData tickerData = responseEntity.getBody();
+                ResponseEntity<ZbResponseEntity> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, ZbResponseEntity.class);
+                ZbResponseEntity tickerData = responseEntity.getBody();
                 String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
                 String key = httpsRedisKey + hashKey;
-//                Map<String, Ticker> map = new HashMap<>();
-//                map.put(hashKey, tickerData.getTicker());
-//                logger.info("httpsKey={},hashKey={}", key, hashKey);
-//                metadataDb5RedisUtil.hmset(key, map);
                 logger.info("httpsKey={}", key);
-                Ticker ticker = tickerData.getTicker();
+                ZbTickerData ticker = tickerData.getTicker();
                 if (null != ticker) {
                     metadataDb5RedisUtil.set(key, ticker, 60);
                 }
@@ -154,11 +146,11 @@ public class GrabBb3rdDataTask {
                 String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
                 String httpsKey = httpsRedisKey + hashKey;
                 String strHttpsTicker = metadataDb5RedisUtil.get(httpsKey);
-                Ticker httpsTicker = JSON.parseObject(strHttpsTicker, Ticker.class);
+                ZbTickerData httpsTicker = JSON.parseObject(strHttpsTicker, ZbTickerData.class);
 
                 String wssKey = httpsRedisKey + hashKey;
                 String strWssTicker = metadataDb5RedisUtil.get(wssKey);
-                Ticker wssTicker = JSON.parseObject(strWssTicker, Ticker.class);
+                ZbTickerData wssTicker = JSON.parseObject(strWssTicker, ZbTickerData.class);
                 if (null == httpsTicker && null == wssTicker) {
                     continue;
                 }
@@ -172,7 +164,7 @@ public class GrabBb3rdDataTask {
 
                 BigDecimal avgLastPrice = httpLast.add(wssLast).divide(new BigDecimal(2), 4, RoundingMode.DOWN);
                 logger.info("{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
-                String key = "bb:" + hashKey + "lastPrice";
+                String key = "bb:lastPrice:" + bbSymbol.getAsset()+":"+bbSymbol.getSymbol() ;
                 HashMap<String, BigDecimal> map = new HashMap<>();
                 map.put(hashKey, avgLastPrice);
                 metadataDb5RedisUtil.hmset(key, map);

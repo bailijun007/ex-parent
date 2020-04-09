@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 /**
  * @author BaiLiJun  on 2020/4/7
  */
-public class Ticker implements Serializable {
+public class ZbTickerData implements Serializable {
     //最高价
     private BigDecimal high;
     //成交量(最近的24小时)
@@ -20,12 +20,12 @@ public class Ticker implements Serializable {
     //卖一价
     private BigDecimal sell;
 
-    public Ticker() {
+    public ZbTickerData() {
     }
 
     @Override
     public String toString() {
-        return "Ticker{" +
+        return "ZbTickerData{" +
                 "high=" + high +
                 ", vol=" + vol +
                 ", last=" + last +
