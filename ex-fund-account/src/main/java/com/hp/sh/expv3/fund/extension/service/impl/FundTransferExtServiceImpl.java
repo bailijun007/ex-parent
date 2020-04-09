@@ -64,7 +64,7 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
                 Optional<FundTransferExtVo> vo = Optional.ofNullable(transferExtVo);
                 transferExtVo.setCtime(vo.map(t -> t.getCreated()).orElse(null));
                 //状态(15=>成功，16=>失败)
-                transferExtVo.setStatus(transferExtVo.getStatus() == 15 ? 1 : 2);
+                transferExtVo.setStatus(transferExtVo.getStatus() == FundTransferStatus.STATUS_SUCCESS ? 1 : 2);
             }
         }
 
