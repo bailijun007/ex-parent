@@ -58,23 +58,12 @@ public class WsClient extends WebSocketListener {
     @Override
     public void onOpen(WebSocket webSocket, Response response) {
         logger.debug("open={}", webSocket);
-//		this.ws.send("{'event':'addChannel', 'channel':'ltcbtc_ticker',}");
     }
 
     @Override
     public void onMessage(WebSocket webSocket, String text) {
         logger.info("text={}", text);
         ZbResponseEntity tickerData = JSON.parseObject(text, ZbResponseEntity.class);
-//   String key = "zb:wss:";
-//        Map<String, ZbTickerData> map = new HashMap<>();
-// map.put(key, tickerData.getTicker());
-//        if (tickerData.getChannel().equals("btcusdt_ticker")) {
-//            key += tickerData.getChannel().split("_")[0];
-//            logger.info("key={}", key);
-//             RedisUtil redisUtil = grabBb3rdDataTask.getRedisUtil();
-//            redisUtil.hmset(key,map);
-//            metadataRedisUtil.hmset(key,map);
-//    }
         queue.add(tickerData);
 
     }
