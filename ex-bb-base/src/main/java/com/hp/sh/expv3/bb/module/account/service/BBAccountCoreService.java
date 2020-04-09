@@ -237,6 +237,7 @@ public class BBAccountCoreService{
 			account.setTotal(BigDecimal.ZERO);
 			account.setUserId(userId);
 			account.setVersion(0L);
+			account.setCreated(-1L);
 		}
 		return account;
 	}
@@ -251,7 +252,7 @@ public class BBAccountCoreService{
 		account.setTotal(account.getBalance().add(account.getFrozen()));
 		account.setModified(now);
 		
-		if(account.getCreated()==null){
+		if(account.getCreated() == -1L){
 			account.setCreated(now);
 			this.accountDAO.save(account);
 		}else{
