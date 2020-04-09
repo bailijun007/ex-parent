@@ -3,6 +3,8 @@ package com.hp.sh.expv3.config.db;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,11 @@ public class SnGenerator {
 	private final Map<Class, SnowflakeSn> idWorkerMap = new HashMap<Class, SnowflakeSn>();
 	
 	public SnGenerator() {
+		
+	}
+	
+	@PostConstruct
+	public void setIdWorker(){
 		idWorkerMap.put(BBAccountRecord.class, new SnowflakeSn(dataCenterId, serverId));
 	}
 
