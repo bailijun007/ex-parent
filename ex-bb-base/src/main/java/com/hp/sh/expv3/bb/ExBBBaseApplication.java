@@ -31,7 +31,7 @@ public class ExBBBaseApplication {
 		try{
 			logger.warn("{}",ExCommonError.REQUIRE_POSITIVE.getMessage());
 		}catch(Exception e){
-			logger.equals(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		return null;
 	}
