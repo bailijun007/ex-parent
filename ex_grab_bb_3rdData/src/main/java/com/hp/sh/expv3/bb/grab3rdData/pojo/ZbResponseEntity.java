@@ -5,18 +5,18 @@ import java.io.Serializable;
 /**
  * @author BaiLiJun  on 2020/4/7
  */
-public class TickerData implements Serializable {
+public class ZbResponseEntity implements Serializable {
     private Long date;
     private String dataType;
     private String channel;
-    private Ticker ticker;
+    private ZbTickerData ticker;
 
-    public TickerData() {
+    public ZbResponseEntity() {
     }
 
     @Override
     public String toString() {
-        return "TickerData{" +
+        return "ZbResponseEntity{" +
                 "date=" + date +
                 ", dataType='" + dataType + '\'' +
                 ", channel='" + channel + '\'' +
@@ -48,11 +48,11 @@ public class TickerData implements Serializable {
         this.channel = channel;
     }
 
-    public Ticker getTicker() {
+    public ZbTickerData getTicker() {
         return ticker;
     }
 
-    public void setTicker(Ticker ticker) {
+    public void setTicker(ZbTickerData ticker) {
         this.ticker = ticker;
     }
 }
