@@ -95,11 +95,8 @@ public class BBAccountCoreService{
 		//保存总账
 		BBAccount account = this.getAccount(record.getUserId(), record.getAsset());
 		account.setBalance(account.getBalance().add(record.getAmount()));
-		this.updateAccount(account, request);
+		this.updateAccount(account, record);
 		
-		//保存本笔明细
-		this.saveRecord(record, account);
-	
 		return InvokeResult.SUCCESS;
 	}
 	
@@ -121,11 +118,8 @@ public class BBAccountCoreService{
 		//保存总账
 		BBAccount account = this.getAccount(record.getUserId(), record.getAsset());
 		account.setBalance(account.getBalance().subtract(record.getAmount()));
-		this.updateAccount(account, request);
+		this.updateAccount(account, record);
 		
-		//保存本笔明细
-		this.saveRecord(record, account);
-	
 		return InvokeResult.SUCCESS;
 	}
 
@@ -152,11 +146,8 @@ public class BBAccountCoreService{
 		BBAccount account = this.getAccount(record.getUserId(), record.getAsset());
 		account.setBalance(account.getBalance().subtract(record.getAmount()));
 		account.setFrozen(account.getFrozen().add(record.getAmount()));
-		this.updateAccount(account, request);
+		this.updateAccount(account, record);
 		
-		//保存本笔明细
-		this.saveRecord(record, account);
-	
 		return InvokeResult.SUCCESS;
 	}
 	
@@ -182,11 +173,8 @@ public class BBAccountCoreService{
 		BBAccount account = this.getAccount(record.getUserId(), record.getAsset());
 		account.setBalance(account.getBalance().add(record.getAmount()));
 		account.setFrozen(account.getFrozen().subtract(record.getAmount()));
-		this.updateAccount(account, request);
+		this.updateAccount(account, record);
 		
-		//保存本笔明细
-		this.saveRecord(record, account);
-	
 		return InvokeResult.SUCCESS;
 	}
 	
@@ -211,11 +199,8 @@ public class BBAccountCoreService{
 		//保存总账
 		BBAccount account = this.getAccount(record.getUserId(), record.getAsset());
 		account.setFrozen(account.getFrozen().subtract(record.getAmount()));
-		this.updateAccount(account, request);
+		this.updateAccount(account, record);
 		
-		//保存本笔明细
-		this.saveRecord(record, account);
-	
 		return InvokeResult.SUCCESS;
 	}
 	
@@ -242,10 +227,17 @@ public class BBAccountCoreService{
 		return account;
 	}
 	
-	private void updateAccount(BBAccount account, FundRequest request){
+	private void updateAccount(BBAccount account, BBAccountRecord record){
 		Long now = DbDateUtils.now();
 		
-		this.checkBalance(account, request);
+		//检查冻结
+		if(account.getFrozen().compareTo(BigDecimal.ZERO) < 0){
+			account.setFrozen(BigDecimal.ZERO);
+			record.setRemark(record.getRemark()+"!!超过了冻结总额");
+			logger.error("超过了冻结总额：{}", record.getTradeNo());
+		}
+		
+		this.checkBalance(account, record);
 		
 		account.setTotal(account.getBalance().add(account.getFrozen()));
 		account.setModified(now);
@@ -259,6 +251,10 @@ public class BBAccountCoreService{
 				throw new UpdateException("更新失败");
 			}
 		}
+		
+		//保存本笔明细
+		this.saveRecord(record, account);
+		
 	}
 	
 	private void saveRecord(BBAccountRecord record, BBAccount account){
@@ -277,14 +273,14 @@ public class BBAccountCoreService{
 		publisher.publishEvent(record);
 	}
 	
-	private void checkBalance(BBAccount account, FundRequest request){
+	private void checkBalance(BBAccount account, BBAccountRecord record){
 		//检查余额
 		if(account.getBalance().compareTo(BigDecimal.ZERO) < 0){
-			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, "balance", request, account);
+			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, "balance", record);
 		}
 		//检查冻结
 		if(account.getFrozen().compareTo(BigDecimal.ZERO) < 0){
-			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, "frozen", request, account);
+			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, "frozen", record);
 		}
 	}
 	

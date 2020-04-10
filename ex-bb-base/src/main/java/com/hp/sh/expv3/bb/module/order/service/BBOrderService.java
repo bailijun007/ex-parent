@@ -99,16 +99,18 @@ public class BBOrderService {
 		////////其他字段，后面随状态修改////////
 		this.setOther(order);
 		
+		this.checOrderMargin(order);
+		
 		this.orderUpdateService.saveOrder(order);
 		
 		//押金
 		BBSymbol bs = new BBSymbol(symbol, bidFlag);
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
 			String remark = BigFormat.format("买,押金=%s%s，手续费=%s%s", order.getOrderMargin(), bs.getMarginCurrency(), order.getFee(), asset);
-			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getGrossMargin(), BBAccountTradeType.ORDER_BUY, remark);
+			this.freezeMargin(userId, bs.getMarginCurrency(), order.getId(), order.getGrossMargin(), BBAccountTradeType.ORDER_BUY, remark);
 		}else{
 			String remark = BigFormat.format("卖,押金=%s%s，手续费=%s%s", order.getVolume(), bs.getMarginCurrency(), "无", "");
-			this.cutMargin(userId, bs.getMarginCurrency(), order.getId(), order.getVolume(), BBAccountTradeType.ORDER_SELL, remark);
+			this.freezeMargin(userId, bs.getMarginCurrency(), order.getId(), order.getVolume(), BBAccountTradeType.ORDER_SELL, remark);
 		}
 		
 		return order;
@@ -137,7 +139,7 @@ public class BBOrderService {
 		bBOrder.setCancelVolume(BigDecimal.ZERO);
 	}
 	
-	private void cutMargin(Long userId, String asset, Long orderId, BigDecimal amount , int tradeType, String remark){
+	private void freezeMargin(Long userId, String asset, Long orderId, BigDecimal amount , int tradeType, String remark){
 		FreezeRequest request = new FreezeRequest();
 		request.setAmount(amount);
 		request.setAsset(asset);
@@ -246,9 +248,10 @@ public class BBOrderService {
 
 		BigDecimal remaining = order.getVolume().subtract(order.getFilledVolume());
 		
+		this.checOrderMargin(order);
+		
 		//退押金
-		BBSymbol bs = new BBSymbol(symbol, order.getBidFlag());
-		int result = this.returnCancelAmt(userId, bs.getMarginCurrency(), orderId, order.getOrderMargin(), order.getFee(), remaining);
+		int result = this.returnCancelAmt(userId, order.getOrderMarginCurrency(), orderId, order.getOrderMargin(), order.getFee(), remaining);
 		if(result==InvokeResult.NOCHANGE){
 			//利用合约账户的幂等性实现本方法的幂等性
 			logger.warn("已经执行过了");
@@ -265,6 +268,19 @@ public class BBOrderService {
 		this.orderUpdateService.updateOrder(order, now);
 		
 		return;
+	}
+
+	private void checOrderMargin(BBOrder order) {
+		if(order.getBidFlag()==0){
+			if(order.getOrderMarginCurrency().equals("USDT")){
+				logger.error("押金类型错误:{}", order.getId());
+				throw new RuntimeException("押金类型错误:"+order.getId());
+			}
+			if(BigUtils.gtZero(order.getFee())){
+				logger.error("保证金大于0:{}", order.getId());
+				throw new RuntimeException("保证金大于0："+order.getId());
+			}
+		}
 	}
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
