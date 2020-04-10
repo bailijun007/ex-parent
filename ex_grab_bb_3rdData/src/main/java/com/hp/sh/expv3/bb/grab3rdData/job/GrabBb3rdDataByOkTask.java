@@ -1,7 +1,7 @@
 package com.hp.sh.expv3.bb.grab3rdData.job;
 
 import com.alibaba.fastjson.JSON;
-import com.hp.sh.expv3.bb.grab3rdData.component.WsClient;
+import com.hp.sh.expv3.bb.grab3rdData.component.ZbWsClient;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.OkResponseEntity;
 import com.hp.sh.expv3.bb.grab3rdData.service.SupportBbGroupIdsJobService;
@@ -15,16 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -32,7 +27,7 @@ import java.util.concurrent.*;
  */
 @Component
 public class GrabBb3rdDataByOkTask {
-    private static final Logger logger = LoggerFactory.getLogger(WsClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(ZbWsClient.class);
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             1,

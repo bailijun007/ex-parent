@@ -1,32 +1,28 @@
 package com.hp.sh.expv3.bb.grab3rdData.component;
 
+import com.alibaba.fastjson.JSON;
+import com.hp.sh.expv3.bb.grab3rdData.pojo.BinanceResponseEntity;
+import com.hp.sh.expv3.bb.grab3rdData.pojo.ZbResponseEntity;
+import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.alibaba.fastjson.JSON;
-import com.hp.sh.expv3.bb.grab3rdData.pojo.ZbResponseEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
-import org.springframework.util.CollectionUtils;
+public class BinanceWsClient extends WebSocketListener {
+    private static final Logger logger = LoggerFactory.getLogger(BinanceWsClient.class);
 
-
-public class WsClient extends WebSocketListener {
-    private static final Logger logger = LoggerFactory.getLogger(WsClient.class);
-
-    private String wsurl = "wss://api.zb.live/websocket";
+    private String wsurl;
 
     private WebSocket ws;
 
-    public static BlockingQueue<ZbResponseEntity> queue = new ArrayBlockingQueue<>(10000000);
+    public static BlockingQueue<BinanceResponseEntity> queue = new ArrayBlockingQueue<BinanceResponseEntity>(10000000);
 
-    public WsClient(String wsurl) {
+    public BinanceWsClient(String wsurl) {
         this.wsurl = wsurl;
     }
 
@@ -63,9 +59,9 @@ public class WsClient extends WebSocketListener {
     @Override
     public void onMessage(WebSocket webSocket, String text) {
         logger.info("text={}", text);
-        ZbResponseEntity tickerData = JSON.parseObject(text, ZbResponseEntity.class);
-        queue.add(tickerData);
 
+        BinanceResponseEntity tickerData = JSON.parseObject(text, BinanceResponseEntity.class);
+        queue.add(tickerData);
     }
 
     @Override
@@ -83,7 +79,7 @@ public class WsClient extends WebSocketListener {
         System.out.println("onClosed");
     }
 
-    public static BlockingQueue<ZbResponseEntity> getBlockingQueue() {
+    public static BlockingQueue<BinanceResponseEntity> getBlockingQueue() {
         if (CollectionUtils.isEmpty(queue)) {
             return null;
         }
