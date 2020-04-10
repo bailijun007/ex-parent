@@ -84,7 +84,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			try{
 				fundServiceContext.cutSrcFund(record);
 			}catch(Exception e){
-				logger.error("处理转账失败", e);
+				logger.error("处理转账失败，{}", e.toString(), e);
 				this.fundTransferCoreService.changeStatus(record, FundTransferStatus.STATUS_FAIL, record.getStatus()+":"+e.getMessage());
 				return;
 			}

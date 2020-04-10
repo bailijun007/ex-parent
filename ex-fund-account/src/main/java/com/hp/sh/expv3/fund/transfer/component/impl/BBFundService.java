@@ -55,6 +55,7 @@ public class BBFundService implements FundService{
 			throw new RuntimeException();
 		}
 		request.setUserId(record.getUserId());
+		request.setAssociatedId(record.getId());
 		bbAccountCoreApi.cut(request);
 	}
 

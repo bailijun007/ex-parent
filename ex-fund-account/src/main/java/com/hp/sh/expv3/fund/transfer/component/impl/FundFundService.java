@@ -29,6 +29,7 @@ public class FundFundService implements FundService{
 		request.setTradeNo(record.getSn());
 		request.setTradeType(TradeType.TRANSFER_IN);
 		request.setUserId(record.getUserId());
+		request.setAssociatedId(record.getId());
 		fundAccountCoreApi.add(request);
 	}
 
@@ -41,6 +42,7 @@ public class FundFundService implements FundService{
 		request.setTradeNo(record.getSn());
 		request.setTradeType(TradeType.TRANSFER_OUT);
 		request.setUserId(record.getUserId());
+		request.setAssociatedId(record.getId());
 		fundAccountCoreApi.cut(request);
 	}
 

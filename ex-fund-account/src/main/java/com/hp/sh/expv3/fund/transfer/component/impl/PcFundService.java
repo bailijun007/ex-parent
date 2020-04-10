@@ -42,6 +42,7 @@ public class PcFundService implements FundService{
 		request.setTradeNo(record.getSn());
 		request.setTradeType(PcAccountTradeType.PC_TO_FUND);
 		request.setUserId(record.getUserId());
+		request.setAssociatedId(record.getId());
 		pcAccountCoreApi.cut(request);
 	}
 
