@@ -164,7 +164,7 @@ public class GrabBb3rdDataByZbTask {
 
                 BigDecimal avgLastPrice = httpLast.add(wssLast).divide(new BigDecimal(2), 4, RoundingMode.DOWN);
                 logger.info("{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
-                String key = "bb:lastPrice:" + bbSymbol.getAsset()+":"+bbSymbol.getSymbol() ;
+                String key = "ticker:bb:lastPrice:" + bbSymbol.getAsset()+":"+bbSymbol.getSymbol() ;
                 HashMap<String, BigDecimal> map = new HashMap<>();
                 map.put(hashKey, avgLastPrice);
                 metadataDb5RedisUtil.hmset(key, map);
