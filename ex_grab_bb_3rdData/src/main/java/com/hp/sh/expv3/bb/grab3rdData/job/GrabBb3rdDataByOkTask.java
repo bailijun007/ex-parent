@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,8 @@ public class GrabBb3rdDataByOkTask {
     @Value("${ok.https.url}")
     private String okHttpsUrl;
 
+    @Value("${grab.bb.3rdDataByOkHttps.enable}")
+    private Integer enableByHttps;
 
     @Value("${ok.https.redisKey.prefix}")
     private String okHttpsRedisKey;
@@ -69,31 +72,42 @@ public class GrabBb3rdDataByOkTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-    @Scheduled(cron = "*/1 * * * * *")
+    //    @Scheduled(cron = "*/1 * * * * *")
+    @PostConstruct
     public void startGrabBb3rdDataByOkHttps() {
-        List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-        if (!CollectionUtils.isEmpty(bbSymbolList)) {
-            for (BBSymbol bbSymbol : bbSymbolList) {
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().get().url(okHttpsUrl).build();
-                Call call = client.newCall(request);
-                try {
-                    Response response = call.execute();
-                    String string = response.body().string();
-                    List<OkResponseEntity> list = JSON.parseArray(string, OkResponseEntity.class);
-                    String symbol =  bbSymbol.getSymbol().split("_")[0]+"-"+bbSymbol.getSymbol().split("_")[1];
-                    for (OkResponseEntity okResponseEntity : list) {
-                        if (okResponseEntity.getProduct_id().equals(symbol)) {
-                            String key = okHttpsRedisKey + symbol;
-                            logger.info("okHttpsRedisKey={}", key);
-                            metadataDb5RedisUtil.set(key, okResponseEntity, 60);
+        if (enableByHttps != 1) {
+            return;
+        }
+        threadPool.execute(() -> {
+            while (true) {
+                List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+                if (!CollectionUtils.isEmpty(bbSymbolList)) {
+                    for (BBSymbol bbSymbol : bbSymbolList) {
+                        OkHttpClient client = new OkHttpClient();
+                        Request request = new Request.Builder().get().url(okHttpsUrl).build();
+                        Call call = client.newCall(request);
+                        try {
+                            Response response = call.execute();
+                            String string = response.body().string();
+                            List<OkResponseEntity> list = JSON.parseArray(string, OkResponseEntity.class);
+                            String symbol = bbSymbol.getSymbol().split("_")[0] + "-" + bbSymbol.getSymbol().split("_")[1];
+                            for (OkResponseEntity okResponseEntity : list) {
+                                String okSymbol = okResponseEntity.getProduct_id();
+                                if (okSymbol.equals(symbol)) {
+                                    String key = okHttpsRedisKey + okSymbol;
+                                    logger.info("okHttpsRedisKey={}", key);
+                                    metadataDb5RedisUtil.set(key, okResponseEntity, 60);
+                                }
+                            }
+                            TimeUnit.SECONDS.sleep(1);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
-        }
+        });
+
     }
 
 
