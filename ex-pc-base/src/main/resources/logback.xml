@@ -3,7 +3,6 @@
 <configuration scan="false">
     <property name="maxHistory" value="60"/>
     
-    <property name="serverId" value="${app.server.id:-0}"></property>
     <property name="log_dir" value="${app.log.home:-/data/hupa/logs/pc0}"></property>
 
     <!-- ConsoleAppender 控制台输出日志 -->
