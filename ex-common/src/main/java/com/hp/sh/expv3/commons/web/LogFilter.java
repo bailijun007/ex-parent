@@ -11,6 +11,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,13 +34,18 @@ public class LogFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		this.serverName = filterConfig.getInitParameter("serverName");
+		if(filterConfig.getInitParameter("serverName")!=null){
+			this.serverName = filterConfig.getInitParameter("serverName");
+		}
 	}
 
-	@Override
+	@Override 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest httpReq = (HttpServletRequest)request;
+		HttpServletResponse httpResp = (HttpServletResponse)response;
 //		httpReq = new MyCachedServletRequest(httpReq);
+		httpResp.addHeader("X-w", serverName);
+		httpResp.addHeader("w", serverName);
 		
 		String requestId = this.getRequestId(httpReq);
 		if(StringUtils.isNotBlank(requestId)){

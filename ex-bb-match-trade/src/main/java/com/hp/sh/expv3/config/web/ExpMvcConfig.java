@@ -53,7 +53,7 @@ public class ExpMvcConfig implements WebMvcConfigurer {
     public FilterRegistrationBean<LogFilter> myLogFilter(){
         FilterRegistrationBean<LogFilter> bean = new FilterRegistrationBean<LogFilter>();
         bean.setFilter(new LogFilter(appName));
-        bean.addUrlPatterns("/api/**");
+        bean.addUrlPatterns("/api/*");
         return bean;
     }
 }

@@ -29,6 +29,9 @@ public class ExpMvcConfig implements WebMvcConfigurer {
 	
 	@Value("${spring.application.name}")
 	private String appName;
+	
+	@Value("${app.server.id:99}")
+	private Integer serverId;
 
 	// 添加拦截器
 	public void addInterceptors(InterceptorRegistry registry) {
@@ -47,8 +50,8 @@ public class ExpMvcConfig implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean<LogFilter> myLogFilter(){
         FilterRegistrationBean<LogFilter> bean = new FilterRegistrationBean<LogFilter>();
-        bean.setFilter(new LogFilter(appName));
-        bean.addUrlPatterns("/api/**");
+        bean.setFilter(new LogFilter(appName+"-"+serverId));
+        bean.addUrlPatterns("/api/*");
         return bean;
     }
 

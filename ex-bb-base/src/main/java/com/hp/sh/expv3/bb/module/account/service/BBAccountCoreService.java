@@ -230,12 +230,12 @@ public class BBAccountCoreService{
 	private void updateAccount(BBAccount account, BBAccountRecord record){
 		Long now = DbDateUtils.now();
 		
-		//检查冻结
-		if(account.getFrozen().compareTo(BigDecimal.ZERO) < 0){
-			account.setFrozen(BigDecimal.ZERO);
-			record.setRemark(record.getRemark()+"!!超过了冻结总额");
-			logger.error("超过了冻结总额：{}", record.getTradeNo());
-		}
+		//错误数据补丁 : 检查冻结
+//		if(account.getFrozen().compareTo(BigDecimal.ZERO) < 0){
+//			account.setFrozen(BigDecimal.ZERO);
+//			record.setRemark(record.getRemark()+"!!超过了冻结总额");
+//			logger.error("超过了冻结总额：{}", record.getTradeNo());
+//		}
 		
 		this.checkBalance(account, record);
 		
@@ -323,25 +323,25 @@ public class BBAccountCoreService{
 
 	private void checkRequest(FundRequest request){
 		if(StringUtils.isBlank(request.getAsset())){
-			throw new ExException(ExCommonError.PARAM_EMPTY); 
+			throw new ExException(ExCommonError.PARAM_EMPTY, request); 
 		}
 		if(StringUtils.isBlank(request.getRemark())){
-			throw new ExException(ExCommonError.PARAM_EMPTY); 
+			throw new ExException(ExCommonError.PARAM_EMPTY, request); 
 		}
 		if(StringUtils.isBlank(request.getTradeNo())){
-			throw new ExException(ExCommonError.PARAM_EMPTY); 
+			throw new ExException(ExCommonError.PARAM_EMPTY, request); 
 		}
 		if(request.getAmount()==null){
-			throw new ExException(ExCommonError.PARAM_EMPTY); 
+			throw new ExException(ExCommonError.PARAM_EMPTY, request); 
 		}
 		if(request.getAssociatedId()==null){
-			throw new ExException(ExCommonError.PARAM_EMPTY); 
+			throw new ExException(ExCommonError.PARAM_EMPTY, request); 
 		}
 		if(request.getTradeType()==null){
-			throw new ExException(ExCommonError.PARAM_EMPTY); 
+			throw new ExException(ExCommonError.PARAM_EMPTY, request); 
 		}
 		if(request.getUserId()==null){
-			throw new ExException(ExCommonError.PARAM_EMPTY); 
+			throw new ExException(ExCommonError.PARAM_EMPTY, request); 
 		}
 		//金额必须是正数
 		if(request.getAmount().compareTo(BigDecimal.ZERO)<0){

@@ -21,7 +21,7 @@ public class ExException extends BizException {
 		super.setErrorData(errorData);
 	}
 	
-    public String getMessage() {
+    public String getExMessage() {
         return super.getMessage()+". "+Arrays.toString(getErrorData());
     }
 
