@@ -1,7 +1,6 @@
 package test;
 
 import com.hp.sh.expv3.bb.grab3rdData.component.WsClient;
-import com.hp.sh.expv3.bb.grab3rdData.util.HttpReqUtil;
 import okhttp3.*;
 
 import java.io.IOException;

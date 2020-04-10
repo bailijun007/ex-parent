@@ -70,6 +70,11 @@ public class GrabBb3rdDataByZbTask {
     @Qualifier("metadataDb5RedisUtil")
     private RedisUtil metadataDb5RedisUtil;
 
+    @Value("${grab.bb.3rdDataByZbWss.enable}")
+    private Integer enableByWss;
+
+    @Value("${grab.bb.3rdDataByZbHttps.enable}")
+    private Integer enableByHttps;
 
     @Autowired
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
@@ -77,6 +82,9 @@ public class GrabBb3rdDataByZbTask {
 
     @PostConstruct
     public void startGrabBb3rdDataByZbWss() {
+        if (enableByWss != 1) {
+            return;
+        }
         WsClient client = new WsClient(zbWssUrl);
         client.connect();
         Map data = new TreeMap();
@@ -113,6 +121,9 @@ public class GrabBb3rdDataByZbTask {
 
     @Scheduled(cron = "*/1 * * * * *")
     public void startGrabBb3rdDataByZbHttps() {
+        if (enableByHttps != 1) {
+            return;
+        }
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
@@ -164,7 +175,7 @@ public class GrabBb3rdDataByZbTask {
 
                 BigDecimal avgLastPrice = httpLast.add(wssLast).divide(new BigDecimal(2), 4, RoundingMode.DOWN);
                 logger.info("{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
-                String key = "bb:lastPrice:" + bbSymbol.getAsset()+":"+bbSymbol.getSymbol() ;
+                String key = "ticker:bb:lastPrice:" + bbSymbol.getAsset() + ":" + bbSymbol.getSymbol();
                 HashMap<String, BigDecimal> map = new HashMap<>();
                 map.put(hashKey, avgLastPrice);
                 metadataDb5RedisUtil.hmset(key, map);
