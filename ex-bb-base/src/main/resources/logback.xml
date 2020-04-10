@@ -127,6 +127,28 @@
 		</encoder>
     </appender>
     
+    <!-- INFO级别日志 appender -->
+    <appender name="SP" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器，只记录INFO级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <file>${log_dir}/sp-log.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 按天回滚 daily -->
+            <fileNamePattern>${log_dir}/sp/sp-log-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <!-- 日志最大的历史 60天 -->
+            <maxHistory>${maxHistory}</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- 设置文件大于1KB进行压缩归档 -->
+                <maxFileSize>256MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+		<encoder>
+			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
+		</encoder>
+    </appender>
+    
     <!-- 
     <logger name="com.hp.sh.expv3.bb.mq" level="info" additivity="false">
         <appender-ref ref="mq"/>
@@ -162,6 +184,11 @@
 	        <appender-ref ref="INFO"/>
         </root>
         
+        <logger name="com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService" level="info">
+        	<appender-ref ref="INFO"/>
+        	 <appender-ref ref="SP"/>
+        </logger>
+        
 		<logger name="com.hp.sh.expv3" level="debug"></logger>
 		<logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
         
@@ -174,6 +201,10 @@
 	        <!-- 文件输出 -->
 	        <appender-ref ref="ERROR"/>
         </root>
+        
+        <logger name="com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService" level="info">
+        	 <appender-ref ref="SP"/>
+        </logger>
         
 		<logger name="com.hp.sh.expv3" level="debug"></logger>
 		<logger name="com.gitee.hupadev.base.spring.interceptor" level="info"></logger>
