@@ -1,6 +1,5 @@
 package test;
 
-import com.hp.sh.expv3.bb.grab3rdData.component.WsClient;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -10,7 +9,7 @@ public class ClientTest {
 	static final String url = "wss://api.zb.live/websocket";
 
 	public static void main(String[] args) throws InterruptedException {
-//		WsClient client = new WsClient(url);
+//		ZbWsClient client = new ZbWsClient(url);
 //		client.connect();
 //
 //		Thread.sleep(3000);

@@ -2,7 +2,7 @@ package com.hp.sh.expv3.bb.grab3rdData.job;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.hp.sh.expv3.bb.grab3rdData.component.WsClient;
+import com.hp.sh.expv3.bb.grab3rdData.component.ZbWsClient;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.ZbTickerData;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.ZbResponseEntity;
@@ -85,7 +85,7 @@ public class GrabBb3rdDataByZbTask {
         if (enableByWss != 1) {
             return;
         }
-        WsClient client = new WsClient(zbWssUrl);
+        ZbWsClient client = new ZbWsClient(zbWssUrl);
         client.connect();
         Map data = new TreeMap();
         data.put("event", "addChannel");
@@ -102,7 +102,7 @@ public class GrabBb3rdDataByZbTask {
 
         threadPool.execute(() -> {
             while (true) {
-                BlockingQueue<ZbResponseEntity> queue = WsClient.getBlockingQueue();
+                BlockingQueue<ZbResponseEntity> queue = ZbWsClient.getBlockingQueue();
                 if (CollectionUtils.isEmpty(queue)) {
                     continue;
                 }
