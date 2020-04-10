@@ -142,6 +142,7 @@ public class BBAccountCoreService{
 			logger.warn("重复的请求！");
 			return InvokeResult.NOCHANGE;
 		}
+		
 		//保存总账
 		BBAccount account = this.getAccount(record.getUserId(), record.getAsset());
 		account.setBalance(account.getBalance().subtract(record.getAmount()));
@@ -229,14 +230,7 @@ public class BBAccountCoreService{
 	
 	private void updateAccount(BBAccount account, BBAccountRecord record){
 		Long now = DbDateUtils.now();
-		
-		//错误数据补丁 : 检查冻结
-//		if(account.getFrozen().compareTo(BigDecimal.ZERO) < 0){
-//			account.setFrozen(BigDecimal.ZERO);
-//			record.setRemark(record.getRemark()+"!!超过了冻结总额");
-//			logger.error("超过了冻结总额：{}", record.getTradeNo());
-//		}
-		
+
 		this.checkBalance(account, record);
 		
 		account.setTotal(account.getBalance().add(account.getFrozen()));
@@ -280,6 +274,7 @@ public class BBAccountCoreService{
 		}
 		//检查冻结
 		if(account.getFrozen().compareTo(BigDecimal.ZERO) < 0){
+			logger.error("冻结金额小于0：{}", record);
 			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, "frozen", record);
 		}
 	}

@@ -30,7 +30,7 @@ public class FundRequest {
 	@ApiModelProperty(value = "调用方支付单号")
 	private String tradeNo;
 	
-	@ApiModelProperty(value = "关联对象ID")
+	@ApiModelProperty(value = "关联对象ID", hidden=true)
 	private Long associatedId;
 		
 	public FundRequest() {
