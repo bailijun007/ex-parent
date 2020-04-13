@@ -162,7 +162,7 @@ public class BBAccountCoreService{
 		this.checkRequest(request);
 		
 		BBAccountRecord record = this.req2record(request);
-		record.setType(BBAccountRecordType.FROZEN);
+		record.setType(BBAccountRecordType.UNFROZEN);
 		
 		//检查重复
 		if(this.checkExist(record)){
@@ -189,7 +189,7 @@ public class BBAccountCoreService{
 		this.checkRequest(request);
 		
 		BBAccountRecord record = this.req2record(request);
-		record.setType(BBAccountRecordType.FROZEN);
+		record.setType(BBAccountRecordType.RELEASE);
 		
 		//检查重复
 		if(this.checkExist(record)){

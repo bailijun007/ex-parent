@@ -23,12 +23,12 @@ public class BBAccountTradeType {
 	
 	public static final int RETURN_ORDER_MARGIN = 8;	//+退回多收的手续费 taker fee - maker fee
 	
-	public static final int TRADE_BUY_IN = 9;			//买入成交获得资产
+	public static final int TRADE_BUY_IN = 9;			//+买入成交获得资产(BTC)
 
-	public static final int TRADE_BUY_RELEASE = 10;		//买入成交释放冻结押金
+	public static final int TRADE_BUY_RELEASE = 10;		//-买入成交释放冻结押金(USDT)
 	
-	public static final int TRADE_SELL_INCOME = 11;		//卖出收入结算货币
+	public static final int TRADE_SELL_INCOME = 11;		//+卖出收入结算货币(USDT)
 	
-	public static final int TRADE_SELL_RELEASE = 12;	//卖出成交释放冻结资产
+	public static final int TRADE_SELL_RELEASE = 12;	//-卖出成交释放冻结资产(BTC)
 
 }
