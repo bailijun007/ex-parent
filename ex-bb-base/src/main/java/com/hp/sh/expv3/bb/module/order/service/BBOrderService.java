@@ -195,14 +195,13 @@ public class BBOrderService {
 		}
 		
 		if(order.getStatus()==OrderStatus.PENDING_CANCEL){
-			if(now - order.getModified() > 1000*30){
+			if(now - order.getModified() > 1000*10){
 				return true;
 			}else{
 				logger.warn("订单状态是PENDING_CANCEL,{}-{}", now, order.getModified());
 				return false;
 			}
 		}
-		
 		
 		orderUpdateService.setPendingCancel(OrderStatus.PENDING_CANCEL, now, orderId, userId, order.getVersion());
 		return true;

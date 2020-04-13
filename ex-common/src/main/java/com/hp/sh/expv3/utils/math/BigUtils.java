@@ -60,5 +60,18 @@ public class BigUtils {
 	public static boolean between(BigDecimal v, BigDecimal start, BigDecimal end){
 		return ge(v, start) && le(v, end);
 	}
+
+	public static boolean haveDecimalPart(BigDecimal num){
+		BigDecimal rem = num.divideAndRemainder(BigDecimal.ONE)[1];
+		return gtZero(rem);
+	}
+
+	public static BigDecimal getDecimalPart(BigDecimal num){
+		return num.divideAndRemainder(BigDecimal.ONE)[1];
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(getDecimalPart(new BigDecimal("123.456")));
+	}
 	
 }
