@@ -1,5 +1,7 @@
 package com.hp.sh.expv3.pc.grab3rdData.pojo;
 
+import io.lettuce.core.output.BooleanListOutput;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -14,18 +16,22 @@ public class BinanceResponseData implements Serializable {
     private Long E;
     // 交易对
     private String s;
-    // 最新成交价格
-    private BigDecimal c;
-    // 24小时前开始第一笔成交价格
-    private BigDecimal o;
-    // 24小时内最高成交价
-    private BigDecimal h;
-    // 24小时内最低成交加
-    private BigDecimal l;
-    //成交量
-    private BigDecimal v;
-    // 成交额
+    // 归集成交ID
+    private BigDecimal a;
+    // 成交价格
+    private BigDecimal p;
+    // 成交数量
     private BigDecimal q;
+    // 被归集的首个交易ID
+    private BigDecimal f;
+    // 被归集的末次交易ID
+    private BigDecimal l;
+    // 成交时间
+    private BigDecimal T;
+    // 买方是否是做市方。如true，则此次成交是一个主动卖出单，否则是一个主动买入单。
+    private Boolean m;
+
+    private Boolean M;
 
     public BinanceResponseData() {
     }
@@ -36,12 +42,14 @@ public class BinanceResponseData implements Serializable {
                 "e='" + e + '\'' +
                 ", E=" + E +
                 ", s='" + s + '\'' +
-                ", c=" + c +
-                ", o=" + o +
-                ", h=" + h +
-                ", l=" + l +
-                ", v=" + v +
+                ", a=" + a +
+                ", p=" + p +
                 ", q=" + q +
+                ", f=" + f +
+                ", l=" + l +
+                ", T=" + T +
+                ", m=" + m +
+                ", M=" + M +
                 '}';
     }
 
@@ -61,28 +69,36 @@ public class BinanceResponseData implements Serializable {
         this.s = s;
     }
 
-    public BigDecimal getC() {
-        return c;
+    public BigDecimal getA() {
+        return a;
     }
 
-    public void setC(BigDecimal c) {
-        this.c = c;
+    public void setA(BigDecimal a) {
+        this.a = a;
     }
 
-    public BigDecimal getO() {
-        return o;
+    public BigDecimal getP() {
+        return p;
     }
 
-    public void setO(BigDecimal o) {
-        this.o = o;
+    public void setP(BigDecimal p) {
+        this.p = p;
     }
 
-    public BigDecimal getH() {
-        return h;
+    public BigDecimal getQ() {
+        return q;
     }
 
-    public void setH(BigDecimal h) {
-        this.h = h;
+    public void setQ(BigDecimal q) {
+        this.q = q;
+    }
+
+    public BigDecimal getF() {
+        return f;
+    }
+
+    public void setF(BigDecimal f) {
+        this.f = f;
     }
 
     public BigDecimal getL() {
@@ -93,20 +109,20 @@ public class BinanceResponseData implements Serializable {
         this.l = l;
     }
 
-    public BigDecimal getV() {
-        return v;
+    public BigDecimal getT() {
+        return T;
     }
 
-    public void setV(BigDecimal v) {
-        this.v = v;
+    public void setT(BigDecimal t) {
+        T = t;
     }
 
-    public BigDecimal getQ() {
-        return q;
+    public Boolean getM() {
+        return m;
     }
 
-    public void setQ(BigDecimal q) {
-        this.q = q;
+    public void setM(Boolean m) {
+        this.m = m;
     }
 
     public void setE(String e) {

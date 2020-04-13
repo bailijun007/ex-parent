@@ -125,13 +125,13 @@ public class GrabBb3rdDataByZbTask {
             return;
         }
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
-                RestTemplate restTemplate = new RestTemplate();
                 String symbol = bbSymbol.getSymbol().toLowerCase();
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-                HttpEntity<String> entity = new HttpEntity<String>(headers);
                 String url = zbHttpsUrl + symbol;
                 logger.info("https url={}", url);
                 ResponseEntity<ZbResponseEntity> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, ZbResponseEntity.class);
@@ -146,9 +146,6 @@ public class GrabBb3rdDataByZbTask {
             }
         }
     }
-
-
-
 
 
 }

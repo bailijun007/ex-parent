@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import com.hp.sh.expv3.pc.grab3rdData.component.ZbWsClient;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.BBSymbol;
+import com.hp.sh.expv3.pc.grab3rdData.pojo.PcSymbol;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.ZbResponseEntity;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.ZbTickerData;
 import com.hp.sh.expv3.pc.grab3rdData.service.SupportBbGroupIdsJobService;
@@ -51,11 +52,6 @@ public class GrabPc3rdDataByZbTask {
     @Value("${zb.https.redisKey.prefix}")
     private String httpsRedisKey;
 
-    @Value("${bb.trade.symbols}")
-    private String symbols;
-
-    @Value("${bb.trade.bbGroupIds}")
-    private Integer bbGroupId;
 
     @Autowired
     @Qualifier("metadataRedisUtil")
@@ -65,82 +61,82 @@ public class GrabPc3rdDataByZbTask {
     @Qualifier("metadataDb5RedisUtil")
     private RedisUtil metadataDb5RedisUtil;
 
-    @Value("${grab.bb.3rdDataByZbWss.enable}")
+    @Value("${grab.pc.3rdDataByZbWss.enable}")
     private Integer enableByWss;
 
-    @Value("${grab.bb.3rdDataByZbHttps.enable}")
+    @Value("${grab.pc.3rdDataByZbHttps.enable}")
     private Integer enableByHttps;
 
     @Autowired
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-    @PostConstruct
-    public void startGrabBb3rdDataByZbWss() {
-        if (enableByWss != 1) {
-            return;
-        }
-        ZbWsClient client = new ZbWsClient(zbWssUrl);
-        client.connect();
-        Map data = new TreeMap();
-        data.put("event", "addChannel");
-        List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-        if (!CollectionUtils.isEmpty(bbSymbolList)) {
-            for (BBSymbol bbSymbol : bbSymbolList) {
-                String[] symbols = bbSymbol.getSymbol().toLowerCase().split("_");
-                String channel = symbols[0] + symbols[1] + "_ticker";
-                logger.info("channel={}", channel);
-                data.put("channel", channel);
-                client.send(JSONObject.toJSONString(data));
-            }
-        }
+//    @PostConstruct
+//    public void startGrabPc3rdDataByZbWss() {
+//        if (enableByWss != 1) {
+//            return;
+//        }
+//        ZbWsClient client = new ZbWsClient(zbWssUrl);
+//        client.connect();
+//        Map data = new TreeMap();
+//        data.put("event", "addChannel");
+//        List<PcSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+//        if (!CollectionUtils.isEmpty(bbSymbolList)) {
+//            for (PcSymbol pcSymbol : bbSymbolList) {
+//                String[] symbols = pcSymbol.getSymbol().toLowerCase().split("_");
+//                String channel = symbols[0] + symbols[1] + "_ticker";
+//                logger.info("channel={}", channel);
+//                data.put("channel", channel);
+//                client.send(JSONObject.toJSONString(data));
+//            }
+//        }
+//
+//        threadPool.execute(() -> {
+//            while (true) {
+//                BlockingQueue<ZbResponseEntity> queue = ZbWsClient.getBlockingQueue();
+//                if (CollectionUtils.isEmpty(queue)) {
+//                    continue;
+//                }
+//                ZbResponseEntity tickerData = queue.poll();
+//                String hashKey = tickerData.getChannel().split("_")[0];
+//                String key = wssRedisKey + hashKey;
+//                logger.info("wssKey={}", key);
+//                ZbTickerData ticker = tickerData.getTicker();
+//                if (null != ticker) {
+//                    metadataDb5RedisUtil.set(key, ticker, 60);
+//                }
+//            }
+//        });
+//    }
 
-        threadPool.execute(() -> {
-            while (true) {
-                BlockingQueue<ZbResponseEntity> queue = ZbWsClient.getBlockingQueue();
-                if (CollectionUtils.isEmpty(queue)) {
-                    continue;
-                }
-                ZbResponseEntity tickerData = queue.poll();
-                String hashKey = tickerData.getChannel().split("_")[0];
-                String key = wssRedisKey + hashKey;
-                logger.info("wssKey={}", key);
-                ZbTickerData ticker = tickerData.getTicker();
-                if (null != ticker) {
-                    metadataDb5RedisUtil.set(key, ticker, 60);
-                }
-            }
-        });
-    }
 
-
-    @Scheduled(cron = "*/1 * * * * *")
-    public void startGrabBb3rdDataByZbHttps() {
-        if (enableByHttps != 1) {
-            return;
-        }
-        List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-        if (!CollectionUtils.isEmpty(bbSymbolList)) {
-            for (BBSymbol bbSymbol : bbSymbolList) {
-                RestTemplate restTemplate = new RestTemplate();
-                String symbol = bbSymbol.getSymbol().toLowerCase();
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-                HttpEntity<String> entity = new HttpEntity<String>(headers);
-                String url = zbHttpsUrl + symbol;
-                logger.info("https url={}", url);
-                ResponseEntity<ZbResponseEntity> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, ZbResponseEntity.class);
-                ZbResponseEntity tickerData = responseEntity.getBody();
-                String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
-                String key = httpsRedisKey + hashKey;
-                logger.info("httpsKey={}", key);
-                ZbTickerData ticker = tickerData.getTicker();
-                if (null != ticker) {
-                    metadataDb5RedisUtil.set(key, ticker, 60);
-                }
-            }
-        }
-    }
+//    @Scheduled(cron = "*/1 * * * * *")
+//    public void startGrabPc3rdDataByZbHttps() {
+//        if (enableByHttps != 1) {
+//            return;
+//        }
+//        List<PcSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+//        if (!CollectionUtils.isEmpty(bbSymbolList)) {
+//            for (PcSymbol pcSymbol : bbSymbolList) {
+//                RestTemplate restTemplate = new RestTemplate();
+//                String symbol = pcSymbol.getSymbol().toLowerCase();
+//                HttpHeaders headers = new HttpHeaders();
+//                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+//                HttpEntity<String> entity = new HttpEntity<String>(headers);
+//                String url = zbHttpsUrl + symbol;
+//                logger.info("https url={}", url);
+//                ResponseEntity<ZbResponseEntity> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, ZbResponseEntity.class);
+//                ZbResponseEntity tickerData = responseEntity.getBody();
+//                String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
+//                String key = httpsRedisKey + hashKey;
+//                logger.info("httpsKey={}", key);
+//                ZbTickerData ticker = tickerData.getTicker();
+//                if (null != ticker) {
+//                    metadataDb5RedisUtil.set(key, ticker, 60);
+//                }
+//            }
+//        }
+//    }
 
 
 

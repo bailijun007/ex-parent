@@ -5,6 +5,7 @@ import com.hp.sh.expv3.pc.grab3rdData.component.BinanceWsClient;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.BBSymbol;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.BinanceResponseData;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.BinanceResponseEntity;
+import com.hp.sh.expv3.pc.grab3rdData.pojo.PcSymbol;
 import com.hp.sh.expv3.pc.grab3rdData.service.SupportBbGroupIdsJobService;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -19,6 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import com.hp.sh.expv3.config.redis.RedisUtil;
+
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
@@ -52,24 +54,15 @@ public class GrabPc3rdDataByBinanceTask {
     @Value("${binance.https.redisKey.prefix}")
     private String httpsRedisKey;
 
-    @Value("${bb.trade.symbols}")
-    private String symbols;
-
-    @Value("${bb.trade.bbGroupIds}")
-    private Integer bbGroupId;
-
-    @Autowired
-    @Qualifier("metadataRedisUtil")
-    private RedisUtil metadataRedisUtil;
 
     @Autowired
     @Qualifier("metadataDb5RedisUtil")
     private RedisUtil metadataDb5RedisUtil;
 
-    @Value("${grab.bb.3rdDataByBinanceWss.enable}")
+    @Value("${grab.pc.3rdDataByBinanceWss.enable}")
     private Integer enableByWss;
 
-    @Value("${grab.bb.3rdDataByBinanceHttps.enable}")
+    @Value("${grab.pc.3rdDataByBinanceHttps.enable}")
     private Integer enableByHttps;
 
     @Autowired
@@ -77,12 +70,20 @@ public class GrabPc3rdDataByBinanceTask {
 
 
     @PostConstruct
-    public void startGrabBb3rdDataByZbWss() {
+    public void startGrabPc3rdDataByWss() {
         if (enableByWss != 1) {
             return;
         }
-        BinanceWsClient client = new BinanceWsClient(binanceWssUrl);
-        client.connect();
+        List<PcSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+        if (!CollectionUtils.isEmpty(bbSymbolList)) {
+            for (PcSymbol pcSymbol : bbSymbolList) {
+                String binanceSymbol = pcSymbol.getSymbol().split("_")[0].toLowerCase() + pcSymbol.getSymbol().split("_")[1].toLowerCase();
+                String url = binanceWssUrl + binanceSymbol + "@aggTrade";
+                logger.info("url ={}", url);
+                BinanceWsClient client = new BinanceWsClient(url);
+                client.connect();
+            }
+        }
 
         threadPool.execute(() -> {
             while (true) {
@@ -95,11 +96,11 @@ public class GrabPc3rdDataByBinanceTask {
                 if (CollectionUtils.isEmpty(list)) {
                     continue;
                 }
-                List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-                if (!CollectionUtils.isEmpty(bbSymbolList)) {
-                    for (BBSymbol bbSymbol : bbSymbolList) {
+                List<PcSymbol> bbSymbolLists = supportBbGroupIdsJobService.getSymbols();
+                if (!CollectionUtils.isEmpty(bbSymbolLists)) {
+                    for (PcSymbol pcSymbol : bbSymbolLists) {
                         for (BinanceResponseData responseData : list) {
-                            String expBbSymbol = bbSymbol.getSymbol().split("_")[0] + bbSymbol.getSymbol().split("_")[1];
+                            String expBbSymbol = pcSymbol.getSymbol().split("_")[0] + pcSymbol.getSymbol().split("_")[1];
                             String binanceBbSymbol = responseData.getS();
                             if (expBbSymbol.equals(binanceBbSymbol)) {
                                 String key = wssRedisKey + binanceBbSymbol;
@@ -114,39 +115,38 @@ public class GrabPc3rdDataByBinanceTask {
     }
 
 
-    @Scheduled(cron = "*/1 * * * * *")
-    public void startGrabBb3rdDataByZbHttps() {
-        if (enableByHttps != 1) {
-            return;
-        }
-        List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-        if (!CollectionUtils.isEmpty(bbSymbolList)) {
-            for (BBSymbol bbSymbol : bbSymbolList) {
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().get().url(binanceHttpsUrl).build();
-                Call call = client.newCall(request);
-                try {
-                    Response response = call.execute();
-                    String string = response.body().string();
-                    String expymbol = bbSymbol.getSymbol().split("_")[0] + bbSymbol.getSymbol().split("_")[1];
-                    final List<Map> list = JSON.parseArray(string, Map.class);
-                    for (Map map : list) {
-                        String binanceSymbol = (String) map.get("symbol");
-                        if (expymbol.equals(binanceSymbol)) {
-                            String key = httpsRedisKey + binanceSymbol;
-                            logger.info("binance httpsRedisKey={}", key);
-                            metadataDb5RedisUtil.set(key, JSON.toJSONString(map), 60);
-                        }
-                    }
-                } catch (Exception e) {
-//                    e.printStackTrace();
-                    continue;
-                }
-            }
-        }
 
-
-    }
+//    @Scheduled(cron = "*/1 * * * * *")
+//    public void startGrabPc3rdDataByHttps() {
+//        if (enableByHttps != 1) {
+//            return;
+//        }
+//        List<PcSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+//        if (!CollectionUtils.isEmpty(bbSymbolList)) {
+//            for (PcSymbol pcSymbol : bbSymbolList) {
+//                OkHttpClient client = new OkHttpClient();
+//                Request request = new Request.Builder().get().url(binanceHttpsUrl).build();
+//                Call call = client.newCall(request);
+//                try {
+//                    Response response = call.execute();
+//                    String string = response.body().string();
+//                    String expymbol = pcSymbol.getSymbol().split("_")[0] + pcSymbol.getSymbol().split("_")[1];
+//                    final List<Map> list = JSON.parseArray(string, Map.class);
+//                    for (Map map : list) {
+//                        String binanceSymbol = (String) map.get("symbol");
+//                        if (expymbol.equals(binanceSymbol)) {
+//                            String key = httpsRedisKey + binanceSymbol;
+//                            logger.info("binance httpsRedisKey={}", key);
+//                            metadataDb5RedisUtil.set(key, JSON.toJSONString(map), 60);
+//                        }
+//                    }
+//                } catch (Exception e) {
+////                    e.printStackTrace();
+//                    continue;
+//                }
+//            }
+//        }
+//    }
 
 
 }

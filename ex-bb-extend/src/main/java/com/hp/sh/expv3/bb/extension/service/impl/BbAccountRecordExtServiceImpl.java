@@ -60,7 +60,11 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
             map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_TYPE);
             list = bbAccountRecordExtMapper.queryByLimit(map);
         } else {
-            map.put("tradeType", tradeType);
+            //10:买入，9：卖出
+            if(tradeType==10){
+
+            }
+            map.put("tradeTypes", tradeType);
             list = bbAccountRecordExtMapper.queryByLimit(map);
         }
         return list;

@@ -2,6 +2,7 @@ package com.hp.sh.expv3.pc.grab3rdData.service.impl;
 
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.BBSymbol;
+import com.hp.sh.expv3.pc.grab3rdData.pojo.PcSymbol;
 import com.hp.sh.expv3.pc.grab3rdData.service.SupportBbGroupIdsJobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,22 +26,22 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
     @Qualifier("metadataRedisUtil")
     private RedisUtil metadataRedisUtil;
 
-    @Value("${bb.trade.symbols}")
+    @Value("${pc.symbols}")
     private String symbols;
 
-    @Value("${bb.trade.bbGroupIds}")
+    @Value("${pc.bbGroupIds}")
     private Integer bbGroupId;
 
-  static    Map<Integer, List<BBSymbol>> map = new ConcurrentHashMap<>();
+  static    Map<Integer, List<PcSymbol>> map = new ConcurrentHashMap<>();
 
     @Override
     @Scheduled(cron = "*/1 * * * * *")
-    public Map<Integer, List<BBSymbol>> listSymbols() {
-        if (symbols.equals("bb_symbol")) {
-            Map<String, BBSymbol> symbolMap = metadataRedisUtil.hgetAll(symbols, BBSymbol.class);
+    public Map<Integer, List<PcSymbol>> listSymbols() {
+        if (symbols.equals("pc_contract")) {
+            Map<String, PcSymbol> symbolMap = metadataRedisUtil.hgetAll(symbols, PcSymbol.class);
             if (!CollectionUtils.isEmpty(symbolMap)) {
-                List<BBSymbol> list = symbolMap.values().stream().collect(Collectors.toList());
-                map = list.stream().collect(Collectors.groupingBy(bbSymbol -> bbSymbol.getBbGroupId()));
+                List<PcSymbol> list = symbolMap.values().stream().collect(Collectors.toList());
+                map = list.stream().collect(Collectors.groupingBy(pcSymbol->pcSymbol.getSymbolType()));
                 return map;
             }
         }
@@ -53,16 +54,16 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
      */
     @Override
     @PostConstruct
-    public List<BBSymbol> getSymbols() {
-        List<BBSymbol> list = new CopyOnWriteArrayList<>();
+    public List<PcSymbol> getSymbols() {
+        List<PcSymbol> list = new CopyOnWriteArrayList<>();
         if (CollectionUtils.isEmpty(map)){
             map = listSymbols();
         }
         if (!CollectionUtils.isEmpty(map)) {
             for (Integer integer : map.keySet()) {
                 if (bbGroupId.equals(integer)) {
-                    List<BBSymbol> bbSymbols = map.get(integer);
-                    for (BBSymbol bbSymbol : bbSymbols) {
+                    List<PcSymbol> bbSymbols = map.get(integer);
+                    for (PcSymbol bbSymbol : bbSymbols) {
                         list.add(bbSymbol);
                     }
                 }
@@ -70,17 +71,6 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
         }
         return list;
     }
-
-//    private List<BBSymbol> converPcSymbols(List<PcSymbol> pcSymbols) {
-//        List<BBSymbol> list = new ArrayList<>();
-//        for (PcSymbol pcSymbol : pcSymbols) {
-//            BBSymbol bbSymbol = new BBSymbol();
-//            BeanUtils.copyProperties(pcSymbol, bbSymbol);
-//            bbSymbol.setBbGroupId(pcSymbol.getContractGroup());
-//            list.add(bbSymbol);
-//        }
-//        return list;
-//    }
 
 
 }

@@ -7,23 +7,28 @@ import java.math.BigDecimal;
  * @author BaiLiJun  on 2020/4/9
  */
 public class OkResponseEntity implements Serializable {
-
+    //卖一价
     private BigDecimal best_ask;
+    //买一 价
     private BigDecimal best_bid;
+    //合约名称
     private String instrument_id;
-    private String product_id;
+    //最新成交价
     private BigDecimal last;
+    //	最新成交的数量
     private BigDecimal last_qty;
-    private BigDecimal ask;
+    //卖一价对应的量
     private BigDecimal best_ask_size;
-    private BigDecimal bid;
+    //买一价对应的数量
     private BigDecimal best_bid_size;
-    private BigDecimal open_24h;
+    //24小时最高价
     private BigDecimal high_24h;
+    //	24小时最低价
     private BigDecimal low_24h;
-    private BigDecimal base_volume_24h;
+    //系统时间戳
     private String timestamp;
-    private BigDecimal quote_volume_24h;
+    //24小时成交量，按张数统计
+    private BigDecimal volume_24h;
 
     public OkResponseEntity() {
     }
@@ -34,19 +39,14 @@ public class OkResponseEntity implements Serializable {
                 "best_ask=" + best_ask +
                 ", best_bid=" + best_bid +
                 ", instrument_id='" + instrument_id + '\'' +
-                ", product_id='" + product_id + '\'' +
                 ", last=" + last +
                 ", last_qty=" + last_qty +
-                ", ask=" + ask +
                 ", best_ask_size=" + best_ask_size +
-                ", bid=" + bid +
                 ", best_bid_size=" + best_bid_size +
-                ", open_24h=" + open_24h +
                 ", high_24h=" + high_24h +
                 ", low_24h=" + low_24h +
-                ", base_volume_24h=" + base_volume_24h +
                 ", timestamp='" + timestamp + '\'' +
-                ", quote_volume_24h=" + quote_volume_24h +
+                ", volume_24h=" + volume_24h +
                 '}';
     }
 
@@ -74,12 +74,12 @@ public class OkResponseEntity implements Serializable {
         this.instrument_id = instrument_id;
     }
 
-    public String getProduct_id() {
-        return product_id;
+    public BigDecimal getVolume_24h() {
+        return volume_24h;
     }
 
-    public void setProduct_id(String product_id) {
-        this.product_id = product_id;
+    public void setVolume_24h(BigDecimal volume_24h) {
+        this.volume_24h = volume_24h;
     }
 
     public BigDecimal getLast() {
@@ -98,14 +98,6 @@ public class OkResponseEntity implements Serializable {
         this.last_qty = last_qty;
     }
 
-    public BigDecimal getAsk() {
-        return ask;
-    }
-
-    public void setAsk(BigDecimal ask) {
-        this.ask = ask;
-    }
-
     public BigDecimal getBest_ask_size() {
         return best_ask_size;
     }
@@ -114,28 +106,12 @@ public class OkResponseEntity implements Serializable {
         this.best_ask_size = best_ask_size;
     }
 
-    public BigDecimal getBid() {
-        return bid;
-    }
-
-    public void setBid(BigDecimal bid) {
-        this.bid = bid;
-    }
-
     public BigDecimal getBest_bid_size() {
         return best_bid_size;
     }
 
     public void setBest_bid_size(BigDecimal best_bid_size) {
         this.best_bid_size = best_bid_size;
-    }
-
-    public BigDecimal getOpen_24h() {
-        return open_24h;
-    }
-
-    public void setOpen_24h(BigDecimal open_24h) {
-        this.open_24h = open_24h;
     }
 
     public BigDecimal getHigh_24h() {
@@ -154,14 +130,6 @@ public class OkResponseEntity implements Serializable {
         this.low_24h = low_24h;
     }
 
-    public BigDecimal getBase_volume_24h() {
-        return base_volume_24h;
-    }
-
-    public void setBase_volume_24h(BigDecimal base_volume_24h) {
-        this.base_volume_24h = base_volume_24h;
-    }
-
     public String getTimestamp() {
         return timestamp;
     }
@@ -170,11 +138,4 @@ public class OkResponseEntity implements Serializable {
         this.timestamp = timestamp;
     }
 
-    public BigDecimal getQuote_volume_24h() {
-        return quote_volume_24h;
-    }
-
-    public void setQuote_volume_24h(BigDecimal quote_volume_24h) {
-        this.quote_volume_24h = quote_volume_24h;
-    }
 }
