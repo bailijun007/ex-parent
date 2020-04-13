@@ -1,9 +1,8 @@
-package com.hp.sh.expv3.bb.grab3rdData.job;
+package com.hp.sh.expv3.pc.grab3rdData.job;
 
 import com.alibaba.fastjson.JSON;
-import com.hp.sh.expv3.bb.grab3rdData.pojo.*;
-import com.hp.sh.expv3.bb.grab3rdData.service.SupportBbGroupIdsJobService;
-import com.hp.sh.expv3.config.redis.RedisUtil;
+import com.hp.sh.expv3.pc.grab3rdData.pojo.*;
+import com.hp.sh.expv3.pc.grab3rdData.service.SupportBbGroupIdsJobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import com.hp.sh.expv3.config.redis.RedisUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,16 +108,16 @@ public class GetLastPriceByMerge {
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
                 BigDecimal zbAvgPrice = mergeByZb(bbSymbol);
-                logger.info("zb最新成交均价为:{},",zbAvgPrice);
+                logger.info("zb最新成交均价为:{},", zbAvgPrice);
                 BigDecimal binanceAvgPrice = mergeByBinance(bbSymbol);
-                logger.info("binance最新成交均价为:{},",binanceAvgPrice);
+                logger.info("binance最新成交均价为:{},", binanceAvgPrice);
                 BigDecimal bitfinexAvgPrice = mergeByBitfinex(bbSymbol);
-                logger.info("bitfinex最新成交均价为:{},",bitfinexAvgPrice);
+                logger.info("bitfinex最新成交均价为:{},", bitfinexAvgPrice);
                 BigDecimal okAvgPrice = mergeByOk(bbSymbol);
-                logger.info("ok最新成交均价为:{},",okAvgPrice);
-                BigDecimal avgLastPrice=zbAvgPrice.add(binanceAvgPrice).add(bitfinexAvgPrice).add(okAvgPrice).divide(new BigDecimal(4), 4, RoundingMode.DOWN);
-               logger.info("最终最新成交均价为:{},",avgLastPrice);
-                saveMerge(bbSymbol,avgLastPrice);
+                logger.info("ok最新成交均价为:{},", okAvgPrice);
+                BigDecimal avgLastPrice = zbAvgPrice.add(binanceAvgPrice).add(bitfinexAvgPrice).add(okAvgPrice).divide(new BigDecimal(4), 4, RoundingMode.DOWN);
+                logger.info("最终最新成交均价为:{},", avgLastPrice);
+                saveMerge(bbSymbol, avgLastPrice);
             }
         }
     }
@@ -210,7 +209,7 @@ public class GetLastPriceByMerge {
         if (null == httpsTicker) {
             avgLastPrice = BigDecimal.ZERO;
         }
-        avgLastPrice = httpsTicker.getLastPrice()==null?BigDecimal.ZERO:httpsTicker.getLastPrice();
+        avgLastPrice = httpsTicker.getLastPrice() == null ? BigDecimal.ZERO : httpsTicker.getLastPrice();
         logger.info("bitfinex的交易对:{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
         return avgLastPrice;
     }
