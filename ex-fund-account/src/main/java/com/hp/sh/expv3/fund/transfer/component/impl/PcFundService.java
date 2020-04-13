@@ -27,7 +27,15 @@ public class PcFundService implements FundService{
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
 		request.setTradeNo("T_" + record.getTargetAccountType() + "_"+record.getSn());
-		request.setTradeType(PcAccountTradeType.FUND_TO_PC);
+		
+		if(record.getSrcAccountType()==AccountType.FUND){
+			request.setTradeType(PcAccountTradeType.FUND_TO_PC);
+		}else if(record.getSrcAccountType()==AccountType.BB){
+			request.setTradeType(PcAccountTradeType.BB_TO_PC);
+		}else{
+			throw new RuntimeException();
+		}
+		
 		request.setUserId(record.getUserId());
 		request.setAssociatedId(record.getId());
 		pcAccountCoreApi.add(request);
@@ -40,7 +48,15 @@ public class PcFundService implements FundService{
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
 		request.setTradeNo("T_" + record.getTargetAccountType() + "_"+record.getSn());
-		request.setTradeType(PcAccountTradeType.PC_TO_FUND);
+		
+		if(record.getTargetAccountType()==AccountType.FUND){
+			request.setTradeType(PcAccountTradeType.PC_TO_FUND);
+		}else if(record.getTargetAccountType()==AccountType.BB){
+			request.setTradeType(PcAccountTradeType.PC_TO_BB);
+		}else{
+			throw new RuntimeException();
+		}
+		
 		request.setUserId(record.getUserId());
 		request.setAssociatedId(record.getId());
 		pcAccountCoreApi.cut(request);

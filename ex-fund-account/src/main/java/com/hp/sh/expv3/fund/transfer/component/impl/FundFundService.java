@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
 import com.hp.sh.expv3.fund.transfer.component.FundService;
 import com.hp.sh.expv3.fund.transfer.constant.AccountType;
 import com.hp.sh.expv3.fund.transfer.entity.FundTransfer;
