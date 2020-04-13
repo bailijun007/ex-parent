@@ -1,7 +1,5 @@
 package com.hp.sh.expv3.pc.msg;
 
-import javax.persistence.Table;
-
 import com.hp.sh.expv3.pc.constant.LogType;
 
 /**
@@ -9,8 +7,8 @@ import com.hp.sh.expv3.pc.constant.LogType;
  *
  * @author wangjg
  */
-@Table(name = "pc_account_log")
-public class PcAccountLog {
+@Deprecated
+public interface PcAccountLog {
 
     public static final int TYPE_TRAD_OPEN_LONG = LogType.TYPE_TRAD_OPEN_LONG;        //成交开多
     public static final int TYPE_TRAD_OPEN_SHORT = LogType.TYPE_TRAD_OPEN_SHORT;        //成交开空
@@ -28,102 +26,4 @@ public class PcAccountLog {
     public static final int TYPE_LIQ_LONG = LogType.TYPE_LIQ_LONG;                //强平平多
     public static final int TYPE_LIQ_SHORT = LogType.TYPE_LIQ_SHORT;				//强平平空
 
-
-    //Id
-    private Long id;
-    
-    /**
-     * 日志类型
-     */
-    private Integer type;
-
-    //用户Id
-    private Long userId;
-
-    //资产
-    private String asset;
-    
-    //交易品种
-    private String symbol;
-    
-    //引用对象Id
-    private Long refId;
-    
-    //时间
-    private Long time;
-
-    public PcAccountLog() {
-    }
-
-    public String tags() {
-        return this.getType() + "";
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getAsset() {
-        return asset;
-    }
-
-    public void setAsset(String asset) {
-        this.asset = asset;
-    }
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
-
-    public Long getRefId() {
-        return refId;
-    }
-
-    public void setRefId(Long refId) {
-        this.refId = refId;
-    }
-
-    public Long getTime() {
-        return time;
-    }
-
-    public void setTime(Long time) {
-        this.time = time;
-    }
-
-    public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	@Override
-    public String toString() {
-        return "PcAccountLog{" +
-                "type=" + type +
-                ", userId=" + userId +
-                ", asset='" + asset + '\'' +
-                ", symbol='" + symbol + '\'' +
-                ", refId=" + refId +
-                ", time=" + time +
-                '}';
-    }
 }

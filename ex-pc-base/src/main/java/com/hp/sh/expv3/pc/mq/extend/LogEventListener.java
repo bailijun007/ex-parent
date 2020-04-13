@@ -94,10 +94,10 @@ public class LogEventListener {
 	}
 
 	private Integer getType(int tradeType) {
-		if(tradeType==PcAccountTradeType.FUND_TO_PC){
+		if(tradeType==PcAccountTradeType.FUND_TO_PC || tradeType==PcAccountTradeType.BB_TO_PC){
 			return LogType.TYPE_ACCOUNT_FUND_TO_PC;
 		}
-		if(tradeType==PcAccountTradeType.PC_TO_FUND){
+		if(tradeType==PcAccountTradeType.PC_TO_FUND || tradeType==PcAccountTradeType.PC_TO_BB){
 			return LogType.TYPE_ACCOUNT_PC_TO_FUND;
 		}
 		if(tradeType>=PcAccountTradeType.ADD_TO_MARGIN && tradeType<=PcAccountTradeType.LEVERAGE_ADD_MARGIN){

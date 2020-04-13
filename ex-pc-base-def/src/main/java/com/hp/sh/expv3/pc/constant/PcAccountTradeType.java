@@ -8,8 +8,10 @@ package com.hp.sh.expv3.pc.constant;
 public class PcAccountTradeType {
 	
 	public static final int FUND_TO_PC = 1;				//+资金转入
-	
 	public static final int PC_TO_FUND = 2;				//-资金转出
+	
+	public static final int BB_TO_PC = 21;				//+从币币转入
+	public static final int PC_TO_BB = 22;				//-转出到币币
 
 	public static final int ORDER_OPEN_LONG = 3;		//-开多（押金）
 	public static final int ORDER_OPEN_SHORT = 4;		//-开空（押金）
