@@ -101,7 +101,6 @@ public class GrabBb3rdDataByBinanceTask {
                 if (CollectionUtils.isEmpty(list)) {
                     continue;
                 }
-//                String hashKey = tickerData.getChannel().split("_")[0];
                 List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
                 if (!CollectionUtils.isEmpty(bbSymbolList)) {
                     for (BBSymbol bbSymbol : bbSymbolList) {
@@ -126,35 +125,32 @@ public class GrabBb3rdDataByBinanceTask {
         if (enableByHttps != 1) {
             return;
         }
-        threadPool.execute(() -> {
-            while (true) {
-                List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-                if (!CollectionUtils.isEmpty(bbSymbolList)) {
-                    for (BBSymbol bbSymbol : bbSymbolList) {
-                        OkHttpClient client = new OkHttpClient();
-                        Request request = new Request.Builder().get().url(binanceHttpsUrl).build();
-                        Call call = client.newCall(request);
-                        try {
-                            Response response = call.execute();
-                            String string = response.body().string();
-                            String expymbol = bbSymbol.getSymbol().split("_")[0] + bbSymbol.getSymbol().split("_")[1];
-                            final List<Map> list = JSON.parseArray(string, Map.class);
-                            for (Map map : list) {
-                                String binanceSymbol = (String) map.get("symbol");
-                                if (expymbol.equals(binanceSymbol)) {
-                                    String key = httpsRedisKey + binanceSymbol;
-                                    logger.info("binance httpsRedisKey={}", key);
-                                    metadataDb5RedisUtil.set(key, map.get("price"), 60);
-                                }
-                            }
-                            TimeUnit.SECONDS.sleep(1);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+        List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+        if (!CollectionUtils.isEmpty(bbSymbolList)) {
+            for (BBSymbol bbSymbol : bbSymbolList) {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder().get().url(binanceHttpsUrl).build();
+                Call call = client.newCall(request);
+                try {
+                    Response response = call.execute();
+                    String string = response.body().string();
+                    String expymbol = bbSymbol.getSymbol().split("_")[0] + bbSymbol.getSymbol().split("_")[1];
+                    final List<Map> list = JSON.parseArray(string, Map.class);
+                    for (Map map : list) {
+                        String binanceSymbol = (String) map.get("symbol");
+                        if (expymbol.equals(binanceSymbol)) {
+                            String key = httpsRedisKey + binanceSymbol;
+                            logger.info("binance httpsRedisKey={}", key);
+                            metadataDb5RedisUtil.set(key, JSON.toJSONString(map), 60);
                         }
                     }
+                } catch (Exception e) {
+//                    e.printStackTrace();
+                    continue;
                 }
             }
-        });
+        }
+
 
     }
 

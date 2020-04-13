@@ -148,40 +148,7 @@ public class GrabBb3rdDataByZbTask {
     }
 
 
-    @Scheduled(cron = "*/1 * * * * *")
-    public void merge() {
-        List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-        if (!CollectionUtils.isEmpty(bbSymbolList)) {
-            for (BBSymbol bbSymbol : bbSymbolList) {
-                String symbol = bbSymbol.getSymbol().toLowerCase();
-                String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
-                String httpsKey = httpsRedisKey + hashKey;
-                String strHttpsTicker = metadataDb5RedisUtil.get(httpsKey);
-                ZbTickerData httpsTicker = JSON.parseObject(strHttpsTicker, ZbTickerData.class);
 
-                String wssKey = httpsRedisKey + hashKey;
-                String strWssTicker = metadataDb5RedisUtil.get(wssKey);
-                ZbTickerData wssTicker = JSON.parseObject(strWssTicker, ZbTickerData.class);
-                if (null == httpsTicker && null == wssTicker) {
-                    continue;
-                }
-                BigDecimal httpLast = BigDecimal.ZERO;
-                BigDecimal wssLast = BigDecimal.ZERO;
-                if (null != httpsTicker) {
-                    httpLast = httpsTicker.getLast();
-                } else if (null != httpsTicker) {
-                    wssLast = wssTicker.getLast();
-                }
-
-                BigDecimal avgLastPrice = httpLast.add(wssLast).divide(new BigDecimal(2), 4, RoundingMode.DOWN);
-                logger.info("{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
-                String key = "ticker:bb:lastPrice:" + bbSymbol.getAsset() + ":" + bbSymbol.getSymbol();
-                HashMap<String, BigDecimal> map = new HashMap<>();
-                map.put(hashKey, avgLastPrice);
-                metadataDb5RedisUtil.hmset(key, map);
-            }
-        }
-    }
 
 
 }
