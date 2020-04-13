@@ -26,7 +26,7 @@ public class PcFundService implements FundService{
 		request.setAmount(record.getAmount());
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
-		request.setTradeNo(record.getSn());
+		request.setTradeNo("T_" + record.getTargetAccountType() + "_"+record.getSn());
 		request.setTradeType(PcAccountTradeType.FUND_TO_PC);
 		request.setUserId(record.getUserId());
 		request.setAssociatedId(record.getId());
@@ -39,7 +39,7 @@ public class PcFundService implements FundService{
 		request.setAmount(record.getAmount());
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
-		request.setTradeNo(record.getSn());
+		request.setTradeNo("T_" + record.getTargetAccountType() + "_"+record.getSn());
 		request.setTradeType(PcAccountTradeType.PC_TO_FUND);
 		request.setUserId(record.getUserId());
 		request.setAssociatedId(record.getId());

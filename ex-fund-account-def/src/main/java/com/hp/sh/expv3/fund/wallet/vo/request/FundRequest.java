@@ -33,7 +33,8 @@ public class FundRequest {
 	@ApiModelProperty(value = "关联对象ID", hidden=true)
 	private Long associatedId;
 		
-	public FundRequest() {
+	protected FundRequest() {
+		
 	}
 
 	public BigDecimal getAmount() {

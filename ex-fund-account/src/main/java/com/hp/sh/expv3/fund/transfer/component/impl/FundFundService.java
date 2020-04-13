@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
 import com.hp.sh.expv3.fund.transfer.component.FundService;
 import com.hp.sh.expv3.fund.transfer.constant.AccountType;
 import com.hp.sh.expv3.fund.transfer.entity.FundTransfer;
@@ -26,8 +27,16 @@ public class FundFundService implements FundService{
 		request.setAmount(record.getAmount());
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
-		request.setTradeNo(record.getSn());
-		request.setTradeType(TradeType.TRANSFER_IN);
+		request.setTradeNo("T_" + record.getSrcAccountType() + "_"+record.getSn());
+		
+		if(record.getSrcAccountType()==AccountType.BB){
+			request.setTradeType(TradeType.BB_IN);
+		}else if(record.getSrcAccountType()==AccountType.PC){
+			request.setTradeType(TradeType.PC_IN);
+		}else{
+			throw new RuntimeException();
+		}
+		
 		request.setUserId(record.getUserId());
 		request.setAssociatedId(record.getId());
 		fundAccountCoreApi.add(request);
@@ -39,8 +48,16 @@ public class FundFundService implements FundService{
 		request.setAmount(record.getAmount());
 		request.setAsset(record.getAsset());
 		request.setRemark(record.getRemark());
-		request.setTradeNo(record.getSn());
-		request.setTradeType(TradeType.TRANSFER_OUT);
+		request.setTradeNo("T_" + record.getTargetAccountType() + "_"+record.getSn());
+		
+		if(record.getTargetAccountType()==AccountType.BB){
+			request.setTradeType(TradeType.BB_OUT);
+		}else if(record.getTargetAccountType()==AccountType.PC){
+			request.setTradeType(TradeType.PC_OUT);
+		}else{
+			throw new RuntimeException();
+		}
+		
 		request.setUserId(record.getUserId());
 		request.setAssociatedId(record.getId());
 		fundAccountCoreApi.cut(request);
