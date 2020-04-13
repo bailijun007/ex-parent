@@ -64,7 +64,7 @@ public class FundTransferCoreService {
 	void changeStatus(Long userId, Long id, Integer newStatsus, Integer oldStatsus, String errorInfo, Long modified) {
 		int n = this.fundTransferDAO.changeStatus(userId, id, newStatsus, oldStatsus, errorInfo, modified);
 		if(n==0){
-			throw new UpdateException("更新失败");
+			throw new UpdateException("更新失败, changeStatus, FundTransfer.id="+id);
 		}
 	}
 
