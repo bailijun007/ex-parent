@@ -153,7 +153,7 @@ public class FundAccountCoreService {
     private void updateAccount(FundAccount fundAccount) {
         int updatedRows = this.fundAccountDAO.update(fundAccount);
         if (updatedRows == 0) {
-            throw new UpdateException("更新失败");
+            throw new UpdateException("更新失败", fundAccount);
         }
     }
 

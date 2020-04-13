@@ -92,9 +92,6 @@
 
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into withdrawal_addr (
 			id,asset,address,remark,enabled,user_id,created,modified
 		)values(

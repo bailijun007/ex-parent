@@ -113,7 +113,7 @@ public class PcRiskfundCoreService{
 	private void updateAccount(PcRiskfundAccount bBCollectorAccount){
 		int updatedRows = this.accountDAO.update(bBCollectorAccount);
 		if(updatedRows==0){
-			throw new UpdateException("更新失败");
+			throw new UpdateException("更新失败", bBCollectorAccount);
 		}
 	}
 	

@@ -112,7 +112,7 @@ public class PcCollectorCoreService{
 	private void updateAccount(PcCollectorAccount bBCollectorAccount){
 		int updatedRows = this.collectorAccountDAO.update(bBCollectorAccount);
 		if(updatedRows==0){
-			throw new UpdateException("更新失败");
+			throw new UpdateException("更新失败", bBCollectorAccount);
 		}
 	}
 	

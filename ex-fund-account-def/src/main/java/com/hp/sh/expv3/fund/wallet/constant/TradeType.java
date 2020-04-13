@@ -16,12 +16,20 @@ public class TradeType {
 	public static final int ADD = 11;				//后台充值
 	public static final int CUT = 12;				//后台扣款
 	
+	@Deprecated
 	public static final int TRANSFER_IN = 13;		//资金转入
+	@Deprecated
 	public static final int TRANSFER_OUT = 14;		//资金转出
 	
 	public static final int C2C_IN = 15;			//C2C买入
 	public static final int C2C_OUT = 16;			//C2C卖出
 	
 	public static final int RAKE_BACK = 17;			//返佣
+	
+	public static final int BB_IN = 21;				//从BB转入
+	public static final int BB_OUT = 22;			//转出至BB
+	
+	public static final int PC_IN = 23;				//从PC转入
+	public static final int PC_OUT = 24;			//转出至PC
 
 }

@@ -160,7 +160,7 @@ public class PcAccountCoreService{
 	private void updateAccount(PcAccount pcAccount){
 		int updatedRows = this.pcAccountDAO.update(pcAccount);
 		if(updatedRows==0){
-			throw new UpdateException("更新失败");
+			throw new UpdateException("更新失败", pcAccount);
 		}
 	}
 	

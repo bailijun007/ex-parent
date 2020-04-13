@@ -106,9 +106,6 @@
 
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into deposit_record (
 			id,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified,tx_hash
 		)values(
