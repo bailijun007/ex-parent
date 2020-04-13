@@ -60,11 +60,13 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
             map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_TYPE);
             list = bbAccountRecordExtMapper.queryByLimit(map);
         } else {
-            //10:买入，9：卖出
-            if(tradeType==10){
-
+            //9:买入，10：卖出
+            if(tradeType.equals(BbAccountRecordConst.TRADE_BUY_IN)){
+                map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_BUY_IN);
+            }else if(tradeType.equals(BbAccountRecordConst.TRADE_SELL_OUT)){
+                map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_SELL_OUT);
             }
-            map.put("tradeTypes", tradeType);
+
             list = bbAccountRecordExtMapper.queryByLimit(map);
         }
         return list;
@@ -81,7 +83,12 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
             map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_TYPE);
             list = bbAccountRecordExtMapper.listBbAccountRecordsByPage(map);
         } else {
-            map.put("tradeType", tradeType);
+            if(tradeType.equals(BbAccountRecordConst.TRADE_BUY_IN)){
+                map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_BUY_IN);
+            }else if(tradeType.equals(BbAccountRecordConst.TRADE_SELL_OUT)){
+                map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_SELL_OUT);
+            }
+
             list = bbAccountRecordExtMapper.listBbAccountRecordsByPage(map);
         }
         return list;
