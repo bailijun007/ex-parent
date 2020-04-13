@@ -159,7 +159,7 @@ public class BBTradeService {
 		request.setUserId(userId);
 		request.setAsset(asset);
 		request.setRemark(remark);
-		request.setTradeNo(SnUtils.getPurchaseSn(orderTradeId));
+		request.setTradeNo(SnUtils.getBuyInSn(orderTradeId));
 		request.setTradeType(BBAccountTradeType.TRADE_BUY_IN);
 		request.setAssociatedId(orderTradeId);
 		this.accountCoreService.add(request);
@@ -171,7 +171,7 @@ public class BBTradeService {
 		request.setUserId(userId);
 		request.setAsset(asset);
 		request.setRemark(remark);
-		request.setTradeNo(SnUtils.getIncomeSn(orderTradeId));
+		request.setTradeNo(SnUtils.getSellIncomeSn(orderTradeId));
 		request.setTradeType(BBAccountTradeType.TRADE_SELL_INCOME);
 		request.setAssociatedId(orderTradeId);
 		this.accountCoreService.add(request);

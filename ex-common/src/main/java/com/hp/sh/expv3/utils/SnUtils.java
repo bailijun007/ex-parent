@@ -60,14 +60,18 @@ public class SnUtils {
 
 	static String newTimeSn(){
 		String dstr = DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSS");
-		String nstr = RandomStringUtils.randomNumeric(6);
+		String nstr = RandomStringUtils.randomNumeric(7);
 		return dstr+nstr;
 	}
 
-	public static String getIncomeSn(Long orderTradeId) {
-		return "BTR"+orderTradeId;
+	public static String getSellIncomeSn(Long orderTradeId) {
+		return "SI"+orderTradeId;
 	}
-
+	
+	public static String getBuyInSn(Long orderTradeId) {
+		return "BI"+orderTradeId;
+	}
+	
 	public static String getRemainSn(Long orderId) {
 		return "R"+orderId;
 	}
