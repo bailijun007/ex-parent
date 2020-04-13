@@ -83,7 +83,7 @@ public class GrabBb3rdDataByBinanceTask {
 
 
     @PostConstruct
-    public void startGrabBb3rdDataByZbWss() {
+    public void startGrabBb3rdDataByWss() {
         if (enableByWss != 1) {
             return;
         }
@@ -121,7 +121,7 @@ public class GrabBb3rdDataByBinanceTask {
 
 
     @Scheduled(cron = "*/1 * * * * *")
-    public void startGrabBb3rdDataByZbHttps() {
+    public void startGrabBb3rdDataByHttps() {
         if (enableByHttps != 1) {
             return;
         }

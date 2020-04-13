@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.pc.grab3rdData.component.ZbWsClient;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.BBSymbol;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.OkResponseEntity;
+import com.hp.sh.expv3.pc.grab3rdData.pojo.PcSymbol;
 import com.hp.sh.expv3.pc.grab3rdData.service.SupportBbGroupIdsJobService;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import com.hp.sh.expv3.config.redis.RedisUtil;
+
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -44,52 +46,44 @@ public class GrabPc3rdDataByOkTask {
     @Value("${ok.https.url}")
     private String okHttpsUrl;
 
-    @Value("${grab.bb.3rdDataByOkHttps.enable}")
+    @Value("${grab.pc.3rdDataByOkHttps.enable}")
     private Integer enableByHttps;
 
     @Value("${ok.https.redisKey.prefix}")
     private String okHttpsRedisKey;
 
-    @Value("${bb.trade.symbols}")
-    private String symbols;
-
-    @Value("${bb.trade.bbGroupIds}")
-    private Integer bbGroupId;
-
-    @Autowired
-    @Qualifier("metadataRedisUtil")
-    private RedisUtil metadataRedisUtil;
-
     @Autowired
     @Qualifier("metadataDb5RedisUtil")
     private RedisUtil metadataDb5RedisUtil;
-
 
     @Autowired
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-    //    @Scheduled(cron = "*/1 * * * * *")
     @PostConstruct
-    public void startGrabBb3rdDataByOkHttps() {
+    public void startGrabPc3rdDataByOkHttps() {
         if (enableByHttps != 1) {
             return;
         }
         threadPool.execute(() -> {
             while (true) {
-                List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-                if (!CollectionUtils.isEmpty(bbSymbolList)) {
-                    for (BBSymbol bbSymbol : bbSymbolList) {
-                        OkHttpClient client = new OkHttpClient();
-                        Request request = new Request.Builder().get().url(okHttpsUrl).build();
-                        Call call = client.newCall(request);
-                        try {
-                            Response response = call.execute();
-                            String string = response.body().string();
-                            List<OkResponseEntity> list = JSON.parseArray(string, OkResponseEntity.class);
-                            String symbol = bbSymbol.getSymbol().split("_")[0] + "-" + bbSymbol.getSymbol().split("_")[1];
+                List<PcSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder().get().url(okHttpsUrl).build();
+                Call call = client.newCall(request);
+                try {
+                    Response response = call.execute();
+                    String string = response.body().string();
+                    List<OkResponseEntity> list = JSON.parseArray(string, OkResponseEntity.class);
+                    if (!CollectionUtils.isEmpty(bbSymbolList)) {
+                        for (PcSymbol pcSymbol : bbSymbolList) {
+                            String symbol = pcSymbol.getSymbol().split("_")[0] + "-" + pcSymbol.getSymbol().split("_")[1];
                             for (OkResponseEntity okResponseEntity : list) {
-                                String okSymbol = okResponseEntity.getProduct_id();
+                                String okSymbol = okResponseEntity.getInstrument_id();
+                                okSymbol = okSymbol.split("-")[0] + "-" + okSymbol.split("-")[1];
+                                if (okSymbol.endsWith("USD")) {
+                                    okSymbol = okSymbol + "T";
+                                }
                                 if (okSymbol.equals(symbol)) {
                                     String key = okHttpsRedisKey + okSymbol;
                                     logger.info("okHttpsRedisKey={}", key);
@@ -97,11 +91,11 @@ public class GrabPc3rdDataByOkTask {
                                 }
                             }
                             TimeUnit.SECONDS.sleep(1);
-                        } catch (Exception e) {
-//                            e.printStackTrace();
-                            continue;
                         }
                     }
+                } catch (Exception e) {
+//                            e.printStackTrace();
+                    continue;
                 }
             }
         });

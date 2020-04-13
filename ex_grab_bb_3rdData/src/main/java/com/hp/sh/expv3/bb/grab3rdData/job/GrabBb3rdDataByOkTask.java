@@ -76,15 +76,16 @@ public class GrabBb3rdDataByOkTask {
         threadPool.execute(() -> {
             while (true) {
                 List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-                if (!CollectionUtils.isEmpty(bbSymbolList)) {
-                    for (BBSymbol bbSymbol : bbSymbolList) {
-                        OkHttpClient client = new OkHttpClient();
-                        Request request = new Request.Builder().get().url(okHttpsUrl).build();
-                        Call call = client.newCall(request);
-                        try {
-                            Response response = call.execute();
-                            String string = response.body().string();
-                            List<OkResponseEntity> list = JSON.parseArray(string, OkResponseEntity.class);
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder().get().url(okHttpsUrl).build();
+                Call call = client.newCall(request);
+                try {
+                    Response response = call.execute();
+                    String string = response.body().string();
+                    List<OkResponseEntity> list = JSON.parseArray(string, OkResponseEntity.class);
+
+                    if (!CollectionUtils.isEmpty(bbSymbolList)) {
+                        for (BBSymbol bbSymbol : bbSymbolList) {
                             String symbol = bbSymbol.getSymbol().split("_")[0] + "-" + bbSymbol.getSymbol().split("_")[1];
                             for (OkResponseEntity okResponseEntity : list) {
                                 String okSymbol = okResponseEntity.getProduct_id();
@@ -95,11 +96,11 @@ public class GrabBb3rdDataByOkTask {
                                 }
                             }
                             TimeUnit.SECONDS.sleep(1);
-                        } catch (Exception e) {
-//                            e.printStackTrace();
-                            continue;
                         }
                     }
+                }catch(Exception e){
+//                            e.printStackTrace();
+                    continue;
                 }
             }
         });
