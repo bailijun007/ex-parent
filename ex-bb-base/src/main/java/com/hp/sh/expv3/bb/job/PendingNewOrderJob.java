@@ -33,7 +33,7 @@ public class PendingNewOrderJob {
 		Long now = DbDateUtils.now();
 		Page page = new Page(1, 100, 1000L);
 		while(true){
-			List<BBOrder> list = this.orderQueryService.pageQuery(page, OrderStatus.PENDING_NEW, System.currentTimeMillis()-1000*30);
+			List<BBOrder> list = this.orderQueryService.queryPendingActive(page, null, System.currentTimeMillis()-1000*30, OrderStatus.PENDING_NEW);
 			
 			if(list==null || list.isEmpty()){
 				break;

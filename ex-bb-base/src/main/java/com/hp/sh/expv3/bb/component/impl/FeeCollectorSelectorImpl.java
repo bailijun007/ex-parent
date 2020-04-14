@@ -15,9 +15,9 @@ public class FeeCollectorSelectorImpl implements FeeCollectorSelector {
     //获取手续费收取人账户(这里暂时写死，随机获取一个收取人账户,后期完善)
     @Override
     public Long getFeeCollectorId(Long userId, String asset, String symbol) {
-        Long[] arr = {1L, 2L};
+        int[] arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         int index = (int) (Math.random() * arr.length);
-        Long aLong = arr[index];
+        long aLong = arr[index];
         return aLong;
     }
 }

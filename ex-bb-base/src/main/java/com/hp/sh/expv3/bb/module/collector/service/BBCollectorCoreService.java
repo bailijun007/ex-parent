@@ -23,6 +23,7 @@ import com.hp.sh.expv3.bb.vo.request.CollectorCutRequest;
 import com.hp.sh.expv3.bb.vo.request.CollectorFundRequest;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
+import com.hp.sh.expv3.config.db.SnGenerator;
 import com.hp.sh.expv3.constant.FundFlowDirection;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
@@ -43,6 +44,8 @@ public class BBCollectorCoreService{
 	@Autowired
 	private BBCollectorAccountRecordDAO fundAccountRecordDAO;
 	
+	@Autowired
+	private SnGenerator generator;
 	/**
 	 * 加钱
 	 */
@@ -50,7 +53,7 @@ public class BBCollectorCoreService{
 		BBCollectorAccountRecord record = this.req2record(request);
 		
 		record.setType(FundFlowDirection.INCOME);
-		record.setSn(SnUtils.newRecordSn());
+		record.setSn(generator.genSn(record));
 		
 		return this.newRecord(record);
 	}

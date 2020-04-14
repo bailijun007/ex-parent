@@ -132,7 +132,7 @@ public class BBOrderQueryService {
 		params.put("page", page);
 		params.put("feeSynchStatus", IntBool.NO);
 		params.put("tradeTimeStart", tradeTimeStart);
-		params.put("orderBy", "created");
+		params.put("orderBy", "trade_time");
 		List<BBOrderTrade> list = this.bBOrderTradeDAO.queryList(params);
 		return list;
 	}

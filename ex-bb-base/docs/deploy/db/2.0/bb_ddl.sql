@@ -50,7 +50,7 @@ CREATE TABLE `bb_account_log` (
 `ref_id`  bigint(20) NOT NULL COMMENT '引用对象Id' ,
 `time`  bigint(20) NOT NULL COMMENT '时间' ,
 PRIMARY KEY (`id`),
-INDEX `idx_user_asset_symbol` (`user_id`, `asset`, `symbol`, `time`) USING BTREE 
+INDEX `idx_user_asset_symbol` (`user_id`, `asset`, `symbol`) USING BTREE 
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
@@ -161,36 +161,6 @@ UNIQUE INDEX `un_sn` (`sn`) USING BTREE
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='币币手续费_账户明细'
-
-;
-
--- ----------------------------
--- Table structure for `bb_match`
--- ----------------------------
-DROP TABLE IF EXISTS `bb_match`;
-CREATE TABLE `bb_match` (
-`id`  bigint(20) NOT NULL COMMENT 'id' ,
-`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
-`symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '交易对' ,
-`match_tx_id`  bigint(20) NOT NULL COMMENT '事务Id' ,
-`tk_bid_flag`  int(11) NOT NULL COMMENT 'taker是否买：1-是，0-否' ,
-`tk_account_id`  bigint(20) NOT NULL COMMENT 'taker账户ID' ,
-`tk_order_id`  bigint(20) NOT NULL COMMENT 'taker订单ID' ,
-`mk_account_id`  bigint(20) NOT NULL COMMENT 'maker账户Id' ,
-`mk_order_id`  bigint(20) NOT NULL COMMENT 'maker订单ID' ,
-`price`  decimal(50,30) NOT NULL COMMENT '成交价格' ,
-`number`  decimal(50,30) NOT NULL COMMENT '数量' ,
-`trade_time`  bigint(20) NOT NULL COMMENT '成交时间' ,
-`created`  bigint(20) NULL DEFAULT NULL ,
-`modified`  bigint(20) NULL DEFAULT NULL ,
-PRIMARY KEY (`id`),
-UNIQUE INDEX `uk_tk_order_id_mk_order_id` (`tk_order_id`, `mk_order_id`) USING BTREE ,
-INDEX `idx_trade_time_symbol` (`trade_time`, `symbol`) USING BTREE ,
-INDEX `idx_match_tx_id` (`match_tx_id`) USING BTREE 
-)
-ENGINE=InnoDB
-DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_成交(撮合结果)'
 
 ;
 
