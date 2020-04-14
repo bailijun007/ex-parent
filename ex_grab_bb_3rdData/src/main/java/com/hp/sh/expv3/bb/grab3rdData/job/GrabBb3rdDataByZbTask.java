@@ -80,6 +80,7 @@ public class GrabBb3rdDataByZbTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
+
     @PostConstruct
     public void startGrabBb3rdDataByZbWss() {
         if (enableByWss != 1) {
@@ -148,6 +149,15 @@ public class GrabBb3rdDataByZbTask {
         }
     }
 
+    @Scheduled(cron = "*/59 * * * * *")
+    public void retryConnection() {
+        ZbWsClient client =ZbWsClient.getZbWsClient(zbWssUrl);
+        Boolean isClosed = client.getIsClosed();
+        if(!isClosed){
+            client.close();
+            startGrabBb3rdDataByZbWss();
+        }
+    }
 
 }
 

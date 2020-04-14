@@ -82,14 +82,13 @@ public class GrabBb3rdDataByBinanceTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-
     @PostConstruct
     public void startGrabBb3rdDataByWss() {
         if (enableByWss != 1) {
             return;
         }
 //        BinanceWsClient client = new BinanceWsClient(binanceWssUrl);
-        BinanceWsClient client =BinanceWsClient.getBinanceWsClient(binanceWssUrl);
+        BinanceWsClient client = BinanceWsClient.getBinanceWsClient(binanceWssUrl);
         client.connect();
 
         threadPool.execute(() -> {
@@ -119,6 +118,16 @@ public class GrabBb3rdDataByBinanceTask {
                 }
             }
         });
+    }
+
+    @Scheduled(cron = "*/59 * * * * *")
+    public void retryConnection() {
+        BinanceWsClient client = BinanceWsClient.getBinanceWsClient(binanceWssUrl);
+        Boolean isClosed = client.getIsClosed();
+        if (!isClosed) {
+            client.close();
+            startGrabBb3rdDataByWss();
+        }
     }
 
 

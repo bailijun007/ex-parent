@@ -15,18 +15,35 @@ import java.util.concurrent.TimeUnit;
 public class BinanceWsClient extends WebSocketListener {
     private static final Logger logger = LoggerFactory.getLogger(BinanceWsClient.class);
 
+    private static volatile BinanceWsClient wsClient = null;
+
     private String wsurl;
+
+    private Boolean isClosed = true;
 
     private WebSocket ws;
 
     public static BlockingQueue<BinanceResponseEntity> queue = new ArrayBlockingQueue<BinanceResponseEntity>(10000000);
 
-    public BinanceWsClient(String wsurl) {
+    private BinanceWsClient(String wsurl) {
         this.wsurl = wsurl;
     }
 
+    public static BinanceWsClient getBinanceWsClient(String wsurl) {
+        if (null == wsClient) {
+            synchronized (BinanceWsClient.class) {
+                if (null == wsClient) {
+                    wsClient = new BinanceWsClient(wsurl);
+                }
+            }
+        }
+        return wsClient;
+    }
+
     public synchronized void connect() {
-        OkHttpClient mOkHttpClient = new OkHttpClient.Builder().readTimeout(10, TimeUnit.SECONDS)// 设置读取超时时间
+        OkHttpClient mOkHttpClient = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)//允许失败重试
+                .readTimeout(10, TimeUnit.SECONDS)// 设置读取超时时间
                 .writeTimeout(10, TimeUnit.SECONDS)// 设置写的超时时间
                 .connectTimeout(3, TimeUnit.SECONDS)// 设置连接超时时间
                 .build();
@@ -65,18 +82,19 @@ public class BinanceWsClient extends WebSocketListener {
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-        logger.debug("t={}", t.getMessage(), t);
+        logger.error("t={}", t.getMessage(), t);
+        logger.error("连接发生了异常,异常原因：{},getCause ={},getMessage={}", t, t.getCause(), t.getMessage());
+        this.isClosed=false;
     }
 
     @Override
     public void onClosing(WebSocket webSocket, int code, String reason) {
-        System.out.println("onClosing");
+        logger.error("断开服务器连接,状态码 code={},断开原因 reason={}", code, reason);
+        this.isClosed=false;
+        this.ws.close(code, reason);
     }
 
-    @Override
-    public void onClosed(WebSocket webSocket, int code, String reason) {
-        System.out.println("onClosed");
-    }
+
 
     public static BlockingQueue<BinanceResponseEntity> getBlockingQueue() {
         if (CollectionUtils.isEmpty(queue)) {
@@ -85,4 +103,7 @@ public class BinanceWsClient extends WebSocketListener {
         return queue;
     }
 
+    public Boolean getIsClosed() {
+        return isClosed;
+    }
 }

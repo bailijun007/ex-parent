@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.pc.grab3rdData.job;
 
 import com.alibaba.fastjson.JSON;
-import com.hp.sh.expv3.pc.grab3rdData.component.ZbWsClient;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.BBSymbol;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.OkResponseEntity;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.PcSymbol;
@@ -31,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class GrabPc3rdDataByOkTask {
-    private static final Logger logger = LoggerFactory.getLogger(ZbWsClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(GrabPc3rdDataByOkTask.class);
 
     private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
             1,

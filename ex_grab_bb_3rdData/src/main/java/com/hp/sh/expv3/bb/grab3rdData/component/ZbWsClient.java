@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 public class ZbWsClient extends WebSocketListener {
     private static final Logger logger = LoggerFactory.getLogger(ZbWsClient.class);
 
+    private Boolean isClosed = true;
     private String wsurl;
 
     private  WebSocket ws;
@@ -87,11 +88,13 @@ public class ZbWsClient extends WebSocketListener {
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
         logger.error("t={}", t.getMessage(), t);
         logger.error("连接发生了异常,异常原因：{},getCause ={},getMessage={}", t, t.getCause(), t.getMessage());
+        this.isClosed=false;
     }
 
     @Override
     public void onClosing(WebSocket webSocket, int code, String reason) {
         logger.error("断开服务器连接,状态码 code={},断开原因 reason={}", code, reason);
+        this.isClosed=false;
         this.ws.close(code, reason);
     }
 
@@ -105,4 +108,7 @@ public class ZbWsClient extends WebSocketListener {
         return queue;
     }
 
+    public Boolean getIsClosed() {
+        return isClosed;
+    }
 }
