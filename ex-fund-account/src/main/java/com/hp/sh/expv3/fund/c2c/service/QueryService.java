@@ -119,8 +119,8 @@ public class QueryService {
     }
 
     @CrossDB
-    public List<C2cOrderVo> queryByPayStatus(Integer payStatus) {
-        List<C2cOrderVo> orderList = c2cOrderDAO.queryByPayStatus(payStatus);
+    public List<C2cOrderVo> queryByPayStatus(Integer payStatus,String payStatusDesc) {
+        List<C2cOrderVo> orderList = c2cOrderDAO.queryByPayStatus(payStatus,payStatusDesc);
 
         return orderList;
     }

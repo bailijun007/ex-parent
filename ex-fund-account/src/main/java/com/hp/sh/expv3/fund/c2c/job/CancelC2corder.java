@@ -39,7 +39,7 @@ public class CancelC2corder {
          LocalDateTime localDateTime = LocalDateTime.now();
 
         //扫描所有的待支付订单
-         List<C2cOrderVo> c2cOrderVos = queryService.queryByPayStatus(C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
+         List<C2cOrderVo> c2cOrderVos = queryService.queryByPayStatus(C2cConst.C2C_PAY_STATUS_NO_PAYMENT,C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
         for (C2cOrderVo c2cOrderVo : c2cOrderVos) {
              LocalDateTime payTime = Instant.ofEpochMilli(c2cOrderVo.getPayTime()).atZone(ZoneOffset.ofHours(8)).toLocalDateTime();
             if (payTime.plusMinutes(20).isBefore(localDateTime)) {

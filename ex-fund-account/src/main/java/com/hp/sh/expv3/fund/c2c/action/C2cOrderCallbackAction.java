@@ -84,9 +84,9 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
                 C2cOrder c2cOrder = new C2cOrder();
                 c2cOrder.setAmount(orderAmount);
                 //计算USDT 就是 orderAmount*( 1 - 手续费率) / 你系统的CNY:USD汇率;
-                BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
-                BigDecimal qty = param.getOrderAmount().multiply(feeRatio).divide(c2cOrder1.getPrice(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
-                c2cOrder.setVolume(qty);
+//                BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
+//                BigDecimal qty = param.getOrderAmount().multiply(feeRatio).divide(c2cOrder1.getPrice(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
+//                c2cOrder.setVolume(qty);
                 c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
                 c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
                 c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_TRUE);
@@ -99,7 +99,7 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
                 // 调用价钱方法和增加流水记录
                 FundAddRequest request=new FundAddRequest();
                 request.setUserId(userId);
-                request.setAmount(qty);
+                request.setAmount(c2cOrder1.getVolume());
                 request.setAsset(c2cOrder1.getExchangeCurrency());
                 request.setRemark(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
                 request.setTradeNo(c2cOrder1.getSn());

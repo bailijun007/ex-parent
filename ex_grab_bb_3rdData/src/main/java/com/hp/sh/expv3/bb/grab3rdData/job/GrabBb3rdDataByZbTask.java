@@ -85,7 +85,8 @@ public class GrabBb3rdDataByZbTask {
         if (enableByWss != 1) {
             return;
         }
-        ZbWsClient client = new ZbWsClient(zbWssUrl);
+//        ZbWsClient client = new ZbWsClient(zbWssUrl);
+        ZbWsClient client =ZbWsClient.getZbWsClient(zbWssUrl);
         client.connect();
         Map data = new TreeMap();
         data.put("event", "addChannel");

@@ -103,7 +103,7 @@ public class GetLastPriceByMerge {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-    @Scheduled(cron = "*/1 * * * * *")
+//    @Scheduled(cron = "*/1 * * * * *")
     public void merge() {
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {

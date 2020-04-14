@@ -82,12 +82,14 @@ public class GrabBb3rdDataByBinanceTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
+
     @PostConstruct
     public void startGrabBb3rdDataByWss() {
         if (enableByWss != 1) {
             return;
         }
-        BinanceWsClient client = new BinanceWsClient(binanceWssUrl);
+//        BinanceWsClient client = new BinanceWsClient(binanceWssUrl);
+        BinanceWsClient client =BinanceWsClient.getBinanceWsClient(binanceWssUrl);
         client.connect();
 
         threadPool.execute(() -> {

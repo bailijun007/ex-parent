@@ -47,13 +47,14 @@ public class PLPayService {
 //        }
 
         //订单金额
-        String orderAmount = fabiAmt.stripTrailingZeros().toPlainString();
+        BigDecimal orderAmount = ratio.multiply(tarVolume);
+//        String orderAmount = fabiAmt.stripTrailingZeros().toPlainString();
 //        String receiveUrl = getReceiveUrl();
 //        String pickupUrl = getPickupUrl();
         //获取加密后的签名
-        String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount, orderCurrency);
+        String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount+"", orderCurrency);
         //转发请求到第三方支付，并返回支付路径
-        String url = pLpayClient.sendRequestUrl(orderNo, orderCurrency, orderAmount, receiveUrl, pickupUrl, sign);
+        String url = pLpayClient.sendRequestUrl(orderNo, orderCurrency, orderAmount+"", receiveUrl, pickupUrl, sign);
 
         //增加一条c2c订单记录
         C2cOrder c2cOrder=new C2cOrder();
@@ -63,8 +64,9 @@ public class PLPayService {
         c2cOrder.setPrice(ratio);
         c2cOrder.setVolume(tarVolume);
         //计算USDT 就是 orderAmount*( 1 - 手续费率) / 你系统的CNY:USD汇率;
-        BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
-        c2cOrder.setAmount(ratio.multiply(tarVolume));
+//        BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
+
+        c2cOrder.setAmount(orderAmount);
         c2cOrder.setType(C2cConst.C2C_BUY);
         c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
         c2cOrder.setPayStatusDesc(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
