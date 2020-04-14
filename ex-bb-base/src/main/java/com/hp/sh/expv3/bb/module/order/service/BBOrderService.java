@@ -185,6 +185,7 @@ public class BBOrderService {
 	
 	@LockIt(key="${userId}-${asset}-${symbol}")
 	public boolean setPendingCancel(long userId, String asset, String symbol, long orderId){
+		Long now = DbDateUtils.now();
 		
 		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
@@ -193,7 +194,15 @@ public class BBOrderService {
 			return false;
 		}
 		
-		Long now = DbDateUtils.now();
+		if(order.getStatus()==OrderStatus.PENDING_CANCEL){
+			if(now - order.getModified() > 1000*10){
+				return true;
+			}else{
+				logger.warn("订单状态是PENDING_CANCEL,{}-{}", now, order.getModified());
+				return false;
+			}
+		}
+		
 		orderUpdateService.setPendingCancel(OrderStatus.PENDING_CANCEL, now, orderId, userId, order.getVersion());
 		return true;
 	}

@@ -33,6 +33,7 @@ import com.hp.sh.expv3.config.db.SnGenerator;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.utils.DbDateUtils;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
  * @author wangjg
@@ -249,6 +250,10 @@ public class BBAccountCoreService{
 		//保存本笔明细
 		this.saveRecord(record, account);
 		
+		
+		if(BigUtils.haveDecimalPart(record.getTotal())){
+			logger.error("结果包含小数，{}", record);
+		}
 	}
 	
 	private void saveRecord(BBAccountRecord record, BBAccount account){
