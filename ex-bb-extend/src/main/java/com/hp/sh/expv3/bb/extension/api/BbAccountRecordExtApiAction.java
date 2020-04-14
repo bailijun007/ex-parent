@@ -52,8 +52,7 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
         }
 
         if (!CollectionUtils.isEmpty(voList)) {
-            if (tradeType == BbAccountRecordConst.ACCOUNT_FUND_TO_BB || tradeType == BbAccountRecordConst.ACCOUNT_BB_TO_FUND ||
-                    tradeType == BbAccountRecordConst.ACCOUNT_PC_TO_BB || tradeType == BbAccountRecordConst.ACCOUNT_BB_TO_PC) {
+            if (tradeType == BbAccountRecordConst.TRADE_BUY_IN || tradeType == BbAccountRecordConst.TRADE_SELL_OUT ) {
                 List<Long> refId = voList.stream().map(BbAccountRecordExtVo::getAssociatedId).collect(Collectors.toList());
                 List<BbOrderTradeVo> bbOrderTradeVoList = bbOrderTradeExtService.queryByIds(refId);
                 if (!CollectionUtils.isEmpty(bbOrderTradeVoList)) {
@@ -64,10 +63,12 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
                         }
                     }
                 }
+            }else {
+                for (BbAccountRecordExtVo recordExtVo : voList) {
+                    recordExtVo.setFee(recordExtVo.getFee() == null ? BigDecimal.ZERO : recordExtVo.getFee());
+                }
             }
-            for (BbAccountRecordExtVo recordExtVo : voList) {
-                recordExtVo.setFee(recordExtVo.getFee() == null ? BigDecimal.ZERO : recordExtVo.getFee());
-            }
+
         }
 
         return voList;

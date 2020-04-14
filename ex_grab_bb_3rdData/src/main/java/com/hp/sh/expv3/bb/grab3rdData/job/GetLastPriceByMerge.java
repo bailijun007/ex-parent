@@ -103,22 +103,24 @@ public class GetLastPriceByMerge {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-//    @Scheduled(cron = "*/1 * * * * *")
+    @Scheduled(cron = "*/1 * * * * *")
     public void merge() {
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
                 BigDecimal zbAvgPrice = mergeByZb(bbSymbol);
-                logger.info("zb最新成交均价为:{},",zbAvgPrice);
+                logger.info("zb最新成交均价为:{},", zbAvgPrice);
                 BigDecimal binanceAvgPrice = mergeByBinance(bbSymbol);
-                logger.info("binance最新成交均价为:{},",binanceAvgPrice);
+                logger.info("binance最新成交均价为:{},", binanceAvgPrice);
                 BigDecimal bitfinexAvgPrice = mergeByBitfinex(bbSymbol);
-                logger.info("bitfinex最新成交均价为:{},",bitfinexAvgPrice);
+                logger.info("bitfinex最新成交均价为:{},", bitfinexAvgPrice);
                 BigDecimal okAvgPrice = mergeByOk(bbSymbol);
-                logger.info("ok最新成交均价为:{},",okAvgPrice);
-                BigDecimal avgLastPrice=zbAvgPrice.add(binanceAvgPrice).add(bitfinexAvgPrice).add(okAvgPrice).divide(new BigDecimal(4), 4, RoundingMode.DOWN);
-               logger.info("最终最新成交均价为:{},",avgLastPrice);
-                saveMerge(bbSymbol,avgLastPrice);
+                logger.info("ok最新成交均价为:{},", okAvgPrice);
+                BigDecimal avgLastPrice = zbAvgPrice.add(binanceAvgPrice).add(bitfinexAvgPrice).add(okAvgPrice).divide(new BigDecimal(4), 4, RoundingMode.DOWN);
+                logger.info("asset={},symbol={}最终最新成交均价为:{},", bbSymbol.getAsset(), bbSymbol.getSymbol(), avgLastPrice);
+                if(avgLastPrice.compareTo(BigDecimal.ZERO)!=0){
+                    saveMerge(bbSymbol, avgLastPrice);
+                }
             }
         }
     }
@@ -131,7 +133,6 @@ public class GetLastPriceByMerge {
         String httpsKey = zbHttpsRedisKey + hashKey;
         String strHttpsTicker = metadataDb5RedisUtil.get(httpsKey);
         ZbTickerData httpsTicker = JSON.parseObject(strHttpsTicker, ZbTickerData.class);
-
         String wssKey = zbWssRedisKey + hashKey;
         String strWssTicker = metadataDb5RedisUtil.get(wssKey);
         ZbTickerData wssTicker = JSON.parseObject(strWssTicker, ZbTickerData.class);
@@ -145,9 +146,9 @@ public class GetLastPriceByMerge {
             avgLastPrice = httpLast.add(wssLast).divide(new BigDecimal(2), 4, RoundingMode.DOWN);
         }
 
-        if (null == httpsTicker) {
+        if (null == httpsTicker && null != wssTicker) {
             avgLastPrice = wssTicker.getLast();
-        } else if (null == wssTicker) {
+        } else if (null == wssTicker && null != httpsTicker) {
             avgLastPrice = httpsTicker.getLast();
         }
 
@@ -159,7 +160,7 @@ public class GetLastPriceByMerge {
 
 
     private void saveMerge(BBSymbol bbSymbol, BigDecimal avgLastPrice) {
-        String key = "ticker:bb:lastPrice:" + bbSymbol.getAsset() + ":" + bbSymbol.getSymbol();
+        String key = "ticker:bb:lastPrice:" + bbSymbol.getAsset();
         HashMap<String, BigDecimal> map = new HashMap<>();
         map.put(bbSymbol.getSymbol(), avgLastPrice);
         metadataDb5RedisUtil.hmset(key, map);
@@ -187,9 +188,9 @@ public class GetLastPriceByMerge {
             avgLastPrice = httpLast.add(wssLast).divide(new BigDecimal(2), 4, RoundingMode.DOWN);
         }
 
-        if (null == httpsTicker) {
+        if (null == httpsTicker && null != wssTicker) {
             avgLastPrice = wssTicker.getC();
-        } else if (null != wssTicker) {
+        } else if (null != wssTicker && null != httpsTicker) {
             Object price = httpsTicker.get("price");
             httpLast = new BigDecimal(price + "");
             avgLastPrice = httpLast;
@@ -209,8 +210,9 @@ public class GetLastPriceByMerge {
         BitfinexResponseEntity httpsTicker = JSON.parseObject(strHttpsTicker, BitfinexResponseEntity.class);
         if (null == httpsTicker) {
             avgLastPrice = BigDecimal.ZERO;
+        } else {
+            avgLastPrice = httpsTicker.getLastPrice();
         }
-        avgLastPrice = httpsTicker.getLastPrice()==null?BigDecimal.ZERO:httpsTicker.getLastPrice();
         logger.info("bitfinex的交易对:{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
         return avgLastPrice;
     }
@@ -224,8 +226,9 @@ public class GetLastPriceByMerge {
         OkResponseEntity httpsTicker = JSON.parseObject(strHttpsTicker, OkResponseEntity.class);
         if (null == httpsTicker) {
             avgLastPrice = BigDecimal.ZERO;
+        } else {
+            avgLastPrice = httpsTicker.getLast();
         }
-        avgLastPrice = httpsTicker.getLast()==null?BigDecimal.ZERO:httpsTicker.getLast();
         logger.info("ok的交易对:{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
         return avgLastPrice;
     }
