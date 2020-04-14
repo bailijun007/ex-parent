@@ -102,6 +102,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
      */
     @Override
     public String withdrawalOrder(Long userId, Long bankCard, String bank, String bankCardName, String srcAsset, BigDecimal srcNum, String tarAsset, BigDecimal tarNum, BigDecimal ratio) {
+        logger.info("userId={},bankCard={},bankCardName={},srcAsset={},srcNum={},tarAsset={},tarNum={},ratio={}",userId,bankCard,bankCardName,srcAsset,srcNum,tarAsset,tarNum,ratio);
         //获取资产账户
         CapitalAccountVo account = fundAccountExtApi.getCapitalAccount(userId, srcAsset);
         BigDecimal remain = account.getAvailable();
