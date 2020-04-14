@@ -89,7 +89,7 @@ INDEX `idx_userid_asset` (`user_id`, `asset`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_账户明细'
+COMMENT='币币_账户明细'
 
 ;
 
@@ -109,7 +109,7 @@ INDEX `idx_symbol` (`symbol`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_活动订单（委托）'
+COMMENT='币币_活动订单（委托）'
 
 ;
 
@@ -267,7 +267,7 @@ INDEX `idx_trade_time` (`trade_time`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_用户订单成交记录'
+COMMENT='币币_用户订单成交记录'
 
 ;
 
@@ -299,6 +299,6 @@ INDEX `idx_mk_order_id` (`mk_order_id`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='永续合约_成交(撮合结果)'
+COMMENT='币币_成交(撮合结果)'
 
 ;
