@@ -249,11 +249,6 @@ public class BBAccountCoreService{
 		
 		//保存本笔明细
 		this.saveRecord(record, account);
-		
-		
-		if(BigUtils.haveDecimalPart(record.getTotal())){
-			logger.error("结果包含小数，{}", record);
-		}
 	}
 	
 	private void saveRecord(BBAccountRecord record, BBAccount account){
