@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.id.generator.SnowflakeSn;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
+import com.hp.sh.expv3.bb.module.collector.entity.BBCollectorAccountRecord;
 
 @Component
 public class SnGenerator {
@@ -29,6 +30,7 @@ public class SnGenerator {
 	@PostConstruct
 	public void setIdWorker(){
 		idWorkerMap.put(BBAccountRecord.class, new SnowflakeSn(dataCenterId, serverId));
+		idWorkerMap.put(BBCollectorAccountRecord.class, new SnowflakeSn(dataCenterId, serverId));
 	}
 
 	public String genSn(Object entity){
