@@ -52,18 +52,27 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
         }
 
         if (!CollectionUtils.isEmpty(voList)) {
-            if (tradeType == BbAccountRecordConst.TRADE_BUY_IN || tradeType == BbAccountRecordConst.TRADE_SELL_OUT ) {
-                List<Long> refId = voList.stream().map(BbAccountRecordExtVo::getAssociatedId).collect(Collectors.toList());
-                List<BbOrderTradeVo> bbOrderTradeVoList = bbOrderTradeExtService.queryByIds(refId);
+            List<Long> refId = voList.stream().map(BbAccountRecordExtVo::getAssociatedId).collect(Collectors.toList());
+             Map<Integer, List<BbAccountRecordExtVo>> map = voList.stream().collect(Collectors.groupingBy(BbAccountRecordExtVo::getTradeType));
+            List<BbOrderTradeVo> bbOrderTradeVoList = bbOrderTradeExtService.queryByIds(refId);
+            if (map.containsKey(BbAccountRecordConst.TRADE_BUY_IN) || map.containsKey(BbAccountRecordConst.TRADE_SELL_OUT)||
+                    map.containsKey(BbAccountRecordConst.TRADE_SELL_INCOME)||  map.containsKey(BbAccountRecordConst.TRADE_SELL_RELEASE) ) {
                 if (!CollectionUtils.isEmpty(bbOrderTradeVoList)) {
                     Map<Long, BbOrderTradeVo> id2Vo = bbOrderTradeVoList.stream().collect(Collectors.toMap(BbOrderTradeVo::getId, Function.identity()));
                     for (BbAccountRecordExtVo recordExtVo : voList) {
                         if (id2Vo.containsKey(recordExtVo.getAssociatedId())) {
                             recordExtVo.setFee(id2Vo.get(recordExtVo.getAssociatedId()).getFee());
                         }
+                        //做映射TradeType=9或者11 都属于买入；TradeType=10或者12 都属于卖出
+                        if(map.containsKey(BbAccountRecordConst.TRADE_SELL_INCOME)){
+                            recordExtVo.setTradeType(BbAccountRecordConst.TRADE_BUY_IN);
+                        }
+                        if(map.containsKey(BbAccountRecordConst.TRADE_SELL_RELEASE)){
+                            recordExtVo.setTradeType(BbAccountRecordConst.TRADE_SELL_OUT);
+                        }
                     }
                 }
-            }else {
+            } else {
                 for (BbAccountRecordExtVo recordExtVo : voList) {
                     recordExtVo.setFee(recordExtVo.getFee() == null ? BigDecimal.ZERO : recordExtVo.getFee());
                 }
