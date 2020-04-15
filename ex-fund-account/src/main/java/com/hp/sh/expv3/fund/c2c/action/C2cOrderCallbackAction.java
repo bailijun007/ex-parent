@@ -82,7 +82,7 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
 
                 //更新一条c2c订单记录
                 C2cOrder c2cOrder = new C2cOrder();
-                c2cOrder.setAmount(orderAmount);
+//                c2cOrder.setAmount(orderAmount);
                 //计算USDT 就是 orderAmount*( 1 - 手续费率) / 你系统的CNY:USD汇率;
 //                BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
 //                BigDecimal qty = param.getOrderAmount().multiply(feeRatio).divide(c2cOrder1.getPrice(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();

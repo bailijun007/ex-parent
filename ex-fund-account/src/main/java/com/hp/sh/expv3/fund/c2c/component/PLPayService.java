@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 
 @Component
@@ -47,7 +48,7 @@ public class PLPayService {
 //        }
 
         //订单金额
-        BigDecimal orderAmount = ratio.multiply(tarVolume);
+        BigDecimal orderAmount = ratio.multiply(tarVolume).setScale(2, RoundingMode.UP);
 //        String orderAmount = fabiAmt.stripTrailingZeros().toPlainString();
 //        String receiveUrl = getReceiveUrl();
 //        String pickupUrl = getPickupUrl();
