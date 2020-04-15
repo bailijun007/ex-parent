@@ -15,6 +15,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -117,9 +119,12 @@ public class GetLastPriceByMerge {
                 BigDecimal okAvgPrice = mergeByOk(bbSymbol);
                 logger.info("ok最新成交均价为:{},", okAvgPrice);
                 BigDecimal avgLastPrice = zbAvgPrice.add(binanceAvgPrice).add(bitfinexAvgPrice).add(okAvgPrice).divide(new BigDecimal(4), 4, RoundingMode.DOWN);
-                logger.info("asset={},symbol={}最终最新成交均价为:{},", bbSymbol.getAsset(), bbSymbol.getSymbol(), avgLastPrice);
-                if(avgLastPrice.compareTo(BigDecimal.ZERO)!=0){
+                LocalDateTime dateTime = LocalDateTime.now();
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String format = dateTime.format(dtf);
+                if (avgLastPrice.compareTo(BigDecimal.ZERO) != 0) {
                     saveMerge(bbSymbol, avgLastPrice);
+                    logger.info("当前时间={},asset={},symbol={},最终最新成交均价为:{},", format, bbSymbol.getAsset(), bbSymbol.getSymbol(), avgLastPrice);
                 }
             }
         }

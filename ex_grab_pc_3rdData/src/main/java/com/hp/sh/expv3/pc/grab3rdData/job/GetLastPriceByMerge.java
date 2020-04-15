@@ -15,6 +15,8 @@ import com.hp.sh.expv3.config.redis.RedisUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,10 +109,13 @@ public class GetLastPriceByMerge {
                 BigDecimal okAvgPrice = mergeByOk(pcSymbol);
                 logger.info("ok最新成交均价为:{},", okAvgPrice);
                 BigDecimal avgLastPrice = binanceAvgPrice.add(okAvgPrice).divide(new BigDecimal(2), 4, RoundingMode.DOWN);
-                logger.info("asset={},symbol={},最终最新成交均价为:{},", pcSymbol.getAsset(),pcSymbol.getSymbol(),avgLastPrice);
-                  if(avgLastPrice.compareTo(BigDecimal.ZERO)!=0){
-                      saveMerge(pcSymbol, avgLastPrice);
-                  }
+                LocalDateTime dateTime = LocalDateTime.now();
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String format = dateTime.format(dtf);
+                if (avgLastPrice.compareTo(BigDecimal.ZERO) != 0) {
+                    saveMerge(pcSymbol, avgLastPrice);
+                    logger.info("当前时间={},asset={},symbol={},最终最新成交均价为:{},", format, pcSymbol.getAsset(), pcSymbol.getSymbol(), avgLastPrice);
+                }
             }
         }
     }

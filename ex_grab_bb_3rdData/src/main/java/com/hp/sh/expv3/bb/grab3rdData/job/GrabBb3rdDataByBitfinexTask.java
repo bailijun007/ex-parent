@@ -38,7 +38,7 @@ public class GrabBb3rdDataByBitfinexTask {
             1,
             1,
             0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(10000000),
+            new LinkedBlockingQueue<Runnable>(1024),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
