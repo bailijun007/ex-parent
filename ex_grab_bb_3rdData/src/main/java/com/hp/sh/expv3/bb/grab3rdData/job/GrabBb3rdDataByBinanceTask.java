@@ -111,7 +111,14 @@ public class GrabBb3rdDataByBinanceTask {
                             if (expBbSymbol.equals(binanceBbSymbol)) {
                                 String key = wssRedisKey + binanceBbSymbol;
                                 logger.info("binance wssKey={}", key);
-                                metadataDb5RedisUtil.set(key, responseData, 60);
+//                                metadataDb5RedisUtil.set(key, responseData, 900);
+                                String s = metadataDb5RedisUtil.get(key);
+                                BinanceResponseData binanceResponseData = JSON.parseObject(s, BinanceResponseData.class);
+                                if (null == binanceResponseData) {
+                                    metadataDb5RedisUtil.set(key, responseData, 900);
+                                }else if (null != binanceResponseData && binanceResponseData.getC().compareTo(responseData.getC()) != 0) {
+                                    metadataDb5RedisUtil.set(key, responseData, 900);
+                                }
                             }
                         }
                     }
@@ -152,7 +159,7 @@ public class GrabBb3rdDataByBinanceTask {
                         if (expymbol.equals(binanceSymbol)) {
                             String key = httpsRedisKey + binanceSymbol;
                             logger.info("binance httpsRedisKey={}", key);
-                            metadataDb5RedisUtil.set(key, JSON.toJSONString(map), 60);
+                            metadataDb5RedisUtil.set(key, JSON.toJSONString(map), 900);
                         }
                     }
                 } catch (Exception e) {

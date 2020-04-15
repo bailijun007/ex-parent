@@ -80,14 +80,13 @@ public class GrabBb3rdDataByZbTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-
     @PostConstruct
     public void startGrabBb3rdDataByZbWss() {
         if (enableByWss != 1) {
             return;
         }
 //        ZbWsClient client = new ZbWsClient(zbWssUrl);
-        ZbWsClient client =ZbWsClient.getZbWsClient(zbWssUrl);
+        ZbWsClient client = ZbWsClient.getZbWsClient(zbWssUrl);
         client.connect();
         Map data = new TreeMap();
         data.put("event", "addChannel");
@@ -111,10 +110,16 @@ public class GrabBb3rdDataByZbTask {
                 ZbResponseEntity tickerData = queue.poll();
                 String hashKey = tickerData.getChannel().split("_")[0];
                 String key = wssRedisKey + hashKey;
-                logger.info("wssKey={}", key);
+                logger.info("zb wssKey={}", key);
                 ZbTickerData ticker = tickerData.getTicker();
                 if (null != ticker) {
-                    metadataDb5RedisUtil.set(key, ticker, 60);
+                    String s = metadataDb5RedisUtil.get(key);
+                    ZbTickerData zbTickerData = JSON.parseObject(s, ZbTickerData.class);
+                    if (null == zbTickerData) {
+                        metadataDb5RedisUtil.set(key, ticker, 900);
+                    }else if (null != zbTickerData && zbTickerData.getLast().compareTo(ticker.getLast()) != 0) {
+                        metadataDb5RedisUtil.set(key, ticker, 900);
+                    }
                 }
             }
         });
@@ -143,7 +148,13 @@ public class GrabBb3rdDataByZbTask {
                 logger.info("httpsKey={}", key);
                 ZbTickerData ticker = tickerData.getTicker();
                 if (null != ticker) {
-                    metadataDb5RedisUtil.set(key, ticker, 60);
+                    String s = metadataDb5RedisUtil.get(key);
+                    ZbTickerData zbTickerData = JSON.parseObject(s, ZbTickerData.class);
+                    if (null == zbTickerData) {
+                        metadataDb5RedisUtil.set(key, ticker, 900);
+                    }else if (null != zbTickerData && zbTickerData.getLast().compareTo(ticker.getLast()) != 0) {
+                        metadataDb5RedisUtil.set(key, ticker, 900);
+                    }
                 }
             }
         }
@@ -151,9 +162,9 @@ public class GrabBb3rdDataByZbTask {
 
     @Scheduled(cron = "*/59 * * * * *")
     public void retryConnection() {
-        ZbWsClient client =ZbWsClient.getZbWsClient(zbWssUrl);
+        ZbWsClient client = ZbWsClient.getZbWsClient(zbWssUrl);
         Boolean isClosed = client.getIsClosed();
-        if(!isClosed){
+        if (!isClosed) {
             client.close();
             startGrabBb3rdDataByZbWss();
         }

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.hp.sh.expv3.bb.grab3rdData.component.ZbWsClient;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.BitfinexResponseEntity;
+import com.hp.sh.expv3.bb.grab3rdData.pojo.OkResponseEntity;
 import com.hp.sh.expv3.bb.grab3rdData.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import okhttp3.Call;
@@ -111,7 +112,14 @@ public class GrabBb3rdDataByBitfinexTask {
                                 if (bitfinexSymbol.equals(symbol)) {
                                     String key = bitfinexHttpsRedisKey + bitfinexSymbol;
                                     logger.info("bitfinexHttpsRedisKey={}", key);
-                                    metadataDb5RedisUtil.set(key, bitfinexResponseEntity, 60);
+//                                    metadataDb5RedisUtil.set(key, bitfinexResponseEntity, 900);
+                                    String s = metadataDb5RedisUtil.get(key);
+                                    BitfinexResponseEntity bitfinexTickerData = JSON.parseObject(s, BitfinexResponseEntity.class);
+                                    if (null == bitfinexTickerData) {
+                                        metadataDb5RedisUtil.set(key, bitfinexResponseEntity, 900);
+                                    }else if (null != bitfinexTickerData && bitfinexTickerData.getLastPrice().compareTo(bitfinexResponseEntity.getLastPrice()) != 0) {
+                                        metadataDb5RedisUtil.set(key, bitfinexResponseEntity, 900);
+                                    }
                                 }
                             }
                             TimeUnit.SECONDS.sleep(1);

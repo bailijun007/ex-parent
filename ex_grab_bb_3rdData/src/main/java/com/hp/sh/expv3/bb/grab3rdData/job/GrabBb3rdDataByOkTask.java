@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.grab3rdData.component.ZbWsClient;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.OkResponseEntity;
+import com.hp.sh.expv3.bb.grab3rdData.pojo.ZbTickerData;
 import com.hp.sh.expv3.bb.grab3rdData.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import okhttp3.Call;
@@ -90,7 +91,14 @@ public class GrabBb3rdDataByOkTask {
                                 if (okSymbol.equals(symbol)) {
                                     String key = okHttpsRedisKey + okSymbol;
                                     logger.info("okHttpsRedisKey={}", key);
-                                    metadataDb5RedisUtil.set(key, okResponseEntity, 60);
+//                                    metadataDb5RedisUtil.set(key, okResponseEntity, 900);
+                                    String s = metadataDb5RedisUtil.get(key);
+                                    OkResponseEntity okTickerData = JSON.parseObject(s, OkResponseEntity.class);
+                                    if (null == okTickerData) {
+                                        metadataDb5RedisUtil.set(key, okResponseEntity, 900);
+                                    }else if (null != okTickerData && okTickerData.getLast().compareTo(okResponseEntity.getLast()) != 0) {
+                                        metadataDb5RedisUtil.set(key, okResponseEntity, 900);
+                                    }
                                 }
                             }
                             TimeUnit.SECONDS.sleep(1);
