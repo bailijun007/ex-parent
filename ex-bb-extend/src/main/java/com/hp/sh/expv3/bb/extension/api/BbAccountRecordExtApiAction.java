@@ -53,7 +53,8 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
 
         if (!CollectionUtils.isEmpty(voList)) {
             List<Long> refId = voList.stream().map(BbAccountRecordExtVo::getAssociatedId).collect(Collectors.toList());
-             Map<Integer, List<BbAccountRecordExtVo>> map = voList.stream().collect(Collectors.groupingBy(BbAccountRecordExtVo::getTradeType));
+            //根据类型进行分组
+            Map<Integer, List<BbAccountRecordExtVo>> map = voList.stream().collect(Collectors.groupingBy(BbAccountRecordExtVo::getTradeType));
             List<BbOrderTradeVo> bbOrderTradeVoList = bbOrderTradeExtService.queryByIds(refId);
             if (map.containsKey(BbAccountRecordConst.TRADE_BUY_IN) || map.containsKey(BbAccountRecordConst.TRADE_SELL_OUT)||
                     map.containsKey(BbAccountRecordConst.TRADE_SELL_INCOME)||  map.containsKey(BbAccountRecordConst.TRADE_SELL_RELEASE) ) {
@@ -64,10 +65,10 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
                             recordExtVo.setFee(id2Vo.get(recordExtVo.getAssociatedId()).getFee());
                         }
                         //做映射TradeType=9或者11 都属于买入；TradeType=10或者12 都属于卖出
-                        if(map.containsKey(BbAccountRecordConst.TRADE_SELL_INCOME)){
+                        if(recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_INCOME)){
                             recordExtVo.setTradeType(BbAccountRecordConst.TRADE_BUY_IN);
                         }
-                        if(map.containsKey(BbAccountRecordConst.TRADE_SELL_RELEASE)){
+                        if(recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_RELEASE)){
                             recordExtVo.setTradeType(BbAccountRecordConst.TRADE_SELL_OUT);
                         }
                     }
