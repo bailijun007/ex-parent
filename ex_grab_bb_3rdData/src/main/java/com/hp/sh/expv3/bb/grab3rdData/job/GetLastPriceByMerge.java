@@ -109,39 +109,131 @@ public class GetLastPriceByMerge {
 
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
-                List<BigDecimal> avgPriceList = new ArrayList<>();
+//                List<BigDecimal> avgPriceList = new ArrayList<>();
                 String key = "ticker:bb:lastPrice:" + bbSymbol.getAsset();
                 List<String> symbols = new ArrayList<>();
                 symbols.add(bbSymbol.getSymbol());
                 Map<String, String> lastPriceMap = metadataDb5RedisUtil.hmget(key, symbols);
-                Map<String, String> currentPriceMap = mergeByAvg(bbSymbol, avgPriceList, key);
-
+                Map<String, BigDecimal> currentPriceMap = mergeByAvg(bbSymbol);
+                BigDecimal avgPrice = this.filter(lastPriceMap, currentPriceMap);
+                if (avgPrice.compareTo(BigDecimal.ZERO) != 0) {
+                    saveMerge(bbSymbol, avgPrice, key);
+                }
             }
         }
     }
 
+    private BigDecimal filter(Map<String, String> lastPriceMap, Map<String, BigDecimal> currentPriceMap) {
+        BigDecimal avgPrice = BigDecimal.ZERO;
+        BigDecimal sumPrice = BigDecimal.ZERO;
+        if (currentPriceMap.size() >= 3) {
+            List<BigDecimal> currentPriceList = new ArrayList<>(currentPriceMap.values());
+            BigDecimal medianPrice = generatedMedian(currentPriceList);
+            for (String s : currentPriceMap.keySet()) {
+                BigDecimal price = currentPriceMap.get(s);
+                BigDecimal abs = price.subtract(medianPrice).abs();
+                BigDecimal rule = abs.divide(medianPrice, 4, RoundingMode.DOWN);
+                if (rule.compareTo(new BigDecimal("0.25")) == 1) {
+                    currentPriceMap.remove(s);
+                }
+            }
+            if (CollectionUtils.isEmpty(currentPriceMap)) {
+                return avgPrice;
+            }else {
+                //求平均价
+                for (String s : currentPriceMap.keySet()) {
+                    sumPrice = sumPrice.add(currentPriceMap.get(s));
+                }
+                avgPrice = sumPrice.divide(new BigDecimal(currentPriceMap.size()), 4, RoundingMode.DOWN);
+                return avgPrice;
+            }
+        }
 
-    private Map<String, String> mergeByAvg(BBSymbol bbSymbol, List<BigDecimal> avgPriceList, String key) {
-        Map<String, String> currentPriceMap = new HashMap<>();
+        if (currentPriceMap.size() == 2) {
+            List<BigDecimal> currentPriceList = new ArrayList<>(currentPriceMap.values());
+            BigDecimal medianPrice = generatedMedian(currentPriceList);
+            for (String s : currentPriceMap.keySet()) {
+                BigDecimal price = currentPriceMap.get(s);
+                BigDecimal rule = (price.subtract(medianPrice).abs()).divide(medianPrice, 4);
+                if (rule.compareTo(new BigDecimal("0.125")) == 1) {
+                    currentPriceMap.remove(s);
+                }
+            }
+            if (CollectionUtils.isEmpty(currentPriceMap)) {
+                return avgPrice;
+            }
+            //如果过滤后currentPriceMap.size() == 2,则直接算出均值，return
+            if (currentPriceMap.size() == 2) {
+                for (String s : currentPriceMap.keySet()) {
+                    BigDecimal bigDecimal = currentPriceMap.get(s);
+                    sumPrice = sumPrice.add(bigDecimal);
+                }
+                avgPrice = sumPrice.divide(new BigDecimal(currentPriceMap.size()), 4, RoundingMode.DOWN);
+                return avgPrice;
+            }
+        }
+
+        if (currentPriceMap.size() == 1) {
+            BigDecimal currentPrice = new ArrayList<>(currentPriceMap.values()).get(0);
+            BigDecimal lastPrice = BigDecimal.ZERO;
+            //如果没有最新成交价，则直接用当前获取的成交价
+            if (CollectionUtils.isEmpty(lastPriceMap)) {
+                return currentPrice;
+            }else if (CollectionUtils.isEmpty(currentPriceMap)) {
+                return BigDecimal.ZERO;
+            } else {
+                String lastPriceStr = new ArrayList<>((List<String>) lastPriceMap.values()).get(0);
+                lastPrice = new BigDecimal(lastPriceStr);
+            }
+
+            if (currentPrice.subtract(lastPrice).abs().compareTo(new BigDecimal("0.25")) == 1) {
+                return BigDecimal.ZERO;
+            } else {
+                return currentPrice;
+            }
+        }
+        return avgPrice;
+    }
+
+
+    /**
+     * 生成中位数
+     *
+     * @param list
+     * @return
+     */
+    private BigDecimal generatedMedian(List<BigDecimal> list) {
+        // 生成中位数
+        BigDecimal j;
+        if (list.size() % 2 == 0) {
+            j = (list.get(list.size() / 2 - 1).add(list.get(list.size() / 2))).divide(new BigDecimal("2"), 4, RoundingMode.DOWN);
+        } else {
+            j = list.get(list.size() / 2);
+        }
+        return j;
+    }
+
+    private Map<String, BigDecimal> mergeByAvg(BBSymbol bbSymbol) {
+        Map<String, BigDecimal> currentPriceMap = new HashMap<>();
         BigDecimal zbAvgPrice = mergeByZb(bbSymbol);
-        avgPriceList.add(zbAvgPrice);
+        currentPriceMap.put("zb", zbAvgPrice);
         logger.info("zb最新成交均价为:{},", zbAvgPrice);
         BigDecimal binanceAvgPrice = mergeByBinance(bbSymbol);
-        avgPriceList.add(binanceAvgPrice);
+        currentPriceMap.put("binance", binanceAvgPrice);
         logger.info("binance最新成交均价为:{},", binanceAvgPrice);
         BigDecimal bitfinexAvgPrice = mergeByBitfinex(bbSymbol);
-        avgPriceList.add(bitfinexAvgPrice);
+        currentPriceMap.put("bitfinex", bitfinexAvgPrice);
         logger.info("bitfinex最新成交均价为:{},", bitfinexAvgPrice);
         BigDecimal okAvgPrice = mergeByOk(bbSymbol);
-        avgPriceList.add(okAvgPrice);
+        currentPriceMap.put("ok", okAvgPrice);
         logger.info("ok最新成交均价为:{},", okAvgPrice);
-        BigDecimal avgLastPrice = zbAvgPrice.add(binanceAvgPrice).add(bitfinexAvgPrice).add(okAvgPrice).divide(new BigDecimal(4), 4, RoundingMode.DOWN);
-        if (avgLastPrice.compareTo(BigDecimal.ZERO) != 0) {
-//            saveMerge(bbSymbol, avgLastPrice, key);
-            currentPriceMap.put(bbSymbol.getSymbol(), avgLastPrice + "");
-            return currentPriceMap;
-        }
-        return Collections.emptyMap();
+//        BigDecimal avgLastPrice = zbAvgPrice.add(binanceAvgPrice).add(bitfinexAvgPrice).add(okAvgPrice).divide(new BigDecimal(4), 4, RoundingMode.DOWN);
+//        if (avgLastPrice.compareTo(BigDecimal.ZERO) != 0) {
+////            saveMerge(bbSymbol, avgLastPrice, key);
+//            currentPriceMap.put(bbSymbol.getSymbol(), avgLastPrice );
+//            return currentPriceMap;
+//        }
+        return currentPriceMap;
     }
 
 
