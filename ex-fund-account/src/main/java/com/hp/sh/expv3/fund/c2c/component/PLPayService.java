@@ -6,6 +6,8 @@ import com.hp.sh.expv3.fund.c2c.service.BuyService;
 import com.hp.sh.expv3.fund.c2c.util.GenerateOrderNumUtils;
 import com.hp.sh.expv3.fund.constant.ApprovalStatus;
 import com.hp.sh.expv3.utils.math.Precision;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,9 @@ import java.time.Instant;
 
 @Component
 public class PLPayService {
+
+    public static final Logger logger= LoggerFactory.getLogger(PLPayService.class);
+
     @Autowired
     private PLpayClient pLpayClient;
 
@@ -39,6 +44,9 @@ public class PLPayService {
      * @return 返回转发的url地址，调用方需要转发到该地址获取数据
      */
     public String rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal tarVolume, BigDecimal fabiAmt,String receiveUrl,String pickupUrl) {
+
+        logger.info("userId={},ratio={},srcCurrency={},tarCurrency={},tarVolume={},fabiAmt={},receiveUrl={},pickupUrl={}",userId,ratio,srcCurrency,tarCurrency,tarVolume,fabiAmt,receiveUrl,pickupUrl);
+
         //生成订单号
         String orderNo = GenerateOrderNumUtils.getOrderNo(userId);
         //订单币种
