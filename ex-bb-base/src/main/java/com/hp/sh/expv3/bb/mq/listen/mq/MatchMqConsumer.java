@@ -64,7 +64,7 @@ public class MatchMqConsumer {
 			throw e;
 		}catch(Exception e){
 			logger.error(e.getMessage(), e);
-			msgService.save(MqTags.TAGS_CANCELLED, msg);
+			msgService.save(MqTags.TAGS_CANCELLED, msg, e.getMessage());
 		}
 	}
 	
@@ -78,7 +78,7 @@ public class MatchMqConsumer {
 			throw e;
 		}catch(Exception e){
 			logger.error(e.getMessage(), e);
-			msgService.save(MqTags.TAGS_TRADE, msg);
+			msgService.save(MqTags.TAGS_TRADE, msg, e.getMessage());
 		}
 	}
 

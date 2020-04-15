@@ -43,20 +43,22 @@ public class BBMqMsgService{
 		this.bBMqMsgDAO.delete(userId, id);
 	}
 
-	public void save(String tag, BBTradeVo msg) {
+	public void save(String tag, BBTradeVo msg, String exMessage) {
 		BBMqMsg msgEntity = new BBMqMsg();
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setUserId(msg.getAccountId());
+		msgEntity.setExMessage(exMessage);
 		msgEntity.setTag(tag);
 		msgEntity.setKey(""+msg.getOrderId());
 		msgEntity.setBody(JsonUtils.toJson(msg));
 		this.bBMqMsgDAO.save(msgEntity);
 	}
 
-	public void save(String tag, BbOrderCancelMqMsg msg) {
+	public void save(String tag, BbOrderCancelMqMsg msg, String exMessage) {
 		BBMqMsg msgEntity = new BBMqMsg();
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setUserId(msg.getAccountId());
+		msgEntity.setExMessage(exMessage);
 		msgEntity.setTag(tag);
 		msgEntity.setKey(""+msg.getOrderId());
 		msgEntity.setBody(JsonUtils.toJson(msg));

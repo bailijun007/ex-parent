@@ -24,6 +24,9 @@ public class BBMqMsg implements UserData{
 	
 	private String body;
 	
+	//异常信息
+	private String exMessage;
+	
 	//处理方法
 	private String method;
 	
@@ -101,10 +104,20 @@ public class BBMqMsg implements UserData{
 		this.created = created;
 	}
 
+	public String getExMessage() {
+		return exMessage;
+	}
+
+	public void setExMessage(String exMessage) {
+		this.exMessage = exMessage;
+	}
+
 	@Override
 	public String toString() {
-		return "BBMqMsg [id=" + messageId + ", method=" + method + ", tag=" + tag + ", key=" + key + ", body=" + body
-				+ ", userId=" + userId + ", created=" + created + "]";
+		return "BBMqMsg [id=" + id + ", messageId=" + messageId + ", tag=" + tag + ", key=" + key + ", body=" + body
+				+ ", exMessage=" + exMessage + ", method=" + method + ", userId=" + userId + ", created=" + created
+				+ "]";
 	}
+
 
 }
