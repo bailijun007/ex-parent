@@ -17,6 +17,6 @@ public interface BaseUserDataMapper<T extends UserData,K>{
 
 	int update(T entity);
 
-	public T findById(@Param(UserDataEntity.USERID_PROPERTY) Long userId, @Param(BaseBizEntity.ID_PROPERTY) Long id);
+	public T findById(@Param(UserDataEntity.USERID_PROPERTY) Long userId, @Param(BaseBizEntity.ID_PROPERTY) K id);
 
 }

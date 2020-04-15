@@ -358,6 +358,10 @@ public class SnowflakeIdWorker {
         SnowflakeIdWorker idWorker = new SnowflakeIdWorker(2, 11, 0, 9).setId(3, 0, 0);
         long time = idWorker.getTimeInMs(165788629711486976L);
         System.out.println(new Date(time).toLocaleString());
+        
+        long sid = idWorker.getServer(170227280512057348L);
+        System.out.println(sid);
+        
 
     }
 }

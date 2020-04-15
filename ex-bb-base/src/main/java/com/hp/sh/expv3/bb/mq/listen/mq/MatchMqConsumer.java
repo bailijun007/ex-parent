@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.job.BBMatchedHandler;
+import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
@@ -34,6 +35,8 @@ public class MatchMqConsumer {
 	private BBOrderService orderService;
 	@Autowired
 	private BBMatchedTradeService matchedTradeService;
+	@Autowired
+	private BBMqMsgService msgService;
 	@Autowired
 	private BBSender sender;
 	
@@ -57,6 +60,17 @@ public class MatchMqConsumer {
 		this.matchedHandler.handleCancelled(msg);
 	}
 	
+	//成交
+	@MQListener(tags=MqTags.TAGS_TRADE)
+	public void handleTradeMsg(BBTradeVo msg){
+		logger.info("收到用户成交消息:{}", msg);
+//		try{
+//			this.tradeService.handleTrade(msg);
+//		}catch(Exception e){
+////			msgService.save(MqTags.TAGS_TRADE, msg);
+//		}
+	}
+
 	/**
 	 * 撮合成功
 	 */
@@ -122,13 +136,6 @@ public class MatchMqConsumer {
 		//处理用户成交
 		matchedHandler.handleMatchedTrade(matchedTrade);
 		
-	}
-	
-	//成交
-	@MQListener(tags=MqTags.TAGS_TRADE)
-	public void handleTradeMsg(BBTradeVo msg){
-		logger.info("收到用户成交消息:{}", msg);
-		this.tradeService.handleTrade(msg);
 	}
 	
 	@Autowired
