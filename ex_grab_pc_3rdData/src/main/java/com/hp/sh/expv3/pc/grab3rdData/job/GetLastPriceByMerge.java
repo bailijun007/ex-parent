@@ -107,8 +107,10 @@ public class GetLastPriceByMerge {
                 BigDecimal okAvgPrice = mergeByOk(pcSymbol);
                 logger.info("ok最新成交均价为:{},", okAvgPrice);
                 BigDecimal avgLastPrice = binanceAvgPrice.add(okAvgPrice).divide(new BigDecimal(2), 4, RoundingMode.DOWN);
-                logger.info("最终最新成交均价为:{},", avgLastPrice);
-                saveMerge(pcSymbol, avgLastPrice);
+                logger.info("asset={},symbol={},最终最新成交均价为:{},", pcSymbol.getAsset(),pcSymbol.getSymbol(),avgLastPrice);
+                  if(avgLastPrice.compareTo(BigDecimal.ZERO)!=0){
+                      saveMerge(pcSymbol, avgLastPrice);
+                  }
             }
         }
     }
@@ -199,8 +201,9 @@ public class GetLastPriceByMerge {
         OkResponseEntity httpsTicker = JSON.parseObject(strHttpsTicker, OkResponseEntity.class);
         if (null == httpsTicker) {
             avgLastPrice = BigDecimal.ZERO;
+        }else {
+            avgLastPrice = httpsTicker.getLast();
         }
-        avgLastPrice = httpsTicker.getLast()==null?BigDecimal.ZERO:httpsTicker.getLast();
         logger.info("ok的交易对:{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
         return avgLastPrice;
     }

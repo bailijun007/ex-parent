@@ -51,8 +51,6 @@ public class GrabBb3rdDataByOkTask {
     @Value("${bb.trade.symbols}")
     private String symbols;
 
-    @Value("${bb.trade.bbGroupIds}")
-    private Integer bbGroupId;
 
     @Autowired
     @Qualifier("metadataRedisUtil")

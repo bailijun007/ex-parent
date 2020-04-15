@@ -64,12 +64,12 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
         }
         if (!CollectionUtils.isEmpty(map)) {
             for (Integer integer : map.keySet()) {
-                if (bbGroupId.equals(integer)) {
+//                if (bbGroupId.equals(integer)) {
                     List<BBSymbol> bbSymbols = map.get(integer);
                     for (BBSymbol bbSymbol : bbSymbols) {
                         list.add(bbSymbol);
                     }
-                }
+//                }
             }
         }
         return list;
