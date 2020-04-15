@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.bb.grab3rdData.job;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.*;
 import com.hp.sh.expv3.bb.grab3rdData.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.config.redis.RedisUtil;
@@ -17,10 +18,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -108,26 +106,42 @@ public class GetLastPriceByMerge {
     @Scheduled(cron = "*/1 * * * * *")
     public void merge() {
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
-                BigDecimal zbAvgPrice = mergeByZb(bbSymbol);
-                logger.info("zb最新成交均价为:{},", zbAvgPrice);
-                BigDecimal binanceAvgPrice = mergeByBinance(bbSymbol);
-                logger.info("binance最新成交均价为:{},", binanceAvgPrice);
-                BigDecimal bitfinexAvgPrice = mergeByBitfinex(bbSymbol);
-                logger.info("bitfinex最新成交均价为:{},", bitfinexAvgPrice);
-                BigDecimal okAvgPrice = mergeByOk(bbSymbol);
-                logger.info("ok最新成交均价为:{},", okAvgPrice);
-                BigDecimal avgLastPrice = zbAvgPrice.add(binanceAvgPrice).add(bitfinexAvgPrice).add(okAvgPrice).divide(new BigDecimal(4), 4, RoundingMode.DOWN);
-                LocalDateTime dateTime = LocalDateTime.now();
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                String format = dateTime.format(dtf);
-                if (avgLastPrice.compareTo(BigDecimal.ZERO) != 0) {
-                    saveMerge(bbSymbol, avgLastPrice);
-                    logger.info("当前时间={},asset={},symbol={},最终最新成交均价为:{},", format, bbSymbol.getAsset(), bbSymbol.getSymbol(), avgLastPrice);
-                }
+                List<BigDecimal> avgPriceList = new ArrayList<>();
+                String key = "ticker:bb:lastPrice:" + bbSymbol.getAsset();
+                List<String> symbols = new ArrayList<>();
+                symbols.add(bbSymbol.getSymbol());
+                Map<String, String> lastPriceMap = metadataDb5RedisUtil.hmget(key, symbols);
+                Map<String, String> currentPriceMap = mergeByAvg(bbSymbol, avgPriceList, key);
+
             }
         }
+    }
+
+
+    private Map<String, String> mergeByAvg(BBSymbol bbSymbol, List<BigDecimal> avgPriceList, String key) {
+        Map<String, String> currentPriceMap = new HashMap<>();
+        BigDecimal zbAvgPrice = mergeByZb(bbSymbol);
+        avgPriceList.add(zbAvgPrice);
+        logger.info("zb最新成交均价为:{},", zbAvgPrice);
+        BigDecimal binanceAvgPrice = mergeByBinance(bbSymbol);
+        avgPriceList.add(binanceAvgPrice);
+        logger.info("binance最新成交均价为:{},", binanceAvgPrice);
+        BigDecimal bitfinexAvgPrice = mergeByBitfinex(bbSymbol);
+        avgPriceList.add(bitfinexAvgPrice);
+        logger.info("bitfinex最新成交均价为:{},", bitfinexAvgPrice);
+        BigDecimal okAvgPrice = mergeByOk(bbSymbol);
+        avgPriceList.add(okAvgPrice);
+        logger.info("ok最新成交均价为:{},", okAvgPrice);
+        BigDecimal avgLastPrice = zbAvgPrice.add(binanceAvgPrice).add(bitfinexAvgPrice).add(okAvgPrice).divide(new BigDecimal(4), 4, RoundingMode.DOWN);
+        if (avgLastPrice.compareTo(BigDecimal.ZERO) != 0) {
+//            saveMerge(bbSymbol, avgLastPrice, key);
+            currentPriceMap.put(bbSymbol.getSymbol(), avgLastPrice + "");
+            return currentPriceMap;
+        }
+        return Collections.emptyMap();
     }
 
 
@@ -164,11 +178,15 @@ public class GetLastPriceByMerge {
     }
 
 
-    private void saveMerge(BBSymbol bbSymbol, BigDecimal avgLastPrice) {
-        String key = "ticker:bb:lastPrice:" + bbSymbol.getAsset();
+    private void saveMerge(BBSymbol bbSymbol, BigDecimal avgLastPrice, String key) {
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String format = dateTime.format(dtf);
         HashMap<String, BigDecimal> map = new HashMap<>();
         map.put(bbSymbol.getSymbol(), avgLastPrice);
         metadataDb5RedisUtil.hmset(key, map);
+        logger.info("当前时间={},asset={},symbol={},最终最新成交均价为:{},", format, bbSymbol.getAsset(), bbSymbol.getSymbol(), avgLastPrice);
+
     }
 
     public BigDecimal mergeByBinance(BBSymbol bbSymbol) {
