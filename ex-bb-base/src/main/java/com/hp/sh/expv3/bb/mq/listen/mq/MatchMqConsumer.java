@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.job.BBMatchedHandler;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
@@ -64,11 +65,14 @@ public class MatchMqConsumer {
 	@MQListener(tags=MqTags.TAGS_TRADE)
 	public void handleTradeMsg(BBTradeVo msg){
 		logger.info("收到用户成交消息:{}", msg);
-//		try{
-//			this.tradeService.handleTrade(msg);
-//		}catch(Exception e){
-////			msgService.save(MqTags.TAGS_TRADE, msg);
-//		}
+		try{
+			this.tradeService.handleTrade(msg);
+		}catch(UpdateException e){
+			throw e;
+		}catch(Exception e){
+//			msgService.save(MqTags.TAGS_TRADE, msg);
+			throw e;
+		}
 	}
 
 	/**

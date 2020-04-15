@@ -29,7 +29,7 @@ public class ExBBBaseApplication {
 	private Object printEnv() {
 		logger.warn("===========profile:{}============", profile);
 		try{
-			logger.warn("{}",ExCommonError.REPEAT_ORDER.getMessage());
+			logger.warn("{}", ExCommonError.REPEAT_ORDER.getMessage());
 		}catch(Exception e){
 			logger.error(e.getMessage(), e);
 		}

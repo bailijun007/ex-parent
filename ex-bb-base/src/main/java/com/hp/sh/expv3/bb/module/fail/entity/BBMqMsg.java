@@ -1,8 +1,11 @@
 package com.hp.sh.expv3.bb.module.fail.entity;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.hp.sh.expv3.base.entity.UserData;
+import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 /**
  * 币币_消息
@@ -11,9 +14,11 @@ import com.hp.sh.expv3.base.entity.UserData;
  */
 @Table(name="bb_mq_msg")
 public class BBMqMsg implements UserData{
+	
+	private Long id;
 
 	//messageId
-	private String id;
+	private String messageId;
 
 	private String tag;
 
@@ -33,12 +38,22 @@ public class BBMqMsg implements UserData{
 	public BBMqMsg() {
 	}
 
-	public String getId() {
+	@Id
+	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getMessageId() {
+		return messageId;
+	}
+
+	public void setMessageId(String id) {
+		this.messageId = id;
 	}
 
 	public String getMethod() {
@@ -91,7 +106,7 @@ public class BBMqMsg implements UserData{
 
 	@Override
 	public String toString() {
-		return "BBMqMsg [id=" + id + ", method=" + method + ", tag=" + tag + ", key=" + key + ", body=" + body
+		return "BBMqMsg [id=" + messageId + ", method=" + method + ", tag=" + tag + ", key=" + key + ", body=" + body
 				+ ", userId=" + userId + ", created=" + created + "]";
 	}
 
