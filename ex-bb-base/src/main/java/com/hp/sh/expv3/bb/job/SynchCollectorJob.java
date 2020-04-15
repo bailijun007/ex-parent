@@ -26,7 +26,6 @@ public class SynchCollectorJob {
 	private BBOrderQueryService orderQueryService;
 	@Autowired
 	private BBTradeService tradeService;
-
 	
 	@XxlJob("bbSynchCollector")
     public ReturnT<String> xxlJobHandler(String param) throws Exception {

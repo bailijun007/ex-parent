@@ -1,11 +1,9 @@
 package com.hp.sh.expv3.bb.module.fail.entity;
 
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.hp.sh.expv3.base.entity.UserData;
-import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 /**
  * 币币_消息
@@ -39,7 +37,6 @@ public class BBMqMsg implements UserData{
 	}
 
 	@Id
-	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
 	public Long getId() {
 		return id;
 	}

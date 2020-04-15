@@ -58,7 +58,14 @@ public class MatchMqConsumer {
 	@MQListener(tags=MqTags.TAGS_CANCELLED)
 	public void handleCancelledMsg(BbOrderCancelMqMsg msg){
 		logger.info("收到取消订单消息:{}", msg);
-		this.matchedHandler.handleCancelled(msg);
+		try{
+			this.matchedHandler.handleCancelled(msg);
+		}catch(UpdateException e){
+			throw e;
+		}catch(Exception e){
+			logger.error(e.getMessage(), e);
+			msgService.save(MqTags.TAGS_CANCELLED, msg);
+		}
 	}
 	
 	//成交
@@ -70,8 +77,8 @@ public class MatchMqConsumer {
 		}catch(UpdateException e){
 			throw e;
 		}catch(Exception e){
-//			msgService.save(MqTags.TAGS_TRADE, msg);
-			throw e;
+			logger.error(e.getMessage(), e);
+			msgService.save(MqTags.TAGS_TRADE, msg);
 		}
 	}
 

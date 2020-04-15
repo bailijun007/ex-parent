@@ -6,6 +6,7 @@
 
 	<resultMap type="com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg" id="BBMqMsg">
 		<result column="id" property="id" />
+		<result column="message_id" property="messageId" />
 		<result column="tag" property="tag" />
 		<result column="key" property="key" />
 		<result column="body" property="body" />
@@ -15,15 +16,16 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,method,tag,key,body,user_id,created
+		id,message_id,`tag`,`key`,body,method,user_id,created
 	</sql>
 
 	<sql id="simple_where" >
 		<where>
-		<if test="id!=null"> and id=#{id}</if>
-		<if test="userId!=null"> and user_id=#{userId}</if>
-		<if test="created!=null"> and created=#{created}</if>
-		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(method,''),IFNULL(tag,''),IFNULL(key,''),IFNULL(body,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
+			<if test="id!=null"> and id=#{id}</if>
+			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+		</where>
 	</sql>
 
 	<sql id="simple_query" >
@@ -85,9 +87,9 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into bb_mq_msg (
-			id,method,tag,key,body,user_id,created
+			id,message_id,`tag`,`key`,body,method,user_id,created
 		)values(
-			#{id},#{method},#{tag},#{key},#{body},#{userId},#{created}
+			#{id},#{messageId},#{tag},#{key},#{body},#{method},#{userId},#{created}
 		)
 	</insert>
 	
@@ -95,7 +97,7 @@
 		update 
 			bb_mq_msg
 		set 
-			id=#{id},method=#{method},tag=#{tag},key=#{key},body=#{body},user_id=#{userId},created=#{created}
+			id=#{id},message_id=#{messageId},`tag`=#{tag},`key`=#{key},body=#{body},method=#{method},user_id=#{userId},created=#{created}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>

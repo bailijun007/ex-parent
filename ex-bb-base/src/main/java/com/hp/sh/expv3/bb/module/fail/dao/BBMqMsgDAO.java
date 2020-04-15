@@ -16,7 +16,7 @@ import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
  * @author wangjg
  *
  */
-public interface BBMqMsgDAO extends BaseUserDataMapper<BBMqMsg,String> {
+public interface BBMqMsgDAO extends BaseUserDataMapper<BBMqMsg,Long> {
 
 	public List<BBMqMsg> queryList(Map<String,Object> params);
 	
@@ -24,6 +24,6 @@ public interface BBMqMsgDAO extends BaseUserDataMapper<BBMqMsg,String> {
 
 	public Long queryCount(Map<String,Object> params);
 
-	public void delete(@Param(UserDataEntity.USERID_PROPERTY) Long userId, @Param(BaseBizEntity.ID_PROPERTY) String id);
+	public void delete(@Param(UserDataEntity.USERID_PROPERTY) Long userId, @Param(BaseBizEntity.ID_PROPERTY) Long id);
 
 }
