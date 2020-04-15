@@ -355,11 +355,12 @@ public class SnowflakeIdWorker {
         long now = System.currentTimeMillis();
         int size = 0;
         Integer x = null;
-        SnowflakeIdWorker idWorker = new SnowflakeIdWorker(2, 11, 0, 9).setId(3, 0, 0);
-        long time = idWorker.getTimeInMs(165788629711486976L);
+        SnowflakeIdWorker idWorker = new SnowflakeIdWorker(2, 5, 8, 7).setId(0, 1, 0);
+        long time = idWorker.getTimeInMs(170584864708395008L);
         System.out.println(new Date(time).toLocaleString());
         
-        long sid = idWorker.getServer(170227280512057348L);
+        System.out.println(idWorker.nextId());
+        long sid = idWorker.getServer(170587110762381312L);
         System.out.println(sid);
         
 
