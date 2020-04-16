@@ -13,6 +13,7 @@ import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
+import com.hp.sh.expv3.fund.cash.component.MetadataService;
 import com.hp.sh.expv3.fund.cash.entity.DepositAddr;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
 import com.hp.sh.expv3.fund.cash.mq.WithDrawalMsg;
@@ -58,6 +59,9 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	
 	@Autowired
 	private WithDrawalSender mqSender;
+	
+	@Autowired
+	private MetadataService metadataService;
 	
 	int _____充值______;
 	
@@ -111,11 +115,18 @@ public class ChainCasehApiAction implements ChainCasehApi{
 		if(StringUtils.isBlank(address)){
 			throw new ExException(ExCommonError.PARAM_EMPTY);
 		}
+		
+		BigDecimal withdrawFee = metadataService.getWithdrawFee(asset);
+		
+		if(withdrawFee.compareTo(amount)>=0){
+			throw new ExException(WalletError.NOT_ENOUGH);
+		}
+		
 		BigDecimal balance = fundAccountCoreApi.getBalance(userId, asset);
 		if(balance==null || balance.compareTo(amount)<0){
 			throw new ExException(WalletError.NOT_ENOUGH);
 		}
-		this.withdrawalService.createWithdrawal(userId, asset, address, amount, null, PayChannel.BYS);
+		this.withdrawalService.createWithdrawal(userId, asset, address, amount, withdrawFee, null, PayChannel.BYS);
 	}
 	
 	@Override
