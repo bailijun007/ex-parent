@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -102,7 +103,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
      */
     @Override
     public String withdrawalOrder(Long userId, Long bankCard, String bank, String bankCardName, String srcAsset, BigDecimal srcNum, String tarAsset, BigDecimal tarNum, BigDecimal ratio) {
-        logger.info("userId={},bankCard={},bankCardName={},srcAsset={},srcNum={},tarAsset={},tarNum={},ratio={}",userId,bankCard,bankCardName,srcAsset,srcNum,tarAsset,tarNum,ratio);
+        logger.info("userId={},bankCard={},bankCardName={},srcAsset={},srcNum={},tarAsset={},tarNum={},ratio={}", userId, bankCard, bankCardName, srcAsset, srcNum, tarAsset, tarNum, ratio);
         //获取资产账户
         CapitalAccountVo account = fundAccountExtApi.getCapitalAccount(userId, srcAsset);
         BigDecimal remain = account.getAvailable();
@@ -168,7 +169,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         //更改订单状态 并返回该对象
         C2cOrder c2cOrder1 = sellService.updateById(order);
 
-        if (c2cOrder1 == null){
+        if (c2cOrder1 == null) {
             throw new ExException(ExFundError.UPDATE_C2C_ORDER_FAIL);
         }
         //如果审核拒绝需要调用加钱方法
@@ -176,7 +177,9 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
             FundAddRequest request = new FundAddRequest();
             request.setAsset(c2cOrder1.getPayCurrency());
             request.setAmount(c2cOrder1.getVolume());
-            request.setTradeNo(c2cOrder1.getSn());
+            String sn = c2cOrder1.getSn();
+            Instant now = Instant.now();
+            request.setTradeNo(now + sn);
             request.setTradeType(TradeType.C2C_IN);
             request.setRemark("c2c审核拒绝，增加余额");
             request.setUserId(c2cOrder1.getUserId());

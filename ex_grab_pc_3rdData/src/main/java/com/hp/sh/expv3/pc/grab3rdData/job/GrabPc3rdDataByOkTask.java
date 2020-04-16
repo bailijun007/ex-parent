@@ -2,6 +2,7 @@ package com.hp.sh.expv3.pc.grab3rdData.job;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.BBSymbol;
+import com.hp.sh.expv3.pc.grab3rdData.pojo.BinanceResponseData;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.OkResponseEntity;
 import com.hp.sh.expv3.pc.grab3rdData.pojo.PcSymbol;
 import com.hp.sh.expv3.pc.grab3rdData.service.SupportBbGroupIdsJobService;
@@ -36,7 +37,7 @@ public class GrabPc3rdDataByOkTask {
             1,
             1,
             0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(10000000),
+            new LinkedBlockingQueue<Runnable>(1024),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
@@ -86,13 +87,22 @@ public class GrabPc3rdDataByOkTask {
                                 if (okSymbol.equals(symbol)) {
                                     String key = okHttpsRedisKey + okSymbol;
                                     logger.info("okHttpsRedisKey={}", key);
-                                    metadataDb5RedisUtil.set(key, okResponseEntity, 60);
+//                                    metadataDb5RedisUtil.set(key, okResponseEntity, 60);
+                                    String s = metadataDb5RedisUtil.get(key);
+                                    OkResponseEntity okResponseData = JSON.parseObject(s, OkResponseEntity.class);
+                                    if (null == okResponseData) {
+                                        metadataDb5RedisUtil.set(key, okResponseEntity, 900);
+                                    }else if (null != okResponseData && okResponseData.getLast().compareTo(okResponseEntity.getLast()) != 0) {
+                                        metadataDb5RedisUtil.set(key, okResponseEntity, 900);
+                                    }
                                 }
                             }
                             TimeUnit.SECONDS.sleep(1);
                         }
                     }
                 } catch (Exception e) {
+                    logger.error("通过https请求获取ok交易所最新成交价定时任务报错！，cause()={},message={}",e.getCause(),e.getMessage());
+
 //                            e.printStackTrace();
                     continue;
                 }

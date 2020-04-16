@@ -22,10 +22,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import redis.clients.jedis.Pipeline;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -41,7 +44,7 @@ public class GrabBb3rdDataByBinanceTask {
             1,
             1,
             0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(10000000),
+            new LinkedBlockingQueue<Runnable>(1024),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
@@ -87,10 +90,10 @@ public class GrabBb3rdDataByBinanceTask {
         if (enableByWss != 1) {
             return;
         }
-//        BinanceWsClient client = new BinanceWsClient(binanceWssUrl);
         BinanceWsClient client = BinanceWsClient.getBinanceWsClient(binanceWssUrl);
         client.connect();
 
+        Map<String, String> map = new HashMap<>(64);
         threadPool.execute(() -> {
             while (true) {
                 BlockingQueue<BinanceResponseEntity> queue = BinanceWsClient.getBlockingQueue();
@@ -110,8 +113,19 @@ public class GrabBb3rdDataByBinanceTask {
                             String binanceBbSymbol = responseData.getS();
                             if (expBbSymbol.equals(binanceBbSymbol)) {
                                 String key = wssRedisKey + binanceBbSymbol;
-                                logger.info("binance wssKey={}", key);
-                                metadataDb5RedisUtil.set(key, responseData, 60);
+                                map.put(key,responseData.getC()+"");
+                                if(map.size()==4){
+                                    metadataDb5RedisUtil.mset(map);
+                                    map.clear();
+                                }
+//                                metadataDb5RedisUtil.set(key, responseData, 900);
+//                                String s = metadataDb5RedisUtil.get(key);
+//                                BinanceResponseData binanceResponseData = JSON.parseObject(s, BinanceResponseData.class);
+//                                if (null == binanceResponseData) {
+//                                    metadataDb5RedisUtil.set(key, responseData, 900);
+//                                } else if (null != binanceResponseData && binanceResponseData.getC().compareTo(responseData.getC()) != 0) {
+//                                    metadataDb5RedisUtil.set(key, responseData, 900);
+//                                }
                             }
                         }
                     }
@@ -137,28 +151,38 @@ public class GrabBb3rdDataByBinanceTask {
             return;
         }
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+        Map<String, String> binanceRedisKeysMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().get().url(binanceHttpsUrl).build();
-                Call call = client.newCall(request);
-                try {
-                    Response response = call.execute();
-                    String string = response.body().string();
-                    String expymbol = bbSymbol.getSymbol().split("_")[0] + bbSymbol.getSymbol().split("_")[1];
-                    final List<Map> list = JSON.parseArray(string, Map.class);
-                    for (Map map : list) {
-                        String binanceSymbol = (String) map.get("symbol");
-                        if (expymbol.equals(binanceSymbol)) {
-                            String key = httpsRedisKey + binanceSymbol;
-                            logger.info("binance httpsRedisKey={}", key);
-                            metadataDb5RedisUtil.set(key, JSON.toJSONString(map), 60);
+                String key = bbSymbol.getSymbol().split("_")[0] + bbSymbol.getSymbol().split("_")[1];
+                binanceRedisKeysMap.put(key, key);
+            }
+        }
+        if (!CollectionUtils.isEmpty(bbSymbolList)) {
+            Map<String, String> map = new HashMap<>();
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder().get().url(binanceHttpsUrl).build();
+            Call call = client.newCall(request);
+            try {
+                Response response = call.execute();
+                String string = response.body().string();
+
+                final List<Map> list = JSON.parseArray(string, Map.class);
+                for (Map data : list) {
+                    String binanceSymbol = (String) data.get("symbol");
+                    if (binanceRedisKeysMap.containsKey(binanceSymbol)) {
+                        String key = httpsRedisKey + binanceSymbol;
+                        String value = (String) data.get("price");
+                        if (null != value || !"".equals(value)) {
+                            map.put(key, value);
                         }
                     }
-                } catch (Exception e) {
-//                    e.printStackTrace();
-                    continue;
                 }
+                //批量保存
+                metadataDb5RedisUtil.mset(map);
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error("通过https请求获取binance交易所最新成交价定时任务报错！，cause()={},message={}", e.getCause(), e.getMessage());
             }
         }
 

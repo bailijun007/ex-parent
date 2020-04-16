@@ -27,7 +27,7 @@ public class ZbWsClient extends WebSocketListener {
 
     private volatile static ZbWsClient zbWsClient=null;
 
-    public static BlockingQueue<ZbResponseEntity> queue = new ArrayBlockingQueue<>(10000000);
+    public static BlockingQueue<ZbResponseEntity> queue = new ArrayBlockingQueue<>(10240);
 
    private ZbWsClient(String wsurl) {
        this.wsurl = wsurl;

@@ -24,7 +24,7 @@ public class BinanceWsClient extends WebSocketListener {
 
     private WebSocket ws;
 
-    public static BlockingQueue<BinanceResponseEntity> queue = new ArrayBlockingQueue<BinanceResponseEntity>(10000000);
+    public static BlockingQueue<BinanceResponseEntity> queue = new ArrayBlockingQueue<BinanceResponseEntity>(10240);
 
     private BinanceWsClient(String wsurl) {
         this.wsurl = wsurl;

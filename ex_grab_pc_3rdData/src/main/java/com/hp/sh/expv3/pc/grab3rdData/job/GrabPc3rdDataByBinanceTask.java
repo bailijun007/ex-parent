@@ -2,10 +2,7 @@ package com.hp.sh.expv3.pc.grab3rdData.job;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.pc.grab3rdData.component.BinanceWsClient;
-import com.hp.sh.expv3.pc.grab3rdData.pojo.BBSymbol;
-import com.hp.sh.expv3.pc.grab3rdData.pojo.BinanceResponseData;
-import com.hp.sh.expv3.pc.grab3rdData.pojo.BinanceResponseEntity;
-import com.hp.sh.expv3.pc.grab3rdData.pojo.PcSymbol;
+import com.hp.sh.expv3.pc.grab3rdData.pojo.*;
 import com.hp.sh.expv3.pc.grab3rdData.service.SupportBbGroupIdsJobService;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -37,7 +34,7 @@ public class GrabPc3rdDataByBinanceTask {
             1,
             1,
             0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(10000000),
+            new LinkedBlockingQueue<Runnable>(1024),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.DiscardOldestPolicy()
     );
@@ -105,7 +102,14 @@ public class GrabPc3rdDataByBinanceTask {
                             if (expBbSymbol.equals(binanceBbSymbol)) {
                                 String key = wssRedisKey + binanceBbSymbol;
                                 logger.info("binance wssKey={}", key);
-                                metadataDb5RedisUtil.set(key, responseData, 60);
+//                                metadataDb5RedisUtil.set(key, responseData, 60);
+                                String s = metadataDb5RedisUtil.get(key);
+                                BinanceResponseData binanceResponseData = JSON.parseObject(s, BinanceResponseData.class);
+                                if (null == binanceResponseData) {
+                                    metadataDb5RedisUtil.set(key, responseData, 900);
+                                }else if (null != binanceResponseData && binanceResponseData.getP().compareTo(responseData.getP()) != 0) {
+                                    metadataDb5RedisUtil.set(key, responseData, 900);
+                                }
                             }
                         }
                     }
