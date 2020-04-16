@@ -39,6 +39,8 @@ public class BBMqMsgService{
 		BBMqMsg msgEntity = new BBMqMsg();
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setUserId(msg.getAccountId());
+		msgEntity.setAsset(msg.getAsset());
+		msgEntity.setSymbol(msg.getSymbol());
 		msgEntity.setExMessage(exMessage);
 		msgEntity.setTag(tag);
 		msgEntity.setKey(""+msg.getOrderId());
@@ -56,6 +58,8 @@ public class BBMqMsgService{
 		BBMqMsg msgEntity = new BBMqMsg();
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setUserId(msg.getAccountId());
+		msgEntity.setAsset(msg.getAsset());
+		msgEntity.setSymbol(msg.getSymbol());
 		msgEntity.setExMessage(exMessage);
 		msgEntity.setTag(tag);
 		msgEntity.setKey(""+msg.getOrderId());

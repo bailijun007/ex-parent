@@ -13,11 +13,14 @@
 		<result column="ex_message" property="exMessage" />
 		<result column="method" property="method" />
 		<result column="user_id" property="userId" />
+		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="sort_id" property="sortId" />
 		<result column="created" property="created" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,message_id,`tag`,`key`,body,ex_message,method,user_id,created
+		id,message_id,`tag`,`key`,body,ex_message,method,user_id,asset,symbol,sort_id,created
 	</sql>
 
 	<sql id="simple_where" >
@@ -26,6 +29,8 @@
 			<if test="userId!=null"> and user_id=#{userId}</if>
 			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
 			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+			<if test="asset!=null and asset!=''"> and asset = #{asset}</if>
+			<if test="symbol!=null and symbol!=''"> and symbol = #{symbol}</if>
 			<if test="tag!=null and tag!=''"> and `tag` = #{tag}</if>
 			<if test="key!=null and key!=''"> and `key` = #{key}</if>
 		</where>
@@ -90,9 +95,9 @@
 			SELECT LAST_INSERT_ID() AS id
 		</selectKey>
 		insert into bb_mq_msg (
-			id,message_id,`tag`,`key`,body,ex_message,method,user_id,created
+			id,message_id,`tag`,`key`,body,ex_message,method,user_id,asset,symbol,sort_id,created
 		)values(
-			#{id},#{messageId},#{tag},#{key},#{body},#{exMessage},#{method},#{userId},#{created}
+			#{id},#{messageId},#{tag},#{key},#{body},#{exMessage},#{method},#{userId},#{asset},#{symbol},#{sortId},#{created}
 		)
 	</insert>
 	
@@ -100,7 +105,7 @@
 		update 
 			bb_mq_msg
 		set 
-			id=#{id},message_id=#{messageId},`tag`=#{tag},`key`=#{key},body=#{body},ex_message=#{exMessage},method=#{method},user_id=#{userId},created=#{created}
+			id=#{id},message_id=#{messageId},`tag`=#{tag},`key`=#{key},body=#{body},ex_message=#{exMessage},method=#{method},user_id=#{userId},asset=#{asset},symbol=#{symbol},sort_id=#{sortId},created=#{created}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>
