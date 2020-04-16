@@ -67,7 +67,7 @@ public class GrabPc3rdDataByBinanceTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-//    @PostConstruct
+    @PostConstruct
     public void startGrabPc3rdDataByWss() {
         if (enableByWss != 1) {
             return;
@@ -108,11 +108,12 @@ public class GrabPc3rdDataByBinanceTask {
                     if (binanceRedisKeysMap.containsKey(binanceBbSymbol)) {
                         String key = wssRedisKey + binanceBbSymbol;
                         map.put(key, responseData.getP() + "");
-                        if (map.size() == 3) {
-                            metadataDb5RedisUtil.mset(map);
-                            map.clear();
-                        }
+
                     }
+                }
+                if (map.size() == 1) {
+                    metadataDb5RedisUtil.mset(map);
+                    map.clear();
                 }
             }
         });
