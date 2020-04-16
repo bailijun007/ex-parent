@@ -19,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -66,12 +67,13 @@ public class GrabPc3rdDataByBinanceTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-    @PostConstruct
+//    @PostConstruct
     public void startGrabPc3rdDataByWss() {
         if (enableByWss != 1) {
             return;
         }
         List<PcSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+        Map<String, String> binanceRedisKeysMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (PcSymbol pcSymbol : bbSymbolList) {
                 String binanceSymbol = pcSymbol.getSymbol().split("_")[0].toLowerCase() + pcSymbol.getSymbol().split("_")[1].toLowerCase();
@@ -79,9 +81,14 @@ public class GrabPc3rdDataByBinanceTask {
                 logger.info("url ={}", url);
                 BinanceWsClient client = BinanceWsClient.getBinanceWsClient(url);
                 client.connect();
+
+                String key = pcSymbol.getSymbol().split("_")[0] + pcSymbol.getSymbol().split("_")[1];
+                binanceRedisKeysMap.put(key, key);
+
             }
         }
 
+        Map<String, String> map = new HashMap<>(16);
         threadPool.execute(() -> {
             while (true) {
                 BlockingQueue<BinanceResponseEntity> queue = BinanceWsClient.getBlockingQueue();
@@ -93,24 +100,17 @@ public class GrabPc3rdDataByBinanceTask {
                 if (CollectionUtils.isEmpty(list)) {
                     continue;
                 }
-                List<PcSymbol> bbSymbolLists = supportBbGroupIdsJobService.getSymbols();
-                if (!CollectionUtils.isEmpty(bbSymbolLists)) {
-                    for (PcSymbol pcSymbol : bbSymbolLists) {
-                        for (BinanceResponseData responseData : list) {
-                            String expBbSymbol = pcSymbol.getSymbol().split("_")[0] + pcSymbol.getSymbol().split("_")[1];
-                            String binanceBbSymbol = responseData.getS();
-                            if (expBbSymbol.equals(binanceBbSymbol)) {
-                                String key = wssRedisKey + binanceBbSymbol;
-                                logger.info("binance wssKey={}", key);
-//                                metadataDb5RedisUtil.set(key, responseData, 60);
-                                String s = metadataDb5RedisUtil.get(key);
-                                BinanceResponseData binanceResponseData = JSON.parseObject(s, BinanceResponseData.class);
-                                if (null == binanceResponseData) {
-                                    metadataDb5RedisUtil.set(key, responseData, 900);
-                                }else if (null != binanceResponseData && binanceResponseData.getP().compareTo(responseData.getP()) != 0) {
-                                    metadataDb5RedisUtil.set(key, responseData, 900);
-                                }
-                            }
+
+//                if (!CollectionUtils.isEmpty(bbSymbolLists)) {
+//                    for (PcSymbol pcSymbol : bbSymbolLists) {
+                for (BinanceResponseData responseData : list) {
+                    String binanceBbSymbol = responseData.getS();
+                    if (binanceRedisKeysMap.containsKey(binanceBbSymbol)) {
+                        String key = wssRedisKey + binanceBbSymbol;
+                        map.put(key, responseData.getP() + "");
+                        if (map.size() == 3) {
+                            metadataDb5RedisUtil.mset(map);
+                            map.clear();
                         }
                     }
                 }
@@ -131,11 +131,11 @@ public class GrabPc3rdDataByBinanceTask {
                 String url = binanceWssUrl + binanceSymbol + "@aggTrade";
                 logger.info("url ={}", url);
                 BinanceWsClient client = BinanceWsClient.getBinanceWsClient(url);
-                 Boolean isClosed = client.getIsClosed();
-                 if(!isClosed){
-                     client.close();
-                     startGrabPc3rdDataByWss();
-                 }
+                Boolean isClosed = client.getIsClosed();
+                if (!isClosed) {
+                    client.close();
+                    startGrabPc3rdDataByWss();
+                }
             }
         }
     }

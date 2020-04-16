@@ -37,7 +37,7 @@
     </sql>
 
     <select id="getFrozenCapital" resultType="java.math.BigDecimal">
-      SELECT IFNULL(SUM(amount),0) from withdrawal_record
+      SELECT IFNULL(SUM(amount+fee_margin),0) from withdrawal_record
         <where>
         <if test="userId!=null">
               user_id=#{userId}

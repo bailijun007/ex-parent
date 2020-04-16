@@ -20,7 +20,9 @@ import org.springframework.util.CollectionUtils;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -67,43 +69,44 @@ public class GrabPc3rdDataByOkTask {
         }
         threadPool.execute(() -> {
             while (true) {
-                List<PcSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+                List<PcSymbol> pcSymbolList = supportBbGroupIdsJobService.getSymbols();
+                Map<String, String> okRedisKeysMap = new HashMap<>();
+                if (!CollectionUtils.isEmpty(pcSymbolList)) {
+                    for (PcSymbol pcSymbol : pcSymbolList) {
+                        String symbol = pcSymbol.getSymbol().split("_")[0] + "-" + pcSymbol.getSymbol().split("_")[1];
+                        okRedisKeysMap.put(symbol, symbol);
+                    }
+                }
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder().get().url(okHttpsUrl).build();
                 Call call = client.newCall(request);
                 try {
                     Response response = call.execute();
                     String string = response.body().string();
+                    Map<String, String> map = new HashMap<>();
                     List<OkResponseEntity> list = JSON.parseArray(string, OkResponseEntity.class);
-                    if (!CollectionUtils.isEmpty(bbSymbolList)) {
-                        for (PcSymbol pcSymbol : bbSymbolList) {
-                            String symbol = pcSymbol.getSymbol().split("_")[0] + "-" + pcSymbol.getSymbol().split("_")[1];
-                            for (OkResponseEntity okResponseEntity : list) {
-                                String okSymbol = okResponseEntity.getInstrument_id();
-                                okSymbol = okSymbol.split("-")[0] + "-" + okSymbol.split("-")[1];
-                                if (okSymbol.endsWith("USD")) {
-                                    okSymbol = okSymbol + "T";
-                                }
-                                if (okSymbol.equals(symbol)) {
-                                    String key = okHttpsRedisKey + okSymbol;
-                                    logger.info("okHttpsRedisKey={}", key);
-//                                    metadataDb5RedisUtil.set(key, okResponseEntity, 60);
-                                    String s = metadataDb5RedisUtil.get(key);
-                                    OkResponseEntity okResponseData = JSON.parseObject(s, OkResponseEntity.class);
-                                    if (null == okResponseData) {
-                                        metadataDb5RedisUtil.set(key, okResponseEntity, 900);
-                                    }else if (null != okResponseData && okResponseData.getLast().compareTo(okResponseEntity.getLast()) != 0) {
-                                        metadataDb5RedisUtil.set(key, okResponseEntity, 900);
-                                    }
+                    if (!CollectionUtils.isEmpty(list)) {
+                        for (OkResponseEntity okResponseEntity : list) {
+                            String okSymbol = okResponseEntity.getInstrument_id();
+                            okSymbol = okSymbol.split("-")[0] + "-" + okSymbol.split("-")[1];
+                            if (okSymbol.endsWith("USD")) {
+                                okSymbol = okSymbol + "T";
+                            }
+                            if (okRedisKeysMap.containsKey(okSymbol)) {
+                                String key = okHttpsRedisKey + okSymbol;
+                                String value = okResponseEntity.getLast() + "";
+                                if (null != value || !"".equals(value)) {
+                                    map.put(key, value);
                                 }
                             }
-                            TimeUnit.SECONDS.sleep(1);
                         }
                     }
-                } catch (Exception e) {
-                    logger.error("通过https请求获取ok交易所最新成交价定时任务报错！，cause()={},message={}",e.getCause(),e.getMessage());
+                    //批量保存
+                    metadataDb5RedisUtil.mset(map);
+                    TimeUnit.SECONDS.sleep(1);
 
-//                            e.printStackTrace();
+                } catch (Exception e) {
+                    logger.error("通过https请求获取ok交易所最新成交价定时任务报错！，cause()={},message={}", e.getCause(), e.getMessage());
                     continue;
                 }
             }

@@ -98,7 +98,7 @@ public class GetLastPriceByMerge {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-    @Scheduled(cron = "*/1 * * * * *")
+//    @Scheduled(cron = "*/1 * * * * *")
     public void merge() {
         List<PcSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
@@ -112,6 +112,7 @@ public class GetLastPriceByMerge {
                 if (avgPrice.compareTo(BigDecimal.ZERO) != 0) {
                     saveMerge(pcSymbol, avgPrice, key);
                 }
+                lastPriceMap.clear();
             }
         }
     }
@@ -120,11 +121,11 @@ public class GetLastPriceByMerge {
         BigDecimal avgPrice = BigDecimal.ZERO;
         BigDecimal sumPrice = BigDecimal.ZERO;
         if (currentPriceMap.size() >= 3) {
-            return getAvgPriceByMergeMoreThan3Bourse(currentPriceMap, avgPrice, sumPrice);
+            return getAvgPriceByMergeMoreThan3Bourse(lastPriceMap, currentPriceMap, avgPrice, sumPrice);
         }
 
         if (currentPriceMap.size() == 2) {
-            return getAvgPriceByMergeMoreThan2Bourse(currentPriceMap, avgPrice,sumPrice);
+            return getAvgPriceByMergeMoreThan2Bourse(lastPriceMap, currentPriceMap, avgPrice, sumPrice);
         }
 
         if (currentPriceMap.size() == 1) {
@@ -136,15 +137,16 @@ public class GetLastPriceByMerge {
 
     /**
      * 通过合并2个交易所获取最新平均成交价
+     *
      * @param currentPriceMap
      * @param avgPrice
      * @param sumPrice
      * @return
      */
-    private BigDecimal getAvgPriceByMergeMoreThan2Bourse(Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice,BigDecimal sumPrice) {
+    private BigDecimal getAvgPriceByMergeMoreThan2Bourse(Map<String, String> lastPriceMap, Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice, BigDecimal sumPrice) {
         List<BigDecimal> currentPriceList = new ArrayList<>(currentPriceMap.values());
         BigDecimal medianPrice = generatedMedian(currentPriceList);
-        if(medianPrice.compareTo(BigDecimal.ZERO)==0){
+        if (medianPrice.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
         for (String s : currentPriceMap.keySet()) {
@@ -152,24 +154,25 @@ public class GetLastPriceByMerge {
             BigDecimal rule = (price.subtract(medianPrice).abs()).divide(medianPrice, 4);
             if (rule.compareTo(new BigDecimal("0.125")) == 1) {
                 currentPriceMap.remove(s);
+                filter(lastPriceMap, currentPriceMap);
             }
         }
         if (CollectionUtils.isEmpty(currentPriceMap)) {
             return BigDecimal.ZERO;
-        }
-        //如果过滤后还是currentPriceMap.size() == 2,则直接算出均值，return
-        if (currentPriceMap.size() == 2) {
+        } else {
             for (String s : currentPriceMap.keySet()) {
                 BigDecimal bigDecimal = currentPriceMap.get(s);
                 sumPrice = sumPrice.add(bigDecimal);
             }
             avgPrice = sumPrice.divide(new BigDecimal(currentPriceMap.size()), 4, RoundingMode.DOWN);
         }
+
         return avgPrice;
     }
 
     /**
      * 通过合并1个交易所获取最新成交价
+     *
      * @param lastPriceMap
      * @param currentPriceMap
      * @return
@@ -180,10 +183,10 @@ public class GetLastPriceByMerge {
         //如果没有最新成交价，则直接用当前获取的成交价
         if (CollectionUtils.isEmpty(lastPriceMap)) {
             return currentPrice;
-        }else if (CollectionUtils.isEmpty(currentPriceMap)) {
+        } else if (CollectionUtils.isEmpty(currentPriceMap)) {
             return BigDecimal.ZERO;
         } else {
-            String lastPriceStr =null;
+            String lastPriceStr = null;
             for (String s : lastPriceMap.keySet()) {
                 lastPriceStr = lastPriceMap.get(s);
             }
@@ -199,15 +202,16 @@ public class GetLastPriceByMerge {
 
     /**
      * 通过合并3个以上交易所得到平均价
+     *
      * @param currentPriceMap
      * @param avgPrice
      * @param sumPrice
      * @return
      */
-    private BigDecimal getAvgPriceByMergeMoreThan3Bourse(Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice, BigDecimal sumPrice) {
+    private BigDecimal getAvgPriceByMergeMoreThan3Bourse(Map<String, String> lastPriceMap, Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice, BigDecimal sumPrice) {
         List<BigDecimal> currentPriceList = new ArrayList<>(currentPriceMap.values());
         BigDecimal medianPrice = generatedMedian(currentPriceList);
-        if(medianPrice.compareTo(BigDecimal.ZERO)==0){
+        if (medianPrice.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
         for (String s : currentPriceMap.keySet()) {
@@ -216,11 +220,12 @@ public class GetLastPriceByMerge {
             BigDecimal rule = abs.divide(medianPrice, 4, RoundingMode.DOWN);
             if (rule.compareTo(new BigDecimal("0.25")) == 1) {
                 currentPriceMap.remove(s);
+                filter(lastPriceMap, currentPriceMap);
             }
         }
         if (CollectionUtils.isEmpty(currentPriceMap)) {
             return avgPrice;
-        }else {
+        } else {
             //求平均价
             for (String s : currentPriceMap.keySet()) {
                 sumPrice = sumPrice.add(currentPriceMap.get(s));
@@ -252,14 +257,14 @@ public class GetLastPriceByMerge {
         Map<String, BigDecimal> currentPriceMap = new ConcurrentHashMap<>();
 
         BigDecimal binanceAvgPrice = mergeByBinance(pcSymbol);
-        if(binanceAvgPrice.compareTo(BigDecimal.ZERO)!=0){
+        if (binanceAvgPrice.compareTo(BigDecimal.ZERO) != 0) {
             currentPriceMap.put("binance", binanceAvgPrice);
             logger.info("binance最新成交均价为:{},", binanceAvgPrice);
 
         }
 
         BigDecimal okAvgPrice = mergeByOk(pcSymbol);
-        if(okAvgPrice.compareTo(BigDecimal.ZERO)!=0){
+        if (okAvgPrice.compareTo(BigDecimal.ZERO) != 0) {
             currentPriceMap.put("ok", okAvgPrice);
             logger.info("ok最新成交均价为:{},", okAvgPrice);
         }
@@ -279,12 +284,12 @@ public class GetLastPriceByMerge {
         String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
         String wssKey = binanceWssRedisKey + hashKey;
         String strWssTicker = metadataDb5RedisUtil.get(wssKey);
-        BinanceResponseData wssTicker = JSON.parseObject(strWssTicker, BinanceResponseData.class);
+//        BinanceResponseData wssTicker = JSON.parseObject(strWssTicker, BinanceResponseData.class);
         BigDecimal wssLast = BigDecimal.ZERO;
-        if ( null == wssTicker) {
+        if (null == strWssTicker) {
             avgLastPrice = BigDecimal.ZERO;
-        } else  {
-            avgLastPrice = wssTicker.getP();
+        } else {
+            avgLastPrice = new BigDecimal(strWssTicker);
         }
 
         logger.info("binance的交易对:{},wssLast的最新成交价为：{}", hashKey, wssLast);
@@ -293,19 +298,17 @@ public class GetLastPriceByMerge {
     }
 
 
-
-
     public BigDecimal mergeByOk(PcSymbol bbSymbol) {
         BigDecimal avgLastPrice = BigDecimal.ZERO;
         String symbol = bbSymbol.getSymbol();
         String hashKey = symbol.split("_")[0] + "-" + symbol.split("_")[1];
         String httpsKey = okHttpsRedisKey + hashKey;
         String strHttpsTicker = metadataDb5RedisUtil.get(httpsKey);
-        OkResponseEntity httpsTicker = JSON.parseObject(strHttpsTicker, OkResponseEntity.class);
-        if (null == httpsTicker) {
+//        OkResponseEntity httpsTicker = JSON.parseObject(strHttpsTicker, OkResponseEntity.class);
+        if (null == strHttpsTicker) {
             avgLastPrice = BigDecimal.ZERO;
-        }else {
-            avgLastPrice = httpsTicker.getLast();
+        } else {
+            avgLastPrice = new BigDecimal(strHttpsTicker);
         }
         logger.info("ok的交易对:{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
         return avgLastPrice;
