@@ -19,7 +19,11 @@ public class ExCommonError extends ErrorCode {
 
 	public static final ExCommonError UNSUPPORTED = new ExCommonError(10103, "不支持此功能");
 
-    public static final ExCommonError REQUIRE_POSITIVE = new ExCommonError(10104, "金额必须是正数!");
+    public static final ExCommonError REQUIRE_POSITIVE_AMOUNT = new ExCommonError(10104, "金额必须是正数!");
+    
+    public static final ExCommonError REQUIRE_POSITIVE_PARAM = new ExCommonError(10105, "参数必须是正数!");
+
+    public static final ExCommonError REQUIRE_BOOL = new ExCommonError(10106, "必须是布尔值:0/1!");
 	
 	
 	private ExCommonError(int code, String message) {

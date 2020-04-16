@@ -143,9 +143,10 @@ public class BBTradeVo {
 
 	@Override
 	public String toString() {
-		return "BBTradeVo [accountId=" + accountId + ", price=" + price + ", number=" + number + ", orderId=" + orderId
-				+ ", tradeId=" + tradeId + ", tradeTime=" + tradeTime + ", makerFlag=" + makerFlag + ", matchTxId="
-				+ matchTxId + ", asset=" + asset + ", symbol=" + symbol + "]";
+		return "BBTradeVo [asset=" + asset + ", symbol=" + symbol + ", accountId=" + accountId + ", price=" + price
+				+ ", number=" + number + ", orderId=" + orderId + ", tradeId=" + tradeId + ", tradeTime=" + tradeTime
+				+ ", makerFlag=" + makerFlag + ", matchTxId=" + matchTxId + ", opponentOrderId=" + opponentOrderId
+				+ "]";
 	}
 
 

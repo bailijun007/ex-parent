@@ -24,6 +24,7 @@ import com.hp.sh.expv3.fund.cash.service.complex.WithdrawalService;
 import com.hp.sh.expv3.fund.constant.PayChannel;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.error.WalletError;
+import com.hp.sh.expv3.utils.CheckUtils;
 import com.hp.sh.expv3.utils.IntBool;
 
 import io.swagger.annotations.Api;
@@ -112,9 +113,9 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	
 	@ApiOperation(value = "1、创建提款记录")
 	public void createWithdrawal(Long userId, String asset, String address, BigDecimal amount) {
-		if(StringUtils.isBlank(address)){
-			throw new ExException(ExCommonError.PARAM_EMPTY);
-		}
+		CheckUtils.checkRequired(userId, asset, address, amount);
+		
+		CheckUtils.checkPositiveNum(amount);
 		
 		BigDecimal withdrawFee = metadataService.getWithdrawFee(asset);
 		
