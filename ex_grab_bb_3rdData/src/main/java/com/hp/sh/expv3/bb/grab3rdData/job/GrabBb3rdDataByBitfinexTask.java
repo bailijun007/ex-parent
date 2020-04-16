@@ -124,6 +124,7 @@ public class GrabBb3rdDataByBitfinexTask {
                             }
                             TimeUnit.SECONDS.sleep(1);
                         } catch (Exception e) {
+                            logger.error("通过https请求获取bitfinex交易所最新成交价定时任务报错！，cause()={},message={}",e.getCause(),e.getMessage());
 //                            e.printStackTrace();
                             continue;
                         }

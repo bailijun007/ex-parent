@@ -105,6 +105,7 @@ public class GrabBb3rdDataByOkTask {
                         }
                     }
                 }catch(Exception e){
+                    logger.error("通过https请求获取ok交易所最新成交价定时任务报错！，cause()={},message={}",e.getCause(),e.getMessage());
 //                            e.printStackTrace();
                     continue;
                 }
