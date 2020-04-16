@@ -238,7 +238,7 @@ public class BBTradeService {
 		if(IntBool.isTrue(order.getBidFlag())){
 			if(BigUtils.gtZero(tradeResult.getTradeFee())){
 				orderTrade.setRemainFee(BigCalc.subtract(order.getFee(), tradeResult.getTradeFee()));
-			}else{
+			}else{//手续费是负数(倒贴),不扣订单手续费
 				orderTrade.setRemainFee(order.getFee());
 			}
 		}else{
