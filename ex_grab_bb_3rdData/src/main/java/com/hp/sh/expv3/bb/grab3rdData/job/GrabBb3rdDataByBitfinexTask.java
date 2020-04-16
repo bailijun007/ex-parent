@@ -19,10 +19,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import redis.clients.jedis.Pipeline;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -79,55 +83,57 @@ public class GrabBb3rdDataByBitfinexTask {
         if (enableByHttps != 1) {
             return;
         }
-        threadPool.execute(()->{
-            while (true){
+        threadPool.execute(() -> {
+            while (true) {
                 List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+                Map<String, String> bitfinexRedisKeysMap = new HashMap<>();
                 if (!CollectionUtils.isEmpty(bbSymbolList)) {
                     for (BBSymbol bbSymbol : bbSymbolList) {
-                        OkHttpClient client = new OkHttpClient();
-                        Request request = new Request.Builder().get().url(bitfinexHttpsUrl).build();
-                        Call call = client.newCall(request);
-                        try {
-                            Response response = call.execute();
-                            String string = response.body().string();
-                            List<String> jsonArrays = JSON.parseArray(string, String.class);
-                            for (String ja : jsonArrays) {
-                                JSONArray jsonArray = JSON.parseArray(ja);
-                                String bitfinexSymbol = jsonArray.getString(0);
-                                BigDecimal bid = jsonArray.getBigDecimal(1);
-                                BigDecimal bidSize = jsonArray.getBigDecimal(2);
-                                BigDecimal ask = jsonArray.getBigDecimal(3);
-                                BigDecimal askSize = jsonArray.getBigDecimal(4);
-                                BigDecimal dailyChange = jsonArray.getBigDecimal(5);
-                                BigDecimal dailyChangeRelative = jsonArray.getBigDecimal(6);
-                                BigDecimal lastPrice = jsonArray.getBigDecimal(7);
-                                BigDecimal volume = jsonArray.getBigDecimal(8);
-                                BigDecimal high = jsonArray.getBigDecimal(9);
-                                BigDecimal low = jsonArray.getBigDecimal(10);
-                                BitfinexResponseEntity bitfinexResponseEntity = new BitfinexResponseEntity(bitfinexSymbol, bid, bidSize, ask, askSize, dailyChange, dailyChangeRelative, lastPrice, volume, high, low);
-                                String symbol = bbSymbol.getSymbol().split("_")[0] + bbSymbol.getSymbol().split("_")[1];
-                                if (bitfinexSymbol.endsWith("USD")) {
-                                    bitfinexSymbol = bitfinexSymbol.substring(1, bitfinexSymbol.length()).concat("T");
-                                }
-                                if (bitfinexSymbol.equals(symbol)) {
-                                    String key = bitfinexHttpsRedisKey + bitfinexSymbol;
-                                    logger.info("bitfinexHttpsRedisKey={}", key);
-//                                    metadataDb5RedisUtil.set(key, bitfinexResponseEntity, 900);
-                                    String s = metadataDb5RedisUtil.get(key);
-                                    BitfinexResponseEntity bitfinexTickerData = JSON.parseObject(s, BitfinexResponseEntity.class);
-                                    if (null == bitfinexTickerData) {
-                                        metadataDb5RedisUtil.set(key, bitfinexResponseEntity, 900);
-                                    }else if (null != bitfinexTickerData && bitfinexTickerData.getLastPrice().compareTo(bitfinexResponseEntity.getLastPrice()) != 0) {
-                                        metadataDb5RedisUtil.set(key, bitfinexResponseEntity, 900);
-                                    }
+                        String symbol = bbSymbol.getSymbol().split("_")[0] + bbSymbol.getSymbol().split("_")[1];
+                        bitfinexRedisKeysMap.put(symbol, symbol);
+                    }
+                }
+                if (!CollectionUtils.isEmpty(bbSymbolList)) {
+                    Map<String, String> map = new HashMap<>();
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder().get().url(bitfinexHttpsUrl).build();
+                    Call call = client.newCall(request);
+                    try {
+                        Response response = call.execute();
+                        String string = response.body().string();
+                        List<String> jsonArrays = JSON.parseArray(string, String.class);
+                        for (String ja : jsonArrays) {
+                            JSONArray jsonArray = JSON.parseArray(ja);
+                            String bitfinexSymbol = jsonArray.getString(0);
+//                                BigDecimal bid = jsonArray.getBigDecimal(1);
+//                                BigDecimal bidSize = jsonArray.getBigDecimal(2);
+//                                BigDecimal ask = jsonArray.getBigDecimal(3);
+//                                BigDecimal askSize = jsonArray.getBigDecimal(4);
+//                                BigDecimal dailyChange = jsonArray.getBigDecimal(5);
+//                                BigDecimal dailyChangeRelative = jsonArray.getBigDecimal(6);
+                            BigDecimal lastPrice = jsonArray.getBigDecimal(7);
+//                                BigDecimal volume = jsonArray.getBigDecimal(8);
+//                                BigDecimal high = jsonArray.getBigDecimal(9);
+//                                BigDecimal low = jsonArray.getBigDecimal(10);
+//                                BitfinexResponseEntity bitfinexResponseEntity = new BitfinexResponseEntity(bitfinexSymbol, bid, bidSize, ask, askSize, dailyChange, dailyChangeRelative, lastPrice, volume, high, low);
+//                                String symbol = bbSymbol.getSymbol().split("_")[0] + bbSymbol.getSymbol().split("_")[1];
+                            if (bitfinexSymbol.endsWith("USD")) {
+                                bitfinexSymbol = bitfinexSymbol.substring(1, bitfinexSymbol.length()).concat("T");
+                            }
+                            if (bitfinexRedisKeysMap.containsKey(bitfinexSymbol)) {
+                                String key = bitfinexHttpsRedisKey + bitfinexSymbol;
+                                String value = lastPrice + "";
+                                if (null!=value||!"".equals(value)) {
+                                    map.put(key, value);
                                 }
                             }
-                            TimeUnit.SECONDS.sleep(1);
-                        } catch (Exception e) {
-                            logger.error("通过https请求获取bitfinex交易所最新成交价定时任务报错！，cause()={},message={}",e.getCause(),e.getMessage());
-//                            e.printStackTrace();
-                            continue;
                         }
+
+                        //批量保存
+                        metadataDb5RedisUtil.mset(map);
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (Exception e) {
+                        logger.error("通过https请求获取bitfinex交易所最新成交价定时任务报错！，cause()={},message={}", e.getCause(), e.getMessage());
                     }
                 }
             }

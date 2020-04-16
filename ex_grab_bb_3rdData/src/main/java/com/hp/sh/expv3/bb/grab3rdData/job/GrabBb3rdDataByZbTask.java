@@ -4,10 +4,15 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hp.sh.expv3.bb.grab3rdData.component.ZbWsClient;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.BBSymbol;
+import com.hp.sh.expv3.bb.grab3rdData.pojo.OkResponseEntity;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.ZbTickerData;
 import com.hp.sh.expv3.bb.grab3rdData.pojo.ZbResponseEntity;
 import com.hp.sh.expv3.bb.grab3rdData.service.SupportBbGroupIdsJobService;
 import com.hp.sh.expv3.config.redis.RedisUtil;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +22,16 @@ import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.commands.JedisCommands;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -85,21 +91,24 @@ public class GrabBb3rdDataByZbTask {
         if (enableByWss != 1) {
             return;
         }
-//        ZbWsClient client = new ZbWsClient(zbWssUrl);
         ZbWsClient client = ZbWsClient.getZbWsClient(zbWssUrl);
         client.connect();
         Map data = new TreeMap();
         data.put("event", "addChannel");
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+        Map<String, String> zbRedisKeysMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
                 String[] symbols = bbSymbol.getSymbol().toLowerCase().split("_");
-                String channel = symbols[0] + symbols[1] + "_ticker";
-                logger.info("channel={}", channel);
+                String key = symbols[0] + symbols[1];
+                zbRedisKeysMap.put(key, key);
+                String channel = key + "_ticker";
                 data.put("channel", channel);
                 client.send(JSONObject.toJSONString(data));
             }
         }
+
+        Map<String, String> map = new HashMap<>(64);
 
         threadPool.execute(() -> {
             while (true) {
@@ -107,18 +116,17 @@ public class GrabBb3rdDataByZbTask {
                 if (CollectionUtils.isEmpty(queue)) {
                     continue;
                 }
+
                 ZbResponseEntity tickerData = queue.poll();
                 String hashKey = tickerData.getChannel().split("_")[0];
                 String key = wssRedisKey + hashKey;
-                logger.info("zb wssKey={}", key);
                 ZbTickerData ticker = tickerData.getTicker();
-                if (null != ticker) {
-                    String s = metadataDb5RedisUtil.get(key);
-                    ZbTickerData zbTickerData = JSON.parseObject(s, ZbTickerData.class);
-                    if (null == zbTickerData) {
-                        metadataDb5RedisUtil.set(key, ticker, 900);
-                    }else if (null != zbTickerData && zbTickerData.getLast().compareTo(ticker.getLast()) != 0) {
-                        metadataDb5RedisUtil.set(key, ticker, 900);
+                if (null != ticker&&zbRedisKeysMap.containsKey(hashKey)) {
+                    String value = ticker.getLast() + "";
+                    map.put(key, value);
+                    if (map.size() == 8) {
+                        metadataDb5RedisUtil.mset(map);
+                        map.clear();
                     }
                 }
             }
@@ -132,33 +140,46 @@ public class GrabBb3rdDataByZbTask {
             return;
         }
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        Map<String, String> zbRedisKeysMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
                 String symbol = bbSymbol.getSymbol().toLowerCase();
-                String url = zbHttpsUrl + symbol;
-                logger.info("https url={}", url);
-                ResponseEntity<ZbResponseEntity> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, ZbResponseEntity.class);
-                ZbResponseEntity tickerData = responseEntity.getBody();
-                String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
-                String key = httpsRedisKey + hashKey;
-                logger.info("httpsKey={}", key);
-                ZbTickerData ticker = tickerData.getTicker();
-                if (null != ticker) {
-                    String s = metadataDb5RedisUtil.get(key);
-                    ZbTickerData zbTickerData = JSON.parseObject(s, ZbTickerData.class);
-                    if (null == zbTickerData) {
-                        metadataDb5RedisUtil.set(key, ticker, 900);
-                    }else if (null != zbTickerData && zbTickerData.getLast().compareTo(ticker.getLast()) != 0) {
-                        metadataDb5RedisUtil.set(key, ticker, 900);
+                String key = symbol.split("_")[0] + symbol.split("_")[1];
+                zbRedisKeysMap.put(key, key);
+            }
+        }
+
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().get().url(zbHttpsUrl).build();
+        Call call = client.newCall(request);
+        try {
+            Response response = call.execute();
+            String string = response.body().string();
+            JSONObject jsonObject = JSON.parseObject(string);
+
+            Map<String, String> map = new HashMap<>();
+            for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
+                Object entryValue = entry.getValue();
+                ZbTickerData zbTickerData = JSON.parseObject(entryValue.toString(), ZbTickerData.class);
+                if (zbRedisKeysMap.containsKey(entry.getKey())) {
+                    String key = httpsRedisKey + entry.getKey();
+                    String value = zbTickerData.getLast() + "";
+                    if (null != value || !"".equals(value)) {
+                        map.put(key, value);
                     }
                 }
             }
+
+            //批量保存
+            metadataDb5RedisUtil.mset(map);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+
     }
+
 
     @Scheduled(cron = "*/59 * * * * *")
     public void retryConnection() {
@@ -169,6 +190,7 @@ public class GrabBb3rdDataByZbTask {
             startGrabBb3rdDataByZbWss();
         }
     }
+
 
 }
 
