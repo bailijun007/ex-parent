@@ -4,23 +4,25 @@
 <mapper namespace="com.hp.sh.expv3.fund.cash.dao.WithdrawalRecordDAO">
 
 	<resultMap type="com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord" id="WithdrawalRecord">
-		<result column="id" property="id" />
 		<result column="approval_status" property="approvalStatus" />
 		<result column="sn" property="sn" />
 		<result column="asset" property="asset" />
 		<result column="amount" property="amount" />
 		<result column="channel_id" property="channelId" />
 		<result column="account" property="account" />
+		<result column="fee" property="fee" />
+		<result column="fee_margin" property="feeMargin" />
 		<result column="transaction_id" property="transactionId" />
 		<result column="pay_status" property="payStatus" />
 		<result column="pay_status_desc" property="payStatusDesc" />
 		<result column="pay_time" property="payTime" />
 		<result column="pay_finish_time" property="payFinishTime" />
 		<result column="synch_status" property="synchStatus" />
+		<result column="tx_hash" property="txHash" />
 		<result column="user_id" property="userId" />
+		<result column="id" property="id" />
 		<result column="created" property="created" />
 		<result column="modified" property="modified" />
-		<result column="tx_hash" property="txHash" />
 	</resultMap>
 	
 	
@@ -30,7 +32,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,approval_status,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified,tx_hash
+		fee,fee_margin,approval_status,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,tx_hash,user_id,id,created,modified
 	</sql>
 
 	<sql id="simple_where">
@@ -115,9 +117,9 @@
 
 	<insert id="save">
 		insert into withdrawal_record (
-			id,approval_status,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,user_id,created,modified,tx_hash
+			fee,fee_margin,approval_status,sn,asset,amount,channel_id,account,transaction_id,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,tx_hash,user_id,id,created,modified
 		)values(
-			#{id},#{approvalStatus},#{sn},#{asset},#{amount},#{channelId},#{account},#{transactionId},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{userId},#{created},#{modified},#{txHash}
+			#{fee},#{feeMargin},#{approvalStatus},#{sn},#{asset},#{amount},#{channelId},#{account},#{transactionId},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{txHash},#{userId},#{id},#{created},#{modified}
 		)
 	</insert>
 	
@@ -125,7 +127,7 @@
 		update 
 			withdrawal_record
 		set 
-			approval_status=#{approvalStatus},sn=#{sn},asset=#{asset},amount=#{amount},channel_id=#{channelId},account=#{account},transaction_id=#{transactionId},pay_status=#{payStatus},pay_status_desc=#{payStatusDesc},pay_time=#{payTime},pay_finish_time=#{payFinishTime},synch_status=#{synchStatus},user_id=#{userId},created=#{created},modified=#{modified},tx_hash=#{txHash}
+			fee=#{fee},fee_margin=#{feeMargin},approval_status=#{approvalStatus},sn=#{sn},asset=#{asset},amount=#{amount},channel_id=#{channelId},account=#{account},transaction_id=#{transactionId},pay_status=#{payStatus},pay_status_desc=#{payStatusDesc},pay_time=#{payTime},pay_finish_time=#{payFinishTime},synch_status=#{synchStatus},tx_hash=#{txHash},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId}
 	</update>
