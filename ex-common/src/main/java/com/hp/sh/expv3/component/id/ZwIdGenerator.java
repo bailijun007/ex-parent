@@ -28,7 +28,7 @@ public class ZwIdGenerator implements IdGenerator{
 
 	public ZwIdGenerator(int dataCenterId, int serverId, List<SequencConfig> idSettings, List<Pair<String,Integer>> entityPairs) {
 		for(SequencConfig sequencConfig : idSettings){
-			SnowflakeIdWorker idworker = IdUtil.newIdWorker(sequencConfig.getDataCenterBits(), sequencConfig.getServerBits(), sequencConfig.getIdTypeBits(), sequencConfig.getSequenceBits(), dataCenterId, serverId, 0);
+			SnowflakeIdWorker idworker = IdUtil.newIdWorker(sequencConfig.getDataCenterBits(), sequencConfig.getServerBits(), sequencConfig.getIdTypeBits(), sequencConfig.getSequenceBits(), dataCenterId, serverId, sequencConfig.getSequencId());
 			idWorkerMap.put(sequencConfig.getSequencId(), idworker);
 		}
 		for(Pair<String,Integer> nameIdPair: entityPairs){

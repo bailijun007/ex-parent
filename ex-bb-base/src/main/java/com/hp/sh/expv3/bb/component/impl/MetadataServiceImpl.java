@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.component.MetadataService;
+import com.hp.sh.expv3.bb.component.vo.AssetVO;
 import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 import com.hp.sh.expv3.bb.constant.RedisKey;
 
@@ -58,5 +59,14 @@ public class MetadataServiceImpl implements MetadataService {
         return list;
     }
 
+    @Override
+	public AssetVO getAsset(String asset) {
+        HashOperations hashOperations = templateDB0.opsForHash();
+        String hashKey = asset;
+        Object o = hashOperations.get(RedisKey.BB_ASSET, hashKey);
+        String json = o.toString();
+        AssetVO vo = JSON.parseObject(json, AssetVO.class);
+        return vo;
+    }
 
 }

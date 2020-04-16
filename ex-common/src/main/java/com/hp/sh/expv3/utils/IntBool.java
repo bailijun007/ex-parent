@@ -11,6 +11,10 @@ public class IntBool {
 
 	public static final int YES = 1;
 	
+	public static final boolean isBool(int value){
+		return (value == YES || value == NO);
+	}
+	
 	public static final boolean isTrue(int value){
 		check(value);
 		return value == YES;

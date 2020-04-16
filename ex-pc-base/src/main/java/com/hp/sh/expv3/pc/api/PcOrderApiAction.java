@@ -16,6 +16,7 @@ import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.vo.ExPageResult;
 import com.hp.sh.expv3.pc.vo.response.ActiveOrderVo;
+import com.hp.sh.expv3.utils.CheckUtils;
 
 @RestController
 public class PcOrderApiAction implements PcOrderApi {
@@ -50,6 +51,10 @@ public class PcOrderApiAction implements PcOrderApi {
 	 */
 	@Override
 	public Long create(Long userId, String asset, String symbol, Integer closeFlag, Integer longFlag, Integer timeInForce, BigDecimal price, BigDecimal number, String cliOrderId){
+		
+		CheckUtils.checkPositiveNum(price, number);
+		
+		CheckUtils.checkIntBool(closeFlag, longFlag);
 		
 		PcOrder order = pcOrderService.create(userId, cliOrderId, asset, symbol, closeFlag, longFlag, timeInForce, price, number);
 

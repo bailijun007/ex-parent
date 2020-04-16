@@ -11,14 +11,23 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.base.spring.interceptor.LimitInterceptor;
+import com.gitee.hupadev.commons.executor.orderly.OrderlyExecutors;
+import com.gitee.hupadev.commons.json.JsonUtils;
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.job.BBMatchedHandler;
+import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
+import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
+import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
+import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
+import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqConsumer;
+import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
-import com.hp.sh.expv3.component.executor.OrderlyExecutors;
+import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -41,6 +50,17 @@ public class BBMaintainAction{
 	
 	@Autowired
 	private OrderlyExecutors tradeExecutors;
+	
+	@Autowired
+	private BBMqMsgService mqMsgService;
+	
+	@Autowired
+	private MatchMqConsumer matchMqConsumer;
+	
+	@Autowired
+	private BBTradeService tradeService;
+	@Autowired
+	private BBOrderService orderService;
 	
 	@ApiOperation(value = "querySynchFee")
 	@GetMapping(value = "/api/bb/maintain/querySynchFee")
@@ -172,6 +192,32 @@ public class BBMaintainAction{
 			page.setPageNo(page.getPageNo()+1);
 		}
 		return n;
+	}
+	
+	@ApiOperation(value = "handleNextFailMsg")
+	@GetMapping(value = "/api/bb/maintain/mq/handleNextFailMsg")	
+	public String handleNextFailMsg(String tag){
+		BBMqMsg msg = mqMsgService.findFirst(tag);
+		if(msg==null){
+			return "no record!";
+		}
+		if(msg.getTag().equals(MqTags.TAGS_TRADE)){
+			BBTradeVo mqMsg = JsonUtils.toObject(msg.getBody(), BBTradeVo.class);
+			this.tradeService.handleTrade(mqMsg);
+		}else if(msg.getTag().equals(MqTags.TAGS_CANCELLED)){
+			BbOrderCancelMqMsg mqMsg = JsonUtils.toObject(msg.getBody(), BbOrderCancelMqMsg.class);
+			orderService.setCancelled(mqMsg.getAccountId(), mqMsg.getAsset(), mqMsg.getSymbol(), mqMsg.getOrderId());
+		}
+		
+		mqMsgService.delete(msg.getUserId(), msg.getId());
+		
+		return "OK";
+	}
+	
+	@ApiOperation(value = "reHandleAllFailMsg")
+	@GetMapping(value = "/api/bb/maintain/mq/reHandleAllFailMsg")	
+	public void reHandleAllFailMsg(){
+		
 	}
 	
 	@ApiOperation(value = "time")

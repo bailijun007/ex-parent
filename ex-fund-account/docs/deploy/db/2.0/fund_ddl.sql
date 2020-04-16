@@ -209,29 +209,28 @@ COMMENT='提现地址'
 -- ----------------------------
 DROP TABLE IF EXISTS `withdrawal_record`;
 CREATE TABLE `withdrawal_record` (
-`id`  bigint(20) NOT NULL COMMENT '主键' ,
-`user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`sn`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '支付单号' ,
-`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
-`amount`  decimal(50,30) NOT NULL COMMENT '提现金额' ,
-`channel_id`  int(11) NOT NULL COMMENT '支付渠道' ,
-`account`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '支付/收款账号（支付服务商端账号）' ,
-`transaction_id`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '支付交易ID（支付服务商端生成）' ,
-`pay_status`  int(11) NOT NULL COMMENT '执行状态:0-提现中，1-提现成功，2-提现失败' ,
-`pay_status_desc`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '支付状态描述' ,
-`pay_time`  bigint(20) NULL DEFAULT NULL COMMENT '支付时间' ,
-`pay_finish_time`  bigint(20) NULL DEFAULT NULL COMMENT '支付完成时间' ,
-`approval_status`  int(11) NULL DEFAULT NULL COMMENT '审批状态(1:审批中 2:审批通过:3:拒绝)' ,
-`synch_status`  int(11) NULL DEFAULT NULL COMMENT '同步状态' ,
-`tx_hash`  varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
-`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`),
-INDEX `idx_user_id_asset` (`user_id`, `asset`) USING BTREE ,
-INDEX `un_sn` (`sn`) USING BTREE 
-)
-ENGINE=InnoDB
-DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='提现记录'
+  `id` bigint(20) NOT NULL COMMENT '主键',
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+  `sn` varchar(64) NOT NULL COMMENT '支付单号',
+  `asset` varchar(20) NOT NULL COMMENT '资产',
+  `amount` decimal(50,30) NOT NULL COMMENT '提现金额',
+  `channel_id` int(11) NOT NULL COMMENT '支付渠道',
+  `account` varchar(64) NOT NULL COMMENT '支付/收款账号（支付服务商端账号）',
+  `transaction_id` varchar(64) DEFAULT NULL COMMENT '支付交易ID（支付服务商端生成）',
+  `pay_status` int(11) NOT NULL COMMENT '执行状态:0-提现中，1-提现成功，2-提现失败',
+  `fee` decimal(50,30) NOT NULL DEFAULT '0.000000000000000000000000000000' COMMENT '应收提币手续费',
+  `fee_margin` decimal(50,30) NOT NULL DEFAULT '0.000000000000000000000000000000' COMMENT '已押手续费',
+  `pay_status_desc` varchar(255) DEFAULT NULL COMMENT '支付状态描述',
+  `pay_time` bigint(20) DEFAULT NULL COMMENT '支付时间',
+  `pay_finish_time` bigint(20) DEFAULT NULL COMMENT '支付完成时间',
+  `approval_status` int(11) DEFAULT NULL COMMENT '审批状态(1:审批中 2:审批通过:3:拒绝)',
+  `synch_status` int(11) DEFAULT NULL COMMENT '同步状态',
+  `tx_hash` varchar(128) DEFAULT NULL,
+  `created` bigint(20) NOT NULL COMMENT '创建时间',
+  `modified` bigint(20) NOT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id_asset` (`user_id`,`asset`) USING BTREE,
+  KEY `un_sn` (`sn`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='提现记录';
 
 ;

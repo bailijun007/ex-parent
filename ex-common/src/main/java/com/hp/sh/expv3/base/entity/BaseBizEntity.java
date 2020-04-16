@@ -21,9 +21,9 @@ public class BaseBizEntity implements Serializable {
 	protected Long id;
 
 	// 创建时间
-	private Long created;
+	protected Long created;
 	// 修改时间
-	private Long modified;
+	protected Long modified;
 
 	@Id
 	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)

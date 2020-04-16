@@ -188,7 +188,7 @@ public class FundAccountCoreService {
             String ov = oldRcd.toValueString();
             String nv = record.toValueString();
             if (!ov.equals(nv)) {
-                throw new ExException(WalletError.INCONSISTENT_REQUESTS);
+                throw new ExException(WalletError.INCONSISTENT_REQUESTS, record);
             }
         }
 

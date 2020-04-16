@@ -13,6 +13,7 @@ import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.fund.cash.component.Asset2Symbol;
 import com.hp.sh.expv3.fund.cash.component.ExChainService;
+import com.hp.sh.expv3.fund.cash.component.MetadataService;
 import com.hp.sh.expv3.fund.cash.entity.DepositAddr;
 import com.hp.sh.expv3.fund.cash.entity.WithdrawalRecord;
 import com.hp.sh.expv3.fund.cash.mq.WithDrawalMsg;
@@ -23,7 +24,9 @@ import com.hp.sh.expv3.fund.cash.service.complex.WithdrawalService;
 import com.hp.sh.expv3.fund.constant.PayChannel;
 import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.error.WalletError;
+import com.hp.sh.expv3.utils.CheckUtils;
 import com.hp.sh.expv3.utils.IntBool;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -58,6 +61,9 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	
 	@Autowired
 	private WithDrawalSender mqSender;
+	
+	@Autowired
+	private MetadataService metadataService;
 	
 	int _____充值______;
 	
@@ -108,14 +114,21 @@ public class ChainCasehApiAction implements ChainCasehApi{
 	
 	@ApiOperation(value = "1、创建提款记录")
 	public void createWithdrawal(Long userId, String asset, String address, BigDecimal amount) {
-		if(StringUtils.isBlank(address)){
-			throw new ExException(ExCommonError.PARAM_EMPTY);
-		}
+		CheckUtils.checkRequired(userId, asset, address, amount);
+		
+		CheckUtils.checkPositiveNum(amount);
+		
 		BigDecimal balance = fundAccountCoreApi.getBalance(userId, asset);
 		if(balance==null || balance.compareTo(amount)<0){
 			throw new ExException(WalletError.NOT_ENOUGH);
 		}
-		this.withdrawalService.createWithdrawal(userId, asset, address, amount, null, PayChannel.BYS);
+
+		BigDecimal withdrawFee = metadataService.getWithdrawFee(asset);
+		if(BigUtils.le(balance.subtract(withdrawFee), amount)){
+			throw new ExException(WalletError.NOT_ENOUGH);
+		}
+		
+		this.withdrawalService.createWithdrawal(userId, asset, address, amount, withdrawFee, null, PayChannel.BYS);
 	}
 	
 	@Override

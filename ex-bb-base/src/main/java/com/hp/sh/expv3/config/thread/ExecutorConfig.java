@@ -3,7 +3,7 @@ package com.hp.sh.expv3.config.thread;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.hp.sh.expv3.component.executor.OrderlyExecutors;
+import com.gitee.hupadev.commons.executor.orderly.OrderlyExecutors;
 
 @Configuration
 public class ExecutorConfig {

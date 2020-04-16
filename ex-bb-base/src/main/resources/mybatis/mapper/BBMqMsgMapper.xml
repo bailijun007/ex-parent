@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.module.fail.dao.BBMqMsgDAO">
+
+	<resultMap type="com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg" id="BBMqMsg">
+		<result column="id" property="id" />
+		<result column="message_id" property="messageId" />
+		<result column="tag" property="tag" />
+		<result column="key" property="key" />
+		<result column="body" property="body" />
+		<result column="ex_message" property="exMessage" />
+		<result column="method" property="method" />
+		<result column="user_id" property="userId" />
+		<result column="created" property="created" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		id,message_id,`tag`,`key`,body,ex_message,method,user_id,created
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+			<if test="id!=null"> and id=#{id}</if>
+			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
+			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
+			<if test="tag!=null and tag!=''"> and `tag` = #{tag}</if>
+			<if test="key!=null and key!=''"> and `key` = #{key}</if>
+		</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from bb_mq_msg
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="BBMqMsg">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="BBMqMsg">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="BBMqMsg">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from bb_mq_msg
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="BBMqMsg">
+		select
+			<include refid="Base_Column_List" />
+		from bb_mq_msg
+			where id=#{id} and user_id=#{userId}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			bb_mq_msg
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into bb_mq_msg (
+			id,message_id,`tag`,`key`,body,ex_message,method,user_id,created
+		)values(
+			#{id},#{messageId},#{tag},#{key},#{body},#{exMessage},#{method},#{userId},#{created}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			bb_mq_msg
+		set 
+			id=#{id},message_id=#{messageId},`tag`=#{tag},`key`=#{key},body=#{body},ex_message=#{exMessage},method=#{method},user_id=#{userId},created=#{created}
+		where 
+			id=#{id} and user_id=#{userId}
+	</update>
+
+	<delete id="delete">
+        delete from bb_mq_msg where id=#{id} and user_id=#{userId}
+    </delete>
+
+    <delete id="condDelete">
+        delete from bb_mq_msg
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+	<select id="queryTrade" resultMap="BBMqMsg">
+		<include refid="simple_query" />
+		order by id asc, `tag` asc
+	</select>
+	
+	<select id="queryTradeList" resultMap="BBMqMsg">
+		<include refid="simple_query" />
+		order by id asc, `tag` asc
+	</select>
+	
+</mapper>
