@@ -26,6 +26,7 @@ import com.hp.sh.expv3.fund.wallet.api.FundAccountCoreApi;
 import com.hp.sh.expv3.fund.wallet.error.WalletError;
 import com.hp.sh.expv3.utils.CheckUtils;
 import com.hp.sh.expv3.utils.IntBool;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -117,16 +118,16 @@ public class ChainCasehApiAction implements ChainCasehApi{
 		
 		CheckUtils.checkPositiveNum(amount);
 		
-		BigDecimal withdrawFee = metadataService.getWithdrawFee(asset);
-		
-		if(withdrawFee.compareTo(amount)>=0){
-			throw new ExException(WalletError.NOT_ENOUGH);
-		}
-		
 		BigDecimal balance = fundAccountCoreApi.getBalance(userId, asset);
 		if(balance==null || balance.compareTo(amount)<0){
 			throw new ExException(WalletError.NOT_ENOUGH);
 		}
+
+		BigDecimal withdrawFee = metadataService.getWithdrawFee(asset);
+		if(BigUtils.le(balance.subtract(withdrawFee), amount)){
+			throw new ExException(WalletError.NOT_ENOUGH);
+		}
+		
 		this.withdrawalService.createWithdrawal(userId, asset, address, amount, withdrawFee, null, PayChannel.BYS);
 	}
 	
