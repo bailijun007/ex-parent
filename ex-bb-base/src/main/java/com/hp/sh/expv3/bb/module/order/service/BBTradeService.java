@@ -236,7 +236,11 @@ public class BBTradeService {
 		orderTrade.setRemainOrderMargin(BigCalc.subtract(order.getOrderMargin(), tradeResult.getTradeOrderMargin()));
 		
 		if(IntBool.isTrue(order.getBidFlag())){
-			orderTrade.setRemainFee(BigCalc.subtract(order.getFee(), tradeResult.getTradeFee()));
+			if(BigUtils.gtZero(tradeResult.getTradeFee())){
+				orderTrade.setRemainFee(BigCalc.subtract(order.getFee(), tradeResult.getTradeFee()));
+			}else{
+				orderTrade.setRemainFee(order.getFee());
+			}
 		}else{
 			orderTrade.setRemainFee(BigDecimal.ZERO);
 		}
