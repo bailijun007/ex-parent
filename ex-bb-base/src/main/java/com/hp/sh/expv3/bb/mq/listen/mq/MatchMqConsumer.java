@@ -59,12 +59,17 @@ public class MatchMqConsumer {
 	public void handleCancelledMsg(BbOrderCancelMqMsg msg){
 		logger.info("收到取消订单消息:{}", msg);
 		try{
-			this.matchedHandler.handleCancelled(msg);
+			boolean existTade = this.msgService.exist(msg.getAccountId(), MqTags.TAGS_TRADE, ""+msg.getOrderId());
+			if(!existTade){
+				orderService.setCancelled(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
+			}else{
+				msgService.saveIfNotExists(MqTags.TAGS_CANCELLED, msg, "存在未处理的trade");
+			}
 		}catch(UpdateException e){
 			throw e;
 		}catch(Exception e){
 			logger.error(e.getMessage(), e);
-			msgService.save(MqTags.TAGS_CANCELLED, msg, e.getMessage());
+			msgService.saveIfNotExists(MqTags.TAGS_CANCELLED, msg, e.getMessage());
 		}
 	}
 	

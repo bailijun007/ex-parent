@@ -193,8 +193,8 @@ public class BBMaintainAction{
 	
 	@ApiOperation(value = "handleNextFailMsg")
 	@GetMapping(value = "/api/bb/maintain/mq/handleNextFailMsg")	
-	public String handleNextFailMsg(){
-		BBMqMsg msg = mqMsgService.findFirst();
+	public String handleNextFailMsg(String tag){
+		BBMqMsg msg = mqMsgService.findFirst(tag);
 		if(msg==null){
 			return "no record!";
 		}

@@ -26,8 +26,8 @@
 			<if test="userId!=null"> and user_id=#{userId}</if>
 			<if test="createdStart!=null"> and created &gt;= #{createdStart}</if>
 			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
-			<if test="key!=null and key!=''"> and `key` = #{key}</if>
 			<if test="tag!=null and tag!=''"> and `tag` = #{tag}</if>
+			<if test="key!=null and key!=''"> and `key` = #{key}</if>
 		</where>
 	</sql>
 
@@ -115,5 +115,15 @@
     </delete>
 
 	<!--  -->
+	
+	<select id="queryTrade" resultMap="BBMqMsg">
+		<include refid="simple_query" />
+		order by id asc, `tag` asc
+	</select>
+	
+	<select id="queryTradeList" resultMap="BBMqMsg">
+		<include refid="simple_query" />
+		order by id asc, `tag` asc
+	</select>
 	
 </mapper>

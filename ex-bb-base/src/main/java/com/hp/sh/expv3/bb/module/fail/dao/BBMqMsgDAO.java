@@ -21,6 +21,10 @@ public interface BBMqMsgDAO extends BaseUserDataMapper<BBMqMsg,Long> {
 	public List<BBMqMsg> queryList(Map<String,Object> params);
 	
 	public BBMqMsg queryOne(Map<String,Object> params);
+	
+	public BBMqMsg queryTrade(Map<String,Object> params);
+	
+	public List<BBMqMsg> queryTradeList(Map<String,Object> params);
 
 	public Long queryCount(Map<String,Object> params);
 
