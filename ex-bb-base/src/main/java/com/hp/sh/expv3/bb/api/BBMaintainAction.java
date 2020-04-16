@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.base.spring.interceptor.LimitInterceptor;
+import com.gitee.hupadev.commons.executor.orderly.OrderlyExecutors;
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.bb.constant.MqTags;
@@ -21,12 +22,12 @@ import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
+import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqConsumer;
 import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
-import com.hp.sh.expv3.component.executor.OrderlyExecutors;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -58,6 +59,8 @@ public class BBMaintainAction{
 	
 	@Autowired
 	private BBTradeService tradeService;
+	@Autowired
+	private BBOrderService orderService;
 	
 	@ApiOperation(value = "querySynchFee")
 	@GetMapping(value = "/api/bb/maintain/querySynchFee")
@@ -203,7 +206,7 @@ public class BBMaintainAction{
 			this.tradeService.handleTrade(mqMsg);
 		}else if(msg.getTag().equals(MqTags.TAGS_CANCELLED)){
 			BbOrderCancelMqMsg mqMsg = JsonUtils.toObject(msg.getBody(), BbOrderCancelMqMsg.class);
-			this.matchedHandler.handleCancelled(mqMsg);
+			orderService.setCancelled(mqMsg.getAccountId(), mqMsg.getAsset(), mqMsg.getSymbol(), mqMsg.getOrderId());
 		}
 		
 		mqMsgService.delete(msg.getUserId(), msg.getId());
