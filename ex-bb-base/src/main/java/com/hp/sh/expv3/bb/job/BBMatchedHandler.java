@@ -16,6 +16,7 @@ import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradePair;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.component.executor.AbstractGroupTask;
 import com.hp.sh.expv3.component.executor.OrderlyExecutors;
 import com.hp.sh.expv3.dev.LimitTimeHandle;
@@ -80,6 +81,7 @@ public class BBMatchedHandler {
 		
 	}
 	
+	@LockIt(key="${msg.accountId}-${msg.asset}-${msg.symbol}")
 	public void handleCancelled(BbOrderCancelMqMsg msg){
 		this.tradeExecutors.submit(new CancelledTask(msg));
 	}
