@@ -19,6 +19,7 @@ import com.hp.sh.expv3.fund.transfer.mq.MqSender;
 import com.hp.sh.expv3.fund.transfer.mq.msg.NewTransfer;
 import com.hp.sh.expv3.fund.transfer.service.FundTransferCoreService;
 import com.hp.sh.expv3.pc.error.PcAccountError;
+import com.hp.sh.expv3.utils.CheckUtils;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 @RestController
@@ -37,6 +38,9 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	@Override
 	@LockIt(key="transfer-${userId}-${asset}")
 	public void transfer(Long userId, String asset, Integer srcAccountType, Integer targetAccountType, BigDecimal amount){
+		CheckUtils.checkRequired(userId, asset, srcAccountType, targetAccountType, amount);
+		CheckUtils.checkPositiveNum(amount, srcAccountType, targetAccountType);
+		
 		if(srcAccountType.equals(targetAccountType)){
 			throw new ExException(TransferError.SAME_ACCOUNT_TYPE);
 		}

@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.commons.lock.Locker;
@@ -17,6 +18,9 @@ public class RedissonDistributedLocker implements Locker{
     private RedissonClient redissonClient;
     
     private String keyPrefix = "redisson:lock:";
+    
+    @Value("${redisson.lock.module:}")
+    private String modulePrefix;
 
     public boolean lock(String lockKey, Integer timeout) {
         RLock lock = redissonClient.getLock(FULLKEY(lockKey));
@@ -46,6 +50,6 @@ public class RedissonDistributedLocker implements Locker{
 	}
 	
 	private String FULLKEY(String key){
-		return keyPrefix+key;
+		return keyPrefix+modulePrefix+key;
 	}
 }

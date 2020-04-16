@@ -66,9 +66,8 @@ public class WithdrawalPayJob {
 			return;
 		}
 		//调用充值接口
-		BigDecimal amount = record.getAmount();
+		BigDecimal amount = record.getAmount().add(record.getFeeMargin()).subtract(record.getFee());
 		Integer symbol = asset2Symbol.getSymbol(record.getAsset());
-		
 		try{
 			WithDrawResponse response = exChainService.draw(record.getUserId(), symbol, record.getAccount(), amount, record.getSn());
 			logger.info("调用提币接口：{}", response.toString());

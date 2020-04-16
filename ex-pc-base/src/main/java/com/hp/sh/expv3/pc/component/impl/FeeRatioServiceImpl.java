@@ -132,8 +132,8 @@ public class FeeRatioServiceImpl implements FeeRatioService {
         HashOperations hashOperations = template.opsForHash();
         Object pcFee = hashOperations.get(key, prefix + userId);
         if (pcFee == null) {
-        	logger.error("FeeRatio:{}__{} is null", key, prefix);
-            throw new RuntimeException("获取手续费率失败:"+key+"#"+prefix);
+        	logger.error("FeeRatio:{}__{}{} is null", key, prefix, userId);
+            throw new RuntimeException("获取手续费率失败:"+key+"#"+prefix+userId);
         }
         return new BigDecimal(pcFee + "");
     }

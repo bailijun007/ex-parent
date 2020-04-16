@@ -86,12 +86,12 @@ public class BBTradeService {
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
 			BigDecimal income = orderTrade.getVolume();
 			String remark = BigFormat.format("购买成交获得：%s", income);
-			this.addBuyIn(orderTrade.getUserId(), orderTrade.getId(), bs.getIncomeCurrency(), income, remark);
+			this.addBuyIn(orderTrade.getUserId(), orderTrade.getId(), orderTrade.getOrderId(), bs.getIncomeCurrency(), income, remark);
 		}else{
 			BigDecimal amount = orderTrade.getVolume().multiply(orderTrade.getPrice());
 			BigDecimal income = amount.subtract(orderTrade.getFee());
 			String remark = BigFormat.format("销售成交收入：%s，手续费-%s", amount, orderTrade.getFee());
-			this.addSellIncome(orderTrade.getUserId(), orderTrade.getId(), bs.getIncomeCurrency(), income, remark);
+			this.addSellIncome(orderTrade.getUserId(), orderTrade.getId(), orderTrade.getOrderId(), bs.getIncomeCurrency(), income, remark);
 		}
 		
 		//修改订单状态
@@ -99,9 +99,9 @@ public class BBTradeService {
 		
 		//释放冻结的保证金，手续费
 		if(order.getBidFlag()==OrderFlag.BID_BUY){
-			this.releaseCurrencyMargin(order.getUserId(), order.getOrderMarginCurrency(), orderTrade.getId(), orderTrade.getFee(), tradeResult.getTradeOrderMargin());
+			this.releaseCurrencyMargin(order.getUserId(), order.getOrderMarginCurrency(), orderTrade.getId(), order.getId(), orderTrade.getFee(), tradeResult.getTradeOrderMargin());
 		}else{
-			this.releaseAssetMargin(order.getUserId(), order.getOrderMarginCurrency(), orderTrade.getId(), BigDecimal.ZERO, tradeResult.getTradeOrderMargin());
+			this.releaseAssetMargin(order.getUserId(), order.getOrderMarginCurrency(), orderTrade.getId(), order.getId(), BigDecimal.ZERO, tradeResult.getTradeOrderMargin());
 		}
 		
 		//退还剩余押金和手续费
@@ -127,7 +127,7 @@ public class BBTradeService {
 		this.accountCoreService.unfreeze(request);
 	}
 
-	private void releaseCurrencyMargin(Long userId, String asset, Long orderTradeId, BigDecimal remainFee, BigDecimal remainOrderMargin) {
+	private void releaseCurrencyMargin(Long userId, String asset, Long orderTradeId, Long orderId, BigDecimal remainFee, BigDecimal remainOrderMargin) {
 		BigDecimal returnAmount = remainFee.add(remainOrderMargin);
 		ReleaseFrozenRequest request = new ReleaseFrozenRequest();
 		request.setAmount(returnAmount);
@@ -136,11 +136,11 @@ public class BBTradeService {
 		request.setRemark(BigFormat.format("释放冻结的押金：%s，手续费：%s", remainOrderMargin, remainFee));
 		request.setTradeNo(SnUtils.getReleaseSn(orderTradeId));
 		request.setTradeType(BBAccountTradeType.TRADE_BUY_RELEASE);
-		request.setAssociatedId(orderTradeId);
+		request.setAssociatedId(orderId);
 		this.accountCoreService.release(request);
 	}
 
-	private void releaseAssetMargin(Long userId, String asset, Long orderTradeId, BigDecimal remainFee, BigDecimal remainOrderMargin) {
+	private void releaseAssetMargin(Long userId, String asset, Long orderTradeId, Long orderId, BigDecimal remainFee, BigDecimal remainOrderMargin) {
 		BigDecimal returnAmount = remainFee.add(remainOrderMargin);
 		ReleaseFrozenRequest request = new ReleaseFrozenRequest();
 		request.setAmount(returnAmount);
@@ -149,11 +149,11 @@ public class BBTradeService {
 		request.setRemark(BigFormat.format("释放冻结的押金：%s，手续费：%s", remainOrderMargin, remainFee));
 		request.setTradeNo(SnUtils.getReleaseSn(orderTradeId));
 		request.setTradeType(BBAccountTradeType.TRADE_SELL_RELEASE);
-		request.setAssociatedId(orderTradeId);
+		request.setAssociatedId(orderId);
 		this.accountCoreService.release(request);
 	}
 
-	private void addBuyIn(Long userId, Long orderTradeId, String asset, BigDecimal amount, String remark) {
+	private void addBuyIn(Long userId, Long orderTradeId, Long orderId, String asset, BigDecimal amount, String remark) {
 		BBAddRequest request = new BBAddRequest();
 		request.setAmount(amount);
 		request.setUserId(userId);
@@ -161,11 +161,11 @@ public class BBTradeService {
 		request.setRemark(remark);
 		request.setTradeNo(SnUtils.getBuyInSn(orderTradeId));
 		request.setTradeType(BBAccountTradeType.TRADE_BUY_IN);
-		request.setAssociatedId(orderTradeId);
+		request.setAssociatedId(orderId);
 		this.accountCoreService.add(request);
 	}
 
-	private void addSellIncome(Long userId, Long orderTradeId, String asset, BigDecimal amount, String remark) {
+	private void addSellIncome(Long userId, Long orderTradeId, Long orderId, String asset, BigDecimal amount, String remark) {
 		BBAddRequest request = new BBAddRequest();
 		request.setAmount(amount);
 		request.setUserId(userId);
@@ -173,7 +173,7 @@ public class BBTradeService {
 		request.setRemark(remark);
 		request.setTradeNo(SnUtils.getSellIncomeSn(orderTradeId));
 		request.setTradeType(BBAccountTradeType.TRADE_SELL_INCOME);
-		request.setAssociatedId(orderTradeId);
+		request.setAssociatedId(orderId);
 		this.accountCoreService.add(request);
 	}
 
@@ -236,7 +236,11 @@ public class BBTradeService {
 		orderTrade.setRemainOrderMargin(BigCalc.subtract(order.getOrderMargin(), tradeResult.getTradeOrderMargin()));
 		
 		if(IntBool.isTrue(order.getBidFlag())){
-			orderTrade.setRemainFee(BigCalc.subtract(order.getFee(), tradeResult.getTradeFee()));
+			if(BigUtils.gtZero(tradeResult.getTradeFee())){
+				orderTrade.setRemainFee(BigCalc.subtract(order.getFee(), tradeResult.getTradeFee()));
+			}else{//手续费是负数(倒贴),不扣订单手续费
+				orderTrade.setRemainFee(order.getFee());
+			}
 		}else{
 			orderTrade.setRemainFee(BigDecimal.ZERO);
 		}

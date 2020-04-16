@@ -70,8 +70,8 @@ public class PcRiskfundCoreService{
 		Long now = DbDateUtils.now();
 		
 		//金额必须是正数
-		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
-			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE, record);
+		if(record.getAmount().compareTo(BigDecimal.ZERO)<=0){
+			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE_AMOUNT, record);
 		}
 		
 		if(this.checkExist(record)){

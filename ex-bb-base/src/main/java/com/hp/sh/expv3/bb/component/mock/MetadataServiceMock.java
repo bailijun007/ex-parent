@@ -1,11 +1,13 @@
 package com.hp.sh.expv3.bb.component.mock;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.component.MetadataService;
+import com.hp.sh.expv3.bb.component.vo.AssetVO;
 import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 
 /**
@@ -40,5 +42,12 @@ public class MetadataServiceMock implements MetadataService {
         
         return list;
     }
+
+	@Override
+	public AssetVO getAsset(String asset) {
+		AssetVO vo = new AssetVO();
+		vo.setWithdrawFee(new BigDecimal("0.00001"));
+		return vo;
+	}
 
 }

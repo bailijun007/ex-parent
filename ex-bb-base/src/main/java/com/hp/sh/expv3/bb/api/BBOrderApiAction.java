@@ -16,6 +16,7 @@ import com.hp.sh.expv3.bb.mq.msg.out.OrderPendingCancelMsg;
 import com.hp.sh.expv3.bb.mq.msg.out.OrderPendingNewMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
+import com.hp.sh.expv3.utils.CheckUtils;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -48,6 +49,10 @@ public class BBOrderApiAction implements BBOrderApi {
 	 */
 	@Override
 	public Long create(Long userId, String asset, String symbol, Integer bidFlag, Integer timeInForce, BigDecimal price, BigDecimal number, String cliOrderId){
+		
+		CheckUtils.checkPositiveNum(price, number);
+		
+		CheckUtils.checkIntBool(bidFlag);
 		
 		BBOrder order = bBOrderService.create(userId, cliOrderId, asset, symbol, bidFlag, timeInForce, price, number);
 

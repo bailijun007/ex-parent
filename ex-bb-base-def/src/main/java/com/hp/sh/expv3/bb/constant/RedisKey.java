@@ -4,6 +4,8 @@ package com.hp.sh.expv3.bb.constant;
  * @author BaiLiJun  on 2019/12/20
  */
 public class RedisKey {
+	
+    public static final String BB_ASSET = "asset";
 
     public static final String BB_SYMBOL = "bb_symbol";
 

@@ -33,7 +33,6 @@ import com.hp.sh.expv3.config.db.SnGenerator;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.utils.DbDateUtils;
-import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
  * @author wangjg
@@ -296,8 +295,8 @@ public class BBAccountCoreService{
 	private boolean checkExist(BBAccountRecord record) {
 		
 		//金额必须是正数
-		if(record.getAmount().compareTo(BigDecimal.ZERO)<0){
-			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE, record);
+		if(record.getAmount().compareTo(BigDecimal.ZERO)<=0){
+			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE_AMOUNT, record);
 		}
 		
 		BBAccountRecord oldRcd = this.fundAccountRecordDAO.findByTradeNo(record.getUserId(), record.getTradeNo());
@@ -339,8 +338,8 @@ public class BBAccountCoreService{
 			throw new ExException(ExCommonError.PARAM_EMPTY, request); 
 		}
 		//金额必须是正数
-		if(request.getAmount().compareTo(BigDecimal.ZERO)<0){
-			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE, request);
+		if(request.getAmount().compareTo(BigDecimal.ZERO)<=0){
+			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE_AMOUNT, request);
 		}
 	}
 
