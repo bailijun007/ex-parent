@@ -69,6 +69,10 @@ public class GetLastPriceByMerge {
     private Integer bbGroupId;
 
     @Autowired
+    @Qualifier("originaldataDb5RedisUtil")
+    private RedisUtil originaldataDb5RedisUtil;
+
+    @Autowired
     @Qualifier("metadataDb5RedisUtil")
     private RedisUtil metadataDb5RedisUtil;
 
@@ -124,11 +128,11 @@ public class GetLastPriceByMerge {
         BigDecimal avgPrice = BigDecimal.ZERO;
         BigDecimal sumPrice = BigDecimal.ZERO;
         if (currentPriceMap.size() >= 3) {
-            return getAvgPriceByMergeMoreThan3Bourse(lastPriceMap,currentPriceMap, avgPrice, sumPrice,symbolMap);
+            return getAvgPriceByMergeMoreThan3Bourse(lastPriceMap, currentPriceMap, avgPrice, sumPrice, symbolMap);
         }
 
         if (currentPriceMap.size() == 2) {
-            getAvgPriceByMergeMoreThan2Bourse(lastPriceMap,currentPriceMap, avgPrice, sumPrice,symbolMap);
+            getAvgPriceByMergeMoreThan2Bourse(lastPriceMap, currentPriceMap, avgPrice, sumPrice, symbolMap);
         }
 
         if (currentPriceMap.size() == 1) {
@@ -177,7 +181,7 @@ public class GetLastPriceByMerge {
      * @param sumPrice
      * @return
      */
-    private BigDecimal getAvgPriceByMergeMoreThan2Bourse(Map<String, String> lastPriceMap,Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice, BigDecimal sumPrice,Map<String, String> symbolMap) {
+    private BigDecimal getAvgPriceByMergeMoreThan2Bourse(Map<String, String> lastPriceMap, Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice, BigDecimal sumPrice, Map<String, String> symbolMap) {
         List<BigDecimal> currentPriceList = new ArrayList<>(currentPriceMap.values());
         BigDecimal medianPrice = generatedMedian(currentPriceList);
         if (medianPrice.compareTo(BigDecimal.ZERO) == 0) {
@@ -188,7 +192,7 @@ public class GetLastPriceByMerge {
             BigDecimal rule = (price.subtract(medianPrice).abs()).divide(medianPrice, 4);
             if (rule.compareTo(new BigDecimal("0.125")) == 1) {
                 currentPriceMap.remove(s);
-                filter(lastPriceMap,currentPriceMap,symbolMap);
+                filter(lastPriceMap, currentPriceMap, symbolMap);
             }
         }
         if (CollectionUtils.isEmpty(currentPriceMap)) {
@@ -213,7 +217,7 @@ public class GetLastPriceByMerge {
      * @param sumPrice
      * @return
      */
-    private BigDecimal getAvgPriceByMergeMoreThan3Bourse(Map<String, String> lastPriceMap,Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice, BigDecimal sumPrice, Map<String, String> symbolMap) {
+    private BigDecimal getAvgPriceByMergeMoreThan3Bourse(Map<String, String> lastPriceMap, Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice, BigDecimal sumPrice, Map<String, String> symbolMap) {
         List<BigDecimal> currentPriceList = new ArrayList<>(currentPriceMap.values());
         BigDecimal medianPrice = generatedMedian(currentPriceList);
         if (medianPrice.compareTo(BigDecimal.ZERO) == 0) {
@@ -225,7 +229,7 @@ public class GetLastPriceByMerge {
             BigDecimal rule = abs.divide(medianPrice, 4, RoundingMode.DOWN);
             if (rule.compareTo(new BigDecimal("0.25")) == 1) {
                 currentPriceMap.remove(s);
-                filter(lastPriceMap,currentPriceMap,symbolMap);
+                filter(lastPriceMap, currentPriceMap, symbolMap);
             }
         }
         if (CollectionUtils.isEmpty(currentPriceMap)) {
@@ -326,11 +330,25 @@ public class GetLastPriceByMerge {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         String format = dateTime.format(dtf);
         HashMap<String, BigDecimal> map = new HashMap<>();
-        map.put(bbSymbol.getSymbol(), avgLastPrice);
+        List<String> list = new ArrayList<>();
+        String symbol = bbSymbol.getSymbol();
+        map.put(symbol, avgLastPrice);
         metadataDb5RedisUtil.hmset(key, map);
-        metadataDb5RedisUtil.zadd("his:" + key, new HashMap<String, Double>() {{
-            put(bbSymbol.getSymbol(), Double.valueOf(format));
-        }});
+        originaldataDb5RedisUtil.hmset(key, map);
+//        metadataDb5RedisUtil.zadd("his:" + key, new HashMap<String, Double>() {{
+//            put(bbSymbol.getSymbol(), Double.valueOf(format));
+//        }});
+
+        list.add(symbol);
+        if (symbol.equals("ETH_USDT")) {
+             BigDecimal ethUsdtValue = map.get("ETH_USDT");
+            BigDecimal bysValue =ethUsdtValue.divide(new BigDecimal("7000"), 8, RoundingMode.DOWN);
+            map.clear();
+            map.put("BYS_USDT",bysValue);
+            metadataDb5RedisUtil.hmset(key, map);
+            originaldataDb5RedisUtil.hmset(key, map);
+        }
+
         logger.info("当前时间={},asset={},symbol={},最终最新成交均价为:{},", format, bbSymbol.getAsset(), bbSymbol.getSymbol(), avgLastPrice);
 
     }

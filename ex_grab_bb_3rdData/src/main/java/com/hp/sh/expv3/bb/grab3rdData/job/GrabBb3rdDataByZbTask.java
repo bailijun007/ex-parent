@@ -69,8 +69,8 @@ public class GrabBb3rdDataByZbTask {
     private Integer bbGroupId;
 
     @Autowired
-    @Qualifier("metadataRedisUtil")
-    private RedisUtil metadataRedisUtil;
+    @Qualifier("originaldataDb5RedisUtil")
+    private RedisUtil originaldataDb5RedisUtil;
 
     @Autowired
     @Qualifier("metadataDb5RedisUtil")
@@ -125,6 +125,7 @@ public class GrabBb3rdDataByZbTask {
                     String value = ticker.getLast() + "";
                     map.put(key, value);
                     if (map.size() == 8) {
+                        originaldataDb5RedisUtil.mset(map);
                         metadataDb5RedisUtil.mset(map);
                         map.clear();
                     }
@@ -172,9 +173,9 @@ public class GrabBb3rdDataByZbTask {
 
             //批量保存
             metadataDb5RedisUtil.mset(map);
-
+            originaldataDb5RedisUtil.mset(map);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
 

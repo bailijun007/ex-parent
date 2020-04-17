@@ -52,7 +52,7 @@ public class MetadataRedisBeans {
                 metadataRedisSetting.getPort(),
                 metadataRedisSetting.getTimeout(),
                 StringUtils.isEmpty(metadataRedisSetting.getPassword()) ? null : metadataRedisSetting.getPassword(),
-               5);
+               14);
         return new RedisUtil(jedisPool);
     }
 
