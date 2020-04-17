@@ -1,11 +1,5 @@
 package com.hp.sh.expv3.bb.mq.listen.mq;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,19 +28,12 @@ public class MatchMqConsumer {
 
 	@Autowired
 	private BBMqMsgService msgService;
-	
-	private BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>(100);
-	private ExecutorService pool = new ThreadPoolExecutor(1, 100, 300L, TimeUnit.SECONDS, queue);
-	
+
 	//撮合未成交
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(BBMatchNotMatchMsg msg){
 		logger.info("收到撮合未成交消息:{}", msg);
-		Runnable task = new Runnable(){
-			public void run(){
-				orderService.setNewStatus(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
-			}};
-		pool.submit(task);
+		orderService.setNewStatus(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
 	}
 	
 	//取消订单

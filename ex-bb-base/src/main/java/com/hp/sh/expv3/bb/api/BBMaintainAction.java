@@ -214,7 +214,7 @@ public class BBMaintainAction{
 			this.handleNextFailMsg(msg);
 		}
 		
-		return "Over.";
+		return "Over."+list.size();
 	}
 	
 	private String handleNextFailMsg(BBMqMsg msg){

@@ -214,7 +214,7 @@ public class BBAccountCoreService{
 	}
 
 	private BBAccount getAccount(Long userId, String asset){
-		BBAccount account = this.accountDAO.getAndLock(userId, asset);
+		BBAccount account = this.accountDAO.get(userId, asset);
 		if(account==null){
 			account = new BBAccount();
 			account.setAsset(asset);
