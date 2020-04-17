@@ -164,6 +164,26 @@ COMMENT='币币手续费_账户明细'
 
 ;
 
+CREATE TABLE `bb_mq_msg` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `message_id` varchar(64) DEFAULT NULL COMMENT 'messageId',
+  `tag` varchar(64) NOT NULL,
+  `key` varchar(64) DEFAULT NULL,
+  `body` varchar(2000) NOT NULL,
+  `ex_message` varchar(1000) DEFAULT NULL COMMENT '异常信息',
+  `method` varchar(255) DEFAULT NULL COMMENT '处理方法',
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+  `asset` varchar(20) NOT NULL COMMENT '资产',
+  `symbol` varchar(20) NOT NULL COMMENT '交易对（合约品种）',
+  `sort_id` bigint(20) NOT NULL,
+  `created` bigint(20) NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_tag_key` (`tag`,`key`,`user_id`),
+  KEY `idx_sort_id` (`sort_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6199 DEFAULT CHARSET=utf8mb4 COMMENT='未处理的_消息';
+
+
+
 -- ----------------------------
 -- Table structure for `bb_order`
 -- ----------------------------

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.fail.dao.BBMqMsgDAO;
 import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
@@ -26,6 +27,9 @@ import com.hp.sh.expv3.utils.DbDateUtils;
 @Service
 @Transactional(rollbackFor=Exception.class)
 public class BBMqMsgService{
+	
+    /** 起始时间戳 */
+    private final long twepoch = 1541606400000L - 1000 * 3600 * 24;
 
 	@Autowired
 	private BBMqMsgDAO bBMqMsgDAO;
@@ -39,11 +43,23 @@ public class BBMqMsgService{
 		BBMqMsg msgEntity = new BBMqMsg();
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setUserId(msg.getAccountId());
+		msgEntity.setAsset(msg.getAsset());
+		msgEntity.setSymbol(msg.getSymbol());
 		msgEntity.setExMessage(exMessage);
 		msgEntity.setTag(tag);
 		msgEntity.setKey(""+msg.getOrderId());
 		msgEntity.setBody(JsonUtils.toJson(msg));
+		msgEntity.setSortId(this.getSortId(tag, msgEntity.getCreated()));
 		this.bBMqMsgDAO.save(msgEntity);
+	}
+
+	private Long getSortId(String tag, Long created) {
+		long tagbit = 1L<<60;
+		if(tag.equals(MqTags.TAGS_TRADE)){
+			tagbit = 0;
+		}
+		long sortId = tagbit | created;
+		return sortId;
 	}
 
 	@LockIt(key="mm-${msg.accountId}-${msg.orderId}")
@@ -56,10 +72,13 @@ public class BBMqMsgService{
 		BBMqMsg msgEntity = new BBMqMsg();
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setUserId(msg.getAccountId());
+		msgEntity.setAsset(msg.getAsset());
+		msgEntity.setSymbol(msg.getSymbol());
 		msgEntity.setExMessage(exMessage);
 		msgEntity.setTag(tag);
 		msgEntity.setKey(""+msg.getOrderId());
 		msgEntity.setBody(JsonUtils.toJson(msg));
+		msgEntity.setSortId(this.getSortId(tag, msgEntity.getCreated()));
 		this.bBMqMsgDAO.save(msgEntity);
 	}
 	

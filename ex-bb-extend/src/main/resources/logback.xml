@@ -128,7 +128,6 @@
     </appender>
 
 	<root level="info">
-		<appender-ref ref="STDOUT" />
 	</root>
 	
 	<logger name="springfox.documentation.spring" level="warn"></logger>

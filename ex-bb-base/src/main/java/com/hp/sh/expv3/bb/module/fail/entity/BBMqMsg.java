@@ -32,6 +32,14 @@ public class BBMqMsg implements UserData{
 	
 	//用户ID
 	private Long userId;
+	
+	//资产
+	protected String asset;
+	
+	//交易对（合约品种）
+	protected String symbol;
+	
+	private Long sortId;
 
 	// 创建时间
 	private Long created;
@@ -112,12 +120,35 @@ public class BBMqMsg implements UserData{
 		this.exMessage = exMessage;
 	}
 
+	public String getAsset() {
+		return asset;
+	}
+
+	public void setAsset(String asset) {
+		this.asset = asset;
+	}
+
+	public String getSymbol() {
+		return symbol;
+	}
+
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
+	}
+
+	public Long getSortId() {
+		return sortId;
+	}
+
+	public void setSortId(Long sortId) {
+		this.sortId = sortId;
+	}
+
 	@Override
 	public String toString() {
 		return "BBMqMsg [id=" + id + ", messageId=" + messageId + ", tag=" + tag + ", key=" + key + ", body=" + body
-				+ ", exMessage=" + exMessage + ", method=" + method + ", userId=" + userId + ", created=" + created
-				+ "]";
+				+ ", exMessage=" + exMessage + ", method=" + method + ", userId=" + userId + ", asset=" + asset
+				+ ", symbol=" + symbol + ", created=" + created + "]";
 	}
-
 
 }
