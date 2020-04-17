@@ -15,7 +15,9 @@ public class BBAccountError extends ErrorCode {
 	
 	public static final BBAccountError INCONSISTENT_REQUESTS = new BBAccountError(-17002, "币币账户变更请求不一致!");
 	
-	public static final BBAccountError BALANCE_NOT_ENOUGH = new BBAccountError(-17003, "余额不足!");
+	public static final BBAccountError BALANCE_NOT_ENOUGH = new BBAccountError(-17003, "可用余额不足!");
+	
+	public static final BBAccountError FROZEN_NOT_ENOUGH = new BBAccountError(-17004, "冻结余额不足!");
 	
 	private BBAccountError(int code, String message) {
 		super(code, message);
