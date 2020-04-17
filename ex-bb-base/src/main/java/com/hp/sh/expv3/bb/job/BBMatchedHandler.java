@@ -81,7 +81,6 @@ public class BBMatchedHandler {
 		
 	}
 	
-	@LockIt(key="${msg.accountId}-${msg.asset}-${msg.symbol}")
 	public void handleCancelled(BbOrderCancelMqMsg msg){
 		this.tradeExecutors.submit(new CancelledTask(msg));
 	}

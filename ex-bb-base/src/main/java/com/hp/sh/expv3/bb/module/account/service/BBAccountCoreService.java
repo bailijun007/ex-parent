@@ -274,7 +274,7 @@ public class BBAccountCoreService{
 		//检查冻结
 		if(account.getFrozen().compareTo(BigDecimal.ZERO) < 0){
 			logger.error("冻结金额小于0：{}", record);
-			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, "frozen", record);
+			throw new ExException(BBAccountError.FROZEN_NOT_ENOUGH, "frozen", record);
 		}
 	}
 	
