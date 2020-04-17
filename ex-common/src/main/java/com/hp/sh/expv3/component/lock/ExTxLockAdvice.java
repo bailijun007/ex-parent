@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.commons.ctx.TxIdContext;
 import com.hp.sh.expv3.commons.lock.LockAdvice;
+import com.hp.sh.expv3.commons.lock.Locker;
+
 
 @Order(Ordered.LOWEST_PRECEDENCE)
 @Aspect
@@ -33,5 +35,9 @@ public class ExTxLockAdvice extends LockAdvice {
     		TxIdContext.reset();
 		}   
     }
-    
+
+    @Autowired(required=false)
+	public void setLocker(Locker locker) {
+		super.setLocker(locker);
+	}
 }

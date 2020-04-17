@@ -79,5 +79,11 @@ public class SnUtils {
 	public static String getReleaseSn(Long orderId) {
 		return "RL"+orderId;
 	}
+	
+	public static Long getId(String sn) {
+//		String str = sn.replaceAll("[^0-9]+", "");
+		String str = sn.replaceAll("[A-Z]+", "");
+		return Long.parseLong(str);
+	}
 
 }

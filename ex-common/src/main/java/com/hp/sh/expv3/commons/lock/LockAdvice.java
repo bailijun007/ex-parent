@@ -11,13 +11,11 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 
 public class LockAdvice {
 	private static final Logger logger = LoggerFactory.getLogger(LockAdvice.class);
 	
-	@Autowired(required=false)
 	private Locker locker;
 
     public LockAdvice() {
@@ -127,6 +125,13 @@ public class LockAdvice {
 		return -1;
 	}
 	
+	protected void setLocker(Locker locker) {
+		if(this.locker!=null){
+			throw new RuntimeException("locker exist.");
+		}
+		this.locker = locker;
+	}
+
 	public static void main(String[] args) throws Exception {
 		System.out.println(getRealKey("xx-{1}-{name.empty}-oo", new Object[]{100,"test"}, new String[]{"id","name"}));
 		System.out.println(getRealKey("test", null, null));
