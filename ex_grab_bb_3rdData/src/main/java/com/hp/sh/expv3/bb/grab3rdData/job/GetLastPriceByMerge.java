@@ -103,15 +103,16 @@ public class GetLastPriceByMerge {
     @Scheduled(cron = "*/1 * * * * *")
     public void merge() {
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-
+        Map<String, String> symbolMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
                 List<String> symbols = new ArrayList<>();
                 String key = "ticker:bb:lastPrice:" + bbSymbol.getAsset();
                 symbols.add(bbSymbol.getSymbol());
+                symbolMap.put(bbSymbol.getSymbol(), bbSymbol.getSymbol());
                 Map<String, String> lastPriceMap = metadataDb5RedisUtil.hmget(key, symbols);
                 Map<String, BigDecimal> currentPriceMap = mergeByAvg(bbSymbol);
-                BigDecimal avgPrice = this.filter(lastPriceMap, currentPriceMap);
+                BigDecimal avgPrice = this.filter(lastPriceMap, currentPriceMap, symbolMap);
                 if (avgPrice.compareTo(BigDecimal.ZERO) != 0) {
                     saveMerge(bbSymbol, avgPrice, key);
                 }
@@ -119,19 +120,19 @@ public class GetLastPriceByMerge {
         }
     }
 
-    private BigDecimal filter(Map<String, String> lastPriceMap, Map<String, BigDecimal> currentPriceMap) {
+    private BigDecimal filter(Map<String, String> lastPriceMap, Map<String, BigDecimal> currentPriceMap, Map<String, String> symbolMap) {
         BigDecimal avgPrice = BigDecimal.ZERO;
         BigDecimal sumPrice = BigDecimal.ZERO;
         if (currentPriceMap.size() >= 3) {
-            return getAvgPriceByMergeMoreThan3Bourse(currentPriceMap, avgPrice, sumPrice);
+            return getAvgPriceByMergeMoreThan3Bourse(lastPriceMap,currentPriceMap, avgPrice, sumPrice,symbolMap);
         }
 
         if (currentPriceMap.size() == 2) {
-            getAvgPriceByMergeMoreThan2Bourse(currentPriceMap, avgPrice, sumPrice);
+            getAvgPriceByMergeMoreThan2Bourse(lastPriceMap,currentPriceMap, avgPrice, sumPrice,symbolMap);
         }
 
         if (currentPriceMap.size() == 1) {
-            return getAvgPriceByMerge1Bourse(lastPriceMap, currentPriceMap);
+            return getAvgPriceByMerge1Bourse(lastPriceMap, currentPriceMap, symbolMap);
         }
         return avgPrice;
     }
@@ -143,7 +144,7 @@ public class GetLastPriceByMerge {
      * @param currentPriceMap
      * @return
      */
-    private BigDecimal getAvgPriceByMerge1Bourse(Map<String, String> lastPriceMap, Map<String, BigDecimal> currentPriceMap) {
+    private BigDecimal getAvgPriceByMerge1Bourse(Map<String, String> lastPriceMap, Map<String, BigDecimal> currentPriceMap, Map<String, String> symbolMap) {
         BigDecimal currentPrice = new ArrayList<>(currentPriceMap.values()).get(0);
         BigDecimal lastPrice = BigDecimal.ZERO;
         //如果没有最新成交价，则直接用当前获取的成交价
@@ -152,13 +153,13 @@ public class GetLastPriceByMerge {
         } else if (CollectionUtils.isEmpty(currentPriceMap)) {
             return BigDecimal.ZERO;
         } else {
-            String lastPriceStr = null;
 //                String lastPriceStr = new ArrayList<>((List<String>) lastPriceMap.values()).get(0);
             for (String s : lastPriceMap.keySet()) {
-                currentPriceMap.containsKey(s);
-                lastPriceStr = lastPriceMap.get(s);
+                if (symbolMap.containsKey(s)) {
+                    String lastPriceStr = lastPriceMap.get(s);
+                    lastPrice = new BigDecimal(lastPriceStr);
+                }
             }
-            lastPrice = new BigDecimal(lastPriceStr);
         }
 
         if (currentPrice.subtract(lastPrice).abs().compareTo(new BigDecimal("0.25")) == 1) {
@@ -176,7 +177,7 @@ public class GetLastPriceByMerge {
      * @param sumPrice
      * @return
      */
-    private BigDecimal getAvgPriceByMergeMoreThan2Bourse(Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice, BigDecimal sumPrice) {
+    private BigDecimal getAvgPriceByMergeMoreThan2Bourse(Map<String, String> lastPriceMap,Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice, BigDecimal sumPrice,Map<String, String> symbolMap) {
         List<BigDecimal> currentPriceList = new ArrayList<>(currentPriceMap.values());
         BigDecimal medianPrice = generatedMedian(currentPriceList);
         if (medianPrice.compareTo(BigDecimal.ZERO) == 0) {
@@ -187,6 +188,7 @@ public class GetLastPriceByMerge {
             BigDecimal rule = (price.subtract(medianPrice).abs()).divide(medianPrice, 4);
             if (rule.compareTo(new BigDecimal("0.125")) == 1) {
                 currentPriceMap.remove(s);
+                filter(lastPriceMap,currentPriceMap,symbolMap);
             }
         }
         if (CollectionUtils.isEmpty(currentPriceMap)) {
@@ -211,7 +213,7 @@ public class GetLastPriceByMerge {
      * @param sumPrice
      * @return
      */
-    private BigDecimal getAvgPriceByMergeMoreThan3Bourse(Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice, BigDecimal sumPrice) {
+    private BigDecimal getAvgPriceByMergeMoreThan3Bourse(Map<String, String> lastPriceMap,Map<String, BigDecimal> currentPriceMap, BigDecimal avgPrice, BigDecimal sumPrice, Map<String, String> symbolMap) {
         List<BigDecimal> currentPriceList = new ArrayList<>(currentPriceMap.values());
         BigDecimal medianPrice = generatedMedian(currentPriceList);
         if (medianPrice.compareTo(BigDecimal.ZERO) == 0) {
@@ -223,6 +225,7 @@ public class GetLastPriceByMerge {
             BigDecimal rule = abs.divide(medianPrice, 4, RoundingMode.DOWN);
             if (rule.compareTo(new BigDecimal("0.25")) == 1) {
                 currentPriceMap.remove(s);
+                filter(lastPriceMap,currentPriceMap,symbolMap);
             }
         }
         if (CollectionUtils.isEmpty(currentPriceMap)) {
