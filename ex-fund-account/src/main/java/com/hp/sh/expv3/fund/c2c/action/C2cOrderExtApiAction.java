@@ -106,53 +106,58 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         logger.info("userId={},bankCard={},bankCardName={},srcAsset={},srcNum={},tarAsset={},tarNum={},ratio={}", userId, bankCard, bankCardName, srcAsset, srcNum, tarAsset, tarNum, ratio);
         //获取资产账户
         CapitalAccountVo account = fundAccountExtApi.getCapitalAccount(userId, srcAsset);
-        BigDecimal remain = account.getAvailable();
-        if (remain.subtract(srcNum).compareTo(BigDecimal.ZERO) >= 0) {
-//            lock.writeLock().lock();
-            try {
-                //生成c2c体现订单(体现状态为审核中)
-                C2cOrder c2cOrder = new C2cOrder();
-                c2cOrder.setBank(bank);
-                c2cOrder.setBankCard(bankCard);
-                c2cOrder.setBankCardName(bankCardName);
-                c2cOrder.setSn(GenerateOrderNumUtils.getOrderNo(userId));
-                c2cOrder.setPayCurrency(srcAsset);
-                c2cOrder.setExchangeCurrency(tarAsset);
-                c2cOrder.setPrice(ratio);
-                c2cOrder.setType(C2cConst.C2C_SELL);
-                c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
-                c2cOrder.setPayStatusDesc(C2cConst.C2C_PAY_STATUS_DESC_WITHDRAWAL);
-                c2cOrder.setPayTime(Instant.now().toEpochMilli());
-                c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
-                c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_FALSE);
-                c2cOrder.setApprovalStatus(C2cConst.C2C_APPROVAL_STATUS_IN_AUDIT);
-                c2cOrder.setUserId(userId);
-                c2cOrder.setCreated(Instant.now().toEpochMilli());
-                c2cOrder.setModified(Instant.now().toEpochMilli());
-                c2cOrder.setVolume(srcNum);
-                c2cOrder.setAmount(ratio.multiply(srcNum));
-                sellService.createC2cOut(c2cOrder);
-
-                //预扣体现金额
-                FundCutRequest request = new FundCutRequest();
-                request.setAsset(c2cOrder.getPayCurrency());
-                request.setAmount(c2cOrder.getVolume());
-                request.setTradeNo(c2cOrder.getSn());
-                request.setTradeType(TradeType.C2C_OUT);
-                request.setRemark(c2cOrder.getPayStatusDesc());
-                request.setUserId(c2cOrder.getUserId());
-                fundAccountCoreApi.cut(request);
-
-            } catch (Exception e) {
-                logger.info("订单回调通知失败{}", e.getMessage());
-                e.printStackTrace();
-            } finally {
-//                lock.writeLock().unlock();
-            }
-            return "success";
-        } else {
-            throw new ExException(ExFundError.ORDER_NOT_SUFFICIENT_FUNDS);
+        if (null== account) {
+            throw new ExException(ExFundError.ACCOUNT_NOT_FIND);
         }
+            BigDecimal remain = account.getAvailable();
+            if (remain.subtract(srcNum).compareTo(BigDecimal.ZERO) >= 0) {
+//            lock.writeLock().lock();
+                try {
+                    //生成c2c体现订单(体现状态为审核中)
+                    C2cOrder c2cOrder = new C2cOrder();
+                    c2cOrder.setBank(bank);
+                    c2cOrder.setBankCard(bankCard);
+                    c2cOrder.setBankCardName(bankCardName);
+                    c2cOrder.setSn(GenerateOrderNumUtils.getOrderNo(userId));
+                    c2cOrder.setPayCurrency(srcAsset);
+                    c2cOrder.setExchangeCurrency(tarAsset);
+                    c2cOrder.setPrice(ratio);
+                    c2cOrder.setType(C2cConst.C2C_SELL);
+                    c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
+                    c2cOrder.setPayStatusDesc(C2cConst.C2C_PAY_STATUS_DESC_WITHDRAWAL);
+                    c2cOrder.setPayTime(Instant.now().toEpochMilli());
+                    c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
+                    c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_FALSE);
+                    c2cOrder.setApprovalStatus(C2cConst.C2C_APPROVAL_STATUS_IN_AUDIT);
+                    c2cOrder.setUserId(userId);
+                    c2cOrder.setCreated(Instant.now().toEpochMilli());
+                    c2cOrder.setModified(Instant.now().toEpochMilli());
+                    c2cOrder.setVolume(srcNum);
+                    c2cOrder.setAmount(ratio.multiply(srcNum));
+                    sellService.createC2cOut(c2cOrder);
+
+                    //预扣体现金额
+                    FundCutRequest request = new FundCutRequest();
+                    request.setAsset(c2cOrder.getPayCurrency());
+                    request.setAmount(c2cOrder.getVolume());
+                    request.setTradeNo(c2cOrder.getSn());
+                    request.setTradeType(TradeType.C2C_OUT);
+                    request.setRemark(c2cOrder.getPayStatusDesc());
+                    request.setUserId(c2cOrder.getUserId());
+                    fundAccountCoreApi.cut(request);
+
+                } catch (Exception e) {
+                    logger.info("订单回调通知失败{}", e.getMessage());
+                    e.printStackTrace();
+                } finally {
+//                lock.writeLock().unlock();
+                }
+                return "success";
+            } else {
+                throw new ExException(ExFundError.ORDER_NOT_SUFFICIENT_FUNDS);
+            }
+
+
     }
 
     @Override
