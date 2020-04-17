@@ -33,11 +33,23 @@ public class BbAccountRecordExtVo implements Serializable {
     @ApiModelProperty("手续费")
     private BigDecimal fee;
 
-    @ApiModelProperty("关联对象的ID")
+    @ApiModelProperty("关联对象的ID(无效)")
     private Long associatedId;
+
+
+    @ApiModelProperty("关联对象的ID（有效）")
+    private String tradeNo;
 
     @ApiModelProperty("创建时间")
     private  Long ctime;
+
+    public String getTradeNo() {
+        return tradeNo;
+    }
+
+    public void setTradeNo(String tradeNo) {
+        this.tradeNo = tradeNo;
+    }
 
     @Override
     public String toString() {
@@ -50,6 +62,9 @@ public class BbAccountRecordExtVo implements Serializable {
                 ", volume=" + volume +
                 ", balance=" + balance +
                 ", fee=" + fee +
+                ", associatedId=" + associatedId +
+                ", tradeNo='" + tradeNo + '\'' +
+                ", ctime=" + ctime +
                 '}';
     }
 
