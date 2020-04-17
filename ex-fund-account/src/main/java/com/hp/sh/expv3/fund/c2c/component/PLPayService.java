@@ -51,9 +51,9 @@ public class PLPayService {
         String orderNo = GenerateOrderNumUtils.getOrderNo(userId);
         //订单币种
         String orderCurrency =srcCurrency;
-//        if(srcCurrency.equals("CNY")){
-//             orderCurrency = "INR";
-//        }
+        if(srcCurrency.equals("CNY")){
+             orderCurrency = "QC";
+        }
 
         //订单金额
         BigDecimal orderAmount = ratio.multiply(tarVolume).setScale(2, RoundingMode.UP);
