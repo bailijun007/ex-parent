@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.bb.mq.listen.mq;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +51,8 @@ public class MatchMqConsumer {
 		}catch(UpdateException e){
 			throw e;
 		}catch(Exception e){
-			Throwable cause = e.getCause();
+			Throwable cause = ExceptionUtils.getRootCause(e);
 			if(cause instanceof UpdateException){
-				logger.error("奇怪...");
 				throw (UpdateException)cause;
 			}
 			logger.error(e.getMessage(), e);
@@ -69,9 +69,8 @@ public class MatchMqConsumer {
 		}catch(UpdateException e){
 			throw e;
 		}catch(Exception e){
-			Throwable cause = e.getCause();
+			Throwable cause = ExceptionUtils.getRootCause(e);
 			if(cause instanceof UpdateException){
-				logger.error("奇怪...");
 				throw (UpdateException)cause;
 			}
 			logger.error(e.getMessage(), e);

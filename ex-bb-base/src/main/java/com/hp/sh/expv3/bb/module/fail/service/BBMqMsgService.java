@@ -40,6 +40,11 @@ public class BBMqMsgService{
 
 	@LockIt(key="mm-${msg.accountId}-${msg.orderId}")
 	public void save(String tag, BBTradeVo msg, String exMessage) {
+		
+		if(exMessage!=null && exMessage.length()>1500){
+			exMessage = exMessage.substring(0, 1500);
+		}
+		
 		BBMqMsg msgEntity = new BBMqMsg();
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setUserId(msg.getAccountId());
@@ -64,6 +69,11 @@ public class BBMqMsgService{
 
 	@LockIt(key="mm-${msg.accountId}-${msg.orderId}")
 	public void saveIfNotExists(String tag, BbOrderCancelMqMsg msg, String exMessage) {
+		
+		if(exMessage!=null && exMessage.length()>1500){
+			exMessage = exMessage.substring(0, 1500);
+		}
+		
 		boolean existCancelled = this.exist(msg.getAccountId(), tag, ""+msg.getOrderId());
 		if(existCancelled){
 			return;
