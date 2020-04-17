@@ -15,6 +15,7 @@ import com.hp.sh.expv3.bb.mq.send.BBSender;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
+@Deprecated
 @Component
 @MQListener(orderly=MQListener.ORDERLY_YES)
 public class MatchMqConsumer4Executor {

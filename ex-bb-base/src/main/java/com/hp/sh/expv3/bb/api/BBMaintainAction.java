@@ -196,11 +196,32 @@ public class BBMaintainAction{
 	
 	@ApiOperation(value = "handleNextFailMsg")
 	@GetMapping(value = "/api/bb/maintain/mq/handleNextFailMsg")	
-	public String handleNextFailMsg(String tag){
-		BBMqMsg msg = mqMsgService.findFirst(tag);
+	public String handleNextFailMsg(String tag, String symbol){
+		BBMqMsg msg = mqMsgService.findFirst(tag, symbol);
+		
+		this.handleNextFailMsg(msg);
+		
+		return "OK";
+	}
+	
+	@ApiOperation(value = "reHandleAllFailMsg")
+	@GetMapping(value = "/api/bb/maintain/mq/reHandleAllFailMsg")	
+	public String reHandleAllFailMsg(Integer num){
+		num = num==null ? 1:num;
+		
+		List<BBMqMsg> list = this.mqMsgService.findFirstList(num);
+		for(BBMqMsg msg : list){
+			this.handleNextFailMsg(msg);
+		}
+		
+		return "Over.";
+	}
+	
+	private String handleNextFailMsg(BBMqMsg msg){
 		if(msg==null){
 			return "no record!";
 		}
+		
 		if(msg.getTag().equals(MqTags.TAGS_TRADE)){
 			BBTradeVo mqMsg = JsonUtils.toObject(msg.getBody(), BBTradeVo.class);
 			this.tradeService.handleTrade(mqMsg);
@@ -212,12 +233,6 @@ public class BBMaintainAction{
 		mqMsgService.delete(msg.getUserId(), msg.getId());
 		
 		return "OK";
-	}
-	
-	@ApiOperation(value = "reHandleAllFailMsg")
-	@GetMapping(value = "/api/bb/maintain/mq/reHandleAllFailMsg")	
-	public void reHandleAllFailMsg(){
-		
 	}
 	
 	@ApiOperation(value = "time")
