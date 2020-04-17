@@ -54,7 +54,7 @@ public class BBMqMsgService{
 	}
 
 	private Long getSortId(String tag, Long created) {
-		long tagbit = 1L<<62;
+		long tagbit = 1L<<60;
 		if(tag.equals(MqTags.TAGS_TRADE)){
 			tagbit = 0;
 		}
