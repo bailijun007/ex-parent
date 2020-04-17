@@ -52,6 +52,9 @@ public class GrabPc3rdDataByBinanceTask {
     @Value("${binance.https.redisKey.prefix}")
     private String httpsRedisKey;
 
+    @Autowired
+    @Qualifier("originaldataDb5RedisUtil")
+    private RedisUtil originaldataDb5RedisUtil;
 
     @Autowired
     @Qualifier("metadataDb5RedisUtil")
@@ -113,6 +116,7 @@ public class GrabPc3rdDataByBinanceTask {
                 }
                 if (map.size() == 1) {
                     metadataDb5RedisUtil.mset(map);
+                    originaldataDb5RedisUtil.mset(map);
                     map.clear();
                 }
             }

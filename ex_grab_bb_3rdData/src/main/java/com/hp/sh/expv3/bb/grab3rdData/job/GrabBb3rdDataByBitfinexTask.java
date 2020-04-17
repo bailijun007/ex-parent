@@ -63,8 +63,8 @@ public class GrabBb3rdDataByBitfinexTask {
     private Integer bbGroupId;
 
     @Autowired
-    @Qualifier("metadataRedisUtil")
-    private RedisUtil metadataRedisUtil;
+    @Qualifier("originaldataDb5RedisUtil")
+    private RedisUtil originaldataDb5RedisUtil;
 
     @Autowired
     @Qualifier("metadataDb5RedisUtil")
@@ -131,6 +131,7 @@ public class GrabBb3rdDataByBitfinexTask {
 
                         //批量保存
                         metadataDb5RedisUtil.mset(map);
+                        originaldataDb5RedisUtil.mset(map);
                         TimeUnit.SECONDS.sleep(1);
                     } catch (Exception e) {
                         logger.error("通过https请求获取bitfinex交易所最新成交价定时任务报错！，cause()={},message={}", e.getCause(), e.getMessage());
