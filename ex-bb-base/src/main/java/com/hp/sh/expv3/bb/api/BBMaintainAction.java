@@ -196,12 +196,10 @@ public class BBMaintainAction{
 	
 	@ApiOperation(value = "handleNextFailMsg")
 	@GetMapping(value = "/api/bb/maintain/mq/handleNextFailMsg")	
-	public String handleNextFailMsg(String tag, String symbol){
+	public Integer handleNextFailMsg(String tag, String symbol){
 		BBMqMsg msg = mqMsgService.findFirst(tag, symbol);
 		
-		this.handleNextFailMsg(msg);
-		
-		return "OK";
+		return this.handleNextFailMsg(msg);
 	}
 	
 	@ApiOperation(value = "reHandleAllFailMsg")
@@ -217,9 +215,9 @@ public class BBMaintainAction{
 		return "Over."+list.size();
 	}
 	
-	private String handleNextFailMsg(BBMqMsg msg){
+	private int handleNextFailMsg(BBMqMsg msg){
 		if(msg==null){
-			return "no record!";
+			return 0;
 		}
 		
 		if(msg.getTag().equals(MqTags.TAGS_TRADE)){
@@ -232,7 +230,7 @@ public class BBMaintainAction{
 		
 		mqMsgService.delete(msg.getUserId(), msg.getId());
 		
-		return "OK";
+		return 1;
 	}
 	
 	@ApiOperation(value = "time")
