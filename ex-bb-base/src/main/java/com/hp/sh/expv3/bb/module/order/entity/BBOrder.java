@@ -328,14 +328,14 @@ public class BBOrder extends UserDataEntity implements OrderData{
 
 	@Override
 	public String toString() {
-		return "BBOrder [asset=" + asset + ", symbol=" + symbol + ", bidFlag=" + bidFlag + ", leverage=" + leverage
+		return "BBOrder [id=" + id + ", userId=" + userId + ", created=" + created + ", modified=" + modified
+				+ ", asset=" + asset + ", symbol=" + symbol + ", bidFlag=" + bidFlag + ", leverage=" + leverage
 				+ ", volume=" + volume + ", price=" + price + ", orderType=" + orderType + ", timeInForce="
 				+ timeInForce + ", feeRatio=" + feeRatio + ", clientOrderId=" + clientOrderId + ", fee=" + fee
 				+ ", orderMargin=" + orderMargin + ", orderMarginCurrency=" + orderMarginCurrency + ", status=" + status
 				+ ", activeFlag=" + activeFlag + ", remark=" + remark + ", cancelTime=" + cancelTime + ", cancelVolume="
 				+ cancelVolume + ", feeCost=" + feeCost + ", filledVolume=" + filledVolume + ", version=" + version
-				+ ", createOperator=" + createOperator + ", cancelOperator=" + cancelOperator + ", userId=" + userId
-				+ ", id=" + id + ", created=" + created + ", modified=" + modified + "]";
+				+ ", createOperator=" + createOperator + ", cancelOperator=" + cancelOperator + "]";
 	}
 
     

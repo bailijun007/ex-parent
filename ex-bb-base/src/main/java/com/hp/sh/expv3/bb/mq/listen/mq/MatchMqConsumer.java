@@ -30,11 +30,15 @@ public class MatchMqConsumer {
 	private BBOrderService orderService;
 	
 	@Autowired
+	private BBTradeService tradeService;
+
+	@Autowired
 	private BBMqMsgService msgService;
 	
 	private BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>(100);
 	private ExecutorService pool = new ThreadPoolExecutor(1, 100, 300L, TimeUnit.SECONDS, queue);
 	
+	//撮合未成交
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(BBMatchNotMatchMsg msg){
 		logger.info("收到撮合未成交消息:{}", msg);
@@ -59,6 +63,11 @@ public class MatchMqConsumer {
 		}catch(UpdateException e){
 			throw e;
 		}catch(Exception e){
+			Throwable cause = e.getCause();
+			if(cause instanceof UpdateException){
+				logger.error("奇怪...");
+				throw (UpdateException)cause;
+			}
 			logger.error(e.getMessage(), e);
 			msgService.saveIfNotExists(MqTags.TAGS_CANCELLED, msg, e.getMessage());
 		}
@@ -73,12 +82,14 @@ public class MatchMqConsumer {
 		}catch(UpdateException e){
 			throw e;
 		}catch(Exception e){
+			Throwable cause = e.getCause();
+			if(cause instanceof UpdateException){
+				logger.error("奇怪...");
+				throw (UpdateException)cause;
+			}
 			logger.error(e.getMessage(), e);
 			msgService.save(MqTags.TAGS_TRADE, msg, e.getMessage());
 		}
 	}
-	
-	@Autowired
-	private BBTradeService tradeService;
     
 }

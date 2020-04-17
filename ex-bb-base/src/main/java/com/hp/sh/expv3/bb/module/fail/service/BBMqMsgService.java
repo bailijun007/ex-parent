@@ -97,20 +97,21 @@ public class BBMqMsgService{
 		return msg!=null;
 	}
 
-	public BBMqMsg findFirst(String tag){
+	public BBMqMsg findFirst(String tag, String symbol){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, 1, 1000L));
-		params.put("orderBy", "id");
+		params.put("orderBy", "sort_id");
 		params.put("asc", true);
 		params.put("tag", tag);
+		params.put("symbol", symbol);
 		BBMqMsg msg = this.bBMqMsgDAO.queryOne(params);
 		return msg;
 	}
 
-	public List<BBMqMsg> findFirstList(){
+	public List<BBMqMsg> findFirstList(int pageSize){
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("page", new Page(1, 100, 1000L));
-		params.put("orderBy", "id");
+		params.put("page", new Page(1, pageSize, 1000L));
+		params.put("orderBy", "sort_id");
 		params.put("asc", true);
 		List<BBMqMsg> msgList = this.bBMqMsgDAO.queryList(params);
 		return msgList;
