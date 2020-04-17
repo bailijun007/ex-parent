@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -52,23 +50,31 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
         }
 
         if (!CollectionUtils.isEmpty(voList)) {
-            List<Long> refId = voList.stream().map(BbAccountRecordExtVo::getAssociatedId).collect(Collectors.toList());
+            List<Long> refId = new ArrayList<>();
+            for (BbAccountRecordExtVo recordExtVo : voList) {
+                String replaceAll = recordExtVo.getTradeNo().replaceAll("[A-Z]", "");
+                long parseLong = Long.parseLong(replaceAll);
+                refId.add(parseLong);
+            }
+
+//             Map<Long, List<BbAccountRecordExtVo>> map2 = voList.stream().collect(Collectors.groupingBy(t -> Long.parseLong(t.getTradeNo().replaceAll("[A-Z]", ""))));
             //根据类型进行分组
             Map<Integer, List<BbAccountRecordExtVo>> map = voList.stream().collect(Collectors.groupingBy(BbAccountRecordExtVo::getTradeType));
             List<BbOrderTradeVo> bbOrderTradeVoList = bbOrderTradeExtService.queryByIds(refId);
-            if (map.containsKey(BbAccountRecordConst.TRADE_BUY_IN) || map.containsKey(BbAccountRecordConst.TRADE_SELL_OUT)||
-                    map.containsKey(BbAccountRecordConst.TRADE_SELL_INCOME)||  map.containsKey(BbAccountRecordConst.TRADE_SELL_RELEASE) ) {
+            if (map.containsKey(BbAccountRecordConst.TRADE_BUY_IN) || map.containsKey(BbAccountRecordConst.TRADE_SELL_OUT) ||
+                    map.containsKey(BbAccountRecordConst.TRADE_SELL_INCOME) || map.containsKey(BbAccountRecordConst.TRADE_SELL_RELEASE)) {
                 if (!CollectionUtils.isEmpty(bbOrderTradeVoList)) {
-                    Map<Long, BbOrderTradeVo> id2Vo = bbOrderTradeVoList.stream().collect(Collectors.toMap(BbOrderTradeVo::getId, Function.identity()));
+                    Map<Long, BbOrderTradeVo> orderTradeids2Map = bbOrderTradeVoList.stream().collect(Collectors.toMap(BbOrderTradeVo::getId, Function.identity()));
                     for (BbAccountRecordExtVo recordExtVo : voList) {
-                        if (id2Vo.containsKey(recordExtVo.getAssociatedId())) {
-                            recordExtVo.setFee(id2Vo.get(recordExtVo.getAssociatedId()).getFee());
+                         long key = Long.parseLong(recordExtVo.getTradeNo().replaceAll("[A-Z]", ""));
+                        if (orderTradeids2Map.containsKey(key)) {
+                            recordExtVo.setFee(orderTradeids2Map.get(key).getFee());
                         }
                         //做映射TradeType=9或者11 都属于买入；TradeType=10或者12 都属于卖出
-                        if(recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_INCOME)){
+                        if (recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_INCOME)) {
                             recordExtVo.setTradeType(BbAccountRecordConst.TRADE_BUY_IN);
                         }
-                        if(recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_RELEASE)){
+                        if (recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_RELEASE)) {
                             recordExtVo.setTradeType(BbAccountRecordConst.TRADE_SELL_OUT);
                         }
                     }
