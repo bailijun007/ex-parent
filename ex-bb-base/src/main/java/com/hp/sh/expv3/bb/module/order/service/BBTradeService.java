@@ -64,7 +64,7 @@ public class BBTradeService {
     private ApplicationEventPublisher publisher;
 	
 	//处理成交订单
-    @LockIt(key="${trade.accountId}-${trade.asset}-${trade.symbol}-${trade.orderId}")
+    @LockIt(key="${trade.accountId}-${trade.asset}-${trade.symbol}")
 	public void handleTrade(BBTradeVo trade){
 		BBOrder order = this.orderQueryService.getOrder(trade.getAccountId(), trade.getOrderId());
 		boolean yes = this.canTrade(order, trade);

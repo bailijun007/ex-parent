@@ -227,7 +227,7 @@ public class BBOrderService {
 		return true;
 	}
 
-	@LockIt(key="${userId}-${asset}-${symbol}-${orderId}")
+	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void setCancelled(long userId, String asset, String symbol, long orderId){
 		this.doCancel(userId, asset, symbol, orderId);
 	}
@@ -292,7 +292,7 @@ public class BBOrderService {
 		}
 	}
 
-	@LockIt(key="${userId}-${asset}-${symbol}-${orderId}")
+	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void setNewStatus(long userId, String asset, String symbol, long orderId){
 		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
