@@ -107,6 +107,9 @@ public class GetLastPriceByMerge {
     @Scheduled(cron = "*/1 * * * * *")
     public void merge() {
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+        BBSymbol bchSymbol = new BBSymbol();
+        bchSymbol.setSymbol("BCHABC_USDT");
+        bbSymbolList.add(bchSymbol);
         Map<String, String> symbolMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
@@ -132,7 +135,7 @@ public class GetLastPriceByMerge {
         }
 
         if (currentPriceMap.size() == 2) {
-            getAvgPriceByMergeMoreThan2Bourse(lastPriceMap, currentPriceMap, avgPrice, sumPrice, symbolMap);
+            return  getAvgPriceByMergeMoreThan2Bourse(lastPriceMap, currentPriceMap, avgPrice, sumPrice, symbolMap);
         }
 
         if (currentPriceMap.size() == 1) {
@@ -297,11 +300,16 @@ public class GetLastPriceByMerge {
         String symbol = bbSymbol.getSymbol().toLowerCase();
         String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
         String httpsKey = zbHttpsRedisKey + hashKey;
+        if(httpsKey.equals("ticker:bb:https:zb:bchusdt")){
+            httpsKey="ticker:bb:https:zb:bchabcusdt";
+        }
         String strHttpsTicker = metadataDb5RedisUtil.get(httpsKey);
-//        ZbTickerData httpsTicker = JSON.parseObject(strHttpsTicker, ZbTickerData.class);
+
         String wssKey = zbWssRedisKey + hashKey;
+        if(wssKey.equals("ticker:bb:wss:zb:bchusdt")){
+            wssKey="ticker:bb:wss:zb:bchabcusdt";
+        }
         String strWssTicker = metadataDb5RedisUtil.get(wssKey);
-//        ZbTickerData wssTicker = JSON.parseObject(strWssTicker, ZbTickerData.class);
         BigDecimal httpLast = BigDecimal.ZERO;
         BigDecimal wssLast = BigDecimal.ZERO;
         if (null == strHttpsTicker && null == strWssTicker) {
@@ -332,6 +340,10 @@ public class GetLastPriceByMerge {
         HashMap<String, BigDecimal> map = new HashMap<>();
         List<String> list = new ArrayList<>();
         String symbol = bbSymbol.getSymbol();
+        if(symbol.equals("BCHABC_USDT")){
+            key="USDT";
+            symbol ="BCH_USDT";
+        }
         map.put(symbol, avgLastPrice);
         metadataDb5RedisUtil.hmset(key, map);
         originaldataDb5RedisUtil.hmset(key, map);

@@ -129,19 +129,11 @@ public class GrabPc3rdDataByBinanceTask {
      */
     @Scheduled(cron = "*/59 * * * * *")
     public void retryConnection() {
-        List<PcSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
-        if (!CollectionUtils.isEmpty(bbSymbolList)) {
-            for (PcSymbol pcSymbol : bbSymbolList) {
-                String binanceSymbol = pcSymbol.getSymbol().split("_")[0].toLowerCase() + pcSymbol.getSymbol().split("_")[1].toLowerCase();
-                String url = binanceWssUrl + binanceSymbol + "@aggTrade";
-                logger.info("url ={}", url);
-                BinanceWsClient client = BinanceWsClient.getBinanceWsClient(url);
-                Boolean isClosed = client.getIsClosed();
-                if (!isClosed) {
-                    client.close();
-                    startGrabPc3rdDataByWss();
-                }
-            }
+        BinanceWsClient client = BinanceWsClient.getBinanceWsClient(binanceWssUrl);
+        Boolean isClosed = client.getIsClosed();
+        if (!isClosed) {
+            client.close();
+            startGrabPc3rdDataByWss();
         }
     }
 

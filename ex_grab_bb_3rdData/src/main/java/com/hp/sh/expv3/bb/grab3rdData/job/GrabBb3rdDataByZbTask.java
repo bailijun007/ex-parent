@@ -76,6 +76,12 @@ public class GrabBb3rdDataByZbTask {
     @Qualifier("metadataDb5RedisUtil")
     private RedisUtil metadataDb5RedisUtil;
 
+    @Value("${zb.bbZb2ExpSymbolMapping}")
+    private String bbZb2ExpSymbolMappingString;
+
+    private Map<String, String> bbZb2ExpSymbolMapping = new HashMap<>();
+    private Map<String, String> bbExp2ZbSymbolMapping = new HashMap<>();
+
     @Value("${grab.bb.3rdDataByZbWss.enable}")
     private Integer enableByWss;
 
@@ -88,6 +94,14 @@ public class GrabBb3rdDataByZbTask {
 
     @PostConstruct
     public void startGrabBb3rdDataByZbWss() {
+        if (null != bbZb2ExpSymbolMappingString && bbZb2ExpSymbolMappingString.length() > 0) {
+            for (String zb2exp : bbZb2ExpSymbolMappingString.split(",")) {
+                final String[] zbAndExp = zb2exp.split(":");
+                bbZb2ExpSymbolMapping.put(zbAndExp[0], zbAndExp[1]);
+                bbExp2ZbSymbolMapping.put(zbAndExp[1], zbAndExp[0]);
+            }
+        }
+
         if (enableByWss != 1) {
             return;
         }
@@ -96,6 +110,9 @@ public class GrabBb3rdDataByZbTask {
         Map data = new TreeMap();
         data.put("event", "addChannel");
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
+        BBSymbol bchSymbol = new BBSymbol();
+        bchSymbol.setSymbol("BCHABC_USDT");
+        bbSymbolList.add(bchSymbol);
         Map<String, String> zbRedisKeysMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
@@ -121,7 +138,7 @@ public class GrabBb3rdDataByZbTask {
                 String hashKey = tickerData.getChannel().split("_")[0];
                 String key = wssRedisKey + hashKey;
                 ZbTickerData ticker = tickerData.getTicker();
-                if (null != ticker&&zbRedisKeysMap.containsKey(hashKey)) {
+                if (null != ticker && zbRedisKeysMap.containsKey(hashKey)) {
                     String value = ticker.getLast() + "";
                     map.put(key, value);
                     if (map.size() == 8) {
@@ -145,8 +162,14 @@ public class GrabBb3rdDataByZbTask {
         if (!CollectionUtils.isEmpty(bbSymbolList)) {
             for (BBSymbol bbSymbol : bbSymbolList) {
                 String symbol = bbSymbol.getSymbol().toLowerCase();
-                String key = symbol.split("_")[0] + symbol.split("_")[1];
-                zbRedisKeysMap.put(key, key);
+                final String[] split = symbol.split("_");
+                String key = split[0] + split[1];
+                if (bbExp2ZbSymbolMapping.containsKey(split[0])) {
+                    final String newKey = bbExp2ZbSymbolMapping.get(split[0]) + split[1];
+                    zbRedisKeysMap.put(newKey, newKey);
+                } else {
+                    zbRedisKeysMap.put(key, key);
+                }
             }
         }
 
