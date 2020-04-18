@@ -199,11 +199,12 @@ public class GetLastPriceByMerge {
             }
         }
 
-        if (currentPrice.subtract(lastPrice).abs().compareTo(new BigDecimal("0.25")) == 1) {
-            return BigDecimal.ZERO;
-        } else {
-            return currentPrice;
-        }
+        return currentPrice;
+//        if (currentPrice.subtract(lastPrice).abs().compareTo(new BigDecimal("0.25")) == 1) {
+//            return BigDecimal.ZERO;
+//        } else {
+//            return currentPrice;
+//        }
     }
 
     /**
@@ -262,12 +263,12 @@ public class GetLastPriceByMerge {
     private Map<String, BigDecimal> mergeByAvg(PcSymbol pcSymbol) {
         Map<String, BigDecimal> currentPriceMap = new ConcurrentHashMap<>();
 
-        BigDecimal binanceAvgPrice = mergeByBinance(pcSymbol);
-        if (binanceAvgPrice.compareTo(BigDecimal.ZERO) != 0) {
-            currentPriceMap.put("binance", binanceAvgPrice);
-            logger.info("binance最新成交均价为:{},", binanceAvgPrice);
-
-        }
+//        BigDecimal binanceAvgPrice = mergeByBinance(pcSymbol);
+//        if (binanceAvgPrice.compareTo(BigDecimal.ZERO) != 0) {
+//            currentPriceMap.put("binance", binanceAvgPrice);
+//            logger.info("binance最新成交均价为:{},", binanceAvgPrice);
+//
+//        }
 
         BigDecimal okAvgPrice = mergeByOk(pcSymbol);
         if (okAvgPrice.compareTo(BigDecimal.ZERO) != 0) {
