@@ -64,7 +64,7 @@ public class BBAccountCoreService{
 		if(fa!=null){
 			return InvokeResult.NOCHANGE;
 		}
-		this.newPcAccount(userId, asset, BigDecimal.ZERO, DbDateUtils.now());
+		this.newAccount(userId, asset, BigDecimal.ZERO, DbDateUtils.now());
 		
 		return InvokeResult.SUCCESS;
 	}
@@ -278,7 +278,7 @@ public class BBAccountCoreService{
 		}
 	}
 	
-	private BBAccount newPcAccount(Long userId, String asset, BigDecimal balance, Long now){
+	private BBAccount newAccount(Long userId, String asset, BigDecimal balance, Long now){
 		BBAccount account = new BBAccount();
 		account.setAsset(asset);
 		account.setBalance(balance);

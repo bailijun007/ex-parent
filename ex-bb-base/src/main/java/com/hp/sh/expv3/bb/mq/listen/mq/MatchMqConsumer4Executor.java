@@ -11,7 +11,7 @@ import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.job.BBMatchedHandler;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
-import com.hp.sh.expv3.bb.mq.send.BBSender;
+import com.hp.sh.expv3.bb.mq.send.BBPublisher;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
@@ -24,7 +24,7 @@ public class MatchMqConsumer4Executor {
 	@Autowired
 	private BBMatchedTradeService matchedTradeService;
 	@Autowired
-	private BBSender sender;
+	private BBPublisher sender;
 
 	/**
 	 * 撮合成功
