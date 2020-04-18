@@ -101,14 +101,15 @@ public class GrabPc3rdDataByOkTask {
                                 String value = okResponseEntity.getLast() + "";
                                 if (null != value || !"".equals(value)) {
                                     map.put(key, value);
+                                    //批量保存
+                                    metadataDb5RedisUtil.mset(map);
+                                    originaldataDb5RedisUtil.mset(map);
+                                    TimeUnit.SECONDS.sleep(1);
                                 }
                             }
                         }
                     }
-                    //批量保存
-                    metadataDb5RedisUtil.mset(map);
-                    originaldataDb5RedisUtil.mset(map);
-                    TimeUnit.SECONDS.sleep(1);
+
 
                 } catch (Exception e) {
                     logger.error("通过https请求获取ok交易所最新成交价定时任务报错！，cause()={},message={}", e.getCause(), e.getMessage());
