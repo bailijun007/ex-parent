@@ -70,7 +70,7 @@ public class GrabPc3rdDataByBinanceTask {
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
 
-    @PostConstruct
+//    @PostConstruct
     public void startGrabPc3rdDataByWss() {
         if (enableByWss != 1) {
             return;
@@ -127,7 +127,7 @@ public class GrabPc3rdDataByBinanceTask {
     /**
      * WS重连策略
      */
-    @Scheduled(cron = "*/59 * * * * *")
+//    @Scheduled(cron = "*/59 * * * * *")
     public void retryConnection() {
         BinanceWsClient client = BinanceWsClient.getBinanceWsClient(binanceWssUrl);
         Boolean isClosed = client.getIsClosed();
