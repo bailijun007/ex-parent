@@ -171,6 +171,7 @@
 	        <appender-ref ref="INFO"/>
 	        <appender-ref ref="DEBUG"/>
         </root>
+        <logger name="com.hp.sh.expv3.commons.lock" level="debug"></logger>
     </springProfile>
     
     <springProfile name="dev">
@@ -181,6 +182,7 @@
 	        <appender-ref ref="ERROR"/>
 	        <appender-ref ref="WARN"/>
 	        <appender-ref ref="INFO"/>
+	        <appender-ref ref="DEBUG"/>
         </root>
         
         <logger name="com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService" level="info">
