@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.error.ExSysError;
 import com.hp.sh.expv3.pc.constant.OrderStatus;
@@ -51,7 +52,7 @@ public class PcOrderUpdateService {
 	public PcOrderLog setNewStatus(PcOrder order, long modified) {
 		long count = this.pcOrderDAO.updateStatus(OrderStatus.NEW, modified, order.getId(), order.getUserId(), order.getVersion());
 		if(count==0){
-			throw new ExSysException(ExSysError.UPDATED_ERR, order);
+			throw new UpdateException("更新失败", order);
 		}
 		
 		//日志

@@ -14,7 +14,7 @@ public class ExSysError extends ErrorCode {
 	public static final ExSysError BIZ_LOGIC_ERR = new ExSysError(11100, "见鬼了！");
 	
 
-	//发生了违反业务逻辑的错误!
+	//数据更新失败,数据过期
 	public static final ExSysError UPDATED_ERR = new ExSysError(11101, "数据更新失败，可能是数据过期！");
 	
 	private ExSysError(int code, String message) {
