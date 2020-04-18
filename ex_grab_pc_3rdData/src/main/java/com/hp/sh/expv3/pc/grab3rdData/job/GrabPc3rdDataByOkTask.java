@@ -93,9 +93,9 @@ public class GrabPc3rdDataByOkTask {
                         for (OkResponseEntity okResponseEntity : list) {
                             String okSymbol = okResponseEntity.getInstrument_id();
                             okSymbol = okSymbol.split("-")[0] + "-" + okSymbol.split("-")[1];
-                            if (okSymbol.endsWith("USD")) {
-                                okSymbol = okSymbol + "T";
-                            }
+//                            if (okSymbol.endsWith("USD")) {
+//                                okSymbol = okSymbol + "T";
+//                            }
                             if (okRedisKeysMap.containsKey(okSymbol)) {
                                 String key = okHttpsRedisKey + okSymbol;
                                 String value = okResponseEntity.getLast() + "";
