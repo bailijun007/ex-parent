@@ -45,7 +45,10 @@ public class ExTxLockAdvice extends LockAdvice {
 	}
     
     protected void preLock(long threadId, String realKey, long lockId, long time, Method method) {
-    	UpdateInterceptor.setVar(method);
+    	String clazzStr = method.getDeclaringClass().getName();
+    	String methodStr = method.getName();
+    	String methodFullName = clazzStr+"."+methodStr+"()";
+    	UpdateInterceptor.setVar(methodFullName);
 	}
 	
     protected void postLock(long threadId, String realKey, long lockId, long unTime, Method method) {
