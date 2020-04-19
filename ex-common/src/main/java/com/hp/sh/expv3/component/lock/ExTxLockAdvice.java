@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.component.lock;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -44,14 +45,14 @@ public class ExTxLockAdvice extends LockAdvice {
 		super.setLocker(locker);
 	}
     
-    protected void preLock(long threadId, String realKey, long lockId, long time, Method method) {
+    protected void preLock(long threadId, String realKey, long lockId, long time, Method method, Object[] args) {
     	String clazzStr = method.getDeclaringClass().getName();
     	String methodStr = method.getName();
-    	String methodFullName = clazzStr+"."+methodStr+"()";
+    	String methodFullName = clazzStr+"."+methodStr+"(),args="+Arrays.toString(args);
     	UpdateInterceptor.setVar(methodFullName);
 	}
 	
-    protected void postLock(long threadId, String realKey, long lockId, long unTime, Method method) {
+    protected void postLock(long threadId, String realKey, long lockId, long unTime, Method method, Object[] args) {
     	UpdateInterceptor.setVar(null);
 	}
     

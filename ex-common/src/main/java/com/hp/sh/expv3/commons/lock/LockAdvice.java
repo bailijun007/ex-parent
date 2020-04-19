@@ -53,9 +53,10 @@ public class LockAdvice {
 		long time = 0 ;
 		long threadId = Thread.currentThread().getId();
 		Method method = null;
+		Object[] args = null;
 		long lockId = a.getAndIncrement();
 		try{
-			Object[] args = joinPoint.getArgs();
+			args = joinPoint.getArgs();
 			MethodSignature signature = (MethodSignature) joinPoint.getSignature();
 			method = signature.getMethod();
 			LockIt lockIt = AnnotationUtils.findAnnotation(method, LockIt.class);
@@ -64,7 +65,7 @@ public class LockAdvice {
 			realKey = getRealKey(configKey, args, names);
 			time = System.currentTimeMillis();
 			logger.debug("lock:\"{}\", {}, {}, {}, {}", realKey, lockId, threadId, time, method);
-			this.preLock(threadId, realKey, lockId, time, method);
+			this.preLock(threadId, realKey, lockId, time, method, args);
 			this.lock(realKey);
 			Object result = joinPoint.proceed(args);
 			return result;
@@ -73,7 +74,7 @@ public class LockAdvice {
 				try{
 					this.unlock(realKey);
 					long unTime = System.currentTimeMillis();
-					this.postLock(threadId, realKey, lockId, unTime, method);
+					this.postLock(threadId, realKey, lockId, unTime, method, args);
 					logger.debug("unlock:\"{}\", {}, {}, {}, {}, {}", realKey, lockId, threadId, unTime, (unTime-time), method);
 					if(lockId>=Long.MAX_VALUE-10000){
 						a.set(0L);
@@ -86,14 +87,14 @@ public class LockAdvice {
 		}      
     }
 
-    protected void preLock(long threadId, String realKey, long lockId, long time, Method method) {
+    protected void preLock(long threadId, String realKey, long lockId, long time, Method method, Object[] args) {
 	}
 	
-    protected void postLock(long threadId, String realKey, long lockId, long unTime, Method method) {
+    protected void postLock(long threadId, String realKey, long lockId, long unTime, Method method, Object[] args) {
 	}
 
 	private void lock(String realKey) {
-		this.locker.lock(realKey, 300);
+		this.locker.lock(realKey, 90);
 	}
 
 	private void unlock(String realKey) {
