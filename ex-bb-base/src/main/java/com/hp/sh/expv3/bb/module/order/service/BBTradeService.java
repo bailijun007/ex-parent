@@ -14,6 +14,7 @@ import com.hp.sh.expv3.bb.component.FeeCollectorSelector;
 import com.hp.sh.expv3.bb.constant.BBAccountTradeType;
 import com.hp.sh.expv3.bb.constant.OrderFlag;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
+import com.hp.sh.expv3.bb.error.BBOrderError;
 import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
 import com.hp.sh.expv3.bb.module.collector.service.BBCollectorCoreService;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
@@ -64,22 +65,22 @@ public class BBTradeService {
     private ApplicationEventPublisher publisher;
 	
 	//处理成交订单
-    @LockIt(key="${trade.accountId}-${trade.asset}-${trade.symbol}")
-	public void handleTrade(BBTradeVo trade){
-		BBOrder order = this.orderQueryService.getOrder(trade.getAccountId(), trade.getOrderId());
-		boolean yes = this.canTrade(order, trade);
+    @LockIt(key="${msg.accountId}-${msg.asset}-${msg.symbol}")
+	public void handleTrade(BBTradeVo msg){
+		BBOrder order = this.orderQueryService.getOrder(msg.getAccountId(), msg.getOrderId());
+		boolean yes = this.canTrade(order, msg);
 		if(!yes){
-			logger.warn("成交已处理过了,trade={}", trade);
+			logger.warn("成交已处理过了,trade={}", msg);
 			return;
 		}
 		
 		Long now = DbDateUtils.now();
 		
 		//计算
-		TradeResult tradeResult = orderStrategy.calcTradeResult(trade, order);
+		TradeResult tradeResult = orderStrategy.calcTradeResult(msg, order);
 		
 		////////// 成交记录  ///////////
-		BBOrderTrade orderTrade = this.saveOrderTrade(trade, order, tradeResult, now);
+		BBOrderTrade orderTrade = this.saveOrderTrade(msg, order, tradeResult, now);
 		
 		// 转账
 		BBSymbol bs = new BBSymbol(orderTrade.getSymbol(), orderTrade.getBidFlag());
@@ -259,7 +260,7 @@ public class BBTradeService {
 	}
 
 	//检查订单状态
-	private boolean canTrade(BBOrder order, BBTradeVo tradeMsg) {
+	private boolean canTrade1(BBOrder order, BBTradeVo tradeMsg) {
 		if(order==null){
 			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
 		}
@@ -267,6 +268,40 @@ public class BBTradeService {
 		BigDecimal remainVol = order.getVolume().subtract(order.getFilledVolume());
 		if(BigUtils.gt(tradeMsg.getNumber(), remainVol)){
 			return false;
+		}
+		
+		//检查重复请求
+		Long count = this.orderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
+		if(count>0){
+			return false;
+		}
+		return true;
+	}
+	
+	//检查订单状态
+	private boolean canTrade(BBOrder order, BBTradeVo tradeMsg) {
+		if(order==null){
+			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
+		}
+		
+		////////////////
+		if(order.getStatus() == OrderStatus.CANCELED){
+			throw new ExSysException(BBOrderError.CANCELED, "canTrade", tradeMsg);
+		}
+		if(order.getStatus() == OrderStatus.FILLED){
+			throw new ExSysException(BBOrderError.FILLED, "canTrade", tradeMsg);
+		}
+		if(BigUtils.eq(order.getVolume(), order.getFilledVolume())){
+			throw new ExSysException(BBOrderError.NOT_ACTIVE, "canTrade", tradeMsg, "FilledVolume");
+		}
+		if(IntBool.isFalse(order.getActiveFlag())){
+			throw new ExSysException(BBOrderError.NOT_ACTIVE, "canTrade", tradeMsg);
+		}
+		////////////////
+		
+		BigDecimal remainVol = order.getVolume().subtract(order.getFilledVolume());
+		if(BigUtils.gt(tradeMsg.getNumber(), remainVol)){
+			throw new ExSysException(BBOrderError.FILLED, "canTrade", tradeMsg, "gt");
 		}
 		
 		//检查重复请求
