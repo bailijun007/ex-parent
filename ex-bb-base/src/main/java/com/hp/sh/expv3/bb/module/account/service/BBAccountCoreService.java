@@ -81,7 +81,6 @@ public class BBAccountCoreService{
 	/**
 	 * 加钱
 	 */
-	@LockIt(key="ACCOUNT-${request.userId}-${request.asset}")
 	public Integer add(@RequestBody BBAddRequest request){
 		//检查请求
 		this.checkRequest(request);
@@ -105,7 +104,6 @@ public class BBAccountCoreService{
 	/**
 	 * 减钱
 	 */
-	@LockIt(key="ACCOUNT-${request.userId}-${request.asset}")
 	public Integer cut(@RequestBody BBCutRequest request){
 		//检查请求
 		this.checkRequest(request);
@@ -133,7 +131,6 @@ public class BBAccountCoreService{
 	 * @param amount
 	 * @return
 	 */
-	@LockIt(key="ACCOUNT-${request.userId}-${request.asset}")
 	public Integer freeze(FreezeRequest request){
 		//检查请求
 		this.checkRequest(request);
@@ -161,7 +158,6 @@ public class BBAccountCoreService{
 	 * @param request
 	 * @return
 	 */
-	@LockIt(key="ACCOUNT-${request.userId}-${request.asset}")
 	public Integer unfreeze(UnFreezeRequest request){
 		//检查请求
 		this.checkRequest(request);
@@ -189,7 +185,6 @@ public class BBAccountCoreService{
 	 * @param request
 	 * @return
 	 */
-	@LockIt(key="ACCOUNT-${request.userId}-${request.asset}")
 	public Integer release(ReleaseFrozenRequest request){
 		//检查请求
 		this.checkRequest(request);
