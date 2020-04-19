@@ -284,6 +284,12 @@ public class BBTradeService {
 			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
 		}
 		
+		//检查重复请求
+		Long count = this.orderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
+		if(count>0){
+			return false;
+		}
+		
 		////////////////
 		if(order.getStatus() == OrderStatus.CANCELED){
 			throw new ExSysException(BBOrderError.CANCELED, "canTrade", tradeMsg);
@@ -303,12 +309,7 @@ public class BBTradeService {
 		if(BigUtils.gt(tradeMsg.getNumber(), remainVol)){
 			throw new ExSysException(BBOrderError.FILLED, "canTrade", tradeMsg, "gt");
 		}
-		
-		//检查重复请求
-		Long count = this.orderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
-		if(count>0){
-			return false;
-		}
+
 		return true;
 	}
 	
