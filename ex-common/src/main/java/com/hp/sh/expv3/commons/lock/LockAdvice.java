@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.commons.lock;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +16,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 
 public class LockAdvice {
 	private static final Logger logger = LoggerFactory.getLogger(LockAdvice.class);
+	
+	private static final AtomicLong a = new AtomicLong(0L);
 	
 	private Locker locker;
 
@@ -49,16 +52,19 @@ public class LockAdvice {
 		String realKey=null;
 		long time = 0 ;
 		long threadId = Thread.currentThread().getId();
+		Method method = null;
+		long lockId = a.getAndIncrement();
 		try{
 			Object[] args = joinPoint.getArgs();
 			MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-			Method method = signature.getMethod();
+			method = signature.getMethod();
 			LockIt lockIt = AnnotationUtils.findAnnotation(method, LockIt.class);
 			String configKey = lockIt.key();
 			String[] names = signature.getParameterNames();
 			realKey = getRealKey(configKey, args, names);
 			time = System.currentTimeMillis();
-			logger.debug("lock:{},\"{}\",{},{}", threadId, realKey, method, time);
+			logger.debug("lock:\"{}\", {}, {}, {}, {}", realKey, lockId, threadId, time, method);
+			this.preLock(threadId, realKey, lockId, time, method);
 			this.lock(realKey);
 			Object result = joinPoint.proceed(args);
 			return result;
@@ -67,17 +73,25 @@ public class LockAdvice {
 				try{
 					this.unlock(realKey);
 					long unTime = System.currentTimeMillis();
-					time = unTime-time;
-					logger.debug("unlock：{},\"{}\",{}ms,{}s,{}", threadId, realKey, unTime, time, joinPoint);
+					this.postLock(threadId, realKey, lockId, unTime, method);
+					logger.debug("unlock:\"{}\", {}, {}, {}, {}, {}", realKey, lockId, threadId, unTime, (unTime-time), method);
+					if(lockId>=Long.MAX_VALUE-10000){
+						a.set(0L);
+					}
 				}catch(Exception e){
-					time = System.currentTimeMillis()-time;
-					logger.error("解锁失败：{},{}ms", realKey, time, e);
+					logger.error("解锁失败：{}, {}", realKey, e);
 					throw e;
 				}
 			}
 		}      
     }
+
+    protected void preLock(long threadId, String realKey, long lockId, long time, Method method) {
+	}
 	
+    protected void postLock(long threadId, String realKey, long lockId, long unTime, Method method) {
+	}
+
 	private void lock(String realKey) {
 		this.locker.lock(realKey, 300);
 	}
