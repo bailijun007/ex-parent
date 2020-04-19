@@ -24,9 +24,6 @@ import io.swagger.annotations.ApiOperation;
 public class BBOrderApiAction implements BBOrderApi {
 
 	@Autowired
-	private BBAccountCoreService bBAccountCoreService;
-	
-	@Autowired
 	private BBOrderService bBOrderService;
 
 	@Autowired

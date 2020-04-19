@@ -178,8 +178,10 @@ public class BBAccountRecord extends BaseRecordEntity	 {
 	@Override
 	public String toString() {
 		return "BBAccountRecord [asset=" + asset + ", sn=" + sn + ", type=" + type + ", amount=" + amount + ", remark="
-				+ remark + ", balance=" + balance + ", tradeNo=" + tradeNo + ", tradeType=" + tradeType + ", serialNo="
-				+ serialNo + ", associatedId=" + associatedId + ", txId=" + txId + "]";
+				+ remark + ", balance=" + balance + ", frozen=" + frozen + ", total=" + total + ", tradeNo=" + tradeNo
+				+ ", tradeType=" + tradeType + ", serialNo=" + serialNo + ", associatedId=" + associatedId + ", txId="
+				+ txId + ", requestId=" + requestId + ", userId=" + userId + ", id=" + id + ", created=" + created
+				+ ", modified=" + modified + "]";
 	}
 	
 }
