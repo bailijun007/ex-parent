@@ -29,6 +29,7 @@ import com.hp.sh.expv3.bb.vo.request.ReleaseFrozenRequest;
 import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.config.db.SnGenerator;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
@@ -80,6 +81,7 @@ public class BBAccountCoreService{
 	/**
 	 * 加钱
 	 */
+	@LockIt(key="ACCOUNT-${request.userId}-${request.asset}")
 	public Integer add(@RequestBody BBAddRequest request){
 		//检查请求
 		this.checkRequest(request);
@@ -103,6 +105,7 @@ public class BBAccountCoreService{
 	/**
 	 * 减钱
 	 */
+	@LockIt(key="ACCOUNT-${request.userId}-${request.asset}")
 	public Integer cut(@RequestBody BBCutRequest request){
 		//检查请求
 		this.checkRequest(request);
@@ -130,6 +133,7 @@ public class BBAccountCoreService{
 	 * @param amount
 	 * @return
 	 */
+	@LockIt(key="ACCOUNT-${request.userId}-${request.asset}")
 	public Integer freeze(FreezeRequest request){
 		//检查请求
 		this.checkRequest(request);
@@ -157,6 +161,7 @@ public class BBAccountCoreService{
 	 * @param request
 	 * @return
 	 */
+	@LockIt(key="ACCOUNT-${request.userId}-${request.asset}")
 	public Integer unfreeze(UnFreezeRequest request){
 		//检查请求
 		this.checkRequest(request);
@@ -184,6 +189,7 @@ public class BBAccountCoreService{
 	 * @param request
 	 * @return
 	 */
+	@LockIt(key="ACCOUNT-${request.userId}-${request.asset}")
 	public Integer release(ReleaseFrozenRequest request){
 		//检查请求
 		this.checkRequest(request);
