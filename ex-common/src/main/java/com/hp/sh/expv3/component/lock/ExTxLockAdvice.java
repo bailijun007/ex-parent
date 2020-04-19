@@ -33,27 +33,29 @@ public class ExTxLockAdvice extends LockAdvice {
 	}
     
     protected void preLock(long threadId, String realKey, long lockId, long time, Method method, Object[] args) {
+    	if(realKey.startsWith("ACCOUNT-")){
+    		return;
+    	}
+    	
     	String clazzStr = method.getDeclaringClass().getName();
     	String methodStr = method.getName();
     	String methodFullName = clazzStr+"."+methodStr+"(),args="+Arrays.toString(args);
     	UpdateInterceptor.setVar(methodFullName);
     	
-		
-		if(!realKey.startsWith("ACCOUNT-")){
-			if(txIdService!=null){
-				Long txId = txIdService.getTxId();
-				TxIdContext.setTxId(txId );
-			}
+		if(txIdService!=null){
+			Long txId = txIdService.getTxId();
+			TxIdContext.setTxId(txId );
 		}
 		
 	}
 	
     protected void postLock(long threadId, String realKey, long lockId, long unTime, Method method, Object[] args) {
-    	UpdateInterceptor.setVar(null);
-    	
-		if(!realKey.startsWith("ACCOUNT-")){
-			TxIdContext.reset();
-		}
+    	if(realKey.startsWith("ACCOUNT-")){
+    		return;
+    	}
+
+		UpdateInterceptor.setVar(null);
+		TxIdContext.reset();
 		
 	}
     
