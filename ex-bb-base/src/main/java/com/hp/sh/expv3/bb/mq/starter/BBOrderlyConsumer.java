@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
@@ -134,6 +135,9 @@ public class BBOrderlyConsumer {
         		}catch(ExSysException e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
         			logger.error(e.toString(), cause);
+        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
+        		}catch(DataAccessException e){
+        			logger.warn(e.toString());
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(UpdateException e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
