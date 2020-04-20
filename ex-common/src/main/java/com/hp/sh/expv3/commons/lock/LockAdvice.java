@@ -64,18 +64,18 @@ public class LockAdvice {
 			String[] names = signature.getParameterNames();
 			realKey = getRealKey(configKey, args, names);
 			time = System.currentTimeMillis();
-			logger.debug("lock:\"{}\", {}, {}, {}, {}", realKey, lockId, threadId, time, method);
 			this.preLock(threadId, realKey, lockId, time, method, args);
 			this.lock(realKey);
+			logger.debug("lock:\"{}\", {}, {}, {}, {}", realKey, lockId, threadId, time, method);
 			Object result = joinPoint.proceed(args);
 			return result;
 		}finally{
 			if(realKey!=null){
 				try{
-					this.unlock(realKey);
 					long unTime = System.currentTimeMillis();
-					this.postLock(threadId, realKey, lockId, unTime, method, args);
 					logger.debug("unlock:\"{}\", {}, {}, {}, {}, {}", realKey, lockId, threadId, unTime, (unTime-time), method);
+					this.unlock(realKey);
+					this.postLock(threadId, realKey, lockId, unTime, method, args);
 					if(lockId>=Long.MAX_VALUE-10000){
 						a.set(0L);
 					}
@@ -94,7 +94,10 @@ public class LockAdvice {
 	}
 
 	private void lock(String realKey) {
-		this.locker.lock(realKey, 90);
+		boolean isLocked = this.locker.lock(realKey, 120);
+		if(!isLocked){
+			throw new RuntimeException("上锁失败:"+realKey);
+		}
 	}
 
 	private void unlock(String realKey) {

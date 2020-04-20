@@ -66,7 +66,7 @@ public class BBOrderService {
 	 * @param price 委托价格
 	 * @param amt 委托金额
 	 */
-	@LockIt(key="${userId}-${asset}-${symbol}")
+	@LockIt(key="U-${userId}")
 	public BBOrder create(long userId, String cliOrderId, String asset, String symbol, int bidFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		
 //		if(this.existClientOrderId(userId, cliOrderId)){
@@ -183,7 +183,7 @@ public class BBOrderService {
 		order.setOrderMarginCurrency(bs.getMarginCurrency());
 	}
 	
-	@LockIt(key="${userId}-${asset}-${symbol}")
+	@LockIt(key="U-${userId}")
 	public boolean setPendingCancel(long userId, String asset, String symbol, long orderId){
 		Long now = DbDateUtils.now();
 		
@@ -227,7 +227,7 @@ public class BBOrderService {
 		return true;
 	}
 
-	@LockIt(key="${userId}-${asset}-${symbol}")
+	@LockIt(key="U-${userId}")
 	public void setCancelled(long userId, String asset, String symbol, long orderId){
 		this.doCancel(userId, asset, symbol, orderId);
 	}
@@ -292,7 +292,7 @@ public class BBOrderService {
 		}
 	}
 
-	@LockIt(key="${userId}-${asset}-${symbol}")
+	@LockIt(key="U-${userId}")
 	public void setNewStatus(long userId, String asset, String symbol, long orderId){
 		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
@@ -304,6 +304,12 @@ public class BBOrderService {
 		long now = DbDateUtils.now();
 		
 		this.orderUpdateService.setNewStatus(order, now);
+	}
+
+	@LockIt(key="U-${userId}")
+	public void test(Long userId) {
+		this.freezeMargin(1L, "USDT", 1L, BigDecimal.ONE, BBAccountTradeType.ORDER_BUY, "test1");
+		this.freezeMargin(1L, "USDT", 2L, BigDecimal.ONE, BBAccountTradeType.ORDER_BUY, "test2");
 	}
 	
 }
