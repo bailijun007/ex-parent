@@ -13,7 +13,7 @@ import com.gitee.hupadev.commons.mybatis.AbstractInterceptor;
 import com.gitee.hupadev.commons.mybatis.util.EntityUtil;
 import com.hp.sh.expv3.base.entity.BaseBizEntity;
 import com.hp.sh.expv3.commons.ctx.RequestContext;
-import com.hp.sh.expv3.commons.ctx.TxIdContext;
+import com.hp.sh.expv3.commons.ctx.TxContext;
 import com.hp.sh.expv3.component.context.IdGeneratorContext;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
@@ -98,7 +98,7 @@ public class ExpUpdateInterceptor extends AbstractInterceptor {
     }
     
     private void setTxId(final Object entity) {
-    	Object txId = TxIdContext.getTxId();
+    	Object txId = TxContext.getTxId();
     	if(txId==null){
     		return;
     	}

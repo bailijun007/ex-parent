@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.mybatis.UpdateInterceptor;
-import com.hp.sh.expv3.commons.ctx.TxIdContext;
+import com.hp.sh.expv3.commons.ctx.TxContext;
 import com.hp.sh.expv3.commons.lock.LockAdvice;
 import com.hp.sh.expv3.commons.lock.Locker;
 
@@ -32,30 +32,24 @@ public class ExTxLockAdvice extends LockAdvice {
 		super.setLocker(locker);
 	}
     
-    protected void preLock(long threadId, String realKey, long lockId, long time, Method method, Object[] args) {
-    	if(realKey.startsWith("ACCOUNT-")){
-    		return;
-    	}
-    	
+    protected void preLock(long threadId, String lockName, long lockNo, long time, Method method, Object[] args) {
     	String clazzStr = method.getDeclaringClass().getName();
     	String methodStr = method.getName();
-    	String methodFullName = clazzStr+"."+methodStr+"(),args="+Arrays.toString(args);
-    	UpdateInterceptor.setVar(methodFullName);
+    	String lockInfo = " threadId="+threadId+", lockName="+lockName+", time="+time+","+clazzStr+"."+methodStr+"(),args="+Arrays.toString(args);
+    	UpdateInterceptor.setVar(lockInfo);
     	
 		if(txIdService!=null){
 			Long txId = txIdService.getTxId();
-			TxIdContext.setTxId(txId );
+			TxContext.setTxId(txId );
 		}
+		
+		TxContext.setLockKey(" threadId="+threadId+", lockName="+lockName+", time="+time+","+clazzStr+"."+methodStr);
 		
 	}
 	
-    protected void postLock(long threadId, String realKey, long lockId, long unTime, Method method, Object[] args) {
-    	if(realKey.startsWith("ACCOUNT-")){
-    		return;
-    	}
-
+    protected void postLock(long threadId, String lockName, long lockNo, long unTime, Method method, Object[] args) {
 		UpdateInterceptor.setVar(null);
-		TxIdContext.reset();
+		TxContext.setTxId(null);
 		
 	}
     

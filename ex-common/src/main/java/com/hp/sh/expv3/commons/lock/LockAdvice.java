@@ -1,7 +1,9 @@
 package com.hp.sh.expv3.commons.lock;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,12 +51,14 @@ public class LockAdvice {
 		if(this.locker == null){
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
-		String realKey=null;
+		String locakName=null;
 		long time = 0 ;
 		long threadId = Thread.currentThread().getId();
 		Method method = null;
 		Object[] args = null;
-		long lockId = a.getAndIncrement();
+		long lockNo = a.getAndIncrement();
+		Lock lock = null;
+		boolean isLocked=false;
 		try{
 			args = joinPoint.getArgs();
 			MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -62,50 +66,45 @@ public class LockAdvice {
 			LockIt lockIt = AnnotationUtils.findAnnotation(method, LockIt.class);
 			String configKey = lockIt.key();
 			String[] names = signature.getParameterNames();
-			realKey = getRealKey(configKey, args, names);
+			locakName = getLockName(configKey, args, names);
 			time = System.currentTimeMillis();
-			this.preLock(threadId, realKey, lockId, time, method, args);
-			this.lock(realKey);
-			logger.debug("lock:\"{}\", {}, {}, {}, {}", realKey, lockId, threadId, time, method);
+			this.preLock(threadId, locakName, lockNo, time, method, args);
+			lock = this.locker.getLock(locakName);
+			isLocked = lock.tryLock(30, TimeUnit.SECONDS);
+			if(!isLocked){
+				logger.error("上锁失败:"+locakName);
+				throw new RuntimeException("上锁失败:"+locakName);
+			}
+			logger.debug("lock:\"{}\", {}, {}, {}, {}", locakName, lockNo, threadId, time, method);
 			Object result = joinPoint.proceed(args);
 			return result;
 		}finally{
-			if(realKey!=null){
+			if(locakName!=null){
 				try{
 					long unTime = System.currentTimeMillis();
-					logger.debug("unlock:\"{}\", {}, {}, {}, {}, {}", realKey, lockId, threadId, unTime, (unTime-time), method);
-					this.unlock(realKey);
-					this.postLock(threadId, realKey, lockId, unTime, method, args);
-					if(lockId>=Long.MAX_VALUE-10000){
+					logger.debug("unlock:\"{}\", {}, {}, {}, {}, {}", locakName, lockNo, threadId, unTime, (unTime-time), method);
+					if(lock!=null){
+						lock.unlock();
+					}
+					this.postLock(threadId, locakName, lockNo, unTime, method, args);
+					if(lockNo>=Long.MAX_VALUE-10000){
 						a.set(0L);
 					}
 				}catch(Exception e){
-					logger.error("解锁失败：{}, {}", realKey, e);
+					logger.error("解锁失败：{}, {}", locakName, e);
 					throw e;
 				}
 			}
 		}      
     }
 
-    protected void preLock(long threadId, String realKey, long lockId, long time, Method method, Object[] args) {
+    protected void preLock(long threadId, String realKey, long lockNo, long time, Method method, Object[] args) {
 	}
 	
-    protected void postLock(long threadId, String realKey, long lockId, long unTime, Method method, Object[] args) {
+    protected void postLock(long threadId, String realKey, long lockNo, long unTime, Method method, Object[] args) {
 	}
 
-	private void lock(String realKey) {
-		boolean isLocked = this.locker.lock(realKey, 30);
-		if(!isLocked){
-			logger.error("上锁失败:"+realKey);
-			throw new RuntimeException("上锁失败:"+realKey);
-		}
-	}
-
-	private void unlock(String realKey) {
-		this.locker.unlock(realKey);
-	}
-
-	private static String getRealKey(String key, Object[] args, String[] names) throws Exception{
+	private static String getLockName(String key, Object[] args, String[] names) throws Exception{
 //		Pattern pattern = Pattern.compile("\\$?\\{(\\w+)\\}", Pattern.MULTILINE|Pattern.DOTALL);
 		Pattern pattern = Pattern.compile("\\$?\\{(\\w+)(?:\\.(\\w+))?\\}", Pattern.MULTILINE|Pattern.DOTALL);
 		Matcher matcher = pattern.matcher(key);
@@ -153,7 +152,7 @@ public class LockAdvice {
 	}
 
 	public static void main(String[] args) throws Exception {
-		System.out.println(getRealKey("xx-{1}-{name.empty}-oo", new Object[]{100,"test"}, new String[]{"id","name"}));
-		System.out.println(getRealKey("test", null, null));
+		System.out.println(getLockName("xx-{1}-{name.empty}-oo", new Object[]{100,"test"}, new String[]{"id","name"}));
+		System.out.println(getLockName("test", null, null));
 	}
 }

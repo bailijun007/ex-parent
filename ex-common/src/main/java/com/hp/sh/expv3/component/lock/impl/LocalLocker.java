@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.commons.lock.Locker;
 
-@Primary
 @ConditionalOnProperty(name="redisson.distributed.lock", havingValue="true")
 @Component
 public class LocalLocker implements Locker{

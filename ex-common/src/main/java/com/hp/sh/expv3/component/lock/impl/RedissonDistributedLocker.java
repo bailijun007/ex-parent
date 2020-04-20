@@ -9,11 +9,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.commons.lock.Locker;
 
 
+@Primary
 @ConditionalOnProperty(name="redisson.distributed.lock", havingValue="true")
 @Component
 public class RedissonDistributedLocker implements Locker {
@@ -30,7 +32,7 @@ public class RedissonDistributedLocker implements Locker {
     private String modulePrefix;
     
 	public RLock getLock(String lockKey) {
-        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
+        RLock lock = redissonClient.getFairLock(FULLKEY(lockKey));
         return lock;
     }
 

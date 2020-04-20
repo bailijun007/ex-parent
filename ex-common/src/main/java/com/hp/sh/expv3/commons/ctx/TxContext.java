@@ -5,9 +5,11 @@ package com.hp.sh.expv3.commons.ctx;
  * @author lw
  *
  */
-public class TxIdContext {
+public class TxContext {
 	
 	private static final ThreadLocal<Long> txIdVar = new ThreadLocal<Long>();
+	
+	private static final ThreadLocal<String> lockKeyHolder = new ThreadLocal<String>();
 	
 	public static void setTxId(Long txId){
 		txIdVar.set(txId);
@@ -17,8 +19,11 @@ public class TxIdContext {
 		return txIdVar.get();
 	}
 	
-	public static void reset(){
-		txIdVar.set(null);
+	public static void setLockKey(String lockKey){
+		lockKeyHolder.set(lockKey);
 	}
-
+	
+	public static String getLockKey(){
+		return lockKeyHolder.get();
+	}
 }
