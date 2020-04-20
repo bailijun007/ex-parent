@@ -75,22 +75,22 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
                     if (!CollectionUtils.isEmpty(bbOrderTradeVoList)) {
                         Map<Long, BbOrderTradeVo> orderTradeids2Map = bbOrderTradeVoList.stream().collect(Collectors.toMap(BbOrderTradeVo::getId, Function.identity()));
                         for (BbAccountRecordExtVo recordExtVo : voList) {
-                            long key = Long.parseLong(recordExtVo.getTradeNo().replaceAll("[A-Z]", ""));
-                            if (orderTradeids2Map.containsKey(key)) {
-                                recordExtVo.setFee(orderTradeids2Map.get(key).getFee());
+                            if (recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_BUY_IN) || recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_OUT) ||
+                                    recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_INCOME) || recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_RELEASE)) {
+                                long key = Long.parseLong(recordExtVo.getTradeNo().replaceAll("[A-Z]", ""));
+                                if (orderTradeids2Map.containsKey(key)) {
+                                    recordExtVo.setFee(orderTradeids2Map.get(key).getFee());
+                                }
+                                //做映射TradeType=9或者11 都属于买入；TradeType=10或者12 都属于卖出
+                                if (recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_INCOME)) {
+                                    recordExtVo.setTradeType(BbAccountRecordConst.TRADE_BUY_IN);
+                                }
+                                if (recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_RELEASE)) {
+                                    recordExtVo.setTradeType(BbAccountRecordConst.TRADE_SELL_OUT);
+                                }
                             }
-                            //做映射TradeType=9或者11 都属于买入；TradeType=10或者12 都属于卖出
-                            if (recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_INCOME)) {
-                                recordExtVo.setTradeType(BbAccountRecordConst.TRADE_BUY_IN);
-                            }
-                            if (recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_RELEASE)) {
-                                recordExtVo.setTradeType(BbAccountRecordConst.TRADE_SELL_OUT);
-                            }
+
                         }
-                    }
-                } else {
-                    for (BbAccountRecordExtVo recordExtVo : voList) {
-                        recordExtVo.setFee(recordExtVo.getFee() == null ? BigDecimal.ZERO : recordExtVo.getFee());
                     }
                 }
             }
