@@ -265,15 +265,21 @@ public class GetLastPriceByMerge {
         BigDecimal binanceAvgPrice = mergeByBinance(pcSymbol);
         if (binanceAvgPrice.compareTo(BigDecimal.ZERO) != 0) {
             currentPriceMap.put("binance", binanceAvgPrice);
-            logger.info("binance最新成交均价为:{},", binanceAvgPrice);
-
+            logger.info("binance:{}最新成交均价为:{},",pcSymbol.getSymbol(), binanceAvgPrice);
         }
 
         BigDecimal okAvgPrice = mergeByOk(pcSymbol);
         if (okAvgPrice.compareTo(BigDecimal.ZERO) != 0) {
             currentPriceMap.put("ok", okAvgPrice);
-            logger.info("ok最新成交均价为:{},", okAvgPrice);
+            logger.info("ok:{}最新成交均价为:{},",pcSymbol.getSymbol(), okAvgPrice);
         }
+
+        BigDecimal bitfinexAvgPrice = mergeByBitfinex(pcSymbol);
+        if (bitfinexAvgPrice.compareTo(BigDecimal.ZERO) != 0) {
+            currentPriceMap.put("bitfinex", bitfinexAvgPrice);
+            logger.info("bitfinex:{}最新成交均价为:{},",pcSymbol.getSymbol(), bitfinexAvgPrice);
+        }
+
         return currentPriceMap;
     }
 
@@ -289,21 +295,29 @@ public class GetLastPriceByMerge {
         BigDecimal avgLastPrice = BigDecimal.ZERO;
         String symbol = bbSymbol.getSymbol();
         String hashKey = symbol.split("_")[0] + symbol.split("_")[1];
-        String wssKey = binanceWssRedisKey + hashKey;
-        String strWssTicker = metadataDb5RedisUtil.get(wssKey);
-//        BinanceResponseData wssTicker = JSON.parseObject(strWssTicker, BinanceResponseData.class);
-        BigDecimal wssLast = BigDecimal.ZERO;
-        if (null == strWssTicker) {
+        String httpsKey = binanceHttpsRedisKey + hashKey;
+        String strHttpsTicker = metadataDb5RedisUtil.get(httpsKey);
+        if (null == strHttpsTicker) {
             avgLastPrice = BigDecimal.ZERO;
         } else {
-            avgLastPrice = new BigDecimal(strWssTicker);
+            avgLastPrice = new BigDecimal(strHttpsTicker);
         }
-
-        logger.info("binance的交易对:{},wssLast的最新成交价为：{}", hashKey, wssLast);
-        logger.info("binance的交易对:{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
         return avgLastPrice;
     }
 
+    public BigDecimal mergeByBitfinex(PcSymbol bbSymbol) {
+        BigDecimal avgLastPrice = BigDecimal.ZERO;
+        String symbol = bbSymbol.getSymbol();
+        String hashKey = symbol.split("_")[0]  + symbol.split("_")[1];
+        String httpsKey = bitfinexHttpsRedisKey + hashKey;
+        String strHttpsTicker = metadataDb5RedisUtil.get(httpsKey);
+        if (null == strHttpsTicker) {
+            avgLastPrice = BigDecimal.ZERO;
+        } else {
+            avgLastPrice = new BigDecimal(strHttpsTicker);
+        }
+        return avgLastPrice;
+    }
 
     public BigDecimal mergeByOk(PcSymbol bbSymbol) {
         BigDecimal avgLastPrice = BigDecimal.ZERO;

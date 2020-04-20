@@ -93,9 +93,6 @@ public class GrabPc3rdDataByOkTask {
                         for (OkResponseEntity okResponseEntity : list) {
                             String okSymbol = okResponseEntity.getInstrument_id();
                             okSymbol = okSymbol.split("-")[0] + "-" + okSymbol.split("-")[1];
-                            if (okSymbol.endsWith("USD")) {
-                                okSymbol = okSymbol + "T";
-                            }
                             if (okRedisKeysMap.containsKey(okSymbol)) {
                                 String key = okHttpsRedisKey + okSymbol;
                                 String value = okResponseEntity.getLast() + "";
@@ -106,9 +103,11 @@ public class GrabPc3rdDataByOkTask {
                         }
                     }
                     //批量保存
-                    metadataDb5RedisUtil.mset(map);
-                    originaldataDb5RedisUtil.mset(map);
-                    TimeUnit.SECONDS.sleep(1);
+                    if(map.size()==3){
+                        metadataDb5RedisUtil.mset(map);
+                        originaldataDb5RedisUtil.mset(map);
+                        TimeUnit.SECONDS.sleep(1);
+                    }
 
                 } catch (Exception e) {
                     logger.error("通过https请求获取ok交易所最新成交价定时任务报错！，cause()={},message={}", e.getCause(), e.getMessage());
