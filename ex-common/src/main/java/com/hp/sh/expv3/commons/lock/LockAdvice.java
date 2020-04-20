@@ -94,8 +94,9 @@ public class LockAdvice {
 	}
 
 	private void lock(String realKey) {
-		boolean isLocked = this.locker.lock(realKey, 120);
+		boolean isLocked = this.locker.lock(realKey, 30);
 		if(!isLocked){
+			logger.error("上锁失败:"+realKey);
 			throw new RuntimeException("上锁失败:"+realKey);
 		}
 	}

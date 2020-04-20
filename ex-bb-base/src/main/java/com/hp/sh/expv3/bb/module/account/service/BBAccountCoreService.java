@@ -29,7 +29,6 @@ import com.hp.sh.expv3.bb.vo.request.ReleaseFrozenRequest;
 import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
-import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.config.db.SnGenerator;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
@@ -273,10 +272,10 @@ public class BBAccountCoreService{
 			throw new ExException(BBAccountError.BALANCE_NOT_ENOUGH, "balance", record);
 		}
 		//检查冻结
-		if(account.getFrozen().compareTo(BigDecimal.ZERO) < 0){
-			logger.error("冻结金额小于0：{}", record);
-			throw new ExException(BBAccountError.FROZEN_NOT_ENOUGH, "frozen", record);
-		}
+//		if(account.getFrozen().compareTo(BigDecimal.ZERO) < 0){
+//			logger.error("冻结金额小于0：{}", record);
+//			throw new ExException(BBAccountError.FROZEN_NOT_ENOUGH, "frozen", record);
+//		}
 	}
 	
 	private BBAccount newAccount(Long userId, String asset, BigDecimal balance, Long now){

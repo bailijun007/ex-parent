@@ -1,10 +1,11 @@
-package com.hp.sh.expv3.component.lock;
+package com.hp.sh.expv3.component.lock.impl;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,31 +16,38 @@ import com.hp.sh.expv3.commons.lock.Locker;
 
 @ConditionalOnProperty(name="redisson.distributed.lock", havingValue="true")
 @Component
-public class RedissonDistributedLocker implements Locker{
+public class RedissonDistributedLocker implements Locker {
+	private static final Logger logger = LoggerFactory.getLogger(RedissonDistributedLocker.class);
 
     @Autowired
     private RedissonClient redissonClient;
     
     private String keyPrefix = "redisson:lock:";
     
+    private static long startTime = System.currentTimeMillis();
+    
     @Value("${redisson.lock.module:}")
     private String modulePrefix;
     
-    public RLock getLock(String lockKey) {
+	public RLock getLock(String lockKey) {
         RLock lock = redissonClient.getLock(FULLKEY(lockKey));
         return lock;
     }
 
 
-    public boolean lock(String lockKey, Integer timeout) {
+	public boolean lock(String lockKey, Integer waitTime) {
         RLock lock = this.getLock(lockKey);
-        if(timeout!=null){
-        	lock.lock(timeout, TimeUnit.SECONDS);
-        }
-        return lock.isLocked();
+    	try {
+			lock.tryLock(waitTime, 60*30, TimeUnit.SECONDS);
+	        return lock.isLocked();
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage(), e);
+			return false;
+		}
     }
 
-    public boolean unlock(String lockKey) {
+    @Override
+	public boolean unlock(String lockKey) {
     	RLock lock = this.getLock(lockKey);
         lock.unlock();
         return true;
@@ -59,6 +67,6 @@ public class RedissonDistributedLocker implements Locker{
 	}
 	
 	private String FULLKEY(String key){
-		return keyPrefix+modulePrefix+key;
+		return keyPrefix+modulePrefix+startTime+":"+key;
 	}
 }

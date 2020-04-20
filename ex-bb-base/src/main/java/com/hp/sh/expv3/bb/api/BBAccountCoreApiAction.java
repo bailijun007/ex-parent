@@ -13,6 +13,7 @@ import com.hp.sh.expv3.bb.api.BBAccountCoreApi;
 import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.BBCutRequest;
+import com.hp.sh.expv3.commons.lock.LockIt;
 
 /**
  * 币币账户核心接口
@@ -35,11 +36,13 @@ public class BBAccountCoreApiAction implements BBAccountCoreApi {
 	}
 
 	@Override
+	@LockIt(key="U-${request.userId}")
 	public Integer add(@RequestBody BBAddRequest request) {
 		return bBAccountCoreService.add(request);
 	}
 
 	@Override
+	@LockIt(key="U-${request.userId}")
 	public Integer cut(@RequestBody BBCutRequest request) {
 		return bBAccountCoreService.cut(request);
 	}

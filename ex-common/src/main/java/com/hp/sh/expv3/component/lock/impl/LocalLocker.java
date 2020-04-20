@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.component.lock;
+package com.hp.sh.expv3.component.lock.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,24 +8,29 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.commons.lock.Locker;
 
-public class LocalLock  implements Locker{
-	private static final Logger logger = LoggerFactory.getLogger(LocalLock.class);
+@Primary
+@ConditionalOnProperty(name="redisson.distributed.lock", havingValue="true")
+@Component
+public class LocalLocker implements Locker{
+	private static final Logger logger = LoggerFactory.getLogger(LocalLocker.class);
 	
 	private static final Map<String, ReentrantLock> lockMap = new HashMap<String, ReentrantLock>();
 
 	@Override
-	public boolean lock(String lockId, Integer timeout) {
+	public boolean lock(String lockId, Integer waitTime) {
 		Lock lock = this.getLock(lockId);
 		try {
-			lock.tryLock(timeout, TimeUnit.SECONDS);
+			return lock.tryLock(waitTime, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 			return false;
 		}
-		return true;
 	}
 
 	@Override
@@ -35,10 +40,10 @@ public class LocalLock  implements Locker{
 		return true;
 	}
 	
-	public synchronized ReentrantLock getLock(String lockId){
+	public synchronized Lock getLock(String lockId){
 		ReentrantLock lock = lockMap.get(lockId);
 		if(lock==null){
-			lock = new ReentrantLock();
+			lock = new ReentrantLock(true);
 			lockMap.put(lockId, lock);
 		}
 		return lock;
