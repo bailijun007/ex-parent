@@ -58,9 +58,12 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
             if (!CollectionUtils.isEmpty(voList)) {
                 List<Long> refId = new ArrayList<>();
                 for (BbAccountRecordExtVo recordExtVo : voList) {
-                    String replaceAll = recordExtVo.getTradeNo().replaceAll("[A-Z]", "");
-                    long parseLong = Long.parseLong(replaceAll);
-                    refId.add(parseLong);
+                    if (recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_BUY_IN) || recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_OUT) ||
+                            recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_INCOME) || recordExtVo.getTradeType().equals(BbAccountRecordConst.TRADE_SELL_RELEASE)) {
+                        String replaceAll = recordExtVo.getTradeNo().replaceAll("[A-Z]", "");
+                        long parseLong = Long.parseLong(replaceAll);
+                        refId.add(parseLong);
+                    }
                 }
 
 //             Map<Long, List<BbAccountRecordExtVo>> map2 = voList.stream().collect(Collectors.groupingBy(t -> Long.parseLong(t.getTradeNo().replaceAll("[A-Z]", ""))));
