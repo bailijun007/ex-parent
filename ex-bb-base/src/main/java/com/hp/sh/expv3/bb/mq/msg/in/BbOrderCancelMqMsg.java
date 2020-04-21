@@ -2,7 +2,7 @@ package com.hp.sh.expv3.bb.mq.msg.in;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.bb.msg.BaseSymbolMsg;
+import com.hp.sh.expv3.bb.mq.msg.BaseSymbolMsg;
 
 /**
  * 取消订单

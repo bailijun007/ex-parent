@@ -1,6 +1,6 @@
 package com.hp.sh.expv3.bb.mq.msg.out;
 
-import com.hp.sh.expv3.bb.msg.BaseSymbolMsg;
+import com.hp.sh.expv3.bb.mq.msg.BaseSymbolMsg;
 
 /**
  * 订单待取消

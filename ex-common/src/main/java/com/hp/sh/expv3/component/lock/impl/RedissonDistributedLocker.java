@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.component.lock.impl;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -21,6 +22,8 @@ import com.hp.sh.expv3.commons.lock.Locker;
 public class RedissonDistributedLocker implements Locker {
 	private static final Logger logger = LoggerFactory.getLogger(RedissonDistributedLocker.class);
 
+	private static final long leaseTime = 10;
+	
     @Autowired
     private RedissonClient redissonClient;
     
@@ -29,37 +32,9 @@ public class RedissonDistributedLocker implements Locker {
     @Value("${redisson.lock.module:}")
     private String modulePrefix;
     
-	public RLock getLock(String lockKey) {
+	public Lock getLock(String lockKey) {
         RLock lock = redissonClient.getFairLock(FULLKEY(lockKey));
-        lock.expire(10L, TimeUnit.SECONDS);
-        return lock;
-    }
-
-	public boolean lock(String lockKey, Integer waitTime) {
-        RLock lock = this.getLock(lockKey);
-    	try {
-			lock.tryLock(waitTime, 20, TimeUnit.SECONDS);
-	        return lock.isLocked();
-		} catch (InterruptedException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		}
-    }
-
-    @Override
-	public boolean unlock(String lockKey) {
-    	RLock lock = this.getLock(lockKey);
-        lock.unlock();
-        return true;
-    }
-
-    public boolean tryLock(String lockKey, long waitTime, long leaseTime) {
-    	RLock lock = this.getLock(lockKey);
-        try {
-            return lock.tryLock(waitTime, leaseTime, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            return false;
-        }
+        return new ExRedissonLock(lock);
     }
 
 	public void setRedissonClient(RedissonClient redissonClient) {
@@ -68,5 +43,17 @@ public class RedissonDistributedLocker implements Locker {
 	
 	private String FULLKEY(String key){
 		return keyPrefix+modulePrefix+key;
+	}
+	
+	class ExRedissonLock extends MyRedissonLock{
+		
+		public ExRedissonLock(RLock rLock) {
+			super(rLock);
+		}
+		
+		@Override
+		public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
+			return rLock.tryLock(time, leaseTime, unit);
+		}
 	}
 }

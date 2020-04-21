@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.hp.sh.expv3.bb.constant.MqTopic;
+import com.hp.sh.expv3.bb.mq.msg.BaseSymbolMsg;
 import com.hp.sh.expv3.bb.mq.starter.MqOrderMessageQueueSelector;
-import com.hp.sh.expv3.bb.msg.BaseSymbolMsg;
 import com.hp.sh.rocketmq.codec.MsgCodec;
 
 public class BaseMqSender {

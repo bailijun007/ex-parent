@@ -2,21 +2,15 @@ package com.hp.sh.expv3.bb.strategy.vo;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.rocketmq.msg.AbstractRocketMsg;
+import com.hp.sh.expv3.bb.mq.msg.BaseSymbolMsg;
 
 /**
  * 撮合成功消息
  * @author wangjg
  *
  */
-public class BBTradeVo extends AbstractRocketMsg{
-	
-	//资产
-	protected String asset;
-	
-	//交易对（合约品种）
-	protected String symbol;
-	
+public class BBTradeVo extends BaseSymbolMsg{
+
 	//用户ID
 	private Long accountId;
 	
@@ -53,22 +47,6 @@ public class BBTradeVo extends AbstractRocketMsg{
 	
 	public String uniqueKey(){
 		return "TRADE_"+this.orderId+"_"+opponentOrderId;
-	}
-
-	public String getAsset() {
-		return asset;
-	}
-
-	public void setAsset(String asset) {
-		this.asset = asset;
-	}
-
-	public String getSymbol() {
-		return symbol;
-	}
-
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
 	}
 
 	public Long getAccountId() {

@@ -1,12 +1,13 @@
 package com.hp.sh.expv3.bb.mq.listen.mq;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
+import com.gitee.hupadev.base.exceptions.CommonError;
+import com.gitee.hupadev.base.exceptions.ExceptionUtils;
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
@@ -15,6 +16,7 @@ import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBMatchNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
@@ -52,14 +54,8 @@ public class MatchMqConsumer {
 		}catch(UpdateException e){
 			throw e;
 		}catch(Exception e){
-			Throwable cause = ExceptionUtils.getRootCause(e);
-			if(cause instanceof UpdateException){
-				throw (UpdateException)cause;
-			}
-			if(cause instanceof DataAccessException){
-				throw (UpdateException)cause;
-			}
-			logger.error(e.getMessage(), e);
+			this.checkException(e);
+			logger.error("消息处理异常：msg={}, ex={}", e.getMessage(), e.toString(), e);
 			msgService.saveIfNotExists(MqTags.TAGS_CANCELLED, msg, e.getMessage());
 		}
 	}
@@ -73,16 +69,36 @@ public class MatchMqConsumer {
 		}catch(UpdateException e){
 			throw e;
 		}catch(Exception e){
-			Throwable cause = ExceptionUtils.getRootCause(e);
-			if(cause instanceof UpdateException){
-				throw (UpdateException)cause;
-			}
-			if(cause instanceof DataAccessException){
-				throw (UpdateException)cause;
-			}
-			logger.error(e.getMessage(), e);
+			this.checkException(e);
+			logger.error("消息处理异常：msg={}, ex={}",e.getMessage() , e.toString(), e);
 			msgService.save(MqTags.TAGS_TRADE, msg, e.getMessage());
 		}
+	}
+	
+	private void checkException(Exception e){
+		if(isResendException(e)){
+			throw (RuntimeException)e;
+		}
+	}
+	
+	public static boolean isResendException(Exception e){
+		Throwable cause = ExceptionUtils.getCause(e);
+		if(cause instanceof UpdateException){
+			return true;
+		}
+		if(cause instanceof DataAccessException){
+			return true;
+		}
+		if(cause instanceof ExException){
+			ExException ex = (ExException)cause;
+			if(ex.getCode()==CommonError.LOCK.getCode()){
+				return true;
+			}
+			if(ex.getCode()==CommonError.DATA_EXPIRED.getCode()){
+				return true;
+			}
+		}
+		return false;
 	}
     
 }

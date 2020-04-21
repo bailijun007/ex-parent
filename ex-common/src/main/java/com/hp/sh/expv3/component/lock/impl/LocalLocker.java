@@ -20,24 +20,6 @@ public class LocalLocker implements Locker{
 	private static final Logger logger = LoggerFactory.getLogger(LocalLocker.class);
 	
 	private static final Map<String, ReentrantLock> lockMap = new HashMap<String, ReentrantLock>();
-
-	@Override
-	public boolean lock(String lockId, Integer waitTime) {
-		Lock lock = this.getLock(lockId);
-		try {
-			return lock.tryLock(waitTime, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		}
-	}
-
-	@Override
-	public boolean unlock(String lockId) {
-		Lock lock = this.getLock(lockId);
-		lock.unlock();
-		return true;
-	}
 	
 	public synchronized Lock getLock(String lockId){
 		ReentrantLock lock = lockMap.get(lockId);
