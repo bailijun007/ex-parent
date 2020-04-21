@@ -8,11 +8,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration;
 
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@EnableTransactionManagement(order=(Integer.MAX_VALUE-1))
+@EnableTransactionManagement
 public class DataSourceConfig {
 
 	@Primary
@@ -23,5 +24,7 @@ public class DataSourceConfig {
 		HikariDataSource ds = new HikariDataSource();
 		return ds;
 	}
+	
+	ProxyTransactionManagementConfiguration df;
 
 }

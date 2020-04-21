@@ -27,6 +27,7 @@ import com.hp.sh.expv3.bb.vo.request.FreezeRequest;
 import com.hp.sh.expv3.bb.vo.request.FundRequest;
 import com.hp.sh.expv3.bb.vo.request.ReleaseFrozenRequest;
 import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
+import com.hp.sh.expv3.commons.ctx.TxContext;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.config.db.SnGenerator;
@@ -245,7 +246,7 @@ public class BBAccountCoreService{
 				throw new UpdateException("更新失败");
 			}
 		}
-		
+		record.setRemark(record.getRemark());
 		//保存本笔明细
 		this.saveRecord(record, account);
 	}

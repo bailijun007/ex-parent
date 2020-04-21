@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@EnableTransactionManagement(order=(Integer.MAX_VALUE-10))
+@EnableTransactionManagement
 public class DataSourceConfig {
 
 	@Primary

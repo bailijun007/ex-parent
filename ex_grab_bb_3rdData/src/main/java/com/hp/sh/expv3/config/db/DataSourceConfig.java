@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 
 @Configuration
-@EnableTransactionManagement(order=(Integer.MAX_VALUE-1))
+@EnableTransactionManagement
 public class DataSourceConfig {
 
 	@Primary

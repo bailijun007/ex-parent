@@ -14,6 +14,7 @@ import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBMatchNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
