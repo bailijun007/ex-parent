@@ -2,12 +2,14 @@ package com.hp.sh.expv3.bb.strategy.vo;
 
 import java.math.BigDecimal;
 
+import com.hp.sh.rocketmq.msg.AbstractRocketMsg;
+
 /**
  * 撮合成功消息
  * @author wangjg
  *
  */
-public class BBTradeVo {
+public class BBTradeVo extends AbstractRocketMsg{
 	
 	//资产
 	protected String asset;
@@ -146,7 +148,7 @@ public class BBTradeVo {
 		return "BBTradeVo [asset=" + asset + ", symbol=" + symbol + ", accountId=" + accountId + ", price=" + price
 				+ ", number=" + number + ", orderId=" + orderId + ", tradeId=" + tradeId + ", tradeTime=" + tradeTime
 				+ ", makerFlag=" + makerFlag + ", matchTxId=" + matchTxId + ", opponentOrderId=" + opponentOrderId
-				+ "]";
+				+ ", topic=" + topic + ", tags=" + tags + ", keys=" + keys + ", msgId=" + msgId + "]";
 	}
 
 

@@ -46,15 +46,20 @@ public class BBMqMsgService{
 		}
 		
 		BBMqMsg msgEntity = new BBMqMsg();
-		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setUserId(msg.getAccountId());
+		
 		msgEntity.setAsset(msg.getAsset());
 		msgEntity.setSymbol(msg.getSymbol());
 		msgEntity.setExMessage(exMessage);
+		
+		msgEntity.setMessageId(msg.getMsgId());
 		msgEntity.setTag(tag);
 		msgEntity.setKey(""+msg.getOrderId());
 		msgEntity.setBody(JsonUtils.toJson(msg));
+		
+		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setSortId(this.getSortId(tag, msgEntity.getCreated()));
+		
 		this.bBMqMsgDAO.save(msgEntity);
 	}
 

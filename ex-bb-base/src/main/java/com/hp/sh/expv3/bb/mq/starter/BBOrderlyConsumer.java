@@ -26,18 +26,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.component.MetadataService;
 import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.constant.MqTopic;
-import com.hp.sh.expv3.commons.exception.ExException;
-import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.rocketmq.config.RocketmqServerSetting;
-import com.hp.sh.rocketmq.exceptions.ReSendException;
 import com.hp.sh.rocketmq.impl.EndpointContext;
 
 @Order
@@ -124,36 +119,10 @@ public class BBOrderlyConsumer {
         			}else{
         				return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         			}
-        		}catch(ReSendException re){
-        			Throwable cause = ExceptionUtils.getRootCause(re);
-        			logger.error(cause.getMessage(), cause);
-        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
-        		}catch(ExException e){
-        			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error(e.toString(), cause);
-        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
-        		}catch(ExSysException e){
-        			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.error(e.toString(), cause);
-        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
-        		}catch(DataAccessException e){
-        			logger.warn(e.toString());
-        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
-        		}catch(UpdateException e){
-        			Throwable cause = ExceptionUtils.getRootCause(e);
-        			logger.warn(cause.toString(), cause);
-        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(Exception e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
-        			if(cause instanceof UpdateException){
-        				logger.warn("更新失败："+cause.toString());
-        			}else{
-            			logger.error("未知捕获异常1,{}", e.getMessage(), e);
-            			logger.error("未知捕获异常msg,{},{}", e.getMessage(), msgs);
-            			if(cause!=null){
-            				logger.error("未知捕获异常cause,{}", cause.getMessage(), cause);
-            			}
-        			}
+        			logger.error("未知捕获异常 e, {}", e.getMessage(), e);
+        			logger.error("未知捕获异常 Cause, {}", cause.toString(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
         		

@@ -4,6 +4,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
@@ -14,7 +15,6 @@ import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBMatchNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
-import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
@@ -56,6 +56,9 @@ public class MatchMqConsumer {
 			if(cause instanceof UpdateException){
 				throw (UpdateException)cause;
 			}
+			if(cause instanceof DataAccessException){
+				throw (UpdateException)cause;
+			}
 			logger.error(e.getMessage(), e);
 			msgService.saveIfNotExists(MqTags.TAGS_CANCELLED, msg, e.getMessage());
 		}
@@ -72,6 +75,9 @@ public class MatchMqConsumer {
 		}catch(Exception e){
 			Throwable cause = ExceptionUtils.getRootCause(e);
 			if(cause instanceof UpdateException){
+				throw (UpdateException)cause;
+			}
+			if(cause instanceof DataAccessException){
 				throw (UpdateException)cause;
 			}
 			logger.error(e.getMessage(), e);
