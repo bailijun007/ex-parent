@@ -9,7 +9,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 @Component
-public class BbKlineRedisBeans {
+public class MetadataRedisBeans {
 
     @Autowired
     private MetadataRedisSetting metadataRedisSetting;
