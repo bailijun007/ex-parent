@@ -39,7 +39,7 @@ public class PcMatchExtServiceImpl implements PcMatchExtService {
         PcMatchExtVo pcMatchExtVo = trades.get(0);
         bbMatchExtMapper.batchSave(trades, table);
         int size = trades.size();
-        String key = "bb:matchCount:" + pcMatchExtVo.getAsset() + ":" + pcMatchExtVo.getSymbol() + ":" + format;
+        String key = "pc:matchCount:" + pcMatchExtVo.getAsset() + ":" + pcMatchExtVo.getSymbol() + ":" + format;
         metadataRedisUtil.incrBy(key, size);
     }
 
