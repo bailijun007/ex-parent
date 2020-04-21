@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -28,14 +29,17 @@ public class PcMatchExtServiceImpl implements PcMatchExtService {
     private RedisUtil metadataRedisUtil;
 
     @Override
-    public void batchSave(List<PcMatchExtVo> trades, String table){
-
+    public void batchSave(List<PcMatchExtVo> trades, String table) {
+        if (CollectionUtils.isEmpty(trades)) {
+            return;
+        }
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate localDate = LocalDate.now();
         String format = localDate.format(dtf);
+        PcMatchExtVo pcMatchExtVo = trades.get(0);
         bbMatchExtMapper.batchSave(trades, table);
         int size = trades.size();
-        String key = "bb:" + format;
+        String key = "bb:matchCount:" + pcMatchExtVo.getAsset() + ":" + pcMatchExtVo.getSymbol() + ":" + format;
         metadataRedisUtil.incrBy(key, size);
     }
 
