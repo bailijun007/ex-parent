@@ -31,7 +31,7 @@ public class RedissonDistributedLocker implements Locker {
     
 	public RLock getLock(String lockKey) {
         RLock lock = redissonClient.getFairLock(FULLKEY(lockKey));
-        lock.expire(20L, TimeUnit.SECONDS);
+        lock.expire(10L, TimeUnit.SECONDS);
         return lock;
     }
 
