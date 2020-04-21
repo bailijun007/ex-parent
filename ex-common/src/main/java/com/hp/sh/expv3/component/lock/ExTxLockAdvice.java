@@ -15,7 +15,7 @@ import com.hp.sh.expv3.commons.lock.LockAdvice;
 import com.hp.sh.expv3.commons.lock.Locker;
 
 
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @Aspect
 @Component
 public class ExTxLockAdvice extends LockAdvice {
@@ -32,23 +32,23 @@ public class ExTxLockAdvice extends LockAdvice {
 		super.setLocker(locker);
 	}
     
-    protected void preLock(long threadId, String lockName, long lockNo, long time, Method method, Object[] args) {
+    protected void _preLock(long threadId, String lockName, long lockNo, long time, Method method, Object[] args) {
     	String clazzStr = method.getDeclaringClass().getName();
     	String methodStr = method.getName();
-    	String lockInfo = " threadId="+threadId+", lockName="+lockName+", time="+time+","+clazzStr+"."+methodStr+"(),args="+Arrays.toString(args);
-    	UpdateInterceptor.setVar(lockInfo);
+    	String lockInfo = " threadId="+threadId+", lockName="+lockName+",lockNo="+lockNo+", time="+time+","+clazzStr+"."+methodStr+"(),args="+Arrays.toString(args);
+    	UpdateInterceptor.setCtxVar(lockInfo);
     	
 		if(txIdService!=null){
 			Long txId = txIdService.getTxId();
 			TxContext.setTxId(txId );
 		}
 		
-		TxContext.setLockKey(" threadId="+threadId+", lockName="+lockName+", time="+time+","+clazzStr+"."+methodStr);
+		TxContext.setLockKey(" threadId="+threadId+", lockName="+lockName+",lockNo="+lockNo+", time="+time+","+clazzStr+"."+methodStr);
 		
 	}
 	
     protected void postLock(long threadId, String lockName, long lockNo, long unTime, Method method, Object[] args) {
-		UpdateInterceptor.setVar(null);
+		UpdateInterceptor.setCtxVar(null);
 		TxContext.setTxId(null);
 		
 	}

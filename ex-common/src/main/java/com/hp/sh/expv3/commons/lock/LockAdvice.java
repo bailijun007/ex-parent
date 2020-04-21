@@ -16,6 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 
+import com.gitee.hupadev.base.exceptions.CommonError;
+import com.hp.sh.expv3.commons.exception.ExException;
+
 public class LockAdvice {
 	private static final Logger logger = LoggerFactory.getLogger(LockAdvice.class);
 	
@@ -47,7 +50,7 @@ public class LockAdvice {
 		return this.doExeLock(joinPoint);
     }
     
-    public Object doExeLock(ProceedingJoinPoint joinPoint) throws Throwable {
+    protected Object doExeLock(ProceedingJoinPoint joinPoint) throws Throwable {
 		if(this.locker == null){
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
@@ -56,25 +59,25 @@ public class LockAdvice {
 		long threadId = Thread.currentThread().getId();
 		Method method = null;
 		Object[] args = null;
-		long lockNo = a.getAndIncrement();
+		long lockNo = -1L; //a.getAndIncrement();
 		Lock lock = null;
 		boolean isLocked=false;
 		try{
 			args = joinPoint.getArgs();
 			MethodSignature signature = (MethodSignature) joinPoint.getSignature();
 			method = signature.getMethod();
-			LockIt lockIt = AnnotationUtils.findAnnotation(method, LockIt.class);
-			String configKey = lockIt.key();
-			String[] names = signature.getParameterNames();
-			locakName = getLockName(configKey, args, names);
+			LockIt lockAnno = AnnotationUtils.findAnnotation(method, LockIt.class);
+			String _configKey = lockAnno.key();
+			String[] _names = signature.getParameterNames();
+			locakName = getLockName(_configKey, args, _names);
+			lock = this.locker.getLock(locakName);
+			isLocked = lock.tryLock(10, TimeUnit.SECONDS);
+			if(!isLocked){
+				throw new ExException(CommonError.LOCK, locakName);
+			}
+			
 			time = System.currentTimeMillis();
 			this.preLock(threadId, locakName, lockNo, time, method, args);
-			lock = this.locker.getLock(locakName);
-			isLocked = lock.tryLock(30, TimeUnit.SECONDS);
-			if(!isLocked){
-				logger.error("上锁失败:"+locakName);
-				throw new RuntimeException("上锁失败:"+locakName);
-			}
 			logger.debug("lock:\"{}\", {}, {}, {}, {}", locakName, lockNo, threadId, time, method);
 			Object result = joinPoint.proceed(args);
 			return result;
@@ -82,11 +85,11 @@ public class LockAdvice {
 			if(locakName!=null){
 				try{
 					long unTime = System.currentTimeMillis();
+					this.postLock(threadId, locakName, lockNo, unTime, method, args);
 					logger.debug("unlock:\"{}\", {}, {}, {}, {}, {}", locakName, lockNo, threadId, unTime, (unTime-time), method);
-					if(lock!=null){
+					if(lock!=null && isLocked){
 						lock.unlock();
 					}
-					this.postLock(threadId, locakName, lockNo, unTime, method, args);
 					if(lockNo>=Long.MAX_VALUE-10000){
 						a.set(0L);
 					}

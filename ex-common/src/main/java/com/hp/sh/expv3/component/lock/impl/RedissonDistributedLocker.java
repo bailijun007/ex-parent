@@ -26,8 +26,6 @@ public class RedissonDistributedLocker implements Locker {
     
     private String keyPrefix = "redisson:lock:";
     
-    private static long startTime = System.currentTimeMillis();
-    
     @Value("${redisson.lock.module:}")
     private String modulePrefix;
     
@@ -40,7 +38,7 @@ public class RedissonDistributedLocker implements Locker {
 	public boolean lock(String lockKey, Integer waitTime) {
         RLock lock = this.getLock(lockKey);
     	try {
-			lock.tryLock(waitTime, 60*30, TimeUnit.SECONDS);
+			lock.tryLock(waitTime, 30, TimeUnit.SECONDS);
 	        return lock.isLocked();
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
@@ -69,6 +67,6 @@ public class RedissonDistributedLocker implements Locker {
 	}
 	
 	private String FULLKEY(String key){
-		return keyPrefix+modulePrefix+startTime+":"+key;
+		return keyPrefix+modulePrefix+key;
 	}
 }
