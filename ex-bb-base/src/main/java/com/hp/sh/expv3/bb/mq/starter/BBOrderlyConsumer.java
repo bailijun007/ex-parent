@@ -123,9 +123,9 @@ public class BBOrderlyConsumer {
         		}catch(Exception e){
         			if(MatchMqConsumer.isResendException(e)){
         				Throwable cause = ExceptionUtils.getRootCause(e);
-        				logger.error("未知捕获异常 Cause, {}", cause.toString());
+        				logger.error("未捕获异常 Cause, {}", cause.toString());
         			}else{
-        				logger.error("未知捕获异常 e, {}", e.getMessage(), e);
+        				logger.error("未捕获异常 e, {}", e.getMessage(), e);
         			}
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}

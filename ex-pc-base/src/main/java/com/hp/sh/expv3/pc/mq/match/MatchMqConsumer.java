@@ -3,8 +3,13 @@ package com.hp.sh.expv3.pc.mq.match;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
+import com.gitee.hupadev.base.exceptions.CommonError;
+import com.gitee.hupadev.base.exceptions.ExceptionUtils;
+import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
+import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.constant.MqTags;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.service.PcTradeService;
@@ -52,4 +57,24 @@ public class MatchMqConsumer {
 		
 	}
     
+	public static boolean isResendException(Exception e){
+		Throwable cause = ExceptionUtils.getCause(e);
+		if(cause instanceof UpdateException){
+			return true;
+		}
+		if(cause instanceof DataAccessException){
+			return true;
+		}
+		if(cause instanceof ExException){
+			ExException ex = (ExException)cause;
+			if(ex.getCode()==CommonError.LOCK.getCode()){
+				return true;
+			}
+			if(ex.getCode()==CommonError.DATA_EXPIRED.getCode()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 }
