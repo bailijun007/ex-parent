@@ -32,18 +32,18 @@ public class ExTxLockAdvice extends LockAdvice {
 		super.setLocker(locker);
 	}
     
-    protected void _preLock(long threadId, String lockName, long lockNo, long time, Method method, Object[] args) {
-    	String clazzStr = method.getDeclaringClass().getName();
-    	String methodStr = method.getName();
-    	String lockInfo = " threadId="+threadId+", lockName="+lockName+",lockNo="+lockNo+", time="+time+","+clazzStr+"."+methodStr+"(),args="+Arrays.toString(args);
-    	UpdateInterceptor.setCtxVar(lockInfo);
-    	
+    protected void preLock(long threadId, String lockName, long lockNo, long time, Method method, Object[] args) {
 		if(txIdService!=null){
 			Long txId = txIdService.getTxId();
 			TxContext.setTxId(txId );
 		}
 		
-		TxContext.setLockKey(" threadId="+threadId+", lockName="+lockName+",lockNo="+lockNo+", time="+time+","+clazzStr+"."+methodStr);
+//    	String clazzStr = method.getDeclaringClass().getName();
+//    	String methodStr = method.getName();
+//    	String lockInfo = " threadId="+threadId+", lockName="+lockName+",lockNo="+lockNo+", time="+time+","+clazzStr+"."+methodStr+"(),args="+Arrays.toString(args);
+//    	UpdateInterceptor.setCtxVar(lockInfo);
+//		
+//		TxContext.setLockKey(" threadId="+threadId+", lockName="+lockName+",lockNo="+lockNo+", time="+time+","+clazzStr+"."+methodStr);
 		
 	}
 	

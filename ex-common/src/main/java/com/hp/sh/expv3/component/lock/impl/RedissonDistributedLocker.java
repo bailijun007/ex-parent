@@ -31,14 +31,14 @@ public class RedissonDistributedLocker implements Locker {
     
 	public RLock getLock(String lockKey) {
         RLock lock = redissonClient.getFairLock(FULLKEY(lockKey));
+        lock.expire(20L, TimeUnit.SECONDS);
         return lock;
     }
-
 
 	public boolean lock(String lockKey, Integer waitTime) {
         RLock lock = this.getLock(lockKey);
     	try {
-			lock.tryLock(waitTime, 30, TimeUnit.SECONDS);
+			lock.tryLock(waitTime, 20, TimeUnit.SECONDS);
 	        return lock.isLocked();
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
@@ -54,7 +54,7 @@ public class RedissonDistributedLocker implements Locker {
     }
 
     public boolean tryLock(String lockKey, long waitTime, long leaseTime) {
-        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
+    	RLock lock = this.getLock(lockKey);
         try {
             return lock.tryLock(waitTime, leaseTime, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
