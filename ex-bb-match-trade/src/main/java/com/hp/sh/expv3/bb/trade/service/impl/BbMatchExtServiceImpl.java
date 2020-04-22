@@ -25,26 +25,17 @@ public class BbMatchExtServiceImpl implements BbMatchExtService {
     @Autowired
     private BbMatchExtMapper bbMatchExtMapper;
 
-    @Autowired
-    @Qualifier("metadataRedisUtil")
-    private RedisUtil metadataRedisUtil;
+
 
 
     @Override
-    public void batchSave(List<BbMatchExtVo> trades, String table) {
+    public int batchSave(List<BbMatchExtVo> trades, String table) {
         if (CollectionUtils.isEmpty(trades)) {
-            return;
+            return 0;
         }
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate localDate = LocalDate.now();
-        String format = localDate.format(dtf);
-        BbMatchExtVo bbMatchExtVo = trades.get(0);
-        String asset = bbMatchExtVo.getAsset();
-        String symbol = bbMatchExtVo.getSymbol();
+
         bbMatchExtMapper.batchSave(trades, table);
-        int size = trades.size();
-        String key = "bb:matchCount:" + asset + ":" + symbol + ":" + format;
-        metadataRedisUtil.incrBy(key, size);
+        return trades.size();
     }
 
 }

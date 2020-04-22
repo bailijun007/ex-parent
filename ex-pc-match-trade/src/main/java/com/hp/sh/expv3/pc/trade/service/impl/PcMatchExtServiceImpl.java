@@ -24,23 +24,16 @@ public class PcMatchExtServiceImpl implements PcMatchExtService {
     @Autowired
     private PcMatchExtMapper bbMatchExtMapper;
 
-    @Autowired
-    @Qualifier("metadataRedisUtil")
-    private RedisUtil metadataRedisUtil;
+
 
     @Override
-    public void batchSave(List<PcMatchExtVo> trades, String table) {
+    public int batchSave(List<PcMatchExtVo> trades, String table) {
         if (CollectionUtils.isEmpty(trades)) {
-            return;
+            return 0;
         }
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate localDate = LocalDate.now();
-        String format = localDate.format(dtf);
-        PcMatchExtVo pcMatchExtVo = trades.get(0);
+
         bbMatchExtMapper.batchSave(trades, table);
-        int size = trades.size();
-        String key = "pc:matchCount:" + pcMatchExtVo.getAsset() + ":" + pcMatchExtVo.getSymbol() + ":" + format;
-        metadataRedisUtil.incrBy(key, size);
+        return trades.size();
     }
 
 }

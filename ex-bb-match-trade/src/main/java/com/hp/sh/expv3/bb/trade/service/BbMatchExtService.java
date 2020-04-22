@@ -8,5 +8,5 @@ import java.util.List;
  * @author BaiLiJun  on 2020/3/31
  */
 public interface BbMatchExtService {
-    void batchSave(List<BbMatchExtVo> trades, String table);
+    int batchSave(List<BbMatchExtVo> trades, String table);
 }

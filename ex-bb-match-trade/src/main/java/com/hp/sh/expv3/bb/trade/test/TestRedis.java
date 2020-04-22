@@ -28,11 +28,16 @@ public class TestRedis {
     public void test4() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate localDate = LocalDate.now();
+        try {
+            final String format = localDate.format(dtf);
 
-        final String format = localDate.format(dtf);
-        System.out.println("format = " + format);
-       int size=2;
-        String key = "bb:matchCount:" + "USDT" + ":" + "BTC_USDT" + ":" + format;
-        metadataRedisUtil.incrBy(key,size);
+            int size = 2 / 0;
+            String key = "bb:matchCount:" + "USDT" + ":" + "BTC_USDT" + ":" + format;
+            System.out.println("key = " + key);
+            metadataRedisUtil.incrBy(key, size);
+        } catch (Exception e) {
+e.printStackTrace();
+        }
+
     }
 }
