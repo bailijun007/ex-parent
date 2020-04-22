@@ -54,7 +54,7 @@ public class BBOrderlyConsumer {
 	@Value("${bb.mq.consumer.groupId:-1}")
 	private Integer groupId;
 	
-	@Value("${server.maxThreads:200}")
+	@Value("${mq.consume.maxThreads:200}")
 	private Integer maxThreads;
 	
 	private final Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
