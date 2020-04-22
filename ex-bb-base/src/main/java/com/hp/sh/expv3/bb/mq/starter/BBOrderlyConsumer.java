@@ -54,6 +54,9 @@ public class BBOrderlyConsumer {
 	@Value("${bb.mq.consumer.groupId:-1}")
 	private Integer groupId;
 	
+	@Value("${server.maxThreads:200}")
+	private Integer maxThreads;
+	
 	private final Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
 	@Scheduled(cron = "0 * * * * ?")
@@ -106,8 +109,7 @@ public class BBOrderlyConsumer {
         
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
         consumer.subscribe(topic, subExpression);
-        consumer.setConsumeThreadMax(32);
-        consumer.setConsumeThreadMax(32);
+        consumer.setConsumeThreadMax(maxThreads);
         
         consumer.registerMessageListener(new MessageListenerOrderly() {
 

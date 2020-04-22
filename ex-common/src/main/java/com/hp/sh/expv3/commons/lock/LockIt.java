@@ -11,6 +11,6 @@ public @interface LockIt {
 
 	public String key() default "";
 	
-	public long waitTime() default 0L;
+	public long waitTime() default -1L;
 
 }

@@ -28,7 +28,7 @@ public class LockAdvice {
 	private Locker locker;
 	
 	@Value("${lock.waitTime:30}")
-	private Long waitTime;
+	private Long globalWaitTime;
 
     public LockAdvice() {
 		super();
@@ -75,6 +75,11 @@ public class LockAdvice {
 			String[] _names = signature.getParameterNames();
 			locakName = getLockName(_configKey, args, _names);
 			lock = this.locker.getLock(locakName);
+			
+			long waitTime = this.globalWaitTime;
+			if(lockAnno.waitTime()!=-1){
+				waitTime = lockAnno.waitTime();
+			}
 			isLocked = lock.tryLock(waitTime, TimeUnit.SECONDS);
 			if(!isLocked){
 				throw new ExException(CommonError.LOCK, locakName, waitTime);
