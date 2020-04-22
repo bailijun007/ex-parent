@@ -10,5 +10,7 @@ import java.lang.annotation.Target;
 public @interface LockIt {
 
 	public String key() default "";
+	
+	public long waitTime() default 0L;
 
 }

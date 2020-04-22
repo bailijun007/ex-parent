@@ -14,6 +14,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
@@ -25,6 +26,9 @@ public class LockAdvice {
 	private static final AtomicLong a = new AtomicLong(0L);
 	
 	private Locker locker;
+	
+	@Value("${lock.waitTime:30}")
+	private Long waitTime;
 
     public LockAdvice() {
 		super();
@@ -71,9 +75,9 @@ public class LockAdvice {
 			String[] _names = signature.getParameterNames();
 			locakName = getLockName(_configKey, args, _names);
 			lock = this.locker.getLock(locakName);
-			isLocked = lock.tryLock(10, TimeUnit.SECONDS);
+			isLocked = lock.tryLock(waitTime, TimeUnit.SECONDS);
 			if(!isLocked){
-				throw new ExException(CommonError.LOCK, locakName);
+				throw new ExException(CommonError.LOCK, locakName, waitTime);
 			}
 			
 			time = System.currentTimeMillis();
@@ -98,7 +102,7 @@ public class LockAdvice {
 					throw e;
 				}
 			}
-		}      
+		}
     }
 
     protected void preLock(long threadId, String realKey, long lockNo, long time, Method method, Object[] args) {

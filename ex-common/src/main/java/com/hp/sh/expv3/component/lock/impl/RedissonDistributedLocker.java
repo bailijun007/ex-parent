@@ -22,7 +22,7 @@ import com.hp.sh.expv3.commons.lock.Locker;
 public class RedissonDistributedLocker implements Locker {
 	private static final Logger logger = LoggerFactory.getLogger(RedissonDistributedLocker.class);
 
-	private static final long leaseTime = 10;
+	private static final long leaseTime = 30;
 	
     @Autowired
     private RedissonClient redissonClient;
@@ -33,7 +33,7 @@ public class RedissonDistributedLocker implements Locker {
     private String modulePrefix;
     
 	public Lock getLock(String lockKey) {
-        RLock lock = redissonClient.getFairLock(FULLKEY(lockKey));
+        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
         return new ExRedissonLock(lock);
     }
 
