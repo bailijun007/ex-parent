@@ -91,6 +91,7 @@ public class BBMqMsgService{
 		msgEntity.setSymbol(msg.getSymbol());
 		msgEntity.setExMessage(exMessage);
 		msgEntity.setTag(tag);
+		msgEntity.setMessageId(msg.getMsgId());
 		msgEntity.setKey(""+msg.getOrderId());
 		msgEntity.setBody(JsonUtils.toJson(msg));
 		msgEntity.setSortId(this.getSortId(tag, msgEntity.getCreated()));

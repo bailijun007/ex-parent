@@ -106,12 +106,14 @@ public class BBOrderlyConsumer {
         
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
         consumer.subscribe(topic, subExpression);
+        consumer.setConsumeThreadMax(32);
+        consumer.setConsumeThreadMax(32);
         
         consumer.registerMessageListener(new MessageListenerOrderly() {
 
         	@Override
         	public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext context) {
-        		logger.debug("收到消息：{},{}", Thread.currentThread().getId(), msgs);
+        		logger.debug("收到消息：{},{}", Thread.currentThread().getName()+"-"+Thread.currentThread().getId(), msgs);
         		context.setAutoCommit(true);
         		try{
         			boolean success = endpointContext.consumeMessage(null, msgs);

@@ -15,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gitee.hupadev.base.spring.autoconfigure.tomcat.MyEmbeddedServletContainerFactory;
 import com.gitee.hupadev.base.spring.interceptor.LimitInterceptor;
 import com.gitee.hupadev.base.spring.plugin.HpLocaleResolver;
 import com.hp.sh.expv3.commons.web.LogFilter;
@@ -60,4 +61,8 @@ public class ExpMvcConfig implements WebMvcConfigurer {
         return bean;
     }
     
+    @Bean
+    public MyEmbeddedServletContainerFactory tomcat(){
+    	return new MyEmbeddedServletContainerFactory();
+    }
 }

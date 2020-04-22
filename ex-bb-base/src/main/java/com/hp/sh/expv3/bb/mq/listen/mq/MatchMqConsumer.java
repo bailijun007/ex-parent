@@ -1,5 +1,8 @@
 package com.hp.sh.expv3.bb.mq.listen.mq;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +43,20 @@ public class MatchMqConsumer {
 		orderService.setNewStatus(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
 	}
 	
+	private Map<Long,Boolean> _cancelMap_ = new HashMap<>();
+	
 	//取消订单
 	@MQListener(tags=MqTags.TAGS_CANCELLED)
 	public void handleCancelledMsg(BbOrderCancelMqMsg msg){
 		logger.info("收到取消订单消息:{}", msg);
+		if(_cancelMap_.containsKey(msg.getOrderId())){
+			return;
+		}
 		try{
 			boolean existTade = this.msgService.exist(msg.getAccountId(), MqTags.TAGS_TRADE, ""+msg.getOrderId());
 			if(!existTade){
 				orderService.setCancelled(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
+				_cancelMap_.put(msg.getOrderId(), true);
 			}else{
 				msgService.saveIfNotExists(MqTags.TAGS_CANCELLED, msg, "存在未处理的trade");
 			}
