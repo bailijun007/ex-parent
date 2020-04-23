@@ -25,7 +25,7 @@ import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqConsumer;
-import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
+import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -232,7 +232,7 @@ public class BBMaintainAction{
 			BBTradeVo mqMsg = JsonUtils.toObject(msg.getBody(), BBTradeVo.class);
 			this.tradeService.handleTrade(mqMsg);
 		}else if(msg.getTag().equals(MqTags.TAGS_CANCELLED)){
-			BbOrderCancelMqMsg mqMsg = JsonUtils.toObject(msg.getBody(), BbOrderCancelMqMsg.class);
+			BBCancelledMsg mqMsg = JsonUtils.toObject(msg.getBody(), BBCancelledMsg.class);
 			orderService.setCancelled(mqMsg.getAccountId(), mqMsg.getAsset(), mqMsg.getSymbol(), mqMsg.getOrderId());
 		}
 		

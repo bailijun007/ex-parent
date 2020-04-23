@@ -14,7 +14,7 @@ import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
-import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
+import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradePair;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.component.executor.AbstractGroupTask;
@@ -80,7 +80,7 @@ public class BBMatchedHandler {
 		
 	}
 	
-	public void handleCancelled(BbOrderCancelMqMsg msg){
+	public void handleCancelled(BBCancelledMsg msg){
 		this.tradeExecutors.submit(new CancelledTask(msg));
 	}
 	
@@ -153,9 +153,9 @@ public class BBMatchedHandler {
 
 	class CancelledTask extends AbstractGroupTask{
 
-		private BbOrderCancelMqMsg msg;
+		private BBCancelledMsg msg;
 		
-		public CancelledTask(BbOrderCancelMqMsg msg) {
+		public CancelledTask(BBCancelledMsg msg) {
 			this.msg = msg;
 		}
 		

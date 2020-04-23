@@ -16,8 +16,8 @@ import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
-import com.hp.sh.expv3.bb.mq.msg.in.BBMatchNotMatchMsg;
-import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
+import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
+import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.rocketmq.annotation.MQListener;
@@ -38,15 +38,14 @@ public class MatchMqConsumer {
 
 	//撮合未成交
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
-	public void handleNotMatch(BBMatchNotMatchMsg msg){
+	public void handleNotMatch(BBNotMatchMsg msg){
 		logger.info("收到撮合未成交消息:{}", msg);
 		orderService.setNewStatus(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
 	}
 	
-	
 	//取消订单
 	@MQListener(tags=MqTags.TAGS_CANCELLED)
-	public void handleCancelledMsg(BbOrderCancelMqMsg msg){
+	public void handleCancelledMsg(BBCancelledMsg msg){
 		logger.info("收到取消订单消息:{}", msg);
 		try{
 			boolean existTade = this.msgService.exist(msg.getAccountId(), MqTags.TAGS_TRADE, ""+msg.getOrderId());
