@@ -245,7 +245,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
      * @param targetFreq
      * @return
      */
-    private Long[] getStartEndMs(long ms, Integer triggerFreq, Integer targetFreq) {
+    private Long[]  getStartEndMs(long ms, Integer triggerFreq, Integer targetFreq) {
         final long divisor = TimeUnit.MILLISECONDS.toMinutes(ms) / targetFreq;
         return new Long[]{
                 TimeUnit.MINUTES.toMillis(divisor * targetFreq),

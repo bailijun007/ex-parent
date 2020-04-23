@@ -35,5 +35,24 @@ public class MetadataRedisBeans {
         return new RedisUtil(jedisPool);
     }
 
+    @Bean(name = "metadataDb5RedisUtil")
+    public RedisUtil getMetadataDb5RedisUtil() {
+        JedisPoolConfig config = new JedisPoolConfig();
+        config.setMaxTotal(metadataRedisSetting.getMaxTotal());
+        config.setMaxIdle(metadataRedisSetting.getMaxIdle());
+        config.setMinIdle(metadataRedisSetting.getMinIdle());
+        config.setMaxWaitMillis(metadataRedisSetting.getMaxWaitMillis());
+        config.setTestOnBorrow(metadataRedisSetting.isTestOnBorrow());
+        config.setTestOnReturn(metadataRedisSetting.isTestOnReturn());
+        config.setTestWhileIdle(metadataRedisSetting.isTestWhileIdle());
+
+        JedisPool jedisPool = new JedisPool(config,
+                metadataRedisSetting.getHostName(),
+                metadataRedisSetting.getPort(),
+                metadataRedisSetting.getTimeout(),
+                StringUtils.isEmpty(metadataRedisSetting.getPassword()) ? null : metadataRedisSetting.getPassword(),
+               5);
+        return new RedisUtil(jedisPool);
+    }
 
 }

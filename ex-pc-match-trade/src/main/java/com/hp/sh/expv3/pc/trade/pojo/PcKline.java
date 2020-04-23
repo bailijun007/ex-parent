@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.trade.pojo;
+package com.hp.sh.expv3.pc.trade.pojo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 /**
  * @author BaiLiJun  on 2020/3/4
  */
-public class BBKLine implements Serializable {
+public class PcKline implements Serializable {
     private Long id;
     private String asset;
     private String symbol;
@@ -18,10 +18,17 @@ public class BBKLine implements Serializable {
     private BigDecimal openPrice;// 按成交时间第一个 first(price)
     private BigDecimal closePrice;// 按成交时间最后一个 last(price)
 
-    public BBKLine() {
+    public PcKline() {
 
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     @Override
     public String toString() {
@@ -36,14 +43,6 @@ public class BBKLine implements Serializable {
                 ", openPrice=" + openPrice +
                 ", closePrice=" + closePrice +
                 '}';
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getAsset() {

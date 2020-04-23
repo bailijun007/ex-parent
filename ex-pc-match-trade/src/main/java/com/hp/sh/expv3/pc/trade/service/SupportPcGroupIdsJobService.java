@@ -8,6 +8,7 @@ import java.util.Map;
 /**
  * @author BaiLiJun  on 2020/3/18
  */
-public interface SupportBbGroupIdsJobService {
+public interface SupportPcGroupIdsJobService {
     public Map<Integer, List<BBSymbol>> listSymbols();
+    List<BBSymbol> getSymbols();
 }

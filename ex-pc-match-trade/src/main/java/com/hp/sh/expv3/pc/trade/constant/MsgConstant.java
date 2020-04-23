@@ -1,6 +1,6 @@
 package com.hp.sh.expv3.pc.trade.constant;
 
-import com.hp.sh.expv3.pc.trade.service.impl.SupportBbGroupIdsJobServiceImpl;
+import com.hp.sh.expv3.pc.trade.service.impl.SupportPcGroupIdsJobServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ public class MsgConstant {
 
 
     @Autowired
-    private SupportBbGroupIdsJobServiceImpl supportBbGroupIdsJobService;
+    private SupportPcGroupIdsJobServiceImpl supportBbGroupIdsJobService;
 
     public static final String TAG_PC_MATCH = "PC_MATCH";
 

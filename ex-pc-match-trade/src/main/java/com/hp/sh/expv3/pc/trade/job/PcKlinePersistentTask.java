@@ -1,13 +1,13 @@
-package com.hp.sh.expv3.bb.trade.job;
+package com.hp.sh.expv3.pc.trade.job;
 
 import com.alibaba.fastjson.JSON;
-import com.hp.sh.expv3.bb.trade.pojo.BBKLine;
-import com.hp.sh.expv3.bb.trade.pojo.BBSymbol;
-import com.hp.sh.expv3.bb.trade.service.BbKlinePersistentDataService;
-import com.hp.sh.expv3.bb.trade.service.SupportBbGroupIdsJobService;
-import com.hp.sh.expv3.bb.trade.util.BBKlineUtil;
-import com.hp.sh.expv3.bb.trade.util.BbKlineRedisKeyUtil;
 import com.hp.sh.expv3.config.redis.RedisUtil;
+import com.hp.sh.expv3.pc.trade.pojo.BBSymbol;
+import com.hp.sh.expv3.pc.trade.pojo.PcKline;
+import com.hp.sh.expv3.pc.trade.service.PcKlinePersistentDataService;
+import com.hp.sh.expv3.pc.trade.service.SupportPcGroupIdsJobService;
+import com.hp.sh.expv3.pc.trade.util.PcKlineRedisKeyUtil;
+import com.hp.sh.expv3.pc.trade.util.PcKlineUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,10 @@ import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Tuple;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.LongSummaryStatistics;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -27,13 +30,14 @@ import java.util.stream.Collectors;
  * @author BaiLiJun  on 2020/4/7
  */
 @Component
-public class BbKlinePersistentTask {
-    private static final Logger logger = LoggerFactory.getLogger(BbKlinePersistentTask.class);
+public class PcKlinePersistentTask {
+    private static final Logger logger = LoggerFactory.getLogger(PcKlinePersistentTask.class);
     @Autowired
-    private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
+    private SupportPcGroupIdsJobService supportBbGroupIdsJobService;
 
     @Value("${kline.persistentData.updateEventPattern}")
     private String updateEventPattern;
+
 
     @Autowired
     @Qualifier("metadataDb5RedisUtil")
@@ -42,20 +46,19 @@ public class BbKlinePersistentTask {
     @Value("${kline.persistent.batchSize}")
     private Integer persistentBatchSize;
 
-    @Value("${bb.kline.data}")
-    private String bbKlinePattern;
+    @Value("${pc.kline.data}")
+    private String pcKlinePattern;
 
     @Autowired
-    private BbKlinePersistentDataService bbKlinePersistentDataService;
-
+    private PcKlinePersistentDataService bbKlinePersistentDataService;
 
     @Scheduled(cron = "*/59 * * * * *")
     public void start1MinutePersistentTask() {
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
 
         Integer freq = 1;
-        for (BBSymbol bbSymbol : bbSymbolList) {
-            start(freq, bbSymbol);
+        for (BBSymbol pcSymbol : bbSymbolList) {
+            start(freq, pcSymbol);
         }
     }
 
@@ -119,9 +122,9 @@ public class BbKlinePersistentTask {
         }
     }
 
-    private void start(Integer freq, BBSymbol bbSymbol) {
-        String persistentDataUpdateEventKey = BbKlineRedisKeyUtil.buildPersistentDataUpdateEventKey(updateEventPattern, bbSymbol.getAsset(), bbSymbol.getSymbol(), freq);
-        String bbKlineDataRedisKey = BbKlineRedisKeyUtil.buildKlineDataRedisKey(bbKlinePattern, bbSymbol.getAsset(), bbSymbol.getSymbol(), freq);
+    private void start(Integer freq, BBSymbol pcSymbol) {
+        String persistentDataUpdateEventKey = PcKlineRedisKeyUtil.buildPersistentDataUpdateEventKey(updateEventPattern, pcSymbol.getAsset(), pcSymbol.getSymbol(), freq);
+        String bbKlineDataRedisKey = PcKlineRedisKeyUtil.buildKlineDataRedisKey(pcKlinePattern, pcSymbol.getAsset(), pcSymbol.getSymbol(), freq);
 
         Set<Tuple> triggers = metadataDb5RedisUtil.zpopmin(persistentDataUpdateEventKey, persistentBatchSize);
         if (CollectionUtils.isEmpty(triggers)) {
@@ -137,25 +140,25 @@ public class BbKlinePersistentTask {
         Long startMs = collect.getMin();
         Long endMs = collect.getMax();
         Set<String> set = metadataDb5RedisUtil.zrangeByScore(bbKlineDataRedisKey, startMs + "", endMs + "", 0, Long.valueOf(endMs - startMs + 1).intValue());
-        List<BBKLine> batchSaveList = new ArrayList<>();
-        List<BBKLine> batchUpdateList = new ArrayList<>();
+        List<PcKline> batchSaveList = new ArrayList<>();
+        List<PcKline> batchUpdateList = new ArrayList<>();
         for (String s : set) {
-            BBKLine bbkLine = BBKlineUtil.convertKlineData(s, freq, bbSymbol.getAsset(), bbSymbol.getSymbol());
+            PcKline pckLine = PcKlineUtil.convertKlineData(s, freq, pcSymbol.getAsset(), pcSymbol.getSymbol());
             //查询是否存在，存在-->更新;  不存在-->新增
-            boolean exist = bbKlinePersistentDataService.isExist(bbkLine);
+            boolean exist = bbKlinePersistentDataService.isExist(pckLine);
             if (!exist) {
-                batchSaveList.add(bbkLine);
+                batchSaveList.add(pckLine);
             } else {
-                Long id = bbKlinePersistentDataService.queryIdByBBKLine(bbkLine);
-                bbkLine.setId(id);
-                batchUpdateList.add(bbkLine);
+                Long id = bbKlinePersistentDataService.queryIdByBBKLine(pckLine);
+                pckLine.setId(id);
+                batchUpdateList.add(pckLine);
             }
         }
 
         bbKlinePersistentDataService.batchSave(batchSaveList);
-        logger.info("asset={},symbol={},freq={},batchSaveList={}", bbSymbol.getAsset(), bbSymbol.getSymbol(), freq, JSON.toJSONString(batchSaveList));
+        logger.info("asset={},symbol={},freq={},batchSaveList={}", pcSymbol.getAsset(), pcSymbol.getSymbol(), freq, JSON.toJSONString(batchSaveList));
         bbKlinePersistentDataService.batchUpdate(batchUpdateList);
-        logger.info("asset={},symbol={},freq={},batchUpdateList={}", bbSymbol.getAsset(), bbSymbol.getSymbol(), freq, JSON.toJSONString(batchUpdateList));
+        logger.info("asset={},symbol={},freq={},batchUpdateList={}", pcSymbol.getAsset(), pcSymbol.getSymbol(), freq, JSON.toJSONString(batchUpdateList));
 
     }
 

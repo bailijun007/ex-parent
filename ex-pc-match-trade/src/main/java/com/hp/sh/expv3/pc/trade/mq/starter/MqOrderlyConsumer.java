@@ -5,7 +5,7 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.pc.trade.constant.MsgConstant;
 import com.hp.sh.expv3.pc.trade.pojo.BBSymbol;
-import com.hp.sh.expv3.pc.trade.service.impl.SupportBbGroupIdsJobServiceImpl;
+import com.hp.sh.expv3.pc.trade.service.impl.SupportPcGroupIdsJobServiceImpl;
 import com.hp.sh.rocketmq.config.RocketmqServerSetting;
 import com.hp.sh.rocketmq.exceptions.ReSendException;
 import com.hp.sh.rocketmq.impl.EndpointContext;
@@ -36,7 +36,7 @@ public class MqOrderlyConsumer {
 	private RocketmqServerSetting setting;
 
     @Autowired
-    private SupportBbGroupIdsJobServiceImpl supportBbGroupIdsJobService;
+    private SupportPcGroupIdsJobServiceImpl supportBbGroupIdsJobService;
 
 	@Autowired
 	private EndpointContext endpointContext;

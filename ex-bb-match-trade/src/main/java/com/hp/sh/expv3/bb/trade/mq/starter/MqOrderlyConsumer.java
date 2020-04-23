@@ -31,7 +31,7 @@ import java.util.Map.Entry;
 @Configuration
 public class MqOrderlyConsumer {
 	private static final Logger logger = LoggerFactory.getLogger(MqOrderlyConsumer.class);
-	
+
 	@Autowired
 	private RocketmqServerSetting setting;
 
@@ -48,17 +48,17 @@ public class MqOrderlyConsumer {
 	private Integer bbGroupId;
 
 	private Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
-	
+
 	private DefaultMQPushConsumer buildConsumer(String topic) throws MQClientException{
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(setting.getDefaultConsumer().getGroup()+"-"+topic);
-        
+
         consumer.setNamesrvAddr(setting.getNamesrvAddr());
         consumer.setNamespace(setting.getNamespace());
         consumer.setInstanceName(setting.getInstanceName());
-        
+
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
         consumer.subscribe(topic, MsgConstant.TAG_BB_MATCH);
-        
+
         consumer.registerMessageListener(new MessageListenerOrderly() {
 
         	@Override
@@ -94,22 +94,22 @@ public class MqOrderlyConsumer {
         			logger.error("未知捕获,{}", cause.getMessage(), cause);
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}
-        		
+
         	}
-        	
+
         });
-        
+
         consumer.start();
         return consumer;
 	}
-	
+
 	@Scheduled(cron = "0 * * * * ?")
 	@PostConstruct
 	public void start123() throws MQClientException{
 		List<BBSymbol> pcList = supportBbGroupIdsJobService.getSymbols();
 
 		logger.debug("更新MQ监听,{},{},{}", pcList.size(), this.bbGroupId, this.setting.getInstanceName());
-		
+
 		Map<String, BBSymbol> symbolMap = new HashMap<String, BBSymbol>();
 		for(BBSymbol bbvo : pcList){
 			if(bbvo.getBbGroupId().equals(this.bbGroupId)){
@@ -118,7 +118,7 @@ public class MqOrderlyConsumer {
 				symbolMap.put(topic, bbvo);
 			}
 		}
-		
+
 		for(String topic : new ArrayList<String>(this.mqMap.keySet())){
 			DefaultMQPushConsumer mq = this.mqMap.get(topic);
 			if(!symbolMap.containsKey(topic)){
@@ -127,7 +127,7 @@ public class MqOrderlyConsumer {
 				this.mqMap.remove(topic);
 			}
 		}
-		
+
 		Set<Entry<String, BBSymbol>> entrySet = symbolMap.entrySet();
 		for(Entry<String, BBSymbol> entry : entrySet){
 			String topic = entry.getKey();
@@ -144,7 +144,7 @@ public class MqOrderlyConsumer {
 		int n = this.mqMap.size();
 		logger.debug("mq:{},{}", n, this.mqMap);
 		return;
-		
+
 	}
 
     @PostConstruct
