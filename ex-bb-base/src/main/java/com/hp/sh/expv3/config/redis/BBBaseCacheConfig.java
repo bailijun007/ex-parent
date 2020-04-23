@@ -23,10 +23,10 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import com.gitee.hupadev.commons.cache.RedisCache;
 import com.gitee.hupadev.commons.cache.RedisPool;
 
-@EnableCaching
+//@EnableCaching
 @Configuration
-public class BaseCacheConfig {
-    private static final Logger logger = LoggerFactory.getLogger(BaseCacheConfig.class);
+public class BBBaseCacheConfig {
+    private static final Logger logger = LoggerFactory.getLogger(BBBaseCacheConfig.class);
 
 	@Primary
 	@Bean
@@ -35,10 +35,10 @@ public class BaseCacheConfig {
 		config = config.entryTtl(Duration.ofMinutes(10));
 	
 		Set<String> cacheNames = new HashSet<>();
-		cacheNames.add("userinfo");
+		cacheNames.add("order");
 	
 		Map<String, RedisCacheConfiguration> configMap = new HashMap<>();
-		configMap.put("userinfo", config.entryTtl(Duration.ofSeconds(30)));
+		configMap.put("order", config.entryTtl(Duration.ofSeconds(60)));
 	
 		RedisCacheManager cacheManager = RedisCacheManager.builder(factory).cacheDefaults(config)
 				.initialCacheNames(cacheNames).withInitialCacheConfigurations(configMap).build();
