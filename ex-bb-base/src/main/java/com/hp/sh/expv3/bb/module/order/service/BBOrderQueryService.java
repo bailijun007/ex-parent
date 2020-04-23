@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
 
 @Service
+@CacheConfig(cacheNames="order")
 @Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 public class BBOrderQueryService {
 
@@ -111,6 +114,7 @@ public class BBOrderQueryService {
 		return list;
 	}
 	
+	@Cacheable(key="#userId+'-'+#orderId", unless="#result==null")
 	public BBOrder getOrder(long userId, Long orderId){
 		BBOrder order = this.bbOrderDAO.findById(userId, orderId);
 		return order;

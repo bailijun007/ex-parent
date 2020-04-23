@@ -3,6 +3,8 @@ package com.hp.sh.expv3.bb.module.order.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,6 +24,7 @@ import com.hp.sh.expv3.bb.mq.msg.vo.BBOrderEvent;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Service
+@CacheConfig(cacheNames="order")
 @Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 public class BBOrderUpdateService {
 	private static final Logger logger = LoggerFactory.getLogger(BBOrderUpdateService.class);
@@ -37,11 +40,12 @@ public class BBOrderUpdateService {
 	
     @Autowired
     private ApplicationEventPublisher publisher;
+    
+    @Autowired
+    private BBOrderUpdateService self;
 	
 	public void saveOrder(BBOrder bBOrder) {
-		this.bBOrderDAO.save(bBOrder);
-		
-		this.saveActiveOrder(bBOrder);
+		self.saveActiveOrder(bBOrder);
 		
 		//日志
 		Long now = DbDateUtils.now();
@@ -49,7 +53,7 @@ public class BBOrderUpdateService {
 	}
 	
 	public BBOrderLog updateOrder(BBOrder order, long now) {
-		this.updateActiveOrder(order);
+		self.updateActiveOrder(order);
 		
 		//日志
 		BBOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), BBOrderLogType.SET_STATUS_CANCEL, now);
@@ -59,7 +63,7 @@ public class BBOrderUpdateService {
 	}
 
 	public void updateOrder4Trad(BBOrder order){
-		this.updateActiveOrder(order);
+		self.updateActiveOrder(order);
 		
 		BBOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), BBOrderLogType.TRADE, order.getModified());
 	}
@@ -120,7 +124,10 @@ public class BBOrderUpdateService {
 		publisher.publishEvent(event);
 	}
 
-	private void saveActiveOrder(BBOrder order) {
+	@CachePut(key="#order.userId+'-'+#order.id")
+	void saveActiveOrder(BBOrder order) {
+		this.bBOrderDAO.save(order);
+		
 		BBActiveOrder bBActiveOrder = new BBActiveOrder();
 		bBActiveOrder.setId(order.getId());
 		bBActiveOrder.setUserId(order.getUserId());
@@ -130,7 +137,8 @@ public class BBOrderUpdateService {
 		this.bBActiveOrderDAO.save(bBActiveOrder);
 	}
 
-	private void updateActiveOrder(BBOrder order) {
+	@CachePut(key="#order.userId+'-'+#order.id")
+	void updateActiveOrder(BBOrder order) {
 		this.bBOrderDAO.update(order);
 		if(order.getActiveFlag()==BBOrder.NO){
 			this.bBActiveOrderDAO.delete(order.getId(), order.getUserId());
