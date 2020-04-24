@@ -24,7 +24,6 @@ import com.hp.sh.expv3.bb.mq.msg.vo.BBOrderEvent;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Service
-@CacheConfig(cacheNames="order")
 @Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 public class BBOrderUpdateService {
 	private static final Logger logger = LoggerFactory.getLogger(BBOrderUpdateService.class);
@@ -124,7 +123,6 @@ public class BBOrderUpdateService {
 		publisher.publishEvent(event);
 	}
 
-	@CachePut(key="#order.userId+'-'+#order.id")
 	void saveActiveOrder(BBOrder order) {
 		this.bBOrderDAO.save(order);
 		
@@ -137,7 +135,6 @@ public class BBOrderUpdateService {
 		this.bBActiveOrderDAO.save(bBActiveOrder);
 	}
 
-	@CachePut(key="#order.userId+'-'+#order.id")
 	void updateActiveOrder(BBOrder order) {
 		this.bBOrderDAO.update(order);
 		if(order.getActiveFlag()==BBOrder.NO){

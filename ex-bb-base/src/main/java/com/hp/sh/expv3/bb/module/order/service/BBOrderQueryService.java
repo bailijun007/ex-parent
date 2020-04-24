@@ -30,7 +30,6 @@ import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
 
 @Service
-@CacheConfig(cacheNames="order")
 @Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 public class BBOrderQueryService {
 
@@ -114,7 +113,6 @@ public class BBOrderQueryService {
 		return list;
 	}
 	
-	@Cacheable(key="#userId+'-'+#orderId", unless="#result==null")
 	public BBOrder getOrder(long userId, Long orderId){
 		BBOrder order = this.bbOrderDAO.findById(userId, orderId);
 		return order;

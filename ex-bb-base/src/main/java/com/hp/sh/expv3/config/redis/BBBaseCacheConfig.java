@@ -23,7 +23,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import com.gitee.hupadev.commons.cache.RedisCache;
 import com.gitee.hupadev.commons.cache.RedisPool;
 
-@EnableCaching
+//@EnableCaching
 @Configuration
 public class BBBaseCacheConfig {
     private static final Logger logger = LoggerFactory.getLogger(BBBaseCacheConfig.class);
