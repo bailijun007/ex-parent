@@ -245,26 +245,13 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("activeFlag", IntBool.YES);
 
         isPage(lastOrderId, currentPage, pageSize, nextPage, isTotalNumber, result, map);
-//        if (isTotalNumber == null) {
-//            map.put("pageSize", pageSize);
-//            map.put("lastOrderId", lastOrderId);
-//            map.put("currentPage", currentPage);
-//            map.put("nextPage", nextPage);
-//
-//        } else if (isTotalNumber == IntBool.YES) {
-//            Long count = pcOrderDAO.queryCount(map);
-//            result.setRowTotal(count);
-//            result.setPageNo(currentPage);
-//        }
-////        map.put("limit", pageSize);
-//        List<PcOrderVo> pcOrderVos = pcOrderDAO.queryUserActivityOrder(map);
-//        result.setList(pcOrderVos);
+
         return result;
     }
 
     @Override
     public PageResult<PcOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, Integer isPageYes) {
-        PageResult<PcOrderVo> result=new PageResult<>();
+        PageResult<PcOrderVo> result = new PageResult<>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
@@ -299,6 +286,20 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         result.setRowTotal(Long.parseLong(String.valueOf(list.size())));
         result.setPageNo(currentPage);
         return result;
+    }
+
+    @Override
+    public BigDecimal queryTotalFee(Long startTime, Long endTime) {
+        BigDecimal total = pcOrderDAO.queryTotalFee(startTime, endTime);
+        if (null == total) {
+            return BigDecimal.ZERO;
+        }
+        return total;
+    }
+
+    @Override
+    public BigDecimal queryTotalOrder(Long startTime, Long endTime) {
+        return   pcOrderDAO.queryTotalOrder(startTime, endTime);
     }
 
 

@@ -190,4 +190,19 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
 
         return bbOrderExtMapper.queryByIds(refIds);
     }
+
+    @Override
+    public BigDecimal queryTotalFee(Long startTime, Long endTime) {
+        BigDecimal total=  bbOrderExtMapper.queryTotalFee(startTime,endTime);
+        if(null==total){
+            return BigDecimal.ZERO;
+        }
+        return total;
+    }
+
+    @Override
+    public BigDecimal queryTotalOrder(Long startTime, Long endTime) {
+        BigDecimal total=  bbOrderExtMapper.queryTotalOrder(startTime,endTime);
+        return total;
+    }
 }

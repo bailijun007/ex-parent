@@ -344,4 +344,14 @@
         LIMIT 0,${limit}
     </select>
 
+    <select id="queryTotalFee" resultType="java.math.BigDecimal">
+        select SUM(fee_cost) from bb_order
+        where created&gt;=#{startTime}
+        and created&lt;=#{endTime}
+    </select>
+
+    <select id="queryTotalOrder" resultType="java.math.BigDecimal">
+      select count(1) from bb_order where created&gt;=#{startTime} and created&lt;=#{endTime}
+    </select>
+
 </mapper>

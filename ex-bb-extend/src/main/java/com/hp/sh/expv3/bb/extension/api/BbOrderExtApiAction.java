@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -86,6 +87,22 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         }
 
         return list;
+    }
+
+    @Override
+    public BigDecimal queryTotalFee(Long startTime, Long endTime) {
+        if (null == startTime || endTime == null) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+        return bbOrderExtService.queryTotalFee(startTime,endTime);
+    }
+
+    @Override
+    public BigDecimal queryTotalOrder(Long startTime, Long endTime) {
+        if (null == startTime || endTime == null) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+        return bbOrderExtService.queryTotalOrder(startTime,endTime);
     }
 
 

@@ -35,4 +35,8 @@ public interface BbOrderExtMapper {
     List<BbOrderVo> queryByIds(@Param("idList") List<Long> idList);
 
     List<BbOrderVo> queryBbActiveOrders(Map<String, Object> map);
+
+    BigDecimal queryTotalFee(@Param("startTime") Long startTime,@Param("endTime") Long endTime);
+
+    BigDecimal queryTotalOrder(@Param("startTime") Long startTime,@Param("endTime") Long endTime);
 }
