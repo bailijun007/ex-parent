@@ -301,8 +301,11 @@ public class PcStrategyContext {
 	 */
 	public BigDecimal calcFloatingPnl(PosData pos) {
 		BigDecimal markPrice = this.markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
-		 HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
-		 return holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice(), markPrice);
+		if(markPrice==null){
+			return BigDecimal.ZERO;
+		}
+		HoldPosStrategy holdPosStrategy = this.getHoldPosStrategy(pos.getAsset(), pos.getSymbol());
+		return holdPosStrategy.calcPnl(pos.getLongFlag(), pos.getVolume(), pos.getFaceValue(), pos.getMeanPrice(), markPrice);
 	}
 	
 	/**

@@ -109,6 +109,9 @@ public class PcLiqService {
 	 * @return 是否触发强平
 	 */
 	private boolean checkAndResetLiqStatus(PcPosition pos, BigDecimal markPrice) {
+		if(markPrice==null){
+			return false;
+		}
 		if(this.checkLiqStatus(pos, markPrice)){ //强平
 			return true;
 		}else{ //不强平
