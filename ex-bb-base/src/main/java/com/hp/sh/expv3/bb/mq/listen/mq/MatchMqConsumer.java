@@ -1,8 +1,5 @@
 package com.hp.sh.expv3.bb.mq.listen.mq;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +13,13 @@ import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
-import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
+import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
-@Component
+//@Component
 @MQListener(orderly=MQListener.ORDERLY_YES)
 public class MatchMqConsumer {
 	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer.class);

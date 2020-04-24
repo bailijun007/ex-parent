@@ -33,10 +33,10 @@ public class BBMessageExtService{
     private final long twepoch = 1587571200000L;
 
 	@Autowired
-	private BBMessageExtDAO BBMessageExtDAO;
+	private BBMessageExtDAO messageExtDAO;
 
-	public void delete(Long userId, Long id){
-		this.BBMessageExtDAO.delete(userId, id);
+	public void delete(Long userId, String msgId){
+		this.messageExtDAO.delete(userId, msgId);
 	}
 	
 	public void saveNotMatchedMsg(String tags, BBNotMatchMsg msg){
@@ -45,7 +45,7 @@ public class BBMessageExtService{
 		
 		msgEntity.setAsset(msg.getAsset());
 		msgEntity.setSymbol(msg.getSymbol());
-		msgEntity.setExInfo(null);
+		msgEntity.setErrorInfo(null);
 		
 		msgEntity.setMsgId(msg.getMsgId());
 		msgEntity.setTags(tags);
@@ -54,22 +54,20 @@ public class BBMessageExtService{
 		
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setSortId(this.getSortId(tags, msgEntity.getCreated()));
+		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
 		
-		this.BBMessageExtDAO.save(msgEntity);
+		this.messageExtDAO.save(msgEntity);
 	}
 
 	public void saveTradeMsg(String tags, BBTradeVo msg, String exMessage) {
-		
-		if(exMessage!=null && exMessage.length()>1500){
-			exMessage = exMessage.substring(0, 1500);
-		}
+		exMessage = this.cutExMsg(exMessage);
 		
 		BBMessageExt msgEntity = new BBMessageExt();
 		msgEntity.setUserId(msg.getAccountId());
 		
 		msgEntity.setAsset(msg.getAsset());
 		msgEntity.setSymbol(msg.getSymbol());
-		msgEntity.setExInfo(exMessage);
+		msgEntity.setErrorInfo(exMessage);
 		
 		msgEntity.setMsgId(msg.getMsgId());
 		msgEntity.setTags(tags);
@@ -78,18 +76,17 @@ public class BBMessageExtService{
 		
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setSortId(this.getSortId(tags, msgEntity.getCreated()));
+		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
 		
-		this.BBMessageExtDAO.save(msgEntity);
+		this.messageExtDAO.save(msgEntity);
 	}
 
 	public void saveCancelIfNotExists(String tag, BBCancelledMsg msg, String exMessage) {
 		
-		if(exMessage!=null && exMessage.length()>1500){
-			exMessage = exMessage.substring(0, 1500);
-		}
+		exMessage = this.cutExMsg(exMessage);
 		
-		boolean existCancelled = this.exist(msg.getAccountId(), tag, ""+msg.getOrderId());
-		if(existCancelled){
+		boolean existCancelledMsg = this.exist(msg.getAccountId(), tag, ""+msg.getOrderId());
+		if(existCancelledMsg){
 			return;
 		}
 		
@@ -98,48 +95,63 @@ public class BBMessageExtService{
 		msgEntity.setUserId(msg.getAccountId());
 		msgEntity.setAsset(msg.getAsset());
 		msgEntity.setSymbol(msg.getSymbol());
-		msgEntity.setExInfo(exMessage);
+		msgEntity.setErrorInfo(exMessage);
 		msgEntity.setTags(tag);
 		msgEntity.setMsgId(msg.getMsgId());
 		msgEntity.setKeys(""+msg.getOrderId());
 		msgEntity.setMsgBody(JsonUtils.toJson(msg));
 		msgEntity.setSortId(this.getSortId(tag, msgEntity.getCreated()));
-		this.BBMessageExtDAO.save(msgEntity);
+		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
+		
+		this.messageExtDAO.save(msgEntity);
 	}
 	
+	public void setStatus(Long userId, String msgId, int status, String errInfo) {
+		this.messageExtDAO.setStatus(userId, msgId, status, this.cutExMsg(errInfo));
+	}
+
 	@LockIt(key="mm-${userId}-${key}")
 	public boolean exist(Long userId, String tag, String key){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, 1, 1000L));
-		params.put("orderBy", "id");
+		params.put("orderBy", "sort_id");
 		params.put("asc", true);
 
 		params.put("userId", userId);
-		params.put("tag", tag);
-		params.put("key", key);
+		params.put("tags", tag);
+		params.put("keys", key);
 		
-		BBMessageExt msg = this.BBMessageExtDAO.queryOne(params);
+		BBMessageExt msg = this.messageExtDAO.queryOne(params);
 		return msg!=null;
 	}
 
 	public BBMessageExt findFirst(String tag, String symbol){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, 1, 1000L));
+		params.put("status", BBMessageExt.STATUS_NEW);
 		params.put("orderBy", "sort_id");
 		params.put("asc", true);
-		params.put("tag", tag);
+		params.put("tags", tag);
 		params.put("symbol", symbol);
-		BBMessageExt msg = this.BBMessageExtDAO.queryOne(params);
+		BBMessageExt msg = this.messageExtDAO.queryOne(params);
 		return msg;
 	}
 
 	public List<BBMessageExt> findFirstList(int pageSize){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, pageSize, 1000L));
+		params.put("status", BBMessageExt.STATUS_NEW);
 		params.put("orderBy", "sort_id");
 		params.put("asc", true);
-		List<BBMessageExt> msgList = this.BBMessageExtDAO.queryList(params);
+		List<BBMessageExt> msgList = this.messageExtDAO.queryList(params);
 		return msgList;
+	}
+	
+	private String cutExMsg(String exMessage){
+		if(exMessage!=null && exMessage.length()>1500){
+			exMessage = exMessage.substring(0, 1500);
+		}
+		return exMessage;
 	}
 
 	private Long getSortId(String tag, Long created) {

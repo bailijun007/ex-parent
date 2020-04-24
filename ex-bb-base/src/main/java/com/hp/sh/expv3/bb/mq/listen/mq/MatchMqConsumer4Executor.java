@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.constant.MqTags;
-import com.hp.sh.expv3.bb.job.BBMatchedHandler;
+import com.hp.sh.expv3.bb.job.old.BBMatchedHandler;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
 import com.hp.sh.expv3.bb.mq.send.BBPublisher;

@@ -13,6 +13,14 @@ import com.hp.sh.expv3.base.entity.UserData;
 @Table(name="bb_message_ext")
 public class BBMessageExt implements UserData{
 	
+	public static final int STATUS_NEW = 0;
+
+	public static final int STATUS_RUNNING = 1;
+	
+	public static final int STATUS_FINISHED = 2;
+	
+	public static final int STATUS_ERR = 3;
+	
 	//msgId
 	@Id
 	private String msgId;
@@ -24,7 +32,7 @@ public class BBMessageExt implements UserData{
 	private String msgBody;
 	
 	//异常信息
-	private String exInfo;
+	private String errorInfo;
 	
 	//用户ID
 	private Long userId;
@@ -39,6 +47,8 @@ public class BBMessageExt implements UserData{
 
 	// 创建时间
 	private Long created;
+	
+	private int status;
 	
 	public BBMessageExt() {
 	}
@@ -91,12 +101,12 @@ public class BBMessageExt implements UserData{
 		this.created = created;
 	}
 
-	public String getExInfo() {
-		return exInfo;
+	public String getErrorInfo() {
+		return errorInfo;
 	}
 
-	public void setExInfo(String exMessage) {
-		this.exInfo = exMessage;
+	public void setErrorInfo(String exMessage) {
+		this.errorInfo = exMessage;
 	}
 
 	public String getAsset() {
@@ -121,6 +131,14 @@ public class BBMessageExt implements UserData{
 
 	public void setSortId(Long sortId) {
 		this.sortId = sortId;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 
 }

@@ -16,7 +16,7 @@ import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
  * @author wangjg
  *
  */
-public interface BBMessageExtDAO extends BaseUserDataMapper<BBMessageExt,Long> {
+public interface BBMessageExtDAO extends BaseUserDataMapper<BBMessageExt,String> {
 
 	public List<BBMessageExt> queryList(Map<String,Object> params);
 	
@@ -28,6 +28,8 @@ public interface BBMessageExtDAO extends BaseUserDataMapper<BBMessageExt,Long> {
 
 	public Long queryCount(Map<String,Object> params);
 
-	public void delete(@Param(UserDataEntity.USERID_PROPERTY) Long userId, @Param(BaseBizEntity.ID_PROPERTY) Long id);
+	public void delete(@Param("userId") Long userId, @Param("msgId") String msgId);
+
+	public void setStatus(@Param("userId") Long userId, @Param("msgId") String msgId, @Param("status") Integer status, @Param("errorInfo") String errorInfo);
 
 }

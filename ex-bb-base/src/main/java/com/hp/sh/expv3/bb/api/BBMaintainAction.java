@@ -16,7 +16,7 @@ import com.gitee.hupadev.commons.json.JsonUtils;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
-import com.hp.sh.expv3.bb.job.BBMatchedHandler;
+import com.hp.sh.expv3.bb.job.old.BBMatchedHandler;
 import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
@@ -53,9 +53,6 @@ public class BBMaintainAction{
 	
 	@Autowired
 	private BBMqMsgService mqMsgService;
-	
-	@Autowired
-	private MatchMqConsumer matchMqConsumer;
 	
 	@Autowired
 	private BBTradeService tradeService;

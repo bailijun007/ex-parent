@@ -10,7 +10,7 @@ public class ExecutorConfig {
 	
 	@Bean("tradeExecutors")
 	public OrderlyExecutors tradeExecutors(){
-		return new OrderlyExecutors(20, 500);
+		return new OrderlyExecutors(20, 1000);
 	}
 
 }
