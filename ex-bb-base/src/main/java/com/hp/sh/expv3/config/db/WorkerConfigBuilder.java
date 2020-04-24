@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
@@ -18,6 +20,7 @@ import com.hp.sh.expv3.component.id.config.SequencConfig;
 import com.hp.sh.expv3.component.id.config.WorkerConfig;
 import com.hp.sh.expv3.enums.IdTypeEnum;
 
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @Component
 public class WorkerConfigBuilder {
 	
