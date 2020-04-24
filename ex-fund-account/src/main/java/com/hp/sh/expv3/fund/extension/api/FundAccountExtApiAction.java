@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -97,6 +98,14 @@ public class FundAccountExtApiAction implements FundAccountExtApi {
         }
 
         return result;
+    }
+
+    @Override
+    public BigDecimal queryTotalNumber(String asset) {
+        if (StringUtils.isEmpty(asset)) {
+            throw new ExException(ExFundError.PARAM_EMPTY);
+        }
+        return fundAccountExtendServer.queryTotalNumber(asset);
     }
 
 

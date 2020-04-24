@@ -65,5 +65,9 @@
         where user_id=#{userId} and asset=#{asset}
     </select>
 
+    <select id="queryTotalNumber" resultType="java.math.BigDecimal">
+        SELECT SUM(balance) AS total from bb_account b where b.asset=#{asset}
+    </select>
+
 
 </mapper>

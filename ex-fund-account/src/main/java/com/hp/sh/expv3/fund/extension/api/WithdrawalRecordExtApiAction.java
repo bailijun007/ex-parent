@@ -14,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -62,14 +63,12 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
         if (userId == null || startTime == null || StringUtils.isEmpty(asset)|| endTime == null ) {
             throw new ExException(ExFundError.PARAM_EMPTY);
         }
-//        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(timestamp));
         List<WithdrawalRecordVo> voList = getWithdrawalRecordVos(userId, asset, startTime, endTime);
         return voList;
     }
 
     /**
      * 获取最新提币历史
-     * TODO txHash 哈希值 数据库缺字段，后期让老王加上或者掉老王接口
      *
      * @param userId 用户id
      * @param asset  资产
@@ -121,15 +120,16 @@ public class WithdrawalRecordExtApiAction implements WithdrawalRecordExtApi {
         }
 
         PageResult<WithdrawalRecordVo> result = withdrawalRecordExtService.pageQueryHistory(userId, asset, pageNo, pageSize, startTime, endTime, approvalStatus);
-//        if (!CollectionUtils.isEmpty(result.getList())) {
-//            for (WithdrawalRecordVo vo : result.getList()) {
-//                WithdrawalAddrVo withdrawalAddrVo = withdrawalAddrExtService.getAddressByUserIdAndAsset(vo.getUserId(), vo.getAsset());
-//                Optional<WithdrawalAddrVo> optional = Optional.ofNullable(withdrawalAddrVo);
-//                vo.setTargetAddress(optional.map(WithdrawalAddrVo::getAddress).orElse(null));
-//            }
-//        }
 
         return result;
+    }
+
+    @Override
+    public BigDecimal queryTotalNumber(String asset, Integer payStatus) {
+        if ( payStatus == null||StringUtils.isEmpty(asset)) {
+            throw new ExException(ExFundError.PARAM_EMPTY);
+        }
+        return withdrawalRecordExtService.queryTotalNumber(asset,payStatus);
     }
 
     private List<WithdrawalRecordVo> getWithdrawalRecordVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {

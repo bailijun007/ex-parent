@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,20 +51,29 @@ public class DepositRecordExtServiceImpl implements DepositRecordExtService {
 
     @Override
     public PageResult<DepositRecordHistoryVo> pageQueryDepositRecordHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
-        PageResult<DepositRecordHistoryVo> pageResult=new PageResult<>();
-        PageHelper.startPage(pageNo,pageSize);
-        List<DepositRecordHistoryVo> list = depositRecordExtMapper.queryByUserIdAndAsset(userId,asset);
-       if(!CollectionUtils.isEmpty(list)){
-           for (DepositRecordHistoryVo historyVo : list) {
-               Optional<DepositRecordHistoryVo> vo = Optional.ofNullable(historyVo);
-               historyVo.setMtime(vo.map(DepositRecordHistoryVo::getModified).orElse(null));
-           }
-       }
+        PageResult<DepositRecordHistoryVo> pageResult = new PageResult<>();
+        PageHelper.startPage(pageNo, pageSize);
+        List<DepositRecordHistoryVo> list = depositRecordExtMapper.queryByUserIdAndAsset(userId, asset);
+        if (!CollectionUtils.isEmpty(list)) {
+            for (DepositRecordHistoryVo historyVo : list) {
+                Optional<DepositRecordHistoryVo> vo = Optional.ofNullable(historyVo);
+                historyVo.setMtime(vo.map(DepositRecordHistoryVo::getModified).orElse(null));
+            }
+        }
         PageInfo<DepositRecordHistoryVo> info = new PageInfo<>(list);
         pageResult.setList(list);
         pageResult.setPageNo(info.getPageNum());
         pageResult.setPageCount(info.getPages());
         pageResult.setRowTotal(info.getTotal());
         return pageResult;
+    }
+
+    @Override
+    public BigDecimal queryTotalNumber(String asset, Integer payStatus) {
+        BigDecimal total = depositRecordExtMapper.queryTotalNumber(asset, payStatus);
+        if (null == total) {
+            return BigDecimal.ZERO;
+        }
+        return total;
     }
 }

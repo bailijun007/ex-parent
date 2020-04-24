@@ -55,20 +55,20 @@ public class BbAccountExtServiceImpl implements BbAccountExtService {
 
     @Override
     public BbAccountExtVo getBBAccount(Long userId, String asset) {
-        BbAccountExtVo vo  = new BbAccountExtVo();
+        BbAccountExtVo vo = new BbAccountExtVo();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
         BbAccountVo bbAccountVo = bbAccountExtMapper.queryOne(map);
         if (bbAccountVo == null) {
-            vo =new BbAccountExtVo();
+            vo = new BbAccountExtVo();
             vo.setAsset(asset);
             vo.setUserId(userId);
             vo.setBalance(BigDecimal.ZERO);
             vo.setAvailable(BigDecimal.ZERO);
             vo.setLock(BigDecimal.ZERO);
             vo.setTotal(BigDecimal.ZERO);
-        }else {
+        } else {
             BeanUtils.copyProperties(bbAccountVo, vo);
             vo.setAvailable(bbAccountVo.getBalance());
         }
@@ -78,9 +78,9 @@ public class BbAccountExtServiceImpl implements BbAccountExtService {
 
     @Override
     public BbAccountExtVo getNewBBAccount(Long userId, String asset) {
-        BbAccountExtVo bbAccountExtVo= bbAccountExtMapper.getBBAccount(userId,asset);
+        BbAccountExtVo bbAccountExtVo = bbAccountExtMapper.getBBAccount(userId, asset);
         if (bbAccountExtVo == null) {
-            bbAccountExtVo =new BbAccountExtVo();
+            bbAccountExtVo = new BbAccountExtVo();
             bbAccountExtVo.setAsset(asset);
             bbAccountExtVo.setUserId(userId);
             bbAccountExtVo.setBalance(BigDecimal.ZERO);
@@ -90,5 +90,14 @@ public class BbAccountExtServiceImpl implements BbAccountExtService {
             return bbAccountExtVo;
         }
         return bbAccountExtVo;
+    }
+
+    @Override
+    public BigDecimal queryTotalNumber(String asset) {
+        BigDecimal total = bbAccountExtMapper.queryTotalNumber(asset);
+        if (null == total) {
+            return BigDecimal.ZERO;
+        }
+        return total;
     }
 }

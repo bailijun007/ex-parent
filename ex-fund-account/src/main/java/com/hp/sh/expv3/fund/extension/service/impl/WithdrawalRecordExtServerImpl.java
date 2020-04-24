@@ -51,15 +51,15 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
             historyVo.setCtime(vo.map(d -> d.getCreated()).orElse(null));
             historyVo.setWithdrawTime(vo.map(d -> d.getCreated()).orElse(null));
             //1.审核中,2.审核通过,3.失败
-            if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()== PaymentStatus.SUCCESS){
+            if (historyVo.getStatus() == ApprovalStatus.APPROVED && historyVo.getPayStatus() == PaymentStatus.SUCCESS) {
                 historyVo.setStatus(WithdrawalStatus.SUCCESS);
-            }else if(historyVo.getStatus()== ApprovalStatus.APPROVED &&historyVo.getPayStatus()== PaymentStatus.FAIL){
-              //审核通过，支付失败 状态也是失败
+            } else if (historyVo.getStatus() == ApprovalStatus.APPROVED && historyVo.getPayStatus() == PaymentStatus.FAIL) {
+                //审核通过，支付失败 状态也是失败
                 historyVo.setStatus(WithdrawalStatus.FAIL);
-            }else if(historyVo.getStatus()== ApprovalStatus.REJECTED){
+            } else if (historyVo.getStatus() == ApprovalStatus.REJECTED) {
                 //审核拒绝  状态也是失败
                 historyVo.setStatus(WithdrawalStatus.FAIL);
-            }else {
+            } else {
                 //审核中
                 historyVo.setStatus(WithdrawalStatus.IN_APPROVAL);
             }
@@ -128,16 +128,25 @@ public class WithdrawalRecordExtServerImpl implements WithdrawalRecordExtService
     }
 
     @Override
-    public PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(Long userId, String asset, Integer status,Integer payStatus, Integer pageNo, Integer pageSize) {
-        PageHelper.startPage(pageNo,pageSize);
-        PageResult<WithdrawalRecordByAdmin> pageResult=new PageResult<>();
-        List<WithdrawalRecordByAdmin> list = withdrawalRecordExtMapper.queryHistoryByAdmin(userId,asset ,status,payStatus);
-         PageInfo<WithdrawalRecordByAdmin> info = new PageInfo<>(list);
+    public PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(Long userId, String asset, Integer status, Integer payStatus, Integer pageNo, Integer pageSize) {
+        PageHelper.startPage(pageNo, pageSize);
+        PageResult<WithdrawalRecordByAdmin> pageResult = new PageResult<>();
+        List<WithdrawalRecordByAdmin> list = withdrawalRecordExtMapper.queryHistoryByAdmin(userId, asset, status, payStatus);
+        PageInfo<WithdrawalRecordByAdmin> info = new PageInfo<>(list);
         pageResult.setList(list);
         pageResult.setRowTotal(info.getTotal());
         pageResult.setPageNo(info.getPageNum());
         pageResult.setPageCount(info.getPages());
         return pageResult;
+    }
+
+    @Override
+    public BigDecimal queryTotalNumber(String asset, Integer payStatus) {
+        BigDecimal total = withdrawalRecordExtMapper.queryTotalNumber(asset, payStatus);
+        if (null == total) {
+            return BigDecimal.ZERO;
+        }
+        return total;
     }
 
 }

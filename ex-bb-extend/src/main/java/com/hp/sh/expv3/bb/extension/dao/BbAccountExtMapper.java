@@ -4,6 +4,7 @@ import com.hp.sh.expv3.bb.extension.vo.BbAccountExtVo;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -19,4 +20,6 @@ public interface BbAccountExtMapper {
     List<BbAccountVo> queryList(Map<String,Object> map);
 
     BbAccountExtVo getBBAccount(@Param("userId") Long userId, @Param("asset") String asset);
+
+    BigDecimal queryTotalNumber( @Param("asset") String asset);
 }

@@ -79,13 +79,14 @@ public class PLPayService {
         c2cOrder.setType(C2cConst.C2C_BUY);
         c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
         c2cOrder.setPayStatusDesc(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
-        c2cOrder.setPayTime(Instant.now().toEpochMilli());
-        c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
+         long payTime = Instant.now().toEpochMilli();
+        c2cOrder.setPayTime(payTime);
+        c2cOrder.setPayFinishTime(payTime);
         c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_FALSE);
         c2cOrder.setApprovalStatus(C2cConst.C2C_APPROVAL_STATUS_IN_AUDIT);
         c2cOrder.setUserId(userId);
-        c2cOrder.setCreated(Instant.now().toEpochMilli());
-        c2cOrder.setModified(Instant.now().toEpochMilli());
+        c2cOrder.setCreated(payTime);
+        c2cOrder.setModified(payTime);
         buyService.saveC2cOrder(c2cOrder);
 
         return url;

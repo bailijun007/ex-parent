@@ -26,4 +26,6 @@ public interface WithdrawalRecordExtService {
     PageResult<WithdrawalRecordVo> pageQueryHistory(Long userId, String asset, Integer pageNo, Integer pageSize, Long startTime, Long endTime,Integer approvalStatus);
 
     PageResult<WithdrawalRecordByAdmin> queryHistoryByAdmin(Long userId, String asset, Integer status,Integer payStatus, Integer pageNo, Integer pageSize);
+
+    BigDecimal queryTotalNumber(String asset, Integer payStatus);
 }

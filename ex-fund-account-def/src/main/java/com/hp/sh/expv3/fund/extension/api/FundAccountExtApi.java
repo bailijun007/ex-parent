@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -45,4 +46,11 @@ public interface FundAccountExtApi {
                                                             @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize", required = true,defaultValue = "20") Integer pageSize);
 
 
+
+    @ApiOperation("根据币种查询平台所有用户的资金账户总额")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true)
+    })
+    @GetMapping(value = "/api/extension/fundAccount/queryTotalNumber")
+    public BigDecimal queryTotalNumber(@RequestParam(value = "asset") String asset);
 }

@@ -1,9 +1,11 @@
 package com.hp.sh.expv3.fund.extension.api;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -58,6 +60,14 @@ public class DepositRecordExtApiAction implements DepositRecordExtApi {
         }
         PageResult<DepositRecordHistoryVo> result = depositRecordExtService.pageQueryDepositRecordHistory(userId, asset, pageNo, pageSize);
         return result;
+    }
+
+    @Override
+    public BigDecimal queryTotalNumber(String asset, Integer payStatus) {
+        if ( payStatus == null|| StringUtils.isEmpty(asset)) {
+            throw new ExException(ExFundError.PARAM_EMPTY);
+        }
+        return depositRecordExtService.queryTotalNumber(asset,payStatus);
     }
 
     private List<DepositRecordHistoryVo> getDepositRecordHistoryVos(Long userId, String asset, Long queryId, Integer pageSize, Integer pageStatus) {

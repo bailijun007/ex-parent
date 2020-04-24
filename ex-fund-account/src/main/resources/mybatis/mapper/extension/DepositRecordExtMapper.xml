@@ -48,5 +48,8 @@
         </where>
 
     </select>
+    <select id="queryTotalNumber" resultType="java.math.BigDecimal">
+        SELECT SUM(amount)  from deposit_record d where d.asset=#{asset} and d.pay_status=#{payStatus}
+    </select>
 
 </mapper>

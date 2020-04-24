@@ -92,4 +92,12 @@ public class PcAccountExtendApiAction implements PcAccountExtendApi {
         return result;
     }
 
+    @Override
+    public BigDecimal queryTotalNumber(String asset) {
+        if (StringUtils.isEmpty(asset)) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        return pcAccountExtendService.queryTotalNumber(asset);
+    }
+
 }

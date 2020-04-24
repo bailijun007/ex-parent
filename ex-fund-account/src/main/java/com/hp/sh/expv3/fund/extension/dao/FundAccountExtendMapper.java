@@ -4,6 +4,7 @@ import com.hp.sh.expv3.fund.extension.vo.CapitalAccountVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -17,5 +18,5 @@ public interface FundAccountExtendMapper {
     List<CapitalAccountVo> queryList(Map<String,Object> map);
 
 
-
+    BigDecimal queryTotalNumber(@Param("asset") String asset);
 }

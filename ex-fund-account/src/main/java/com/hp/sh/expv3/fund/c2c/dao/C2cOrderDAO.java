@@ -1,6 +1,7 @@
 
 package com.hp.sh.expv3.fund.c2c.dao;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -33,4 +34,6 @@ public interface C2cOrderDAO extends BaseUserDataMapper<C2cOrder, Long> {
     List<C2cOrderVo> queryByPayStatus(@Param("payStatus") Integer payStatus,@Param("payStatusDesc") String payStatusDesc);
 
     List<C2cOrderVo> queryByStatus(Map<String, Object> map);
+
+    BigDecimal queryTotalNumber(@Param("asset") String asset, @Param("type")Integer type,@Param("payStatus") Integer payStatus);
 }
