@@ -17,16 +17,21 @@ public class BBKLine implements Serializable {
     private BigDecimal lowPrice;// min(price)
     private BigDecimal openPrice;// 按成交时间第一个 first(price)
     private BigDecimal closePrice;// 按成交时间最后一个 last(price)
-
+    private Long created;
+    private Long modified;
     public BBKLine() {
 
     }
 
+    public Long getCreated() {
+        return created;
+    }
 
     @Override
     public String toString() {
         return "BBKLine{" +
-                "asset='" + asset + '\'' +
+                "id=" + id +
+                ", asset='" + asset + '\'' +
                 ", symbol='" + symbol + '\'' +
                 ", frequence=" + frequence +
                 ", timestamp=" + timestamp +
@@ -35,7 +40,21 @@ public class BBKLine implements Serializable {
                 ", lowPrice=" + lowPrice +
                 ", openPrice=" + openPrice +
                 ", closePrice=" + closePrice +
+                ", created=" + created +
+                ", modified=" + modified +
                 '}';
+    }
+
+    public void setCreated(Long created) {
+        this.created = created;
+    }
+
+    public Long getModified() {
+        return modified;
+    }
+
+    public void setModified(Long modified) {
+        this.modified = modified;
     }
 
     public Long getId() {

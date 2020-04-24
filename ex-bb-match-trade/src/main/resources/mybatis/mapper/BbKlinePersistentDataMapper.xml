@@ -20,10 +20,10 @@
 
     <insert id="batchSave">
         insert into bb_kline_persistent_data
-        (asset,symbol,open_price,high_price,low_price,close_price,volume,`timestamp`,frequence )
+        (asset,symbol,open_price,high_price,low_price,close_price,volume,`timestamp`,frequence,created,modified )
         values
         <foreach collection="bbKlineDataList" item="item" index="index" separator=",">
-            (#{item.asset},#{item.symbol},#{item.openPrice},#{item.highPrice},#{item.lowPrice},#{item.closePrice},#{item.volume},#{item.timestamp},#{item.frequence})
+            (#{item.asset},#{item.symbol},#{item.openPrice},#{item.highPrice},#{item.lowPrice},#{item.closePrice},#{item.volume},#{item.timestamp},#{item.frequence},#{item.created},#{item.modified})
         </foreach>
     </insert>
 
@@ -42,7 +42,8 @@
             open_price=#{item.openPrice},
             high_price=#{item.highPrice},
             low_price=#{item.lowPrice},
-            close_price=#{item.closePrice}
+            close_price=#{item.closePrice},
+            modified=#{item.modified}
             <where>
                 id = #{item.id}
             </where>

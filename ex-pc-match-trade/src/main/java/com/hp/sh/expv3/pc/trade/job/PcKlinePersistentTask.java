@@ -19,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Tuple;
 
 import javax.annotation.PostConstruct;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LongSummaryStatistics;
@@ -146,10 +147,14 @@ public class PcKlinePersistentTask {
             PcKline pckLine = PcKlineUtil.convertKlineData(s, freq, pcSymbol.getAsset(), pcSymbol.getSymbol());
             //查询是否存在，存在-->更新;  不存在-->新增
             boolean exist = bbKlinePersistentDataService.isExist(pckLine);
+            long time = Instant.now().toEpochMilli();
             if (!exist) {
+                pckLine.setCreated(time);
+                pckLine.setModified(time);
                 batchSaveList.add(pckLine);
             } else {
                 Long id = bbKlinePersistentDataService.queryIdByBBKLine(pckLine);
+                pckLine.setModified(time);
                 pckLine.setId(id);
                 batchUpdateList.add(pckLine);
             }

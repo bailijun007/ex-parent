@@ -19,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Tuple;
 
 import javax.annotation.PostConstruct;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -143,10 +144,14 @@ public class BbKlinePersistentTask {
             BBKLine bbkLine = BBKlineUtil.convertKlineData(s, freq, bbSymbol.getAsset(), bbSymbol.getSymbol());
             //查询是否存在，存在-->更新;  不存在-->新增
             boolean exist = bbKlinePersistentDataService.isExist(bbkLine);
+             long milli = Instant.now().toEpochMilli();
             if (!exist) {
+                bbkLine.setCreated(milli);
+                bbkLine.setModified(milli);
                 batchSaveList.add(bbkLine);
             } else {
                 Long id = bbKlinePersistentDataService.queryIdByBBKLine(bbkLine);
+                bbkLine.setModified(milli);
                 bbkLine.setId(id);
                 batchUpdateList.add(bbkLine);
             }
