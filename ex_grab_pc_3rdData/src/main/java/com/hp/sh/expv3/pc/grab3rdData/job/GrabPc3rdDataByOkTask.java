@@ -20,6 +20,10 @@ import org.springframework.util.CollectionUtils;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,10 +98,33 @@ public class GrabPc3rdDataByOkTask {
                             String okSymbol = okResponseEntity.getInstrument_id();
                             okSymbol = okSymbol.split("-")[0] + "-" + okSymbol.split("-")[1];
                             if (okRedisKeysMap.containsKey(okSymbol)) {
+                                long timestamp = System.currentTimeMillis();
                                 String key = okHttpsRedisKey + okSymbol;
-                                String value = okResponseEntity.getLast() + "";
+                                String value = okResponseEntity.getLast() + "&" + timestamp;
                                 if (null != value || !"".equals(value)) {
-                                    map.put(key, value);
+                                    String lastValue = metadataDb5RedisUtil.get(key);
+                                    if(null==lastValue||"".equals(lastValue)){
+                                        map.put(key, value);
+                                        continue;
+                                    }
+                                    String[] split = lastValue.split("&");
+                                    BigDecimal lastPrice = new BigDecimal(split[0]);
+
+                                    String[] currentSplit = value.split("&");
+                                    BigDecimal currentPrice = new BigDecimal(currentSplit[0]);
+                                    if (split.length == 1) {
+                                        //当前价格跟最后更新价格不一样时， 才进行更新操作
+                                        if (currentPrice.compareTo(lastPrice) != 0) {
+                                            map.put(key, value);
+                                        }
+                                    } else if (split.length == 2) {
+                                        LocalDateTime now = Instant.ofEpochMilli(Long.parseLong(currentSplit[1])).atZone(ZoneOffset.systemDefault()).toLocalDateTime();
+                                        //当前价格跟最后更新价格不一样时，并且当前时间在15分钟内， 才进行更新操作
+                                        if (currentPrice.compareTo(lastPrice) != 0 && now.plusMinutes(15).compareTo(now) >= 0) {
+                                            map.put(key, value);
+                                        }
+                                    }
+//                                    map.put(key, value);
                                 }
                             }
                         }

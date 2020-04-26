@@ -109,6 +109,7 @@ public class GrabBb3rdDataByOkTask {
                                 if (null != value || !"".equals(value)) {
                                     String lastValue = metadataDb5RedisUtil.get(key);
                                    if(null==lastValue||"".equals(lastValue)){
+                                       map.put(key, value);
                                        continue;
                                    }
                                     String[] split = lastValue.split("&");

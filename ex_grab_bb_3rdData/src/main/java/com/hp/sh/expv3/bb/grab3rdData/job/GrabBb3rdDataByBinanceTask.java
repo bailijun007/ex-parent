@@ -118,8 +118,9 @@ public class GrabBb3rdDataByBinanceTask {
                                 long timestamp = System.currentTimeMillis();
                                 String key = wssRedisKey + binanceBbSymbol;
                                  String value = responseData.getC() + "&" + timestamp;
-                                String lastValue = originaldataDb5RedisUtil.get(key);
+                                String lastValue = metadataDb5RedisUtil.get(key);
                                 if(null==lastValue||"".equals(lastValue)){
+                                    map.put(key, value);
                                     continue;
                                 }
                                 String[] split = lastValue.split("&");
@@ -190,10 +191,33 @@ public class GrabBb3rdDataByBinanceTask {
                 for (Map data : list) {
                     String binanceSymbol = (String) data.get("symbol");
                     if (binanceRedisKeysMap.containsKey(binanceSymbol)) {
+                        long timestamp = System.currentTimeMillis();
                         String key = httpsRedisKey + binanceSymbol;
-                        String value = (String) data.get("price");
+                        String value = (String) data.get("price")+ "&" + timestamp;;
                         if (null != value || !"".equals(value)) {
-                            map.put(key, value);
+                            String lastValue = metadataDb5RedisUtil.get(key);
+                            if(null==lastValue||"".equals(lastValue)){
+                                map.put(key, value);
+                                continue;
+                            }
+                            String[] split = lastValue.split("&");
+                            BigDecimal lastPrice = new BigDecimal(split[0]);
+
+                            String[] currentSplit = value.split("&");
+                            BigDecimal currentPrice = new BigDecimal(currentSplit[0]);
+                            if (split.length == 1) {
+                                //当前价格跟最后更新价格不一样时， 才进行更新操作
+                                if (currentPrice.compareTo(lastPrice) != 0) {
+                                    map.put(key, value);
+                                }
+                            } else if (split.length == 2) {
+                                LocalDateTime now = Instant.ofEpochMilli(Long.parseLong(currentSplit[1])).atZone(ZoneOffset.systemDefault()).toLocalDateTime();
+                                //当前价格跟最后更新价格不一样时，并且当前时间在15分钟内， 才进行更新操作
+                                if (currentPrice.compareTo(lastPrice) != 0 && now.plusMinutes(15).compareTo(now) >= 0) {
+                                    map.put(key, value);
+                                }
+                            }
+//                            map.put(key, value);
                         }
                     }
                 }

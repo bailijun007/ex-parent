@@ -300,7 +300,7 @@ public class GetLastPriceByMerge {
         if (null == strHttpsTicker) {
             avgLastPrice = BigDecimal.ZERO;
         } else {
-            avgLastPrice = new BigDecimal(strHttpsTicker);
+            avgLastPrice = new BigDecimal(strHttpsTicker.split("&")[0]);
         }
         return avgLastPrice;
     }
@@ -314,7 +314,7 @@ public class GetLastPriceByMerge {
         if (null == strHttpsTicker) {
             avgLastPrice = BigDecimal.ZERO;
         } else {
-            avgLastPrice = new BigDecimal(strHttpsTicker);
+            avgLastPrice = new BigDecimal(strHttpsTicker.split("&")[0]);
         }
         return avgLastPrice;
     }
@@ -329,7 +329,7 @@ public class GetLastPriceByMerge {
         if (null == strHttpsTicker) {
             avgLastPrice = BigDecimal.ZERO;
         } else {
-            avgLastPrice = new BigDecimal(strHttpsTicker);
+            avgLastPrice = new BigDecimal(strHttpsTicker.split("&")[0]);
         }
         logger.info("ok的交易对:{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
         return avgLastPrice;
