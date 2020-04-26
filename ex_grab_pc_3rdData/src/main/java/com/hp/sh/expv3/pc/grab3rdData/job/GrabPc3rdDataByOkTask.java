@@ -89,6 +89,7 @@ public class GrabPc3rdDataByOkTask {
                 Request request = new Request.Builder().get().url(okHttpsUrl).build();
                 Call call = client.newCall(request);
                 try {
+                    TimeUnit.SECONDS.sleep(1);
                     Response response = call.execute();
                     String string = response.body().string();
                     Map<String, String> map = new HashMap<>();
@@ -133,7 +134,6 @@ public class GrabPc3rdDataByOkTask {
                     if(map.size()==2){
                         metadataDb5RedisUtil.mset(map);
                         originaldataDb5RedisUtil.mset(map);
-                        TimeUnit.SECONDS.sleep(1);
                     }
 
                 } catch (Exception e) {

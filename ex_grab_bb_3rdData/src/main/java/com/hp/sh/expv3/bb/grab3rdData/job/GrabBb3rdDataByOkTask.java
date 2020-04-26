@@ -94,6 +94,7 @@ public class GrabBb3rdDataByOkTask {
                 Request request = new Request.Builder().get().url(okHttpsUrl).build();
                 Call call = client.newCall(request);
                 try {
+                    TimeUnit.SECONDS.sleep(1);
                     Response response = call.execute();
                     String string = response.body().string();
                     List<OkResponseEntity> list = JSON.parseArray(string, OkResponseEntity.class);
@@ -135,7 +136,7 @@ public class GrabBb3rdDataByOkTask {
                         //批量保存
                         metadataDb5RedisUtil.mset(map);
                         originaldataDb5RedisUtil.mset(map);
-                        TimeUnit.SECONDS.sleep(1);
+
                     }
                 } catch (Exception e) {
                     logger.error("通过https请求获取ok交易所最新成交价定时任务报错！，cause()={},message={}", e.getCause(), e.getMessage());
