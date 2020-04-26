@@ -130,7 +130,7 @@ public class GrabPc3rdDataByOkTask {
                         }
                     }
                     //批量保存
-                    if(map.size()==3){
+                    if(map.size()==2){
                         metadataDb5RedisUtil.mset(map);
                         originaldataDb5RedisUtil.mset(map);
                         TimeUnit.SECONDS.sleep(1);

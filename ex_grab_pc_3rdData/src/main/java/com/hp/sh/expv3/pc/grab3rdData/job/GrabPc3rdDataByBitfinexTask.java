@@ -116,7 +116,7 @@ public class GrabPc3rdDataByBitfinexTask {
 //                        map.put(key, value);
                     }
 
-                    if(map.size()==3){
+                    if(map.size()==1){
                         //批量保存
                         metadataDb5RedisUtil.mset(map);
                         originaldataDb5RedisUtil.mset(map);

@@ -166,7 +166,7 @@ public class GrabBb3rdDataByZbTask {
                         }
                     }
 
-                    if (map.size() == 5) {
+                    if (map.size() == 4) {
                         originaldataDb5RedisUtil.mset(map);
                         metadataDb5RedisUtil.mset(map);
                         map.clear();
