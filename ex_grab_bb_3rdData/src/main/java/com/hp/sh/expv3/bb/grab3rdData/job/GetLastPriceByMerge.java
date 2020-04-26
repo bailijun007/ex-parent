@@ -315,15 +315,15 @@ public class GetLastPriceByMerge {
         if (null == strHttpsTicker && null == strWssTicker) {
             avgLastPrice = BigDecimal.ZERO;
         } else if (null != strHttpsTicker && null != strWssTicker) {
-            httpLast = new BigDecimal(strHttpsTicker);
-            wssLast = new BigDecimal(strWssTicker);
+            httpLast = new BigDecimal(strHttpsTicker.split("&")[0]);
+            wssLast = new BigDecimal(strWssTicker.split("&")[0]);
             avgLastPrice = httpLast.add(wssLast).divide(new BigDecimal(2), 4, RoundingMode.DOWN);
         }
 
         if (null == strHttpsTicker && null != strWssTicker) {
-            avgLastPrice = new BigDecimal(strWssTicker);
+            avgLastPrice = new BigDecimal(strWssTicker.split("&")[0]);
         } else if (null == strWssTicker && null != strHttpsTicker) {
-            avgLastPrice = new BigDecimal(strHttpsTicker);
+            avgLastPrice = new BigDecimal(strHttpsTicker.split("&")[0]);
         }
 
         logger.info("zb的交易对:{},httpLast的最新成交价为：{},wssLast的最新成交价为：{}", hashKey, httpLast, wssLast);
@@ -382,16 +382,16 @@ public class GetLastPriceByMerge {
             avgLastPrice = BigDecimal.ZERO;
         } else if (null != strHttpsTicker && null != strWssTicker) {
 //            Object price = httpsTicker.get("price");
-            httpLast = new BigDecimal(strHttpsTicker);
-            wssLast = new BigDecimal(strWssTicker);
+            httpLast = new BigDecimal(strHttpsTicker.split("&")[0]);
+            wssLast = new BigDecimal(strWssTicker.split("&")[0]);
             avgLastPrice = httpLast.add(wssLast).divide(new BigDecimal(2), 4, RoundingMode.DOWN);
         }
 
         if (null == strHttpsTicker && null != strWssTicker) {
-            avgLastPrice = new BigDecimal(strWssTicker);
+            avgLastPrice = new BigDecimal(strWssTicker.split("&")[0]);
         } else if (null != strWssTicker && null != strHttpsTicker) {
 //            Object price = httpsTicker.get("price");
-            httpLast = new BigDecimal(strHttpsTicker);
+            httpLast = new BigDecimal(strHttpsTicker.split("&")[0]);
             avgLastPrice = httpLast;
         }
         logger.info("binance的交易对:{},httpLast的最新成交价为：{},wssLast的最新成交价为：{}", hashKey, httpLast, wssLast);
@@ -410,7 +410,7 @@ public class GetLastPriceByMerge {
         if (null == strHttpsTicker) {
             avgLastPrice = BigDecimal.ZERO;
         } else {
-            avgLastPrice = new BigDecimal(strHttpsTicker);
+            avgLastPrice = new BigDecimal(strHttpsTicker.split("&")[0]);
         }
         logger.info("bitfinex的交易对:{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
         return avgLastPrice;
@@ -426,7 +426,7 @@ public class GetLastPriceByMerge {
         if (null == strHttpsTicker) {
             avgLastPrice = BigDecimal.ZERO;
         } else {
-            avgLastPrice = new BigDecimal(strHttpsTicker);
+            avgLastPrice = new BigDecimal(strHttpsTicker.split("&")[0]);
         }
         logger.info("ok的交易对:{},merge后的最新成交价为：{}", hashKey, avgLastPrice);
         return avgLastPrice;
