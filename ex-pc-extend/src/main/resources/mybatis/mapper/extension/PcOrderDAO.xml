@@ -375,7 +375,7 @@
             LIMIT 0,${limit}
         </if>
     </select>
-    bbOrderExtMapper.queryBbActiveOrders(map);
+
     <select id="queryTotalFee" resultType="java.math.BigDecimal">
         select SUM(fee_cost) from pc_order
         where created &gt;=#{startTime}
