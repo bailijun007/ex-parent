@@ -52,7 +52,7 @@ public class PLPayService {
         //订单币种
         String orderCurrency =srcCurrency;
         if(srcCurrency.equals("CNY")){
-             orderCurrency = "QC";
+             orderCurrency = "CNY";
         }
 
         //订单金额
