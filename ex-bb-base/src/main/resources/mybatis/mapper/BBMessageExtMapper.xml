@@ -5,6 +5,7 @@
 <mapper namespace="com.hp.sh.expv3.bb.module.msg.dao.BBMessageExtDAO">
 
 	<resultMap type="com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt" id="BBMessageExt">
+		<result column="id" property="id" />
 		<result column="msg_id" property="msgId" />
 		<result column="tags" property="tags" />
 		<result column="keys" property="keys" />
@@ -13,13 +14,13 @@
 		<result column="user_id" property="userId" />
 		<result column="asset" property="asset" />
 		<result column="symbol" property="symbol" />
-		<result column="sort_id" property="sortId" />
 		<result column="created" property="created" />
+		<result column="shard_id" property="shardId" />
 		<result column="status" property="status" />
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		msg_id,tags,`keys`,msg_body,error_info,user_id,asset,symbol,sort_id,created,status
+		id,msg_id,tags,`keys`,msg_body,error_info,user_id,asset,symbol,created,shard_id,status
 	</sql>
 
 	<sql id="simple_where" >
@@ -30,9 +31,15 @@
 		#{idList[${i}]}
 		</foreach>
 		</if>
+		<if test="msgId!=null"> and msg_id=#{msgId}</if>
+		<if test="startId!=null"> and id &gt; #{startId}</if>
+		<if test="shardId!=null"> and shard_id=#{shardId}</if>
 		<if test="userId!=null"> and user_id=#{userId}</if>
-		<if test="sortId!=null"> and sort_id=#{sortId}</if>
 		<if test="created!=null"> and created=#{created}</if>
+		
+		<if test="tags!=null"> and tags=#{tags}</if>
+		<if test="keys!=null"> and `keys`=#{keys}</if>
+		
 		<if test="status!=null"> and status=#{status}</if>
 		</where>
 	</sql>
@@ -93,9 +100,9 @@
 
 	<insert id="save">
 		insert into bb_message_ext (
-			msg_id,tags,`keys`,msg_body,error_info,user_id,asset,symbol,sort_id,created,status
+			msg_id,id,tags,`keys`,msg_body,error_info,user_id,asset,symbol,created,shard_id,status
 		)values(
-			#{msgId},#{tags},#{keys},#{msgBody},#{errorInfo},#{userId},#{asset},#{symbol},#{sortId},#{created},#{status}
+			#{msgId},#{id},#{tags},#{keys},#{msgBody},#{errorInfo},#{userId},#{asset},#{symbol},#{created},#{shardId},#{status}
 		)
 	</insert>
 	
@@ -103,13 +110,13 @@
 		update 
 			bb_message_ext
 		set 
-			tags=#{tags},`keys`=#{keys},msg_body=#{msgBody},error_info=#{errorInfo},user_id=#{userId},asset=#{asset},symbol=#{symbol},sort_id=#{sortId},created=#{created},status=#{status}
+			id=#{id},tags=#{tags},`keys`=#{keys},msg_body=#{msgBody},error_info=#{errorInfo},user_id=#{userId},asset=#{asset},symbol=#{symbol},created=#{created},shard_id=#{shardId},status=#{status}
 		where 
-			user_id=#{userId} and msg_id=#{msgId}
+			user_id=#{userId} and id=#{id}
 	</update>
 
 	<delete id="delete">
-        delete from bb_message_ext where user_id=#{userId} and msg_id=#{msgId}
+        delete from bb_message_ext where user_id=#{userId} and id=#{id}
     </delete>
 
     <delete id="condDelete">
@@ -125,7 +132,7 @@
 		set 
 			status=#{status},error_info=#{errorInfo}
 		where 
-			user_id=#{userId} and msg_id=#{msgId}
+			user_id=#{userId} and id=#{id}
 	</update>
 	
 </mapper>

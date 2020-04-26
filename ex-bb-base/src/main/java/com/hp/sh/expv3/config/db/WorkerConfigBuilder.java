@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
 import com.hp.sh.expv3.bb.module.collector.entity.BBCollectorAccountRecord;
 import com.hp.sh.expv3.bb.module.log.entity.BBAccountLog;
+import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.module.order.entity.BBActiveOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;
@@ -50,6 +51,9 @@ public class WorkerConfigBuilder {
 
 	private static final String BB_ACCOUNT_LOG = BBAccountLog.class.getName();
 	private static final int BB_ACCOUNT_LOG_ID = IdTypeEnum.BB_ACCOUNT_LOG_ID.getValue();
+
+	private static final String BB_MESSAGE_EXT = BBMessageExt.class.getName();
+	private static final int BB_MESSAGE_EXT_ID = IdTypeEnum.BB_MESSAGE_EXT_ID.getValue();
 	
 	
 	@Value("${id.generator.dataCenterId}")
@@ -78,6 +82,7 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, BB_ACTIVE_ORDER_ID, BB_ACTIVE_ORDER);
 		this.set(workerConfig, BB_MATCHED_TRADE_ID, BB_MATCHED_TRADE);
 		this.set(workerConfig, BB_COLLECTOR_ACCOUNT_RECORD_ID, BB_COLLECTOR_ACCOUNT_RECORD);
+		this.set(workerConfig, BB_MESSAGE_EXT_ID, BB_MESSAGE_EXT);
 	}
 	
 	private void set(WorkerConfig workerConfig, int seqId, String tableUUID){

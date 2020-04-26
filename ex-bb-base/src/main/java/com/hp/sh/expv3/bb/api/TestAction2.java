@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.json.JsonUtils;
+import com.hp.sh.expv3.bb.job.BBMsgHandler;
 import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
@@ -22,6 +23,9 @@ public class TestAction2 {
 
 	@Autowired
 	private BBMqMsgService msgService;
+	
+	@Autowired
+	private BBMsgHandler msgHandler;
 
 	@ApiOperation(value = "测试保存数据库")
 	@GetMapping(value = "/api/bb/test/dbsave")
@@ -87,6 +91,23 @@ public class TestAction2 {
 		time = System.currentTimeMillis()-time;
 		return time;
 	}
+	
+	@ApiOperation(value = "测试提交任务")
+	@GetMapping(value = "/api/bb/test/submitTask")
+	public Long submitTask() throws IOException{
+		long time = System.currentTimeMillis();
+		msgHandler.handlePending();
+		time = System.currentTimeMillis()-time;
+		return time;
+	}
+	
+	
+	@ApiOperation(value = "任务执行结果")
+	@GetMapping(value = "/api/bb/test/taskResult")
+	public Long taskResult() throws IOException{
+		return 0L;
+	}
+	
 	
 	private BBMqMsg getBBMqMsg(BBTradeVo msg){
 		BBMqMsg msgEntity = new BBMqMsg();

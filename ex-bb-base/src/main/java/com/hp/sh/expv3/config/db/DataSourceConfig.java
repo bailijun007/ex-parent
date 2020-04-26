@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -25,6 +24,4 @@ public class DataSourceConfig {
 		return ds;
 	}
 	
-	ProxyTransactionManagementConfiguration df;
-
 }

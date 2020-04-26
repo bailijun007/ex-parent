@@ -51,8 +51,6 @@ public class MatchMqConsumer {
 			}else{
 				msgService.saveIfNotExists(MqTags.TAGS_CANCELLED, msg, "存在未处理的trade");
 			}
-		}catch(UpdateException e){
-			throw e;
 		}catch(Exception e){
 			this.checkException(e);
 			logger.error("消息处理异常：msg={}, ex={}", e.getMessage(), e.toString(), e);
@@ -66,8 +64,6 @@ public class MatchMqConsumer {
 		logger.info("收到用户成交消息:{}", msg);
 		try{
 			this.tradeService.handleTrade(msg);
-		}catch(UpdateException e){
-			throw e;
 		}catch(Exception e){
 			this.checkException(e);
 			logger.error("消息处理异常：msg={}, ex={}",e.getMessage() , e.toString(), e);

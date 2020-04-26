@@ -18,6 +18,7 @@ import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.commons.lock.LockIt;
+import com.hp.sh.expv3.config.shard.ShardGroup;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 /**
@@ -34,9 +35,12 @@ public class BBMessageExtService{
 
 	@Autowired
 	private BBMessageExtDAO messageExtDAO;
+	
+	@Autowired
+	private ShardGroup shardGroup;
 
-	public void delete(Long userId, String msgId){
-		this.messageExtDAO.delete(userId, msgId);
+	public void delete(Long userId, Long id){
+		this.messageExtDAO.delete(userId, id);
 	}
 	
 	public void saveNotMatchedMsg(String tags, BBNotMatchMsg msg){
@@ -53,7 +57,7 @@ public class BBMessageExtService{
 		msgEntity.setMsgBody(JsonUtils.toJson(msg));
 		
 		msgEntity.setCreated(DbDateUtils.now());
-		msgEntity.setSortId(this.getSortId(tags, msgEntity.getCreated()));
+		msgEntity.setShardId(getMsgSardId(msgEntity));
 		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
 		
 		this.messageExtDAO.save(msgEntity);
@@ -75,19 +79,19 @@ public class BBMessageExtService{
 		msgEntity.setMsgBody(JsonUtils.toJson(msg));
 		
 		msgEntity.setCreated(DbDateUtils.now());
-		msgEntity.setSortId(this.getSortId(tags, msgEntity.getCreated()));
+		msgEntity.setShardId(getMsgSardId(msgEntity));
 		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
 		
 		this.messageExtDAO.save(msgEntity);
 	}
 
-	public void saveCancelIfNotExists(String tag, BBCancelledMsg msg, String exMessage) {
+	public boolean saveCancelIfNotExists(String tag, BBCancelledMsg msg, String exMessage) {
 		
 		exMessage = this.cutExMsg(exMessage);
 		
 		boolean existCancelledMsg = this.exist(msg.getAccountId(), tag, ""+msg.getOrderId());
 		if(existCancelledMsg){
-			return;
+			return false;
 		}
 		
 		BBMessageExt msgEntity = new BBMessageExt();
@@ -100,26 +104,39 @@ public class BBMessageExtService{
 		msgEntity.setMsgId(msg.getMsgId());
 		msgEntity.setKeys(""+msg.getOrderId());
 		msgEntity.setMsgBody(JsonUtils.toJson(msg));
-		msgEntity.setSortId(this.getSortId(tag, msgEntity.getCreated()));
+		msgEntity.setShardId(getMsgSardId(msgEntity));
 		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
 		
 		this.messageExtDAO.save(msgEntity);
+		
+		return true;
 	}
 	
-	public void setStatus(Long userId, String msgId, int status, String errInfo) {
-		this.messageExtDAO.setStatus(userId, msgId, status, this.cutExMsg(errInfo));
+	public void setStatus(Long userId, Long id, int status, String errInfo) {
+		this.messageExtDAO.setStatus(userId, id, status, this.cutExMsg(errInfo));
 	}
 
 	@LockIt(key="mm-${userId}-${key}")
-	public boolean exist(Long userId, String tag, String key){
+	public boolean exist(Long userId, String tags, String keys){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, 1, 1000L));
-		params.put("orderBy", "sort_id");
 		params.put("asc", true);
 
 		params.put("userId", userId);
-		params.put("tags", tag);
-		params.put("keys", key);
+		params.put("tags", tags);
+		params.put("keys", keys);
+		
+		BBMessageExt msg = this.messageExtDAO.queryOne(params);
+		return msg!=null;
+	}
+	
+	public boolean existMsgId(Long userId, String msgId){
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("page", new Page(1, 1, 1000L));
+		params.put("asc", true);
+
+		params.put("userId", userId);
+		params.put("msgId", msgId);
 		
 		BBMessageExt msg = this.messageExtDAO.queryOne(params);
 		return msg!=null;
@@ -128,8 +145,8 @@ public class BBMessageExtService{
 	public BBMessageExt findFirst(String tag, String symbol){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, 1, 1000L));
-		params.put("status", BBMessageExt.STATUS_NEW);
-		params.put("orderBy", "sort_id");
+//		params.put("status", BBMessageExt.STATUS_NEW);
+		params.put("orderBy", "id");
 		params.put("asc", true);
 		params.put("tags", tag);
 		params.put("symbol", symbol);
@@ -137,14 +154,20 @@ public class BBMessageExtService{
 		return msg;
 	}
 
-	public List<BBMessageExt> findFirstList(int pageSize){
+	public List<BBMessageExt> findFirstList(int pageSize, Integer shardId, Long startId){
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("page", new Page(1, pageSize, 1000L));
-		params.put("status", BBMessageExt.STATUS_NEW);
-		params.put("orderBy", "sort_id");
+		params.put("page", new Page(1, pageSize, 10000L));
+		params.put("shardId", shardId);
+		params.put("startId", startId);
+//		params.put("status", BBMessageExt.STATUS_NEW);
+		params.put("orderBy", "id");
 		params.put("asc", true);
 		List<BBMessageExt> msgList = this.messageExtDAO.queryList(params);
 		return msgList;
+	}
+	
+	private Integer getMsgSardId(BBMessageExt msgEntity){
+		return shardGroup.getMsgSardId(msgEntity.getUserId());
 	}
 	
 	private String cutExMsg(String exMessage){

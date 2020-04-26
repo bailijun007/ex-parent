@@ -15,7 +15,14 @@ public abstract class AbstractGroupTask implements GroupTask{
 	@Override
 	public void run() {
 		try{
-			this.doRun();
+			if(logger.isDebugEnabled()){
+				long time = System.currentTimeMillis();
+				this.doRun();
+				time = System.currentTimeMillis() - time;
+				logger.debug("任务执行完成,{},{}", time, this.toString());
+			}else{
+				this.doRun();
+			}
 		}catch(ExException e){
 			Throwable cause = ExceptionUtils.getRootCause(e);
 			logger.error(e.toString(), cause);

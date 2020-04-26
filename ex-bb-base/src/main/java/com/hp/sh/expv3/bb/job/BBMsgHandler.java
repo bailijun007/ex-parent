@@ -14,6 +14,7 @@ import com.gitee.hupadev.commons.json.JsonUtils;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.module.msg.service.BBMessageExtService;
+import com.hp.sh.expv3.bb.module.msg.service.BBMessageOffsetService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
@@ -38,14 +39,21 @@ public class BBMsgHandler {
 	@Autowired
 	private BBMessageExtService msgService;
 	
-	private Map<Long,String> userErrorMap = new ConcurrentHashMap<Long,String>();
+	@Autowired
+	private BBMessageOffsetService offsetService;
+	
+	private Map<Object,Long> errorMsgMap = new ConcurrentHashMap<Object,Long>();
 
-	private int batchNum = 50;
+	private int batchNum = 1000;
+	
+	private Long shardId = null;
+
+	private Long startId = null;
 	
 	@LimitTimeHandle
 	public void handlePending() {
 		while(true){
-			List<BBMessageExt> list = this.msgService.findFirstList(batchNum);
+			List<BBMessageExt> list = this.msgService.findFirstList(batchNum, null, startId);
 			
 			if(list==null || list.isEmpty()){
 				break;
@@ -53,19 +61,25 @@ public class BBMsgHandler {
 			
 			for(BBMessageExt msg : list){
 				tradeExecutors.submit(new MsgTask(msg));
-				this.msgService.setStatus(msg.getUserId(), msg.getMsgId(), BBMessageExt.STATUS_RUNNING, "处理中");
 			}
 			
+			startId = list.get(list.size()-1) .getId();
 		}
 		
 	}
 	
-	private void handleOneMsg(BBMessageExt msgExt){
-		if(userErrorMap.containsKey(msgExt.getUserId())){
-			logger.error("用户存在出错未处理的消息{}", msgExt.getUserId());
-			msgService.setStatus(msgExt.getUserId(), msgExt.getMsgId(), BBMessageExt.STATUS_ERR, "用户存在出错未处理的消息:"+userErrorMap.get(msgExt.getUserId()));
-			return;
+	protected void handleMsgAndErr(BBMessageExt msgExt){
+		Long errMsgId = errorMsgMap.get(msgExt.getKeys());
+		if(errMsgId!=null){
+			this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, "前面存在未处理的消息:"+errMsgId);
+		}else{
+			this.handleMsg(msgExt);
 		}
+		
+	}
+	
+	private void handleMsg(BBMessageExt msgExt){
+		logger.info("task处理消息，{}", msgExt.getId());
 		try{
 			if(msgExt.getTags().equals(MqTags.TAGS_TRADE)){
 				BBTradeVo tradeMsg = JsonUtils.toObject(msgExt.getMsgBody(), BBTradeVo.class);
@@ -79,11 +93,11 @@ public class BBMsgHandler {
 			}else{
 				throw new RuntimeException("位置的tag类型!!! : " + msgExt.getTags());
 			}
-			msgService.delete(msgExt.getUserId(), msgExt.getMsgId());
+			msgService.delete(msgExt.getUserId(), msgExt.getId());
 		}catch(Exception e){
-			logger.error("[异步]处理消息失败 "+e.getMessage(), e);
-			userErrorMap.put(msgExt.getUserId(), msgExt.getMsgId());
-			msgService.setStatus(msgExt.getUserId(), msgExt.getMsgId(), BBMessageExt.STATUS_ERR, e.getMessage());
+			errorMsgMap.put(msgExt.getKeys(), msgExt.getId());
+			logger.error("[异步]处理消息失败 {},{}", e.getMessage(), e.toString(), e);
+			this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, e.getMessage());
 		}
 	}
 	
@@ -95,13 +109,18 @@ public class BBMsgHandler {
 			this.msg = msg;
 		}
 		
-		public int getKey(){
-			int key = msg.getUserId().hashCode();
-			return Math.abs(key);
+		public Object getKey(){
+			return msg.getShardId();
 		}
 
 		public void doRun() {
-			handleOneMsg(msg);
+			BBMsgHandler.this.handleMsgAndErr(msg);
+			offsetService.cacheShardOffset(msg.getShardId(), msg.getId());
+		}
+
+		@Override
+		public String toString() {
+			return "MsgTask [msg=" + msg + "]";
 		}
 
 	}

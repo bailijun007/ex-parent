@@ -1,9 +1,11 @@
 package com.hp.sh.expv3.bb.module.msg.entity;
 
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.hp.sh.expv3.base.entity.UserData;
+import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 /**
  * 币币_撮合消息
@@ -15,11 +17,13 @@ public class BBMessageExt implements UserData{
 	
 	public static final int STATUS_NEW = 0;
 
-	public static final int STATUS_RUNNING = 1;
-	
-	public static final int STATUS_FINISHED = 2;
+	public static final int STATUS_RETRY = 2;
 	
 	public static final int STATUS_ERR = 3;
+
+	public static final int STATUS_FINISHED = 4;
+	
+	private Long id;
 	
 	//msgId
 	@Id
@@ -43,13 +47,24 @@ public class BBMessageExt implements UserData{
 	//交易对（合约品种）
 	protected String symbol;
 	
-	private Long sortId;
-
 	// 创建时间
 	private Long created;
 	
+	//分片Id
+	private int shardId;
+	
 	private int status;
 	
+	@Id
+	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public BBMessageExt() {
 	}
 
@@ -125,20 +140,45 @@ public class BBMessageExt implements UserData{
 		this.symbol = symbol;
 	}
 
-	public Long getSortId() {
-		return sortId;
-	}
-
-	public void setSortId(Long sortId) {
-		this.sortId = sortId;
-	}
-
 	public int getStatus() {
 		return status;
 	}
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	public int getShardId() {
+		return shardId;
+	}
+
+	public void setShardId(int shardId) {
+		this.shardId = shardId;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((msgId == null) ? 0 : msgId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BBMessageExt other = (BBMessageExt) obj;
+		if (msgId == null) {
+			if (other.msgId != null)
+				return false;
+		} else if (!msgId.equals(other.msgId))
+			return false;
+		return true;
 	}
 
 }

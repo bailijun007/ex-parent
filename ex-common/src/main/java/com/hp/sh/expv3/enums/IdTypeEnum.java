@@ -37,6 +37,7 @@ public enum IdTypeEnum {
     BB_MATCHED_TRADE_ID(26),
     BB_COLLECTOR_ACCOUNT_RECORD_ID(27),
     BB_ACCOUNT_LOG_ID(28),
+    BB_MESSAGE_EXT_ID(29),
     
     //pc
     PC_TX_ID(30),

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.module.msg.dao.BBMessageOffsetDAO">
+
+	<resultMap type="com.hp.sh.expv3.bb.module.msg.entity.BBMessageOffset" id="BBMessageOffset">
+		<result column="shard_id" property="shardId" />
+		<result column="readed_offset" property="readedOffset" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		shard_id,readed_offset,modified
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="shardId!=null"> and shard_id=#{shardId}</if>
+		<if test="readedOffset!=null"> and readed_offset=#{readedOffset}</if>
+		<if test="modified!=null"> and modified=#{modified}</if>	</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from bb_message_offset
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="BBMessageOffset">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="BBMessageOffset">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="BBMessageOffset">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from bb_message_offset
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="BBMessageOffset">
+		select
+			<include refid="Base_Column_List" />
+		from bb_message_offset
+			where shard_id=#{shardId}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			bb_message_offset
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		insert into bb_message_offset (
+			shard_id,readed_offset,modified
+		)values(
+			#{shardId},#{readedOffset},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			bb_message_offset
+		set 
+			shard_id=#{shardId},readed_offset=#{readedOffset},modified=#{modified}
+		where 
+			shard_id=#{shardId}
+	</update>
+
+	<delete id="delete">
+        delete from bb_message_offset where shard_id=#{shardId}
+    </delete>
+
+    <delete id="condDelete">
+        delete from bb_message_offset
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+</mapper>

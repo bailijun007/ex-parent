@@ -41,24 +41,48 @@ public class MatchMqConsumer4Seq {
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(BBNotMatchMsg msg){
 		logger.info("收到撮合未成交消息:{}", msg);
-		msgService.saveNotMatchedMsg(MqTags.TAGS_NOT_MATCHED, msg);
-		msgHandleThreadJob.trigger();
+		try{
+			msgService.saveNotMatchedMsg(MqTags.TAGS_NOT_MATCHED, msg);
+			msgHandleThreadJob.trigger();
+		}catch(Exception e){
+			String s = e.getMessage();
+			if(s!=null && s.contains("Duplicate entry")){
+				if(msgService.existMsgId(msg.getAccountId(), msg.getMsgId())){
+					return;
+				}
+			}
+			throw e;
+		}
 	}
 	
 	//取消订单
 	@MQListener(tags=MqTags.TAGS_CANCELLED)
 	public void handleCancelledMsg(BBCancelledMsg msg){
 		logger.info("收到取消订单消息:{}", msg);
-		msgService.saveCancelIfNotExists(MqTags.TAGS_CANCELLED, msg, null);
-		msgHandleThreadJob.trigger();
+		boolean ok = msgService.saveCancelIfNotExists(MqTags.TAGS_CANCELLED, msg, null);
+		if(ok){
+			msgHandleThreadJob.trigger();
+		}else{
+			logger.warn("订单取消msg已存在："+msg.getOrderId());
+		}
 	}
 	
 	//成交
 	@MQListener(tags=MqTags.TAGS_TRADE)
 	public void handleTradeMsg(BBTradeVo msg){
 		logger.info("收到用户成交消息:{}", msg);
-		msgService.saveTradeMsg(MqTags.TAGS_TRADE, msg, null);
-		msgHandleThreadJob.trigger();
+		try{
+			msgService.saveTradeMsg(MqTags.TAGS_TRADE, msg, null);
+			msgHandleThreadJob.trigger();
+		}catch(Exception e){
+			String s = e.getMessage();
+			if(s!=null && s.contains("Duplicate entry")){
+				if(msgService.existMsgId(msg.getAccountId(), msg.getMsgId())){
+					return;
+				}
+			}
+			throw e;
+		}
 	}
 	
 	public static boolean isResendException(Exception e){

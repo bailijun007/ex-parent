@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hp.sh.expv3.config.db.shard;
+package com.hp.sh.expv3.config.shard;
 
 import java.util.ArrayList;
 import java.util.Collection;
