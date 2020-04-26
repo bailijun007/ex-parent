@@ -35,4 +35,6 @@ public interface PcOrderDAO {
     BigDecimal queryTotalFee(@Param("startTime") Long startTime,@Param("endTime") Long endTime);
 
     BigDecimal queryTotalOrder(@Param("startTime") Long startTime,@Param("endTime") Long endTime);
+
+    List<PcOrderVo> queryPcActivityOrder(Map<String, Object> map);
 }

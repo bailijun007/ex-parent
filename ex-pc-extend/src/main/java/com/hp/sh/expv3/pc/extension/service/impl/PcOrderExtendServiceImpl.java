@@ -4,6 +4,7 @@ import com.gitee.hupadev.base.api.PageResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hp.sh.expv3.pc.extension.constant.ExtCommonConstant;
+import com.hp.sh.expv3.pc.extension.constant.OrderStatus;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
@@ -188,7 +189,16 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("gtOrderId", gtOrderId);
         map.put("ltOrderId", ltOrderId);
         map.put("limit", count);
-        List<PcOrderVo> list = pcOrderDAO.queryOrderList(map);
+
+        List<PcOrderVo> list =null;
+        //如果状态为已取消 或者部分成交，则直接查bb_order表
+        if(statusList.contains(OrderStatus.CANCELED)||statusList.contains(OrderStatus.FILLED)){
+            map.put("activeFlag", IntBool.NO);
+            list = pcOrderDAO.queryOrderList(map);
+        }else {
+            map.put("activeFlag", IntBool.YES);
+            list = pcOrderDAO.queryPcActivityOrder(map);
+        }
         return list;
     }
 
