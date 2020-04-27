@@ -107,7 +107,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("asset", asset);
         map.put("symbol", symbol);
         map.put("bidFlag", bidFlag);
-        map.put("activeFlag", IntBool.YES);
+//        map.put("activeFlag", IntBool.YES);
         map.put("lastOrderId", lastOrderId);
 
         //总条数
