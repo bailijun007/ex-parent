@@ -8,16 +8,16 @@ import com.gitee.hupadev.commons.executor.orderly.KeyGroup;
 public class ShardGroup implements KeyGroup{
 	
 	public int getMsgSardId(Object key){
-		return getGroupId(key);
-	}
-
-	@Override
-	public int getGroupId(Object key) {
 		if(key==null){
 			return 0;
 		}
 		int index = Math.abs(key.hashCode()) % ShardConstant.SHARD_NUM;
 		return index;
+	}
+
+	@Override
+	public int getGroupId(Object shardId) {
+		return (int)shardId;
 	}
 
 }
