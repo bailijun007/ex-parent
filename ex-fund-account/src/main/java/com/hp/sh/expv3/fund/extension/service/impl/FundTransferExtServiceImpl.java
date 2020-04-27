@@ -41,6 +41,8 @@ public class FundTransferExtServiceImpl implements FundTransferExtService {
                 transferExtVo.setStatus(1);
             } else if (transferExtVo.getStatus() == FundTransferStatus.STATUS_FAIL) {
                 transferExtVo.setStatus(2);
+            }else {
+                transferExtVo.setStatus(3);
             }
         }
         Long count = fundTransferExtMapper.queryCount(userId, asset, queryId, pageStatus);

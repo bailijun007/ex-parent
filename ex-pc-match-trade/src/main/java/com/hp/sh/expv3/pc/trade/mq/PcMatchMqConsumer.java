@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.pc.trade.mq;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.hp.sh.expv3.config.redis.RedisUtil;
 import com.hp.sh.expv3.pc.trade.constant.MsgConstant;
 import com.hp.sh.expv3.pc.trade.pojo.PcMatchData;
@@ -20,8 +22,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
-public class BbMatchMqConsumer {
-    private static final Logger logger = LoggerFactory.getLogger(BbMatchMqConsumer.class);
+public class PcMatchMqConsumer {
+    private static final Logger logger = LoggerFactory.getLogger(PcMatchMqConsumer.class);
     @Autowired
     private PcMatchExtService bbMatchExtService;
 
@@ -37,13 +39,13 @@ public class BbMatchMqConsumer {
         String jsonString = JSON.toJSONString(msg);
         logger.info("收到pc_match撮合推送消息:{}", jsonString);
 
-        String str = "\"match\": [";
         List<PcMatchExtVo> match = null;
-        if (jsonString.contains(str)) {
+        Object json = JSONObject.parse(jsonString);
+        if (json instanceof JSONObject) {
             //对象格式
             PcMatchData bbMatchData = JSON.parseObject(jsonString, PcMatchData.class);
             match = bbMatchData.getMatch();
-        } else {
+        }else if (json instanceof JSONArray){
             //数组格式
             match = JSON.parseArray(jsonString, PcMatchExtVo.class);
         }

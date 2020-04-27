@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.bb.trade.mq;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.hp.sh.expv3.bb.trade.constant.MsgConstant;
 import com.hp.sh.expv3.bb.trade.pojo.BbMatchData;
@@ -39,13 +40,13 @@ public class BbMatchMqConsumer {
     public void handleMsg(Object msg) {
         logger.info("收到bb_match撮合推送消息:{}", msg);
         String jsonString = JSON.toJSONString(msg);
-        String str = "\"match\": [";
         List<BbMatchExtVo> match = null;
-        if (jsonString.contains(str)) {
+        Object json = JSONObject.parse(jsonString);
+        if (json instanceof JSONObject) {
             //对象格式
             BbMatchData bbMatchData = JSON.parseObject(jsonString, BbMatchData.class);
             match = bbMatchData.getMatch();
-        } else {
+        }else if (json instanceof JSONArray){
             //数组格式
             match = JSON.parseArray(jsonString, BbMatchExtVo.class);
         }
