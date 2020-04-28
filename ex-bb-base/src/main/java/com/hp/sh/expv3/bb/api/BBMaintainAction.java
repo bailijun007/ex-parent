@@ -16,7 +16,6 @@ import com.gitee.hupadev.commons.json.JsonUtils;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
-import com.hp.sh.expv3.bb.job.old.BBMatchedHandler;
 import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
@@ -24,7 +23,6 @@ import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
-import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqConsumer;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
@@ -44,9 +42,6 @@ public class BBMaintainAction{
 	
 	@Autowired
 	private BBOrderApiAction orderApiAction;
-	
-	@Autowired
-	private BBMatchedHandler matchedHandler;
 	
 	@Autowired
 	private OrderlyExecutors tradeExecutors;
@@ -242,12 +237,6 @@ public class BBMaintainAction{
 	@GetMapping(value = "/api/bb/maintain/sys/time")	
 	public Long sysTime(){
 		return System.currentTimeMillis();
-	}
-
-	@ApiOperation(value = "job")
-	@GetMapping(value = "/api/bb/maintain/job/handle")	
-	public void jobHandle(){
-		matchedHandler.handlePending();
 	}
 
 	@ApiOperation(value = "thead")

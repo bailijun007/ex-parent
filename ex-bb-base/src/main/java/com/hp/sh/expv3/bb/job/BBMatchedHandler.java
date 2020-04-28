@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.job.old;
+package com.hp.sh.expv3.bb.job;
 
 import java.util.List;
 
@@ -22,6 +22,7 @@ import com.hp.sh.expv3.dev.LimitTimeHandle;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 
+@Deprecated
 @Component
 public class BBMatchedHandler {
     private static final Logger logger = LoggerFactory.getLogger(BBMatchedHandler.class);
