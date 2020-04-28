@@ -16,8 +16,8 @@ import com.hp.sh.expv3.bb.msg.EventMsg;
 
 
 @Component
-public class BBSender {
-	private static final Logger logger = LoggerFactory.getLogger(BBSender.class);
+public class BBPublisher {
+	private static final Logger logger = LoggerFactory.getLogger(BBPublisher.class);
 
 	@Autowired
 	private RedisPublisher publisher;

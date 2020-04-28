@@ -94,9 +94,6 @@ public class BBCommonOrderStrategy implements OrderStrategy {
 
 	/**
 	 * 计算本单的各项数据
-	 * @param order
-	 * @param tradeVo
-	 * @param pcPosition
 	 * @return
 	 */
 	public TradeResult calcTradeResult(BBTradeVo tradeVo, BBOrder order){

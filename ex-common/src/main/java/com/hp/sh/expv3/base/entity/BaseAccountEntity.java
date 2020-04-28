@@ -17,10 +17,10 @@ public abstract class BaseAccountEntity implements UserData, Serializable{
 	public static final String USERID_PROPERTY = "userId";
 	
 	// 创建时间
-	private Long created;
+	protected Long created;
 	
 	// 修改时间
-	private Long modified;
+	protected Long modified;
 
 	public Long getCreated() {
 		return created;

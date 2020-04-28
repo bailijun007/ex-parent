@@ -11,6 +11,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.hp.sh.expv3.error.ExCommonError;
+import com.hp.sh.expv3.error.ExSysError;
 
 @EnableDiscoveryClient
 @ComponentScan("com.hp.sh.expv3")
@@ -30,6 +31,7 @@ public class ExBBBaseApplication {
 		logger.warn("===========profile:{}============", profile);
 		try{
 			logger.warn("{}", ExCommonError.REPEAT_ORDER.getMessage());
+			logger.warn("{}", ExSysError.UPDATED_ERR.getMessage());
 		}catch(Exception e){
 			logger.error(e.getMessage(), e);
 		}

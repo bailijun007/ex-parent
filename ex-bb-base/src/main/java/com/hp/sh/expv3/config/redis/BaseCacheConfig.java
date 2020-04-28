@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -19,15 +20,13 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
-import com.gitee.hupadev.commons.cache.JsonCacheSerializer;
 import com.gitee.hupadev.commons.cache.RedisCache;
 import com.gitee.hupadev.commons.cache.RedisPool;
-import com.gitee.hupadev.commons.cache.RedisPublisher;
 
 @EnableCaching
 @Configuration
-public class RedisConfig {
-    private static final Logger logger = LoggerFactory.getLogger(RedisConfig.class);
+public class BaseCacheConfig {
+    private static final Logger logger = LoggerFactory.getLogger(BaseCacheConfig.class);
 
 	@Primary
 	@Bean
@@ -47,25 +46,17 @@ public class RedisConfig {
 		return cacheManager;
 	}
 
-	@Bean
-	@ConfigurationProperties(prefix = "redis")
-	public RedisPool redisPool() {
+	@Bean("baseRedisPool")
+	@ConfigurationProperties(prefix = "base.redis")
+	public RedisPool baseRedisPool() {
 		return new RedisPool();
 	}
 
 	@Lazy
 	@Bean
-	public RedisCache redisCache(RedisPool redisPool) {
+	public RedisCache redisCache(@Qualifier("baseRedisPool") RedisPool redisPool) {
 		RedisCache rc = new RedisCache(redisPool);
 		return rc;
-	}
-	
-	@Bean
-	public RedisPublisher redisPublisher(RedisPool redisPool){
-		JsonCacheSerializer jsonCs = new JsonCacheSerializer();
-		RedisPublisher rp = new RedisPublisher(redisPool);
-		rp.setCacheSerializer(jsonCs);
-		return rp;
 	}
 	
 }

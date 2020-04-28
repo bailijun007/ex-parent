@@ -114,7 +114,7 @@
         <file>${log_dir}/mq.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
-            <fileNamePattern>${log_dir}/pcNotify/pcNotify-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <fileNamePattern>${log_dir}/mq/mq-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
             <!-- 日志最大的历史 60天 -->
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -171,6 +171,7 @@
 	        <appender-ref ref="INFO"/>
 	        <appender-ref ref="DEBUG"/>
         </root>
+        <logger name="com.hp.sh.expv3.commons.lock" level="debug"></logger>
     </springProfile>
     
     <springProfile name="dev">
@@ -181,12 +182,15 @@
 	        <appender-ref ref="ERROR"/>
 	        <appender-ref ref="WARN"/>
 	        <appender-ref ref="INFO"/>
+	        <appender-ref ref="DEBUG"/>
         </root>
         
         <logger name="com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService" level="info">
         	<appender-ref ref="INFO"/>
         	 <appender-ref ref="SP"/>
         </logger>
+        
+        <logger name="com.hp.sh.expv3.commons.lock" level="debug"></logger>
         
 		<logger name="com.hp.sh.expv3" level="debug"></logger>
 		<logger name="com.gitee.hupadev.base.spring.interceptor" level="debug"></logger>
@@ -204,6 +208,8 @@
         <logger name="com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService" level="info">
         	 <appender-ref ref="SP"/>
         </logger>
+        
+        <logger name="com.hp.sh.expv3.commons.lock" level="debug"></logger>
         
 		<logger name="com.hp.sh.expv3" level="debug"></logger>
 		<logger name="com.gitee.hupadev.base.spring.interceptor" level="info"></logger>
