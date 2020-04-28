@@ -39,4 +39,8 @@ public interface PcOrderExtendService {
     PageResult<PcOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, Integer isPageYes);
 
     PageResult<PcOrderVo> queryActivityOrder(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber);
+
+    BigDecimal queryTotalFee(Long startTime, Long endTime);
+
+    BigDecimal queryTotalOrder(Long startTime, Long endTime);
 }

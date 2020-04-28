@@ -20,11 +20,7 @@ public class ExBBMatchTradeApplication {
     private static final Logger logger = LoggerFactory.getLogger(ExBBMatchTradeApplication.class);
 
     public static void main(String[] args) throws Exception {
-        final ConfigurableApplicationContext ac = SpringApplication.run(ExBBMatchTradeApplication.class, args);
-
-//        final BbKlineHistoryCalcByTradeFromExpService bbKlineHistoryCalcByTradeFromExpService = ac.getBean(BbKlineHistoryCalcByTradeFromExpService.class);
-//        bbKlineHistoryCalcByTradeFromExpService.execute();
-
+         SpringApplication.run(ExBBMatchTradeApplication.class, args);
     }
 
     @Value("${spring.profiles.active:}")

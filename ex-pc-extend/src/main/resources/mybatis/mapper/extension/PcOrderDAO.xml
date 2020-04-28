@@ -174,6 +174,7 @@
             <if test="userId!=null">
                 and user_id=#{userId}
             </if>
+            <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
             <if test="gtOrderId!=null">
                 and id &gt;#{gtOrderId}
                 ORDER BY id asc
@@ -309,7 +310,17 @@
         <where>
             <if test="userId!=null">and ao.user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
+            <if test="assetList!=null">and ao.asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
             <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
+            <if test="symbolList!=null">and ao.symbol in
+                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
+                    #{symbolList[${i}]}
+                </foreach>
+            </if>
             <if test="visibleFlag!=null">and o.visible_flag=#{visibleFlag}</if>
             <if test="clientOrderId!=null and clientOrderId!=''">and o.client_order_id=#{clientOrderId}</if>
             <if test="closeFlag!=null">and o.close_flag=#{closeFlag}</if>
@@ -318,6 +329,11 @@
             <if test="timeInForce!=null">and o.time_in_force=#{timeInForce}</if>
             <if test="marginMode!=null">and o.margin_mode=#{marginMode}</if>
             <if test="status!=null">and o.status=#{status}</if>
+            <if test="statusList!=null">and o.status in
+                <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
+                    #{statusList[${i}]}
+                </foreach>
+            </if>
             <if test="activeFlag!=null">and o.active_flag=#{activeFlag}</if>
             <if test="cancelTimeStart!=null">and o.cancel_time &gt;= #{cancelTimeStart}</if>
             <if test="cancelTimeEnd!=null">and o.cancel_time &lt;= #{cancelTimeEnd}</if>
@@ -359,5 +375,62 @@
             LIMIT 0,${limit}
         </if>
     </select>
+
+    <select id="queryTotalFee" resultType="java.math.BigDecimal">
+        select SUM(fee_cost) from pc_order
+        where created &gt;=#{startTime}
+        and created&lt;=#{endTime}
+    </select>
+
+    <select id="queryTotalOrder" resultType="java.math.BigDecimal">
+         select count(1) from pc_order
+        where created &gt;=#{startTime}
+        and created&lt;=#{endTime}
+    </select>
+
+    <select id="queryPcActivityOrder" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
+        SELECT
+        o.*
+        FROM
+        pc_active_order ao
+        LEFT JOIN
+        pc_order o ON o.id = ao.id
+        <where>
+            <if test="userId!=null">ao.user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
+            <if test="assetList!=null">and ao.asset in
+                <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
+                    #{assetList[${i}]}
+                </foreach>
+            </if>
+            <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
+            <if test="symbolList!=null">and ao.symbol in
+                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
+                    #{symbolList[${i}]}
+                </foreach>
+            </if>
+            <if test="statusList!=null">and o.status in
+                <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
+                    #{statusList[${i}]}
+                </foreach>
+            </if>
+            <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
+
+            <if test="gtOrderId!=null">
+                and ao.id &gt;#{gtOrderId}
+                ORDER BY ao.id asc
+            </if>
+
+            <if test="ltOrderId!=null">
+                and ao.id &lt;#{ltOrderId}
+                ORDER BY ao.id desc
+            </if>
+            <if test="ltOrderId==null and gtOrderId==null">
+                ORDER BY ao.id desc
+            </if>
+        </where>
+        LIMIT 0,${limit}
+    </select>
+
 
 </mapper>

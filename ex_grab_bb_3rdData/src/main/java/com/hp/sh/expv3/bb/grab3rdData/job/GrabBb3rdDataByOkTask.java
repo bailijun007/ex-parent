@@ -23,6 +23,9 @@ import redis.clients.jedis.Pipeline;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +94,7 @@ public class GrabBb3rdDataByOkTask {
                 Request request = new Request.Builder().get().url(okHttpsUrl).build();
                 Call call = client.newCall(request);
                 try {
+                    TimeUnit.SECONDS.sleep(1);
                     Response response = call.execute();
                     String string = response.body().string();
                     List<OkResponseEntity> list = JSON.parseArray(string, OkResponseEntity.class);
@@ -101,16 +105,38 @@ public class GrabBb3rdDataByOkTask {
                             String okSymbol = okResponseEntity.getProduct_id();
                             if (okRedisKeysMap.containsKey(okSymbol)) {
                                 String key = okHttpsRedisKey + okSymbol;
-                                String value = okResponseEntity.getLast() + "";
+                                long timestamp = System.currentTimeMillis();
+                                String value = okResponseEntity.getLast() + "&" + timestamp;
                                 if (null != value || !"".equals(value)) {
-                                    map.put(key, value);
+                                    String lastValue = metadataDb5RedisUtil.get(key);
+                                   if(null==lastValue||"".equals(lastValue)){
+                                       map.put(key, value);
+                                       continue;
+                                   }
+                                    String[] split = lastValue.split("&");
+                                    BigDecimal lastPrice = new BigDecimal(split[0]);
+                                    String[] currentSplit = value.split("&");
+                                    BigDecimal currentPrice = new BigDecimal(currentSplit[0]);
+                                    if (split.length == 1) {
+                                        //当前价格跟最后更新价格不一样时， 才进行更新操作
+                                        if (currentPrice.compareTo(lastPrice) != 0) {
+                                            map.put(key, value);
+                                        }
+                                    } else if (split.length == 2) {
+                                        LocalDateTime now = Instant.ofEpochMilli(Long.parseLong(currentSplit[1])).atZone(ZoneOffset.systemDefault()).toLocalDateTime();
+                                        //当前价格跟最后更新价格不一样时，并且当前时间在15分钟内， 才进行更新操作
+                                        if (currentPrice.compareTo(lastPrice) != 0 && now.plusMinutes(15).compareTo(now) >= 0) {
+                                            map.put(key, value);
+                                        }
+                                    }
+//                                    map.put(key, value);
                                 }
                             }
                         }
                         //批量保存
                         metadataDb5RedisUtil.mset(map);
                         originaldataDb5RedisUtil.mset(map);
-                        TimeUnit.SECONDS.sleep(1);
+
                     }
                 } catch (Exception e) {
                     logger.error("通过https请求获取ok交易所最新成交价定时任务报错！，cause()={},message={}", e.getCause(), e.getMessage());

@@ -302,6 +302,22 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         return result;
     }
 
+    @Override
+    public BigDecimal queryTotalFee(Long startTime, Long endTime) {
+        if (startTime == null || endTime == null ) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        return pcOrderExtendService.queryTotalFee(startTime,endTime);
+    }
+
+    @Override
+    public BigDecimal queryTotalOrder(Long startTime, Long endTime) {
+        if (startTime == null || endTime == null ) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        return pcOrderExtendService.queryTotalOrder(startTime,endTime);
+    }
+
 
     private void checkParam(Long userId, String asset, Integer currentPage, Integer pageSize, Integer nextPage) {
         if (StringUtils.isEmpty(asset) || null == userId || currentPage == null || pageSize == null || nextPage == null) {

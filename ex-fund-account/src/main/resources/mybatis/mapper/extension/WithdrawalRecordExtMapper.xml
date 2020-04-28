@@ -166,4 +166,8 @@
         ORDER BY id desc
     </select>
 
+    <select id="queryTotalNumber" resultType="java.math.BigDecimal">
+        SELECT SUM(amount)  from withdrawal_record w where w.asset=#{asset} and w.pay_status=#{payStatus};
+    </select>
+
 </mapper>

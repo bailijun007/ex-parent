@@ -29,4 +29,6 @@ public interface WithdrawalRecordExtMapper {
 
 
     List<WithdrawalRecordByAdmin> queryHistoryByAdmin(@Param("userId") Long userId,@Param("asset") String asset,@Param("approvalStatus")  Integer approvalStatus,@Param("payStatus")Integer payStatus);
+
+    BigDecimal queryTotalNumber(@Param("asset") String asset, @Param("payStatus")  Integer payStatus);
 }

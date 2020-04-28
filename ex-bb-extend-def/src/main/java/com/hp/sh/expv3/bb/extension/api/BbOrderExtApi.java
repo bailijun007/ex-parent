@@ -11,6 +11,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -91,5 +92,21 @@ public interface BbOrderExtApi {
                                      @RequestParam(value = "ltOrderId", required = false) Long ltOrderId, @RequestParam("count") Integer count,
                                      @RequestParam("status") String status);
 
+
+    @ApiOperation(value = "查询当天平台实收币币手续费共计")
+    @GetMapping(value = "/api/bb/order/ext/queryTotalFee")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true),
+            @ApiImplicitParam(name = "endTime ", value = "结束时间 ", required = true)
+    })
+    BigDecimal queryTotalFee(@RequestParam("startTime") Long startTime, @RequestParam("endTime") Long endTime);
+
+    @ApiOperation(value = "查询当天平台实收币币交易订单数")
+    @GetMapping(value = "/api/bb/order/ext/queryTotalOrder")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true),
+            @ApiImplicitParam(name = "endTime ", value = "结束时间 ", required = true)
+    })
+    BigDecimal queryTotalOrder(@RequestParam("startTime") Long startTime, @RequestParam("endTime") Long endTime);
 
 }

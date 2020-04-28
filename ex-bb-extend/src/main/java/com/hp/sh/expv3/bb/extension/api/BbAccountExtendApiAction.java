@@ -28,10 +28,10 @@ public class BbAccountExtendApiAction implements BbAccountExtendApi {
     public void createBBAccount(Long userId, String asset) {
         checkParam(userId, asset);
         //查询账户是否存在
-         Boolean exist = this.bbAccountExist(userId, asset);
-         if(exist){
-             throw new ExException(BbExtCommonErrorCode.ACCOUNT_ALREADY_EXISTS);
-         }
+        Boolean exist = this.bbAccountExist(userId, asset);
+        if (exist) {
+            throw new ExException(BbExtCommonErrorCode.ACCOUNT_ALREADY_EXISTS);
+        }
         //创建bb账户
         bbAccountExtService.createBBAccount(userId, asset);
     }
@@ -81,5 +81,11 @@ public class BbAccountExtendApiAction implements BbAccountExtendApi {
             throw new ExException(BbExtCommonErrorCode.ACCOUNT_DOES_NOT_EXIST);
         }
         return bbAccount.getBalance();
+    }
+
+    @Override
+    public BigDecimal queryTotalNumber(String asset) {
+        BigDecimal total = bbAccountExtService.queryTotalNumber(asset);
+        return total;
     }
 }

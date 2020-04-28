@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 
 import com.hp.sh.expv3.bb.extension.vo.BbAccountExtVo;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountVo;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,5 +45,11 @@ public interface BbAccountExtendApi {
     @GetMapping(value = "/api/bb/trade/ext/getBalance")
     BigDecimal getBalance(@RequestParam(value = "userId") Long userId, @RequestParam("asset") String asset);
 
+    @ApiOperation("根据币种查询平台所有用户的币币账户总额")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true)
+    })
+    @GetMapping(value = "/api/extension/bbAccount/queryTotalNumber")
+    public BigDecimal queryTotalNumber(@RequestParam(value = "asset") String asset);
 
 }

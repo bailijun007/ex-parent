@@ -1,6 +1,6 @@
 package com.hp.sh.expv3.pc.trade.service.impl;
 
-import com.hp.sh.expv3.pc.trade.service.SupportBbGroupIdsJobService;
+import com.hp.sh.expv3.pc.trade.service.SupportPcGroupIdsJobService;
 import com.hp.sh.expv3.pc.trade.pojo.BBSymbol;
 import com.hp.sh.expv3.pc.trade.pojo.PcSymbol;
 import com.hp.sh.expv3.config.redis.RedisUtil;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * @author BaiLiJun  on 2020/3/18
  */
 @Service
-public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobService {
+public class SupportPcGroupIdsJobServiceImpl implements SupportPcGroupIdsJobService {
     @Autowired
     @Qualifier("metadataRedisUtil")
     private RedisUtil metadataRedisUtil;
@@ -59,9 +59,7 @@ public class SupportBbGroupIdsJobServiceImpl implements SupportBbGroupIdsJobServ
     }
 
 
-    /**
-     * @return USDT__ETC_USDT
-     */
+    @Override
     public List<BBSymbol> getSymbols() {
         List<BBSymbol> list = new CopyOnWriteArrayList<>();
         if (!CollectionUtils.isEmpty(map)) {

@@ -5,6 +5,7 @@ import com.hp.sh.expv3.pc.extension.vo.PcAccountVo;
 import org.apache.ibatis.annotations.Param;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -22,4 +23,5 @@ public interface PcAccountDAO {
     public PcAccountVo queryOne(Map<String,Object> params);
 
 
+    BigDecimal queryTotalNumber( @Param("asset") String asset);
 }

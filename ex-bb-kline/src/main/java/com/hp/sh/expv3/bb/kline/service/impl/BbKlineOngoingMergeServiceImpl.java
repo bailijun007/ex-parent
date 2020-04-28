@@ -71,22 +71,13 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     private List<Integer> supportFrequence = new CopyOnWriteArrayList<>();
 
 
-    private static ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
-            1,
-            1,
-            0, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(20000000),
-            Executors.defaultThreadFactory(),
-            new ThreadPoolExecutor.DiscardOldestPolicy()
-    );
-
     @Scheduled(cron = "*/1 * * * * *")
     public void satrt() {
         //  ongoingMergeEnable=1
         if (1 != ongoingMergeEnable) {
             return;
         } else {
-            threadPool.execute(() -> mergeKlineData());
+            mergeKlineData();
         }
     }
 
@@ -94,10 +85,6 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
     @Override
     public void mergeKlineData() {
         List<BBSymbol> targetBbSymbols = BBKlineUtil.listSymbols(supportBbGroupIdsJobService, supportBbGroupIds);
-
-//        List<BBSymbol> bbSymbols = BBKlineUtil.listSymbol(metadataRedisUtil);
-//        List<BBSymbol> targetBbSymbols = BBKlineUtil.filterBbSymbols(bbSymbols,supportBbGroupIds);
-
 
         // 谁由谁触发
         TreeMap<Integer, Integer> tar2TriggerFrequence = buildTargetFrequence2TriggerFrequence(supportFrequence);
@@ -109,7 +96,6 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
             final String symbol = bbSymbol.getSymbol();
             for (Integer triggerFreq : supportFrequence) {
                 String triggerRedisKey = BbKlineRedisKeyUtil.buildKlineUpdateEventRedisKey(updateEventPattern, asset, symbol, triggerFreq);
-//                String triggerRedisKey = buildKlineSaveRedisKey(asset, symbol, triggerFreq);
                 final Set<Tuple> triggers = bbKlineOngoingRedisUtil.zpopmin(triggerRedisKey, triggerBatchSize);
                 final TreeSet<Integer> targetFreqs = trigger2TarFrequence.get(triggerFreq);
                 if (null == targetFreqs) {
@@ -259,7 +245,7 @@ public class BbKlineOngoingMergeServiceImpl implements BbKlineOngoingMergeServic
      * @param targetFreq
      * @return
      */
-    private Long[] getStartEndMs(long ms, Integer triggerFreq, Integer targetFreq) {
+    private Long[]  getStartEndMs(long ms, Integer triggerFreq, Integer targetFreq) {
         final long divisor = TimeUnit.MILLISECONDS.toMinutes(ms) / targetFreq;
         return new Long[]{
                 TimeUnit.MINUTES.toMillis(divisor * targetFreq),

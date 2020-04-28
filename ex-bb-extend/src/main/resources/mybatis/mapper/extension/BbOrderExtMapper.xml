@@ -103,27 +103,26 @@
     </select>
 
     <select id="queryBbActiveOrdersByIsNextPage" resultMap="BbOrderVo">
-        select
-        <include refid="Base_Column_List"/>
-        from bb_order
+        SELECT
+        o.*
+        FROM
+        bb_active_order ao
+        LEFT JOIN
+        bb_order o ON o.id = ao.id
         <where>
 
-            <if test="activeFlag!=null">
-                active_flag=#{activeFlag}
-            </if>
             <if test="userId!=null">
-                and user_id=#{userId}
+                ao.user_id=#{userId}
             </if>
             <if test="asset!=null and asset!=''">
-                and asset=#{asset}
+                and ao.asset=#{asset}
             </if>
             <if test="symbol!=null and symbol!=''">
-                and symbol=#{symbol}
+                and ao.symbol=#{symbol}
             </if>
             <if test="bidFlag!=null">
-                and bid_flag=#{bidFlag}
+                and ao.bid_flag=#{bidFlag}
             </if>
-
             <choose>
                 <when test="nextPage==1 and limit!=null and lastOrderId!=null">
                     and id &lt; #{lastOrderId}
@@ -220,7 +219,6 @@
             <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
             <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
             <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
-            <if test="activeFlag!=null">and o.active_flag=#{activeFlag}</if>
             <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
         </where>
         ORDER BY ao.id desc
@@ -299,6 +297,7 @@
 			ao.user_id=#{userId}
             and o.order_margin_currency=#{asset}
     </select>
+
     <select id="queryBbActiveOrders" resultType="com.hp.sh.expv3.bb.extension.vo.BbOrderVo">
         SELECT
         o.*
@@ -342,6 +341,16 @@
             </if>
         </where>
         LIMIT 0,${limit}
+    </select>
+
+    <select id="queryTotalFee" resultType="java.math.BigDecimal">
+        select SUM(fee_cost) from bb_order
+        where created&gt;=#{startTime}
+        and created&lt;=#{endTime}
+    </select>
+
+    <select id="queryTotalOrder" resultType="java.math.BigDecimal">
+      select count(1) from bb_order where created&gt;=#{startTime} and created&lt;=#{endTime}
     </select>
 
 </mapper>

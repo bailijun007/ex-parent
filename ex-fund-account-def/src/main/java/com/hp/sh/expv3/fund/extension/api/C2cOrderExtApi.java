@@ -94,4 +94,15 @@ public interface C2cOrderExtApi {
                                                           @RequestParam("pageNo")  Integer pageNo,@RequestParam("pageSize")  Integer pageSize);
 
 
+    @ApiOperation("根据币种和类型查询平台所有用户的C2C入金（出金）总数量")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "type", value = "1:入金，-1:出金", example = "1", required = true),
+            @ApiImplicitParam(name = "payStatus", value = "执行状态:0-待支付，1-支付成功，2-支付失败，3:已取消", example = "1", required = true)
+    })
+    @GetMapping(value = "/api/extension/c2cOrder/depositOrWithdrawal/queryTotalNumber")
+    public BigDecimal queryTotalNumber(@RequestParam(value = "asset") String asset,
+                                       @RequestParam(value = "type") Integer type,
+                                       @RequestParam(value = "payStatus") Integer payStatus);
+
 }

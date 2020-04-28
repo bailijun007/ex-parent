@@ -33,4 +33,8 @@
         <include refid="simple_where"/>
     </select>
 
+    <select id="queryTotalNumber" resultType="java.math.BigDecimal">
+      SELECT SUM(balance)  from fund_account f where f.asset=#{asset}
+    </select>
+
 </mapper>

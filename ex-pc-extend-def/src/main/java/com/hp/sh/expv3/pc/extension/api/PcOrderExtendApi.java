@@ -10,6 +10,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -141,4 +142,20 @@ public interface PcOrderExtendApi {
 
 
 
+    @ApiOperation(value = "查询当天平台实收合约手续费总计")
+    @GetMapping(value = "/api/extension/pc/order/queryTotalFee")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true),
+            @ApiImplicitParam(name = "endTime ", value = "结束时间 ", required = true)
+    })
+    BigDecimal queryTotalFee(@RequestParam("startTime") Long startTime,@RequestParam("endTime") Long endTime);
+
+
+    @ApiOperation(value = "查询当天平台实收合约交易订单数")
+    @GetMapping(value = "/api/extension/pc/order/queryTotalOrder")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true),
+            @ApiImplicitParam(name = "endTime ", value = "结束时间 ", required = true)
+    })
+    BigDecimal queryTotalOrder(@RequestParam("startTime") Long startTime, @RequestParam("endTime") Long endTime);
 }

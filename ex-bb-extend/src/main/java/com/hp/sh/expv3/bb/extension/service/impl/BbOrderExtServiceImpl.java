@@ -107,7 +107,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("asset", asset);
         map.put("symbol", symbol);
         map.put("bidFlag", bidFlag);
-        map.put("activeFlag", IntBool.YES);
+//        map.put("activeFlag", IntBool.YES);
         map.put("lastOrderId", lastOrderId);
 
         //总条数
@@ -189,5 +189,20 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     public List<BbOrderVo> queryByIds(List<Long> refIds) {
 
         return bbOrderExtMapper.queryByIds(refIds);
+    }
+
+    @Override
+    public BigDecimal queryTotalFee(Long startTime, Long endTime) {
+        BigDecimal total=  bbOrderExtMapper.queryTotalFee(startTime,endTime);
+        if(null==total){
+            return BigDecimal.ZERO;
+        }
+        return total;
+    }
+
+    @Override
+    public BigDecimal queryTotalOrder(Long startTime, Long endTime) {
+        BigDecimal total=  bbOrderExtMapper.queryTotalOrder(startTime,endTime);
+        return total;
     }
 }

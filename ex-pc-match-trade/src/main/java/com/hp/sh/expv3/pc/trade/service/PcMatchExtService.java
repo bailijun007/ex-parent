@@ -10,5 +10,5 @@ import java.util.List;
  * @author BaiLiJun  on 2020/3/31
  */
 public interface PcMatchExtService {
-    void batchSave(List<PcMatchExtVo> trades, String table);
+    int batchSave(List<PcMatchExtVo> trades, String table);
 }

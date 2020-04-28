@@ -31,6 +31,9 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -139,9 +142,31 @@ public class GrabBb3rdDataByZbTask {
                 String key = wssRedisKey + hashKey;
                 ZbTickerData ticker = tickerData.getTicker();
                 if (null != ticker && zbRedisKeysMap.containsKey(hashKey)) {
-                    String value = ticker.getLast() + "";
-                    map.put(key, value);
-                    if (map.size() == 8) {
+                    long timestamp = System.currentTimeMillis();
+                    String value = ticker.getLast() + "&" + timestamp;
+                    String lastValue = metadataDb5RedisUtil.get(key);
+                    if(null==lastValue||"".equals(lastValue)){
+                        map.put(key, value);
+                        continue;
+                    }
+                    String[] split = lastValue.split("&");
+                    BigDecimal lastPrice = new BigDecimal(split[0]);
+                    String[] currentSplit = value.split("&");
+                    BigDecimal currentPrice = new BigDecimal(currentSplit[0]);
+                    if (split.length == 1) {
+                        //当前价格跟最后更新价格不一样时， 才进行更新操作
+                        if (currentPrice.compareTo(lastPrice) != 0) {
+                            map.put(key, value);
+                        }
+                    } else if (split.length == 2) {
+                        LocalDateTime now = Instant.ofEpochMilli(Long.parseLong(currentSplit[1])).atZone(ZoneOffset.systemDefault()).toLocalDateTime();
+                        //当前价格跟最后更新价格不一样时，并且当前时间在15分钟内， 才进行更新操作
+                        if (currentPrice.compareTo(lastPrice) != 0 && now.plusMinutes(15).compareTo(now) >= 0) {
+                            map.put(key, value);
+                        }
+                    }
+
+                    if (map.size() == 4) {
                         originaldataDb5RedisUtil.mset(map);
                         metadataDb5RedisUtil.mset(map);
                         map.clear();
@@ -150,6 +175,7 @@ public class GrabBb3rdDataByZbTask {
             }
         });
     }
+
 
 
     @Scheduled(cron = "*/1 * * * * *")
@@ -187,9 +213,31 @@ public class GrabBb3rdDataByZbTask {
                 ZbTickerData zbTickerData = JSON.parseObject(entryValue.toString(), ZbTickerData.class);
                 if (zbRedisKeysMap.containsKey(entry.getKey())) {
                     String key = httpsRedisKey + entry.getKey();
-                    String value = zbTickerData.getLast() + "";
+                    long timestamp = System.currentTimeMillis();
+                    String value = zbTickerData.getLast() + "&"+timestamp;
                     if (null != value || !"".equals(value)) {
-                        map.put(key, value);
+                        String lastValue = metadataDb5RedisUtil.get(key);
+                        if(null==lastValue||"".equals(lastValue)){
+                            map.put(key, value);
+                            continue;
+                        }
+                        String[] split = lastValue.split("&");
+                        BigDecimal lastPrice = new BigDecimal(split[0]);
+                        String[] currentSplit = value.split("&");
+                        BigDecimal currentPrice = new BigDecimal(currentSplit[0]);
+                        if (split.length == 1) {
+                            //当前价格跟最后更新价格不一样时， 才进行更新操作
+                            if (currentPrice.compareTo(lastPrice) != 0) {
+                                map.put(key, value);
+                            }
+                        } else if (split.length == 2) {
+                            LocalDateTime now = Instant.ofEpochMilli(Long.parseLong(currentSplit[1])).atZone(ZoneOffset.systemDefault()).toLocalDateTime();
+                            //当前价格跟最后更新价格不一样时，并且当前时间在15分钟内， 才进行更新操作
+                            if (currentPrice.compareTo(lastPrice) != 0 && now.plusMinutes(15).compareTo(now) >= 0) {
+                                map.put(key, value);
+                            }
+                        }
+//                        map.put(key, value);
                     }
                 }
             }

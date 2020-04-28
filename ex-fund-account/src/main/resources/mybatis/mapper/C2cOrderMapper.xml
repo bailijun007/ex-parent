@@ -364,4 +364,8 @@
         where user_id=#{userId} and sn=#{sn}
     </select>
 
+    <select id="queryTotalNumber" resultType="java.math.BigDecimal">
+        SELECT SUM(volume)  from c2c_order c where c.exchange_currency=#{asset} and c.type=#{type} and c.pay_status=#{payStatus}
+    </select>
+
 </mapper>

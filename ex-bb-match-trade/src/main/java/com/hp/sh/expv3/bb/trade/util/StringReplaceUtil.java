@@ -9,7 +9,7 @@ import java.util.Map;
 public class StringReplaceUtil {
 
     public static final String replace(String pattern, Map<String, String> values) {
-        StringSubstitutor ss = new StringSubstitutor(values, "#{", "}");
+        StringSubstitutor ss = new StringSubstitutor(values, "%{", "}");
         return ss.replace(pattern);
     }
 

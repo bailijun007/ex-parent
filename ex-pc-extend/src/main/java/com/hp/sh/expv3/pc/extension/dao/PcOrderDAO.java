@@ -31,4 +31,10 @@ public interface PcOrderDAO {
 	List<PcOrderVo> queryNextList(Map<String, Object> map);
 
     List<PcOrderVo> queryActivityOrder(Map<String, Object> map);
+
+    BigDecimal queryTotalFee(@Param("startTime") Long startTime,@Param("endTime") Long endTime);
+
+    BigDecimal queryTotalOrder(@Param("startTime") Long startTime,@Param("endTime") Long endTime);
+
+    List<PcOrderVo> queryPcActivityOrder(Map<String, Object> map);
 }

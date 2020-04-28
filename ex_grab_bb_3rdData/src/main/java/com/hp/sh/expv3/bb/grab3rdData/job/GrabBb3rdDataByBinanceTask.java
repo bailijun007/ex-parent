@@ -28,6 +28,9 @@ import redis.clients.jedis.Pipeline;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,21 +115,37 @@ public class GrabBb3rdDataByBinanceTask {
                             String expBbSymbol = bbSymbol.getSymbol().split("_")[0] + bbSymbol.getSymbol().split("_")[1];
                             String binanceBbSymbol = responseData.getS();
                             if (expBbSymbol.equals(binanceBbSymbol)) {
+                                long timestamp = System.currentTimeMillis();
                                 String key = wssRedisKey + binanceBbSymbol;
-                                map.put(key,responseData.getC()+"");
+                                 String value = responseData.getC() + "&" + timestamp;
+                                String lastValue = metadataDb5RedisUtil.get(key);
+                                if(null==lastValue||"".equals(lastValue)){
+                                    map.put(key, value);
+                                    continue;
+                                }
+                                String[] split = lastValue.split("&");
+                                BigDecimal lastPrice = new BigDecimal(split[0]);
+
+                                String[] currentSplit = value.split("&");
+                                BigDecimal currentPrice = new BigDecimal(currentSplit[0]);
+                                if (split.length == 1) {
+                                    //当前价格跟最后更新价格不一样时， 才进行更新操作
+                                    if (currentPrice.compareTo(lastPrice) != 0) {
+                                        map.put(key, value);
+                                    }
+                                } else if (split.length == 2) {
+                                    LocalDateTime now = Instant.ofEpochMilli(Long.parseLong(currentSplit[1])).atZone(ZoneOffset.systemDefault()).toLocalDateTime();
+                                    //当前价格跟最后更新价格不一样时，并且当前时间在15分钟内， 才进行更新操作
+                                    if (currentPrice.compareTo(lastPrice) != 0 && now.plusMinutes(15).compareTo(now) >= 0) {
+                                        map.put(key, value);
+                                    }
+                                }
+//                                map.put(key, value);
                                 if(map.size()==4){
                                     metadataDb5RedisUtil.mset(map);
                                     originaldataDb5RedisUtil.mset(map);
                                     map.clear();
                                 }
-//                                metadataDb5RedisUtil.set(key, responseData, 900);
-//                                String s = metadataDb5RedisUtil.get(key);
-//                                BinanceResponseData binanceResponseData = JSON.parseObject(s, BinanceResponseData.class);
-//                                if (null == binanceResponseData) {
-//                                    metadataDb5RedisUtil.set(key, responseData, 900);
-//                                } else if (null != binanceResponseData && binanceResponseData.getC().compareTo(responseData.getC()) != 0) {
-//                                    metadataDb5RedisUtil.set(key, responseData, 900);
-//                                }
                             }
                         }
                     }
@@ -172,10 +191,33 @@ public class GrabBb3rdDataByBinanceTask {
                 for (Map data : list) {
                     String binanceSymbol = (String) data.get("symbol");
                     if (binanceRedisKeysMap.containsKey(binanceSymbol)) {
+                        long timestamp = System.currentTimeMillis();
                         String key = httpsRedisKey + binanceSymbol;
-                        String value = (String) data.get("price");
+                        String value = (String) data.get("price")+ "&" + timestamp;;
                         if (null != value || !"".equals(value)) {
-                            map.put(key, value);
+                            String lastValue = metadataDb5RedisUtil.get(key);
+                            if(null==lastValue||"".equals(lastValue)){
+                                map.put(key, value);
+                                continue;
+                            }
+                            String[] split = lastValue.split("&");
+                            BigDecimal lastPrice = new BigDecimal(split[0]);
+
+                            String[] currentSplit = value.split("&");
+                            BigDecimal currentPrice = new BigDecimal(currentSplit[0]);
+                            if (split.length == 1) {
+                                //当前价格跟最后更新价格不一样时， 才进行更新操作
+                                if (currentPrice.compareTo(lastPrice) != 0) {
+                                    map.put(key, value);
+                                }
+                            } else if (split.length == 2) {
+                                LocalDateTime now = Instant.ofEpochMilli(Long.parseLong(currentSplit[1])).atZone(ZoneOffset.systemDefault()).toLocalDateTime();
+                                //当前价格跟最后更新价格不一样时，并且当前时间在15分钟内， 才进行更新操作
+                                if (currentPrice.compareTo(lastPrice) != 0 && now.plusMinutes(15).compareTo(now) >= 0) {
+                                    map.put(key, value);
+                                }
+                            }
+//                            map.put(key, value);
                         }
                     }
                 }

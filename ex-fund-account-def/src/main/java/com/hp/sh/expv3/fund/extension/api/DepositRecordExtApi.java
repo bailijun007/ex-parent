@@ -10,6 +10,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -44,6 +45,16 @@ public interface DepositRecordExtApi {
     @GetMapping(value = "/api/extension/account/deposit/queryAllUserHistory")
     public PageResult<DepositRecordHistoryVo> queryAllUserHistory(@RequestParam(value = "userId",required = false) Long userId, @RequestParam(value = "asset", required = false) String asset,
                                                                   @RequestParam(value = "pageNo") Integer pageNo, @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize);
+
+
+    @ApiOperation("根据币种和支付状态查询平台所有用户的充币总数")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "payStatus", value = "执行状态:0-提现中，1-提现成功，2-提现失败", example = "1", required = true)
+    })
+    @GetMapping(value = "/api/extension/depositRecord/queryTotalNumber")
+    public BigDecimal queryTotalNumber(@RequestParam(value = "asset") String asset,
+                                       @RequestParam(value = "payStatus") Integer payStatus);
 
 
 }

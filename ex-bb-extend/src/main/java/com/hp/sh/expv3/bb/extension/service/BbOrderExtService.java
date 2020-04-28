@@ -22,4 +22,8 @@ public interface BbOrderExtService {
     List<BbHistoryOrderVo> queryOrderList(Long userId, List<String> assetList, List<String> symbolList, Long gtOrderId, Long ltOrderId, Integer count, List<Integer> statusList);
 
     List<BbOrderVo> queryByIds(List<Long> refIds);
+
+    BigDecimal queryTotalFee(Long startTime, Long endTime);
+
+    BigDecimal queryTotalOrder(Long startTime, Long endTime);
 }

@@ -19,6 +19,13 @@ public final class BbKlineRedisKeyUtil {
         return persistentDataUpdateEventKey;
     }
 
+    public static String buildKlineDataRedisKey(String pattern, String asset, String symbol, int frequency) {
+        return StringReplaceUtil.replace(pattern, new HashMap<String, String>() {{
+            put("asset", asset);
+            put("symbol", symbol);
+            put("freq", "" + frequency);
+        }});
+    }
 
 
 

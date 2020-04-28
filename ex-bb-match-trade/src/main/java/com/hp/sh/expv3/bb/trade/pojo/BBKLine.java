@@ -7,35 +7,62 @@ import java.math.BigDecimal;
  * @author BaiLiJun  on 2020/3/4
  */
 public class BBKLine implements Serializable {
-    private String asset, symbol;
+    private Long id;
+    private String asset;
+    private String symbol;
     private int frequence;// 频率，固定一分钟
-    private long minute; // 分钟时间戳
-    private long ms; // 毫秒时间戳
+    private long timestamp; // 分钟时间戳
     private BigDecimal volume; //  number 累加
-    //        BigDecimal amt;//
-    private BigDecimal high; // max(price)
-    private BigDecimal low;// min(price)
-    private BigDecimal open;// 按成交时间第一个 first(price)
-    private BigDecimal close;// 按成交时间最后一个 last(price)
-
+    private BigDecimal highPrice; // max(price)
+    private BigDecimal lowPrice;// min(price)
+    private BigDecimal openPrice;// 按成交时间第一个 first(price)
+    private BigDecimal closePrice;// 按成交时间最后一个 last(price)
+    private Long created;
+    private Long modified;
     public BBKLine() {
 
+    }
+
+    public Long getCreated() {
+        return created;
     }
 
     @Override
     public String toString() {
         return "BBKLine{" +
-                "asset='" + asset + '\'' +
+                "id=" + id +
+                ", asset='" + asset + '\'' +
                 ", symbol='" + symbol + '\'' +
                 ", frequence=" + frequence +
-                ", minute=" + minute +
-                ", ms=" + ms +
+                ", timestamp=" + timestamp +
                 ", volume=" + volume +
-                ", high=" + high +
-                ", low=" + low +
-                ", open=" + open +
-                ", close=" + close +
+                ", highPrice=" + highPrice +
+                ", lowPrice=" + lowPrice +
+                ", openPrice=" + openPrice +
+                ", closePrice=" + closePrice +
+                ", created=" + created +
+                ", modified=" + modified +
                 '}';
+    }
+
+    public void setCreated(Long created) {
+        this.created = created;
+    }
+
+    public Long getModified() {
+        return modified;
+    }
+
+    public void setModified(Long modified) {
+        this.modified = modified;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getAsset() {
@@ -62,6 +89,14 @@ public class BBKLine implements Serializable {
         this.frequence = frequence;
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public BigDecimal getVolume() {
         return volume;
     }
@@ -70,51 +105,35 @@ public class BBKLine implements Serializable {
         this.volume = volume;
     }
 
-    public BigDecimal getHigh() {
-        return high;
+    public BigDecimal getHighPrice() {
+        return highPrice;
     }
 
-    public void setHigh(BigDecimal high) {
-        this.high = high;
+    public void setHighPrice(BigDecimal highPrice) {
+        this.highPrice = highPrice;
     }
 
-    public BigDecimal getLow() {
-        return low;
+    public BigDecimal getLowPrice() {
+        return lowPrice;
     }
 
-    public void setLow(BigDecimal low) {
-        this.low = low;
+    public void setLowPrice(BigDecimal lowPrice) {
+        this.lowPrice = lowPrice;
     }
 
-    public BigDecimal getOpen() {
-        return open;
+    public BigDecimal getOpenPrice() {
+        return openPrice;
     }
 
-    public void setOpen(BigDecimal open) {
-        this.open = open;
+    public void setOpenPrice(BigDecimal openPrice) {
+        this.openPrice = openPrice;
     }
 
-    public BigDecimal getClose() {
-        return close;
+    public BigDecimal getClosePrice() {
+        return closePrice;
     }
 
-    public void setClose(BigDecimal close) {
-        this.close = close;
-    }
-
-    public long getMinute() {
-        return minute;
-    }
-
-    public void setMinute(long minute) {
-        this.minute = minute;
-    }
-
-    public long getMs() {
-        return ms;
-    }
-
-    public void setMs(long ms) {
-        this.ms = ms;
+    public void setClosePrice(BigDecimal closePrice) {
+        this.closePrice = closePrice;
     }
 }

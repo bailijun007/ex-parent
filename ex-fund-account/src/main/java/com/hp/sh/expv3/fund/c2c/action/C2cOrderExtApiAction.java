@@ -202,4 +202,12 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         return queryService.pageQueryByApprovalStatus(auditStatus, pageNo, pageSize, userId);
 
     }
+
+    @Override
+    public BigDecimal queryTotalNumber(String asset, Integer type, Integer payStatus) {
+        if (payStatus == null || type == null|| org.springframework.util.StringUtils.isEmpty(asset)) {
+            throw new ExException(ExFundError.PARAM_EMPTY);
+        }
+        return queryService.queryTotalNumber(asset,type,payStatus);
+    }
 }

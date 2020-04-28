@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.trade.dao.BbKlinePersistentDataMapper">
+    <sql id="Base_Column_List">
+     id, asset,symbol,open_price,high_price,low_price,close_price,volume,`timestamp`,frequence
+</sql>
+
+    <sql id="simple_where">
+        <where>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="timestamp!=null">and `timestamp`=#{timestamp}</if>
+            <if test="frequence!=null">and frequence=#{frequence}</if>
+        </where>
+
+    </sql>
+
+    <insert id="batchSave">
+        insert into bb_kline_persistent_data
+        (asset,symbol,open_price,high_price,low_price,close_price,volume,`timestamp`,frequence,created,modified )
+        values
+        <foreach collection="bbKlineDataList" item="item" index="index" separator=",">
+            (#{item.asset},#{item.symbol},#{item.openPrice},#{item.highPrice},#{item.lowPrice},#{item.closePrice},#{item.volume},#{item.timestamp},#{item.frequence},#{item.created},#{item.modified})
+        </foreach>
+    </insert>
+
+    <insert id="save">
+         insert into bb_kline_persistent_data
+        (asset,symbol,open_price,high_price,low_price,close_price,volume,`timestamp`,frequence )
+        values
+          (#{asset},#{symbol},#{openPrice},#{highPrice},#{lowPrice},#{closePrice},#{volume},#{timestamp},#{frequence})
+
+    </insert>
+
+    <update id="batchUpdate">
+        <foreach collection="bbKlineDataList" item="item" index="index" open="" close="" separator=";">
+            UPDATE bb_kline_persistent_data
+            set
+            open_price=#{item.openPrice},
+            high_price=#{item.highPrice},
+            low_price=#{item.lowPrice},
+            close_price=#{item.closePrice},
+            modified=#{item.modified}
+            <where>
+                id = #{item.id}
+            </where>
+        </foreach>
+    </update>
+
+    <update id="update">
+        UPDATE bb_kline_persistent_data
+            set
+            open_price=#{openPrice},
+            high_price=#{highPrice},
+            low_price=#{lowPrice},
+            close_price=#{closePrice}
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <select id="queryOne" resultType="com.hp.sh.expv3.bb.trade.pojo.BBKLine">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_kline_persistent_data
+        <include refid="simple_where"/>
+    </select>
+
+
+</mapper>

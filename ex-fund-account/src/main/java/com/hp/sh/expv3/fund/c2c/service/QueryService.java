@@ -85,7 +85,7 @@ public class QueryService {
             Integer rowTotal = Integer.parseInt(String.valueOf(count));
             pageResult.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
             return pageResult;
-        }else if(payStatus == C2cConst.C2C_PAY_STATUS_NO_PAYMENT){
+        } else if (payStatus == C2cConst.C2C_PAY_STATUS_NO_PAYMENT) {
 
         }
 
@@ -119,8 +119,8 @@ public class QueryService {
     }
 
     @CrossDB
-    public List<C2cOrderVo> queryByPayStatus(Integer payStatus,String payStatusDesc) {
-        List<C2cOrderVo> orderList = c2cOrderDAO.queryByPayStatus(payStatus,payStatusDesc);
+    public List<C2cOrderVo> queryByPayStatus(Integer payStatus, String payStatusDesc) {
+        List<C2cOrderVo> orderList = c2cOrderDAO.queryByPayStatus(payStatus, payStatusDesc);
 
         return orderList;
     }
@@ -156,5 +156,13 @@ public class QueryService {
 
     public C2cOrder queryById(Long id) {
         return c2cOrderDAO.queryById(id);
+    }
+
+    public BigDecimal queryTotalNumber(String asset, Integer type, Integer payStatus) {
+        BigDecimal total = c2cOrderDAO.queryTotalNumber(asset, type, payStatus);
+        if (null == total) {
+            return BigDecimal.ZERO;
+        }
+        return total;
     }
 }

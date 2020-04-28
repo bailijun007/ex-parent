@@ -50,4 +50,11 @@ public interface PcAccountExtendApi {
                                                        @RequestParam(value = "pageNo", required = true) Integer pageNo, @RequestParam(value = "pageSize", required = true,defaultValue = "20") Integer pageSize);
 
 
+    @ApiOperation("根据币种查询平台所有用户的合约账户总额")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true)
+    })
+    @GetMapping(value = "/api/extension/pcAccount/queryTotalNumber")
+    public BigDecimal queryTotalNumber(@RequestParam(value = "asset") String asset);
+
 }

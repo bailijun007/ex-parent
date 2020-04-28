@@ -24,6 +24,9 @@ import redis.clients.jedis.Pipeline;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +102,7 @@ public class GrabBb3rdDataByBitfinexTask {
                     Request request = new Request.Builder().get().url(bitfinexHttpsUrl).build();
                     Call call = client.newCall(request);
                     try {
+                        TimeUnit.SECONDS.sleep(1);
                         Response response = call.execute();
                         String string = response.body().string();
                         List<String> jsonArrays = JSON.parseArray(string, String.class);
@@ -121,10 +125,33 @@ public class GrabBb3rdDataByBitfinexTask {
                                 bitfinexSymbol = bitfinexSymbol.substring(1, bitfinexSymbol.length()).concat("T");
                             }
                             if (bitfinexRedisKeysMap.containsKey(bitfinexSymbol)) {
+                                long timestamp = System.currentTimeMillis();
                                 String key = bitfinexHttpsRedisKey + bitfinexSymbol;
-                                String value = lastPrice + "";
+                                String value = lastPrice + "&" + timestamp;
                                 if (null != value || !"".equals(value)) {
-                                    map.put(key, value);
+                                    String lastValue = metadataDb5RedisUtil.get(key);
+                                    if(null==lastValue||"".equals(lastValue)){
+                                        map.put(key, value);
+                                        continue;
+                                    }
+                                    String[] split = lastValue.split("&");
+                                    BigDecimal lastPriceValue = new BigDecimal(split[0]);
+
+                                    String[] currentSplit = value.split("&");
+                                    BigDecimal currentPrice = new BigDecimal(currentSplit[0]);
+                                    if (split.length == 1) {
+                                        //当前价格跟最后更新价格不一样时， 才进行更新操作
+                                        if (currentPrice.compareTo(lastPriceValue) != 0) {
+                                            map.put(key, value);
+                                        }
+                                    } else if (split.length == 2) {
+                                        LocalDateTime now = Instant.ofEpochMilli(Long.parseLong(currentSplit[1])).atZone(ZoneOffset.systemDefault()).toLocalDateTime();
+                                        //当前价格跟最后更新价格不一样时，并且当前时间在15分钟内， 才进行更新操作
+                                        if (currentPrice.compareTo(lastPriceValue) != 0 && now.plusMinutes(15).compareTo(now) >= 0) {
+                                            map.put(key, value);
+                                        }
+                                    }
+//                                    map.put(key, value);
                                 }
                             }
                         }
@@ -132,7 +159,7 @@ public class GrabBb3rdDataByBitfinexTask {
                         //批量保存
                         metadataDb5RedisUtil.mset(map);
                         originaldataDb5RedisUtil.mset(map);
-                        TimeUnit.SECONDS.sleep(1);
+
                     } catch (Exception e) {
                         logger.error("通过https请求获取bitfinex交易所最新成交价定时任务报错！，cause()={},message={}", e.getCause(), e.getMessage());
                         continue;
