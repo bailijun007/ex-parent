@@ -75,8 +75,42 @@ public class C2cOrderVo implements Serializable {
     @ApiModelProperty("审批状态")
     private Integer approvalStatus;
 
+    @ApiModelProperty("体现冻结资金")
+    private BigDecimal frozenAsset;
 
     public C2cOrderVo() {
+    }
+
+    @Override
+    public String toString() {
+        return "C2cOrderVo{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", created=" + created +
+                ", modified=" + modified +
+                ", sn='" + sn + '\'' +
+                ", payCurrency='" + payCurrency + '\'' +
+                ", exchangeCurrency='" + exchangeCurrency + '\'' +
+                ", type=" + type +
+                ", price=" + price +
+                ", volume=" + volume +
+                ", amount=" + amount +
+                ", payStatus=" + payStatus +
+                ", payStatusDesc='" + payStatusDesc + '\'' +
+                ", payTime=" + payTime +
+                ", payFinishTime=" + payFinishTime +
+                ", synchStatus=" + synchStatus +
+                ", approvalStatus=" + approvalStatus +
+                ", frozenAsset=" + frozenAsset +
+                '}';
+    }
+
+    public BigDecimal getFrozenAsset() {
+        return frozenAsset;
+    }
+
+    public void setFrozenAsset(BigDecimal frozenAsset) {
+        this.frozenAsset = frozenAsset;
     }
 
     public Long getId() {
