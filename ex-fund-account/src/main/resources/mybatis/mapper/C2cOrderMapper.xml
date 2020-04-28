@@ -127,9 +127,9 @@
             SELECT LAST_INSERT_ID() AS id
         </selectKey>
         insert into c2c_order (
-        sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified,bank,bank_card_name,bank_card
+        sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified,bank,bank_card_name,bank_card,frozen_asset
         )values(
-        #{sn},#{payCurrency},#{exchangeCurrency},#{type},#{price},#{volume},#{amount},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{approvalStatus},#{userId},#{id},#{created},#{modified},#{bank},#{bankCardName},#{bankCard}
+        #{sn},#{payCurrency},#{exchangeCurrency},#{type},#{price},#{volume},#{amount},#{payStatus},#{payStatusDesc},#{payTime},#{payFinishTime},#{synchStatus},#{approvalStatus},#{userId},#{id},#{created},#{modified},#{bank},#{bankCardName},#{bankCard},#{frozenAsset}
         )
     </insert>
 
@@ -366,6 +366,12 @@
 
     <select id="queryTotalNumber" resultType="java.math.BigDecimal">
         SELECT SUM(volume)  from c2c_order c where c.exchange_currency=#{asset} and c.type=#{type} and c.pay_status=#{payStatus}
+    </select>
+
+    <select id="queryC2cFrozenAsset" resultType="java.math.BigDecimal">
+      select IFNULL(SUM(frozen_asset),0) from c2c_order
+          where  user_id=#{userId}
+          and pay_currency=#{asset}
     </select>
 
 </mapper>

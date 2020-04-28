@@ -36,4 +36,6 @@ public interface C2cOrderDAO extends BaseUserDataMapper<C2cOrder, Long> {
     List<C2cOrderVo> queryByStatus(Map<String, Object> map);
 
     BigDecimal queryTotalNumber(@Param("asset") String asset, @Param("type")Integer type,@Param("payStatus") Integer payStatus);
+
+    BigDecimal queryC2cFrozenAsset(@Param("userId") Long userId, @Param("asset") String asset);
 }

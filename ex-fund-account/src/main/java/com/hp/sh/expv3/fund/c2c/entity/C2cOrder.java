@@ -79,7 +79,18 @@ public class C2cOrder extends UserDataEntity {
     @ApiModelProperty("银行卡号")
     private Long bankCard;
 
+    @ApiModelProperty("冻结资产")
+    private  BigDecimal frozenAsset;
+
     public C2cOrder() {
+    }
+
+    public BigDecimal getFrozenAsset() {
+        return frozenAsset;
+    }
+
+    public void setFrozenAsset(BigDecimal frozenAsset) {
+        this.frozenAsset = frozenAsset;
     }
 
     public String getBank() {
