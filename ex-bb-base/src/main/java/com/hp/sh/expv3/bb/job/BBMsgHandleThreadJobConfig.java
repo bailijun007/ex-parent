@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import com.hp.sh.expv3.config.shard.ShardGroup;
 
@@ -38,6 +39,13 @@ public class BBMsgHandleThreadJobConfig{
 	public void trigger(int shardId){
 		MsgShardHandlerThread thread = threadMap.get(shardId);
 		thread.trigger();
+	}
+	
+	@Scheduled(cron = "0/30 * * * * ?")
+	public void timer() {
+		for(MsgShardHandlerThread thread : threadMap.values()){
+			thread.trigger();
+		}
 	}
 	
 }

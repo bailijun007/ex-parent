@@ -5,10 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.gitee.hupadev.commons.executor.orderly.KeyGroup;
-
 @Component
-public class ShardGroup implements KeyGroup{
+public class ShardGroup {
 	
 	public int getMsgSardId(Object key){
 		if(key==null){
@@ -16,11 +14,6 @@ public class ShardGroup implements KeyGroup{
 		}
 		int index = Math.abs(key.hashCode()) % ShardConstant.SHARD_NUM;
 		return index;
-	}
-
-	@Override
-	public int getGroupId(Object shardId) {
-		return (int)shardId;
 	}
 	
 	public List<Integer> getShardIdList(){

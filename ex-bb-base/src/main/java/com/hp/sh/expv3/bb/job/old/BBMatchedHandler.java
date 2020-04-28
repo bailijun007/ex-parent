@@ -128,7 +128,7 @@ public class BBMatchedHandler {
 			this.tradeVo = tradeVo;
 		}
 		
-		public Object getKey(){
+		public Object getGroupId(){
 			return tradeVo.getOrderId();
 		}
 
@@ -158,7 +158,7 @@ public class BBMatchedHandler {
 			this.msg = msg;
 		}
 		
-		public Object getKey(){
+		public Object getGroupId(){
 			return msg.getOrderId();
 		}
 

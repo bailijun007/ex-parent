@@ -109,7 +109,7 @@ public class BBMsgHandler {
 			this.msg = msg;
 		}
 		
-		public Object getKey(){
+		public Object getGroupId(){
 			return msg.getShardId();
 		}
 

@@ -291,9 +291,9 @@ public class BBTradeService {
 		}
 		
 		////////////////
-//		if(order.getStatus() == OrderStatus.CANCELED){
-//			throw new ExSysException(BBOrderError.CANCELED, "canTrade", tradeMsg);
-//		}
+		if(order.getStatus() == OrderStatus.CANCELED){
+			throw new ExSysException(BBOrderError.CANCELED, "canTrade", tradeMsg);
+		}
 		if(order.getStatus() == OrderStatus.FILLED){
 			throw new ExSysException(BBOrderError.FILLED, "canTrade", tradeMsg);
 		}

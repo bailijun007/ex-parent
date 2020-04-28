@@ -1,7 +1,6 @@
 package com.hp.sh.expv3.component.lock;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;

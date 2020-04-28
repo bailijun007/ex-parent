@@ -32,28 +32,36 @@ public class RedissonDistributedLocker implements Locker {
     @Value("${redisson.lock.module:}")
     private String modulePrefix;
     
-	public Lock getLock(String lockKey) {
-        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
-        return new ExRedissonLock(lock);
-    }
-
 	public void setRedissonClient(RedissonClient redissonClient) {
 		this.redissonClient = redissonClient;
 	}
-	
+
+	public Lock getLock(String lockKey) {
+        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
+        return new ExRedissonLock(lock, leaseTime);
+    }
+
+	public Lock getLock(String lockKey, long leaseTime) {
+        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
+        return new ExRedissonLock(lock, leaseTime);
+    }
+
 	private String FULLKEY(String key){
 		return keyPrefix+modulePrefix+key;
 	}
 	
 	class ExRedissonLock extends MyRedissonLock{
 		
-		public ExRedissonLock(RLock rLock) {
+		private long leaseTime = -1;
+		
+		public ExRedissonLock(RLock rLock, long leaseTime) {
 			super(rLock);
+			this.leaseTime = leaseTime;
 		}
 		
 		@Override
-		public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
-			return rLock.tryLock(time, leaseTime, unit);
+		public boolean tryLock(long waitTime, TimeUnit unit) throws InterruptedException {
+			return rLock.tryLock(waitTime, leaseTime, unit);
 		}
 	}
 }

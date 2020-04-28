@@ -14,6 +14,7 @@ import com.hp.sh.expv3.bb.job.MsgShardHandler;
 import com.hp.sh.expv3.bb.job.old.BBMsgHandler;
 import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
+import com.hp.sh.expv3.bb.module.msg.service.BBMessageOffsetService;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
@@ -27,6 +28,18 @@ public class TestAction2 {
 	
 	@Autowired
 	private MsgShardHandler msgHandler;
+	
+	@Autowired
+	private BBMessageOffsetService offsetService;
+	
+	@ApiOperation(value = "测试cache")
+	@GetMapping(value = "/api/bb/test/cache")
+	public Long cache() throws Exception{
+		Long id = offsetService.cacheShardOffset(1, 100L);
+		offsetService.getCachedShardOffset(1);
+		offsetService.getCachedShardOffset(1);
+		return id;
+	}
 
 	@ApiOperation(value = "测试保存数据库")
 	@GetMapping(value = "/api/bb/test/dbsave")
@@ -95,7 +108,7 @@ public class TestAction2 {
 	
 	@ApiOperation(value = "测试提交任务")
 	@GetMapping(value = "/api/bb/test/submitTask")
-	public Long submitTask(Integer shardId) throws IOException{
+	public Long submitTask(Integer shardId) throws Exception{
 		long time = System.currentTimeMillis();
 		msgHandler.handlePending(shardId);
 		time = System.currentTimeMillis()-time;

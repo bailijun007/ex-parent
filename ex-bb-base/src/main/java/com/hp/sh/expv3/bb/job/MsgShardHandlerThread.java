@@ -7,11 +7,11 @@ public class MsgShardHandlerThread extends Thread{
 
     private static final Logger logger = LoggerFactory.getLogger(MsgShardHandlerThread.class);
 
-	private MsgShardHandler matchedHandler;
+	private final MsgShardHandler matchedHandler;
 
 	private final Object lock = new Object();
 	
-	private Integer shardId;
+	private final Integer shardId;
 	
 	public MsgShardHandlerThread(MsgShardHandler matchedHandler, Integer shardId) {
 		super("MsgShardHandlerThread-"+shardId);
@@ -19,10 +19,6 @@ public class MsgShardHandlerThread extends Thread{
 		this.shardId = shardId;
 	}
 
-	public void timer() {
-		this.trigger();
-	}
-	
 	public void run(){
 		while(true){
 			try{
@@ -49,14 +45,6 @@ public class MsgShardHandlerThread extends Thread{
         synchronized (lock) {
             lock.notifyAll();
         }
-	}
-
-	public void setMatchedHandler(MsgShardHandler matchedHandler) {
-		this.matchedHandler = matchedHandler;
-	}
-
-	public void setShardId(Integer shardId) {
-		this.shardId = shardId;
 	}
 	
 }
