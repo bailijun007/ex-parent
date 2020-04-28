@@ -10,7 +10,9 @@ import com.gitee.hupadev.base.exceptions.CommonError;
 import com.gitee.hupadev.base.exceptions.ExceptionUtils;
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.constant.MqTags;
-import com.hp.sh.expv3.bb.job.BBMsgHandleThreadJob;
+import com.hp.sh.expv3.bb.job.BBMsgHandleThreadJobConfig;
+import com.hp.sh.expv3.bb.job.old.BBMsgHandleThreadJob;
+import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.module.msg.service.BBMessageExtService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
@@ -35,15 +37,15 @@ public class MatchMqConsumer4Seq {
 	private BBMessageExtService msgService;
 	
 	@Autowired
-	private BBMsgHandleThreadJob msgHandleThreadJob;
+	private BBMsgHandleThreadJobConfig msgHandleThreadJob;
 
 	//撮合未成交
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(BBNotMatchMsg msg){
 		logger.info("收到撮合未成交消息:{}", msg);
 		try{
-			msgService.saveNotMatchedMsg(MqTags.TAGS_NOT_MATCHED, msg);
-			msgHandleThreadJob.trigger();
+			BBMessageExt entity = msgService.saveNotMatchedMsg(MqTags.TAGS_NOT_MATCHED, msg);
+			msgHandleThreadJob.trigger(entity.getShardId());
 		}catch(Exception e){
 			String s = e.getMessage();
 			if(s!=null && s.contains("Duplicate entry")){
@@ -59,9 +61,9 @@ public class MatchMqConsumer4Seq {
 	@MQListener(tags=MqTags.TAGS_CANCELLED)
 	public void handleCancelledMsg(BBCancelledMsg msg){
 		logger.info("收到取消订单消息:{}", msg);
-		boolean ok = msgService.saveCancelIfNotExists(MqTags.TAGS_CANCELLED, msg, null);
-		if(ok){
-			msgHandleThreadJob.trigger();
+		BBMessageExt entity = msgService.saveCancelIfNotExists(MqTags.TAGS_CANCELLED, msg, null);
+		if(entity!=null){
+			msgHandleThreadJob.trigger(entity.getShardId());
 		}else{
 			logger.warn("订单取消msg已存在："+msg.getOrderId());
 		}
@@ -72,8 +74,8 @@ public class MatchMqConsumer4Seq {
 	public void handleTradeMsg(BBTradeVo msg){
 		logger.info("收到用户成交消息:{}", msg);
 		try{
-			msgService.saveTradeMsg(MqTags.TAGS_TRADE, msg, null);
-			msgHandleThreadJob.trigger();
+			BBMessageExt entity = msgService.saveTradeMsg(MqTags.TAGS_TRADE, msg, null);
+			msgHandleThreadJob.trigger(entity.getShardId());
 		}catch(Exception e){
 			String s = e.getMessage();
 			if(s!=null && s.contains("Duplicate entry")){

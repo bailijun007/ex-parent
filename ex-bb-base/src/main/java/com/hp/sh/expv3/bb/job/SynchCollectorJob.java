@@ -24,6 +24,7 @@ public class SynchCollectorJob {
 
 	@Autowired
 	private BBOrderQueryService orderQueryService;
+	
 	@Autowired
 	private BBTradeService tradeService;
 	

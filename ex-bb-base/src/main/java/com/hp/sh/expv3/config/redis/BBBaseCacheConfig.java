@@ -36,9 +36,11 @@ public class BBBaseCacheConfig {
 	
 		Set<String> cacheNames = new HashSet<>();
 		cacheNames.add("order");
+		cacheNames.add("errorMsg");
 	
 		Map<String, RedisCacheConfiguration> configMap = new HashMap<>();
 		configMap.put("order", config.entryTtl(Duration.ofSeconds(60)));
+		configMap.put("errorMsg", config.entryTtl(Duration.ZERO));
 	
 		RedisCacheManager cacheManager = RedisCacheManager.builder(factory).cacheDefaults(config)
 				.initialCacheNames(cacheNames).withInitialCacheConfigurations(configMap).build();

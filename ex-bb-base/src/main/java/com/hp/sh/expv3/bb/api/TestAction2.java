@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.json.JsonUtils;
-import com.hp.sh.expv3.bb.job.BBMsgHandler;
+import com.hp.sh.expv3.bb.job.MsgShardHandler;
+import com.hp.sh.expv3.bb.job.old.BBMsgHandler;
 import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
@@ -25,7 +26,7 @@ public class TestAction2 {
 	private BBMqMsgService msgService;
 	
 	@Autowired
-	private BBMsgHandler msgHandler;
+	private MsgShardHandler msgHandler;
 
 	@ApiOperation(value = "测试保存数据库")
 	@GetMapping(value = "/api/bb/test/dbsave")
@@ -94,9 +95,9 @@ public class TestAction2 {
 	
 	@ApiOperation(value = "测试提交任务")
 	@GetMapping(value = "/api/bb/test/submitTask")
-	public Long submitTask() throws IOException{
+	public Long submitTask(Integer shardId) throws IOException{
 		long time = System.currentTimeMillis();
-		msgHandler.handlePending();
+		msgHandler.handlePending(shardId);
 		time = System.currentTimeMillis()-time;
 		return time;
 	}

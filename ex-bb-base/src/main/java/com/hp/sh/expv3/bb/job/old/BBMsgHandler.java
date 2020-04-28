@@ -1,18 +1,14 @@
-package com.hp.sh.expv3.bb.job;
+package com.hp.sh.expv3.bb.job.old;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.gitee.hupadev.commons.executor.orderly.OrderlyExecutors;
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.hp.sh.expv3.bb.constant.MqTags;
@@ -24,13 +20,12 @@ import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
-import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.component.executor.AbstractGroupTask;
 import com.hp.sh.expv3.dev.LimitTimeHandle;
 
 //@Component
-public class BBMsgShardHandler {
-    private static final Logger logger = LoggerFactory.getLogger(BBMsgShardHandler.class);
+public class BBMsgHandler {
+    private static final Logger logger = LoggerFactory.getLogger(BBMsgHandler.class);
 
 	@Autowired
 	private BBTradeService tradeService;
@@ -39,58 +34,43 @@ public class BBMsgShardHandler {
 	private BBOrderService orderService;
 	
 	@Autowired
+	private OrderlyExecutors tradeExecutors;
+
+	@Autowired
 	private BBMessageExtService msgService;
 	
 	@Autowired
 	private BBMessageOffsetService offsetService;
 	
 	private Map<Object,Long> errorMsgMap = new ConcurrentHashMap<Object,Long>();
-	
-	@Autowired
-	private BBMsgShardHandler self;
 
 	private int batchNum = 1000;
+	
+	private Long shardId = null;
 
-	@LockIt(key="shard-${shardId}")
-	public void handlePending(int shardId) {
-		Long offsetId = this.offsetService.getCachedShardOffset(shardId);
+	private Long startId = null;
+	
+	@LimitTimeHandle
+	public void handlePending() {
 		while(true){
-			List<BBMessageExt> list = this.msgService.findFirstList(batchNum, shardId, offsetId);
+			List<BBMessageExt> list = this.msgService.findFirstList(batchNum, null, startId);
+			
 			if(list==null || list.isEmpty()){
 				break;
 			}
 			
-			Map<Long, List<BBMessageExt>> userMsgMap = BeanHelper.groupByProperty(list, "userId");
-			Set<Entry<Long, List<BBMessageExt>>> entrySet = userMsgMap.entrySet();
-			
-			for(Entry<Long, List<BBMessageExt>> entry : entrySet){
-				Long userId = entry.getKey();
-				List<BBMessageExt> userMsgList = entry.getValue();
-				try{
-					self.handleBatch(userMsgList);
-					offsetId = userMsgList.get(userMsgList.size()-1).getId();
-				}catch(Exception e){
-					for(BBMessageExt msgExt : userMsgList){
-						self.handleMsgAndErr(msgExt);
-						offsetId = msgExt.getId();
-					}
-				}
+			for(BBMessageExt msg : list){
+				tradeExecutors.submit(new MsgTask(msg));
 			}
 			
+			startId = list.get(list.size()-1) .getId();
 		}
-		this.offsetService.cacheShardOffset(shardId, offsetId);
+		
 	}
 	
-	@Transactional(rollbackFor=Exception.class)
-	public void handleBatch(List<BBMessageExt> userMsgList) {
-		for(BBMessageExt msgExt : userMsgList){
-			self.handleMsgAndErr(msgExt);
-		}
-	}
-
-	public void handleMsgAndErr(BBMessageExt msgExt){
+	protected void handleMsgAndErr(BBMessageExt msgExt){
 		Long errMsgId = errorMsgMap.get(msgExt.getKeys());
-		if(errMsgId!=null && msgExt.getId()>errMsgId){
+		if(errMsgId!=null){
 			this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, "前面存在未处理的消息:"+errMsgId);
 		}else{
 			this.handleMsg(msgExt);
@@ -119,6 +99,30 @@ public class BBMsgShardHandler {
 			logger.error("[异步]处理消息失败 {},{}", e.getMessage(), e.toString(), e);
 			this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, e.getMessage());
 		}
+	}
+	
+	class MsgTask extends AbstractGroupTask{
+
+		private BBMessageExt msg;
+		
+		public MsgTask(BBMessageExt msg) {
+			this.msg = msg;
+		}
+		
+		public Object getKey(){
+			return msg.getShardId();
+		}
+
+		public void doRun() {
+			BBMsgHandler.this.handleMsgAndErr(msg);
+			offsetService.cacheShardOffset(msg.getShardId(), msg.getId());
+		}
+
+		@Override
+		public String toString() {
+			return "MsgTask [msg=" + msg + "]";
+		}
+
 	}
 	
 }

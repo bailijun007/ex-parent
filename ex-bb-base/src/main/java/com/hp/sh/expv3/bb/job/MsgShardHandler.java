@@ -2,14 +2,17 @@ package com.hp.sh.expv3.bb.job;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.gitee.hupadev.commons.executor.orderly.OrderlyExecutors;
+import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
@@ -20,12 +23,11 @@ import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
-import com.hp.sh.expv3.component.executor.AbstractGroupTask;
-import com.hp.sh.expv3.dev.LimitTimeHandle;
+import com.hp.sh.expv3.commons.lock.LockIt;
 
 @Component
-public class BBMsgHandler {
-    private static final Logger logger = LoggerFactory.getLogger(BBMsgHandler.class);
+public class MsgShardHandler {
+    private static final Logger logger = LoggerFactory.getLogger(MsgShardHandler.class);
 
 	@Autowired
 	private BBTradeService tradeService;
@@ -34,43 +36,56 @@ public class BBMsgHandler {
 	private BBOrderService orderService;
 	
 	@Autowired
-	private OrderlyExecutors tradeExecutors;
-
-	@Autowired
 	private BBMessageExtService msgService;
 	
 	@Autowired
 	private BBMessageOffsetService offsetService;
 	
-	private Map<Object,Long> errorMsgMap = new ConcurrentHashMap<Object,Long>();
+	@Autowired
+	private MsgShardHandler self;
 
 	private int batchNum = 1000;
-	
-	private Long shardId = null;
 
-	private Long startId = null;
-	
-	@LimitTimeHandle
-	public void handlePending() {
+	@LockIt(key="msgShard-${shardId}")
+	public void handlePending(int shardId) {
+		Long offsetId = this.offsetService.getCachedShardOffset(shardId);
 		while(true){
-			List<BBMessageExt> list = this.msgService.findFirstList(batchNum, null, startId);
-			
+			List<BBMessageExt> list = this.msgService.findFirstList(batchNum, shardId, offsetId);
 			if(list==null || list.isEmpty()){
 				break;
 			}
 			
-			for(BBMessageExt msg : list){
-				tradeExecutors.submit(new MsgTask(msg));
+			Map<Long, List<BBMessageExt>> userMsgMap = BeanHelper.groupByProperty(list, "userId");
+			Set<Entry<Long, List<BBMessageExt>>> entrySet = userMsgMap.entrySet();
+			
+			for(Entry<Long, List<BBMessageExt>> entry : entrySet){
+				Long userId = entry.getKey();
+				List<BBMessageExt> userMsgList = entry.getValue();
+				try{
+					self.handleBatch(userMsgList);
+					offsetId = userMsgList.get(userMsgList.size()-1).getId();
+				}catch(Exception e){
+					for(BBMessageExt msgExt : userMsgList){
+						self.handleMsgAndErr(msgExt);
+						offsetId = msgExt.getId();
+					}
+				}
 			}
 			
-			startId = list.get(list.size()-1) .getId();
 		}
-		
+		this.offsetService.cacheShardOffset(shardId, offsetId);
 	}
 	
-	protected void handleMsgAndErr(BBMessageExt msgExt){
-		Long errMsgId = errorMsgMap.get(msgExt.getKeys());
-		if(errMsgId!=null){
+	@Transactional(rollbackFor=Exception.class)
+	public void handleBatch(List<BBMessageExt> userMsgList) {
+		for(BBMessageExt msgExt : userMsgList){
+			self.handleMsgAndErr(msgExt);
+		}
+	}
+
+	public void handleMsgAndErr(BBMessageExt msgExt){
+		Long errMsgId = this.getErrorMsgId(msgExt.getKeys());
+		if(errMsgId!=null && msgExt.getId()>errMsgId){
 			this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, "前面存在未处理的消息:"+errMsgId);
 		}else{
 			this.handleMsg(msgExt);
@@ -95,34 +110,20 @@ public class BBMsgHandler {
 			}
 			msgService.delete(msgExt.getUserId(), msgExt.getId());
 		}catch(Exception e){
-			errorMsgMap.put(msgExt.getKeys(), msgExt.getId());
+			this.saveErrorMsgId(msgExt.getKeys(), msgExt.getId());
 			logger.error("[异步]处理消息失败 {},{}", e.getMessage(), e.toString(), e);
 			this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, e.getMessage());
 		}
 	}
 	
-	class MsgTask extends AbstractGroupTask{
+	@CachePut(cacheNames="errorMsg", key="#orderId")
+	private Long saveErrorMsgId(Object orderId, Long msgId){
+		return msgId;
+	}
 
-		private BBMessageExt msg;
-		
-		public MsgTask(BBMessageExt msg) {
-			this.msg = msg;
-		}
-		
-		public Object getKey(){
-			return msg.getShardId();
-		}
-
-		public void doRun() {
-			BBMsgHandler.this.handleMsgAndErr(msg);
-			offsetService.cacheShardOffset(msg.getShardId(), msg.getId());
-		}
-
-		@Override
-		public String toString() {
-			return "MsgTask [msg=" + msg + "]";
-		}
-
+	@CachePut(cacheNames="errorMsg", key="#orderId")
+	private Long getErrorMsgId(Object orderId){
+		return null;
 	}
 	
 }

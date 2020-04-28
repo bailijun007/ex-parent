@@ -1,27 +1,24 @@
 package com.hp.sh.expv3.bb.job;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
-@Order(999)
-@Component
-public class BBMsgHandleThreadJob extends Thread {
-    private static final Logger logger = LoggerFactory.getLogger(BBMsgHandleThreadJob.class);
+public class MsgShardHandlerThread extends Thread{
 
-	@Autowired
-	private BBMsgHandler matchedHandler;
+    private static final Logger logger = LoggerFactory.getLogger(MsgShardHandlerThread.class);
+
+	private MsgShardHandler matchedHandler;
 
 	private final Object lock = new Object();
 	
+	private Integer shardId;
 	
-	@Scheduled(cron = "0 * * * * ?")
+	public MsgShardHandlerThread(MsgShardHandler matchedHandler, Integer shardId) {
+		super("MsgShardHandlerThread-"+shardId);
+		this.matchedHandler = matchedHandler;
+		this.shardId = shardId;
+	}
+
 	public void timer() {
 		this.trigger();
 	}
@@ -29,7 +26,7 @@ public class BBMsgHandleThreadJob extends Thread {
 	public void run(){
 		while(true){
 			try{
-				matchedHandler.handlePending();
+				matchedHandler.handlePending(shardId);
 			}catch(Exception e){
 				logger.error("分派消息失败：{}", e.getMessage(), e);
 				try {
@@ -53,10 +50,13 @@ public class BBMsgHandleThreadJob extends Thread {
             lock.notifyAll();
         }
 	}
-	
-	@PostConstruct
-	void begin(){
-		this.start();
+
+	public void setMatchedHandler(MsgShardHandler matchedHandler) {
+		this.matchedHandler = matchedHandler;
 	}
 
+	public void setShardId(Integer shardId) {
+		this.shardId = shardId;
+	}
+	
 }

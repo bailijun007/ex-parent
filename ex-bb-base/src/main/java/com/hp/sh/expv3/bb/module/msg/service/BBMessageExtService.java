@@ -43,7 +43,7 @@ public class BBMessageExtService{
 		this.messageExtDAO.delete(userId, id);
 	}
 	
-	public void saveNotMatchedMsg(String tags, BBNotMatchMsg msg){
+	public BBMessageExt saveNotMatchedMsg(String tags, BBNotMatchMsg msg){
 		BBMessageExt msgEntity = new BBMessageExt();
 		msgEntity.setUserId(msg.getAccountId());
 		
@@ -61,9 +61,11 @@ public class BBMessageExtService{
 		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
 		
 		this.messageExtDAO.save(msgEntity);
+		
+		return msgEntity;
 	}
 
-	public void saveTradeMsg(String tags, BBTradeVo msg, String exMessage) {
+	public BBMessageExt saveTradeMsg(String tags, BBTradeVo msg, String exMessage) {
 		exMessage = this.cutExMsg(exMessage);
 		
 		BBMessageExt msgEntity = new BBMessageExt();
@@ -83,15 +85,17 @@ public class BBMessageExtService{
 		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
 		
 		this.messageExtDAO.save(msgEntity);
+		
+		return msgEntity;
 	}
 
-	public boolean saveCancelIfNotExists(String tag, BBCancelledMsg msg, String exMessage) {
+	public BBMessageExt saveCancelIfNotExists(String tag, BBCancelledMsg msg, String exMessage) {
 		
 		exMessage = this.cutExMsg(exMessage);
 		
 		boolean existCancelledMsg = this.exist(msg.getAccountId(), tag, ""+msg.getOrderId());
 		if(existCancelledMsg){
-			return false;
+			return null;
 		}
 		
 		BBMessageExt msgEntity = new BBMessageExt();
@@ -109,7 +113,7 @@ public class BBMessageExtService{
 		
 		this.messageExtDAO.save(msgEntity);
 		
-		return true;
+		return msgEntity;
 	}
 	
 	public void setStatus(Long userId, Long id, int status, String errInfo) {
