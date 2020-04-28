@@ -28,7 +28,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-		id,sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified,bank,bank_card_name,bank_card
+		id,sn,pay_currency,exchange_currency,type,price,volume,amount,pay_status,pay_status_desc,pay_time,pay_finish_time,synch_status,approval_status,user_id,id,created,modified,bank,bank_card_name,bank_card,frozen_asset
 	</sql>
 
     <sql id="simple_where">
