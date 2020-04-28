@@ -57,7 +57,7 @@ public class MsgShardHandler {
 	@Autowired
 	private RedissonDistributedLocker locker;
 
-	private int batchNum = 10000;
+	private int batchNum = 1000;
 	
 	public void handlePending(int shardId) throws Exception {
 		Lock lock = locker.getLock("msgHandlerSardJobLock-"+shardId, -1);
@@ -95,7 +95,8 @@ public class MsgShardHandler {
 						offsetId = userMsgList.get(userMsgList.size()-1).getId();
 						logger.info("处理用户消息成功：shardId={}, userId={}, size={}", shardId, userId, userMsgList.size());
 					}catch(Exception e){
-						logger.error("批量处理消息失败:{},{}", e.getMessage(), e.toString(), e);
+						Exception cause = (Exception) ExceptionUtils.getCause(e);
+						logger.error("批量处理消息失败:{},{}", e.getMessage(), cause.toString(), e);
 						if(isResendException(e)){
 							try {
 								Thread.sleep(10);
