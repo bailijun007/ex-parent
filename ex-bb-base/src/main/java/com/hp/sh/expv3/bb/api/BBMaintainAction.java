@@ -99,7 +99,7 @@ public class BBMaintainAction{
 	}
 
 	@ApiOperation(value = "queryResend")
-	@GetMapping(value = "/api/pc/maintain/queryResend")	
+	@GetMapping(value = "/api/bb/maintain/queryResend")	
 	public Integer queryResend(String symbol){
 		long now = DbDateUtils.now()-2000;
 		int n = 0;
@@ -124,7 +124,7 @@ public class BBMaintainAction{
 
 
 	@ApiOperation(value = "resendPending")
-	@GetMapping(value = "/api/pc/maintain/resendPending")	
+	@GetMapping(value = "/api/bb/maintain/resendPending")	
 	public Map resendPending(String symbol){
 		Map map = new HashMap();
 		Integer resendPendingCancel = this.resendPendingCancel(symbol);
@@ -135,7 +135,7 @@ public class BBMaintainAction{
 	}
 
 	@ApiOperation(value = "resendPendingCancel")
-	@GetMapping(value = "/api/pc/maintain/resendPendingCancel")	
+	@GetMapping(value = "/api/bb/maintain/resendPendingCancel")	
 	public Integer resendPendingCancel(String symbol){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
@@ -165,7 +165,7 @@ public class BBMaintainAction{
 	}
 
 	@ApiOperation(value = "resendPendingNew")
-	@GetMapping(value = "/api/pc/maintain/resendPendingNew")	
+	@GetMapping(value = "/api/bb/maintain/resendPendingNew")	
 	public Integer resendPendingNew(String symbol){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);

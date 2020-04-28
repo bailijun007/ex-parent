@@ -29,6 +29,7 @@ import com.hp.sh.expv3.bb.vo.request.ReleaseFrozenRequest;
 import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.config.db.SnGenerator;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
@@ -64,7 +65,7 @@ public class BBAccountCoreService{
 		if(fa!=null){
 			return InvokeResult.NOCHANGE;
 		}
-		this.newPcAccount(userId, asset, BigDecimal.ZERO, DbDateUtils.now());
+		this.newAccount(userId, asset, BigDecimal.ZERO, DbDateUtils.now());
 		
 		return InvokeResult.SUCCESS;
 	}
@@ -278,7 +279,7 @@ public class BBAccountCoreService{
 		}
 	}
 	
-	private BBAccount newPcAccount(Long userId, String asset, BigDecimal balance, Long now){
+	private BBAccount newAccount(Long userId, String asset, BigDecimal balance, Long now){
 		BBAccount account = new BBAccount();
 		account.setAsset(asset);
 		account.setBalance(balance);

@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
@@ -62,15 +63,15 @@ public class BBOrderlyConsumer {
 	@Scheduled(cron = "0 * * * * ?")
 	@PostConstruct
 	public void start123() throws MQClientException{
-		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
+		List<BBSymbolVO> symbolList = this.metadataService.getAllBBContract();
 		
 		String subExpression = this.subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE);
 	
-		logger.debug("更新MQ监听,{},{},{},{}", pcList.size(), this.groupId, this.setting.getInstanceName(), subExpression);
+		logger.debug("更新MQ监听,{},{},{},{}", symbolList.size(), this.groupId, this.setting.getInstanceName(), subExpression);
 		
 		Set<String> topicSet = new HashSet<String>();
 		
-		for(BBSymbolVO bbvo : pcList){
+		for(BBSymbolVO bbvo : symbolList){
 			if(groupId==-1 || bbvo.getBbGroupId().equals(this.groupId)){
 				String topic = MqTopic.getMatchTopic(bbvo.getAsset(), bbvo.getSymbol());
 				topicSet.add(topic);
@@ -134,6 +135,9 @@ public class BBOrderlyConsumer {
         		}catch(ExSysException e){
         			Throwable cause = ExceptionUtils.getRootCause(e);
         			logger.error(e.toString(), cause);
+        			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
+        		}catch(DataAccessException e){
+        			logger.warn(e.toString());
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}catch(UpdateException e){
         			Throwable cause = ExceptionUtils.getRootCause(e);

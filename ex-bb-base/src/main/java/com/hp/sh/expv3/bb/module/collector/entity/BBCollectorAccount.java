@@ -54,7 +54,9 @@ public class BBCollectorAccount extends BaseSysEntity{
 
 	@Override
 	public String toString() {
-		return "BBCollectorAccount [asset=" + asset + ", balance=" + balance + ", version=" + version + "]";
+		return "BBCollectorAccount [asset=" + asset + ", balance=" + balance + ", version=" + version + ", id=" + id
+				+ ", created=" + created + ", modified=" + modified + "]";
 	}
+
 
 }

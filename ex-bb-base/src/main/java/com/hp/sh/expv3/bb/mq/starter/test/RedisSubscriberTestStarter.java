@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,6 +30,7 @@ public class RedisSubscriberTestStarter {
 	private MetadataService metadataService;
 	
 	@Autowired
+	@Qualifier("expRedisPool") 
 	private RedisPool redisPool;
 
 	private final Map<String,RedisSubscriberTest> subMap = new LinkedHashMap<String,RedisSubscriberTest>();
@@ -36,11 +38,11 @@ public class RedisSubscriberTestStarter {
 	@Scheduled(cron = "0 * * * * ?")
 	@PostConstruct
 	public void testRs(){
-		List<BBSymbolVO> pcList = this.metadataService.getAllBBContract();
+		List<BBSymbolVO> symbolList = this.metadataService.getAllBBContract();
 		
 		Set<String> channels = new HashSet<String>();
 		
-		for(BBSymbolVO bbvo : pcList){
+		for(BBSymbolVO bbvo : symbolList){
 			channels.add("bb:account:"+bbvo.getAsset());
 			channels.add("bb:order:"+bbvo.getAsset()+":"+bbvo.getSymbol());
 			channels.add("bb:pos:"+bbvo.getAsset()+":"+bbvo.getSymbol());

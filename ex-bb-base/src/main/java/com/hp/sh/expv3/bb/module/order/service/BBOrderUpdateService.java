@@ -8,8 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hp.sh.expv3.bb.constant.OrderStatus;
+import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.constant.BBOrderLogType;
+import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.constant.TriggerType;
 import com.hp.sh.expv3.bb.module.order.dao.BBActiveOrderDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderDAO;
@@ -18,8 +19,6 @@ import com.hp.sh.expv3.bb.module.order.entity.BBActiveOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;
 import com.hp.sh.expv3.bb.mq.msg.vo.BBOrderEvent;
-import com.hp.sh.expv3.commons.exception.ExSysException;
-import com.hp.sh.expv3.error.ExSysError;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Service
@@ -68,7 +67,7 @@ public class BBOrderUpdateService {
 	public BBOrderLog setNewStatus(BBOrder order, long modified) {
 		long count = this.bBOrderDAO.updateStatus(OrderStatus.NEW, modified, order.getId(), order.getUserId(), order.getVersion());
 		if(count==0){
-			throw new ExSysException(ExSysError.UPDATED_ERR, order);
+			throw new UpdateException("更新失败", order);
 		}
 		
 		//日志

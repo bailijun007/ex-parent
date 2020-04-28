@@ -18,14 +18,19 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * base
+ * @author wangjg
+ *
+ */
 @Configuration
-public class RedisTemplateConfig {
+public class ExpRedisTemplateConfig {
 
-	@Value("${meta.redis.host}")
+	@Value("${exp.redis.host}")
 	private String hostName;
-	@Value("${meta.redis.port}")
+	@Value("${exp.redis.port}")
 	private Integer port;
-	@Value("${meta.redis.password}")
+	@Value("${exp.redis.password}")
 	private String password;
 
     @Primary
