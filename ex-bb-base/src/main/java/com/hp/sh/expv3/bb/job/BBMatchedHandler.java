@@ -128,9 +128,9 @@ public class BBMatchedHandler {
 			this.tradeVo = tradeVo;
 		}
 		
-		public Object getKey(){
+		public Object getGroupId(){
 			int key = tradeVo.getOrderId().hashCode();
-			return Math.abs(key);
+			return Math.abs(key)%20;
 		}
 
 		public void doRun() {
@@ -159,9 +159,9 @@ public class BBMatchedHandler {
 			this.msg = msg;
 		}
 		
-		public Object getKey(){
+		public Object getGroupId(){
 			int key = msg.getOrderId().hashCode();
-			return Math.abs(key);
+			return Math.abs(key)%20;
 		}
 
 		public void doRun() {
