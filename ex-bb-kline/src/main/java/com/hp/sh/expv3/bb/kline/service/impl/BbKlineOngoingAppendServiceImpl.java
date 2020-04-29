@@ -223,10 +223,11 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
     }
 
 
-    private void notifyKlinePersistentData(String asset, String symbol, Integer targetFreq, Long startMs) {
+    private void notifyKlinePersistentData(String asset, String symbol, Integer targetFreq, Long minute) {
         String key = BbKlineRedisKeyUtil.buildKlinePersistentDataRedisKey(persistentDataEventPattern, asset, symbol, targetFreq);
+         long ms = TimeUnit.MINUTES.toMillis(minute);
         bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
-                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, targetFreq, startMs), Long.valueOf(startMs).doubleValue());
+                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, targetFreq, ms), Long.valueOf(ms).doubleValue());
                 }}
         );
     }
