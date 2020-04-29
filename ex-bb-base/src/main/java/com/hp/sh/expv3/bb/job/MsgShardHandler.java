@@ -90,11 +90,11 @@ public class MsgShardHandler {
 				while(true){
 					try{
 						long time = System.currentTimeMillis();
-						logger.info("批量处理用户消息：shardId={}, userId={}, size={}", shardId, userId, userMsgList.size());
+						logger.info("批量处理用户消息：shardId={}, threadName={}, userId={}, size={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size());
 						self.handleBatch(userId, userMsgList);
 						offsetId = userMsgList.get(userMsgList.size()-1).getId();
 						time = System.currentTimeMillis() - time;
-						logger.info("批量处理用户消息成功：shardId={}, userId={}, size={}, time={}", shardId, userId, userMsgList.size(), time);
+						logger.info("批量处理用户消息成功：shardId={}, threadName={}, userId={}, size={}, time={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size(), time);
 						break;
 					}catch(Exception e){
 						Exception cause = (Exception) ExceptionUtils.getCause(e);
@@ -141,7 +141,7 @@ public class MsgShardHandler {
 				logger.info("处理单个消息成功，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId());
 			}catch(Exception e){
 				self.saveErrorMsgId(msgExt.getKeys(), msgExt.getId());
-				logger.info("处理单个消息失败，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId());
+				logger.info("处理单个消息失败，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId(), e);
 				this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, e.getMessage());
 			}
 			
