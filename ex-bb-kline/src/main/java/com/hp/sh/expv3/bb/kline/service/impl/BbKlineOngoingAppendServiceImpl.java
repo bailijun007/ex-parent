@@ -55,6 +55,9 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
     @Value("${bb.kline.bbGroupIds}")
     private Set<Integer> supportBbGroupIds;
 
+    @Value("${kline.persistentData.updateEventPattern}")
+    private String persistentDataEventPattern;
+
     @Autowired
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
 
@@ -203,6 +206,9 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
                                     );
                                     logger.info("===============");
                                     notifyUpdate(asset, symbol, minute, oneMinuteInterval);
+
+                                    //1分钟持久化数据通知
+                                    notifyKlinePersistentData(asset, symbol,oneMinuteInterval, minute);
                                 }
                             }
                         }
@@ -216,6 +222,15 @@ public class BbKlineOngoingAppendServiceImpl implements BbKlineOngoingAppendServ
 
     }
 
+
+    private void notifyKlinePersistentData(String asset, String symbol, Integer targetFreq, Long minute) {
+        String key = BbKlineRedisKeyUtil.buildKlinePersistentDataRedisKey(persistentDataEventPattern, asset, symbol, targetFreq);
+         long ms = TimeUnit.MINUTES.toMillis(minute);
+        bbKlineOngoingRedisUtil.zadd(key, new HashMap<String, Double>() {{
+                    put(BbKlineRedisKeyUtil.buildUpdateRedisMember(asset, symbol, targetFreq, ms), Long.valueOf(ms).doubleValue());
+                }}
+        );
+    }
 
     public BBKLine append(BBKLine oldkLine, BBKLine newkLine) {
         // oldKline 有可能是空，直接返回newKline

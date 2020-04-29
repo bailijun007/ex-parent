@@ -50,7 +50,7 @@ public class BbKlinePersistentTask {
     private BbKlinePersistentDataService bbKlinePersistentDataService;
 
 
-    @Scheduled(cron = "*/59 * * * * *")
+    @Scheduled(cron = "0/59 * * * * ?")
     public void start1MinutePersistentTask() {
         List<BBSymbol> bbSymbolList = supportBbGroupIdsJobService.getSymbols();
 
