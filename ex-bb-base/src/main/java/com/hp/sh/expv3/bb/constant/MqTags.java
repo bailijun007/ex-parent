@@ -9,6 +9,8 @@ public class MqTags {
 
 	public static final String TAGS_BOOK_RESET = "BB_BOOK_RESET";
 	
+	public static final String TAGS_ORDER_REBASE = "BB_ORDER_REBASE";
+	
 	//consumer
 	public static final String TAGS_CANCELLED = "BB_MATCH_ORDER_CANCELLED";
 
