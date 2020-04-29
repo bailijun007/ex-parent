@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.component.lock;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -23,9 +24,15 @@ public class RedissonDistributedLocker implements Locker{
     
     @Value("${redisson.lock.module:}")
     private String modulePrefix;
+    
+    public RLock getLock(String lockKey) {
+        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
+        return lock;
+    }
+
 
     public boolean lock(String lockKey, Integer timeout) {
-        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
+        RLock lock = this.getLock(lockKey);
         if(timeout!=null){
         	lock.lock(timeout, TimeUnit.SECONDS);
         }
@@ -33,7 +40,7 @@ public class RedissonDistributedLocker implements Locker{
     }
 
     public boolean unlock(String lockKey) {
-        RLock lock = redissonClient.getLock(FULLKEY(lockKey));
+    	RLock lock = this.getLock(lockKey);
         lock.unlock();
         return true;
     }
