@@ -24,8 +24,6 @@ public class PLPayService {
     @Autowired
     private PLpayClient pLpayClient;
 
-//    @Value("${expv3.base.url}")
-//    private String baseUrl;
 
     @Value("${plpay.server.c2c_fee_ratio}")
     private String c2cFeeRatio;
@@ -40,7 +38,6 @@ public class PLPayService {
      * @param tarCurrency 兑换币种:USDT
      * @param fabiAmt     法定货币总金额 100
      * @param tarVolume   兑换成资产数量：14.5
-     *                    TODO 老王，入金回调如何确保幂等（高并发情况下，如何确认入金状态与入金账户的修改）
      * @return 返回转发的url地址，调用方需要转发到该地址获取数据
      */
     public String rujin(long userId, BigDecimal ratio, String srcCurrency, String tarCurrency, BigDecimal tarVolume, BigDecimal fabiAmt,String receiveUrl,String pickupUrl) {
@@ -57,9 +54,6 @@ public class PLPayService {
 
         //订单金额
         BigDecimal orderAmount = ratio.multiply(tarVolume).setScale(2, RoundingMode.UP);
-//        String orderAmount = fabiAmt.stripTrailingZeros().toPlainString();
-//        String receiveUrl = getReceiveUrl();
-//        String pickupUrl = getPickupUrl();
         //获取加密后的签名
         String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount+"", orderCurrency);
         //转发请求到第三方支付，并返回支付路径
@@ -72,8 +66,6 @@ public class PLPayService {
         c2cOrder.setExchangeCurrency(tarCurrency);
         c2cOrder.setPrice(ratio);
         c2cOrder.setVolume(tarVolume);
-        //计算USDT 就是 orderAmount*( 1 - 手续费率) / 你系统的CNY:USD汇率;
-//        BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
 
         c2cOrder.setAmount(orderAmount);
         c2cOrder.setType(C2cConst.C2C_BUY);
@@ -90,29 +82,6 @@ public class PLPayService {
         buyService.saveC2cOrder(c2cOrder);
 
         return url;
-    }
-
-
-
-
-
-    private String getOrderAmout() {
-        return "";
-    }
-
-    //通知回调地址
-//    private String getReceiveUrl() {
-//        return baseUrl + "api/callback/c2c/deposit/notify";
-//    }
-//
-//    //交易完成跳转URL
-//    private String getPickupUrl() {
-//        return baseUrl+"api/callback/c2c/deposit/tradeSuccessSkip";
-//    }
-
-
-    private String getShopNo() {
-        return "";
     }
 
 
