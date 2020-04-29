@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.bb.job;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class BBMsgHandleThreadJobConfig{
 	@Bean("__")
 	int begin(){
 		List<Integer> list = shardGroup.getShardIdList();
+//		list = Arrays.asList(2);
 		for(int shardId : list){
 			MsgShardHandlerThread thread = new MsgShardHandlerThread(msgShardHandler, shardId);
 			threadMap.put(shardId, thread);

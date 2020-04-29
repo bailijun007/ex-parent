@@ -227,7 +227,6 @@ public class BBOrderService {
 		return true;
 	}
 
-	@LockIt(key="U-${userId}")
 	public void setCancelled(long userId, String asset, String symbol, long orderId){
 		this.doCancel(userId, asset, symbol, orderId);
 	}
@@ -292,7 +291,6 @@ public class BBOrderService {
 		}
 	}
 
-	@LockIt(key="U-${userId}")
 	public void setNewStatus(long userId, String asset, String symbol, long orderId){
 		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
@@ -304,12 +302,6 @@ public class BBOrderService {
 		long now = DbDateUtils.now();
 		
 		this.orderUpdateService.setNewStatus(order, now);
-	}
-
-	@LockIt(key="U-${userId}")
-	public void test(Long userId) {
-		this.freezeMargin(1L, "USDT", 1L, BigDecimal.ONE, BBAccountTradeType.ORDER_BUY, "test1");
-		this.freezeMargin(1L, "USDT", 2L, BigDecimal.ONE, BBAccountTradeType.ORDER_BUY, "test2");
 	}
 	
 }

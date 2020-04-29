@@ -65,7 +65,6 @@ public class BBTradeService {
     private ApplicationEventPublisher publisher;
 	
 	//处理成交订单
-    @LockIt(key="U-${msg.accountId}")
 	public void handleTrade(BBTradeVo msg){
 		BBOrder order = this.orderQueryService.getOrder(msg.getAccountId(), msg.getOrderId());
 		boolean yes = this.canTrade(order, msg);
@@ -292,7 +291,8 @@ public class BBTradeService {
 		
 		////////////////
 		if(order.getStatus() == OrderStatus.CANCELED){
-			throw new ExSysException(BBOrderError.CANCELED, "canTrade", tradeMsg);
+//			throw new ExSysException(BBOrderError.CANCELED, "canTrade", tradeMsg);
+			return false;
 		}
 		if(order.getStatus() == OrderStatus.FILLED){
 			throw new ExSysException(BBOrderError.FILLED, "canTrade", tradeMsg);
@@ -301,7 +301,8 @@ public class BBTradeService {
 			throw new ExSysException(BBOrderError.NOT_ACTIVE, "canTrade", tradeMsg, "FilledVolume");
 		}
 		if(IntBool.isFalse(order.getActiveFlag())){
-			throw new ExSysException(BBOrderError.NOT_ACTIVE, "canTrade", tradeMsg);
+//			throw new ExSysException(BBOrderError.NOT_ACTIVE, "canTrade", tradeMsg);
+			return false;
 		}
 		////////////////
 		

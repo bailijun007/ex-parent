@@ -7,22 +7,22 @@ public class MsgShardHandlerThread extends Thread{
 
     private static final Logger logger = LoggerFactory.getLogger(MsgShardHandlerThread.class);
 
-	private final MsgShardHandler matchedHandler;
+	private final MsgShardHandler msgShardHandler;
 
 	private final Object lock = new Object();
 	
 	private final Integer shardId;
 	
-	public MsgShardHandlerThread(MsgShardHandler matchedHandler, Integer shardId) {
+	public MsgShardHandlerThread(MsgShardHandler msgShardHandler, Integer shardId) {
 		super("MsgShardHandlerThread-"+shardId);
-		this.matchedHandler = matchedHandler;
+		this.msgShardHandler = msgShardHandler;
 		this.shardId = shardId;
 	}
 
 	public void run(){
 		while(true){
 			try{
-				matchedHandler.handlePending(shardId);
+				msgShardHandler.handlePending(shardId);
 			}catch(Exception e){
 				logger.error("分派消息失败：{}", e.getMessage(), e);
 				try {

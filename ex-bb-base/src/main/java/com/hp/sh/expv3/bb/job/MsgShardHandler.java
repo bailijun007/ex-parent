@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
@@ -27,7 +27,6 @@ import com.hp.sh.expv3.bb.module.msg.service.BBMessageExtService;
 import com.hp.sh.expv3.bb.module.msg.service.BBMessageOffsetService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
-import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqConsumer;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
@@ -57,7 +56,7 @@ public class MsgShardHandler {
 	@Autowired
 	private RedissonDistributedLocker locker;
 
-	private int batchNum = 1000;
+	private int batchNum = 500;
 	
 	public void handlePending(int shardId) throws Exception {
 		Lock lock = locker.getLock("msgHandlerSardJobLock-"+shardId, -1);
@@ -90,13 +89,16 @@ public class MsgShardHandler {
 				List<BBMessageExt> userMsgList = entry.getValue();
 				while(true){
 					try{
-						logger.info("处理用户消息：shardId={}, userId={}, size={}", shardId, userId, userMsgList.size());
+						long time = System.currentTimeMillis();
+						logger.info("批量处理用户消息：shardId={}, userId={}, size={}", shardId, userId, userMsgList.size());
 						self.handleBatch(userId, userMsgList);
 						offsetId = userMsgList.get(userMsgList.size()-1).getId();
-						logger.info("处理用户消息成功：shardId={}, userId={}, size={}", shardId, userId, userMsgList.size());
+						time = System.currentTimeMillis() - time;
+						logger.info("批量处理用户消息成功：shardId={}, userId={}, size={}, time={}", shardId, userId, userMsgList.size(), time);
+						break;
 					}catch(Exception e){
 						Exception cause = (Exception) ExceptionUtils.getCause(e);
-						logger.error("批量处理消息失败:{},{}", e.getMessage(), cause.toString(), e);
+						logger.error("批量处理用户消息失败:{},{}", e.getMessage(), cause.toString(), e);
 						if(isResendException(e)){
 							try {
 								Thread.sleep(10);
@@ -106,7 +108,7 @@ public class MsgShardHandler {
 							continue;
 						}else{
 							for(BBMessageExt msgExt : userMsgList){
-								self.handleMsgAndErr(msgExt);
+								self.handleMsgAndErr(msgExt.getUserId(), msgExt);
 								offsetId = msgExt.getId();
 							}
 							break;
@@ -127,7 +129,8 @@ public class MsgShardHandler {
 		}
 	}
 
-	public void handleMsgAndErr(BBMessageExt msgExt){
+	@LockIt(key="U-${userId}")
+	public void handleMsgAndErr(Long userId, BBMessageExt msgExt){
 		Long errMsgId = self.getErrorMsgId(msgExt.getKeys());
 		if(errMsgId!=null && msgExt.getId()>errMsgId){
 			this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, "前面存在未处理的消息:"+errMsgId);
@@ -163,12 +166,12 @@ public class MsgShardHandler {
 	}
 	
 	@CachePut(cacheNames="errorMsg", key="#orderId")
-	private Long saveErrorMsgId(Object orderId, Long msgId){
+	public Long saveErrorMsgId(Object orderId, Long msgId){
 		return msgId;
 	}
 
 	@Cacheable(cacheNames="errorMsg", key="#orderId")
-	private Long getErrorMsgId(Object orderId){
+	public Long getErrorMsgId(Object orderId){
 		return null;
 	}
 	
