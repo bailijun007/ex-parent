@@ -16,6 +16,7 @@ import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.mq.msg.out.BookResetMsg;
 import com.hp.sh.expv3.bb.mq.msg.out.OrderPendingCancelMsg;
 import com.hp.sh.expv3.bb.mq.msg.out.OrderPendingNewMsg;
+import com.hp.sh.expv3.bb.mq.msg.out.OrderRebaseMsg;
 
 @Component
 public class MatchMqSender extends BaseMqSender{
@@ -70,6 +71,10 @@ public class MatchMqSender extends BaseMqSender{
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void sendBookRebaseMsg(OrderRebaseMsg msg) {
+		this.sendOrderMsg(msg, MqTags.TAGS_ORDER_REBASE, MqTags.TAGS_ORDER_REBASE);
 	}
 
 }

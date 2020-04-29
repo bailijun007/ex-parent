@@ -26,6 +26,8 @@ import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqConsumer;
 import com.hp.sh.expv3.bb.mq.msg.in.BbOrderCancelMqMsg;
+import com.hp.sh.expv3.bb.mq.msg.out.BookResetMsg;
+import com.hp.sh.expv3.bb.mq.msg.out.OrderRebaseMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -125,7 +127,8 @@ public class BBMaintainAction{
 
 	@ApiOperation(value = "resendPending")
 	@GetMapping(value = "/api/bb/maintain/resendPending")	
-	public Map resendPending(String symbol){
+	public Map resendPending(String asset, String symbol){
+		this.matchMqSender.sendBookRebaseMsg(new OrderRebaseMsg(asset, symbol));
 		Map map = new HashMap();
 		Integer resendPendingCancel = this.resendPendingCancel(symbol);
 		Integer resendPendingNew = this.resendPendingNew(symbol);
