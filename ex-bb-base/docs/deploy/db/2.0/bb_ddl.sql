@@ -164,6 +164,45 @@ COMMENT='币币手续费_账户明细'
 
 ;
 
+-- ----------------------------
+-- Table structure for `bb_message_ext`
+-- ----------------------------
+DROP TABLE IF EXISTS `bb_message_ext`;
+CREATE TABLE `bb_message_ext` (
+  `id` bigint(20) NOT NULL,
+  `msg_id` varchar(64) NOT NULL,
+  `tags` varchar(40) NOT NULL,
+  `keys` varchar(64) NOT NULL,
+  `msg_body` varchar(2000) NOT NULL,
+  `error_info` varchar(3000) DEFAULT NULL COMMENT '异常信息',
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+  `asset` varchar(20) NOT NULL COMMENT '资产',
+  `symbol` varchar(20) NOT NULL COMMENT '交易对（合约品种）',
+  `shard_id` int(11) NOT NULL DEFAULT '0',
+  `created` bigint(20) NOT NULL COMMENT '创建时间',
+  `status` int(11) NOT NULL,
+  PRIMARY KEY (`id`,`shard_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='币币_撮合消息'
+PARTITION BY LINEAR KEY (shard_id) PARTITIONS 32
+
+;
+
+-- ----------------------------
+-- Table structure for `bb_message_offset`
+-- ----------------------------
+DROP TABLE IF EXISTS `bb_message_offset`;
+CREATE TABLE `bb_message_offset` (
+`shard_id`  int(11) NOT NULL COMMENT '分片Id' ,
+`readed_offset`  bigint(20) NULL DEFAULT NULL COMMENT '读取位置' ,
+`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
+PRIMARY KEY (`shard_id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+COMMENT='消息偏移量(系统表)'
+
+;
+
 CREATE TABLE `bb_mq_msg` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `message_id` varchar(64) DEFAULT NULL COMMENT 'messageId',
@@ -180,7 +219,7 @@ CREATE TABLE `bb_mq_msg` (
   PRIMARY KEY (`id`),
   KEY `idx_tag_key` (`tag`,`key`,`user_id`),
   KEY `idx_sort_id` (`sort_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6199 DEFAULT CHARSET=utf8mb4 COMMENT='未处理的_消息';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='未处理的_消息';
 
 
 
