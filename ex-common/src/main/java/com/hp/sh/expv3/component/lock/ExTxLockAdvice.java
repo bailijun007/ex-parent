@@ -40,7 +40,6 @@ public class ExTxLockAdvice extends LockAdvice {
     	String clazzStr = method.getDeclaringClass().getName();
     	String methodStr = method.getName();
     	String methodFullName = clazzStr+"."+methodStr+"(),args="+Arrays.toString(args);
-    	UpdateInterceptor.setVar(methodFullName);
     	
 		if(txIdService!=null){
 			Long txId = txIdService.getTxId();
@@ -54,7 +53,6 @@ public class ExTxLockAdvice extends LockAdvice {
     		return;
     	}
 
-		UpdateInterceptor.setVar(null);
 		TxIdContext.reset();
 		
 	}

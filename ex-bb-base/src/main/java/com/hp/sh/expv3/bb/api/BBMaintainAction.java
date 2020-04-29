@@ -257,7 +257,7 @@ public class BBMaintainAction{
 	@GetMapping(value = "/api/bb/maintain/thead/queueSizeMap")	
 	public Map getQueueSizeMap(){
 		Map result = new HashMap();
-		Map<Integer,Integer> map = tradeExecutors.getQueueSizeMap();
+		Map<Object,Integer> map = tradeExecutors.getQueueSizeMap();
 		int total = 0;
 		for(int n : map.values()){
 			total += n;
