@@ -53,14 +53,6 @@ public class BBMaintainAction{
 	private BBTradeService tradeService;
 	@Autowired
 	private BBOrderService orderService;
-
-	
-	@ApiOperation(value = "test")
-	@GetMapping(value = "/api/bb/maintain/test")
-	public String test(Long userId){
-		this.orderService.test(userId);
-		return null;
-	}
 	
 	@ApiOperation(value = "querySynchFee")
 	@GetMapping(value = "/api/bb/maintain/querySynchFee")
