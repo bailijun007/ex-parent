@@ -111,6 +111,14 @@
 			where id=#{id} and user_id=#{userId}
 	</select>
 
+	<select id="lockById" resultMap="BBOrder">
+		select
+			<include refid="Base_Column_List" />
+		from bb_order
+			where id=#{id} and user_id=#{userId}
+		for update
+	</select>
+
 	<select id="exist" resultType="boolean">
 		select 
 			count(1)

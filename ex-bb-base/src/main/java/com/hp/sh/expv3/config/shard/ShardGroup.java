@@ -18,7 +18,7 @@ public class ShardGroup {
 	
 	public final Map<Long,Long> userDbShardMap = new HashMap<>();
 
-	@Value("${user.vip.thread.userIds}")
+	@Value("${user.vip.thread.userIds:}")
 	private String vipThreadUserIds;
 	
 	@Value("${user.vip.db.userIds:}")

@@ -2,20 +2,14 @@ package com.hp.sh.expv3.component.lock.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.commons.lock.Locker;
 
-@ConditionalOnProperty(name="redisson.distributed.lock", havingValue="true")
-@Component
 public class LocalLocker implements Locker{
 	private static final Logger logger = LoggerFactory.getLogger(LocalLocker.class);
 	

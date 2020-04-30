@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.component.lock;
+package com.hp.sh.expv3.component.lock.impl;
 
 import java.io.IOException;
 
@@ -10,12 +10,11 @@ import org.redisson.config.SingleServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
-public class RedissonAutoConfiguration {
-	private static final Logger logger = LoggerFactory.getLogger(RedissonAutoConfiguration.class);
+@Component
+public class ExRedissonClient {
+	private static final Logger logger = LoggerFactory.getLogger(ExRedissonClient.class);
 
 	@Value("${spring.redis.host}")
 	private String redisHost;
@@ -29,11 +28,7 @@ public class RedissonAutoConfiguration {
 	@Value("${spring.redis.database:0}")
 	private Integer database;
 	
-	@Value("${redisson.lock.prefix:redisson}")
-    private String keyPrefix;
-	
-    @Bean
-    public  RedissonClient getRedisson() throws IOException {
+    public RedissonClient getRedisson() throws IOException {
 
         Config config = new Config();
 

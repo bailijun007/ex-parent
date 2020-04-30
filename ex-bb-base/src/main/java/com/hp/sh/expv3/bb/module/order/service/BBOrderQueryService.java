@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,13 +16,13 @@ import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.module.order.dao.BBActiveOrderDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderDAO;
-import com.hp.sh.expv3.bb.module.order.dao.BBOrderLogDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
+import com.hp.sh.expv3.component.lock.LockConfig;
 import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
@@ -40,13 +38,13 @@ public class BBOrderQueryService {
 	private BBActiveOrderDAO bBActiveOrderDAO;
 
 	@Autowired
-	private BBOrderLogDAO bBOrderLogDAO;
-
-	@Autowired
 	private BBOrderTradeDAO bBOrderTradeDAO;
 
 	@Autowired
 	private BBCommonOrderStrategy orderStrategy;
+	
+    @Autowired
+    private LockConfig lockConfig;
 
 	public Long queryCount(Map<String, Object> params) {
 		return this.bbOrderDAO.queryCount(params);
@@ -114,8 +112,13 @@ public class BBOrderQueryService {
 	}
 	
 	public BBOrder getOrder(long userId, Long orderId){
-		BBOrder order = this.bbOrderDAO.findById(userId, orderId);
-		return order;
+		if(lockConfig.usePessimisticLock()){
+			BBOrder order = this.bbOrderDAO.lockById(userId, orderId);
+			return order;
+		}else{
+			BBOrder order = this.bbOrderDAO.findById(userId, orderId);
+			return order;
+		}
 	}
 	
 	@CrossDB

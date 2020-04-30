@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -23,13 +24,18 @@ public class ExTxLockAdvice extends LockAdvice {
 	@Autowired(required=false)
 	private TxIdService txIdService;
 	
+	@Value("${lock.use.anno:true}")
+	private Boolean useLockAnno;
+	
     public ExTxLockAdvice() {
 		super();
 	}
 
     @Autowired(required=false)
 	public void setLocker(Locker locker) {
-		super.setLocker(locker);
+    	if(Boolean.TRUE.equals(useLockAnno)){
+    		super.setLocker(locker);
+    	}
 	}
     
     protected Object doExeLock(ProceedingJoinPoint joinPoint) throws Throwable {

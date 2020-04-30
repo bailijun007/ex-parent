@@ -7,29 +7,19 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.commons.lock.Locker;
 
 
-@Primary
-@ConditionalOnProperty(name="redisson.distributed.lock", havingValue="true")
-@Component
 public class RedissonDistributedLocker implements Locker {
 	private static final Logger logger = LoggerFactory.getLogger(RedissonDistributedLocker.class);
 
-	private static final long leaseTime = 30;
+	private long defaultLeaseTime = 30;
 	
-    @Autowired
     private RedissonClient redissonClient;
     
     private String keyPrefix = "redisson:lock:";
     
-    @Value("${redisson.lock.module:}")
     private String modulePrefix;
     
 	public void setRedissonClient(RedissonClient redissonClient) {
@@ -38,7 +28,7 @@ public class RedissonDistributedLocker implements Locker {
 
 	public Lock getLock(String lockKey) {
         RLock lock = redissonClient.getLock(FULLKEY(lockKey));
-        return new ExRedissonLock(lock, leaseTime);
+        return new ExRedissonLock(lock, defaultLeaseTime);
     }
 
 	public Lock getLock(String lockKey, long leaseTime) {
@@ -50,6 +40,31 @@ public class RedissonDistributedLocker implements Locker {
 		return keyPrefix+modulePrefix+key;
 	}
 	
+	
+	public String getKeyPrefix() {
+		return keyPrefix;
+	}
+
+	public void setKeyPrefix(String keyPrefix) {
+		this.keyPrefix = keyPrefix;
+	}
+
+	public String getModulePrefix() {
+		return modulePrefix;
+	}
+
+	public void setModulePrefix(String modulePrefix) {
+		this.modulePrefix = modulePrefix;
+	}
+
+	public long getDefaultLeaseTime() {
+		return defaultLeaseTime;
+	}
+
+	public void setDefaultLeaseTime(long defaultLeaseTime) {
+		this.defaultLeaseTime = defaultLeaseTime;
+	}
+
 	class ExRedissonLock extends MyRedissonLock{
 		
 		private long leaseTime = -1;

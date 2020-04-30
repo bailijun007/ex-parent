@@ -29,6 +29,7 @@ import com.hp.sh.expv3.bb.vo.request.ReleaseFrozenRequest;
 import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
+import com.hp.sh.expv3.component.lock.LockConfig;
 import com.hp.sh.expv3.config.db.SnGenerator;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.error.ExCommonError;
@@ -50,6 +51,9 @@ public class BBAccountCoreService{
 	
 	@Autowired
 	private SnGenerator generator;
+	
+    @Autowired
+    private LockConfig lockConfig;
     
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -214,7 +218,12 @@ public class BBAccountCoreService{
 	}
 
 	private BBAccount getAccount(Long userId, String asset){
-		BBAccount account = this.accountDAO.get(userId, asset);
+		BBAccount account;
+		if(lockConfig.usePessimisticLock()){
+			account = this.accountDAO.getAndLock(userId, asset);
+		}else{
+			account = this.accountDAO.get(userId, asset);
+		}
 		if(account==null){
 			account = new BBAccount();
 			account.setAsset(asset);
