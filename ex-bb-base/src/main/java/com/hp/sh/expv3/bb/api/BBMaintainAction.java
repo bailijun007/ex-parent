@@ -27,6 +27,7 @@ import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.out.OrderRebaseMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.config.shard.ShardGroup;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -54,6 +55,16 @@ public class BBMaintainAction{
 	private BBTradeService tradeService;
 	@Autowired
 	private BBOrderService orderService;
+	
+	@Autowired
+	private ShardGroup shardGroup;
+
+	@ApiOperation(value = "userShard")
+	@GetMapping(value = "/api/bb/maintain/userShard")
+	public Long userShard(Long userId){
+		Long shardId = shardGroup.getMsgSardId(userId);
+		return shardId;
+	}
 	
 	@ApiOperation(value = "querySynchFee")
 	@GetMapping(value = "/api/bb/maintain/querySynchFee")

@@ -24,12 +24,12 @@ public class BBMsgHandleThreadJobConfig{
 	@Autowired
 	private ShardGroup shardGroup;
 	
-	private final Map<Integer,MsgShardHandlerThread> threadMap = new HashMap<Integer,MsgShardHandlerThread>();
+	private final Map<Long,MsgShardHandlerThread> threadMap = new HashMap<Long,MsgShardHandlerThread>();
 	
 	@Bean("__")
 	int begin(){
-		List<Integer> list = shardGroup.getShardIdList();
-		for(int shardId : list){
+		List<Long> list = shardGroup.getShardIdList();
+		for(Long shardId : list){
 			MsgShardHandlerThread thread = new MsgShardHandlerThread(msgShardHandler, shardId);
 			threadMap.put(shardId, thread);
 			thread.start();
@@ -37,7 +37,7 @@ public class BBMsgHandleThreadJobConfig{
 		return -1;
 	}
 
-	public void trigger(int shardId){
+	public void trigger(long shardId){
 		MsgShardHandlerThread thread = threadMap.get(shardId);
 		if(thread==null){
 			logger.error("ShardThread=null,shardId={}",shardId);

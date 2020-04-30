@@ -51,7 +51,7 @@ public class BBMessageExt implements UserData{
 	private Long created;
 	
 	//分片Id
-	private int shardId;
+	private Long shardId;
 	
 	private int status;
 	
@@ -148,11 +148,11 @@ public class BBMessageExt implements UserData{
 		this.status = status;
 	}
 
-	public int getShardId() {
+	public Long getShardId() {
 		return shardId;
 	}
 
-	public void setShardId(int shardId) {
+	public void setShardId(Long shardId) {
 		this.shardId = shardId;
 	}
 

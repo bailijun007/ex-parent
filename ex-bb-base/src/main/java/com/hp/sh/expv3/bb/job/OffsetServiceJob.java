@@ -26,8 +26,8 @@ public class OffsetServiceJob {
 	
 	@Scheduled(cron = "0/30 * * * * ?")
 	public void handle() {
-		List<Integer> list = shardGroup.getShardIdList();
-		for(int shardId : list){
+		List<Long> list = shardGroup.getShardIdList();
+		for(Long shardId : list){
 			offsetService.persistCachedOffset(shardId);
 			
 		}

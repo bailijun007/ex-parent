@@ -10,7 +10,7 @@ import javax.persistence.Table;
 public class BBMessageOffset {
 
 	//分片Id
-	private Integer shardId;
+	private Long shardId;
 	
 	//读取位置
 	private Long readedOffset;
@@ -21,11 +21,11 @@ public class BBMessageOffset {
     public BBMessageOffset() {
 	}
 
-	public Integer getShardId() {
+	public Long getShardId() {
 		return shardId;
 	}
 
-	public void setShardId(Integer shardId) {
+	public void setShardId(Long shardId) {
 		this.shardId = shardId;
 	}
 

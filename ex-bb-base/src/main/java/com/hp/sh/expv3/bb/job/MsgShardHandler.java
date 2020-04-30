@@ -56,9 +56,9 @@ public class MsgShardHandler {
 	@Autowired
 	private RedissonDistributedLocker locker;
 
-	private int batchNum = 500;
+	private int batchNum = 600;
 	
-	public void handlePending(int shardId) throws Exception {
+	public void handlePending(Long shardId) throws Exception {
 		Lock lock = locker.getLock("msgHandlerSardJobLock-"+shardId, -1);
 		boolean isLocked = lock.tryLock(0L, TimeUnit.SECONDS);
 		if(isLocked){
@@ -73,7 +73,7 @@ public class MsgShardHandler {
 		
 	}
 
-	void doHandlePending(int shardId) {
+	void doHandlePending(Long shardId) {
 		Long offsetId = this.offsetService.getCachedShardOffset(shardId);
 		while(true){
 			List<BBMessageExt> shardMsgList = this.msgService.findFirstList(batchNum, shardId, offsetId);
@@ -130,6 +130,7 @@ public class MsgShardHandler {
 	}
 
 	@LockIt(key="U-${userId}")
+	@Transactional(rollbackFor=Exception.class)
 	public void handleMsgAndErr(Long userId, BBMessageExt msgExt){
 		Long errMsgId = self.getErrorMsgId(msgExt.getKeys());
 		if(errMsgId!=null && msgExt.getId()>errMsgId){

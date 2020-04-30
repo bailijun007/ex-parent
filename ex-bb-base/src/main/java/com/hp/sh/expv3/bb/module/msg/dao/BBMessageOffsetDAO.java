@@ -16,7 +16,7 @@ import com.hp.sh.expv3.bb.module.msg.entity.BBMessageOffset;
  */
 public interface BBMessageOffsetDAO extends BaseMapper<BBMessageOffset,Long> {
 	
-	public BBMessageOffset findById(@Param("shardId") Integer shardId);
+	public BBMessageOffset findById(@Param("shardId") Long shardId);
 	
 	public List<BBMessageOffset> queryList(Map<String,Object> params);
 	

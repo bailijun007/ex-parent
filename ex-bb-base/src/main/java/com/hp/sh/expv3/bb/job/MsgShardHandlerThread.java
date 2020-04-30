@@ -11,9 +11,9 @@ public class MsgShardHandlerThread extends Thread{
 
 	private final Object lock = new Object();
 	
-	private final Integer shardId;
+	private final Long shardId;
 	
-	public MsgShardHandlerThread(MsgShardHandler msgShardHandler, Integer shardId) {
+	public MsgShardHandlerThread(MsgShardHandler msgShardHandler, Long shardId) {
 		super("MsgShardHandlerThread-"+shardId);
 		this.msgShardHandler = msgShardHandler;
 		this.shardId = shardId;

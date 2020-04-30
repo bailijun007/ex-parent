@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,15 +34,15 @@ public class TestAction2 {
 	@ApiOperation(value = "测试cache")
 	@GetMapping(value = "/api/bb/test/cache")
 	public Long cache() throws Exception{
-		Long id = offsetService.cacheShardOffset(1, 100L);
-		offsetService.getCachedShardOffset(1);
-		offsetService.getCachedShardOffset(1);
+		Long id = offsetService.cacheShardOffset(1L, 100L);
+		offsetService.getCachedShardOffset(1L);
+		offsetService.getCachedShardOffset(1L);
 		return id;
 	}
 
 	@ApiOperation(value = "测试保存数据库")
 	@GetMapping(value = "/api/bb/test/dbsave")
-//	@Transactional(rollbackFor=Exception.class)
+	@Transactional(rollbackFor=Exception.class)
 	public Long dbsave(){
 		String tag="test";
 		String ext="test";
@@ -106,20 +107,18 @@ public class TestAction2 {
 	
 	@ApiOperation(value = "测试提交任务")
 	@GetMapping(value = "/api/bb/test/submitTask")
-	public Long submitTask(Integer shardId) throws Exception{
+	public Long submitTask(Long shardId) throws Exception{
 		long time = System.currentTimeMillis();
 		msgHandler.handlePending(shardId);
 		time = System.currentTimeMillis()-time;
 		return time;
 	}
 	
-	
 	@ApiOperation(value = "任务执行结果")
 	@GetMapping(value = "/api/bb/test/taskResult")
 	public Long taskResult() throws IOException{
 		return 0L;
 	}
-	
 	
 	private BBMqMsg getBBMqMsg(BBTradeVo msg){
 		BBMqMsg msgEntity = new BBMqMsg();

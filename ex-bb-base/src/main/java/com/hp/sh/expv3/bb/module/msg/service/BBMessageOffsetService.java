@@ -29,17 +29,17 @@ public class BBMessageOffsetService{
 	private BBMessageOffsetService self;
 	
 	@CachePut(key="#shardId")
-	public Long cacheShardOffset(Integer shardId, Long offsetId){
+	public Long cacheShardOffset(Long shardId, Long offsetId){
 		return offsetId;
 	}
 	
 	@Cacheable(key="#shardId")
-	public Long getCachedShardOffset(Integer shardId){
+	public Long getCachedShardOffset(Long shardId){
 		BBMessageOffset offset = this.getMessageOffset(shardId);
 		return offset.getReadedOffset();
 	}
 	
-	public void persistCachedOffset(Integer shardId){
+	public void persistCachedOffset(Long shardId){
 		Long offset = self.getCachedShardOffset(shardId);
 		if(offset==null){
 			return;
@@ -51,7 +51,7 @@ public class BBMessageOffsetService{
 		this.messageOffsetDAO.update(msgOffset);
 	}
 
-	public BBMessageOffset getMessageOffset(Integer shardId ) {
+	public BBMessageOffset getMessageOffset(Long shardId ) {
 		BBMessageOffset offset = this.messageOffsetDAO.findById(shardId);
 		if(offset==null){
 			offset = new BBMessageOffset();

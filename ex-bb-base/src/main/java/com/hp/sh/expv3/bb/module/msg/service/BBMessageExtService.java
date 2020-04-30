@@ -158,7 +158,7 @@ public class BBMessageExtService{
 		return msg;
 	}
 
-	public List<BBMessageExt> findFirstList(int pageSize, Integer shardId, Long startId){
+	public List<BBMessageExt> findFirstList(int pageSize, Long shardId, Long startId){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, pageSize, 10000L));
 		params.put("shardId", shardId);
@@ -170,7 +170,7 @@ public class BBMessageExtService{
 		return msgList;
 	}
 	
-	private Integer getMsgSardId(BBMessageExt msgEntity){
+	private Long getMsgSardId(BBMessageExt msgEntity){
 		return shardGroup.getMsgSardId(msgEntity.getUserId());
 	}
 	
