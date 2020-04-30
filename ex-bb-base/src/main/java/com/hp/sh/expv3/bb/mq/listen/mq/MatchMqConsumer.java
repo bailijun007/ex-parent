@@ -3,6 +3,7 @@ package com.hp.sh.expv3.bb.mq.listen.mq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -19,8 +20,9 @@ import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
-//@Component
+@Component
 @MQListener(orderly=MQListener.ORDERLY_YES)
+@ConditionalOnProperty(name="mq.orderly.consumer.select", havingValue="1")
 public class MatchMqConsumer {
 	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer.class);
 
@@ -32,6 +34,11 @@ public class MatchMqConsumer {
 
 	@Autowired
 	private BBMqMsgService msgService;
+
+	public MatchMqConsumer() {
+		super();
+		logger.info("init");
+	}
 
 	//撮合未成交
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)

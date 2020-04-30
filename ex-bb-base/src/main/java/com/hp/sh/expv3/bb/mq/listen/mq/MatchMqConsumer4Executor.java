@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.constant.MqTags;
@@ -16,8 +17,9 @@ import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Deprecated
-//@Component
+@Component
 @MQListener(orderly=MQListener.ORDERLY_YES)
+@ConditionalOnProperty(name="mq.orderly.consumer.select", havingValue="1")
 public class MatchMqConsumer4Executor {
 	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer4Executor.class);
 
@@ -25,6 +27,11 @@ public class MatchMqConsumer4Executor {
 	private BBMatchedTradeService matchedTradeService;
 	@Autowired
 	private BBPublisher sender;
+
+	public MatchMqConsumer4Executor() {
+		super();
+		logger.info("init");
+	}
 
 	/**
 	 * 撮合成功

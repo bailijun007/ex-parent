@@ -3,6 +3,7 @@ package com.hp.sh.expv3.bb.mq.listen.mq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.constant.MqTags;
@@ -18,8 +19,9 @@ import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
 @MQListener(orderly=MQListener.ORDERLY_YES)
-public class MatchMqConsumer4Seq {
-	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer4Seq.class);
+@ConditionalOnProperty(name="mq.orderly.consumer.select", havingValue="2")
+public class MatchMqConsumer4Shard {
+	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer4Shard.class);
 
 	@Autowired
 	private BBOrderService orderService;
@@ -32,6 +34,11 @@ public class MatchMqConsumer4Seq {
 	
 	@Autowired
 	private BBMsgHandleThreadJobConfig msgHandleThreadJob;
+
+	public MatchMqConsumer4Shard() {
+		super();
+		logger.info("init");
+	}
 
 	//撮合未成交
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)

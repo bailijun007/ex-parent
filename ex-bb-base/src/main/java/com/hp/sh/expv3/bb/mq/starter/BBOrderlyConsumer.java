@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -59,9 +60,10 @@ public class BBOrderlyConsumer {
 	
 	private final Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
+	@Order
 	@Scheduled(cron = "0 * * * * ?")
-	@PostConstruct
-	public void start123() throws MQClientException{
+	@Bean("startOrderlyConsumer123")
+	public String start123() throws MQClientException{
 		List<BBSymbolVO> symbolList = this.metadataService.getAllBBContract();
 		
 		String subExpression = this.subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE);
@@ -96,7 +98,7 @@ public class BBOrderlyConsumer {
 	
 		int n = this.mqMap.size();
 		logger.debug("mq:{},{}", n, this.mqMap);
-		return;
+		return null;
 		
 	}
 
