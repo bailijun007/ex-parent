@@ -5,6 +5,7 @@ package com.hp.sh.expv3.component.dbshard;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,6 @@ import com.hp.sh.expv3.component.context.IdGeneratorContext;
  * @author wangjg
  */
 public class TableShardingByDateAsset implements ComplexKeysShardingAlgorithm {
-	
-	private static final String dateFormat = "yyyyMM";
 	
 	public TableShardingByDateAsset() {
 	}

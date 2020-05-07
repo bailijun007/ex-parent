@@ -65,17 +65,24 @@ public class BBMaintainAction{
 	@Autowired
 	private DbGlobalService dbGlobalService;
 	
-	@ApiOperation(value = "createOrderTable")
-	@GetMapping(value = "/api/bb/maintain/createOrderTables")
+	@ApiOperation(value = "createNextMonthTables")
+	@GetMapping(value = "/api/bb/maintain/createNextMonthTables")
 	public Long createNextMonthTables(){
 		dbGlobalService.createNextMonthTables();
 		return 0L;
 	}
+	
+	@ApiOperation(value = "createCurMonthTables")
+	@GetMapping(value = "/api/bb/maintain/createCurMonthTables")
+	public Long createCurMonthTables(){
+		dbGlobalService.createCurMonthTables();
+		return 0L;
+	}
 
-	@ApiOperation(value = "createOrderTable")
-	@GetMapping(value = "/api/bb/maintain/createOrderTable")
-	public Long createOrderTable(String asset, String symbol, Long start, Long end){
-		dbGlobalService.createOrderTable(asset, symbol, start, end);
+	@ApiOperation(value = "createNewSymbol")
+	@GetMapping(value = "/api/bb/maintain/createNewSymbol")
+	public Long createNewSymbol(String asset, String symbol){
+		dbGlobalService.createNewSymbol(asset, symbol);
 		return 0L;
 	}
 	

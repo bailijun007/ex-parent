@@ -7,9 +7,26 @@
 		select table_name 
 			from information_schema.tables 
 		<where> 
-		<if test="dbName!=null and dbName!=''"> and table_schema=#{dbName}</if>
+			<if test="dbName!=null and dbName!=''">
+			 and table_schema=#{dbName}
+			</if>
 			and table_name=#{tableName}
 		</where>
+		order by table_name desc
+	</select>
+	
+	<select id="findTableByKeyword" resultType="string">
+		select table_name 
+			from information_schema.tables 
+		<where> 
+			<if test="dbName!=null and dbName!=''">
+			 and table_schema=#{dbName}
+			</if>
+			and table_name like CONCAT('',#{keyword},'%')
+			and right(table_name, 3)!='_sn'
+			and right(table_name, 3)!='_no'
+		</where>
+		order by table_name desc
 	</select>
 	
 	<update id="createAccountRecordTable">

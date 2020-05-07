@@ -10,6 +10,8 @@ import org.apache.ibatis.annotations.Param;
 public interface DbGlobalDAO {
 	
 	public String findTableName(@Param("dbName") String dbName, @Param("tableName") String tableName);
+	
+	public String findTableByKeyword(@Param("dbName") String dbName, @Param("keyword") String keyword);
 
 	public Long createAccountRecordTable(@Param("tableName") String tableName);
 	

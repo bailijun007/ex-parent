@@ -28,17 +28,49 @@ public class DbGlobalService {
 	
 	@Autowired
 	private DbGlobalDAO dbGlobalDAO;
+
+	public void createCurMonthTables() {
+		Date nextMonth = DateUtils.monthEnd(new Date());
+		logger.info("nextMonth={}", nextMonth.toLocaleString());
+		String asset = "USDT";
+		String[] symbols = {"BTC_USDT","EOS_USDT","ETH_USDT","LTC_USDT","BCH_USDT","BSV_USDT","BYS_USDT","ETC_USDT","XRP_USDT"};
+		
+		for(String symbol:symbols){
+			this.createAccountRecordTable(asset, nextMonth.getTime(), nextMonth.getTime());
+			this.createOrderTable(asset, symbol, nextMonth.getTime(), nextMonth.getTime());
+			this.createOrderTradeTable(asset, symbol, nextMonth.getTime(), nextMonth.getTime());
+		}
+	}
 	
 	public void createNextMonthTables(){
 		Date date = DateUtils.monthEnd(new Date());
 		Date nextMonth = DateUtils.dayAdd(date, 1);
 		logger.info("nextMonth={}", nextMonth.toLocaleString());
 		String asset = "USDT";
-		String[] symbols = {"BTC_USDT", "BYS_USDT", "ETC_USDT", "ETH_USDT", "LTC_USDT"};
+		String[] symbols = {"BTC_USDT","EOS_USDT","ETH_USDT","LTC_USDT","BCH_USDT","BSV_USDT","BYS_USDT","ETC_USDT","XRP_USDT"};
 		
 		for(String symbol:symbols){
+			this.createAccountRecordTable(asset, nextMonth.getTime(), nextMonth.getTime());
 			this.createOrderTable(asset, symbol, nextMonth.getTime(), nextMonth.getTime());
+			this.createOrderTradeTable(asset, symbol, nextMonth.getTime(), nextMonth.getTime());
 		}
+	}
+	
+	public void createNewSymbol(String asset, String symbol){
+		String firstTableName = this.dbGlobalDAO.findTableByKeyword(dbName, ORDER_TRADE+"_");
+		
+		Date date = DateUtils.monthEnd(new Date());
+		Date nextMonth = DateUtils.dayAdd(date, 1);
+		
+		Date start = nextMonth;
+		if(firstTableName!=null){
+			start = DateShardUtils.getTableDate(firstTableName);
+		}
+		
+		logger.info("nextMonth={}", nextMonth.toLocaleString());
+		
+		this.createOrderTable(asset, symbol, start.getTime(), nextMonth.getTime());
+		this.createOrderTradeTable(asset, symbol, start.getTime(), nextMonth.getTime());
 	}
 	
 	public void createAccountRecordTable(String asset, Long start, Long end){

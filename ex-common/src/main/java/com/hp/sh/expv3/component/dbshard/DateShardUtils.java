@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 
+import com.gitee.hupadev.commons.date.DateUtils;
+
 public class DateShardUtils {
 	private static final String dateFormat = "yyyyMM";
 
@@ -50,6 +52,18 @@ public class DateShardUtils {
 		}
 		String str = DateFormatUtils.format(date, dateFormat);
 		return str;
+	}
+
+	public static Date parseTableDate(String dateStr){
+		Date date = DateUtils.parse(dateStr, dateFormat);
+		return date;
+	}
+	
+	public static Date getTableDate(String tableName) {
+		int pos = tableName.lastIndexOf('_');
+		String dateStr = tableName.substring(pos+1);
+		Date date = DateShardUtils.parseTableDate(dateStr);
+		return date;
 	}
 	
 	public static void main(String[] args) {
