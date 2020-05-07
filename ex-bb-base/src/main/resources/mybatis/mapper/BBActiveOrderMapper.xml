@@ -107,17 +107,6 @@
     </delete>
 
 	<!--  -->
-	
-	<select id="queryActiveOrderIds" resultType="long">
-		select 
-			id 
-		from 
-			bb_active_order
-		where 
-			user_id=#{userId}
-			and asset=#{asset}
-			and symbol=#{symbol}
-			<if test="bidFlag!=null"> and bid_flag=#{bidFlag}</if>
-	</select>
+
 	
 </mapper>

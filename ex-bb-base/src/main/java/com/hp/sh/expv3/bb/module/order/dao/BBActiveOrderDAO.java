@@ -24,8 +24,6 @@ public interface BBActiveOrderDAO extends BaseUserDataMapper<BBActiveOrder,Long>
 
 	public void delete(@Param("id") Long id, @Param("userId") Long userId);
 	
-	public List<Long> queryActiveOrderIds(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol);
-
 	public long exist(@Param("userId") long userId, @Param("asset") String asset, @Param("symbol") String symbol, @Param("bidFlag") Integer bidFlag);
 
 }

@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiOperation;
 public class BBOrderApiAction implements BBOrderApi {
 
 	@Autowired
-	private BBOrderService bBOrderService;
+	private BBOrderService orderService;
 
 	@Autowired
 	private BBOrderQueryService orderQueryService;
@@ -50,7 +50,7 @@ public class BBOrderApiAction implements BBOrderApi {
 		
 		CheckUtils.checkIntBool(bidFlag);
 		
-		BBOrder order = bBOrderService.create(userId, cliOrderId, asset, symbol, bidFlag, timeInForce, price, number);
+		BBOrder order = orderService.create(userId, cliOrderId, asset, symbol, bidFlag, timeInForce, price, number);
 
 		//send mq
 		this.sendOrderMsg(order);
@@ -61,7 +61,7 @@ public class BBOrderApiAction implements BBOrderApi {
 	@Override
 	public void cancel(Long userId, String asset, String symbol, Long orderId) {
 
-		boolean ok = this.bBOrderService.setPendingCancel(userId, asset, symbol, orderId);
+		boolean ok = this.orderService.setPendingCancel(userId, asset, symbol, orderId);
 
 		if(!ok){
 			return;
@@ -82,7 +82,7 @@ public class BBOrderApiAction implements BBOrderApi {
 	@GetMapping(value = "/api/bb/order/setCancelled")
 	public void setCancelled(Long userId, String asset, String symbol, Long orderId) {
 
-		this.bBOrderService.setCancelled(userId, asset, symbol, orderId);
+		this.orderService.setCancelled(userId, asset, symbol, orderId);
 		
 	}
 	

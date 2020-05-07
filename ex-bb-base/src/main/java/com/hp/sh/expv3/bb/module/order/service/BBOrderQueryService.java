@@ -1,27 +1,22 @@
 package com.hp.sh.expv3.bb.module.order.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.gitee.hupadev.commons.page.Page;
-import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.module.order.dao.BBActiveOrderDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
-import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
 import com.hp.sh.expv3.component.lock.LockConfig;
 import com.hp.sh.expv3.dev.CrossDB;
@@ -47,10 +42,12 @@ public class BBOrderQueryService {
     @Autowired
     private LockConfig lockConfig;
 
+    @Deprecated
 	public Long queryCount(Map<String, Object> params) {
 		return this.orderDAO.queryCount(params);
 	}
 
+    @Deprecated
 	public List<BBOrder> queryList(Map<String, Object> params) {
 		return this.orderDAO.queryList(params);
 	}
