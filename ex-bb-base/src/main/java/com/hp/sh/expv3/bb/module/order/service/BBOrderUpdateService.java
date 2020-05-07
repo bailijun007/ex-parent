@@ -10,9 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
-import com.hp.sh.expv3.bb.module.order.dao.BBActiveOrderDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderDAO;
-import com.hp.sh.expv3.bb.module.order.entity.BBActiveOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;
 import com.hp.sh.expv3.bb.mq.msg.vo.BBOrderEvent;
@@ -25,9 +23,6 @@ public class BBOrderUpdateService {
 	@Autowired
 	private BBOrderDAO orderDAO;
 
-	@Autowired
-	private BBActiveOrderDAO activeOrderDAO;
-	
     @Autowired
     private ApplicationEventPublisher publisher;
     
@@ -74,20 +69,12 @@ public class BBOrderUpdateService {
 
 	void saveActiveOrder(BBOrder order) {
 		this.orderDAO.save(order);
-		
-		BBActiveOrder activeOrder = new BBActiveOrder();
-		activeOrder.setId(order.getId());
-		activeOrder.setUserId(order.getUserId());
-		activeOrder.setAsset(order.getAsset());
-		activeOrder.setSymbol(order.getSymbol());
-		activeOrder.setBidFlag(order.getBidFlag());
-		this.activeOrderDAO.save(activeOrder);
 	}
 
 	void updateActiveOrder(BBOrder order) {
 		this.orderDAO.update(order);
 		if(order.getActiveFlag()==BBOrder.NO){
-			this.activeOrderDAO.delete(order.getId(), order.getUserId());
+			
 		}
 	}
 }

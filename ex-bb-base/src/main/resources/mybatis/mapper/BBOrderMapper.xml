@@ -119,13 +119,15 @@
 		for update
 	</select>
 
-	<select id="exist" resultType="boolean">
-		select 
-			count(1)
-		from 
-			bb_order
-		<include refid="simple_where" />
-		limit 1
+	<select id="exist" resultType="long">
+		select EXISTS(
+			select 
+				1
+			from 
+				bb_order
+			<include refid="simple_where" />
+			limit 1
+		)
 	</select>
 
 	<insert id="save">

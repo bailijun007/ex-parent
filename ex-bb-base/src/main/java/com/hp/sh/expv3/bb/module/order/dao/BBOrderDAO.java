@@ -44,4 +44,8 @@ public interface BBOrderDAO extends BaseAccountDataMapper<BBOrder, Long> {
 	@CrossDB
 	public List<BBOrder> queryPendingActiveOrders(Page page, @Param("asset") String asset, @Param("symbol") String symbol, @Param("createdEnd") long createdEnd, @Param("status") int status, @Param("liqFlag") int liqFlag);
 
+	public void delete(@Param("id") Long id, @Param("userId") Long userId);
+	
+	public long exist(@Param("userId") long userId, @Param("asset") String asset, @Param("symbol") String symbol, @Param("bidFlag") Integer bidFlag);
+	
 }

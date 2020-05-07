@@ -9,6 +9,7 @@ import com.hp.sh.expv3.commons.mybatis.TxId;
 /**
  * 订单日志
  */
+@Deprecated
 @Table(name="bb_order_log")
 public class BBOrderLog extends BaseRecordEntity{
 	private static final long serialVersionUID = 1L;

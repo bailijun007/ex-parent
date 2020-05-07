@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.page.Page;
-import com.hp.sh.expv3.bb.module.order.dao.BBActiveOrderDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderDAO;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
@@ -29,9 +28,6 @@ public class BBOrderQueryService {
 
 	@Autowired
 	private BBOrderDAO orderDAO;
-
-	@Autowired
-	private BBActiveOrderDAO activeOrderDAO;
 
 	@Autowired
 	private BBOrderTradeDAO orderTradeDAO;
@@ -53,7 +49,7 @@ public class BBOrderQueryService {
 	}
 	
 	public boolean hasActiveOrder(long userId, String asset, String symbol, Integer bidFlag) {
-		long count = this.activeOrderDAO.exist(userId, asset, symbol, bidFlag);
+		long count = this.orderDAO.exist(userId, asset, symbol, bidFlag);
 		return count>0;
 	}
 	
