@@ -66,12 +66,13 @@ public class TableShardingByDateSymbol implements ComplexKeysShardingAlgorithm {
 				}
 			}
 		}
-		
-		for(String asset : assets){
-			for(String symbol : symbols){
-				for(Long created : dateMills){
-					String tableName = getTableName(logicTableName, asset, symbol, DateShardUtils.getDate(created));
-					list.add(tableName);
+		if(assets!=null){
+			for(String asset : assets){
+				for(String symbol : symbols){
+					for(Long created : dateMills){
+						String tableName = getTableName(logicTableName, asset, symbol, DateShardUtils.getDate(created));
+						list.add(tableName);
+					}
 				}
 			}
 		}
