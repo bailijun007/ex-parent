@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.bb.module.sys.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -32,32 +33,49 @@ public class DbGlobalService {
 	public void createCurMonthTables() {
 		Date nextMonth = DateUtils.monthEnd(new Date());
 		logger.info("nextMonth={}", nextMonth.toLocaleString());
-		String asset = "USDT";
-		String[] symbols = {"BTC_USDT","EOS_USDT","ETH_USDT","LTC_USDT","BCH_USDT","BSV_USDT","BYS_USDT","ETC_USDT","XRP_USDT"};
-		
-		for(String symbol:symbols){
-			this.createAccountRecordTable(asset, nextMonth.getTime(), nextMonth.getTime());
-			this.createOrderTable(asset, symbol, nextMonth.getTime(), nextMonth.getTime());
-			this.createOrderTradeTable(asset, symbol, nextMonth.getTime(), nextMonth.getTime());
-		}
+		this.createAllTables(nextMonth.getTime(), nextMonth.getTime());
 	}
 	
 	public void createNextMonthTables(){
 		Date date = DateUtils.monthEnd(new Date());
 		Date nextMonth = DateUtils.dayAdd(date, 1);
 		logger.info("nextMonth={}", nextMonth.toLocaleString());
-		String asset = "USDT";
-		String[] symbols = {"BTC_USDT","EOS_USDT","ETH_USDT","LTC_USDT","BCH_USDT","BSV_USDT","BYS_USDT","ETC_USDT","XRP_USDT"};
+		this.createAllTables(nextMonth.getTime(), nextMonth.getTime());
+	}
+	
+	public void createAllTables(Long start, Long end){
+		logger.info("nextMonth={}", new Date(end).toLocaleString());
+		String[] fullSymbols = {"USDT__BTC_USDT","USDT__EOS_USDT","USDT__ETH_USDT","USDT__LTC_USDT","USDT__BCH_USDT","USDT__BSV_USDT","USDT__BYS_USDT","USDT__ETC_USDT","USDT__XRP_USDT"};
+
+		List<String> assets = new ArrayList<>();
+		for(String fullSymbol:fullSymbols){
+			String asset = getAsset(fullSymbol);
+			assets.add(asset);
+		}
+		assets.add("USDT");
 		
-		for(String symbol:symbols){
-			this.createAccountRecordTable(asset, nextMonth.getTime(), nextMonth.getTime());
-			this.createOrderTable(asset, symbol, nextMonth.getTime(), nextMonth.getTime());
-			this.createOrderTradeTable(asset, symbol, nextMonth.getTime(), nextMonth.getTime());
+		for(String fullSymbol:fullSymbols){
+			String[] sa = fullSymbol.split("__");
+			String asset = sa[0];
+			String symbol = sa[1];
+			this.createOrderTable(asset, symbol, start, end);
+			this.createOrderTradeTable(asset, symbol, start, end);
+		}
+		
+		for(String asset:assets){
+			this.createAccountRecordTable(asset, start, end);
 		}
 	}
 	
+	private String getAsset(String fullSymbol){
+		String[] sa = fullSymbol.split("__");
+		String[] sa2 = sa[1].split("_");
+		String asset = sa2[0];
+		return asset;
+	}
+	
 	public void createNewSymbol(String asset, String symbol){
-		String firstTableName = this.dbGlobalDAO.findTableByKeyword(dbName, ORDER_TRADE+"_");
+		String firstTableName = this.dbGlobalDAO.findFirstTableByKeyword(dbName, ORDER_TRADE+"_");
 		
 		Date date = DateUtils.monthEnd(new Date());
 		Date nextMonth = DateUtils.dayAdd(date, 1);
@@ -69,11 +87,13 @@ public class DbGlobalService {
 		
 		logger.info("nextMonth={}", nextMonth.toLocaleString());
 		
+		this.createAccountRecordTable(this.getAsset(asset+"__"+symbol), start.getTime(), nextMonth.getTime());
+		
 		this.createOrderTable(asset, symbol, start.getTime(), nextMonth.getTime());
 		this.createOrderTradeTable(asset, symbol, start.getTime(), nextMonth.getTime());
 	}
 	
-	public void createAccountRecordTable(String asset, Long start, Long end){
+	protected void createAccountRecordTable(String asset, Long start, Long end){
 		List<String> list = DateShardUtils.getRangeDates(start, end);
 		for(String date : list){
 			String table = TableShardingByDateAsset.getTableName(ACCOUNT_RECORD, asset, date);
@@ -85,7 +105,7 @@ public class DbGlobalService {
 		}
 	}
 	
-	public void createOrderTable(String asset, String symbol, Long start, Long end){
+	protected void createOrderTable(String asset, String symbol, Long start, Long end){
 		System.out.print(new Date(end).toLocaleString());
 		List<String> list = DateShardUtils.getRangeDates(start, end);
 		for(String date : list){
@@ -98,7 +118,7 @@ public class DbGlobalService {
 		}
 	}
 	
-	public void createOrderTradeTable(String asset, String symbol, Long start, Long end){
+	protected void createOrderTradeTable(String asset, String symbol, Long start, Long end){
 		List<String> list = DateShardUtils.getRangeDates(start, end);
 		for(String date : list){
 			String table = TableShardingByDateSymbol.getTableName(ORDER_TRADE, asset, symbol, date);

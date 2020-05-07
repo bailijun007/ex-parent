@@ -15,6 +15,21 @@
 		order by table_name desc
 	</select>
 	
+	<select id="findFirstTableByKeyword" resultType="string">
+		select table_name 
+			from information_schema.tables 
+		<where> 
+			<if test="dbName!=null and dbName!=''">
+			 and table_schema=#{dbName}
+			</if>
+			and table_name like CONCAT('',#{keyword},'%')
+			and right(table_name, 3)!='_sn'
+			and right(table_name, 3)!='_no'
+		</where>
+		order by table_name desc
+		limit 1
+	</select>
+	
 	<select id="findTableByKeyword" resultType="string">
 		select table_name 
 			from information_schema.tables 

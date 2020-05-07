@@ -6,7 +6,6 @@ package com.hp.sh.expv3.bb.module.account.service;
 import java.math.BigDecimal;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
