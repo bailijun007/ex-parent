@@ -28,5 +28,10 @@ public class IdGeneratorContext implements ApplicationContextAware{
 		long time = idGenerator.getTimeStamp(className, id);
 		return time;
 	}
+	
+	public static long getSnowIdTime(Long id){
+		long time = idGenerator.getTimeStamp(id);
+		return time;
+	}
 
 }

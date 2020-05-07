@@ -58,5 +58,11 @@ public class ZwIdGenerator implements IdGenerator{
 		long time = idworker.getTime(id);
 		return time;
 	}
+	
+	public long getTimeStamp(Long id){
+		SnowflakeIdWorker idworker = idWorkerMap.values().iterator().next();
+		long time = idworker.getTime(id);
+		return time;
+	}
 
 }

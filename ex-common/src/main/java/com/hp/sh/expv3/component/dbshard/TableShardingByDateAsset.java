@@ -43,7 +43,7 @@ public class TableShardingByDateAsset implements ComplexKeysShardingAlgorithm {
 		
 		if(ids!=null){
 			for(Long id: ids){
-				Long time = IdGeneratorContext.getSnowIdTime("com.hp.sh.expv3.bb.module.order.entity.BBOrder", id);
+				Long time = IdGeneratorContext.getSnowIdTime(id);
 				dateMills.add(time);
 			}
 		}
