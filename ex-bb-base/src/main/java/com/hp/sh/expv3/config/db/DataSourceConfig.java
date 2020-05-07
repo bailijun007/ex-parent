@@ -35,7 +35,7 @@ public class DataSourceConfig {
 		BBShardingBuilder builder = new BBShardingBuilder();
 		builder.setDataSourceList(dsList);
 		builder.addAssetSubTableName("bb_account_record");
-		builder.addSymbolSubTableName("bb_order");
+		builder.addSymbolSubTableName("bb_order_history");
 		builder.addSymbolSubTableName("bb_order_trade");
 		return builder.build();
 	}

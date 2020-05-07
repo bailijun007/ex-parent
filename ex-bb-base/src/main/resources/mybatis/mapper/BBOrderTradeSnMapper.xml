@@ -71,15 +71,13 @@
 				1
 			from 
 				bb_order_trade_sn
-			<include refid="simple_where" />
+			where 
+				trade_sn=#{tradeSn}
 			limit 1
 		)
 	</select>
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into bb_order_trade_sn (
 			trade_sn,id,tx_id
 		)values(

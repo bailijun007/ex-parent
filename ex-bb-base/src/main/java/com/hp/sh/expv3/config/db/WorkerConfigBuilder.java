@@ -33,13 +33,13 @@ public class WorkerConfigBuilder {
 	private static final int BB_ORDER_ID = IdTypeEnum.BB_ORDER_ID.getValue();
 	
 //	private static final String BB_ORDER_LOG = BBOrderLog.class.getName();
-	private static final int BB_ORDER_LOG_ID = IdTypeEnum.BB_ORDER_LOG_ID.getValue();
+//	private static final int BB_ORDER_LOG_ID = IdTypeEnum.BB_ORDER_LOG_ID.getValue();
 
 	private static final String BB_ORDER_TRADE = BBOrderTrade.class.getName();
 	private static final int BB_ORDER_TRADE_ID = IdTypeEnum.BB_ORDER_TRADE_ID.getValue();
 
 //	private static final String BB_ACTIVE_ORDER = BBActiveOrder.class.getName();
-	private static final int BB_ACTIVE_ORDER_ID = IdTypeEnum.BB_ACTIVE_ORDER_ID.getValue();
+//	private static final int BB_ACTIVE_ORDER_ID = IdTypeEnum.BB_ACTIVE_ORDER_ID.getValue();
 
 	private static final String BB_MATCHED_TRADE = BBMatchedTrade.class.getName();
 	private static final int BB_MATCHED_TRADE_ID = IdTypeEnum.BB_MATCHED_TRADE_ID.getValue();

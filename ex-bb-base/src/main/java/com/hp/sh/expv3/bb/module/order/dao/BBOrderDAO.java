@@ -7,7 +7,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 import com.gitee.hupadev.commons.page.Page;
-import com.hp.sh.expv3.base.mapper.BaseAccountDataMapper;
+import com.hp.sh.expv3.base.mapper.BaseMapper;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.dev.CrossDB;
 
@@ -16,8 +16,7 @@ import com.hp.sh.expv3.dev.CrossDB;
  * @author wangjg
  *
  */
-public interface BBOrderDAO extends BaseAccountDataMapper<BBOrder, Long> {
-	
+public interface BBOrderDAO extends BaseMapper<BBOrder, Long> {
 
 	public BBOrder findById(@Param("asset") String asset, @Param("symbol") String symbol, @Param("userId") Long userId, @Param("id") Long id);
 

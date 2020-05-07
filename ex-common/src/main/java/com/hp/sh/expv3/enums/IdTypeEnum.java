@@ -31,7 +31,7 @@ public enum IdTypeEnum {
     BB_TX_ID(20),
     BB_ACCOUNT_RECORD_ID(21),
     BB_ORDER_ID(22),
-    BB_ORDER_LOG_ID(23),
+//    BB_ORDER_LOG_ID(23),
     BB_ORDER_TRADE_ID(24),
     BB_ACTIVE_ORDER_ID(25),
     BB_MATCHED_TRADE_ID(26),

@@ -137,6 +137,8 @@ public class BBOrderService {
 		
 		///////////其他///
 		bBOrder.setCancelVolume(BigDecimal.ZERO);
+		
+		bBOrder.setTradeMeanPrice(BigDecimal.ZERO);
 	}
 	
 	private void freezeMargin(Long userId, String asset, Long orderId, BigDecimal amount , int tradeType, String remark){
