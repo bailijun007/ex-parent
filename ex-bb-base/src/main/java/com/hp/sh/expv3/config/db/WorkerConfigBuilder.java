@@ -13,7 +13,6 @@ import com.hp.sh.expv3.bb.module.collector.entity.BBCollectorAccountRecord;
 import com.hp.sh.expv3.bb.module.log.entity.BBAccountLog;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
-import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.component.id.config.SequencConfig;
@@ -33,7 +32,7 @@ public class WorkerConfigBuilder {
 	private static final String BB_ORDER = BBOrder.class.getName();
 	private static final int BB_ORDER_ID = IdTypeEnum.BB_ORDER_ID.getValue();
 	
-	private static final String BB_ORDER_LOG = BBOrderLog.class.getName();
+//	private static final String BB_ORDER_LOG = BBOrderLog.class.getName();
 	private static final int BB_ORDER_LOG_ID = IdTypeEnum.BB_ORDER_LOG_ID.getValue();
 
 	private static final String BB_ORDER_TRADE = BBOrderTrade.class.getName();
@@ -76,7 +75,7 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, BB_ACCOUNT_LOG_ID, BB_ACCOUNT_LOG);
 		this.set(workerConfig, BB_ACCOUNT_RECORD_ID, BB_ACCOUNT_RECORD);
 		this.set(workerConfig, BB_ORDER_ID, BB_ORDER);
-		this.set(workerConfig, BB_ORDER_LOG_ID, BB_ORDER_LOG);
+//		this.set(workerConfig, BB_ORDER_LOG_ID, BB_ORDER_LOG);
 		this.set(workerConfig, BB_ORDER_TRADE_ID, BB_ORDER_TRADE);
 //		this.set(workerConfig, BB_ACTIVE_ORDER_ID, BB_ACTIVE_ORDER);
 		this.set(workerConfig, BB_MATCHED_TRADE_ID, BB_MATCHED_TRADE);

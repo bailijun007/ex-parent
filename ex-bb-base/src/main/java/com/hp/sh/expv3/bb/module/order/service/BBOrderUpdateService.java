@@ -12,7 +12,6 @@ import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
-import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;
 import com.hp.sh.expv3.bb.mq.msg.vo.BBOrderEvent;
 
 @Service
@@ -62,7 +61,7 @@ public class BBOrderUpdateService {
 		}
 	}
 
-	private void publishOrderEvent(BBOrder order, BBOrderLog orderLog){
+	private void publishOrderEvent(BBOrder order, Object orderLog){
 		BBOrderEvent event = new BBOrderEvent(order, orderLog);
 		publisher.publishEvent(event);
 	}

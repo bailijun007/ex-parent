@@ -1,15 +1,14 @@
 package com.hp.sh.expv3.bb.mq.msg.vo;
 
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
-import com.hp.sh.expv3.bb.module.order.entity.BBOrderLog;
 
 public class BBOrderEvent {
 
 	private BBOrder order;
 
-	private BBOrderLog orderLog;
+	private Object orderLog;
 
-	public BBOrderEvent(BBOrder bBOrder, BBOrderLog bBOrderLog) {
+	public BBOrderEvent(BBOrder bBOrder, Object bBOrderLog) {
 		super();
 		this.order = bBOrder;
 		this.orderLog = bBOrderLog;
@@ -23,11 +22,11 @@ public class BBOrderEvent {
 		this.order = bBOrder;
 	}
 
-	public BBOrderLog getOrderLog() {
+	public Object getOrderLog() {
 		return orderLog;
 	}
 
-	public void setOrderLog(BBOrderLog bBOrderLog) {
+	public void setOrderLog(Object bBOrderLog) {
 		this.orderLog = bBOrderLog;
 	}
 
