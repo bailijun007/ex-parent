@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.module.account.dao.BBAccountRecordTradeNoDAO">
+
+	<resultMap type="com.hp.sh.expv3.bb.module.account.entity.BBAccountRecordTradeNo" id="BBAccountRecordTradeNo">
+		<result column="trade_no" property="tradeNo" />
+		<result column="record_id" property="recordId" />
+		<result column="tx_id" property="txId" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		trade_no,record_id,tx_id
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="recordId!=null"> and record_id=#{recordId}</if>
+		<if test="txId!=null"> and tx_id=#{txId}</if>
+		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(trade_no,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from bb_account_record_trade_no
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="BBAccountRecordTradeNo">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="BBAccountRecordTradeNo">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="BBAccountRecordTradeNo">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from bb_account_record_trade_no
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="BBAccountRecordTradeNo">
+		select
+			<include refid="Base_Column_List" />
+		from bb_account_record_trade_no
+			where id=#{id}
+	</select>
+
+	<insert id="save">
+		insert into bb_account_record_trade_no (
+			trade_no,record_id,tx_id
+		)values(
+			#{tradeNo},#{recordId},#{txId}
+		)
+	</insert>
+
+	<!--  -->
+
+	<select id="findByTradeNo" resultMap="BBAccountRecordTradeNo">
+		select
+			<include refid="Base_Column_List" />
+		from bb_account_record_trade_no
+			where trade_no=#{tradeNo}
+	</select>
+	
+</mapper>

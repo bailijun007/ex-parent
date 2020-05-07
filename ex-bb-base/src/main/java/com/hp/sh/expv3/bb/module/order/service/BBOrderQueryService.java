@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -32,13 +33,13 @@ import com.hp.sh.expv3.utils.math.Precision;
 public class BBOrderQueryService {
 
 	@Autowired
-	private BBOrderDAO bbOrderDAO;
+	private BBOrderDAO orderDAO;
 
 	@Autowired
-	private BBActiveOrderDAO bBActiveOrderDAO;
+	private BBActiveOrderDAO activeOrderDAO;
 
 	@Autowired
-	private BBOrderTradeDAO bBOrderTradeDAO;
+	private BBOrderTradeDAO orderTradeDAO;
 
 	@Autowired
 	private BBCommonOrderStrategy orderStrategy;
@@ -47,25 +48,21 @@ public class BBOrderQueryService {
     private LockConfig lockConfig;
 
 	public Long queryCount(Map<String, Object> params) {
-		return this.bbOrderDAO.queryCount(params);
+		return this.orderDAO.queryCount(params);
 	}
 
 	public List<BBOrder> queryList(Map<String, Object> params) {
-		return this.bbOrderDAO.queryList(params);
+		return this.orderDAO.queryList(params);
 	}
 	
 	public boolean hasActiveOrder(long userId, String asset, String symbol, Integer bidFlag) {
-		long count = this.bBActiveOrderDAO.exist(userId, asset, symbol, bidFlag);
+		long count = this.activeOrderDAO.exist(userId, asset, symbol, bidFlag);
 		return count>0;
 	}
 	
 	public List<ActiveOrderVo> queryActiveList(long userId, String asset, String symbol){
 		List<ActiveOrderVo> result = new ArrayList<ActiveOrderVo>();
-		List<BBOrder> list = this.bbOrderDAO.queryActiveOrderList(userId, asset, symbol);
-		
-		List<Long> _orderIdList = BeanHelper.getDistinctPropertyList(list, "id");
-		List<OrderTradeVo> _tradeList = bBOrderTradeDAO.queryOrderTrade(userId, _orderIdList);
-		Map<Long, List<OrderTradeVo>> _tradeListMap = BeanHelper.groupByProperty(_tradeList, "orderId");
+		List<BBOrder> list = this.orderDAO.queryActiveOrderList(userId, asset, symbol);
 		
 		for(BBOrder order : list){
 			ActiveOrderVo activeOrderVo = new ActiveOrderVo();
@@ -79,10 +76,7 @@ public class BBOrderQueryService {
             activeOrderVo.setFilledVolume(order.getFilledVolume());
             activeOrderVo.setFilledRatio(order.getFilledVolume().divide(order.getVolume(), Precision.COMMON_PRECISION, Precision.LESS));
 
-            List<OrderTradeVo> orderTradeList = _tradeListMap.get(order.getId());
-            BigDecimal meanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
-
-            activeOrderVo.setMeanPrice(meanPrice);
+            activeOrderVo.setMeanPrice(order.getTradeMeanPrice());
             activeOrderVo.setPrice(order.getPrice());
             activeOrderVo.setFeeCost(order.getFeeCost());
             activeOrderVo.setStatus(order.getStatus());
@@ -93,42 +87,19 @@ public class BBOrderQueryService {
 	}
 	
 
-	public List<BBOrder> queryPendingActive(Page page, String symbol, Long createdEnd, Integer status) {
-		List<BBOrder> list = this.bbOrderDAO.queryPendingActiveOrders(page, symbol, createdEnd, status, IntBool.NO);
+	public List<BBOrder> queryPendingActive(Page page, String asset, String symbol, Long createdEnd, Integer status) {
+		List<BBOrder> list = this.orderDAO.queryPendingActiveOrders(page, asset, symbol, createdEnd, status, IntBool.NO);
 		return list;
 	}
 	
-	public List<BBOrder> queryRebaseOrder(Page page, Long createdEnd) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("activeFlag", IntBool.YES);
-		params.put("liqFlag", IntBool.NO);
-		params.put("orderBy", "id");
-		params.put("asc", true);
-		params.put("page", page);
-		params.put("status", OrderStatus.PENDING_NEW);
-		params.put("createdEnd", createdEnd);
-		List<BBOrder> list = this.bbOrderDAO.queryList(params);
-		return list;
-	}
-	
-	public BBOrder getOrder(long userId, Long orderId){
+	public BBOrder getOrder(String asset, String symbol, long userId, Long orderId){
 		if(lockConfig.usePessimisticLock()){
-			BBOrder order = this.bbOrderDAO.lockById(userId, orderId);
+			BBOrder order = this.orderDAO.lockById(asset, symbol, userId, orderId);
 			return order;
 		}else{
-			BBOrder order = this.bbOrderDAO.findById(userId, orderId);
+			BBOrder order = this.orderDAO.findById(asset, symbol, userId, orderId);
 			return order;
 		}
-	}
-	
-	@CrossDB
-	public List<BBOrder> pageQuery(Page page, Integer status, Long modified){
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("page", page);
-		params.put("status", status);
-		params.put("modifiedEnd", modified);
-		List<BBOrder> list = this.bbOrderDAO.queryList(params);
-		return list;
 	}
 	
 	@CrossDB
@@ -138,7 +109,7 @@ public class BBOrderQueryService {
 		params.put("feeSynchStatus", IntBool.NO);
 		params.put("tradeTimeStart", tradeTimeStart);
 		params.put("orderBy", "trade_time");
-		List<BBOrderTrade> list = this.bBOrderTradeDAO.queryList(params);
+		List<BBOrderTrade> list = this.orderTradeDAO.queryList(params);
 		return list;
 	}
 }

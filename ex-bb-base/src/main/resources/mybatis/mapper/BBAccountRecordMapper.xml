@@ -93,6 +93,7 @@
 			<include refid="Base_Column_List" />
 		from bb_account_record
 			where id=#{id}
+			<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
 	</select>
 
 	<select id="exist" resultType="boolean">
@@ -119,12 +120,8 @@
 		set 
 			asset=#{asset},sn=#{sn},type=#{type},amount=#{amount},remark=#{remark},balance=#{balance},frozen=#{frozen},total=#{total},trade_no=#{tradeNo},trade_type=#{tradeType},serial_no=#{serialNo},associated_id=#{associatedId},tx_id=#{txId},request_id=#{requestId},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
-			id=#{id} and user_id=#{userId}
+			id=#{id} and user_id=#{userId} and asset=#{asset}
 	</update>
-
-	<delete id="delete">
-        delete from bb_account_record where where id=#{id} and user_id=#{userId}
-    </delete>
 
     <delete id="condDelete">
         delete from bb_account_record
@@ -137,7 +134,7 @@
 		select
 			<include refid="Base_Column_List" />
 		from bb_account_record
-			where user_id=#{userId} and trade_no=#{tradeNo}
+			where user_id=#{userId} and trade_no=#{tradeNo} and asset=#{asset}
 	</select>
 	
 </mapper>

@@ -25,6 +25,11 @@ public class OrderTradeVo implements OrderTrade{
 	public OrderTradeVo() {
 	}
 
+	public OrderTradeVo(BigDecimal volume, BigDecimal price) {
+		this.volume = volume;
+		this.price = price;
+	}
+
 	public BigDecimal getVolume() {
 		return volume;
 	}

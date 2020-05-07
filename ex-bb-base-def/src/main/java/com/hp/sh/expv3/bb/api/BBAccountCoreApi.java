@@ -46,6 +46,6 @@ public interface BBAccountCoreApi {
 
 	@ApiOperation(value = "查询资金记录是否存在")
 	@GetMapping(value = "/api/bb/account/record/exist")
-	public Boolean checkTradNo(@RequestParam("userId") Long userId, @RequestParam("tradeNo") String tradeNo);
+	public Boolean checkTradNo(@RequestParam("asset") String asset, @RequestParam("userId") Long userId, @RequestParam("tradeNo") String tradeNo);
 
 }

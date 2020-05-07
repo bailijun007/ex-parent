@@ -108,14 +108,14 @@
 		select
 			<include refid="Base_Column_List" />
 		from bb_order
-			where id=#{id} and user_id=#{userId}
+			where id=#{id} and user_id=#{userId} and asset=#{asset} and symbol=#{symbol}
 	</select>
 
 	<select id="lockById" resultMap="BBOrder">
 		select
 			<include refid="Base_Column_List" />
 		from bb_order
-			where id=#{id} and user_id=#{userId}
+			where id=#{id} and user_id=#{userId} and asset=#{asset} and symbol=#{symbol}
 		for update
 	</select>
 

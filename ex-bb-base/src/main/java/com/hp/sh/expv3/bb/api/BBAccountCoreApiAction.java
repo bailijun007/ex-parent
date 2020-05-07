@@ -48,8 +48,8 @@ public class BBAccountCoreApiAction implements BBAccountCoreApi {
 	}
 
 	@Override
-	public Boolean checkTradNo(Long userId, String tradeNo) {
-		return bBAccountCoreService.checkTradNo(userId, tradeNo);
+	public Boolean checkTradNo(String asset, Long userId, String tradeNo) {
+		return bBAccountCoreService.existTradeNo(asset, userId, tradeNo);
 	}
 
 	@Override

@@ -126,32 +126,10 @@
 		set 
 			asset=#{asset},symbol=#{symbol},price=#{price},volume=#{volume},bid_flag=#{bidFlag},trade_sn=#{tradeSn},trade_id=#{tradeId},order_id=#{orderId},maker_flag=#{makerFlag},trade_time=#{tradeTime},opponent_order_id=#{opponentOrderId},fee_collector_id=#{feeCollectorId},fee_ratio=#{feeRatio},fee=#{fee},order_margin=#{orderMargin},remain_volume=#{remainVolume},remain_order_margin=#{remainOrderMargin},remain_fee=#{remainFee},match_tx_id=#{matchTxId},tx_id=#{txId},fee_synch_status=#{feeSynchStatus},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
 		where 
-			id=#{id} and user_id=#{userId}
+			id=#{id} and user_id=#{userId} and asset=#{asset} and symbol=#{symbol}
 	</update>
 
-	<delete id="delete">
-        delete from bb_order_trade where id=#{id} and user_id=#{userId}
-    </delete>
-
-    <delete id="condDelete">
-        delete from bb_order_trade
-		<include refid="simple_where" />
-    </delete>
-
 	<!--  -->
-	
-	<select id="queryOrderTrade" resultType="com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo">
-		select
-			volume, price, order_id, id
-		from 
-			bb_order_trade
-		where
-			user_id=#{userId}
-		and order_id in
-			<foreach item="item" index="i" collection="orderIdList" open="(" separator="," close=")">
-			#{orderIdList[${i}]}
-			</foreach>
-	</select>
 	
 	<update id="setSynchStatus">
 		update 
@@ -159,7 +137,7 @@
 		set 
 			fee_synch_status=#{feeSynchStatus},modified=#{modified}
 		where 
-			id=#{id} and user_id=#{userId}
+			id=#{id} and user_id=#{userId} and asset=#{asset} and symbol=#{symbol}
 	</update>
 
 </mapper>

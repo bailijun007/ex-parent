@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.bb.module.order.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +20,15 @@ import com.hp.sh.expv3.bb.error.BBOrderError;
 import com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService;
 import com.hp.sh.expv3.bb.module.collector.service.BBCollectorCoreService;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
+import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeSnDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
+import com.hp.sh.expv3.bb.module.order.entity.BBOrderTradeSn;
 import com.hp.sh.expv3.bb.module.order.vo.BBSymbol;
 import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
+import com.hp.sh.expv3.bb.strategy.data.OrderTrade;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.bb.strategy.vo.TradeResult;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.CollectorAddRequest;
@@ -61,12 +67,15 @@ public class BBTradeService {
 	@Autowired
 	private FeeCollectorSelector feeCollectorSelector;
 	
+	@Autowired
+	private BBOrderTradeSnDAO orderTradeSnDAO;
+	
     @Autowired
     private ApplicationEventPublisher publisher;
 	
 	//处理成交订单
 	public void handleTrade(BBTradeVo msg){
-		BBOrder order = this.orderQueryService.getOrder(msg.getAccountId(), msg.getOrderId());
+		BBOrder order = this.orderQueryService.getOrder(msg.getAsset(), msg.getSymbol(), msg.getAccountId(), msg.getOrderId());
 		boolean yes = this.canTrade(order, msg);
 		if(!yes){
 			logger.warn("成交已处理过了,trade={}", msg);
@@ -198,6 +207,14 @@ public class BBTradeService {
         order.setActiveFlag(orderTrade.isOrderCompleted()?BBOrder.NO:BBOrder.YES);
         //修改时间
 		order.setModified(now);
+		
+		//成交均价
+		List<OrderTrade> orderTradeList = new ArrayList<>();
+		orderTradeList.add(orderTrade);
+		orderTradeList.add(new OrderTradeVo(order.getFilledVolume(), order.getTradeMeanPrice()));
+		BigDecimal tradeMeanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
+		order.setTradeMeanPrice(tradeMeanPrice);
+		
 		this.orderUpdateService.updateOrder4Trad(order);
 		
 	}
@@ -255,6 +272,9 @@ public class BBTradeService {
 		
 		publisher.publishEvent(orderTrade);
 		
+		BBOrderTradeSn tradeSn = new BBOrderTradeSn(orderTrade.getTradeSn(), orderTrade.getId(), orderTrade.getTxId());
+		orderTradeSnDAO.save(tradeSn);
+		
 		return orderTrade;
 	}
 
@@ -270,7 +290,7 @@ public class BBTradeService {
 		}
 		
 		//检查重复请求
-		Long count = this.orderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
+		Long count = this.orderTradeSnDAO.exist(tradeMsg.uniqueKey());
 		if(count>0){
 			return false;
 		}
@@ -284,7 +304,7 @@ public class BBTradeService {
 		}
 		
 		//检查重复请求
-		Long count = this.orderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
+		Long count = this.orderTradeSnDAO.exist(tradeMsg.uniqueKey());
 		if(count>0){
 			return false;
 		}
@@ -354,7 +374,7 @@ public class BBTradeService {
 	
 	public void setSynchStatus(BBOrderTrade orderTrade){
 		Long now = DbDateUtils.now();
-		this.orderTradeDAO.setSynchStatus(orderTrade.getUserId(), orderTrade.getId(), IntBool.YES, now);
+		this.orderTradeDAO.setSynchStatus(orderTrade.getAsset(), orderTrade.getSymbol(), orderTrade.getUserId(), orderTrade.getId(), IntBool.YES, now);
 	}
 
 }

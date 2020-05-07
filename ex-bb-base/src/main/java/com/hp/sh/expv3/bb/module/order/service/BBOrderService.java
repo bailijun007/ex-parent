@@ -69,7 +69,7 @@ public class BBOrderService {
 	@LockIt(key="U-${userId}")
 	public BBOrder create(long userId, String cliOrderId, String asset, String symbol, int bidFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		
-//		if(this.existClientOrderId(userId, cliOrderId)){
+//		if(this.existClientOrderId(asset, symbol, userId, cliOrderId)){
 //			throw new ExException(BBOrderError.CREATED);
 //		}
 		
@@ -116,7 +116,7 @@ public class BBOrderService {
 		return order;
 	}
 
-	private boolean existClientOrderId(long userId, String clientOrderId) {
+	private boolean existClientOrderId(String asset, String symbol, long userId, String clientOrderId) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("userId", userId);
 		params.put("clientOrderId", clientOrderId);
@@ -187,7 +187,7 @@ public class BBOrderService {
 	public boolean setPendingCancel(long userId, String asset, String symbol, long orderId){
 		Long now = DbDateUtils.now();
 		
-		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
+		BBOrder order = this.orderQueryService.getOrder(asset, symbol, userId, orderId);
 		
 		if(!this.canCancel(order, orderId)){
 			logger.info("订单无法取消：{}", order);
@@ -239,7 +239,7 @@ public class BBOrderService {
 	 * @param number 撤几张合约
 	 */
 	private void doCancel(long userId, String asset, String symbol, long orderId){
-		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
+		BBOrder order = this.orderQueryService.getOrder(asset, symbol, userId, orderId);
 		if(order==null){
 			logger.error("订单不存在:orderId={}", orderId);
 			return;
@@ -292,7 +292,7 @@ public class BBOrderService {
 	}
 
 	public void setNewStatus(long userId, String asset, String symbol, long orderId){
-		BBOrder order = this.orderQueryService.getOrder(userId, orderId);
+		BBOrder order = this.orderQueryService.getOrder(asset, symbol, userId, orderId);
 		
 		if(order.getStatus()!=OrderStatus.PENDING_NEW){
 			logger.warn("NEW状态错误，orderId={}", orderId, order.getStatus());

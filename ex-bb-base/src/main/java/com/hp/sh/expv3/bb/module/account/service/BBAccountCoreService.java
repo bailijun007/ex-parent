@@ -6,6 +6,7 @@ package com.hp.sh.expv3.bb.module.account.service;
 import java.math.BigDecimal;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,10 @@ import com.hp.sh.expv3.bb.constant.BBAccountRecordType;
 import com.hp.sh.expv3.bb.error.BBAccountError;
 import com.hp.sh.expv3.bb.module.account.dao.BBAccountDAO;
 import com.hp.sh.expv3.bb.module.account.dao.BBAccountRecordDAO;
+import com.hp.sh.expv3.bb.module.account.dao.BBAccountRecordTradeNoDAO;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccount;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
+import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecordTradeNo;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.BBCutRequest;
 import com.hp.sh.expv3.bb.vo.request.FreezeRequest;
@@ -48,6 +51,9 @@ public class BBAccountCoreService{
 
 	@Autowired
 	private BBAccountRecordDAO fundAccountRecordDAO;
+	
+	@Autowired
+	private BBAccountRecordTradeNoDAO accountRecordTradeNoDAO;
 	
 	@Autowired
 	private SnGenerator generator;
@@ -209,12 +215,9 @@ public class BBAccountCoreService{
 		return InvokeResult.SUCCESS;
 	}
 	
-	public Boolean checkTradNo(Long userId, String tradeNo) {
-		BBAccountRecord rcd = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);
-		if (rcd == null) {
-			return Boolean.FALSE;
-		}
-		return Boolean.TRUE;
+	public boolean existTradeNo(String asset, Long userId, String tradeNo){
+		BBAccountRecordTradeNo r = accountRecordTradeNoDAO.findByTradeNo(tradeNo);
+		return r!=null;
 	}
 
 	private BBAccount getAccount(Long userId, String asset){
@@ -257,6 +260,10 @@ public class BBAccountCoreService{
 		record.setRemark(record.getRemark());
 		//保存本笔明细
 		this.saveRecord(record, account);
+		
+		//保存成交单号
+		BBAccountRecordTradeNo artn = new BBAccountRecordTradeNo(record.getTradeNo(), record.getId(), record.getTxId());
+		accountRecordTradeNoDAO.save(artn);
 	}
 	
 	private void saveRecord(BBAccountRecord record, BBAccount account){
@@ -308,7 +315,7 @@ public class BBAccountCoreService{
 			throw new ExSysException(ExCommonError.REQUIRE_POSITIVE_AMOUNT, record);
 		}
 		
-		BBAccountRecord oldRcd = this.fundAccountRecordDAO.findByTradeNo(record.getUserId(), record.getTradeNo());
+		BBAccountRecord oldRcd = this.findByTradeNo(record.getAsset(), record.getUserId(), record.getTradeNo());
 		if(oldRcd == null){
 			return false;
 		}
@@ -322,6 +329,15 @@ public class BBAccountCoreService{
 		}
 		
 		return true;
+	}
+	
+	private BBAccountRecord findByTradeNo(String asset, Long userId, String tradeNo){
+		BBAccountRecordTradeNo tNo = this.accountRecordTradeNoDAO.findByTradeNo(tradeNo);
+		if(tNo==null){
+			return null;
+		}
+		BBAccountRecord r = this.fundAccountRecordDAO.findById(asset, userId, tNo.getRecordId());
+		return r;
 	}
 
 	private void checkRequest(FundRequest request){

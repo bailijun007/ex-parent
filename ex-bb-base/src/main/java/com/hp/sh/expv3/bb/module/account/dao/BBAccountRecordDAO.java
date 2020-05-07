@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.hp.sh.expv3.base.entity.BaseBizEntity;
+import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.base.mapper.BaseAccountDataMapper;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
 
@@ -22,6 +24,9 @@ public interface BBAccountRecordDAO extends BaseAccountDataMapper<BBAccountRecor
 
 	public Double queryCount(Map<String,Object> params);
 
-	public BBAccountRecord findByTradeNo(@Param("userId") Long userId, @Param("tradeNo") String tradeNo);
+	@Deprecated
+	public BBAccountRecord findByTradeNo(@Param("asset") String asset, @Param("userId") Long userId, @Param("tradeNo") String tradeNo);
+
+	public BBAccountRecord findById(@Param("asset") String asset, @Param(UserDataEntity.USERID_PROPERTY) Long userId, @Param(BaseBizEntity.ID_PROPERTY) Long id);
 
 }

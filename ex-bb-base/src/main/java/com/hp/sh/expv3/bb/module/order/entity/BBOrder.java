@@ -115,6 +115,9 @@ public class BBOrder extends UserDataEntity implements OrderData{
 	 * 已成交量
 	 */
 	private BigDecimal filledVolume;
+	
+	//成交均价
+	private BigDecimal tradeMeanPrice;
 
 	//版本
 	private Long version;
@@ -324,6 +327,14 @@ public class BBOrder extends UserDataEntity implements OrderData{
 
 	public void setCancelOperator(String cancelOperator) {
 		this.cancelOperator = cancelOperator;
+	}
+
+	public BigDecimal getTradeMeanPrice() {
+		return tradeMeanPrice;
+	}
+
+	public void setTradeMeanPrice(BigDecimal tradeMeanPrice) {
+		this.tradeMeanPrice = tradeMeanPrice;
 	}
 
 	@Override

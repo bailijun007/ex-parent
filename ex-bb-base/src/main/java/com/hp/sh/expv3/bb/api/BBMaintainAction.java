@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.bb.api;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.base.spring.interceptor.LimitInterceptor;
+import com.gitee.hupadev.commons.date.DateUtils;
 import com.gitee.hupadev.commons.executor.orderly.OrderlyExecutors;
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.gitee.hupadev.commons.page.Page;
@@ -23,6 +25,7 @@ import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
+import com.hp.sh.expv3.bb.module.sys.service.DbGlobalService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.out.OrderRebaseMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
@@ -58,7 +61,24 @@ public class BBMaintainAction{
 	
 	@Autowired
 	private ShardGroup shardGroup;
+	
+	@Autowired
+	private DbGlobalService dbGlobalService;
+	
+	@ApiOperation(value = "createOrderTable")
+	@GetMapping(value = "/api/bb/maintain/createOrderTables")
+	public Long createNextMonthTables(){
+		dbGlobalService.createNextMonthTables();
+		return 0L;
+	}
 
+	@ApiOperation(value = "createOrderTable")
+	@GetMapping(value = "/api/bb/maintain/createOrderTable")
+	public Long createOrderTable(String asset, String symbol, Long start, Long end){
+		dbGlobalService.createOrderTable(asset, symbol, start, end);
+		return 0L;
+	}
+	
 	@ApiOperation(value = "userShard")
 	@GetMapping(value = "/api/bb/maintain/userShard")
 	public Long userShard(Long userId){
@@ -104,12 +124,12 @@ public class BBMaintainAction{
 
 	@ApiOperation(value = "queryResend")
 	@GetMapping(value = "/api/bb/maintain/queryResend")	
-	public Integer queryResend(String symbol){
+	public Integer queryResend(String asset, String symbol){
 		long now = DbDateUtils.now()-2000;
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, symbol, now, OrderStatus.PENDING_NEW);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -132,8 +152,8 @@ public class BBMaintainAction{
 	public Map resendPending(String asset, String symbol){
 		this.resendRebase(asset, symbol);
 		Map map = new HashMap();
-		Integer resendPendingCancel = this.resendPendingCancel(symbol);
-		Integer resendPendingNew = this.resendPendingNew(symbol);
+		Integer resendPendingCancel = this.resendPendingCancel(asset, symbol);
+		Integer resendPendingNew = this.resendPendingNew(asset, symbol);
 		map.put("resendPendingCancel", resendPendingCancel);
 		map.put("resendPendingNew", resendPendingNew);
 		return map;
@@ -147,12 +167,12 @@ public class BBMaintainAction{
 
 	@ApiOperation(value = "resendPendingCancel")
 	@GetMapping(value = "/api/bb/maintain/resendPendingCancel")	
-	public Integer resendPendingCancel(String symbol){
+	public Integer resendPendingCancel(String asset, String symbol){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		long now = DbDateUtils.now()-2000;
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, symbol, now, OrderStatus.PENDING_CANCEL);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_CANCEL);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -177,12 +197,12 @@ public class BBMaintainAction{
 
 	@ApiOperation(value = "resendPendingNew")
 	@GetMapping(value = "/api/bb/maintain/resendPendingNew")	
-	public Integer resendPendingNew(String symbol){
+	public Integer resendPendingNew(String asset, String symbol){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		long now = DbDateUtils.now()-2000;
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, symbol, now, OrderStatus.PENDING_NEW);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW);
 			if(list==null||list.isEmpty()){
 				break;
 			}

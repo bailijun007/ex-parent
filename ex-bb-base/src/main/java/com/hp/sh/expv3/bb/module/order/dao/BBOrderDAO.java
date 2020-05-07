@@ -7,8 +7,6 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 import com.gitee.hupadev.commons.page.Page;
-import com.hp.sh.expv3.base.entity.BaseBizEntity;
-import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.base.mapper.BaseAccountDataMapper;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.dev.CrossDB;
@@ -19,8 +17,11 @@ import com.hp.sh.expv3.dev.CrossDB;
  *
  */
 public interface BBOrderDAO extends BaseAccountDataMapper<BBOrder, Long> {
+	
 
-	public BBOrder lockById(@Param(UserDataEntity.USERID_PROPERTY) Long userId, @Param(BaseBizEntity.ID_PROPERTY) Long id);
+	public BBOrder findById(@Param("asset") String asset, @Param("symbol") String symbol, @Param("userId") Long userId, @Param("id") Long id);
+
+	public BBOrder lockById(@Param("asset") String asset, @Param("symbol") String symbol, @Param("userId") Long userId, @Param("id") Long id);
 
 	public List<BBOrder> queryList(Map<String, Object> params);
 
@@ -41,6 +42,6 @@ public interface BBOrderDAO extends BaseAccountDataMapper<BBOrder, Long> {
 	public List<BBOrder> queryActiveOrderList(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol);
 	
 	@CrossDB
-	public List<BBOrder> queryPendingActiveOrders(Page page, @Param("symbol") String symbol, @Param("createdEnd") long createdEnd, @Param("status") int status, @Param("liqFlag") int liqFlag);
+	public List<BBOrder> queryPendingActiveOrders(Page page, @Param("asset") String asset, @Param("symbol") String symbol, @Param("createdEnd") long createdEnd, @Param("status") int status, @Param("liqFlag") int liqFlag);
 
 }
