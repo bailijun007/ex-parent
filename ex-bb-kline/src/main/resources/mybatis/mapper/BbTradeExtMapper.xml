@@ -49,7 +49,7 @@
       </where>
 
         order by id asc
-        LIMIT 0,${endLimit};
+        LIMIT 0,${endLimit}
     </select>
 
 

@@ -1,17 +1,3 @@
-/*
-Navicat MySQL Data Transfer
-
-Source Server         : 192.168.0.190-ex
-Source Server Version : 50726
-Source Host           : 192.168.0.190:3306
-Source Database       : expv3_bb
-
-Target Server Type    : MYSQL
-Target Server Version : 50599
-File Encoding         : 65001
-
-Date: 2020-04-02 15:54:46
-*/
 
 SET FOREIGN_KEY_CHECKS=0;
 
@@ -313,8 +299,8 @@ CREATE TABLE `bb_order_trade` (
 `created`  bigint(20) NOT NULL COMMENT '创建时间' ,
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
 `remain_volume`  decimal(50,30) NULL DEFAULT NULL COMMENT '未成交量' ,
-`remain_order_margin`  decimal(10,0) NOT NULL COMMENT '订单剩余保证金' ,
-`remain_fee`  decimal(10,0) NOT NULL COMMENT '订单剩余手续费' ,
+`remain_order_margin`  decimal(50,30) NOT NULL COMMENT '订单剩余保证金' ,
+`remain_fee`  decimal(50,30) NOT NULL COMMENT '订单剩余手续费' ,
 `match_tx_id`  bigint(20) NULL DEFAULT NULL COMMENT '撮合事务Id' ,
 `tx_id`  bigint(20) NULL DEFAULT NULL COMMENT '事务ID' ,
 `fee_synch_status`  int(11) NOT NULL COMMENT '手续费同步状态' ,
