@@ -170,9 +170,10 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         List<BbOrderVo> list =null;
         //如果状态为已取消 或者部分成交，则直接查bb_order表
         if(statusList.contains(OrderStatus.CANCELED)||statusList.contains(OrderStatus.FILLED)){
+            map.put("activeFlag", IntBool.NO);
              list = bbOrderExtMapper.queryOrderList(map);
         }else {
-            map.put("activeFlag", IntBool.YES);
+//            map.put("activeFlag", IntBool.YES);
             list = bbOrderExtMapper.queryBbActiveOrders(map);
         }
 

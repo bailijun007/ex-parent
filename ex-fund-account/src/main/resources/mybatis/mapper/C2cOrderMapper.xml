@@ -247,6 +247,9 @@
             <if test="modified!=null">
                 modified=#{modified}
             </if>
+            <if test="frozenAsset!=null AND frozenAsset!=''">
+                frozen_asset=#{frozenAsset}
+            </if>
         </set>
         where id=#{id}
     </update>

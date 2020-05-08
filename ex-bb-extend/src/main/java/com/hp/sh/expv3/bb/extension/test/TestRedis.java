@@ -1,9 +1,14 @@
 package com.hp.sh.expv3.bb.extension.test;
 
 import com.alibaba.fastjson.JSON;
+import com.hp.sh.expv3.bb.extension.dao.BbAccountExtMapper;
 import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
+import com.hp.sh.expv3.bb.extension.thirdKlineData.mapper.ThirdKlineDataMapper;
+import com.hp.sh.expv3.bb.extension.vo.BbAccountExtVo;
+import com.hp.sh.expv3.bb.extension.vo.KlineDataPo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.HashOperations;
@@ -20,7 +25,7 @@ import java.util.Map;
 /**
  * @author BaiLiJun  on 2020/3/26
  */
-@ActiveProfiles("dev")
+@ActiveProfiles("bai")
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class TestRedis {
@@ -46,6 +51,39 @@ public class TestRedis {
                 System.out.println(bbSymbol.getSymbol());
             }
         }
+    }
+
+@Autowired
+    private BbAccountExtMapper bbAccountExtMapper;
+
+    @Test
+    public void test2() {
+        Long userId=109027203634737280L;
+         BbAccountExtVo bbAccountExtVo = bbAccountExtMapper.getBBAccount(userId, "ETH");
+        System.out.println("bbAccountExtVo="+bbAccountExtVo.getAvailable());
+    }
+
+    @Autowired
+    private ThirdKlineDataMapper klineDataMapper;
+
+    @Test
+    public void test3(){
+        Long userId=109027203634737280L;
+        BbAccountExtVo bbAccountExtVo = bbAccountExtMapper.getBBAccount(userId, "ETH");
+        System.out.println("bbAccountExtVo="+bbAccountExtVo.getAvailable());
+
+        String table="kline_data_202005";
+        Integer klineType=1;
+        String pair="BTC_USDT";
+        String interval="1min";
+        Long openTimeBegin=1588833240000L;
+        Long openTimeEnd=1588844040000L;
+        String expName="binance";
+        List<KlineDataPo> klineDataPos = klineDataMapper.queryKlineDataByThirdData(table, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
+        for (KlineDataPo klineDataPo : klineDataPos) {
+            System.out.println("klineDataPo = " + klineDataPo);
+        }
+
     }
 
 }
