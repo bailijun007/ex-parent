@@ -13,7 +13,7 @@ import com.gitee.hupadev.commons.json.JsonUtils;
 import com.hp.sh.expv3.bb.job.MsgShardHandler;
 import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
-import com.hp.sh.expv3.bb.module.msg.service.BBMessageOffsetService;
+import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqHandler;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.component.lock.TxIdService;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -21,7 +21,7 @@ import com.hp.sh.expv3.utils.DbDateUtils;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-public class TestAction2 {
+public class DbTestAction2 {
 
 	@Autowired
 	private BBMqMsgService msgService;
@@ -29,21 +29,23 @@ public class TestAction2 {
 	@Autowired
 	private MsgShardHandler msgHandler;
 	
-	@Autowired
-	private BBMessageOffsetService offsetService;
-	
 	@Autowired(required=false)
 	private TxIdService txIdService;
 	
-	private static final int RECORD_TOTAL = 10000;
+	@Autowired
+	private MatchMqHandler mqHandler;
 	
-	@ApiOperation(value = "测试cache")
-	@GetMapping(value = "/api/bb/test/cache")
-	public Long cache() throws Exception{
-		Long id = offsetService.cacheShardOffset(1L, 100L);
-		offsetService.getCachedShardOffset(1L);
-		offsetService.getCachedShardOffset(1L);
-		return id;
+	private static final int RECORD_TOTAL = 10000;
+
+	@ApiOperation(value = "测试Lock")
+	@GetMapping(value = "/api/bb/test/lock")
+	public Long testLock(){
+		long time = System.currentTimeMillis();
+		for(int i=0; i<RECORD_TOTAL; i++){
+			mqHandler.testLock(1L);
+		}
+		time = System.currentTimeMillis()-time;
+		return time;
 	}
 
 	@ApiOperation(value = "测试保存数据库（单线程多事务）")
