@@ -40,8 +40,8 @@ public class MasterDataSourceConfig {
     private static final String MAPPER_LOCATIONS = "classpath:mybatis/mapper/extension/*.xml";
 
 
-    @Bean(name = "masterDataSource")
     @Primary
+    @Bean(name = "masterDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.hikari.primary")
     public HikariDataSource masterDateSource() {
     return     DataSourceBuilder.create().type(HikariDataSource.class).build();
@@ -53,15 +53,15 @@ public class MasterDataSourceConfig {
     @Resource(name = "pageInterceptor")
     private PageInterceptor pageInterceptor;
 
-    @Bean(name = "masterSqlSessionFactory")
     @Primary
+    @Bean(name = "masterSqlSessionFactory")
     public SqlSessionFactory masterSqlSessionFactory(@Qualifier("masterDataSource") DataSource masterDataSource) throws Exception {
         return SqlSessionFactoryUtil.createSqlSessionFactory(masterDataSource,TYPE_ALIASES_PACKAGE,
                 TYPE_HANDLERS_PACKAGE,MAPPER_LOCATIONS,mybatisConfig,new Interceptor[] {pageInterceptor});
     }
 
-    @Bean("masterSqlSessionFactory")
     @Primary
+    @Bean("masterSqlSessionFactory")
     public SqlSessionTemplate masterSqlSessionTemplate(@Qualifier("masterSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
