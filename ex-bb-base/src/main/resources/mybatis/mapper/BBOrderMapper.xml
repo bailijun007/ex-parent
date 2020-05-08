@@ -193,7 +193,6 @@
 		<where> 
 			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 			<if test="status!=null"> and status=#{status}</if>
-			<if test="liqFlag!=null"> and liq_flag=#{liqFlag}</if>
 			<if test="symbol!=null"> and symbol=#{symbol}</if>
 		</where>
 			order by id asc
