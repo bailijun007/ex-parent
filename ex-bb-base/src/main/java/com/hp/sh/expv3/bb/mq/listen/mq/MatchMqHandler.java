@@ -26,9 +26,14 @@ public class MatchMqHandler {
 		orderService.setNewStatus(userId, asset, symbol, orderId);
 	}
 
-	@LockIt(key="U-${userId}")
+	@LockIt(key="U-${msg.accountId}")
 	public void handleTrade(BBTradeVo msg){
 		tradeService.handleTrade(msg);
+	}
+
+	@LockIt(key="U-${userId}")
+	public void testLock(Long userId){
+		
 	}
 	
 }

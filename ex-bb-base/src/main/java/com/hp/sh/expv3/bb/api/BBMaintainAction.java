@@ -1,8 +1,11 @@
 package com.hp.sh.expv3.bb.api;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.base.spring.interceptor.LimitInterceptor;
+import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.gitee.hupadev.commons.executor.orderly.OrderlyExecutors;
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.gitee.hupadev.commons.page.Page;
@@ -23,6 +27,7 @@ import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
+import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqHandler;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.out.OrderRebaseMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
@@ -58,6 +63,9 @@ public class BBMaintainAction{
 	
 	@Autowired
 	private ShardGroup shardGroup;
+	
+	@Autowired
+	private MatchMqHandler mqHandler;
 
 	@ApiOperation(value = "userShard")
 	@GetMapping(value = "/api/bb/maintain/userShard")
@@ -216,14 +224,49 @@ public class BBMaintainAction{
 	@ApiOperation(value = "reHandleAllFailMsg")
 	@GetMapping(value = "/api/bb/maintain/mq/reHandleAllFailMsg")	
 	public String reHandleAllFailMsg(Integer num){
+		long time = System.currentTimeMillis();
+		
 		num = num==null ? 1:num;
 		
 		List<BBMqMsg> list = this.mqMsgService.findFirstList(num);
 		for(BBMqMsg msg : list){
 			this.handleNextFailMsg(msg);
 		}
+		time = System.currentTimeMillis()-time;
+		return "num="+list.size()+", time="+ time;
+	}
+	
+	
+	@ApiOperation(value = "reHandleAllFailMsg2")
+	@GetMapping(value = "/api/bb/maintain/mq/reHandleAllFailMsg2")	
+	public String reHandleAllFailMsg2(Integer num) throws Exception{
+		num = num==null ? 1:num;
 		
-		return "Over."+list.size();
+		List<BBMqMsg> list = this.mqMsgService.findFirstList(num);
+		Map<Long,List<BBMqMsg>> userMsgMap = BeanHelper.groupByProperty(list, "userId");
+		Set<Entry<Long, List<BBMqMsg>>> entrySet = userMsgMap.entrySet();
+		
+		long time = System.currentTimeMillis();
+		List<Thread> tList = new ArrayList<>();
+		for(Entry<Long, List<BBMqMsg>> entry:entrySet){
+			List<BBMqMsg> umList = entry.getValue();
+			Thread t = new Thread(){
+				public void run(){
+					for(BBMqMsg um : umList){
+						handleNextFailMsg(um);
+					}
+				}
+			};
+			t.start();
+			tList.add(t);
+		}
+		
+		for(Thread t:tList){
+			t.join();
+		}
+		
+		time = System.currentTimeMillis()-time;
+		return "num="+list.size()+",users="+userMsgMap.size()+", time="+ time;
 	}
 	
 	private int handleNextFailMsg(BBMqMsg msg){
@@ -233,10 +276,10 @@ public class BBMaintainAction{
 		
 		if(msg.getTag().equals(MqTags.TAGS_TRADE)){
 			BBTradeVo mqMsg = JsonUtils.toObject(msg.getBody(), BBTradeVo.class);
-			this.tradeService.handleTrade(mqMsg);
+			this.mqHandler.handleTrade(mqMsg);
 		}else if(msg.getTag().equals(MqTags.TAGS_CANCELLED)){
 			BBCancelledMsg mqMsg = JsonUtils.toObject(msg.getBody(), BBCancelledMsg.class);
-			orderService.setCancelled(mqMsg.getAccountId(), mqMsg.getAsset(), mqMsg.getSymbol(), mqMsg.getOrderId());
+			mqHandler.setCancelled(mqMsg.getAccountId(), mqMsg.getAsset(), mqMsg.getSymbol(), mqMsg.getOrderId());
 		}
 		
 		mqMsgService.delete(msg.getUserId(), msg.getId());
