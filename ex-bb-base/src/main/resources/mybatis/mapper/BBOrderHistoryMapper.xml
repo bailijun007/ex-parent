@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.bb.module.order.dao.BBOrderHistoryDAO">
+
+	<resultMap type="com.hp.sh.expv3.bb.module.order.entity.BBOrderHistory" id="BBOrderHistory">
+		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="bid_flag" property="bidFlag" />
+		<result column="leverage" property="leverage" />
+		<result column="volume" property="volume" />
+		<result column="price" property="price" />
+		<result column="order_type" property="orderType" />
+		<result column="time_in_force" property="timeInForce" />
+		<result column="fee_ratio" property="feeRatio" />
+		<result column="client_order_id" property="clientOrderId" />
+		<result column="fee" property="fee" />
+		<result column="order_margin" property="orderMargin" />
+		<result column="order_margin_currency" property="orderMarginCurrency" />
+		<result column="status" property="status" />
+		<result column="active_flag" property="activeFlag" />
+		<result column="remark" property="remark" />
+		<result column="cancel_time" property="cancelTime" />
+		<result column="cancel_volume" property="cancelVolume" />
+		<result column="fee_cost" property="feeCost" />
+		<result column="filled_volume" property="filledVolume" />
+		<result column="trade_mean_price" property="tradeMeanPrice" />
+		<result column="version" property="version" />
+		<result column="create_operator" property="createOperator" />
+		<result column="cancel_operator" property="cancelOperator" />
+		<result column="user_id" property="userId" />
+		<result column="id" property="id" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		asset,symbol,bid_flag,leverage,volume,price,order_type,time_in_force,fee_ratio,client_order_id,fee,order_margin,order_margin_currency,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,trade_mean_price,version,create_operator,cancel_operator,user_id,id,created,modified
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="bidFlag!=null"> and bid_flag=#{bidFlag}</if>
+		<if test="orderType!=null"> and order_type=#{orderType}</if>
+		<if test="timeInForce!=null"> and time_in_force=#{timeInForce}</if>
+		<if test="status!=null"> and status=#{status}</if>
+		<if test="activeFlag!=null"> and active_flag=#{activeFlag}</if>
+		<if test="cancelTime!=null"> and cancel_time=#{cancelTime}</if>
+		<if test="version!=null"> and version=#{version}</if>
+		<if test="userId!=null"> and user_id=#{userId}</if>
+		<if test="id!=null"> and id=#{id}</if>
+		<if test="created!=null"> and created=#{created}</if>
+		<if test="modified!=null"> and modified=#{modified}</if>
+		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(asset,''),IFNULL(symbol,''),IFNULL(client_order_id,''),IFNULL(order_margin_currency,''),IFNULL(remark,''),IFNULL(create_operator,''),IFNULL(cancel_operator,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from bb_order_history
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="BBOrderHistory">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="BBOrderHistory">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="BBOrderHistory">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from bb_order_history
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="BBOrderHistory">
+		select
+			<include refid="Base_Column_List" />
+		from bb_order_history
+			where id=#{id}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			bb_order_history
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into bb_order_history (
+			asset,symbol,bid_flag,leverage,volume,price,order_type,time_in_force,fee_ratio,client_order_id,fee,order_margin,order_margin_currency,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,trade_mean_price,version,create_operator,cancel_operator,user_id,id,created,modified
+		)values(
+			#{asset},#{symbol},#{bidFlag},#{leverage},#{volume},#{price},#{orderType},#{timeInForce},#{feeRatio},#{clientOrderId},#{fee},#{orderMargin},#{orderMarginCurrency},#{status},#{activeFlag},#{remark},#{cancelTime},#{cancelVolume},#{feeCost},#{filledVolume},#{tradeMeanPrice},#{version},#{createOperator},#{cancelOperator},#{userId},#{id},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			bb_order_history
+		set 
+			asset=#{asset},symbol=#{symbol},bid_flag=#{bidFlag},leverage=#{leverage},volume=#{volume},price=#{price},order_type=#{orderType},time_in_force=#{timeInForce},fee_ratio=#{feeRatio},client_order_id=#{clientOrderId},fee=#{fee},order_margin=#{orderMargin},order_margin_currency=#{orderMarginCurrency},status=#{status},active_flag=#{activeFlag},remark=#{remark},cancel_time=#{cancelTime},cancel_volume=#{cancelVolume},fee_cost=#{feeCost},filled_volume=#{filledVolume},trade_mean_price=#{tradeMeanPrice},version=#{version},create_operator=#{createOperator},cancel_operator=#{cancelOperator},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+		where 
+			id=#{id} 
+			and user_id=#{userId}
+			and asset=#{asset}
+			and symbol=#{symbol}
+	</update>
+
+	<delete id="delete">
+        delete from 
+        	bb_order_history 
+		where 
+			id=#{id} 
+			and user_id=#{userId}
+			and asset=#{asset}
+			and symbol=#{symbol}
+    </delete>
+
+    <delete id="condDelete">
+        delete from bb_order_history
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+</mapper>

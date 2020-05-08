@@ -40,24 +40,36 @@ public class TestAction2 {
 		return id;
 	}
 
-	@ApiOperation(value = "测试保存数据库")
-	@GetMapping(value = "/api/bb/test/dbsave")
-	@Transactional(rollbackFor=Exception.class)
-	public Long dbsave(){
-		String tag="test";
-		String ext="test";
-		
+	@ApiOperation(value = "测试保存数据库（单线程多事务）")
+	@GetMapping(value = "/api/bb/test/dbsave1")
+	public Long dbsave1(){
 		long time = System.currentTimeMillis();
-		for(int i=0;i<10000;i++){
-			BBTradeVo msg = getBBTradeVo();
-			msgService.save(tag, msg, ext);
-		}
-		
+		this.doDbsave();
+		time = System.currentTimeMillis()-time;
+		return time;
+	}
+
+	@ApiOperation(value = "测试保存数据库（单线程单事务）")
+	@GetMapping(value = "/api/bb/test/dbsave2")
+	@Transactional(rollbackFor=Exception.class)
+	public Long dbsave2(){
+		long time = System.currentTimeMillis();
+		this.doDbsave();
 		time = System.currentTimeMillis()-time;
 		return time;
 	}
 	
-	@ApiOperation(value = "测试多线程保存数据库")
+	private void doDbsave(){
+		String tag="test";
+		String ext="test";
+		
+		for(int i=0;i<100000;i++){
+			BBTradeVo msg = getBBTradeVo();
+			msgService.save(tag, msg, ext);
+		}
+	}
+	
+	@ApiOperation(value = "测试多线程保存数据库（多线程多事务）")
 	@GetMapping(value = "/api/bb/test/dbsavemt")
 	public Long dbsavemt() throws InterruptedException{
 		String tag="test";
@@ -69,7 +81,7 @@ public class TestAction2 {
 		for(int i=0;i<100;i++){
 			Thread t = new Thread(){
 				public void run(){
-					for(int i=0;i<100;i++){
+					for(int i=0;i<1000;i++){
 						msgService.save(tag, msg, ext);
 					}
 				}

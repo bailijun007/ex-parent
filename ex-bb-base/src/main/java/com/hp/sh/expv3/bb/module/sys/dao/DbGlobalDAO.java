@@ -23,4 +23,6 @@ public interface DbGlobalDAO {
 	
 	public Long createOrderTradeTable(@Param("tableName") String tableName);
 
+	public void execute(@Param("sqlStr") String sqlStr);
+
 }

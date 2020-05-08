@@ -8,10 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.constant.OrderStatus;
 import com.hp.sh.expv3.bb.module.order.dao.BBOrderDAO;
+import com.hp.sh.expv3.bb.module.order.dao.BBOrderHistoryDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
+import com.hp.sh.expv3.bb.module.order.entity.BBOrderHistory;
 import com.hp.sh.expv3.bb.mq.msg.vo.BBOrderEvent;
 
 @Service
@@ -21,6 +24,9 @@ public class BBOrderUpdateService {
 
 	@Autowired
 	private BBOrderDAO orderDAO;
+	
+	@Autowired
+	private BBOrderHistoryDAO orderHistoryDAO;
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -71,9 +77,13 @@ public class BBOrderUpdateService {
 	}
 
 	void updateActiveOrder(BBOrder order) {
-		this.orderDAO.update(order);
-		if(order.getActiveFlag()==BBOrder.NO){
-			
+		if(order.getActiveFlag()==BBOrder.YES){
+			this.orderDAO.update(order);
+		}else{
+			this.orderDAO.delete(order.getId(), order.getUserId(), order.getAsset(), order.getSymbol());
+			//保存到历史订单
+			BBOrderHistory orderHistrory = BeanHelper.copyBean(order, BBOrderHistory.class);
+			orderHistoryDAO.save(orderHistrory);
 		}
 	}
 }

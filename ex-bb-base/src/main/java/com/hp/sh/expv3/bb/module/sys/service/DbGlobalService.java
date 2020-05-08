@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.date.DateUtils;
 import com.hp.sh.expv3.bb.module.sys.dao.DbGlobalDAO;
+import com.hp.sh.expv3.commons.config.FileConfig;
 import com.hp.sh.expv3.component.dbshard.DateShardUtils;
 import com.hp.sh.expv3.component.dbshard.TableShardingByDateAsset;
 import com.hp.sh.expv3.component.dbshard.TableShardingByDateSymbol;
@@ -24,7 +27,7 @@ public class DbGlobalService {
 	private static final String dbName = null;
 	
 	private static final String ACCOUNT_RECORD = "bb_account_record";
-	private static final String ORDER = "bb_order";
+	private static final String ORDER_HISTORY = "bb_order_history";
 	private static final String ORDER_TRADE = "bb_order_trade";
 	
 	@Autowired
@@ -109,7 +112,7 @@ public class DbGlobalService {
 		System.out.print(new Date(end).toLocaleString());
 		List<String> list = DateShardUtils.getRangeDates(start, end);
 		for(String date : list){
-			String table = TableShardingByDateSymbol.getTableName(ORDER, asset, symbol, date);
+			String table = TableShardingByDateSymbol.getTableName(ORDER_HISTORY, asset, symbol, date);
 			if(this.dbGlobalDAO.findTableName(dbName, table)==null){
 				dbGlobalDAO.createOrderTable(table);
 			}else{
@@ -127,6 +130,21 @@ public class DbGlobalService {
 			}else{
 				logger.error("表已存在：{}", table);
 			}
+		}
+	}
+	
+	@PostConstruct
+	public void initSql(){
+		try {
+			FileConfig fc = new FileConfig();
+			fc.setConfigPath("bb_ddl.sql");
+			String text = fc.getFileContent();
+			String[] sqls = text.split(";");
+			for(String sql:sqls){
+				this.dbGlobalDAO.execute(sql);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 

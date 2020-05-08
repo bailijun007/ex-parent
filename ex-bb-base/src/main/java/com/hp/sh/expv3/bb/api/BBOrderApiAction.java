@@ -15,6 +15,7 @@ import com.hp.sh.expv3.bb.mq.msg.out.OrderPendingCancelMsg;
 import com.hp.sh.expv3.bb.mq.msg.out.OrderPendingNewMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.utils.CheckUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -78,6 +79,7 @@ public class BBOrderApiAction implements BBOrderApi {
 		
 	}
 	
+	@LockIt(key="U-${userId}")
 	@ApiOperation(value = "测试撮合取消")
 	@GetMapping(value = "/api/bb/order/setCancelled")
 	public void setCancelled(Long userId, String asset, String symbol, Long orderId) {

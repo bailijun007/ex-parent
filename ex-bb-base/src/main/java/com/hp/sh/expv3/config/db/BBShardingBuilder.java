@@ -12,12 +12,10 @@ import javax.sql.DataSource;
 import org.apache.shardingsphere.api.config.sharding.ShardingRuleConfiguration;
 import org.apache.shardingsphere.api.config.sharding.TableRuleConfiguration;
 import org.apache.shardingsphere.api.config.sharding.strategy.ComplexShardingStrategyConfiguration;
-import org.apache.shardingsphere.api.config.sharding.strategy.ShardingStrategyConfiguration;
 import org.apache.shardingsphere.api.config.sharding.strategy.StandardShardingStrategyConfiguration;
 import org.apache.shardingsphere.shardingjdbc.api.ShardingDataSourceFactory;
 
 import com.hp.sh.expv3.component.dbshard.DbShardingAlgorithm;
-import com.hp.sh.expv3.component.dbshard.TableShardingByDate;
 import com.hp.sh.expv3.component.dbshard.TableShardingByDateAsset;
 import com.hp.sh.expv3.component.dbshard.TableShardingByDateSymbol;
 

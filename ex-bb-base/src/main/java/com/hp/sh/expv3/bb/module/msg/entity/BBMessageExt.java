@@ -1,11 +1,8 @@
 package com.hp.sh.expv3.bb.module.msg.entity;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.hp.sh.expv3.base.entity.UserData;
-import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 /**
  * 币币_撮合消息
@@ -26,7 +23,6 @@ public class BBMessageExt implements UserData{
 	private Long id;
 	
 	//msgId
-	@Id
 	private String msgId;
 
 	private String tags;
@@ -55,8 +51,6 @@ public class BBMessageExt implements UserData{
 	
 	private int status;
 	
-	@Id
-	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
 	public Long getId() {
 		return id;
 	}

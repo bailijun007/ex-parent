@@ -60,6 +60,8 @@ public class BBMessageExtService{
 		msgEntity.setShardId(getMsgSardId(msgEntity));
 		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
 		
+		msgEntity.setId(msg.getSeqId());
+		
 		this.messageExtDAO.save(msgEntity);
 		
 		return msgEntity;
@@ -83,6 +85,8 @@ public class BBMessageExtService{
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setShardId(getMsgSardId(msgEntity));
 		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
+		
+		msgEntity.setId(msg.getSeqId());
 		
 		this.messageExtDAO.save(msgEntity);
 		
@@ -110,6 +114,8 @@ public class BBMessageExtService{
 		msgEntity.setMsgBody(JsonUtils.toJson(msg));
 		msgEntity.setShardId(getMsgSardId(msgEntity));
 		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
+		
+		msgEntity.setId(msg.getSeqId());
 		
 		this.messageExtDAO.save(msgEntity);
 		

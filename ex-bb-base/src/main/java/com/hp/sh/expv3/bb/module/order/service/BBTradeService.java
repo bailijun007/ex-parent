@@ -311,8 +311,8 @@ public class BBTradeService {
 		
 		////////////////
 		if(order.getStatus() == OrderStatus.CANCELED){
-//			throw new ExSysException(BBOrderError.CANCELED, "canTrade", tradeMsg);
-			return false;
+			throw new ExSysException(BBOrderError.CANCELED, "canTrade", tradeMsg);
+//			return false;
 		}
 		if(order.getStatus() == OrderStatus.FILLED){
 			throw new ExSysException(BBOrderError.FILLED, "canTrade", tradeMsg);
@@ -321,8 +321,8 @@ public class BBTradeService {
 			throw new ExSysException(BBOrderError.NOT_ACTIVE, "canTrade", tradeMsg, "FilledVolume");
 		}
 		if(IntBool.isFalse(order.getActiveFlag())){
-//			throw new ExSysException(BBOrderError.NOT_ACTIVE, "canTrade", tradeMsg);
-			return false;
+			throw new ExSysException(BBOrderError.NOT_ACTIVE, "canTrade", tradeMsg);
+//			return false;
 		}
 		////////////////
 		

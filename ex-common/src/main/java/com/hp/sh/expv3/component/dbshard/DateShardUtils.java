@@ -1,13 +1,13 @@
 package com.hp.sh.expv3.component.dbshard;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
-
-import com.gitee.hupadev.commons.date.DateUtils;
 
 public class DateShardUtils {
 	private static final String dateFormat = "yyyyMM";
@@ -50,13 +50,21 @@ public class DateShardUtils {
 		}else{
 			date = (Date)value;
 		}
-		String str = DateFormatUtils.format(date, dateFormat);
-		return str;
+		
+		SimpleDateFormat df = dateFormat();
+		String dateStr = df.format(date);
+		
+		return dateStr;
 	}
 
 	public static Date parseTableDate(String dateStr){
-		Date date = DateUtils.parse(dateStr, dateFormat);
-		return date;
+		SimpleDateFormat df = dateFormat();
+		try {
+			Date date = df.parse(dateStr);
+			return date;
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public static Date getTableDate(String tableName) {
@@ -66,6 +74,11 @@ public class DateShardUtils {
 		return date;
 	}
 	
+	private static SimpleDateFormat dateFormat(){
+		SimpleDateFormat df = new SimpleDateFormat(dateFormat);
+		return df;
+	}
+
 	public static void main(String[] args) {
 		Long now = System.currentTimeMillis();
 		System.out.println(DateShardUtils.getRangeDates(now, now));

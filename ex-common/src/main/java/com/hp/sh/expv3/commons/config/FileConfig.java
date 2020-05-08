@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,19 @@ public class FileConfig implements SysConfig{
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public String getFileContent() throws Exception{
+		InputStream in = this.getInputStream();
+		String text = IOUtils.toString(in, "utf-8");
+		return text;
+	}
+	
+	public InputStream getInputStream() throws Exception {
+		URL url = this.getResource(configPath);
+		this.file = new File(url.toURI());
+		InputStream in = new FileInputStream(file);
+		return in;
 	}
 	
 	protected URL getResource(String path){

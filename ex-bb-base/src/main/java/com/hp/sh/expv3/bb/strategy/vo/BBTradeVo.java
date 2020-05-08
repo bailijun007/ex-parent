@@ -37,6 +37,8 @@ public class BBTradeVo extends BaseSymbolMsg{
 	
 	//对手订单ID
 	private Long opponentOrderId;
+	
+    private Long seqId;
 
 	public BBTradeVo() {
 	}
@@ -119,6 +121,14 @@ public class BBTradeVo extends BaseSymbolMsg{
 
 	public void setOpponentOrderId(Long opponentOrderId) {
 		this.opponentOrderId = opponentOrderId;
+	}
+
+	public Long getSeqId() {
+		return seqId;
+	}
+
+	public void setSeqId(Long seqId) {
+		this.seqId = seqId;
 	}
 
 	@Override

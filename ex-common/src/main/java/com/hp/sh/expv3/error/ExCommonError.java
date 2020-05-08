@@ -24,6 +24,10 @@ public class ExCommonError extends ErrorCode {
     public static final ExCommonError REQUIRE_POSITIVE_PARAM = new ExCommonError(10105, "参数必须是正数!");
 
     public static final ExCommonError REQUIRE_BOOL = new ExCommonError(10106, "必须是布尔值:0/1!");
+    
+	public static final ExCommonError DATA_EXPIRED = new ExCommonError(-5014, "服务器忙！");
+	
+	public static final ExCommonError LOCK = new ExCommonError(-5015, "服务器忙！！");
 	
 	
 	private ExCommonError(int code, String message) {

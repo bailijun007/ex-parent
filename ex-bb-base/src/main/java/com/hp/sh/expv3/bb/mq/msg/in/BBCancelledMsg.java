@@ -13,6 +13,8 @@ public class BBCancelledMsg extends BaseSymbolMsg{
     private Long accountId;
     private Long orderId;
     private BigDecimal cancelNumber;
+    
+    private Long seqId;
 	
 	public BBCancelledMsg() {
 	}
@@ -39,6 +41,14 @@ public class BBCancelledMsg extends BaseSymbolMsg{
 
 	public void setCancelNumber(BigDecimal cancelNumber) {
 		this.cancelNumber = cancelNumber;
+	}
+
+	public Long getSeqId() {
+		return seqId;
+	}
+
+	public void setSeqId(Long seqId) {
+		this.seqId = seqId;
 	}
 
 	@Override
