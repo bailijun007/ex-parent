@@ -158,7 +158,7 @@
         
     </springProfile>
     
-    <springProfile name="local">
+    <springProfile name="bai">
         <root level="INFO">
 	        <!-- 控制台输出 -->
 	        <appender-ref ref="STDOUT"/>
