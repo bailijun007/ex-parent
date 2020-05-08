@@ -1,11 +1,8 @@
 package com.hp.sh.expv3.bb.api;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.base.spring.interceptor.LimitInterceptor;
-import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.gitee.hupadev.commons.executor.orderly.OrderlyExecutors;
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.gitee.hupadev.commons.page.Page;
@@ -25,14 +21,11 @@ import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
-import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
-import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqHandler;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.out.OrderRebaseMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
-import com.hp.sh.expv3.config.shard.ShardGroup;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -57,22 +50,7 @@ public class BBMaintainAction{
 	private BBMqMsgService mqMsgService;
 	
 	@Autowired
-	private BBTradeService tradeService;
-	@Autowired
-	private BBOrderService orderService;
-	
-	@Autowired
-	private ShardGroup shardGroup;
-	
-	@Autowired
 	private MatchMqHandler mqHandler;
-
-	@ApiOperation(value = "userShard")
-	@GetMapping(value = "/api/bb/maintain/userShard")
-	public Long userShard(Long userId){
-		Long shardId = shardGroup.getMsgSardId(userId);
-		return shardId;
-	}
 	
 	@ApiOperation(value = "querySynchFee")
 	@GetMapping(value = "/api/bb/maintain/querySynchFee")
@@ -112,12 +90,12 @@ public class BBMaintainAction{
 
 	@ApiOperation(value = "queryResend")
 	@GetMapping(value = "/api/bb/maintain/queryResend")	
-	public Integer queryResend(String symbol){
+	public Integer queryResend(String asset, String symbol){
 		long now = DbDateUtils.now()-2000;
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, symbol, now, OrderStatus.PENDING_NEW);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -140,8 +118,8 @@ public class BBMaintainAction{
 	public Map resendPending(String asset, String symbol){
 		this.resendRebase(asset, symbol);
 		Map map = new HashMap();
-		Integer resendPendingCancel = this.resendPendingCancel(symbol);
-		Integer resendPendingNew = this.resendPendingNew(symbol);
+		Integer resendPendingCancel = this.resendPendingCancel(asset, symbol);
+		Integer resendPendingNew = this.resendPendingNew(asset, symbol);
 		map.put("resendPendingCancel", resendPendingCancel);
 		map.put("resendPendingNew", resendPendingNew);
 		return map;
@@ -155,12 +133,12 @@ public class BBMaintainAction{
 
 	@ApiOperation(value = "resendPendingCancel")
 	@GetMapping(value = "/api/bb/maintain/resendPendingCancel")	
-	public Integer resendPendingCancel(String symbol){
+	public Integer resendPendingCancel(String asset, String symbol){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		long now = DbDateUtils.now()-2000;
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, symbol, now, OrderStatus.PENDING_CANCEL);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_CANCEL);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -185,12 +163,12 @@ public class BBMaintainAction{
 
 	@ApiOperation(value = "resendPendingNew")
 	@GetMapping(value = "/api/bb/maintain/resendPendingNew")	
-	public Integer resendPendingNew(String symbol){
+	public Integer resendPendingNew(String asset, String symbol){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		long now = DbDateUtils.now()-2000;
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, symbol, now, OrderStatus.PENDING_NEW);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -224,49 +202,14 @@ public class BBMaintainAction{
 	@ApiOperation(value = "reHandleAllFailMsg")
 	@GetMapping(value = "/api/bb/maintain/mq/reHandleAllFailMsg")	
 	public String reHandleAllFailMsg(Integer num){
-		long time = System.currentTimeMillis();
-		
 		num = num==null ? 1:num;
 		
 		List<BBMqMsg> list = this.mqMsgService.findFirstList(num);
 		for(BBMqMsg msg : list){
 			this.handleNextFailMsg(msg);
 		}
-		time = System.currentTimeMillis()-time;
-		return "num="+list.size()+", time="+ time;
-	}
-	
-	
-	@ApiOperation(value = "reHandleAllFailMsg2")
-	@GetMapping(value = "/api/bb/maintain/mq/reHandleAllFailMsg2")	
-	public String reHandleAllFailMsg2(Integer num) throws Exception{
-		num = num==null ? 1:num;
 		
-		List<BBMqMsg> list = this.mqMsgService.findFirstList(num);
-		Map<Long,List<BBMqMsg>> userMsgMap = BeanHelper.groupByProperty(list, "userId");
-		Set<Entry<Long, List<BBMqMsg>>> entrySet = userMsgMap.entrySet();
-		
-		long time = System.currentTimeMillis();
-		List<Thread> tList = new ArrayList<>();
-		for(Entry<Long, List<BBMqMsg>> entry:entrySet){
-			List<BBMqMsg> umList = entry.getValue();
-			Thread t = new Thread(){
-				public void run(){
-					for(BBMqMsg um : umList){
-						handleNextFailMsg(um);
-					}
-				}
-			};
-			t.start();
-			tList.add(t);
-		}
-		
-		for(Thread t:tList){
-			t.join();
-		}
-		
-		time = System.currentTimeMillis()-time;
-		return "num="+list.size()+",users="+userMsgMap.size()+", time="+ time;
+		return "Over."+list.size();
 	}
 	
 	private int handleNextFailMsg(BBMqMsg msg){

@@ -95,7 +95,7 @@ public class BBOrderQueryService {
 	}
 	
 
-	public List<BBOrder> queryPendingActive(Page page, String symbol, Long createdEnd, Integer status) {
+	public List<BBOrder> queryPendingActive(Page page, String asset, String symbol, Long createdEnd, Integer status) {
 		List<BBOrder> list = this.bbOrderDAO.queryPendingActiveOrders(page, symbol, createdEnd, status);
 		return list;
 	}
