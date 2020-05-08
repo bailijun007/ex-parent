@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.hp.sh.expv3.component.dbshard.ExShardingBuilder;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
@@ -32,7 +33,7 @@ public class DataSourceConfig {
 	@Bean("shardingDataSource")
 	public DataSource shardingDataSource(@Qualifier("primaryDataSource") DataSource primaryDataSource, List<DataSource> dsList) throws SQLException {
 		// 配置分片规则
-		BBShardingBuilder builder = new BBShardingBuilder();
+		ExShardingBuilder builder = new ExShardingBuilder();
 		builder.setDataSourceList(dsList);
 		builder.addAssetSubTableName("bb_account_record");
 		builder.addSymbolSubTableName("bb_order_history");

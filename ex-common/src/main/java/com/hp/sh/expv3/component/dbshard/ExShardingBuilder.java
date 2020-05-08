@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.config.db;
+package com.hp.sh.expv3.component.dbshard;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import com.hp.sh.expv3.component.dbshard.DbShardingAlgorithm;
 import com.hp.sh.expv3.component.dbshard.TableShardingByDateAsset;
 import com.hp.sh.expv3.component.dbshard.TableShardingByDateSymbol;
 
-public class BBShardingBuilder{
+public class ExShardingBuilder{
 	
 	public static final String DS_PREFIX = "data-source-";
 	
@@ -29,10 +29,10 @@ public class BBShardingBuilder{
     private List<String> assetSubTableNames = new ArrayList<String>();
     private List<String> symbolSubTableNames = new ArrayList<String>();
     
-    public BBShardingBuilder() {
+    public ExShardingBuilder() {
 	}
 
-	public BBShardingBuilder setDataSourceList(List<DataSource> dsList) {
+	public ExShardingBuilder setDataSourceList(List<DataSource> dsList) {
 		this.dataSourceList = dsList;
 		return this;
 	}
@@ -42,7 +42,7 @@ public class BBShardingBuilder{
 	 * @param tableName
 	 * @return
 	 */
-	public BBShardingBuilder addSubDBTableName(String tableName){
+	public ExShardingBuilder addSubDBTableName(String tableName){
 		subDBTableNames.add(tableName);
 		return this;
     }
@@ -52,7 +52,7 @@ public class BBShardingBuilder{
 	 * @param tableName
 	 * @return
 	 */
-	public BBShardingBuilder addAssetSubTableName(String tableName){
+	public ExShardingBuilder addAssetSubTableName(String tableName){
 		assetSubTableNames.add(tableName);
 		return this;
     }
@@ -62,7 +62,7 @@ public class BBShardingBuilder{
 	 * @param tableName
 	 * @return
 	 */
-	public BBShardingBuilder addSymbolSubTableName(String tableName){
+	public ExShardingBuilder addSymbolSubTableName(String tableName){
 		symbolSubTableNames.add(tableName);
 		return this;
     }

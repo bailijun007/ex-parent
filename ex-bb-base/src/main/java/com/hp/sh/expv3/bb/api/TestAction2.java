@@ -15,6 +15,7 @@ import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.module.msg.service.BBMessageOffsetService;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.component.lock.TxIdService;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +31,11 @@ public class TestAction2 {
 	
 	@Autowired
 	private BBMessageOffsetService offsetService;
+	
+	@Autowired(required=false)
+	private TxIdService txIdService;
+	
+	private static final int RECORD_TOTAL = 10000;
 	
 	@ApiOperation(value = "测试cache")
 	@GetMapping(value = "/api/bb/test/cache")
@@ -63,7 +69,7 @@ public class TestAction2 {
 		String tag="test";
 		String ext="test";
 		
-		for(int i=0;i<100000;i++){
+		for(int i=0;i<RECORD_TOTAL;i++){
 			BBTradeVo msg = getBBTradeVo();
 			msgService.save(tag, msg, ext);
 		}
@@ -81,7 +87,7 @@ public class TestAction2 {
 		for(int i=0;i<100;i++){
 			Thread t = new Thread(){
 				public void run(){
-					for(int i=0;i<1000;i++){
+					for(int i=0;i<RECORD_TOTAL/100;i++){
 						msgService.save(tag, msg, ext);
 					}
 				}
