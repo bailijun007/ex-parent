@@ -129,7 +129,7 @@
         ORDER BY id ASC
     </select>
 
-    <select id="queryByIds" resultType="com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo">
+    <select id="queryByIds" resultMap="BBOrderTrade">
         select
         <include refid="Base_Column_List"/>
         from bb_order_trade
