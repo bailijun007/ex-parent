@@ -4,11 +4,14 @@ import com.gitee.hupadev.base.api.PageResult;
 import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hp.sh.expv3.bb.extension.constant.BbExtCommonConstant;
 import com.hp.sh.expv3.bb.extension.constant.OrderStatus;
 import com.hp.sh.expv3.bb.extension.dao.BbOrderExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
 import com.hp.sh.expv3.bb.extension.strategy.common.BBExtCommonOrderStrategy;
+import com.hp.sh.expv3.bb.extension.util.CommonDateUtils;
+import com.hp.sh.expv3.bb.extension.vo.BbAccountRecordVo;
 import com.hp.sh.expv3.bb.extension.vo.BbHistoryOrderVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
@@ -18,9 +21,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author BaiLiJun  on 2020/2/14
@@ -39,25 +44,54 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     private BBExtCommonOrderStrategy orderStrategy;
 
     @Override
-    public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, Integer pageNo, Integer pageSize) {
+    public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, String symbol, String startTime, String endTime, Integer pageNo, Integer pageSize) {
         PageResult<BbOrderVo> pageResult = new PageResult<>();
-        PageHelper.startPage(pageNo, pageSize);
+        List<BbOrderVo> list = new ArrayList<>();
+        //        PageHelper.startPage(pageNo, pageSize);
+        long begin = CommonDateUtils.stringToTimestamp(startTime);
+        long end = CommonDateUtils.stringToTimestamp(endTime);
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        List<BbOrderVo> list = bbOrderExtMapper.queryList(map);
-        PageInfo<BbOrderVo> info = new PageInfo<>(list);
-        pageResult.setPageNo(info.getPageNum());
-        pageResult.setPageCount(info.getPages());
-        pageResult.setRowTotal(info.getTotal());
-        pageResult.setList(list);
+        map.put("symbol", symbol);
+        map.put("createdBegin", begin);
+        map.put("createdEnd", end);
+
+        List<Integer> timeDifference = CommonDateUtils.getTimeDifference(startTime, endTime);
+        String tableName = null;
+
+        for (Integer date : timeDifference) {
+            //tableName   eg:bb_order_history_usdt__bys_usdt_202005
+            tableName = BbExtCommonConstant.BB_ORDER_HISTORY_PREFIX + asset.toLowerCase() +"__"+ symbol.toLowerCase() + "_" + date;
+            int existTable = bbOrderExtMapper.existTable(BbExtCommonConstant.DB_NAME_EXPV3_BB, tableName);
+            //表不存在则直接跳过
+            if (existTable != 1) {
+                continue;
+            }
+            map.put("tableName", tableName);
+            List<BbOrderVo> bbOrderVos = bbOrderExtMapper.queryList(map);
+            if (!CollectionUtils.isEmpty(bbOrderVos)) {
+                list.addAll(bbOrderVos);
+            }
+
+        }
+
+        List<BbOrderVo> pageList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
+        pageResult.setList(pageList);
+        Integer rowTotal = list.size();
+        pageResult.setPageNo(pageNo);
+        pageResult.setRowTotal(Long.parseLong(String.valueOf(rowTotal)));
+        pageResult.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
         return pageResult;
     }
 
     @Override
-    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
-        PageResult<BbHistoryOrderVo> result=new PageResult<>();
-        List<BbHistoryOrderVo> bbHistoryOrderVos = new ArrayList<>();
+    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage,String startTime, String endTime) {
+        PageResult<BbHistoryOrderVo> result = new PageResult<>();
+        result.setRowTotal(0L);
+        List<BbHistoryOrderVo> listResult = new ArrayList<>();
+        long begin = CommonDateUtils.stringToTimestamp(startTime);
+        long end = CommonDateUtils.stringToTimestamp(endTime);
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
@@ -65,25 +99,37 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("bidFlag", bidFlag);
         map.put("activeFlag", IntBool.NO);
         map.put("lastOrderId", lastOrderId);
-
-        result.setRowTotal(0L);
-
+        map.put("createdBegin", begin);
+        map.put("createdEnd", end);
         map.put("limit", pageSize);
-        List<BbOrderVo> list = null;
-        if (lastOrderId == null) {
-            list = bbOrderExtMapper.queryHistoryOrderList(map);
-        } else {
-            map.put("nextPage", nextPage);
-            list = bbOrderExtMapper.queryHistoryByIsNextPage(map);
+
+        List<Integer> timeDifference = CommonDateUtils.getTimeDifference(startTime, endTime);
+        String tableName = null;
+
+        for (Integer date : timeDifference) {
+            //tableName   eg:bb_order_history_usdt__bys_usdt_202005
+            tableName = BbExtCommonConstant.BB_ORDER_HISTORY_PREFIX + asset.toLowerCase() +"__"+ symbol.toLowerCase() + "_" + date;
+            int existTable = bbOrderExtMapper.existTable(BbExtCommonConstant.DB_NAME_EXPV3_BB, tableName);
+            //表不存在则直接跳过
+            if (existTable != 1) {
+                continue;
+            }
+            map.put("tableName", tableName);
+            List<BbOrderVo> list = null;
+            if (lastOrderId == null) {
+                list = bbOrderExtMapper.queryHistoryOrderList(map);
+            } else {
+                map.put("nextPage", nextPage);
+                list = bbOrderExtMapper.queryHistoryByIsNextPage(map);
+            }
+            if (list == null || list.isEmpty()) {
+                continue;
+            }
+            //TODO 可能有bug 待测试
+            this.convertOrderList(userId, listResult, list);
         }
 
-        if (list == null || list.isEmpty()) {
-            return result;
-        }
-
-        this.convertOrderList(userId, bbHistoryOrderVos, list);
-
-        result.setList(bbHistoryOrderVos);
+        result.setList(listResult);
         return result;
 
     }
@@ -101,7 +147,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     @Override
     public PageResult<BbHistoryOrderVo> queryBbActiveOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
         PageResult<BbHistoryOrderVo> result = new PageResult<>();
-        List<BbHistoryOrderVo> voList=new ArrayList<>();
+        List<BbHistoryOrderVo> voList = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
@@ -111,7 +157,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("lastOrderId", lastOrderId);
 
         //总条数
-      Long count= bbOrderExtMapper.queryActiveOrderCount(map);
+        Long count = bbOrderExtMapper.queryActiveOrderCount(map);
 
         map.put("limit", pageSize);
         List<BbOrderVo> list = null;
@@ -167,12 +213,12 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("gtOrderId", gtOrderId);
         map.put("ltOrderId", ltOrderId);
         map.put("limit", count);
-        List<BbOrderVo> list =null;
+        List<BbOrderVo> list = null;
         //如果状态为已取消 或者部分成交，则直接查bb_order表
-        if(statusList.contains(OrderStatus.CANCELED)||statusList.contains(OrderStatus.FILLED)){
+        if (statusList.contains(OrderStatus.CANCELED) || statusList.contains(OrderStatus.FILLED)) {
             map.put("activeFlag", IntBool.NO);
-             list = bbOrderExtMapper.queryOrderList(map);
-        }else {
+            list = bbOrderExtMapper.queryOrderList(map);
+        } else {
 //            map.put("activeFlag", IntBool.YES);
             list = bbOrderExtMapper.queryBbActiveOrders(map);
         }
@@ -194,8 +240,8 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
 
     @Override
     public BigDecimal queryTotalFee(Long startTime, Long endTime) {
-        BigDecimal total=  bbOrderExtMapper.queryTotalFee(startTime,endTime);
-        if(null==total){
+        BigDecimal total = bbOrderExtMapper.queryTotalFee(startTime, endTime);
+        if (null == total) {
             return BigDecimal.ZERO;
         }
         return total;
@@ -203,7 +249,7 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
 
     @Override
     public BigDecimal queryTotalOrder(Long startTime, Long endTime) {
-        BigDecimal total=  bbOrderExtMapper.queryTotalOrder(startTime,endTime);
+        BigDecimal total = bbOrderExtMapper.queryTotalOrder(startTime, endTime);
         return total;
     }
 }

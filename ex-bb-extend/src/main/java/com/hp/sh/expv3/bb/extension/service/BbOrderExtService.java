@@ -11,9 +11,9 @@ import java.util.List;
  * @author BaiLiJun  on 2020/2/14
  */
 public interface BbOrderExtService {
-    PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, Integer pageNo, Integer pageSize);
+    PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset,String symbol,String startTime,String endTime ,Integer pageNo, Integer pageSize);
 
-    PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage);
+    PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage, String startTime, String endTime);
 
     BigDecimal getLockAsset(Long userId, String asset);
 

@@ -11,9 +11,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,21 +35,25 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
     private BbOrderExtService bbOrderExtService;
 
     @Override
-    public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, Integer pageSize, Integer pageNo) {
-        if (pageSize == null || pageNo == null) {
+    public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, String symbol, String startTime, String endTime, Integer pageSize, Integer pageNo) {
+        if (pageSize == null || pageNo == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        return bbOrderExtService.queryAllBbOrederHistory(userId, asset, pageNo, pageSize);
+        startTime = getDefaultDateTime(startTime);
+        endTime=getDefaultDateTime(endTime);
+        return bbOrderExtService.queryAllBbOrederHistory(userId, asset, symbol, startTime, endTime, pageNo, pageSize);
     }
 
 
     @Override
-    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage) {
-        long startTime = System.currentTimeMillis();
+    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, String startTime, String endTime, Integer pageSize, Long lastOrderId, Integer nextPage) {
+        long start = System.currentTimeMillis();
         checkParam(userId, asset, symbol, pageSize, nextPage);
-        PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(userId, asset, symbol, bidFlag, pageSize, lastOrderId, nextPage);
-        long endTime = System.currentTimeMillis();
-        logger.info("查询历史委托接口耗时：{}毫秒,userId={},asset={},symbol={}", (endTime - startTime),asset,symbol);
+        startTime = getDefaultDateTime(startTime);
+        endTime=getDefaultDateTime(endTime);
+        PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(userId, asset, symbol, bidFlag, pageSize, lastOrderId, nextPage,startTime,endTime);
+        long end = System.currentTimeMillis();
+        logger.info("查询历史委托接口耗时：{}毫秒,userId={},asset={},symbol={}", (end - start), asset, symbol);
         return result;
     }
 
@@ -94,7 +101,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         if (null == startTime || endTime == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        return bbOrderExtService.queryTotalFee(startTime,endTime);
+        return bbOrderExtService.queryTotalFee(startTime, endTime);
     }
 
     @Override
@@ -102,7 +109,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         if (null == startTime || endTime == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        return bbOrderExtService.queryTotalOrder(startTime,endTime);
+        return bbOrderExtService.queryTotalOrder(startTime, endTime);
     }
 
 
@@ -111,4 +118,15 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
     }
+
+    private String getDefaultDateTime(String startTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime dateTime = LocalDateTime.now();
+        //如果开始时间，结束时间没有值则给默认今天时间
+        if (StringUtils.isEmpty(startTime)) {
+            startTime = formatter.format(dateTime);
+        }
+        return startTime;
+    }
+
 }

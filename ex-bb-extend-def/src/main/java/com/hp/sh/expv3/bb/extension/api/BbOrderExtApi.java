@@ -27,14 +27,18 @@ public interface BbOrderExtApi {
     @ApiImplicitParams(
             {
                     @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
-                    @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+                    @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+                    @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+                    @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
+                    @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false),
                     @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
                     @ApiImplicitParam(name = "pageSize", value = "页大小", example = "10", required = true)
             }
     )
     @GetMapping(value = "/api/bb/trade/ext/queryAllBbOrederHistory")
-    PageResult<BbOrderVo> queryAllBbOrederHistory(@RequestParam(value = "userId",required = false) Long userId, @RequestParam(value = "asset",required = false) String asset,
-                                                    @RequestParam(value = "pageSize")  Integer pageSize, @RequestParam(value = "pageNo") Integer pageNo);
+    PageResult<BbOrderVo> queryAllBbOrederHistory(@RequestParam(value = "userId",required = false) Long userId, @RequestParam(value = "asset",required = true) String asset, @RequestParam(value = "symbol",required = true) String symbol,
+                                                  @RequestParam(value = "startTime",required = false) String startTime, @RequestParam(value = "endTime",required = false) String endTime,
+                                                  @RequestParam(value = "pageSize")  Integer pageSize, @RequestParam(value = "pageNo") Integer pageNo);
 
 
     @ApiOperation(value = "查询历史委托")
@@ -45,6 +49,8 @@ public interface BbOrderExtApi {
                     @ApiImplicitParam(name = "symbol", value = "交易对", required = false),
                     @ApiImplicitParam(name = "bidFlag", value = " 1.买入,0.卖出,非必填", required = false),
                     @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "10", required = true),
+                    @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
+                    @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false),
                     @ApiImplicitParam(name = "lastOrderId ", value = "当前页最后一张委托的id", example = "10", required = false),
                     @ApiImplicitParam(name = "nextPage ", value = " 翻页标记,-1 上一页,1.下一页 ", example = "1", required = true)
             }
@@ -52,6 +58,7 @@ public interface BbOrderExtApi {
     @GetMapping(value = "/api/bb/order/ext/queryHistoryOrderList")
     PageResult<BbHistoryOrderVo> queryHistoryOrderList(@RequestParam("userId") Long userId, @RequestParam("asset") String asset, @RequestParam(value = "symbol",required = false) String symbol,
                                                  @RequestParam(value = "bidFlag",required = false) Integer bidFlag,
+                                                  @RequestParam(value = "startTime",required = false) String startTime, @RequestParam(value = "endTime",required = false) String endTime,
                                                  @RequestParam(value = "pageSize") Integer pageSize,
                                                  @RequestParam(value = "lastOrderId",required = false) Long lastOrderId,
                                                  @RequestParam(value = "nextPage") Integer nextPage);

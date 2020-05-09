@@ -98,7 +98,7 @@
     <select id="queryList" resultMap="BbOrderVo">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM bb_order
+        FROM ${tableName}
         <include refid="simple_where"/>
     </select>
 
@@ -229,7 +229,7 @@
         SELECT
         <include refid="Base_Column_List"/>
         FROM
-        bb_order
+       ${tableName}
 
         <where>
             <if test="userId!=null">and user_id=#{userId}</if>
@@ -238,6 +238,8 @@
             <if test="bidFlag!=null">and bid_flag=#{bidFlag}</if>
             <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
             <if test="lastOrderId!=null">and id &lt; #{lastOrderId}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
         </where>
         ORDER BY id desc
         <if test="limit!=null">
@@ -351,6 +353,10 @@
 
     <select id="queryTotalOrder" resultType="java.math.BigDecimal">
       select count(1) from bb_order where created&gt;=#{startTime} and created&lt;=#{endTime}
+    </select>
+
+    <select id="existTable" resultType="java.lang.Integer">
+        select count(1) from information_schema.TABLES where table_schema = #{dbName} and  table_name = #{tableName}
     </select>
 
 </mapper>
