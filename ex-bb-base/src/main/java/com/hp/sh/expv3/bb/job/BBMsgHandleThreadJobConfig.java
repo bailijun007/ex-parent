@@ -7,6 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,10 +24,16 @@ public class BBMsgHandleThreadJobConfig{
 	@Autowired
 	private ShardGroup shardGroup;
 	
+	@Value("${shard.thread.enable:true}")
+	private Boolean enableShardThread;
+	
 	private final Map<Long,MsgShardHandlerThread> threadMap = new HashMap<Long,MsgShardHandlerThread>();
 	
-	@Bean("__")
+	@Bean("init_shard_handl_hread")
 	int begin(){
+		if(!enableShardThread){
+			return 0;
+		}
 		List<Long> list = shardGroup.getShardIdList();
 		for(Long shardId : list){
 			MsgShardHandlerThread thread = new MsgShardHandlerThread(msgShardHandler, shardId);

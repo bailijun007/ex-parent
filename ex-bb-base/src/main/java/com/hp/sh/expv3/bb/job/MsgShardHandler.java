@@ -86,38 +86,52 @@ public class MsgShardHandler {
 			for(Entry<Long, List<BBMessageExt>> entry : entrySet){
 				Long userId = entry.getKey();
 				List<BBMessageExt> userMsgList = entry.getValue();
-				while(true){
-					try{
-						long time = System.currentTimeMillis();
-						logger.info("批量处理用户消息：shardId={}, threadName={}, userId={}, size={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size());
-						self.handleBatch(userId, userMsgList);
-						offsetId = userMsgList.get(userMsgList.size()-1).getId();
-						time = System.currentTimeMillis() - time;
-						logger.info("批量处理用户消息成功：shardId={}, threadName={}, userId={}, size={}, time={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size(), time);
-						break;
-					}catch(Exception e){
-						Exception cause = (Exception) ExceptionUtils.getCause(e);
-						logger.error("批量处理用户消息失败:{},{}", e.getMessage(), cause.toString(), e);
-						if(isResendException(e)){
-							try {
-								Thread.sleep(10);
-							} catch (InterruptedException e1) {
-								e1.printStackTrace();
-							}
-							continue;
-						}else{
-							for(BBMessageExt msgExt : userMsgList){
-								self.handleMsgAndErr(msgExt.getUserId(), msgExt);
-								offsetId = msgExt.getId();
-							}
-							break;
-						}
-					}
+				Long curOffsetId = this.handleUserMsgList(shardId, userId, userMsgList);
+				if(curOffsetId!=null){
+					offsetId = curOffsetId;
 				}
 			}
 			
 		}
 		this.offsetService.cacheShardOffset(shardId, offsetId);
+	}
+	
+	private Long handleUserMsgList(Long shardId, Long userId, List<BBMessageExt> userMsgList){
+		Long offsetId = null;
+		while(true){
+			try{
+				long time1 = System.currentTimeMillis();
+				logger.info("批量处理用户消息：shardId={}, threadName={}, userId={}, size={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size());
+				self.handleBatch(userId, userMsgList);
+				offsetId = userMsgList.get(userMsgList.size()-1).getId();
+				long time2 = System.currentTimeMillis();
+				long time = time2 - time1;
+				if(time>1000){
+					logger.warn("批量处理用户消息成功：shardId={}, threadName={}, userId={}, size={}, time={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size(), time);
+				}else{
+					logger.info("批量处理用户消息成功：shardId={}, threadName={}, userId={}, size={}, time={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size(), time);
+				}
+				break;
+			}catch(Exception e){
+				Exception cause = (Exception) ExceptionUtils.getCause(e);
+				logger.error("批量处理用户消息失败:{},{}", e.getMessage(), cause.toString(), e);
+				if(isResendException(e)){
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+					continue;
+				}else{
+					for(BBMessageExt msgExt : userMsgList){
+						self.handleMsgAndErr(msgExt.getUserId(), msgExt);
+						offsetId = msgExt.getId();
+					}
+					break;
+				}
+			}
+		}
+		return offsetId;
 	}
 	
 	@LockIt(key="U-${userId}")

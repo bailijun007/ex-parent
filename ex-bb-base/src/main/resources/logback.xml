@@ -198,20 +198,19 @@
     </springProfile>
     
     <springProfile name="local">
-        <root level="INFO">
+        <root level="WARN">
 	        <!-- 控制台输出 -->
 	        <appender-ref ref="STDOUT"/>
 	        <!-- 文件输出 -->
 	        <appender-ref ref="ERROR"/>
         </root>
         
-        <logger name="com.hp.sh.expv3.bb.module.account.service.BBAccountCoreService" level="info">
-        	 <appender-ref ref="SP"/>
-        </logger>
-        
+        <!-- 
         <logger name="com.hp.sh.expv3.commons.lock" level="debug"></logger>
         
 		<logger name="com.hp.sh.expv3" level="debug"></logger>
+		 -->
+		
 		<logger name="com.gitee.hupadev.base.spring.interceptor" level="info"></logger>
         
     </springProfile>
