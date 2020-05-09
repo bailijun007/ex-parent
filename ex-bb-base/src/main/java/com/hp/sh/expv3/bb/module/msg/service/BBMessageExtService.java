@@ -164,10 +164,11 @@ public class BBMessageExtService{
 		return msg;
 	}
 
-	public List<BBMessageExt> findFirstList(int pageSize, Long shardId, Long startId){
+	public List<BBMessageExt> findFirstList(int pageSize, Long shardId, Long userId, Long startId){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, pageSize, 10000L));
 		params.put("shardId", shardId);
+		params.put("userId", userId);
 		params.put("startId", startId);
 //		params.put("status", BBMessageExt.STATUS_NEW);
 		params.put("orderBy", "id");

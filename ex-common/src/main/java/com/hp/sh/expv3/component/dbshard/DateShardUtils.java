@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 
+import com.hp.sh.expv3.constant.ExpTimeZone;
+
 public class DateShardUtils {
 	private static final String dateFormat = "yyyyMM";
 
@@ -40,7 +42,7 @@ public class DateShardUtils {
 		if(value instanceof String){
 			return value.toString().substring(dateFormat.length());
 		}else if(value instanceof Calendar){
-			return DateFormatUtils.format((Calendar)value, dateFormat);
+			return formatTableDate((Calendar)value);
 		}
 		
 		Date date = null;
@@ -51,13 +53,31 @@ public class DateShardUtils {
 			date = (Date)value;
 		}
 		
-		SimpleDateFormat df = dateFormat();
-		String dateStr = df.format(date);
+		String dateStr = formatTableDate(date);
 		
 		return dateStr;
 	}
 
-	public static Date parseTableDate(String dateStr){
+	public static Date getTableDate(String tableName) {
+		int pos = tableName.lastIndexOf('_');
+		String dateStr = tableName.substring(pos+1);
+		Date date = parseTableDate(dateStr);
+		return date;
+	}
+	
+	static String formatTableDate(Calendar calendar){
+		String dateStr = DateFormatUtils.format(calendar, dateFormat, ExpTimeZone.timeZone);
+		return dateStr;
+	}
+	
+	static String formatTableDate(Date date){
+		SimpleDateFormat df = dateFormat();
+		String dateStr = df.format(date);
+		return dateStr;
+	}
+	
+	static Date parseTableDate(String dateStr){
+		
 		SimpleDateFormat df = dateFormat();
 		try {
 			Date date = df.parse(dateStr);
@@ -66,16 +86,10 @@ public class DateShardUtils {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public static Date getTableDate(String tableName) {
-		int pos = tableName.lastIndexOf('_');
-		String dateStr = tableName.substring(pos+1);
-		Date date = DateShardUtils.parseTableDate(dateStr);
-		return date;
-	}
-	
+
 	private static SimpleDateFormat dateFormat(){
 		SimpleDateFormat df = new SimpleDateFormat(dateFormat);
+		df.setTimeZone(ExpTimeZone.timeZone);
 		return df;
 	}
 

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hp.sh.expv3.bb.job.MsgShardHandler;
 import com.hp.sh.expv3.bb.module.sys.service.DbGlobalService;
 import com.hp.sh.expv3.config.shard.ShardGroup;
 
@@ -23,6 +24,8 @@ public class BBMaintainAction2{
 	@Autowired
 	private DbGlobalService dbGlobalService;
 
+	@Autowired
+	private MsgShardHandler msgShardHandler;
 	
 	@ApiOperation(value = "createNextMonthTables")
 	@GetMapping(value = "/createNextMonthTables")

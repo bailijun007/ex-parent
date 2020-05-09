@@ -75,7 +75,7 @@ public class MsgShardHandler {
 	void doHandlePending(Long shardId) {
 		Long offsetId = this.offsetService.getCachedShardOffset(shardId);
 		while(true){
-			List<BBMessageExt> shardMsgList = this.msgService.findFirstList(batchNum, shardId, offsetId);
+			List<BBMessageExt> shardMsgList = this.msgService.findFirstList(batchNum, shardId, null, offsetId);
 			if(shardMsgList==null || shardMsgList.isEmpty()){
 				break;
 			}
