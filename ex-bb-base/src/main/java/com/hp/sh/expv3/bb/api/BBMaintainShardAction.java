@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hp.sh.expv3.bb.job.MsgShardHandler;
 import com.hp.sh.expv3.bb.module.sys.service.DbGlobalService;
 import com.hp.sh.expv3.config.shard.ShardGroup;
 
@@ -15,8 +14,8 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/api/bb/maintain2")
-public class BBMaintainAction2{
-	private static final Logger logger = LoggerFactory.getLogger(BBMaintainAction2.class);
+public class BBMaintainShardAction{
+	private static final Logger logger = LoggerFactory.getLogger(BBMaintainShardAction.class);
 
 	@Autowired
 	private ShardGroup shardGroup;
@@ -24,9 +23,6 @@ public class BBMaintainAction2{
 	@Autowired
 	private DbGlobalService dbGlobalService;
 
-	@Autowired
-	private MsgShardHandler msgShardHandler;
-	
 	@ApiOperation(value = "createNextMonthTables")
 	@GetMapping(value = "/createNextMonthTables")
 	public Long createNextMonthTables(){
