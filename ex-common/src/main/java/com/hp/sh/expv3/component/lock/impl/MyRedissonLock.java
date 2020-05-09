@@ -8,10 +8,17 @@ import org.redisson.api.RLock;
 
 public class MyRedissonLock implements Lock{
 	
-	protected RLock rLock;
+	private long leaseTime = -1;
+	
+	protected final RLock rLock;
 
 	public MyRedissonLock(RLock rLock) {
 		this.rLock = rLock;
+	}
+
+	public MyRedissonLock(RLock rLock, long leaseTime) {
+		this.rLock = rLock;
+		this.leaseTime = leaseTime;
 	}
 
 	@Override
@@ -30,8 +37,12 @@ public class MyRedissonLock implements Lock{
 	}
 
 	@Override
-	public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
-		return rLock.tryLock(time, unit);
+	public boolean tryLock(long waitTime, TimeUnit unit) throws InterruptedException {
+		if(this.leaseTime!=-1){
+			return rLock.tryLock(waitTime, leaseTime, unit);
+		}else{
+			return rLock.tryLock(waitTime, unit);
+		}
 	}
 
 	@Override

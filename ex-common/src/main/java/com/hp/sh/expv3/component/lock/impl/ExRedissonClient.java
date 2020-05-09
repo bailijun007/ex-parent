@@ -34,8 +34,8 @@ public class ExRedissonClient {
 
         SingleServerConfig bc = config.useSingleServer()
                 .setAddress("redis://"+redisHost+":"+redisPort)
-                .setTimeout(2000)
-                .setConnectionPoolSize(50)
+                .setTimeout(3000)
+                .setConnectionPoolSize(1000)
                 .setConnectionMinimumIdleSize(10)
                 .setDatabase(database);
         if(StringUtils.isNotBlank(redisPassword)){
