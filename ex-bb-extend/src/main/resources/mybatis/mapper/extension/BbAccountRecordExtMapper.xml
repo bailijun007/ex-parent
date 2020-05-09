@@ -75,7 +75,7 @@
     <select id="queryList" resultMap="BbAccountRecordVo">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM bb_account_record
+        FROM ${tableName}
         <include refid="simple_where"/>
     </select>
 
@@ -95,7 +95,7 @@
     <select id="queryByLimit" resultType="com.hp.sh.expv3.bb.extension.vo.BbAccountRecordExtVo">
         SELECT
         id,asset,created tradeTime,trade_type tradeType,amount volume ,balance,user_id userId,associated_id associatedId,created ctime,trade_no tradeNo
-        FROM bb_account_record
+        FROM ${tableName}
         <where>
 
             <if test="idList!=null">id in
@@ -123,9 +123,20 @@
                     #{tradeTypes[${i}]}
                 </foreach>
             </if>
-
+            <choose>
+                <when test="nextPage==1 and  lastId!=null">
+                    and id &lt; #{lastId}
+                    ORDER BY id desc
+                </when>
+                <when test="nextPage==-1 and lastId!=null">
+                    and id &gt;= #{lastId}
+                    ORDER BY id asc
+                </when>
+                <otherwise>
+                    order by created desc
+                </otherwise>
+            </choose>
         </where>
-        order by created desc
         LIMIT 0,${limit}
     </select>
 
@@ -177,5 +188,8 @@
         LIMIT 0,${limit}
     </select>
 
+    <select id="existTable" resultType="Integer">
+        select count(1) from information_schema.TABLES where table_schema = #{dbName} and  table_name = #{tableName}
+    </select>
 
 </mapper>

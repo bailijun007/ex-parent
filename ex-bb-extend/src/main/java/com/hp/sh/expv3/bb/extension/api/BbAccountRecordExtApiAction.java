@@ -14,9 +14,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -36,12 +39,24 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
     private BbOrderTradeExtService bbOrderTradeExtService;
 
     @Override
-    public PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, Integer pageSize, Integer pageNo) {
-        if (pageSize == null || pageNo == null) {
+    public PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, String startTime, String endTime, Integer pageSize, Integer pageNo) {
+        if (pageSize == null || pageNo == null || StringUtils.isEmpty(asset)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        return bbAccountRecordExtService.queryHistory(userId, asset, pageNo, pageSize);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime dateTime = LocalDateTime.now();
+        //如果开始时间，结束时间没有值则给默认今天时间
+        if (StringUtils.isEmpty(startTime)) {
+            startTime = formatter.format(dateTime);
+        }
+
+        if (StringUtils.isEmpty(endTime)) {
+            endTime = formatter.format(dateTime);
+        }
+
+        return bbAccountRecordExtService.queryHistory(userId, asset, startTime, endTime, pageNo, pageSize);
     }
+
 
     @Override
     public List<BbAccountRecordExtVo> query(Long userId, String asset, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Long lastId, Integer pageSize) {
@@ -95,7 +110,7 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
                 }
             }
         } catch (Exception e) {
-            logger.error("message={}", e.getMessage());
+            logger.error("查询币币账单报错，报错message={}", e.getMessage());
         }
         return voList;
     }

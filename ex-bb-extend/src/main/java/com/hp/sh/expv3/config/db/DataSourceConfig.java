@@ -29,7 +29,7 @@ public class DataSourceConfig {
 //    }
 
    // @Primary
-    @Order(3)
+    @Order(2)
     @Bean("shardingDataSource")
     public DataSource shardingDataSource(@Qualifier("masterDataSource") DataSource primaryDataSource, List<DataSource> dsList) throws SQLException {
         // 配置分片规则

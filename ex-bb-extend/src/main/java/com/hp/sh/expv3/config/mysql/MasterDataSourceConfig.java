@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Primary;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -41,6 +42,7 @@ public class MasterDataSourceConfig {
 
 
     @Primary
+    @Order(1)
     @Bean(name = "masterDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.hikari.primary")
     public HikariDataSource masterDateSource() {

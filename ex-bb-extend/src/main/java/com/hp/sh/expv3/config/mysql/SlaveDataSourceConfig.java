@@ -15,6 +15,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -39,7 +40,7 @@ public class SlaveDataSourceConfig {
     //mapper文件目录
     private static final String MAPPER_LOCATIONS = "classpath:mybatis/dao/thirdKlineData/*.xml";
 
-
+    @Order(3)
     @Bean(name = "slaveDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.hikari.slave")
     public HikariDataSource slaveDateSource() {

@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.config.mysql;
 
 import com.github.pagehelper.PageInterceptor;
+import org.apache.ibatis.logging.slf4j.Slf4jImpl;
 import org.apache.ibatis.session.LocalCacheScope;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -47,6 +48,8 @@ public class DbCommonConfig {
         }else {
             configuration.setLocalCacheScope(LocalCacheScope.STATEMENT);
         }
+        configuration.addInterceptor(new com.gitee.hupadev.commons.mybatis.PageInterceptor());
+        configuration.setLogImpl(Slf4jImpl.class);
         return configuration;
     }
 

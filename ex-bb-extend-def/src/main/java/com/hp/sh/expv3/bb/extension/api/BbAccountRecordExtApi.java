@@ -20,18 +20,22 @@ import java.util.List;
 @FeignClient(value = "ex-bb-extend")
 public interface BbAccountRecordExtApi {
 
+
     @ApiOperation(value = "查询所有用户币币划转历史记录")
     @ApiImplicitParams(
             {
                     @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
-                    @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+                    @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+                    @ApiImplicitParam(name = "startTime", value = "开始时间", required = false),
+                    @ApiImplicitParam(name = "endTime", value = "结束时间", required = false),
                     @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
                     @ApiImplicitParam(name = "pageSize", value = "页大小", example = "10", required = true)
             }
     )
     @GetMapping(value = "/api/bb/trade/ext/queryHistory")
-    PageResult<BbAccountRecordVo> queryHistory(@RequestParam(value = "userId",required = false) Long userId, @RequestParam(value = "asset",required = false) String asset,
-                                               @RequestParam(value = "pageSize")  Integer pageSize,  @RequestParam(value = "pageNo") Integer pageNo);
+    PageResult<BbAccountRecordVo> queryHistory(@RequestParam(value = "userId",required = false) Long userId, @RequestParam(value = "asset",required = true) String asset,
+                                                @RequestParam(value = "startTime",required = false) String startTime, @RequestParam(value = "endTime",required = false) String endTime,
+                                                @RequestParam(value = "pageSize")  Integer pageSize,  @RequestParam(value = "pageNo") Integer pageNo);
 
 
 
@@ -57,5 +61,6 @@ public interface BbAccountRecordExtApi {
                                      @RequestParam(value = "nextPage", required = true) Integer nextPage,
                                      @RequestParam(value = "lastId", required = false) Long lastId,
                                      @RequestParam(value = "pageSize", required = true, defaultValue = "20") Integer pageSize );
+
 
 }
