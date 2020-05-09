@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hp.sh.expv3.bb.module.msg.service.BBMessageOffsetService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderUpdateService;
@@ -24,6 +25,18 @@ public class TestAction3 {
 
 	@Autowired
 	private BBOrderUpdateService orderUpdateService;
+	
+	@Autowired
+	private BBMessageOffsetService offsetService;
+	
+	@ApiOperation(value = "测试cache")
+	@GetMapping(value = "/api/bb/test/cache")
+	public Long cache() throws Exception{
+		Long id = offsetService.cacheShardOffset(1L, 100L);
+		offsetService.getCachedShardOffset(1L);
+		offsetService.getCachedShardOffset(1L);
+		return id;
+	}
 	
 	@ApiOperation(value = "测试updateOrder")
 	@GetMapping(value = "/api/bb/test/updateOrder")

@@ -5,6 +5,7 @@ package com.hp.sh.expv3.component.dbshard;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +22,6 @@ import com.hp.sh.expv3.component.context.IdGeneratorContext;
  */
 public class TableShardingByDateSymbol implements ComplexKeysShardingAlgorithm {
 	
-	private static final String dateFormat = "yyyyMM";
-	
 	public TableShardingByDateSymbol() {
 	}
 
@@ -38,8 +37,7 @@ public class TableShardingByDateSymbol implements ComplexKeysShardingAlgorithm {
 		Collection<Long> createds = (Collection<Long>) cvMap.get("created");
 		Collection<Long> ids = (Collection<Long>) cvMap.get("id");
 		Range<Long> createdRange = (Range<Long>) crMap.get("created");
-		Collection<String> rangeDates = getRangeDates(createdRange);
-		Set<String> list = new HashSet<String>();
+		Set<String> tableSet = new HashSet<String>();
 		
 		List<Long> dateMills = new ArrayList<Long>();
 		
@@ -56,43 +54,45 @@ public class TableShardingByDateSymbol implements ComplexKeysShardingAlgorithm {
 			}
 		}
 		
-		if(rangeDates!=null){
+		Collection<String> rangeDateStr = getRangeDates(createdRange);
+		
+		if(rangeDateStr!=null){
 			for(String asset : assets){
 				for(String symbol : symbols){
-					for(String date : rangeDates){
+					for(String date : rangeDateStr){
 						String tableName = getTableName(logicTableName, asset, symbol, date);
-						list.add(tableName);
+						tableSet.add(tableName);
 					}
 				}
 			}
 		}
-		if(assets!=null){
+		if(dateMills!=null){
 			for(String asset : assets){
 				for(String symbol : symbols){
 					for(Long created : dateMills){
 						String tableName = getTableName(logicTableName, asset, symbol, DateShardUtils.getDate(created));
-						list.add(tableName);
+						tableSet.add(tableName);
 					}
 				}
 			}
 		}
 		
-		return list;
+		return tableSet;
 	}
 	
 	public static String getTableName(String logicTableName, String asset, String symbol, String date) {
-		String suffix = asset + "__" + symbol + "_" + date;
-		String tableName = logicTableName +"_"+ suffix;
+		String suffix = "_" + asset + "__" + symbol + "_" + date;
+		String tableName = logicTableName + suffix;
 		tableName = tableName.toLowerCase();
 		return tableName;
 	}
 
-	private static List<String> getRangeDates(Range<Long> createdRange) {
-		if(createdRange==null){
-			return null;
+	private static List<String> getRangeDates(Range<Long> dateRange) {
+		if(dateRange==null){
+			return Collections.emptyList();
 		}
-		Long start = createdRange.lowerEndpoint();
-		Long end = createdRange.hasUpperBound()?createdRange.upperEndpoint():System.currentTimeMillis();
+		Long start = dateRange.lowerEndpoint();
+		Long end = dateRange.hasUpperBound()?dateRange.upperEndpoint():System.currentTimeMillis();
 		long now = System.currentTimeMillis();
 		if(end > now){
 			end = now;

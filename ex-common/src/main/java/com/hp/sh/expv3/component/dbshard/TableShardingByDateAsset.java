@@ -5,7 +5,7 @@ package com.hp.sh.expv3.component.dbshard;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +36,7 @@ public class TableShardingByDateAsset implements ComplexKeysShardingAlgorithm {
 		Collection<Long> createds = (Collection<Long>) cvMap.get("created");
 		Collection<Long> ids = (Collection<Long>) cvMap.get("id");
 		Range<Long> createdRange = (Range<Long>) crMap.get("created");
-		Collection<String> rangDates = getRangeDates(createdRange);
-		Set<String> list = new HashSet<String>();
+		Set<String> tableSet = new HashSet<String>();
 		
 		List<Long> dateMills = new ArrayList<Long>();
 		
@@ -54,44 +53,48 @@ public class TableShardingByDateAsset implements ComplexKeysShardingAlgorithm {
 			}
 		}
 		
-		if(rangDates!=null){
+		Collection<String> rangeDateStr = getRangeDates(createdRange);
+		
+		if(rangeDateStr!=null){
 			for(String asset : assets){
-				for(String date : rangDates){
+				for(String date : rangeDateStr){
 					String tableName = getTableName(logicTableName, asset, date);
-					list.add(tableName);
+					tableSet.add(tableName);
+				}
+			}
+		}
+		if(dateMills!=null){
+			for(String asset : assets){
+				for(Long created : dateMills){
+					String tableName = getTableName(logicTableName, asset, DateShardUtils.getDate(created));
+					tableSet.add(tableName);
 				}
 			}
 		}
 		
-		for(String asset : assets){
-			for(Long created : dateMills){
-				String tableName = getTableName(logicTableName, asset, DateShardUtils.getDate(created));
-				list.add(tableName);
-			}
-		}
-		
-		return list;
+		return tableSet;
 	}
 	
 	public static String getTableName(String logicTableName, String asset, String date) {
-		String suffix = asset + "__" + date;
-		String tableName = logicTableName +"_"+ suffix;
+		String suffix = "_" + asset + "_" + date;
+		String tableName = logicTableName + suffix;
 		tableName = tableName.toLowerCase();
 		return tableName;
 	}
 
-	private static List<String> getRangeDates(Range<Long> createdRange) {
-		if(createdRange==null){
-			return null;
+	private static List<String> getRangeDates(Range<Long> dateRange) {
+		if(dateRange==null){
+			return Collections.emptyList();
 		}
-		Long start = createdRange.lowerEndpoint();
-		Long end = createdRange.hasUpperBound()?createdRange.upperEndpoint():System.currentTimeMillis();
+		Long start = dateRange.lowerEndpoint();
+		Long end = dateRange.hasUpperBound()?dateRange.upperEndpoint():System.currentTimeMillis();
 		long now = System.currentTimeMillis();
 		if(end > now){
 			end = now;
 		}
 		
 		return DateShardUtils.getRangeDates(start, end);
+
 	}
 
 }

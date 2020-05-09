@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.bb.api;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,10 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.base.spring.interceptor.LimitInterceptor;
-import com.gitee.hupadev.commons.date.DateUtils;
 import com.gitee.hupadev.commons.executor.orderly.OrderlyExecutors;
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.gitee.hupadev.commons.page.Page;
@@ -23,19 +22,17 @@ import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
-import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
-import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
-import com.hp.sh.expv3.bb.module.sys.service.DbGlobalService;
+import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqHandler;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.out.OrderRebaseMsg;
 import com.hp.sh.expv3.bb.mq.send.MatchMqSender;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
-import com.hp.sh.expv3.config.shard.ShardGroup;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
 
 @RestController
+@RequestMapping("/api/bb/maintain")
 public class BBMaintainAction{
 	private static final Logger logger = LoggerFactory.getLogger(BBMaintainAction.class);
 	
@@ -55,46 +52,10 @@ public class BBMaintainAction{
 	private BBMqMsgService mqMsgService;
 	
 	@Autowired
-	private BBTradeService tradeService;
-	@Autowired
-	private BBOrderService orderService;
-	
-	@Autowired
-	private ShardGroup shardGroup;
-	
-	@Autowired
-	private DbGlobalService dbGlobalService;
-	
-	@ApiOperation(value = "createNextMonthTables")
-	@GetMapping(value = "/api/bb/maintain/createNextMonthTables")
-	public Long createNextMonthTables(){
-		dbGlobalService.createNextMonthTables();
-		return 0L;
-	}
-	
-	@ApiOperation(value = "createCurMonthTables")
-	@GetMapping(value = "/api/bb/maintain/createCurMonthTables")
-	public Long createCurMonthTables(){
-		dbGlobalService.createCurMonthTables();
-		return 0L;
-	}
-
-	@ApiOperation(value = "createNewSymbol")
-	@GetMapping(value = "/api/bb/maintain/createNewSymbol")
-	public Long createNewSymbol(String asset, String symbol){
-		dbGlobalService.createNewSymbol(asset, symbol);
-		return 0L;
-	}
-	
-	@ApiOperation(value = "userShard")
-	@GetMapping(value = "/api/bb/maintain/userShard")
-	public Long userShard(Long userId){
-		Long shardId = shardGroup.getMsgSardId(userId);
-		return shardId;
-	}
+	private MatchMqHandler mqHandler;
 	
 	@ApiOperation(value = "querySynchFee")
-	@GetMapping(value = "/api/bb/maintain/querySynchFee")
+	@GetMapping(value = "/querySynchFee")
 	public List<BBOrderTrade> querySynchFee(){
 		Long startTime = DbDateUtils.now()-1000*60*10;
 		Page page = new Page(1, 100, 1000L);
@@ -103,7 +64,7 @@ public class BBMaintainAction{
 	}
 	
 	@ApiOperation(value = "urlSets")
-	@GetMapping(value = "/api/bb/maintain/urlSets")
+	@GetMapping(value = "/urlSets")
 	public Map urlSets(){
 		Map map = new HashMap();
 		map.put("isSysClose", LimitInterceptor.isSysClose());
@@ -112,25 +73,25 @@ public class BBMaintainAction{
 	}
 	
 	@ApiOperation(value = "sleepUrl")
-	@GetMapping(value = "/api/bb/maintain/sleepUrl")
+	@GetMapping(value = "/sleepUrl")
 	public void sleepUrl(String url, long sleep){
 		LimitInterceptor.set(url, false, sleep);
 	}
 	
 	@ApiOperation(value = "unSleepUrl")
-	@GetMapping(value = "/api/bb/maintain/unSleepUrl")
+	@GetMapping(value = "/unSleepUrl")
 	public void unSleepUrl(String url){
 		LimitInterceptor.remove(url);
 	}
 
 	@ApiOperation(value = "version")
-	@GetMapping(value = "/api/bb/maintain/version")
+	@GetMapping(value = "/version")
 	public Integer version(){
 		return 1001;
 	}
 
 	@ApiOperation(value = "queryResend")
-	@GetMapping(value = "/api/bb/maintain/queryResend")	
+	@GetMapping(value = "/queryResend")	
 	public Integer queryResend(String asset, String symbol){
 		long now = DbDateUtils.now()-2000;
 		int n = 0;
@@ -155,7 +116,7 @@ public class BBMaintainAction{
 
 
 	@ApiOperation(value = "resendPending")
-	@GetMapping(value = "/api/bb/maintain/resendPending")	
+	@GetMapping(value = "/resendPending")	
 	public Map resendPending(String asset, String symbol){
 		this.resendRebase(asset, symbol);
 		Map map = new HashMap();
@@ -167,13 +128,13 @@ public class BBMaintainAction{
 	}
 
 	@ApiOperation(value = "resendRebase")
-	@GetMapping(value = "/api/bb/maintain/resendRebase")	
+	@GetMapping(value = "/resendRebase")	
 	public void resendRebase(String asset, String symbol){
 		this.matchMqSender.sendBookRebaseMsg(new OrderRebaseMsg(asset, symbol));
 	}
 
 	@ApiOperation(value = "resendPendingCancel")
-	@GetMapping(value = "/api/bb/maintain/resendPendingCancel")	
+	@GetMapping(value = "/resendPendingCancel")	
 	public Integer resendPendingCancel(String asset, String symbol){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
@@ -203,7 +164,7 @@ public class BBMaintainAction{
 	}
 
 	@ApiOperation(value = "resendPendingNew")
-	@GetMapping(value = "/api/bb/maintain/resendPendingNew")	
+	@GetMapping(value = "/resendPendingNew")	
 	public Integer resendPendingNew(String asset, String symbol){
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
@@ -233,7 +194,7 @@ public class BBMaintainAction{
 	}
 	
 	@ApiOperation(value = "handleNextFailMsg")
-	@GetMapping(value = "/api/bb/maintain/mq/handleNextFailMsg")	
+	@GetMapping(value = "/mq/handleNextFailMsg")	
 	public Integer handleNextFailMsg(String tag, String symbol){
 		BBMqMsg msg = mqMsgService.findFirst(tag, symbol);
 		
@@ -241,7 +202,7 @@ public class BBMaintainAction{
 	}
 	
 	@ApiOperation(value = "reHandleAllFailMsg")
-	@GetMapping(value = "/api/bb/maintain/mq/reHandleAllFailMsg")	
+	@GetMapping(value = "/mq/reHandleAllFailMsg")	
 	public String reHandleAllFailMsg(Integer num){
 		num = num==null ? 1:num;
 		
@@ -260,10 +221,10 @@ public class BBMaintainAction{
 		
 		if(msg.getTag().equals(MqTags.TAGS_TRADE)){
 			BBTradeVo mqMsg = JsonUtils.toObject(msg.getBody(), BBTradeVo.class);
-			this.tradeService.handleTrade(mqMsg);
+			this.mqHandler.handleTrade(mqMsg);
 		}else if(msg.getTag().equals(MqTags.TAGS_CANCELLED)){
 			BBCancelledMsg mqMsg = JsonUtils.toObject(msg.getBody(), BBCancelledMsg.class);
-			orderService.setCancelled(mqMsg.getAccountId(), mqMsg.getAsset(), mqMsg.getSymbol(), mqMsg.getOrderId());
+			mqHandler.setCancelled(mqMsg.getAccountId(), mqMsg.getAsset(), mqMsg.getSymbol(), mqMsg.getOrderId());
 		}
 		
 		mqMsgService.delete(msg.getUserId(), msg.getId());
@@ -272,13 +233,13 @@ public class BBMaintainAction{
 	}
 	
 	@ApiOperation(value = "time")
-	@GetMapping(value = "/api/bb/maintain/sys/time")	
+	@GetMapping(value = "/sys/time")	
 	public Long sysTime(){
 		return System.currentTimeMillis();
 	}
 
 	@ApiOperation(value = "thead")
-	@GetMapping(value = "/api/bb/maintain/thead/queueSizeMap")	
+	@GetMapping(value = "/thead/queueSizeMap")	
 	public Map getQueueSizeMap(){
 		Map result = new HashMap();
 		Map<Object,Integer> map = tradeExecutors.getQueueSizeMap();
