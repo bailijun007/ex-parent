@@ -37,7 +37,7 @@ public class ExpPerformAction {
 	@ApiOperation(value = "")
 	@GetMapping(value = "/oneUser")
 	public void handleOneUser(Long userId, Integer num) throws Exception{
-		List<BBMessageExt> userMsgList = msgService.findFirstList(num, null, userId);
+		List<BBMessageExt> userMsgList = msgService.findFirstList(num, null, userId, null);
 		msgHandler.handleBatch(userId, userMsgList);
 		return ;
 	}
