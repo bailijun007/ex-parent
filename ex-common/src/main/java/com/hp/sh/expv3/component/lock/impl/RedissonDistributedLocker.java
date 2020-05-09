@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.component.lock.impl;
 
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
 import org.redisson.api.RLock;
@@ -14,7 +13,7 @@ import com.hp.sh.expv3.commons.lock.Locker;
 public class RedissonDistributedLocker implements Locker {
 	private static final Logger logger = LoggerFactory.getLogger(RedissonDistributedLocker.class);
 
-	private long defaultLeaseTime = 30;
+	private long defaultLeaseTime = -1;
 	
     private RedissonClient redissonClient;
     
@@ -28,12 +27,12 @@ public class RedissonDistributedLocker implements Locker {
 
 	public Lock getLock(String lockKey) {
         RLock lock = redissonClient.getLock(FULLKEY(lockKey));
-        return new ExRedissonLock(lock, defaultLeaseTime);
+        return lock;
     }
 
 	public Lock getLock(String lockKey, long leaseTime) {
         RLock lock = redissonClient.getLock(FULLKEY(lockKey));
-        return new ExRedissonLock(lock, leaseTime);
+        return lock;
     }
 
 	private String FULLKEY(String key){
@@ -65,18 +64,4 @@ public class RedissonDistributedLocker implements Locker {
 		this.defaultLeaseTime = defaultLeaseTime;
 	}
 
-	class ExRedissonLock extends MyRedissonLock{
-		
-		private long leaseTime = -1;
-		
-		public ExRedissonLock(RLock rLock, long leaseTime) {
-			super(rLock);
-			this.leaseTime = leaseTime;
-		}
-		
-		@Override
-		public boolean tryLock(long waitTime, TimeUnit unit) throws InterruptedException {
-			return rLock.tryLock(waitTime, leaseTime, unit);
-		}
-	}
 }

@@ -22,8 +22,8 @@ public class LockConfig {
     @Autowired
     private ExRedissonClient redissonClient;
 	
-    @Bean
-    public RedissonDistributedLocker locker() throws IOException{
+    @Bean("redissonLocker")
+    public RedissonDistributedLocker redissonLocker() throws IOException{
     	RedissonDistributedLocker rdLocker = new RedissonDistributedLocker();
     	rdLocker.setRedissonClient(redissonClient.getRedisson());
     	rdLocker.setModulePrefix(modulePrefix);

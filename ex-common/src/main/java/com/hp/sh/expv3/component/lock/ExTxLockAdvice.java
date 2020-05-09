@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -32,7 +33,7 @@ public class ExTxLockAdvice extends LockAdvice {
 	}
 
     @Autowired(required=false)
-	public void setLocker(Locker locker) {
+	public void setLocker(@Qualifier("redissonLocker") Locker locker) {
     	if(Boolean.TRUE.equals(useLockAnno)){
     		super.setLocker(locker);
     	}
