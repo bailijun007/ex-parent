@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.hp.sh.expv3.component.lock.impl.ExRedissonClient;
-import com.hp.sh.expv3.component.lock.impl.LocalLocker;
 import com.hp.sh.expv3.component.lock.impl.RedissonDistributedLocker;
 
 @Configuration
@@ -29,11 +28,6 @@ public class LockConfig {
     	rdLocker.setRedissonClient(redissonClient.getRedisson());
     	rdLocker.setModulePrefix(modulePrefix);
     	return rdLocker;
-    }
-    
-    @Bean("localLocker")
-    public LocalLocker localLocker() throws IOException{
-    	return new LocalLocker();
     }
 
 	public Boolean usePessimisticLock() {
