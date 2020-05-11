@@ -95,7 +95,7 @@ public class DateShardUtils {
 
 	public static void main(String[] args) {
 		Long now = System.currentTimeMillis();
-		System.out.println(DateShardUtils.getRangeDates(now, now));
+		System.out.println(DateShardUtils.getRangeDates(1588262400000L, 1588262400000L));
 	}
 	
 }

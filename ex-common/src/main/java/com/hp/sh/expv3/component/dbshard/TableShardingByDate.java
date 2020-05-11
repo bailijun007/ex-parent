@@ -96,6 +96,9 @@ public class TableShardingByDate extends ExBaseShardingAlgorithm implements Comp
 		if(dateRange==null){
 			return Collections.emptyList();
 		}
+		if(!dateRange.hasLowerBound()){
+			return Collections.emptyList();
+		}
 		Long start = dateRange.lowerEndpoint();
 		Long end = dateRange.hasUpperBound()?dateRange.upperEndpoint():System.currentTimeMillis();
 		long now = System.currentTimeMillis();

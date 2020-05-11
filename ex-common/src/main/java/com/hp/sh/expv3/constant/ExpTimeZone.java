@@ -4,6 +4,6 @@ import java.util.TimeZone;
 
 public class ExpTimeZone {
 
-	public static final TimeZone timeZone = TimeZone.getTimeZone("GMT");
+	public static final TimeZone timeZone = TimeZone.getTimeZone("UTC");
 	
 }
