@@ -21,30 +21,33 @@ import java.util.List;
 @FeignClient(value = "ex-bb-extend")
 public interface BbOrderTradeExtApi {
 
-    @ApiOperation(value = "查小于某个时间点的最大的一条记录")
-    @ApiImplicitParams(
-            {
-                    @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
-                    @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
-                    @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
-                    @ApiImplicitParam(name = "pageSize", value = "页大小", example = "10", required = true)
-            }
-    )
-    @GetMapping(value = "/api/bb/trade/ext/selectLessTimeTrade")
-    public BbOrderTradeVo selectLessTimeTrade(@RequestParam(value = "asset") String asset, @RequestParam(value = "symbol") String symbol,  @RequestParam(value = "statTime")Long statTime);
+//    @ApiOperation(value = "查小于某个时间点的最大的一条记录")
+//    @ApiImplicitParams(
+//            {
+//                    @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
+//                    @ApiImplicitParam(name = "asset", value = "资产类型", example = "USDT", required = true),
+//                    @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+//                    @ApiImplicitParam(name = "startTime ", value = "开始时间", required = true),
+//                    @ApiImplicitParam(name = "endTime ", value = "结束时间", required = true)
+//            }
+//    )
+//    @GetMapping(value = "/api/bb/trade/ext/selectLessTimeTrade")
+//    public BbOrderTradeVo selectLessTimeTrade(@RequestParam(value = "userId",required = false) Long userId,
+//                                              @RequestParam(value = "asset") String asset, @RequestParam(value = "symbol") String symbol,
+//                                              @RequestParam(value = "statTime",required = true) Long statTime, @RequestParam(value = "endTime",required = true) Long endTime);
 
-    @ApiOperation(value = "查某个用户的所有成交记录")
-    @GetMapping(value = "/api/bb/trade/ext/selectAllTradeListByUser")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
-            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
-            @ApiImplicitParam(name = "userId ", value = "用户id", required = true)
-    })
-    List<BbOrderTradeVo> selectAllTradeListByUser(
-            @RequestParam(value = "asset", required = false) String asset,
-            @RequestParam(value = "symbol", required = false) String symbol,
-            @RequestParam(value = "userId", required = true) Long userId
-    );
+//    @ApiOperation(value = "查某个用户的所有成交记录")
+//    @GetMapping(value = "/api/bb/trade/ext/selectAllTradeListByUser")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+//            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+//            @ApiImplicitParam(name = "userId ", value = "用户id", required = true)
+//    })
+//    List<BbOrderTradeVo> selectAllTradeListByUser(
+//            @RequestParam(value = "asset", required = false) String asset,
+//            @RequestParam(value = "symbol", required = false) String symbol,
+//            @RequestParam(value = "userId", required = true) Long userId
+//    );
 
     @ApiOperation(value = "查某个时间区间某个用户的成交记录 (不传时间则默认查今天以前的所有数据)")
     @GetMapping(value = "/api/bb/trade/ext/selectTradeListByUserId")
@@ -75,7 +78,7 @@ public interface BbOrderTradeExtApi {
             @ApiImplicitParam(name = "endTime", value = "结束时间", example = "1578891531000", required = true)
     })
     List<BbOrderTradeDetailVo> selectBbFeeCollectByAccountId(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol,
-                                                 @RequestParam("userId") Long userId, @RequestParam("statTime") Long statTime, @RequestParam("endTime") Long endTime);
+                                                             @RequestParam("userId") Long userId, @RequestParam("statTime") Long statTime, @RequestParam("endTime") Long endTime);
 
 
 }

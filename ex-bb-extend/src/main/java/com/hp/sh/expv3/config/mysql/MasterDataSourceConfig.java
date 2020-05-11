@@ -41,8 +41,8 @@ public class MasterDataSourceConfig {
     private static final String MAPPER_LOCATIONS = "classpath:mybatis/mapper/extension/*.xml";
 
 
-    @Primary
-    @Order(1)
+//    @Primary
+    @Order(2)
     @Bean(name = "masterDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.hikari.primary")
     public HikariDataSource masterDateSource() {
@@ -57,7 +57,7 @@ public class MasterDataSourceConfig {
 
     @Primary
     @Bean(name = "masterSqlSessionFactory")
-    public SqlSessionFactory masterSqlSessionFactory(@Qualifier("masterDataSource") DataSource masterDataSource) throws Exception {
+    public SqlSessionFactory masterSqlSessionFactory(@Qualifier("shardingDataSource") DataSource masterDataSource) throws Exception {
         return SqlSessionFactoryUtil.createSqlSessionFactory(masterDataSource,TYPE_ALIASES_PACKAGE,
                 TYPE_HANDLERS_PACKAGE,MAPPER_LOCATIONS,mybatisConfig,new Interceptor[] {pageInterceptor});
     }

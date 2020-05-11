@@ -40,13 +40,13 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
 
     @Override
     public List<BbAccountRecordExtVo> listBbAccountRecords(Long userId, String asset, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer pageSize) {
-        List<BbAccountRecordExtVo> list = new ArrayList<>();
+        List<BbAccountRecordExtVo> list = null;
         Map<String, Object> map = new HashMap<>();
         simpleMap(userId, asset, historyType, startDate, endDate, pageSize, map);
         if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
             map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_TYPE);
-            findBbAccountRecords(asset, startDate, endDate, list, map);
-
+//            findBbAccountRecords(asset, startDate, endDate, list, map);
+            list =bbAccountRecordExtMapper.queryByLimit(map);
         } else {
             //9:买入，10：卖出
             if (tradeType.equals(BbAccountRecordConst.TRADE_BUY_IN)) {
@@ -54,8 +54,8 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
             } else if (tradeType.equals(BbAccountRecordConst.TRADE_SELL_OUT)) {
                 map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_SELL_OUT);
             }
-            findBbAccountRecords(asset, startDate, endDate, list, map);
-//            list = bbAccountRecordExtMapper.queryByLimit(map);
+//            findBbAccountRecords(asset, startDate, endDate, list, map);
+            list = bbAccountRecordExtMapper.queryByLimit(map);
         }
         return list;
     }
@@ -89,19 +89,19 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
         simpleMap(userId, asset, historyType, startDate, endDate, pageSize, map);
         map.put("lastId", lastId);
         map.put("nextPage", nextPage);
-        List<BbAccountRecordExtVo> list = new ArrayList<>();
+        List<BbAccountRecordExtVo> list = null;
         if (BbextendConst.TRADE_TYPE_ALL.equals(tradeType)) {
             map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_TYPE);
-            findBbAccountRecords(asset, startDate, endDate, list, map);
-//            list = bbAccountRecordExtMapper.listBbAccountRecordsByPage(map);
+//            findBbAccountRecords(asset, startDate, endDate, list, map);
+            list = bbAccountRecordExtMapper.listBbAccountRecordsByPage(map);
         } else {
             if (tradeType.equals(BbAccountRecordConst.TRADE_BUY_IN)) {
                 map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_BUY_IN);
             } else if (tradeType.equals(BbAccountRecordConst.TRADE_SELL_OUT)) {
                 map.put("tradeTypes", BbAccountRecordConst.ALL_TRADE_SELL_OUT);
             }
-            findBbAccountRecords(asset, startDate, endDate, list, map);
-//            list = bbAccountRecordExtMapper.listBbAccountRecordsByPage(map);
+//            findBbAccountRecords(asset, startDate, endDate, list, map);
+          list = bbAccountRecordExtMapper.listBbAccountRecordsByPage(map);
         }
         return list;
     }
@@ -109,7 +109,7 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
     @Override
     public PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, String startTime, String endTime, Integer pageNo, Integer pageSize) {
         PageResult<BbAccountRecordVo> pageResult = new PageResult<>();
-        List<BbAccountRecordVo> list = new ArrayList<>();
+
         long begin = CommonDateUtils.stringToTimestamp(startTime);
         long end = CommonDateUtils.stringToTimestamp(endTime);
         Map<String, Object> map = new HashMap<>();
@@ -117,31 +117,16 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
         map.put("asset", asset);
         map.put("createdBegin", begin);
         map.put("createdEnd", end);
-        List<Integer> timeDifference = CommonDateUtils.getTimeDifference(startTime, endTime);
-        String tableName = null;
 
-        for (Integer date : timeDifference) {
-            tableName = BbExtCommonConstant.BB_ACCOUNT_RECORD_PREFIX + asset.toLowerCase() + "__" + date;
-            int existTable = bbAccountRecordExtMapper.existTable(BbExtCommonConstant.DB_NAME_EXPV3_BB, tableName);
-            //表不存在则直接跳过
-            if (existTable != 1) {
-                continue;
-            }
-            map.put("tableName", tableName);
-            List<BbAccountRecordVo> bbAccountRecordVos = bbAccountRecordExtMapper.queryList(map);
-            if(!CollectionUtils.isEmpty(bbAccountRecordVos)){
-                list.addAll(bbAccountRecordVos);
-            }
-
-        }
-
-        List<BbAccountRecordVo> pageList = list.stream().skip(pageSize * (pageNo - 1)).limit(pageSize).collect(Collectors.toList());
-        pageResult.setList(pageList);
-        Integer rowTotal = list.size();
+        Long count=bbAccountRecordExtMapper.queryCount(map);
+        map.put("offset", pageNo-1);
+        map.put("limit", pageSize);
+        List<BbAccountRecordVo>  list = bbAccountRecordExtMapper.queryList(map);
+        Integer rowTotal =count.intValue();
+        pageResult.setList(list);
         pageResult.setPageNo(pageNo);
-        pageResult.setRowTotal(Long.parseLong(String.valueOf(rowTotal)));
+        pageResult.setRowTotal(count);
         pageResult.setPageCount(rowTotal % pageSize == 0 ? rowTotal / pageSize : rowTotal / pageSize + 1);
-
         return pageResult;
     }
 

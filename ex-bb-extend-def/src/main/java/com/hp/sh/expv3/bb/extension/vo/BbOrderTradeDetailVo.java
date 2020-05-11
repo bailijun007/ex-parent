@@ -49,6 +49,22 @@ public class BbOrderTradeDetailVo implements Serializable {
     public BbOrderTradeDetailVo() {
     }
 
+    @Override
+    public String toString() {
+        return "BbOrderTradeDetailVo{" +
+                "id=" + id +
+                ", bidFlag=" + bidFlag +
+                ", userId=" + userId +
+                ", asset='" + asset + '\'' +
+                ", symbol='" + symbol + '\'' +
+                ", tradeTime=" + tradeTime +
+                ", price=" + price +
+                ", qty=" + qty +
+                ", amt=" + amt +
+                ", fee=" + fee +
+                '}';
+    }
+
     public Integer getBidFlag() {
         return bidFlag;
     }

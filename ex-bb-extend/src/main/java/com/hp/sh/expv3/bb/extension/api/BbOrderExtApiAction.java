@@ -40,7 +40,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
         startTime = getDefaultDateTime(startTime);
-        endTime=getDefaultDateTime(endTime);
+        endTime = getDefaultDateTime(endTime);
         return bbOrderExtService.queryAllBbOrederHistory(userId, asset, symbol, startTime, endTime, pageNo, pageSize);
     }
 
@@ -50,10 +50,12 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         long start = System.currentTimeMillis();
         checkParam(userId, asset, symbol, pageSize, nextPage);
         startTime = getDefaultDateTime(startTime);
-        endTime=getDefaultDateTime(endTime);
-        PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(userId, asset, symbol, bidFlag, pageSize, lastOrderId, nextPage,startTime,endTime);
-        long end = System.currentTimeMillis();
-        logger.info("查询历史委托接口耗时：{}毫秒,userId={},asset={},symbol={}", (end - start), asset, symbol);
+        endTime = getDefaultDateTime(endTime);
+        PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(userId, asset, symbol, bidFlag, pageSize, lastOrderId, nextPage, startTime, endTime);
+        if (result != null) {
+            long end = System.currentTimeMillis();
+            logger.info("查询历史委托接口耗时：{}毫秒,userId={},asset={},symbol={}", (end - start), asset, symbol);
+        }
         return result;
     }
 
@@ -67,7 +69,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
     }
 
     @Override
-    public List<BbHistoryOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status) {
+    public List<BbHistoryOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status, String startTime, String endTime) {
         if (null == userId || count == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
@@ -88,7 +90,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(status)) {
             statusList = Arrays.asList(status.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
         }
-        List<BbHistoryOrderVo> list = bbOrderExtService.queryOrderList(userId, assetList, symbolList, gtOrderId, ltOrderId, count, statusList);
+        List<BbHistoryOrderVo> list = bbOrderExtService.queryOrderList(userId, assetList, symbolList, gtOrderId, ltOrderId, count, statusList, startTime, endTime);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();
         }
@@ -97,19 +99,19 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
     }
 
     @Override
-    public BigDecimal queryTotalFee(Long startTime, Long endTime) {
-        if (null == startTime || endTime == null) {
+    public BigDecimal queryTotalFee(String asset, String symbol, Long startTime, Long endTime) {
+        if (null == startTime || endTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        return bbOrderExtService.queryTotalFee(startTime, endTime);
+        return bbOrderExtService.queryTotalFee(asset, symbol, startTime, endTime);
     }
 
     @Override
-    public BigDecimal queryTotalOrder(Long startTime, Long endTime) {
+    public BigDecimal queryTotalOrder(String asset, String symbol, Long startTime, Long endTime) {
         if (null == startTime || endTime == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        return bbOrderExtService.queryTotalOrder(startTime, endTime);
+        return bbOrderExtService.queryTotalOrder(asset, symbol, startTime, endTime);
     }
 
 
