@@ -38,7 +38,7 @@ public class RedisSubscriberTestStarter {
 	@Scheduled(cron = "0 * * * * ?")
 	@PostConstruct
 	public void testRs(){
-		List<BBSymbolVO> symbolList = this.metadataService.getAllBBContract();
+		List<BBSymbolVO> symbolList = this.metadataService.getAllBBSymbol();
 		
 		Set<String> channels = new HashSet<String>();
 		

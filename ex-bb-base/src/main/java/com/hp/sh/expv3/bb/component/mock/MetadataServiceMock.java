@@ -17,7 +17,7 @@ import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 public class MetadataServiceMock implements MetadataService {
 
     @Override
-	public BBSymbolVO getBBContract(String asset, String symbol) {
+	public BBSymbolVO getBBSymboll(String asset, String symbol) {
         BBSymbolVO vo = new BBSymbolVO();
         vo.setAsset(asset);
         vo.setSymbol(symbol);
@@ -25,7 +25,7 @@ public class MetadataServiceMock implements MetadataService {
     }
 
     @Override
-    public List<BBSymbolVO> getAllBBContract(){
+    public List<BBSymbolVO> getAllBBSymbol(){
         List<BBSymbolVO> list = new ArrayList<>();
         
         BBSymbolVO bb1 = new BBSymbolVO();

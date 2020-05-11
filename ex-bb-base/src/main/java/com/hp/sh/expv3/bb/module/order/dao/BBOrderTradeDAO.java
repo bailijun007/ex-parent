@@ -14,7 +14,7 @@ import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
  * @author wangjg
  *
  */
-public interface BBOrderTradeDAO extends BaseUserDataMapper<BBOrderTrade,Long> {
+public interface BBOrderTradeDAO extends BaseUserDataMapper<BBOrderTrade,String> {
 
 	public List<BBOrderTrade> queryList(Map<String,Object> params);
 	

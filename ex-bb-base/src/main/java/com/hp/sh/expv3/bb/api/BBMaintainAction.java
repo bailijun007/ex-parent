@@ -59,7 +59,7 @@ public class BBMaintainAction{
 	public List<BBOrderTrade> querySynchFee(){
 		Long startTime = DbDateUtils.now()-1000*60*10;
 		Page page = new Page(1, 100, 1000L);
-		List<BBOrderTrade> list = orderQueryService.querySynchFee(page, startTime);
+		List<BBOrderTrade> list = orderQueryService.querySynchFee(page, "USDT", "BTC_USDT", startTime);
 		return list;
 	}
 	

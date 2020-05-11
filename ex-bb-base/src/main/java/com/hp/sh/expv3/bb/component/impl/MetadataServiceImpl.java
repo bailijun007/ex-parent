@@ -33,7 +33,7 @@ public class MetadataServiceImpl implements MetadataService {
     private StringRedisTemplate templateDB5;
 
     @Override
-	public BBSymbolVO getBBContract(String asset, String symbol) {
+	public BBSymbolVO getBBSymboll(String asset, String symbol) {
         HashOperations hashOperations = templateDB0.opsForHash();
         String hashKey = asset+"__"+symbol;
         Object o = hashOperations.get(RedisKey.BB_SYMBOL, hashKey);
@@ -43,7 +43,7 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     @Override
-    public List<BBSymbolVO> getAllBBContract(){
+    public List<BBSymbolVO> getAllBBSymbol(){
         HashOperations opsForHash = templateDB0.opsForHash();
         Cursor<Map.Entry<String, Object>> curosr = opsForHash.scan(RedisKey.BB_SYMBOL, ScanOptions.NONE);
 

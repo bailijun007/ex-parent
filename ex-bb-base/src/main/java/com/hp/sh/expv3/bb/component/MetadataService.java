@@ -12,9 +12,9 @@ import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
  */
 public interface MetadataService {
 
-	BBSymbolVO getBBContract(String asset, String symbol);
+	BBSymbolVO getBBSymboll(String asset, String symbol);
 
-	List<BBSymbolVO> getAllBBContract();
+	List<BBSymbolVO> getAllBBSymbol();
 
 	AssetVO getAsset(String asset);
 }

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import javax.persistence.Table;
 
-import com.hp.sh.expv3.base.entity.UserDataEntity;
+import com.hp.sh.expv3.base.entity.UserData;
 import com.hp.sh.expv3.bb.strategy.data.OrderTrade;
 import com.hp.sh.expv3.commons.mybatis.TxId;
 import com.hp.sh.expv3.utils.math.BigUtils;
@@ -14,9 +14,7 @@ import com.hp.sh.expv3.utils.math.BigUtils;
  * 
  */
 @Table(name="bb_order_trade")
-public class BBOrderTrade extends UserDataEntity implements OrderTrade {
-
-	private static final long serialVersionUID = 1L;
+public class BBOrderTrade implements OrderTrade, UserData {
 
 	//资产
 	private String asset;
@@ -79,6 +77,16 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 	
 	//手续费同步状态
 	private Integer feeSynchStatus;
+	
+	//用户ID
+	private Long userId;
+	
+	private Long id;
+
+	// 创建时间
+	private Long created;
+	// 修改时间
+	private Long modified;
 	
 	public BBOrderTrade() {
 		super();
@@ -251,6 +259,38 @@ public class BBOrderTrade extends UserDataEntity implements OrderTrade {
 
 	public void setOpponentOrderId(Long opponentOrderId) {
 		this.opponentOrderId = opponentOrderId;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getCreated() {
+		return created;
+	}
+
+	public void setCreated(Long created) {
+		this.created = created;
+	}
+
+	public Long getModified() {
+		return modified;
+	}
+
+	public void setModified(Long modified) {
+		this.modified = modified;
 	}
 
 	@Override

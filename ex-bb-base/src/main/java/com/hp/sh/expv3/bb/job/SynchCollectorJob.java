@@ -11,6 +11,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.bb.component.MetadataService;
+import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderQueryService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
@@ -29,6 +31,9 @@ public class SynchCollectorJob {
 	
 	@Autowired
 	private BBTradeService tradeService;
+	
+	@Autowired
+	private MetadataService metadataService;
 	
 	@XxlJob("bbSynchCollector")
     public ReturnT<String> xxlJobHandler(String param) throws Exception {
@@ -54,20 +59,21 @@ public class SynchCollectorJob {
 	private void handleJob(Long startTime, Integer pageSize) {
 		Page page = new Page(1, pageSize, 1000L);
 		while(true){
-			List<BBOrderTrade> list = orderQueryService.querySynchFee(page, startTime);
-			
-			if(list==null || list.isEmpty()){
-				break;
-			}
-			
-			for(BBOrderTrade orderTrade : list){
-				try{
-					handleOrderTrade(orderTrade);
-				}catch(Exception e){
-					logger.error(e.getMessage(), e);
+			List<BBSymbolVO> symbolList = metadataService.getAllBBSymbol();
+			for(BBSymbolVO vo : symbolList){
+				List<BBOrderTrade> list = orderQueryService.querySynchFee(page, vo.getAsset(), vo.getSymbol(), startTime);
+				if(list==null || list.isEmpty()){
+					break;
+				}
+				for(BBOrderTrade orderTrade : list){
+					try{
+						handleOrderTrade(orderTrade);
+					}catch(Exception e){
+						logger.error(e.getMessage(), e);
+					}
 				}
 			}
-			
+			break;
 		}
 	}
 

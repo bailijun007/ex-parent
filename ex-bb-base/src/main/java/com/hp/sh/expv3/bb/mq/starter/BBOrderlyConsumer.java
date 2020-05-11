@@ -62,7 +62,7 @@ public class BBOrderlyConsumer {
 	@Scheduled(cron = "0 * * * * ?")
 	@Bean("startOrderlyConsumer123")
 	public String start123() throws MQClientException{
-		List<BBSymbolVO> symbolList = this.metadataService.getAllBBContract();
+		List<BBSymbolVO> symbolList = this.metadataService.getAllBBSymbol();
 		
 		String subExpression = this.subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE);
 	

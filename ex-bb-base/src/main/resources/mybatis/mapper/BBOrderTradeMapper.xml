@@ -38,6 +38,10 @@
 
 	<sql id="simple_where" >
 		<where>
+		
+		<if test="asset!=null and asset!=''"> and asset=#{asset}</if>
+		<if test="symbol!=null and symbol!=''"> and symbol=#{symbol}</if>
+		
 		<if test="bidFlag!=null"> and bid_flag=#{bidFlag}</if>
 		<if test="tradeId!=null"> and trade_id=#{tradeId}</if>
 		<if test="orderId!=null"> and order_id=#{orderId}</if>
@@ -53,9 +57,11 @@
 		<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 		<if test="modifiedStart!=null"> and modified &gt;= #{modifiedStart}</if>
 		<if test="modifiedEnd!=null"> and modified &lt;= #{modifiedEnd}</if>
-		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(asset,''),IFNULL(symbol,''),IFNULL(trade_sn,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
-		
+		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(asset,''),IFNULL(symbol,''),IFNULL(trade_sn,''),'') like CONCAT('%',#{keyword},'%')</if>	
 		<if test="tradeTimeStart!=null"> and trade_time &gt;= #{tradeTimeStart}</if>
+		<if test="tradeTimeEnd!=null"> and trade_time &lt;= #{tradeTimeEnd}</if>
+		</where>
+		
 	</sql>
 
 	<sql id="simple_query" >
