@@ -20,14 +20,14 @@ public class DateShardUtils {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(start);
 
-		String startStr = getDate(start);
-		String endStr = getDate(end);
+		String startStr = getDateShard(start);
+		String endStr = getDateShard(end);
 		List<String> list = new ArrayList<String>();
 		list.add(startStr);
 		
 		while(true){
 			cal.add(Calendar.MONTH, 1);
-			String s = getDate(cal);
+			String s = getDateShard(cal);
 			if(s.compareTo(endStr) <= 0){
 				list.add(s);
 			}else{
@@ -38,7 +38,7 @@ public class DateShardUtils {
 		return list;
 	}
 
-	public static String getDate(Object value){
+	public static String getDateShard(Object value){
 		if(value instanceof String){
 			return value.toString().substring(dateFormat.length());
 		}else if(value instanceof Calendar){

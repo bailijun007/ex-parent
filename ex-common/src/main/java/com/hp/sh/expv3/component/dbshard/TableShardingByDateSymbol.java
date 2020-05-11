@@ -3,9 +3,7 @@
  */
 package com.hp.sh.expv3.component.dbshard;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,15 +12,13 @@ import java.util.Set;
 import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingAlgorithm;
 import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingValue;
 
-import com.google.common.collect.Range;
-import com.hp.sh.expv3.component.context.IdGeneratorContext;
-
 /**
  * @author wangjg
  */
-public class TableShardingByDateSymbol implements ComplexKeysShardingAlgorithm {
+public class TableShardingByDateSymbol extends TableShardingByDate implements ComplexKeysShardingAlgorithm {
 	
 	public TableShardingByDateSymbol() {
+		super("id", "created");
 	}
 
 	@Override
@@ -34,43 +30,15 @@ public class TableShardingByDateSymbol implements ComplexKeysShardingAlgorithm {
 		Map crMap = shardingValue.getColumnNameAndRangeValuesMap();
 		Collection<String> assets = (Collection<String>) cvMap.get("asset");
 		Collection<String> symbols = (Collection<String>) cvMap.get("symbol");
-		Collection<Long> createds = (Collection<Long>) cvMap.get("created");
-		Collection<Long> ids = (Collection<Long>) cvMap.get("id");
-		Range<Long> createdRange = (Range<Long>) crMap.get("created");
 		Set<String> tableSet = new HashSet<String>();
 		
-		List<Long> dateMills = new ArrayList<Long>();
+		List<String> dateShards = this.getDateShards(shardingValue);
 		
-		if(ids!=null){
-			for(Long id: ids){
-				Long time = IdGeneratorContext.getSnowIdTime(id);
-				dateMills.add(time);
-			}
-		}
-		
-		if(createds!=null){
-			for(Long created : createds){
-				dateMills.add(created);
-			}
-		}
-		
-		Collection<String> rangeDateStr = getRangeDates(createdRange);
-		
-		if(rangeDateStr!=null){
+		if(dateShards!=null){
 			for(String asset : assets){
 				for(String symbol : symbols){
-					for(String date : rangeDateStr){
-						String tableName = getTableName(logicTableName, asset, symbol, date);
-						tableSet.add(tableName);
-					}
-				}
-			}
-		}
-		if(dateMills!=null){
-			for(String asset : assets){
-				for(String symbol : symbols){
-					for(Long created : dateMills){
-						String tableName = getTableName(logicTableName, asset, symbol, DateShardUtils.getDate(created));
+					for(String dateShard : dateShards){
+						String tableName = getTableName(logicTableName, asset, symbol, dateShard);
 						tableSet.add(tableName);
 					}
 				}
@@ -85,21 +53,6 @@ public class TableShardingByDateSymbol implements ComplexKeysShardingAlgorithm {
 		String tableName = logicTableName + suffix;
 		tableName = tableName.toLowerCase();
 		return tableName;
-	}
-
-	private static List<String> getRangeDates(Range<Long> dateRange) {
-		if(dateRange==null){
-			return Collections.emptyList();
-		}
-		Long start = dateRange.lowerEndpoint();
-		Long end = dateRange.hasUpperBound()?dateRange.upperEndpoint():System.currentTimeMillis();
-		long now = System.currentTimeMillis();
-		if(end > now){
-			end = now;
-		}
-		
-		return DateShardUtils.getRangeDates(start, end);
-
 	}
 
 }

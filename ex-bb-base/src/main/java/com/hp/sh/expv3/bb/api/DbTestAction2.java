@@ -41,8 +41,8 @@ public class DbTestAction2 {
 	@GetMapping(value = "/api/bb/test/lock")
 	public Long testLock(){
 		long time = System.currentTimeMillis();
-		for(int i=0; i<RECORD_TOTAL; i++){
-			mqHandler.testLock(1L);
+		for(long i=0; i<RECORD_TOTAL; i++){
+			mqHandler.testLock(i);
 		}
 		time = System.currentTimeMillis()-time;
 		return time;

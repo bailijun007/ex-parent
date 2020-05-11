@@ -113,7 +113,7 @@ public class ExShardingBuilder{
 	    
 		for(String table : this.symbolSubTableNames){
 			TableRuleConfiguration tableRule = ruleMap.get(table);
-			ComplexShardingStrategyConfiguration strategyConfig = new ComplexShardingStrategyConfiguration("asset,symbol,created,id", new TableShardingByDateSymbol());
+			ComplexShardingStrategyConfiguration strategyConfig = new ComplexShardingStrategyConfiguration("asset,symbol,id,created,trade_time", new TableShardingByDateSymbol());
 			tableRule.setTableShardingStrategyConfig(strategyConfig);
 		}
 
