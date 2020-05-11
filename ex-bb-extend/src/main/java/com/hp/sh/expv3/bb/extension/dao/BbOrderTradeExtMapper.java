@@ -18,7 +18,7 @@ public interface BbOrderTradeExtMapper {
 
     Long queryCount();
 
-    BbOrderTradeVo selectLessTimeTrade(@Param("asset") String asset,@Param("symbol") String symbol,@Param("tradeTime") Long tradeTime);
+    BbOrderTradeVo selectLessTimeTrade(@Param("asset") String asset,@Param("symbol") String symbol,@Param("startTime") Long startTime);
 
     List<BbOrderTradeVo> selectAllTradeListByUser(@Param("asset") String asset,@Param("symbol") String symbol,@Param("userId") Long userId);
 

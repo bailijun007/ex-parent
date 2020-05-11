@@ -10,6 +10,7 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.dev.CrossDB;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @RestController
 public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
-   @Autowired
+    @Autowired
     private BbOrderTradeExtService bbOrderTradeExtService;
 
     /**
@@ -32,43 +33,42 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
      * @param statTime 成交时间
      * @return
      */
-    @CrossDB
-    @Override
-    public BbOrderTradeVo selectLessTimeTrade(String asset, String symbol, Long statTime) {
-        if (StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)||statTime == null) {
-            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
-        }
-        return bbOrderTradeExtService.selectLessTimeTrade(asset,symbol,statTime);
-    }
+//    @Override
+//    public BbOrderTradeVo selectLessTimeTrade(Long userId, String asset, String symbol, Long statTime,Long endTime) {
+//        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || statTime == null ) {
+//            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+//        }
+//        return bbOrderTradeExtService.selectLessTimeTrade(asset, symbol, statTime,endTime);
+//    }
+
+//    @Override
+//    public List<BbOrderTradeVo> selectAllTradeListByUser(String asset, String symbol, Long userId) {
+//        if (userId == null) {
+//            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+//        }
+//        return bbOrderTradeExtService.selectAllTradeListByUser(asset, symbol, userId);
+//    }
 
     @Override
-    public List<BbOrderTradeVo> selectAllTradeListByUser(String asset, String symbol, Long userId) {
-        if (userId == null) {
-            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
-        }
-        return bbOrderTradeExtService.selectAllTradeListByUser(asset,symbol,userId);
-    }
-
-    @Override
-    public List<BbUserOrderTrade> selectTradeListByUserId(String asset, String symbol, Long userId, Long id,Long startTime, Long endTime) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null ) {
+    public List<BbUserOrderTrade> selectTradeListByUserId(String asset, String symbol, Long userId, Long id, Long startTime, Long endTime) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
 
         if (startTime == null && endTime == null) {
             endTime = Instant.now().toEpochMilli();
         }
-        List<BbUserOrderTrade> tradeVo = bbOrderTradeExtService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId,id);
+        List<BbUserOrderTrade> tradeVo = bbOrderTradeExtService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId, id);
         return tradeVo;
     }
 
     @Override
     public List<BbOrderTradeDetailVo> selectBbFeeCollectByAccountId(String asset, String symbol, Long userId, Long statTime, Long endTime) {
-        if (userId == null||statTime==null||endTime==null||StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)) {
+        if (userId == null || statTime == null || endTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
 
-        List<BbOrderTradeDetailVo> result = bbOrderTradeExtService.selectPcFeeCollectByAccountId(asset, symbol, userId,statTime,endTime);
+        List<BbOrderTradeDetailVo> result = bbOrderTradeExtService.selectPcFeeCollectByAccountId(asset, symbol, userId, statTime, endTime);
         return result;
     }
 }

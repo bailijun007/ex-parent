@@ -23,4 +23,6 @@ public interface BbAccountRecordExtMapper {
     List<BbAccountRecordExtVo> listBbAccountRecordsByPage(Map<String, Object> map);
 
     int existTable(@Param("dbName") String dbName, @Param("tableName") String tableName);
+
+    Long queryCount(Map<String, Object> map);
 }

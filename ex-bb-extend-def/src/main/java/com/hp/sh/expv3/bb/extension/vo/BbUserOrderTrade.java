@@ -30,6 +30,21 @@ public class BbUserOrderTrade implements Serializable {
     public BbUserOrderTrade() {
     }
 
+    @Override
+    public String toString() {
+        return "BbUserOrderTrade{" +
+                "id=" + id +
+                ", asset='" + asset + '\'' +
+                ", symbol='" + symbol + '\'' +
+                ", tkAccountId=" + tkAccountId +
+                ", price=" + price +
+                ", number=" + number +
+                ", tradeTime=" + tradeTime +
+                ", modified=" + modified +
+                ", created=" + created +
+                '}';
+    }
+
     public Long getId() {
         return id;
     }

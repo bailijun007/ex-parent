@@ -26,6 +26,7 @@
         <result column="cancel_operator" property="cancelOperator"/>
         <result column="client_order_id" property="clientOrderId"/>
         <result column="remark" property="remark"/>
+        <result column="trade_mean_price" property="tradeMeanPrice"/>
         <result column="version" property="version"/>
         <result column="leverage" property="leverage"/>
         <result column="order_margin_currency" property="orderMarginCurrency"/>
@@ -83,7 +84,7 @@
     </sql>
 
     <sql id="Base_Column_List">
-		id,user_id,asset,symbol,bid_flag,price,order_type,volume,status,fee_ratio,fee_cost,order_margin,fee,filled_volume,cancel_volume,
+		id,user_id,asset,symbol,bid_flag,price,order_type,volume,status,fee_ratio,fee_cost,order_margin,fee,filled_volume,cancel_volume,trade_mean_price,
 		time_in_force,cancel_time,active_flag,create_operator,cancel_operator,client_order_id,version,leverage,order_margin_currency,remark,modified,created
 	</sql>
 
@@ -98,30 +99,30 @@
     <select id="queryList" resultMap="BbOrderVo">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM ${tableName}
+        FROM bb_order_history
         <include refid="simple_where"/>
+        order by id desc
+        limit ${offset}, ${limit}
     </select>
 
     <select id="queryBbActiveOrdersByIsNextPage" resultMap="BbOrderVo">
         SELECT
-        o.*
+        *
         FROM
-        bb_active_order ao
-        LEFT JOIN
-        bb_order o ON o.id = ao.id
+        bb_order
         <where>
 
             <if test="userId!=null">
-                ao.user_id=#{userId}
+                user_id=#{userId}
             </if>
             <if test="asset!=null and asset!=''">
-                and ao.asset=#{asset}
+                and asset=#{asset}
             </if>
             <if test="symbol!=null and symbol!=''">
-                and ao.symbol=#{symbol}
+                and symbol=#{symbol}
             </if>
             <if test="bidFlag!=null">
-                and ao.bid_flag=#{bidFlag}
+                and bid_flag=#{bidFlag}
             </if>
             <choose>
                 <when test="nextPage==1 and limit!=null and lastOrderId!=null">
@@ -147,7 +148,7 @@
 
     <select id="queryActiveOrderCount" resultType="java.lang.Long">
         select count(1)
-        from bb_active_order
+        from bb_order
         <where>
             <if test="userId!=null">user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
@@ -171,7 +172,7 @@
     <select id="queryOrderList" resultMap="BbOrderVo">
         select
         <include refid="Base_Column_List"/>
-        from bb_order
+        from bb_order_history
         <where>
             <if test="assetList!=null">and asset in
                 <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
@@ -191,6 +192,8 @@
             <if test="userId!=null">
                 and user_id=#{userId}
             </if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
             <if test="gtOrderId!=null">
                 and id &gt;#{gtOrderId}
                 ORDER BY id asc
@@ -209,19 +212,16 @@
 
     <select id="queryBbActiveOrderList" resultMap="BbOrderVo">
         SELECT
-        o.*
-        FROM
-        bb_active_order ao
-        LEFT JOIN
-        bb_order o ON o.id = ao.id
+        *
+        from bb_order
         <where>
-            <if test="userId!=null">ao.user_id=#{userId}</if>
-            <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
-            <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
-            <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
-            <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
+            <if test="userId!=null">user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="bidFlag!=null">and bid_flag=#{bidFlag}</if>
+            <if test="lastOrderId!=null">and id &lt; #{lastOrderId}</if>
         </where>
-        ORDER BY ao.id desc
+        ORDER BY id desc
         LIMIT 0,${limit}
     </select>
 
@@ -229,7 +229,7 @@
         SELECT
         <include refid="Base_Column_List"/>
         FROM
-       ${tableName}
+        bb_order_history
 
         <where>
             <if test="userId!=null">and user_id=#{userId}</if>
@@ -251,7 +251,7 @@
     <select id="queryHistoryByIsNextPage" resultMap="BbOrderVo">
         select
         <include refid="Base_Column_List"/>
-        from bb_order
+        from bb_order_history
         <where>
 
             <if test="activeFlag!=null">
@@ -266,7 +266,8 @@
             <if test="symbol!=null and symbol!=''">
                 and symbol=#{symbol}
             </if>
-
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
             <choose>
                 <when test="nextPage==1 and limit!=null and lastOrderId!=null">
                     and id &lt; #{lastOrderId}
@@ -302,61 +303,70 @@
 
     <select id="queryBbActiveOrders" resultMap="BbOrderVo">
         SELECT
-        o.*
+        *
         FROM
-        bb_active_order ao
-        LEFT JOIN
-        bb_order o ON o.id = ao.id
+        bb_order
         <where>
-            <if test="userId!=null">ao.user_id=#{userId}</if>
-            <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
-            <if test="assetList!=null">and ao.asset in
+            <if test="userId!=null">user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="assetList!=null">and asset in
                 <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
                     #{assetList[${i}]}
                 </foreach>
             </if>
-            <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
-            <if test="symbolList!=null">and ao.symbol in
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="symbolList!=null">and symbol in
                 <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
                     #{symbolList[${i}]}
                 </foreach>
             </if>
-            <if test="statusList!=null">and o.status in
+            <if test="statusList!=null">and status in
                 <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
                     #{statusList[${i}]}
                 </foreach>
             </if>
-            <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
-            <if test="activeFlag!=null">and o.active_flag=#{activeFlag}</if>
-
+            <if test="bidFlag!=null">and bid_flag=#{bidFlag}</if>
+            <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
             <if test="gtOrderId!=null">
                 and ao.id &gt;#{gtOrderId}
-                ORDER BY ao.id asc
+                ORDER BY id asc
             </if>
 
             <if test="ltOrderId!=null">
                 and ao.id &lt;#{ltOrderId}
-                ORDER BY ao.id desc
+                ORDER BY id desc
             </if>
             <if test="ltOrderId==null and gtOrderId==null">
-                ORDER BY ao.id desc
+                ORDER BY id desc
             </if>
         </where>
         LIMIT 0,${limit}
     </select>
 
     <select id="queryTotalFee" resultType="java.math.BigDecimal">
-        select SUM(fee_cost) from bb_order
-        where created&gt;=#{startTime}
+        select SUM(fee_cost) from bb_order_history
+        where asset=#{asset}
+        and symbol=#{symbol}
+         and created&gt;=#{startTime}
         and created&lt;=#{endTime}
     </select>
 
     <select id="queryTotalOrder" resultType="java.math.BigDecimal">
-      select count(1) from bb_order where created&gt;=#{startTime} and created&lt;=#{endTime}
+      select count(1) from bb_order_history where
+      asset=#{asset} and symbol=#{symbol}
+       and created&gt;=#{startTime} and created&lt;=#{endTime}
     </select>
 
     <select id="existTable" resultType="java.lang.Integer">
         select count(1) from information_schema.TABLES where table_schema = #{dbName} and  table_name = #{tableName}
+    </select>
+
+    <select id="queryCount" resultType="java.lang.Long">
+        select count(1)
+        from bb_order_history
+        <include refid="simple_where"/>
     </select>
 
 </mapper>

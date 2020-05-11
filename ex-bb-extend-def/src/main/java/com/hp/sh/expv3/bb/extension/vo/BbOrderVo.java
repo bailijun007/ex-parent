@@ -58,6 +58,10 @@ public class BbOrderVo implements Serializable {
     @ApiModelProperty("委托有效时间")
     private Integer timeInForce;
 
+    //成交均价
+    @ApiModelProperty("成交均价")
+    private BigDecimal tradeMeanPrice;
+
     @ApiModelProperty("取消时间")
     private long cancelTime;
 
@@ -114,6 +118,7 @@ public class BbOrderVo implements Serializable {
                 ", filledVolume=" + filledVolume +
                 ", cancelVolume=" + cancelVolume +
                 ", timeInForce=" + timeInForce +
+                ", tradeMeanPrice=" + tradeMeanPrice +
                 ", cancelTime=" + cancelTime +
                 ", activeFlag=" + activeFlag +
                 ", createOperator='" + createOperator + '\'' +
@@ -126,6 +131,14 @@ public class BbOrderVo implements Serializable {
                 ", modified=" + modified +
                 ", created=" + created +
                 '}';
+    }
+
+    public BigDecimal getTradeMeanPrice() {
+        return tradeMeanPrice;
+    }
+
+    public void setTradeMeanPrice(BigDecimal tradeMeanPrice) {
+        this.tradeMeanPrice = tradeMeanPrice;
     }
 
     public Long getId() {

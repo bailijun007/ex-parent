@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.config.db;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -28,13 +29,13 @@ public class DataSourceConfig {
 //        return DataSourceBuilder.create().type(HikariDataSource.class).build();
 //    }
 
-   // @Primary
+    @Primary
     @Order(2)
     @Bean("shardingDataSource")
-    public DataSource shardingDataSource(@Qualifier("masterDataSource") DataSource primaryDataSource, List<DataSource> dsList) throws SQLException {
+    public DataSource shardingDataSource(@Qualifier("masterDataSource") DataSource primaryDataSource) throws SQLException {
         // 配置分片规则
         ExShardingBuilder builder = new ExShardingBuilder();
-        builder.setDataSourceList(dsList);
+        builder.setDataSourceList(Arrays.asList(primaryDataSource));
         builder.addAssetSubTableName("bb_account_record");
         builder.addSymbolSubTableName("bb_order_history");
         builder.addSymbolSubTableName("bb_order_trade");

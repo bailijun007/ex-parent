@@ -36,9 +36,11 @@ public interface BbOrderExtMapper {
 
     List<BbOrderVo> queryBbActiveOrders(Map<String, Object> map);
 
-    BigDecimal queryTotalFee(@Param("startTime") Long startTime,@Param("endTime") Long endTime);
+    BigDecimal queryTotalFee(@Param("asset")  String asset,@Param("symbol") String symbol,@Param("startTime") Long startTime,@Param("endTime") Long endTime);
 
-    BigDecimal queryTotalOrder(@Param("startTime") Long startTime,@Param("endTime") Long endTime);
+    BigDecimal queryTotalOrder(@Param("asset") String asset, @Param("symbol") String symbol,@Param("startTime") Long startTime,@Param("endTime") Long endTime);
 
     int existTable(@Param("dbName") String dbName, @Param("tableName") String tableName);
+
+    Long queryCount(Map<String, Object> map);
 }

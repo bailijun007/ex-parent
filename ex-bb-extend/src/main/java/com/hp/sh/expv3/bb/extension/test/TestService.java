@@ -5,6 +5,7 @@ import com.hp.sh.expv3.bb.extension.service.BbAccountRecordExtService;
 import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountRecordExtVo;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountRecordVo;
+import com.hp.sh.expv3.bb.extension.vo.BbHistoryOrderVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,8 +32,8 @@ public class TestService {
     private BbOrderExtService bbOrderExtService;
 
     @Test
-    public void testHistory2(){
-         PageResult<BbAccountRecordVo> pageResult = bbAccountRecordExtService.queryHistory(null, "btc", "2019-03", "2020-05", 1, 20);
+    public void queryHistory(){
+         PageResult<BbAccountRecordVo> pageResult = bbAccountRecordExtService.queryHistory(null, "btc", "2020-04-08", "2020-05-09", 1, 20);
 
          if(null!=pageResult){
              System.out.println("pageResult.getList()="+pageResult.getList());
@@ -39,21 +41,53 @@ public class TestService {
     }
 
     @Test
-    public void testBBAccountRecord(){
-//        final List<BbAccountRecordExtVo> extVos = bbAccountRecordExtService.listBbAccountRecords(null, "btc", 1, 0, 1583562840000L, 1588953600000L, 20);
+    public void query(){
+//        final List<BbAccountRecordExtVo> extVos = bbAccountRecordExtService.listBbAccountRecords(null, "btc", 2, 0, 1586241240000L, 1588953600000L, 20);
 //        System.out.println("extVos = " + extVos);
 
-        final List<BbAccountRecordExtVo> extVos = bbAccountRecordExtService.listBbAccountRecordsByPage(null, "btc", 1, 0, 2L, -1, 1583562840000L, 1588953600000L, 20);
+        final List<BbAccountRecordExtVo> extVos = bbAccountRecordExtService.listBbAccountRecordsByPage(null, "btc", 2, 0, 2L, -1, 1586241240000L, 1588953600000L, 20);
         System.out.println("extVos = " + extVos);
     }
 
     @Test
-    public void testqueryAllBbOrederHistory(){
-        final PageResult<BbOrderVo> pageResult = bbOrderExtService.queryAllBbOrederHistory(null, "USDT", "BTC_USDT", "2020-03-12", "2020-05-09", 1, 20);
+    public void queryAllBbOrederHistory(){
+        final PageResult<BbOrderVo> pageResult = bbOrderExtService.queryAllBbOrederHistory(null, "USDT", "BTC_USDT", "2020-04-12", "2020-05-09", 1, 2);
         if (!CollectionUtils.isEmpty(pageResult.getList())){
             System.out.println("pageResult.getList()="+pageResult.getList());
         }
     }
 
 
+    @Test
+    public void testqueryHistoryOrderList(){
+        final PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(null, "USDT", "BTC_USDT", 1, 2, 1L, -1, "2020-03-12", "2020-05-09");
+        System.out.println("result.getList()="+result.getList());
+    }
+
+    @Test
+    public void testqueryOrderList(){
+        List<Integer> statusList=new ArrayList<>();
+        statusList.add(8);
+        List<String> assetList=new ArrayList<>();
+        assetList.add("USDT");
+        List<String> symbolList=new ArrayList<>();
+        symbolList.add("BTC_USDT");
+        final List<BbHistoryOrderVo> bbHistoryOrderVos = bbOrderExtService.queryOrderList(null, assetList, symbolList, null, null, 20, statusList, "2020-04-12", "2020-05-09");
+        System.out.println("bbHistoryOrderVos = " + bbHistoryOrderVos);
+    }
+
+    @Test
+    public void testqueryBbActiveOrderList(){
+        final PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryBbActiveOrderList(null, "USDT", "BTC_USDT", null, 20, null, 1);
+        System.out.println("result.getList()="+result.getList());
+    }
+
+    @Test
+    public void queryHistoryOrderList(){
+        final PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(null, "USDT", "BTC_USDT", 1, 2, 1L, -1, "2020-04-12", "2020-05-09");
+        System.out.println("result.getList()="+result.getList());
+    }
+
 }
+
+
