@@ -39,4 +39,6 @@ public interface BbOrderExtMapper {
     BigDecimal queryTotalFee(@Param("startTime") Long startTime,@Param("endTime") Long endTime);
 
     BigDecimal queryTotalOrder(@Param("startTime") Long startTime,@Param("endTime") Long endTime);
+
+    int existTable(@Param("dbName") String dbName, @Param("tableName") String tableName);
 }
