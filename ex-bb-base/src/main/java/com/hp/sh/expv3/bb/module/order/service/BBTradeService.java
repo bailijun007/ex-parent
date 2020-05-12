@@ -107,7 +107,7 @@ public class BBTradeService {
 		//退还剩余押金和手续费
 		if(orderTrade.isOrderCompleted()){
 			if(BigUtils.gtZero(orderTrade.getRemainFee()) || BigUtils.gtZero(orderTrade.getRemainOrderMargin())){
-				logger.warn("剩余押金={}，手续费={}", orderTrade.getRemainOrderMargin(), orderTrade.getRemainFee());
+				logger.info("剩余押金={}，手续费={}", orderTrade.getRemainOrderMargin(), orderTrade.getRemainFee());
 				this.returnRemaining(order.getUserId(), order.getAsset(), order.getId(), orderTrade.getRemainFee(), orderTrade.getRemainOrderMargin());
 			}
 		}
