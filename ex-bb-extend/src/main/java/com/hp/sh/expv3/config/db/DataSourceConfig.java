@@ -36,9 +36,10 @@ public class DataSourceConfig {
         // 配置分片规则
         ExShardingBuilder builder = new ExShardingBuilder();
         builder.setDataSourceList(Arrays.asList(primaryDataSource));
-        builder.addAssetSubTableName("bb_account_record");
-        builder.addSymbolSubTableName("bb_order_history");
-        builder.addSymbolSubTableName("bb_order_trade");
+
+		builder.addAssetSubTable("bb_account_record", "id", "created");
+		builder.addSymbolSubTable("bb_order_history", "id", "created");
+		builder.addSymbolSubTable("bb_order_trade", "id", "trade_time");
         return builder.build();
     }
 

@@ -1,21 +1,33 @@
 package com.hp.sh.expv3.component.dbshard;
 
-import com.hp.sh.expv3.component.context.IdGeneratorContext;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
-public class ExBaseShardingAlgorithm {
+import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingAlgorithm;
 
-	protected String getDateShardById(Object id){
-		if(id instanceof Long){
-			Long time = IdGeneratorContext.getSnowIdTime((Long)id);
-			String shardTime = DateShardUtils.getDateShard(time);
-			return shardTime;
-		}else if(id instanceof String){
-			String month = ((String)id).substring(0, 6);
-			return month;
-		}else{
-			throw new RuntimeException();
+public abstract class ExBaseShardingAlgorithm implements ComplexKeysShardingAlgorithm{
+
+	public abstract String getShardingColumns();
+	
+	protected TableInfoCache tableInfoCache;
+	
+	protected Collection<String> filter(Set<String> tableSet) {
+		if(this.tableInfoCache==null){
+			return tableSet;
 		}
+		Iterator<String> it = tableSet.iterator();
+		while(it.hasNext()){
+			String table = it.next();
+			if(!this.tableInfoCache.have(table)){
+				it.remove();
+			}
+		}
+		return tableSet;
 	}
 
+	public void setTableInfoCache(TableInfoCache tableInfoCache) {
+		this.tableInfoCache = tableInfoCache;
+	}
 	
 }

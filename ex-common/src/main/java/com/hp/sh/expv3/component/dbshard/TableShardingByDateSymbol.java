@@ -9,16 +9,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingAlgorithm;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingValue;
 
 /**
  * @author wangjg
  */
-public class TableShardingByDateSymbol extends TableShardingByDate implements ComplexKeysShardingAlgorithm {
+public class TableShardingByDateSymbol extends TableShardingByDate {
 	
 	public TableShardingByDateSymbol() {
 		super("id", "created");
+	}
+
+	public TableShardingByDateSymbol(String idColumnName, String dateColumnName) {
+		super(idColumnName, dateColumnName);
+	}
+
+	public TableShardingByDateSymbol(String idColumnName, String dateColumnName, IdDateShard idDateShard) {
+		super(idColumnName, dateColumnName, idDateShard);
 	}
 
 	@Override
@@ -45,14 +53,19 @@ public class TableShardingByDateSymbol extends TableShardingByDate implements Co
 			}
 		}
 		
-		return tableSet;
+		return this.filter(tableSet);
 	}
-	
+
 	public static String getTableName(String logicTableName, String asset, String symbol, String date) {
 		String suffix = "_" + asset + "__" + symbol + "_" + date;
 		String tableName = logicTableName + suffix;
 		tableName = tableName.toLowerCase();
 		return tableName;
+	}
+	
+	public String getShardingColumns(){
+		String colums = StringUtils.joinWith(",", this.idColumnName, this.dateColumnName, "asset", "symbol");
+		return colums;
 	}
 
 }

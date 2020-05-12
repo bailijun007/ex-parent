@@ -345,6 +345,18 @@ public class SnowflakeIdWorker {
     public String getSequence64String(long id) {
         return StringUtils.replace(String.format("%64s", Long.toBinaryString(getSequence(id))), " ", "0");
     }
+    
+    public long resetIdType(long id, int type){
+    	int swap = (type << IdTypeShift);
+    	
+    	int mask = ~0;
+    	
+    	mask = (mask<<(idTypeBits+sequenceBits))^(mask<<(sequenceBits));
+    	
+    	long newId = (id & ~mask) | swap;
+    	
+    	return newId;
+    }
 
     //==============================Test=============================================
 

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hp.sh.expv3.bb.module.sys.service.DbGlobalService;
+import com.hp.sh.expv3.bb.module.sys.service.ShardTableService;
 import com.hp.sh.expv3.config.shard.ShardGroup;
 
 import io.swagger.annotations.ApiOperation;
@@ -21,26 +21,29 @@ public class BBMaintainShardAction{
 	private ShardGroup shardGroup;
 	
 	@Autowired
-	private DbGlobalService dbGlobalService;
+	private ShardTableService shardTableService;
 
 	@ApiOperation(value = "createNextMonthTables")
 	@GetMapping(value = "/createNextMonthTables")
 	public Long createNextMonthTables(){
-		dbGlobalService.createNextMonthTables();
+		shardTableService.createNextMonthTables();
+		shardTableService.loadPhysicsTableNames();
 		return 0L;
 	}
 	
 	@ApiOperation(value = "createCurMonthTables")
 	@GetMapping(value = "/createCurMonthTables")
 	public Long createCurMonthTables(){
-		dbGlobalService.createCurMonthTables();
+		shardTableService.createCurMonthTables();
+		shardTableService.loadPhysicsTableNames();
 		return 0L;
 	}
 
 	@ApiOperation(value = "createNewSymbol")
 	@GetMapping(value = "/createNewSymbol")
 	public Long createNewSymbol(String asset, String symbol){
-		dbGlobalService.createNewSymbol(asset, symbol);
+		shardTableService.createNewSymbol(asset, symbol);
+		shardTableService.loadPhysicsTableNames();
 		return 0L;
 	}
 	

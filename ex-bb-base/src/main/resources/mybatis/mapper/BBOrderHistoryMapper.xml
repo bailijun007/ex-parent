@@ -110,9 +110,6 @@
 
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into bb_order_history (
 			asset,symbol,bid_flag,leverage,volume,price,order_type,time_in_force,fee_ratio,client_order_id,fee,order_margin,order_margin_currency,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,trade_mean_price,version,create_operator,cancel_operator,user_id,id,created,modified
 		)values(

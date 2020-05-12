@@ -36,7 +36,7 @@ import com.hp.sh.expv3.bb.vo.request.CollectorCutRequest;
 import com.hp.sh.expv3.bb.vo.request.ReleaseFrozenRequest;
 import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.exception.ExSysException;
-import com.hp.sh.expv3.commons.lock.LockIt;
+import com.hp.sh.expv3.component.dbshard.impl.TradeId2DateShard;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.SnUtils;
@@ -51,6 +51,9 @@ public class BBTradeService {
 
 	@Autowired
 	private BBOrderTradeDAO orderTradeDAO;
+	
+	@Autowired
+	private TradeId2DateShard tradeId;
 	
 	@Autowired
 	private BBOrderUpdateService orderUpdateService;
@@ -222,7 +225,7 @@ public class BBTradeService {
 	private BBOrderTrade saveOrderTrade(BBTradeVo tradeMsg, BBOrder order, TradeResult tradeResult, Long now) {
 		BBOrderTrade orderTrade = new BBOrderTrade();
 
-		orderTrade.setId(null);
+		orderTrade.setId(tradeId.genTradId(tradeMsg.getTradeTime()));
 		orderTrade.setAsset(order.getAsset());
 		orderTrade.setSymbol(order.getSymbol());
 		orderTrade.setVolume(tradeResult.getTradeVolume());

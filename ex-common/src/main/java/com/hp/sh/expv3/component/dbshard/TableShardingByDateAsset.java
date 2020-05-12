@@ -9,16 +9,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingAlgorithm;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingValue;
 
 /**
  * @author wangjg
  */
-public class TableShardingByDateAsset extends TableShardingByDate implements ComplexKeysShardingAlgorithm {
+public class TableShardingByDateAsset extends TableShardingByDate{
 
 	public TableShardingByDateAsset() {
 		super("id", "created");
+	}
+
+	public TableShardingByDateAsset(String idColumnName, String dateColumnName) {
+		super(idColumnName, dateColumnName);
 	}
 
 	@Override
@@ -42,7 +46,7 @@ public class TableShardingByDateAsset extends TableShardingByDate implements Com
 			}
 		}
 		
-		return tableSet;
+		return this.filter(tableSet);
 	}
 	
 	public static String getTableName(String logicTableName, String asset, String date) {
@@ -52,5 +56,9 @@ public class TableShardingByDateAsset extends TableShardingByDate implements Com
 		return tableName;
 	}
 
+	public String getShardingColumns(){
+		String colums = StringUtils.joinWith(",", this.idColumnName, this.dateColumnName, "asset");
+		return colums;
+	}
 
 }

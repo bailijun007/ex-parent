@@ -11,27 +11,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingAlgorithm;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingValue;
 
 import com.google.common.collect.Range;
+import com.hp.sh.expv3.component.dbshard.impl.SnowId2DateShard;
 
 /**
  * @author wangjg
  */
-public class TableShardingByDate extends ExBaseShardingAlgorithm implements ComplexKeysShardingAlgorithm {
+public class TableShardingByDate extends ExBaseShardingAlgorithm {
 
-	private final String idColumnName;
+	protected final String idColumnName;
 	
-	private final String dateColumnName;
+	protected final String dateColumnName;
+	
+	protected final IdDateShard idDateShard;
 	
 	public TableShardingByDate() {
-		this("id", "created");
+		this("id", "created", new SnowId2DateShard());
 	}
 
 	public TableShardingByDate(String idColumnName, String dateColumnName) {
+		this(idColumnName, dateColumnName, new SnowId2DateShard());
+	}
+
+	public TableShardingByDate(String idColumnName, String dateColumnName, IdDateShard idDateShard) {
 		this.idColumnName = idColumnName;
 		this.dateColumnName = dateColumnName;
+		this.idDateShard = idDateShard;
 	}
 
 	@Override
@@ -52,7 +60,7 @@ public class TableShardingByDate extends ExBaseShardingAlgorithm implements Comp
 			}
 		}
 		
-		return tableSet;
+		return this.filter(tableSet);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -67,7 +75,7 @@ public class TableShardingByDate extends ExBaseShardingAlgorithm implements Comp
 		
 		if(ids!=null){
 			for(Object id: ids){
-				dateShards.add(this.getDateShardById(id));
+				dateShards.add(idDateShard.getDateShardById(id));
 			}
 		}
 		
@@ -110,4 +118,9 @@ public class TableShardingByDate extends ExBaseShardingAlgorithm implements Comp
 
 	}
 
+	public String getShardingColumns(){
+		String colums = StringUtils.joinWith(",", this.idColumnName, this.dateColumnName);
+		return colums;
+	}
+	
 }

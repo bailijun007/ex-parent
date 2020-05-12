@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -15,19 +17,17 @@ import org.apache.shardingsphere.api.config.sharding.strategy.ComplexShardingStr
 import org.apache.shardingsphere.api.config.sharding.strategy.StandardShardingStrategyConfiguration;
 import org.apache.shardingsphere.shardingjdbc.api.ShardingDataSourceFactory;
 
-import com.hp.sh.expv3.component.dbshard.DbShardingAlgorithm;
-import com.hp.sh.expv3.component.dbshard.TableShardingByDateAsset;
-import com.hp.sh.expv3.component.dbshard.TableShardingByDateSymbol;
-
 public class ExShardingBuilder{
 	
 	public static final String DS_PREFIX = "data-source-";
 	
     private List<DataSource> dataSourceList;
     private String defaultDataSourceName;
-    private List<String> subDBTableNames = new ArrayList<String>();
-    private List<String> assetSubTableNames = new ArrayList<String>();
-    private List<String> symbolSubTableNames = new ArrayList<String>();
+    private List<String> dbShardTableNames = new ArrayList<String>();
+    
+    private Map<String,ExBaseShardingAlgorithm> algorithms = new HashMap<String,ExBaseShardingAlgorithm>();
+    
+    private TableInfoCache tableInfoCache = new TableInfoCache(){};
     
     public ExShardingBuilder() {
 	}
@@ -42,8 +42,8 @@ public class ExShardingBuilder{
 	 * @param tableName
 	 * @return
 	 */
-	public ExShardingBuilder addSubDBTableName(String tableName){
-		subDBTableNames.add(tableName);
+	public ExShardingBuilder addDbShard(String tableName){
+		dbShardTableNames.add(tableName);
 		return this;
     }
 
@@ -52,8 +52,10 @@ public class ExShardingBuilder{
 	 * @param tableName
 	 * @return
 	 */
-	public ExShardingBuilder addAssetSubTableName(String tableName){
-		assetSubTableNames.add(tableName);
+	public ExShardingBuilder addAssetSubTable(String tableName, String idColumn, String dateColumn){
+		TableShardingByDateAsset ts = new TableShardingByDateAsset(idColumn, dateColumn);
+		ts.setTableInfoCache(tableInfoCache);
+		algorithms.put(tableName, ts);
 		return this;
     }
 
@@ -62,8 +64,22 @@ public class ExShardingBuilder{
 	 * @param tableName
 	 * @return
 	 */
-	public ExShardingBuilder addSymbolSubTableName(String tableName){
-		symbolSubTableNames.add(tableName);
+	public ExShardingBuilder addSymbolSubTable(String tableName, String idColumn, String dateColumn){
+		TableShardingByDateSymbol ts = new TableShardingByDateSymbol(idColumn, dateColumn);
+		ts.setTableInfoCache(tableInfoCache);
+		algorithms.put(tableName, ts);
+		return this;
+    }
+
+	/**
+	 * 添加symbol分表表名
+	 * @param tableName
+	 * @return
+	 */
+	public ExShardingBuilder addSymbolSubTable(String tableName, String idColumn, String dateColumn, IdDateShard idDateShard){
+		TableShardingByDateSymbol ts = new TableShardingByDateSymbol(idColumn, dateColumn, idDateShard);
+		ts.setTableInfoCache(tableInfoCache);
+		algorithms.put(tableName, ts);
 		return this;
     }
 	
@@ -84,40 +100,39 @@ public class ExShardingBuilder{
 	    ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
 		shardingRuleConfig.setDefaultDataSourceName(defaultDataSourceName);
 		
-		List<String> tableList = new ArrayList<>();
-		tableList.addAll(subDBTableNames);
-		tableList.removeAll(assetSubTableNames);
-		tableList.addAll(assetSubTableNames);
-		
-		tableList.removeAll(symbolSubTableNames);
-		tableList.addAll(symbolSubTableNames);
+		List<String> _tableList = new ArrayList<>();
+		_tableList.addAll(dbShardTableNames);
+		_tableList.removeAll(this.algorithms.keySet());
+		_tableList.addAll(this.algorithms.keySet());
 		
 		Map<String, TableRuleConfiguration> ruleMap = new HashMap<>();
 		
-		for(String table : tableList){
+		for(String table : _tableList){
 			TableRuleConfiguration tableRule = new TableRuleConfiguration(table, DS_PREFIX+"${0.."+(dataSourceList.size()-1)+"}."+table);
 			shardingRuleConfig.getTableRuleConfigs().add(tableRule);
 			ruleMap.put(table, tableRule);
 		}
 	    
-		for(String table : this.subDBTableNames){
+		//分库
+		for(String table : this.dbShardTableNames){
 			TableRuleConfiguration tableRule = ruleMap.get(table);
 			tableRule.setDatabaseShardingStrategyConfig(new StandardShardingStrategyConfiguration("user_id", new DbShardingAlgorithm()));
 		}
 	    
-		for(String table : this.assetSubTableNames){
-			TableRuleConfiguration tableRule = ruleMap.get(table);
-			ComplexShardingStrategyConfiguration strategyConfig = new ComplexShardingStrategyConfiguration("asset,created,id", new TableShardingByDateAsset());
-			tableRule.setTableShardingStrategyConfig(strategyConfig);
-		}
-	    
-		for(String table : this.symbolSubTableNames){
-			TableRuleConfiguration tableRule = ruleMap.get(table);
-			ComplexShardingStrategyConfiguration strategyConfig = new ComplexShardingStrategyConfiguration("asset,symbol,id,created,trade_time", new TableShardingByDateSymbol());
-			tableRule.setTableShardingStrategyConfig(strategyConfig);
+		//分表
+		Set<Entry<String, ExBaseShardingAlgorithm>> entrySet = this.algorithms.entrySet();
+		for(Entry<String, ExBaseShardingAlgorithm> entry : entrySet){
+			String tableName = entry.getKey();
+			ExBaseShardingAlgorithm algo = entry.getValue();
+			TableRuleConfiguration tableRule = ruleMap.get(tableName);
+			tableRule.setTableShardingStrategyConfig(new ComplexShardingStrategyConfiguration(algo.getShardingColumns(), algo));
 		}
 
 		return shardingRuleConfig;
+	}
+
+	public void setTableInfoCache(TableInfoCache tableInfoCache) {
+		this.tableInfoCache = tableInfoCache;
 	}
 	
 }
