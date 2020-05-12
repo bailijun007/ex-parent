@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Scope;
 import java.util.Properties;
 
 
-@Configuration
+//@Configuration
 public class DbCommonConfig {
     @Value("${mybatis.configuration.cache-enabled}")
     private Boolean cacheEnabled;

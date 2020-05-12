@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 /**
  * @author BaiLiJun  on 2020/5/8
  */
-@Configuration
+//@Configuration
 @MapperScan(basePackages = MasterDataSourceConfig.PACKAGE, sqlSessionFactoryRef = "masterSqlSessionFactory")
 public class MasterDataSourceConfig {
     private final static Logger LOGGER = LoggerFactory.getLogger(MasterDataSourceConfig.class);

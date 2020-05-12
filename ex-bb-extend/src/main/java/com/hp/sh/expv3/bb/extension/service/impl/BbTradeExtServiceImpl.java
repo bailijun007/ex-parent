@@ -3,9 +3,11 @@ package com.hp.sh.expv3.bb.extension.service.impl;
 import com.hp.sh.expv3.bb.extension.dao.BbTradeExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbTradeExtService;
 import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
+import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +49,11 @@ public class BbTradeExtServiceImpl implements BbTradeExtService {
         map.put("symbol",symbol);
         map.put("orderBy","trade_time");
         map.put("limit",count);
-        return bbTradeExtMapper.queryLastTrade(map);
+         List<BbTradeVo> list = bbTradeExtMapper.queryLastTrade(map);
+        if(CollectionUtils.isEmpty(list)){
+            return Lists.emptyList();
+        }
+        return list;
     }
 
 //    @Override

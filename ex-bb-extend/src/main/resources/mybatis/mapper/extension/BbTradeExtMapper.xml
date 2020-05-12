@@ -25,8 +25,8 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-		id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,tk_close_flag,mk_account_id,
-		mk_order_id,mk_close_flag,price,`number`,trade_time,maker_handle_status,taker_handle_status,created,modified
+		id,asset,symbol,match_tx_id,tk_bid_flag,tk_account_id,tk_order_id,mk_account_id,
+		mk_order_id,price,`number`,trade_time,maker_handle_status,taker_handle_status,created,modified
 
     </sql>
 
