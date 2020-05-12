@@ -73,7 +73,6 @@ public class MsgShardHandler {
 	}
 
 	void doHandlePending(Long shardId) {
-		Long offsetId = this.offsetService.getCachedShardOffset(shardId);
 		while(true){
 			List<BBMessageExt> shardMsgList = this.msgService.findFirstList(batchNum, shardId, null);
 			if(shardMsgList==null || shardMsgList.isEmpty()){
@@ -86,54 +85,48 @@ public class MsgShardHandler {
 			for(Entry<Long, List<BBMessageExt>> entry : entrySet){
 				Long userId = entry.getKey();
 				List<BBMessageExt> userMsgList = entry.getValue();
-				Long curOffsetId = this.handleUserMsgList(shardId, userId, userMsgList);
-				if(curOffsetId!=null){
-					offsetId = curOffsetId;
-				}
+				this.handleUserMsgList(shardId, userId, userMsgList);
 			}
 			
 		}
-		this.offsetService.cacheShardOffset(shardId, offsetId);
 	}
 	
 	private Long handleUserMsgList(Long shardId, Long userId, List<BBMessageExt> userMsgList){
 		Long offsetId = null;
-		while(true){
-			try{
-				long time1 = System.currentTimeMillis();
-				logger.info("批量处理用户消息：shardId={}, threadName={}, userId={}, size={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size());
-				self.handleBatch(userId, userMsgList);
-				offsetId = userMsgList.get(userMsgList.size()-1).getId();
-				long time2 = System.currentTimeMillis();
-				long time = time2 - time1;
-				if(time>1000){
-					logger.warn("批量处理用户消息成功：shardId={}, threadName={}, userId={}, size={}, time={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size(), time);
-				}else{
-					logger.info("批量处理用户消息成功：shardId={}, threadName={}, userId={}, size={}, time={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size(), time);
+		try{
+			long time1 = System.currentTimeMillis();
+			logger.info("批量处理用户消息：shardId={}, threadName={}, userId={}, size={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size());
+			self.handleBatch(userId, userMsgList);
+			offsetId = userMsgList.get(userMsgList.size()-1).getId();
+			long time2 = System.currentTimeMillis();
+			long time = time2 - time1;
+			if(time>1000){
+				logger.warn("批量处理用户消息成功：shardId={}, threadName={}, userId={}, size={}, time={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size(), time);
+			}else{
+				logger.info("批量处理用户消息成功：shardId={}, threadName={}, userId={}, size={}, time={}", shardId, Thread.currentThread().getName(), userId, userMsgList.size(), time);
+			}
+		}catch(Exception e1){
+			Exception cause = (Exception) ExceptionUtils.getCause(e1);
+			logger.error("批量处理用户消息失败:{},{}", e1.getMessage(), cause.toString(), e1);
+			if(isResendException(e1)){
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException te) {
+					logger.error(te.getMessage(), te);
 				}
-				break;
-			}catch(Exception e){
-				Exception cause = (Exception) ExceptionUtils.getCause(e);
-				logger.error("批量处理用户消息失败:{},{}", e.getMessage(), cause.toString(), e);
-				if(isResendException(e)){
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-					continue;
-				}else{
-					for(BBMessageExt msgExt : userMsgList){
-						self.handleMsgAndErr(msgExt.getUserId(), msgExt);
-						offsetId = msgExt.getId();
-					}
-					break;
-				}
+			}else{
+				self.handleMsgAndErr(userId, userMsgList);
 			}
 		}
 		return offsetId;
 	}
 	
+	public void handleMsgAndErr(Long userId, List<BBMessageExt> userMsgList) {
+		for(BBMessageExt msgExt: userMsgList){
+			this.handleMsgAndErr(userId, msgExt);
+		}
+	}
+
 	@LockIt(key="U-${userId}")
 	@Transactional(rollbackFor=Exception.class)
 	public void handleBatch(Long userId, List<BBMessageExt> userMsgList) {
@@ -146,7 +139,7 @@ public class MsgShardHandler {
 	@Transactional(rollbackFor=Exception.class)
 	public void handleMsgAndErr(Long userId, BBMessageExt msgExt){
 		Long errMsgId = self.getErrorMsgId(msgExt.getKeys());
-		if(errMsgId!=null && msgExt.getId()>errMsgId){
+		if(errMsgId!=null && msgExt.getId() > errMsgId){
 			this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, "前面存在未处理的消息:"+errMsgId);
 		}else{
 			logger.info("处理单个消息，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId());
@@ -155,7 +148,7 @@ public class MsgShardHandler {
 				logger.info("处理单个消息成功，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId());
 			}catch(Exception e){
 				self.saveErrorMsgId(msgExt.getKeys(), msgExt.getId());
-				logger.info("处理单个消息失败，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId(), e);
+				logger.error("处理单个消息失败，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId(), e);
 				this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, e.getMessage());
 			}
 			
