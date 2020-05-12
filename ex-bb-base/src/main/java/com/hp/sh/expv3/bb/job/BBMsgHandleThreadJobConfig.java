@@ -52,7 +52,7 @@ public class BBMsgHandleThreadJobConfig{
 		thread.trigger();
 	}
 	
-	@Scheduled(cron = "0/30 * * * * ?")
+	@Scheduled(cron = "0/10 * * * * ?")
 	public void timer() {
 		for(MsgShardHandlerThread thread : threadMap.values()){
 			thread.trigger();

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hp.sh.expv3.bb.job.MsgShardHandler;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.module.msg.service.BBMessageExtService;
-import com.hp.sh.expv3.bb.module.msg.service.BBMessageOffsetService;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -23,9 +22,6 @@ public class ExpPerformAction {
 
 	@Autowired
 	private BBMessageExtService msgService;
-	
-	@Autowired
-	private BBMessageOffsetService offsetService;
 	
 	@ApiOperation(value = "")
 	@GetMapping(value = "/oneShard")
