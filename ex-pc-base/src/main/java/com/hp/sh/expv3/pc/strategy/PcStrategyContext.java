@@ -322,7 +322,7 @@ public class PcStrategyContext {
 	public BigDecimal calPosMarginRatio(PosData pos, BigDecimal floatingPnl){
 		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
 		if(markPrice==null){
-			return BigDecimal.ONE;
+			markPrice = pos.getMeanPrice();
 		}
 		return this.calPosMarginRatio(pos, floatingPnl, markPrice);
 	}
