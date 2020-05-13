@@ -10,8 +10,6 @@ import java.util.concurrent.locks.Lock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +52,9 @@ public class MsgShardHandler {
 	
 	@Autowired
 	private RedissonDistributedLocker locker;
+	
+	@Autowired
+	private ErrorMsgCache errorMsgCache;
 
 	private int batchNum = 600;
 	
@@ -138,16 +139,19 @@ public class MsgShardHandler {
 	@LockIt(key="U-${userId}")
 	@Transactional(rollbackFor=Exception.class)
 	public void handleMsgAndErr(Long userId, BBMessageExt msgExt){
-		Long errMsgId = self.getErrorMsgId(msgExt.getKeys());
+		Long errMsgId = errorMsgCache.getErrorMsgIdCache(msgExt.getKeys());
 		if(errMsgId!=null && msgExt.getId() > errMsgId){
 			this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, "前面存在未处理的消息:"+errMsgId);
 		}else{
 			logger.info("处理单个消息，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId());
 			try{
 				this.handleMsg(msgExt);
+				if(errMsgId!=null){
+					errorMsgCache.evictErrorMsgIdCache(msgExt.getKeys());
+				}
 				logger.info("处理单个消息成功，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId());
 			}catch(Exception e){
-				self.saveErrorMsgId(msgExt.getKeys(), msgExt.getId());
+				errorMsgCache.saveErrorMsgIdCache(msgExt.getKeys(), msgExt.getId());
 				logger.error("处理单个消息失败，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId(), e);
 				this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, e.getMessage());
 			}
@@ -170,16 +174,6 @@ public class MsgShardHandler {
 			throw new RuntimeException("位置的tag类型!!! : " + msgExt.getTags());
 		}
 		msgService.delete(msgExt.getUserId(), msgExt.getId());
-	}
-	
-	@CachePut(cacheNames="errorMsg", key="#orderId")
-	public Long saveErrorMsgId(Object orderId, Long msgId){
-		return msgId;
-	}
-
-	@Cacheable(cacheNames="errorMsg", key="#orderId")
-	public Long getErrorMsgId(Object orderId){
-		return null;
 	}
 	
 	private boolean isResendException(Exception e){
