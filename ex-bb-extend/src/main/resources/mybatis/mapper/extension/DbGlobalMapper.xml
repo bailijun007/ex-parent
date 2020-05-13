@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.bb.extension.sys.dao.DbGlobalDAO">
+
+	<select id="findTableName" resultType="string">
+		select table_name 
+			from information_schema.tables 
+		<where> 
+			<if test="dbName!=null and dbName!=''">
+			 and table_schema=#{dbName}
+			</if>
+			and table_name=#{tableName}
+		</where>
+		order by table_name desc
+	</select>
+	
+	<select id="findTableByKeyword" resultType="string">
+		select table_name 
+			from information_schema.tables 
+		<where> 
+			<if test="dbName!=null and dbName!=''">
+			 and table_schema=#{dbName}
+			</if>
+			and table_name like CONCAT('',#{keyword},'%')
+			and right(table_name, 3)!='_sn'
+			and right(table_name, 3)!='_no'
+		</where>
+		order by table_name desc
+	</select>
+
+</mapper>
