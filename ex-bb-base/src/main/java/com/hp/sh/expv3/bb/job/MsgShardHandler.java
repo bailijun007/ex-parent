@@ -116,7 +116,7 @@ public class MsgShardHandler {
 					logger.error(te.getMessage(), te);
 				}
 			}else{
-				self.handleMsgAndErr(userId, userMsgList);
+				this.handleMsgAndErr(userId, userMsgList);
 			}
 		}
 		return offsetId;
@@ -124,7 +124,7 @@ public class MsgShardHandler {
 	
 	public void handleMsgAndErr(Long userId, List<BBMessageExt> userMsgList) {
 		for(BBMessageExt msgExt: userMsgList){
-			this.handleMsgAndErr(userId, msgExt);
+			self.handleMsgAndErr(userId, msgExt);
 		}
 	}
 
