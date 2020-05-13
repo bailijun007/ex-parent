@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gitee.hupadev.commons.date.DateUtils;
 import com.hp.sh.expv3.bb.component.MetadataService;
 import com.hp.sh.expv3.bb.component.vo.BBSymbolVO;
-import com.hp.sh.expv3.bb.module.sys.constant.LogicTable;
+import com.hp.sh.expv3.bb.constant.LogicTable;
 import com.hp.sh.expv3.bb.module.sys.dao.DbGlobalDAO;
 import com.hp.sh.expv3.commons.config.FileConfig;
 import com.hp.sh.expv3.component.dbshard.DateShardUtils;

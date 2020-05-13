@@ -75,7 +75,7 @@ public class MsgShardHandler {
 
 	void doHandlePending(Long shardId) {
 		while(true){
-			List<BBMessageExt> shardMsgList = this.msgService.findFirstList(batchNum, shardId, null);
+			List<BBMessageExt> shardMsgList = this.msgService.findFirstList(batchNum, shardId, null, null);
 			if(shardMsgList==null || shardMsgList.isEmpty()){
 				break;
 			}

@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.module.sys.constant;
+package com.hp.sh.expv3.bb.constant;
 
 public class LogicTable {
 
