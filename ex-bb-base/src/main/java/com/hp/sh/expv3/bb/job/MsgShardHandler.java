@@ -21,7 +21,6 @@ import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.module.msg.service.BBMessageExtService;
-import com.hp.sh.expv3.bb.module.msg.service.BBMessageOffsetService;
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
@@ -43,9 +42,6 @@ public class MsgShardHandler {
 	
 	@Autowired
 	private BBMessageExtService msgService;
-	
-	@Autowired
-	private BBMessageOffsetService offsetService;
 	
 	@Autowired
 	private MsgShardHandler self;
@@ -168,8 +164,8 @@ public class MsgShardHandler {
 			BBCancelledMsg cancelMsg = JsonUtils.toObject(msgExt.getMsgBody(), BBCancelledMsg.class);
 			this.orderService.setCancelled(cancelMsg.getAccountId(), cancelMsg.getAsset(), cancelMsg.getSymbol(), cancelMsg.getOrderId());
 		}else if(msgExt.getTags().equals(MqTags.TAGS_NOT_MATCHED)){
-			BBNotMatchMsg cancelMsg = JsonUtils.toObject(msgExt.getMsgBody(), BBNotMatchMsg.class);
-			orderService.setNewStatus(cancelMsg.getAccountId(), cancelMsg.getAsset(), cancelMsg.getSymbol(), cancelMsg.getOrderId());
+			BBNotMatchMsg notMatched = JsonUtils.toObject(msgExt.getMsgBody(), BBNotMatchMsg.class);
+			orderService.setNewStatus(notMatched.getAccountId(), notMatched.getAsset(), notMatched.getSymbol(), notMatched.getOrderId());
 		}else{
 			throw new RuntimeException("位置的tag类型!!! : " + msgExt.getTags());
 		}

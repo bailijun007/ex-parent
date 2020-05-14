@@ -7,7 +7,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
-@CacheConfig(cacheNames="pcErrorMsg")
+@CacheConfig(cacheNames="bbErrorMsg")
 public class ErrorMsgCache {
     @CachePut(key="#orderId")
 	public Long saveErrorMsgIdCache(Object orderId, Long msgId){
