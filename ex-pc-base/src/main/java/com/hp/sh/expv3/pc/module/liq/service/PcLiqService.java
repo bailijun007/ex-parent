@@ -148,7 +148,7 @@ public class PcLiqService {
 	}
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list, Integer lastFlag) {
+	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list, Integer lastFlag, BigDecimal liqMarkPrice) {
 		PcPosition pos = this.positionDataService.getPosition(userId, asset, symbol, posId);
 		
 		if(pos==null){
@@ -166,10 +166,8 @@ public class PcLiqService {
 			return;
 		}
 		
-		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
-		
 		//检查触发强平
-		if(!this.checkAndResetLiqStatus(pos, markPrice)){
+		if(!this.checkAndResetLiqStatus(pos, liqMarkPrice)){
 			return;
 		}
 		
