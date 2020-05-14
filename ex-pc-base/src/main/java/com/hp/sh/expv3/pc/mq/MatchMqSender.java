@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.pc.constant.MqTags;
 import com.hp.sh.expv3.pc.constant.MqTopic;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
-import com.hp.sh.expv3.pc.mq.liq.msg.LiqLockMsg;
-import com.hp.sh.expv3.pc.mq.match.msg.BookResetMsg;
-import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
-import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingNewMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.BookResetMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.OrderPendingCancelMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.OrderPendingNewMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.liq.LiqLockMsg;
 import com.hp.sh.expv3.utils.BidUtils;
 
 @Component

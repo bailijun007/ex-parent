@@ -31,7 +31,7 @@ import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 import com.hp.sh.expv3.pc.constant.MqTags;
 import com.hp.sh.expv3.pc.constant.MqTopic;
-import com.hp.sh.expv3.pc.mq.match.MatchMqConsumer;
+import com.hp.sh.expv3.pc.mq.consumer.PcMqConsumer;
 import com.hp.sh.rocketmq.config.RocketmqServerSetting;
 import com.hp.sh.rocketmq.impl.EndpointContext;
 
@@ -120,7 +120,7 @@ public class PcOrderlyConsumer {
         				return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         			}
         		}catch(Exception e){
-        			if(MatchMqConsumer.isResendException(e)){
+        			if(PcMqConsumer.isResendException(e)){
         				Throwable cause = ExceptionUtils.getRootCause(e);
         				logger.error("未捕获异常 Cause, {}", cause.toString());
         			}else{

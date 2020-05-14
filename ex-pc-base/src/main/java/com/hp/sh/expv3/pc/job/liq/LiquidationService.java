@@ -28,7 +28,7 @@ import com.hp.sh.expv3.pc.module.position.service.PcTradeService;
 import com.hp.sh.expv3.pc.module.position.vo.PosUID;
 import com.hp.sh.expv3.pc.module.riskfund.service.PcRiskfundCoreService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
-import com.hp.sh.expv3.pc.mq.liq.msg.LiqLockMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.liq.LiqLockMsg;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.vo.LiqHandleResult;
 import com.hp.sh.expv3.pc.vo.request.RiskFundRequest;
