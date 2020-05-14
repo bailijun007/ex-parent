@@ -2,8 +2,6 @@ package com.hp.sh.expv3.pc.mq.consumer.msg;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
-
 /**
  * 新订单消息
  * @author lw

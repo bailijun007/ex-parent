@@ -369,7 +369,7 @@ public class PcOrderService {
 	}
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void cancel(long userId, String asset, String symbol, long orderId, BigDecimal number){
+	public void setCancelled(long userId, String asset, String symbol, long orderId, BigDecimal number){
 		this.doCancel(userId, asset, symbol, orderId, number);
 	}
 	
