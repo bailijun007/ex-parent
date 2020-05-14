@@ -178,32 +178,33 @@ public class PcLiqService {
 		
 		//强平
 		if(IntBool.isTrue(lastFlag)){
-			this.doLiq(pos);
+			this.doLiq(pos, liqMarkPrice);
 		}
 	}
 	
     @LockIt(key="${pos.userId}-${pos.asset}-${pos.symbol}")
-	public void forceClose(PcPosition pos) {
-    	this.doLiq(pos);
+	public void forceClose(PcPosition pos, BigDecimal liqMarkPrice) {
+    	this.doLiq(pos, liqMarkPrice);
     }
 	
-	private void doLiq(PcPosition pos){
+	private void doLiq(PcPosition pos, BigDecimal liqMarkPrice){
 		Long now = DbDateUtils.now();
 		//1、保存强平记录
 		this.saveLiqRecord(pos, now);
 		//2、清空仓位
-		this.clearLiqPos(pos, now);
+		this.clearLiqPos(pos, liqMarkPrice, now);
 		
 		//3、创建强平委托
 		//this.createLiqOrder(record);
 	}
 	
-	private void clearLiqPos(PcPosition pos, Long now){
+	private void clearLiqPos(PcPosition pos, BigDecimal liqMarkPrice, Long now){
 		pos.setVolume(BigDecimal.ZERO);
 		pos.setCloseFee(BigDecimal.ZERO);
 		pos.setPosMargin(BigDecimal.ZERO);
 		pos.setLiqStatus(LiqStatus.FORCE_CLOSE);
 		pos.setModified(now);
+		pos.setLiqMarkPrice(liqMarkPrice);
 		positionDataService.update(pos);
 	}
 	

@@ -477,6 +477,9 @@ public class PcTradeService {
 	private PcCollectorCoreService collectorCoreService;
 
 	public void synchCollector(PcOrderTrade orderTrade){
+		if(BigUtils.isZero(orderTrade.getFee())){
+			return ;
+		}
 		if(BigUtils.gtZero(orderTrade.getFee())){
 			CollectorAddRequest request = new CollectorAddRequest();
 			request.setAmount(orderTrade.getFee());

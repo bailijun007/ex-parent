@@ -173,7 +173,8 @@ public class MaintainAction{
 	@GetMapping(value = "/api/pc/maintain/liq/forceClose")
 	public void forceClose(Long userId, String asset, String symbol, Long posId){
 		PcPosition pos = this.positionDataService.getPosition(userId, posId);
-		liqService.forceClose(pos);
+		BigDecimal liqMarkPrice = this.markPriceService.getCurrentMarkPrice(asset, symbol);
+		liqService.forceClose(pos, liqMarkPrice);
 	}
 	
 }
