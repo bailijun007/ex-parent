@@ -15,8 +15,8 @@ import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.bb.module.trade.service.BBMatchedTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.bb.strategy.vo.BBTradePair;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.component.executor.AbstractGroupTask;
 import com.hp.sh.expv3.dev.LimitTimeHandle;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -69,13 +69,13 @@ public class BBMatchedHandler {
 		
 		// MAKER
 		if(matchedTrade.getMakerHandleStatus()==BBMatchedTrade.NO){
-			BBTradeVo tradeVo = tradePair.getMakerTradeVo();
+			BBTradeMsg tradeVo = tradePair.getMakerTradeVo();
 			this.tradeExecutors.submit(new TradeTask(tradeVo));
 		}
 		
 		// TAKER
 		if(matchedTrade.getTakerHandleStatus()==BBMatchedTrade.NO){
-			BBTradeVo tradeVo = tradePair.getTakerTradeVo();
+			BBTradeMsg tradeVo = tradePair.getTakerTradeVo();
 			this.tradeExecutors.submit(new TradeTask(tradeVo));
 		}
 		
@@ -87,7 +87,7 @@ public class BBMatchedHandler {
 	
 	private BBTradePair getTradePair(BBMatchedTrade matchedTrade){
 		// MAKER
-		BBTradeVo makerTradeVo = new BBTradeVo();
+		BBTradeMsg makerTradeVo = new BBTradeMsg();
 		makerTradeVo.setTradeId(matchedTrade.getId());
 		makerTradeVo.setMakerFlag(TradeRoles.MAKER);
 		makerTradeVo.setAsset(matchedTrade.getAsset());
@@ -103,7 +103,7 @@ public class BBMatchedHandler {
 		makerTradeVo.setOpponentOrderId(matchedTrade.getTkOrderId());
 
 		// TAKER
-		BBTradeVo takerTradeVo = new BBTradeVo();
+		BBTradeMsg takerTradeVo = new BBTradeMsg();
 		takerTradeVo.setTradeId(matchedTrade.getId());
 		takerTradeVo.setMakerFlag(TradeRoles.TAKER);
 		takerTradeVo.setAsset(matchedTrade.getAsset());
@@ -123,9 +123,9 @@ public class BBMatchedHandler {
 
 	class TradeTask extends AbstractGroupTask{
 
-		private BBTradeVo tradeVo;
+		private BBTradeMsg tradeVo;
 		
-		public TradeTask(BBTradeVo tradeVo) {
+		public TradeTask(BBTradeMsg tradeVo) {
 			this.tradeVo = tradeVo;
 		}
 		

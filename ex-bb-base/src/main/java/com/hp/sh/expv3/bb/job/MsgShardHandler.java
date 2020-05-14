@@ -26,7 +26,7 @@ import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.component.lock.impl.RedissonDistributedLocker;
@@ -162,7 +162,7 @@ public class MsgShardHandler {
 	
 	private void handleMsg(BBMessageExt msgExt){
 		if(msgExt.getTags().equals(MqTags.TAGS_TRADE)){
-			BBTradeVo tradeMsg = JsonUtils.toObject(msgExt.getMsgBody(), BBTradeVo.class);
+			BBTradeMsg tradeMsg = JsonUtils.toObject(msgExt.getMsgBody(), BBTradeMsg.class);
 			this.tradeService.handleTrade(tradeMsg);
 		}else if(msgExt.getTags().equals(MqTags.TAGS_CANCELLED)){
 			BBCancelledMsg cancelMsg = JsonUtils.toObject(msgExt.getMsgBody(), BBCancelledMsg.class);

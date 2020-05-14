@@ -14,7 +14,7 @@ import com.hp.sh.expv3.bb.job.MsgShardHandler;
 import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.module.msg.service.BBMessageOffsetService;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -49,7 +49,7 @@ public class TestAction2 {
 		
 		long time = System.currentTimeMillis();
 		for(int i=0;i<10000;i++){
-			BBTradeVo msg = getBBTradeVo();
+			BBTradeMsg msg = getBBTradeVo();
 			msgService.save(tag, msg, ext);
 		}
 		
@@ -63,7 +63,7 @@ public class TestAction2 {
 		String tag="test";
 		String ext="test";
 		
-		BBTradeVo msg = getBBTradeVo();
+		BBTradeMsg msg = getBBTradeVo();
 		long time = System.currentTimeMillis();
 		Thread[] ta = new Thread[100];
 		for(int i=0;i<100;i++){
@@ -94,7 +94,7 @@ public class TestAction2 {
 		FileWriter out = new FileWriter("e:\\wal.txt", true);
 		long time = System.currentTimeMillis();
 		for(int i=0;i<10000;i++){
-			BBTradeVo msg = getBBTradeVo();
+			BBTradeMsg msg = getBBTradeVo();
 			BBMqMsg msgEntity = this.getBBMqMsg(msg);
 			String json = JsonUtils.toJson(msgEntity);
 			out.write(json);
@@ -120,7 +120,7 @@ public class TestAction2 {
 		return 0L;
 	}
 	
-	private BBMqMsg getBBMqMsg(BBTradeVo msg){
+	private BBMqMsg getBBMqMsg(BBTradeMsg msg){
 		BBMqMsg msgEntity = new BBMqMsg();
 		msgEntity.setUserId(msg.getAccountId());
 		
@@ -138,8 +138,8 @@ public class TestAction2 {
 		return msgEntity;
 	}
 
-	private BBTradeVo getBBTradeVo(){
-		BBTradeVo msg = new BBTradeVo();
+	private BBTradeMsg getBBTradeVo(){
+		BBTradeMsg msg = new BBTradeMsg();
 		msg.setAccountId(1L);
 		msg.setAsset("USDT");
 		msg.setKeys("1234567890");

@@ -15,8 +15,8 @@ import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.msg.dao.BBMessageExtDAO;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.config.shard.ShardGroup;
 import com.hp.sh.expv3.utils.DbDateUtils;
@@ -65,7 +65,7 @@ public class BBMessageExtService{
 		return msgEntity;
 	}
 
-	public BBMessageExt saveTradeMsg(String tags, BBTradeVo msg, String exMessage) {
+	public BBMessageExt saveTradeMsg(String tags, BBTradeMsg msg, String exMessage) {
 		exMessage = this.cutExMsg(exMessage);
 		
 		BBMessageExt msgEntity = new BBMessageExt();

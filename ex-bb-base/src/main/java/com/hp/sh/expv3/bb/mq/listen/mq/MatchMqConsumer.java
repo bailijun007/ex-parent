@@ -12,11 +12,9 @@ import com.gitee.hupadev.base.exceptions.ExceptionUtils;
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
-import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
-import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
@@ -64,7 +62,7 @@ public class MatchMqConsumer {
 	
 	//成交
 	@MQListener(tags=MqTags.TAGS_TRADE)
-	public void handleTradeMsg(BBTradeVo msg){
+	public void handleTradeMsg(BBTradeMsg msg){
 		logger.info("收到用户成交消息:{}", msg);
 		try{
 			this.mqHandler.handleTrade(msg);

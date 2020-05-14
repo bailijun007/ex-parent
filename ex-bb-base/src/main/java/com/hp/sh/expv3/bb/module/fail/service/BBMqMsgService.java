@@ -15,7 +15,7 @@ import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.fail.dao.BBMqMsgDAO;
 import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
@@ -39,7 +39,7 @@ public class BBMqMsgService{
 	}
 
 	@LockIt(key="mm-${msg.accountId}-${msg.orderId}")
-	public void save(String tag, BBTradeVo msg, String exMessage) {
+	public void save(String tag, BBTradeMsg msg, String exMessage) {
 		
 		if(exMessage!=null && exMessage.length()>1500){
 			exMessage = exMessage.substring(0, 1500);

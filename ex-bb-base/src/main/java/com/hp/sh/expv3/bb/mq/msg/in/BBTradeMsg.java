@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.strategy.vo;
+package com.hp.sh.expv3.bb.mq.msg.in;
 
 import java.math.BigDecimal;
 
@@ -9,7 +9,7 @@ import com.hp.sh.expv3.bb.mq.msg.BaseSymbolMsg;
  * @author wangjg
  *
  */
-public class BBTradeVo extends BaseSymbolMsg{
+public class BBTradeMsg extends BaseSymbolMsg{
 
 	//用户ID
 	private Long accountId;
@@ -38,10 +38,10 @@ public class BBTradeVo extends BaseSymbolMsg{
 	//对手订单ID
 	private Long opponentOrderId;
 
-	public BBTradeVo() {
+	public BBTradeMsg() {
 	}
 
-	public BBTradeVo(String asset, String symbol, Long tradeId) {
+	public BBTradeMsg(String asset, String symbol, Long tradeId) {
 		this.tradeId = tradeId;
 	}
 	
@@ -123,7 +123,7 @@ public class BBTradeVo extends BaseSymbolMsg{
 
 	@Override
 	public String toString() {
-		return "BBTradeVo [asset=" + asset + ", symbol=" + symbol + ", accountId=" + accountId + ", price=" + price
+		return "BBTradeMsg [asset=" + asset + ", symbol=" + symbol + ", accountId=" + accountId + ", price=" + price
 				+ ", number=" + number + ", orderId=" + orderId + ", tradeId=" + tradeId + ", tradeTime=" + tradeTime
 				+ ", makerFlag=" + makerFlag + ", matchTxId=" + matchTxId + ", opponentOrderId=" + opponentOrderId
 				+ ", topic=" + topic + ", tags=" + tags + ", keys=" + keys + ", msgId=" + msgId + "]";

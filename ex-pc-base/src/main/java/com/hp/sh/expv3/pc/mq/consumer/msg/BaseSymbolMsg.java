@@ -1,6 +1,8 @@
-package com.hp.sh.expv3.pc.msg;
+package com.hp.sh.expv3.pc.mq.consumer.msg;
 
-public class BaseSymbolMsg {
+import com.hp.sh.rocketmq.msg.AbstractRocketMsg;
+
+public class BaseSymbolMsg extends AbstractRocketMsg{
 
 	//资产
 	protected String asset;

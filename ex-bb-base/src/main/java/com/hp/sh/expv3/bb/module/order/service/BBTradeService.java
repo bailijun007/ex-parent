@@ -21,8 +21,8 @@ import com.hp.sh.expv3.bb.module.order.dao.BBOrderTradeDAO;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.order.vo.BBSymbol;
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.bb.strategy.vo.TradeResult;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;
 import com.hp.sh.expv3.bb.vo.request.CollectorAddRequest;
@@ -65,7 +65,7 @@ public class BBTradeService {
     private ApplicationEventPublisher publisher;
 	
 	//处理成交订单
-	public void handleTrade(BBTradeVo msg){
+	public void handleTrade(BBTradeMsg msg){
 		BBOrder order = this.orderQueryService.getOrder(msg.getAccountId(), msg.getOrderId());
 		boolean yes = this.canTrade(order, msg);
 		if(!yes){
@@ -202,7 +202,7 @@ public class BBTradeService {
 		
 	}
 
-	private BBOrderTrade saveOrderTrade(BBTradeVo tradeMsg, BBOrder order, TradeResult tradeResult, Long now) {
+	private BBOrderTrade saveOrderTrade(BBTradeMsg tradeMsg, BBOrder order, TradeResult tradeResult, Long now) {
 		BBOrderTrade orderTrade = new BBOrderTrade();
 
 		orderTrade.setId(null);
@@ -259,7 +259,7 @@ public class BBTradeService {
 	}
 
 	//检查订单状态
-	private boolean canTrade1(BBOrder order, BBTradeVo tradeMsg) {
+	private boolean canTrade1(BBOrder order, BBTradeMsg tradeMsg) {
 		if(order==null){
 			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
 		}
@@ -278,7 +278,7 @@ public class BBTradeService {
 	}
 	
 	//检查订单状态
-	private boolean canTrade(BBOrder order, BBTradeVo tradeMsg) {
+	private boolean canTrade(BBOrder order, BBTradeMsg tradeMsg) {
 		if(order==null){
 			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
 		}
