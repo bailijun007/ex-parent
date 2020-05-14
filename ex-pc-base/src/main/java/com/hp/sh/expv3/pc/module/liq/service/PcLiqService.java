@@ -47,10 +47,10 @@ public class PcLiqService {
     private PcPositionDataService positionDataService;
 
     @Autowired
-    private PcOrderService pcOrderService;
+    private PcOrderService orderService;
     
     @Autowired
-    private PcPositionMarginService pcPositionMarginService;
+    private PcPositionMarginService positionMarginService;
     
     @Autowired
     private PcStrategyContext strategyContext;
@@ -59,7 +59,7 @@ public class PcLiqService {
     private MarkPriceService markPriceService;
     
     @Autowired
-    private PcLiqRecordDAO pcLiqRecordDAO;
+    private PcLiqRecordDAO liqRecordDAO;
     
 	@Autowired
 	private FeeRatioService feeRatioService;
@@ -69,6 +69,11 @@ public class PcLiqService {
 
     @LockIt(key="${pos.userId}-${pos.asset}-${pos.symbol}")
 	public LiqHandleResult checkPosLiq(PosUID pos) {
+    	BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
+    	if(markPrice==null){
+    		throw new RuntimeException("标记价格不存在：symbol="+pos.getSymbol());
+    	}
+    	
     	PcPosition pcPosition = this.positionDataService.getPosition(pos.getUserId(), pos.getId());
 		LiqHandleResult liqResult = new LiqHandleResult();
 		
@@ -76,7 +81,6 @@ public class PcLiqService {
     		return liqResult;
     	}
 		
-		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pcPosition.getAsset(), pcPosition.getSymbol());
 		//检查触发强平
 		if(!this.checkAndResetLiqStatus(pcPosition, markPrice)){
 			return liqResult;
@@ -84,7 +88,7 @@ public class PcLiqService {
 		
 		//追加保证金
 		if(pcPosition.getAutoAddFlag()==IntBool.YES){
-			this.pcPositionMarginService.autoAddMargin(pcPosition);
+			this.positionMarginService.autoAddMargin(pcPosition);
 		}
 		
 		//检查触发强平
@@ -173,7 +177,7 @@ public class PcLiqService {
 		
 		//取消订单
 		for(CancelOrder co : list){
-			this.pcOrderService.cance4Liq(userId, asset, symbol, co.getOrderId(), co.getCancelNumber());
+			this.orderService.cance4Liq(userId, asset, symbol, co.getOrderId(), co.getCancelNumber());
 		}
 		
 		//强平
@@ -233,7 +237,7 @@ public class PcLiqService {
 		record.setFeeRatio(feeRatioService.getTakerFeeRatio(pos.getUserId(), pos.getAsset(), pos.getSymbol()));
 		
 		//save
-		pcLiqRecordDAO.save(record);
+		liqRecordDAO.save(record);
 		publisher.publishEvent(record);
 		return record;
 	}
@@ -242,11 +246,11 @@ public class PcLiqService {
 	@LockIt(key="${record.userId}-${record.asset}-${record.symbol}")
 	public PcOrder createLiqOrder(PcLiqRecord record){
 		PcPosition pos = positionDataService.getPosition(record.getUserId(), record.getAsset(), record.getSymbol(), record.getPosId());
-		PcOrder order = this.pcOrderService.createLiqOrder(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), record.getLongFlag(), record.getBankruptPrice(), record.getVolume(), pos);
+		PcOrder order = this.orderService.createLiqOrder(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), record.getLongFlag(), record.getBankruptPrice(), record.getVolume(), pos);
 		
 		record.setStatus(LiqRecordStatus.BANKRUPT_ORDER);
 		record.setModified(order.getModified());
-		this.pcLiqRecordDAO.update(record);
+		this.liqRecordDAO.update(record);
 		
 		PcOrderMsg msg = new PcOrderMsg(order);
 		this.publisher.publishEvent(msg);
