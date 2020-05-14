@@ -1,14 +1,16 @@
-package com.hp.sh.expv3.pc.msg;
+package com.hp.sh.expv3.bb.mq.msg.in;
 
 import java.math.BigDecimal;
+
+import com.hp.sh.expv3.bb.mq.msg.BaseSymbolMsg;
 
 /**
  * 撮合成功消息
  * @author wangjg
  *
  */
-public class PcTradeMsg extends BaseSymbolMsg {
-	
+public class BBTradeMsg extends BaseSymbolMsg{
+
 	//用户ID
 	private Long accountId;
 	
@@ -21,25 +23,27 @@ public class PcTradeMsg extends BaseSymbolMsg {
 	//订单Id
 	private Long orderId;
 
-	//是否maker
-	private Integer makerFlag;
-	
-	//对手订单ID
-	private Long opponentOrderId;
-
 	//交易ID
 	private Long tradeId;
 
 	//成交时间
 	private Long tradeTime;
+
+	//是否maker
+	private Integer makerFlag;
 	
 	//撮合事务Id
 	private Long matchTxId;
+	
+	//对手订单ID
+	private Long opponentOrderId;
+	
+    private Long seqId;
 
-	public PcTradeMsg() {
+	public BBTradeMsg() {
 	}
 
-	public PcTradeMsg(String asset, String symbol, Long tradeId) {
+	public BBTradeMsg(String asset, String symbol, Long tradeId) {
 		this.tradeId = tradeId;
 	}
 	
@@ -119,11 +123,20 @@ public class PcTradeMsg extends BaseSymbolMsg {
 		this.opponentOrderId = opponentOrderId;
 	}
 
+	public Long getSeqId() {
+		return seqId;
+	}
+
+	public void setSeqId(Long seqId) {
+		this.seqId = seqId;
+	}
+
 	@Override
 	public String toString() {
-		return "PcTradeMsg [accountId=" + accountId + ", price=" + price + ", number=" + number + ", orderId=" + orderId
-				+ ", tradeId=" + tradeId + ", tradeTime=" + tradeTime + ", makerFlag=" + makerFlag + ", matchTxId="
-				+ matchTxId + ", asset=" + asset + ", symbol=" + symbol + "]";
+		return "BBTradeMsg [asset=" + asset + ", symbol=" + symbol + ", accountId=" + accountId + ", price=" + price
+				+ ", number=" + number + ", orderId=" + orderId + ", tradeId=" + tradeId + ", tradeTime=" + tradeTime
+				+ ", makerFlag=" + makerFlag + ", matchTxId=" + matchTxId + ", opponentOrderId=" + opponentOrderId
+				+ ", topic=" + topic + ", tags=" + tags + ", keys=" + keys + ", msgId=" + msgId + "]";
 	}
 
 

@@ -59,7 +59,7 @@ public class PcOrderlyConsumer {
 	public void start123() throws MQClientException{
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 		
-		String subExpression = subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_PC_TRADE, MqTags.TAGS_ORDER_ALL_CANCELLED);
+		String subExpression = subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE, MqTags.TAGS_ORDER_ALL_CANCELLED);
 	
 		logger.debug("更新MQ监听,{},{},{},{}", pcList.size(), this.groupId, this.setting.getInstanceName(), subExpression);
 		

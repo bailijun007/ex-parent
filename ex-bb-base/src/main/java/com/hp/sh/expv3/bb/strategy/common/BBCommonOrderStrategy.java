@@ -10,10 +10,10 @@ import com.hp.sh.expv3.bb.component.FeeRatioService;
 import com.hp.sh.expv3.bb.constant.OrderFlag;
 import com.hp.sh.expv3.bb.constant.TradeRoles;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.bb.strategy.OrderStrategy;
 import com.hp.sh.expv3.bb.strategy.data.OrderFeeParam;
 import com.hp.sh.expv3.bb.strategy.data.OrderTrade;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.bb.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.bb.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.math.BigCalc;
@@ -96,7 +96,7 @@ public class BBCommonOrderStrategy implements OrderStrategy {
 	 * 计算本单的各项数据
 	 * @return
 	 */
-	public TradeResult calcTradeResult(BBTradeVo tradeVo, BBOrder order){
+	public TradeResult calcTradeResult(BBTradeMsg tradeVo, BBOrder order){
 		long userId = order.getUserId();
 		String asset = order.getAsset();
 		String symbol = order.getSymbol();

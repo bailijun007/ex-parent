@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.mq.starter.test;
+package com.hp.sh.expv3.config.redis.test;
 
 import java.util.ArrayList;
 import java.util.HashSet;

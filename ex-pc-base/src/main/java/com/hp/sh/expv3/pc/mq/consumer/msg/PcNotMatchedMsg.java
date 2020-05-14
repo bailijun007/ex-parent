@@ -1,18 +1,16 @@
 package com.hp.sh.expv3.pc.mq.consumer.msg;
 
-import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
-
 /**
  * 未匹配
  * @author lw
  *
  */
-public class MatchNotMatchMsg extends BaseSymbolMsg{
+public class PcNotMatchedMsg extends BaseSymbolMsg{
 
 	private Long accountId;
 	private Long orderId;
 	
-	public MatchNotMatchMsg() {
+	public PcNotMatchedMsg() {
 	}
 
 	public Long getAccountId() {
@@ -33,7 +31,7 @@ public class MatchNotMatchMsg extends BaseSymbolMsg{
 
 	@Override
 	public String toString() {
-		return "MatchNotMatchMsg [accountId=" + accountId + ", orderId=" + orderId + ", asset=" + asset + ", symbol="
+		return "PcNotMatchedMsg [accountId=" + accountId + ", orderId=" + orderId + ", asset=" + asset + ", symbol="
 				+ symbol + "]";
 	}
 

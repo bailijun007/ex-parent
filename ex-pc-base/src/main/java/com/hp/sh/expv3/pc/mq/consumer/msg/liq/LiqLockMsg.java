@@ -2,7 +2,7 @@ package com.hp.sh.expv3.pc.mq.consumer.msg.liq;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.BaseSymbolMsg;
 
 public class LiqLockMsg extends BaseSymbolMsg{
 

@@ -16,7 +16,7 @@ import com.hp.sh.expv3.pc.constant.OrderFlag;
 import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
-import com.hp.sh.expv3.pc.msg.PcTradeMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.data.OrderFeeParam;
 import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
 import com.hp.sh.expv3.pc.strategy.data.PosBaseData;

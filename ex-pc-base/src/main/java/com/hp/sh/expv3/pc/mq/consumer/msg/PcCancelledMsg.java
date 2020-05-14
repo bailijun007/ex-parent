@@ -2,19 +2,17 @@ package com.hp.sh.expv3.pc.mq.consumer.msg;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
-
 /**
  * 取消订单
  * @author lw
  *
  */
-public class MatchedOrderCancelledMsg extends BaseSymbolMsg{
+public class PcCancelledMsg extends BaseSymbolMsg{
 	private Long accountId;
 	private Long orderId;
 	private BigDecimal cancelNumber;
 	
-	public MatchedOrderCancelledMsg() {
+	public PcCancelledMsg() {
 	}
 
 	public Long getAccountId() {
@@ -43,7 +41,7 @@ public class MatchedOrderCancelledMsg extends BaseSymbolMsg{
 
 	@Override
 	public String toString() {
-		return "MatchedOrderCancelledMsg [accountId=" + accountId + ", orderId=" + orderId + ", cancelNumber="
+		return "PcCancelledMsg [accountId=" + accountId + ", orderId=" + orderId + ", cancelNumber="
 				+ cancelNumber + ", asset=" + asset + ", symbol=" + symbol + "]";
 	}
 

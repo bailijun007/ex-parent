@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.job;
+package com.hp.sh.expv3.pc.job.msghandler;
 
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -7,7 +7,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
-@CacheConfig(cacheNames="bbErrorMsg")
+@CacheConfig(cacheNames="pcErrorMsg")
 public class ErrorMsgCache {
     @CachePut(key="#orderId")
 	public Long saveErrorMsgIdCache(Object orderId, Long msgId){

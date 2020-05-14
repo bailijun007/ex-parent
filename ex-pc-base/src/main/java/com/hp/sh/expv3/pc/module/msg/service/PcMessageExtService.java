@@ -1,5 +1,5 @@
 
-package com.hp.sh.expv3.bb.module.msg.service;
+package com.hp.sh.expv3.pc.module.msg.service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,14 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.gitee.hupadev.commons.page.Page;
-import com.hp.sh.expv3.bb.constant.MqTags;
-import com.hp.sh.expv3.bb.module.msg.dao.BBMessageExtDAO;
-import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
-import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
-import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
-import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.config.shard.ShardGroup;
+import com.hp.sh.expv3.pc.constant.MqTags;
+import com.hp.sh.expv3.pc.module.msg.dao.PcMessageExtDAO;
+import com.hp.sh.expv3.pc.module.msg.entity.PcMessageExt;
+import com.hp.sh.expv3.pc.mq.consumer.msg.PcNotMatchedMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.PcCancelledMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.PcTradeMsg;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 /**
@@ -28,23 +28,23 @@ import com.hp.sh.expv3.utils.DbDateUtils;
  */
 @Service
 @Transactional(rollbackFor=Exception.class)
-public class BBMessageExtService{
+public class PcMessageExtService{
 	
     /** 起始时间戳 */
     private final long twepoch = 1587571200000L;
 
 	@Autowired
-	private BBMessageExtDAO messageExtDAO;
+	private PcMessageExtDAO messageExtDAO;
 	
 	@Autowired
 	private ShardGroup shardGroup;
-
+	
 	public void delete(Long userId, Long id){
 		this.messageExtDAO.delete(userId, id);
 	}
 	
-	public BBMessageExt saveNotMatchedMsg(String tags, BBNotMatchMsg msg){
-		BBMessageExt msgEntity = new BBMessageExt();
+	public PcMessageExt saveNotMatchedMsg(String tags, PcNotMatchedMsg msg){
+		PcMessageExt msgEntity = new PcMessageExt();
 		msgEntity.setUserId(msg.getAccountId());
 		
 		msgEntity.setAsset(msg.getAsset());
@@ -58,19 +58,17 @@ public class BBMessageExtService{
 		
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setShardId(getMsgSardId(msgEntity));
-		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
-		
-		msgEntity.setId(msg.getSeqId());
+		msgEntity.setStatus(PcMessageExt.STATUS_NEW);
 		
 		this.messageExtDAO.save(msgEntity);
 		
 		return msgEntity;
 	}
 
-	public BBMessageExt saveTradeMsg(String tags, BBTradeMsg msg, String exMessage) {
+	public PcMessageExt saveTradeMsg(String tags, PcTradeMsg msg, String exMessage) {
 		exMessage = this.cutExMsg(exMessage);
 		
-		BBMessageExt msgEntity = new BBMessageExt();
+		PcMessageExt msgEntity = new PcMessageExt();
 		msgEntity.setUserId(msg.getAccountId());
 		
 		msgEntity.setAsset(msg.getAsset());
@@ -84,16 +82,14 @@ public class BBMessageExtService{
 		
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setShardId(getMsgSardId(msgEntity));
-		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
-		
-		msgEntity.setId(msg.getSeqId());
+		msgEntity.setStatus(PcMessageExt.STATUS_NEW);
 		
 		this.messageExtDAO.save(msgEntity);
 		
 		return msgEntity;
 	}
 
-	public BBMessageExt saveCancelIfNotExists(String tag, BBCancelledMsg msg, String exMessage) {
+	public PcMessageExt saveCancelIfNotExists(String tag, PcCancelledMsg msg, String exMessage) {
 		
 		exMessage = this.cutExMsg(exMessage);
 		
@@ -102,7 +98,7 @@ public class BBMessageExtService{
 			return null;
 		}
 		
-		BBMessageExt msgEntity = new BBMessageExt();
+		PcMessageExt msgEntity = new PcMessageExt();
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setUserId(msg.getAccountId());
 		msgEntity.setAsset(msg.getAsset());
@@ -113,9 +109,7 @@ public class BBMessageExtService{
 		msgEntity.setKeys(""+msg.getOrderId());
 		msgEntity.setMsgBody(JsonUtils.toJson(msg));
 		msgEntity.setShardId(getMsgSardId(msgEntity));
-		msgEntity.setStatus(BBMessageExt.STATUS_NEW);
-		
-		msgEntity.setId(msg.getSeqId());
+		msgEntity.setStatus(PcMessageExt.STATUS_NEW);
 		
 		this.messageExtDAO.save(msgEntity);
 		
@@ -136,7 +130,7 @@ public class BBMessageExtService{
 		params.put("tags", tags);
 		params.put("keys", keys);
 		
-		BBMessageExt msg = this.messageExtDAO.queryOne(params);
+		PcMessageExt msg = this.messageExtDAO.queryOne(params);
 		return msg!=null;
 	}
 	
@@ -148,36 +142,35 @@ public class BBMessageExtService{
 		params.put("userId", userId);
 		params.put("msgId", msgId);
 		
-		BBMessageExt msg = this.messageExtDAO.queryOne(params);
+		PcMessageExt msg = this.messageExtDAO.queryOne(params);
 		return msg!=null;
 	}
 
-	public BBMessageExt findFirst(String tag, String symbol){
+	public PcMessageExt findFirst(String tag, String symbol){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, 1, 1000L));
-//		params.put("status", BBMessageExt.STATUS_NEW);
+//		params.put("status", PcMessageExt.STATUS_NEW);
 		params.put("orderBy", "id");
 		params.put("asc", true);
 		params.put("tags", tag);
 		params.put("symbol", symbol);
-		BBMessageExt msg = this.messageExtDAO.queryOne(params);
+		PcMessageExt msg = this.messageExtDAO.queryOne(params);
 		return msg;
 	}
 
-	public List<BBMessageExt> findFirstList(int pageSize, Long shardId, Long userId, Long startId){
+	public List<PcMessageExt> findFirstList(int pageSize, Long shardId, Long startId){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, pageSize, 10000L));
 		params.put("shardId", shardId);
-		params.put("userId", userId);
 		params.put("startId", startId);
-//		params.put("status", BBMessageExt.STATUS_NEW);
+//		params.put("status", PcMessageExt.STATUS_NEW);
 		params.put("orderBy", "id");
 		params.put("asc", true);
-		List<BBMessageExt> msgList = this.messageExtDAO.queryList(params);
+		List<PcMessageExt> msgList = this.messageExtDAO.queryList(params);
 		return msgList;
 	}
 	
-	private Long getMsgSardId(BBMessageExt msgEntity){
+	private Long getMsgSardId(PcMessageExt msgEntity){
 		return shardGroup.getMsgSardId(msgEntity.getUserId());
 	}
 	

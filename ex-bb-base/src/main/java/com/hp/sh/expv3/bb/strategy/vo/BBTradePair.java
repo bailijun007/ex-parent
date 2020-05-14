@@ -1,29 +1,31 @@
 package com.hp.sh.expv3.bb.strategy.vo;
 
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
+
 public class BBTradePair {
 
-	private BBTradeVo makerTradeVo;
+	private BBTradeMsg makerTradeVo;
 	
-	private BBTradeVo takerTradeVo;
+	private BBTradeMsg takerTradeVo;
 
-	public BBTradePair(BBTradeVo makerTradeVo, BBTradeVo takerTradeVo) {
+	public BBTradePair(BBTradeMsg makerTradeVo, BBTradeMsg takerTradeVo) {
 		this.makerTradeVo = makerTradeVo;
 		this.takerTradeVo = takerTradeVo;
 	}
 
-	public BBTradeVo getMakerTradeVo() {
+	public BBTradeMsg getMakerTradeVo() {
 		return makerTradeVo;
 	}
 
-	public void setMakerTradeVo(BBTradeVo makerTradeVo) {
+	public void setMakerTradeVo(BBTradeMsg makerTradeVo) {
 		this.makerTradeVo = makerTradeVo;
 	}
 
-	public BBTradeVo getTakerTradeVo() {
+	public BBTradeMsg getTakerTradeVo() {
 		return takerTradeVo;
 	}
 
-	public void setTakerTradeVo(BBTradeVo takerTradeVo) {
+	public void setTakerTradeVo(BBTradeMsg takerTradeVo) {
 		this.takerTradeVo = takerTradeVo;
 	}
 

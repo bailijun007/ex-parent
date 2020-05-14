@@ -1,7 +1,5 @@
 package com.hp.sh.expv3.pc.mq.consumer.msg;
 
-import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
-
 /**
  * 订单待取消
  * @author lw

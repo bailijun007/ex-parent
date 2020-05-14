@@ -10,24 +10,16 @@ import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.job.BBMsgHandleThreadJobConfig;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.module.msg.service.BBMessageExtService;
-import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
-import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
 @MQListener(orderly=MQListener.ORDERLY_YES)
 @ConditionalOnProperty(name="mq.orderly.consumer.select", havingValue="2")
-public class MatchMqConsumer4Shard {
-	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer4Shard.class);
-
-	@Autowired
-	private BBOrderService orderService;
-	
-	@Autowired
-	private BBTradeService tradeService;
+public class MatchMqConsumer4Persist {
+	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer4Persist.class);
 
 	@Autowired
 	private BBMessageExtService msgService;
@@ -35,7 +27,7 @@ public class MatchMqConsumer4Shard {
 	@Autowired
 	private BBMsgHandleThreadJobConfig msgHandleThreadJob;
 
-	public MatchMqConsumer4Shard() {
+	public MatchMqConsumer4Persist() {
 		super();
 		logger.info("init");
 	}
@@ -72,7 +64,7 @@ public class MatchMqConsumer4Shard {
 	
 	//成交
 	@MQListener(tags=MqTags.TAGS_TRADE)
-	public void handleTradeMsg(BBTradeVo msg){
+	public void handleTradeMsg(BBTradeMsg msg){
 		logger.info("收到用户成交消息:{}", msg);
 		try{
 			BBMessageExt entity = msgService.saveTradeMsg(MqTags.TAGS_TRADE, msg, null);

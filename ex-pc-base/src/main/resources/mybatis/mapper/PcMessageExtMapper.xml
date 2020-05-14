@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.pc.module.msg.dao.PcMessageExtDAO">
+
+	<resultMap type="com.hp.sh.expv3.pc.module.msg.entity.PcMessageExt" id="PcMessageExt">
+		<result column="id" property="id" />
+		<result column="msg_id" property="msgId" />
+		<result column="tags" property="tags" />
+		<result column="keys" property="keys" />
+		<result column="msg_body" property="msgBody" />
+		<result column="error_info" property="errorInfo" />
+		<result column="user_id" property="userId" />
+		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="created" property="created" />
+		<result column="shard_id" property="shardId" />
+		<result column="status" property="status" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		id,msg_id,tags,`keys`,msg_body,error_info,user_id,asset,symbol,created,shard_id,status
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="idList!=null">
+		and msg_id in
+		<foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+		#{idList[${i}]}
+		</foreach>
+		</if>
+		<if test="msgId!=null"> and msg_id=#{msgId}</if>
+		<if test="startId!=null"> and id &gt; #{startId}</if>
+		<if test="shardId!=null"> and shard_id=#{shardId}</if>
+		<if test="userId!=null"> and user_id=#{userId}</if>
+		<if test="created!=null"> and created=#{created}</if>
+		
+		<if test="tags!=null"> and tags=#{tags}</if>
+		<if test="keys!=null"> and `keys`=#{keys}</if>
+		
+		<if test="status!=null"> and status=#{status}</if>
+		</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from pc_message_ext
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="PcMessageExt">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="PcMessageExt">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="PcMessageExt">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from pc_message_ext
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="PcMessageExt">
+		select
+			<include refid="Base_Column_List" />
+		from pc_message_ext
+			where msg_id=#{msgId}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			pc_message_ext
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		insert into pc_message_ext (
+			msg_id,id,tags,`keys`,msg_body,error_info,user_id,asset,symbol,created,shard_id,status
+		)values(
+			#{msgId},#{id},#{tags},#{keys},#{msgBody},#{errorInfo},#{userId},#{asset},#{symbol},#{created},#{shardId},#{status}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			pc_message_ext
+		set 
+			id=#{id},tags=#{tags},`keys`=#{keys},msg_body=#{msgBody},error_info=#{errorInfo},user_id=#{userId},asset=#{asset},symbol=#{symbol},created=#{created},shard_id=#{shardId},status=#{status}
+		where 
+			user_id=#{userId} and id=#{id}
+	</update>
+
+	<delete id="delete">
+        delete from pc_message_ext where user_id=#{userId} and id=#{id}
+    </delete>
+
+    <delete id="condDelete">
+        delete from pc_message_ext
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+	<update id="setStatus">
+		update 
+			pc_message_ext
+		set 
+			status=#{status},error_info=#{errorInfo}
+		where 
+			user_id=#{userId} and id=#{id}
+	</update>
+	
+</mapper>

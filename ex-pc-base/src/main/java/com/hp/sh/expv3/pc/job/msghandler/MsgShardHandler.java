@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.bb.job;
+package com.hp.sh.expv3.pc.job.msghandler;
 
 import java.util.List;
 import java.util.Map;
@@ -18,30 +18,30 @@ import com.gitee.hupadev.base.exceptions.ExceptionUtils;
 import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
-import com.hp.sh.expv3.bb.constant.MqTags;
-import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
-import com.hp.sh.expv3.bb.module.msg.service.BBMessageExtService;
-import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
-import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
-import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
-import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
-import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.component.lock.impl.RedissonDistributedLocker;
+import com.hp.sh.expv3.pc.constant.MqTags;
+import com.hp.sh.expv3.pc.module.msg.entity.PcMessageExt;
+import com.hp.sh.expv3.pc.module.msg.service.PcMessageExtService;
+import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
+import com.hp.sh.expv3.pc.module.position.service.PcTradeService;
+import com.hp.sh.expv3.pc.mq.consumer.msg.PcNotMatchedMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.PcCancelledMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.PcTradeMsg;
 
 @Component
 public class MsgShardHandler {
     private static final Logger logger = LoggerFactory.getLogger(MsgShardHandler.class);
 
 	@Autowired
-	private BBTradeService tradeService;
+	private PcTradeService tradeService;
 	
 	@Autowired
-	private BBOrderService orderService;
+	private PcOrderService orderService;
 	
 	@Autowired
-	private BBMessageExtService msgService;
+	private PcMessageExtService msgService;
 	
 	@Autowired
 	private MsgShardHandler self;
@@ -71,24 +71,24 @@ public class MsgShardHandler {
 
 	void doHandlePending(Long shardId) {
 		while(true){
-			List<BBMessageExt> shardMsgList = this.msgService.findFirstList(batchNum, shardId, null, null);
+			List<PcMessageExt> shardMsgList = this.msgService.findFirstList(batchNum, shardId, null);
 			if(shardMsgList==null || shardMsgList.isEmpty()){
 				break;
 			}
 			logger.info("处理SHARD消息：shardId={},size={}", shardId, shardMsgList.size());
-			Map<Long, List<BBMessageExt>> userMsgMap = BeanHelper.groupByProperty(shardMsgList, "userId");
-			Set<Entry<Long, List<BBMessageExt>>> entrySet = userMsgMap.entrySet();
+			Map<Long, List<PcMessageExt>> userMsgMap = BeanHelper.groupByProperty(shardMsgList, "userId");
+			Set<Entry<Long, List<PcMessageExt>>> entrySet = userMsgMap.entrySet();
 			
-			for(Entry<Long, List<BBMessageExt>> entry : entrySet){
+			for(Entry<Long, List<PcMessageExt>> entry : entrySet){
 				Long userId = entry.getKey();
-				List<BBMessageExt> userMsgList = entry.getValue();
+				List<PcMessageExt> userMsgList = entry.getValue();
 				this.handleUserMsgList(shardId, userId, userMsgList);
 			}
 			
 		}
 	}
 	
-	private Long handleUserMsgList(Long shardId, Long userId, List<BBMessageExt> userMsgList){
+	private Long handleUserMsgList(Long shardId, Long userId, List<PcMessageExt> userMsgList){
 		Long offsetId = null;
 		try{
 			long time1 = System.currentTimeMillis();
@@ -112,32 +112,32 @@ public class MsgShardHandler {
 					logger.error(te.getMessage(), te);
 				}
 			}else{
-				this.handleMsgAndErr(userId, userMsgList);
+				self.handleMsgAndErr(userId, userMsgList);
 			}
 		}
 		return offsetId;
 	}
 	
-	public void handleMsgAndErr(Long userId, List<BBMessageExt> userMsgList) {
-		for(BBMessageExt msgExt: userMsgList){
-			self.handleMsgAndErr(userId, msgExt);
+	public void handleMsgAndErr(Long userId, List<PcMessageExt> userMsgList) {
+		for(PcMessageExt msgExt: userMsgList){
+			this.handleMsgAndErr(userId, msgExt);
 		}
 	}
 
 	@LockIt(key="U-${userId}")
 	@Transactional(rollbackFor=Exception.class)
-	public void handleBatch(Long userId, List<BBMessageExt> userMsgList) {
-		for(BBMessageExt msgExt : userMsgList){
+	public void handleBatch(Long userId, List<PcMessageExt> userMsgList) {
+		for(PcMessageExt msgExt : userMsgList){
 			this.handleMsg(msgExt);
 		}
 	}
 
 	@LockIt(key="U-${userId}")
 	@Transactional(rollbackFor=Exception.class)
-	public void handleMsgAndErr(Long userId, BBMessageExt msgExt){
+	public void handleMsgAndErr(Long userId, PcMessageExt msgExt){
 		Long errMsgId = errorMsgCache.getErrorMsgIdCache(msgExt.getKeys());
 		if(errMsgId!=null && msgExt.getId() > errMsgId){
-			this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, "前面存在未处理的消息:"+errMsgId);
+			this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), PcMessageExt.STATUS_ERR, "前面存在未处理的消息:"+errMsgId);
 		}else{
 			logger.info("处理单个消息，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId());
 			try{
@@ -149,23 +149,23 @@ public class MsgShardHandler {
 			}catch(Exception e){
 				errorMsgCache.saveErrorMsgIdCache(msgExt.getKeys(), msgExt.getId());
 				logger.error("处理单个消息失败，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId(), e);
-				this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, e.getMessage());
+				this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), PcMessageExt.STATUS_ERR, e.getMessage());
 			}
 			
 		}
 		
 	}
 	
-	private void handleMsg(BBMessageExt msgExt){
+	private void handleMsg(PcMessageExt msgExt){
 		if(msgExt.getTags().equals(MqTags.TAGS_TRADE)){
-			BBTradeMsg tradeMsg = JsonUtils.toObject(msgExt.getMsgBody(), BBTradeMsg.class);
-			this.tradeService.handleTrade(tradeMsg);
+			PcTradeMsg tradeMsg = JsonUtils.toObject(msgExt.getMsgBody(), PcTradeMsg.class);
+			this.tradeService.handleTradeOrder(tradeMsg);
 		}else if(msgExt.getTags().equals(MqTags.TAGS_CANCELLED)){
-			BBCancelledMsg cancelMsg = JsonUtils.toObject(msgExt.getMsgBody(), BBCancelledMsg.class);
-			this.orderService.setCancelled(cancelMsg.getAccountId(), cancelMsg.getAsset(), cancelMsg.getSymbol(), cancelMsg.getOrderId());
+			PcCancelledMsg cancelMsg = JsonUtils.toObject(msgExt.getMsgBody(), PcCancelledMsg.class);
+			this.orderService.setCancelled(cancelMsg.getAccountId(), cancelMsg.getAsset(), cancelMsg.getSymbol(), cancelMsg.getOrderId(), cancelMsg.getCancelNumber());
 		}else if(msgExt.getTags().equals(MqTags.TAGS_NOT_MATCHED)){
-			BBNotMatchMsg notMatched = JsonUtils.toObject(msgExt.getMsgBody(), BBNotMatchMsg.class);
-			orderService.setNewStatus(notMatched.getAccountId(), notMatched.getAsset(), notMatched.getSymbol(), notMatched.getOrderId());
+			PcNotMatchedMsg cancelMsg = JsonUtils.toObject(msgExt.getMsgBody(), PcNotMatchedMsg.class);
+			orderService.setNewStatus(cancelMsg.getAccountId(), cancelMsg.getAsset(), cancelMsg.getSymbol(), cancelMsg.getOrderId());
 		}else{
 			throw new RuntimeException("位置的tag类型!!! : " + msgExt.getTags());
 		}

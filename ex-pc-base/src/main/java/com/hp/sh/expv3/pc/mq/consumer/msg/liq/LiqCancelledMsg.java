@@ -3,7 +3,7 @@ package com.hp.sh.expv3.pc.mq.consumer.msg.liq;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.BaseSymbolMsg;
 
 public class LiqCancelledMsg extends BaseSymbolMsg{
 

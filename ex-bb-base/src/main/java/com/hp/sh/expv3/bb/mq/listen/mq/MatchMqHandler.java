@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.bb.module.order.service.BBOrderService;
 import com.hp.sh.expv3.bb.module.order.service.BBTradeService;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.commons.lock.LockIt;
 
 @Component
@@ -27,7 +27,7 @@ public class MatchMqHandler {
 	}
 
 	@LockIt(key="U-${msg.accountId}")
-	public void handleTrade(BBTradeVo msg){
+	public void handleTrade(BBTradeMsg msg){
 		tradeService.handleTrade(msg);
 	}
 
