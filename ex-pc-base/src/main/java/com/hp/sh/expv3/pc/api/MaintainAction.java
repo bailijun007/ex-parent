@@ -22,7 +22,7 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
-import com.hp.sh.expv3.pc.mq.match.msg.OrderPendingCancelMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -173,7 +173,8 @@ public class MaintainAction{
 	@GetMapping(value = "/api/pc/maintain/liq/forceClose")
 	public void forceClose(Long userId, String asset, String symbol, Long posId){
 		PcPosition pos = this.positionDataService.getPosition(userId, posId);
-		liqService.forceClose(pos);
+		BigDecimal liqMarkPrice = this.markPriceService.getCurrentMarkPrice(asset, symbol);
+		liqService.forceClose(pos, liqMarkPrice);
 	}
 	
 }

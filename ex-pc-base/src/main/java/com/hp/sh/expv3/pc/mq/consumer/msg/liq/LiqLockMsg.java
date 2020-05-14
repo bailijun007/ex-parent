@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.mq.liq.msg;
+package com.hp.sh.expv3.pc.mq.consumer.msg.liq;
 
 import java.math.BigDecimal;
 

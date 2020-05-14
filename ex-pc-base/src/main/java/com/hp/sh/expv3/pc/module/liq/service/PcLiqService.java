@@ -23,8 +23,8 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
 import com.hp.sh.expv3.pc.module.position.vo.PosUID;
+import com.hp.sh.expv3.pc.mq.consumer.msg.liq.CancelOrder;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderMsg;
-import com.hp.sh.expv3.pc.mq.liq.msg.CancelOrder;
 import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.strategy.vo.LiqHandleResult;
 import com.hp.sh.expv3.pc.vo.response.MarkPriceVo;
@@ -47,10 +47,10 @@ public class PcLiqService {
     private PcPositionDataService positionDataService;
 
     @Autowired
-    private PcOrderService pcOrderService;
+    private PcOrderService orderService;
     
     @Autowired
-    private PcPositionMarginService pcPositionMarginService;
+    private PcPositionMarginService positionMarginService;
     
     @Autowired
     private PcStrategyContext strategyContext;
@@ -59,7 +59,7 @@ public class PcLiqService {
     private MarkPriceService markPriceService;
     
     @Autowired
-    private PcLiqRecordDAO pcLiqRecordDAO;
+    private PcLiqRecordDAO liqRecordDAO;
     
 	@Autowired
 	private FeeRatioService feeRatioService;
@@ -69,6 +69,11 @@ public class PcLiqService {
 
     @LockIt(key="${pos.userId}-${pos.asset}-${pos.symbol}")
 	public LiqHandleResult checkPosLiq(PosUID pos) {
+    	BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
+    	if(markPrice==null){
+    		throw new RuntimeException("标记价格不存在：symbol="+pos.getSymbol());
+    	}
+    	
     	PcPosition pcPosition = this.positionDataService.getPosition(pos.getUserId(), pos.getId());
 		LiqHandleResult liqResult = new LiqHandleResult();
 		
@@ -76,7 +81,6 @@ public class PcLiqService {
     		return liqResult;
     	}
 		
-		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pcPosition.getAsset(), pcPosition.getSymbol());
 		//检查触发强平
 		if(!this.checkAndResetLiqStatus(pcPosition, markPrice)){
 			return liqResult;
@@ -84,7 +88,7 @@ public class PcLiqService {
 		
 		//追加保证金
 		if(pcPosition.getAutoAddFlag()==IntBool.YES){
-			this.pcPositionMarginService.autoAddMargin(pcPosition);
+			this.positionMarginService.autoAddMargin(pcPosition);
 		}
 		
 		//检查触发强平
@@ -148,7 +152,7 @@ public class PcLiqService {
 	}
 
 	@LockIt(key="${userId}-${asset}-${symbol}")
-	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list, Integer lastFlag) {
+	public void cancelCloseOrder(Long userId, String asset, String symbol, Integer longFlag, Long posId, List<CancelOrder> list, Integer lastFlag, BigDecimal liqMarkPrice) {
 		PcPosition pos = this.positionDataService.getPosition(userId, asset, symbol, posId);
 		
 		if(pos==null){
@@ -166,46 +170,45 @@ public class PcLiqService {
 			return;
 		}
 		
-		BigDecimal markPrice = markPriceService.getCurrentMarkPrice(pos.getAsset(), pos.getSymbol());
-		
 		//检查触发强平
-		if(!this.checkAndResetLiqStatus(pos, markPrice)){
+		if(!this.checkAndResetLiqStatus(pos, liqMarkPrice)){
 			return;
 		}
 		
 		//取消订单
 		for(CancelOrder co : list){
-			this.pcOrderService.cance4Liq(userId, asset, symbol, co.getOrderId(), co.getCancelNumber());
+			this.orderService.cance4Liq(userId, asset, symbol, co.getOrderId(), co.getCancelNumber());
 		}
 		
 		//强平
 		if(IntBool.isTrue(lastFlag)){
-			this.doLiq(pos);
+			this.doLiq(pos, liqMarkPrice);
 		}
 	}
 	
     @LockIt(key="${pos.userId}-${pos.asset}-${pos.symbol}")
-	public void forceClose(PcPosition pos) {
-    	this.doLiq(pos);
+	public void forceClose(PcPosition pos, BigDecimal liqMarkPrice) {
+    	this.doLiq(pos, liqMarkPrice);
     }
 	
-	private void doLiq(PcPosition pos){
+	private void doLiq(PcPosition pos, BigDecimal liqMarkPrice){
 		Long now = DbDateUtils.now();
 		//1、保存强平记录
 		this.saveLiqRecord(pos, now);
 		//2、清空仓位
-		this.clearLiqPos(pos, now);
+		this.clearLiqPos(pos, liqMarkPrice, now);
 		
 		//3、创建强平委托
 		//this.createLiqOrder(record);
 	}
 	
-	private void clearLiqPos(PcPosition pos, Long now){
+	private void clearLiqPos(PcPosition pos, BigDecimal liqMarkPrice, Long now){
 		pos.setVolume(BigDecimal.ZERO);
 		pos.setCloseFee(BigDecimal.ZERO);
 		pos.setPosMargin(BigDecimal.ZERO);
 		pos.setLiqStatus(LiqStatus.FORCE_CLOSE);
 		pos.setModified(now);
+		pos.setLiqMarkPrice(liqMarkPrice);
 		positionDataService.update(pos);
 	}
 	
@@ -234,7 +237,7 @@ public class PcLiqService {
 		record.setFeeRatio(feeRatioService.getTakerFeeRatio(pos.getUserId(), pos.getAsset(), pos.getSymbol()));
 		
 		//save
-		pcLiqRecordDAO.save(record);
+		liqRecordDAO.save(record);
 		publisher.publishEvent(record);
 		return record;
 	}
@@ -243,11 +246,11 @@ public class PcLiqService {
 	@LockIt(key="${record.userId}-${record.asset}-${record.symbol}")
 	public PcOrder createLiqOrder(PcLiqRecord record){
 		PcPosition pos = positionDataService.getPosition(record.getUserId(), record.getAsset(), record.getSymbol(), record.getPosId());
-		PcOrder order = this.pcOrderService.createLiqOrder(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), record.getLongFlag(), record.getBankruptPrice(), record.getVolume(), pos);
+		PcOrder order = this.orderService.createLiqOrder(record.getUserId(), "LIQ-"+record.getId(), record.getAsset(), record.getSymbol(), record.getLongFlag(), record.getBankruptPrice(), record.getVolume(), pos);
 		
 		record.setStatus(LiqRecordStatus.BANKRUPT_ORDER);
 		record.setModified(order.getModified());
-		this.pcLiqRecordDAO.update(record);
+		this.liqRecordDAO.update(record);
 		
 		PcOrderMsg msg = new PcOrderMsg(order);
 		this.publisher.publishEvent(msg);

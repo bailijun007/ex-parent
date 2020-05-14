@@ -1,5 +1,6 @@
-package com.hp.sh.expv3.pc.mq.liq.msg;
+package com.hp.sh.expv3.pc.mq.consumer.msg.liq;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
@@ -14,6 +15,16 @@ public class LiqCancelledMsg extends BaseSymbolMsg{
     private Integer longFlag;
     
     private Integer lastFlag;
+    
+    /**
+     * 触发强平的标记价格
+     */
+    private BigDecimal liqMarkPrice;
+
+    /**
+     * 触发强平的标记时间
+     */
+    private Long liqMarkTime;
     
     private List<CancelOrder> cancelOrders;
     
@@ -61,6 +72,22 @@ public class LiqCancelledMsg extends BaseSymbolMsg{
 		this.lastFlag = lastFlag;
 	}
 	
+	public BigDecimal getLiqMarkPrice() {
+		return liqMarkPrice;
+	}
+
+	public void setLiqMarkPrice(BigDecimal liqMarkPrice) {
+		this.liqMarkPrice = liqMarkPrice;
+	}
+
+	public Long getLiqMarkTime() {
+		return liqMarkTime;
+	}
+
+	public void setLiqMarkTime(Long liqMarkTime) {
+		this.liqMarkTime = liqMarkTime;
+	}
+
 	@Override
 	public String toString() {
 		return "LiqCancelledMsg [accountId=" + accountId + ", posId=" + posId + ", longFlag=" + longFlag + ", lastFlag="

@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.mq.match.msg;
+package com.hp.sh.expv3.pc.mq.consumer.msg;
 
 import com.hp.sh.expv3.pc.msg.BaseSymbolMsg;
 

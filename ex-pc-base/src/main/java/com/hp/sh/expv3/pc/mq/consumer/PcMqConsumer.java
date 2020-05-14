@@ -1,4 +1,4 @@
-package com.hp.sh.expv3.pc.mq.match;
+package com.hp.sh.expv3.pc.mq.consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,24 +11,28 @@ import com.gitee.hupadev.base.exceptions.ExceptionUtils;
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.constant.MqTags;
+import com.hp.sh.expv3.pc.module.liq.service.PcLiqService;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.service.PcTradeService;
-import com.hp.sh.expv3.pc.mq.match.msg.MatchNotMatchMsg;
-import com.hp.sh.expv3.pc.mq.match.msg.MatchedOrderCancelledMsg;
-import com.hp.sh.expv3.pc.msg.MatchedMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.MatchNotMatchMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.MatchedOrderCancelledMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.liq.LiqCancelledMsg;
 import com.hp.sh.expv3.pc.msg.PcTradeMsg;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
 @MQListener(orderly=MQListener.ORDERLY_YES)
-public class MatchMqConsumer {
-	private static final Logger logger = LoggerFactory.getLogger(MatchMqConsumer.class);
+public class PcMqConsumer {
+	private static final Logger logger = LoggerFactory.getLogger(PcMqConsumer.class);
 
 	@Autowired
 	private PcOrderService pcOrderService;
 	
 	@Autowired
 	private PcTradeService pcTradeService;
+	
+    @Autowired
+    private PcLiqService pcLiqService;
 
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
 	public void handleNotMatch(MatchNotMatchMsg msg){
@@ -50,11 +54,10 @@ public class MatchMqConsumer {
 		pcTradeService.handleTradeOrder(msg);
 	}
 	
-	//撮合成功
-	@MQListener(tags=MqTags.TAGS_MATCHED)  
-	public void handleMatch(MatchedMsg msg){
-		logger.info("收到消息:{}", msg);
-		
+	@MQListener(tags = MqTags.TAGS_ORDER_ALL_CANCELLED)
+	public void handleCancelled(LiqCancelledMsg msg){
+		logger.warn("收到强平撤销消息:{}", msg);
+		pcLiqService.cancelCloseOrder(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getLongFlag(), msg.getPosId(), msg.getCancelOrders(), msg.getLastFlag(), msg.getLiqMarkPrice());
 	}
     
 	public static boolean isResendException(Exception e){
