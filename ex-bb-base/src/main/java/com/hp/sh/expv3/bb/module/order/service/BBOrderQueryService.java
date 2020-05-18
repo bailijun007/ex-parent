@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,14 +96,13 @@ public class BBOrderQueryService {
 	
 
 	public List<BBOrder> queryPendingActive(Page page, String symbol, Long createdEnd, Integer status) {
-		List<BBOrder> list = this.bbOrderDAO.queryPendingActiveOrders(page, symbol, createdEnd, status, IntBool.NO);
+		List<BBOrder> list = this.bbOrderDAO.queryPendingActiveOrders(page, symbol, createdEnd, status);
 		return list;
 	}
 	
 	public List<BBOrder> queryRebaseOrder(Page page, Long createdEnd) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("activeFlag", IntBool.YES);
-		params.put("liqFlag", IntBool.NO);
 		params.put("orderBy", "id");
 		params.put("asc", true);
 		params.put("page", page);
