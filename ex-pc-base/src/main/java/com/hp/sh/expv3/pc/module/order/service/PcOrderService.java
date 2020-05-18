@@ -313,6 +313,7 @@ public class PcOrderService {
 		return this.accountCoreService.add(request);
 	}
 	
+	@LockIt(key="U-${userId}")
 	public boolean setPendingCancel(long userId, String asset, String symbol, long orderId){
 		
 		PcOrder order = this.orderQueryService.getOrder(userId, orderId);

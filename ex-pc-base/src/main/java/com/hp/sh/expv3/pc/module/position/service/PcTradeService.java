@@ -171,7 +171,7 @@ public class PcTradeService {
 		
 	}
     
-    //处理成交订单
+    //处理成交平仓委托
 	protected void handleTradeCloseOrder(PcOrder order, PcTradeMsg trade){
 		Long now = DbDateUtils.now();
 		

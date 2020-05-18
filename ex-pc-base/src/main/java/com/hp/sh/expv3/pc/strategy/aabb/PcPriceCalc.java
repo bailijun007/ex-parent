@@ -1,10 +1,14 @@
 package com.hp.sh.expv3.pc.strategy.aabb;
 
+import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.DecimalUtil;
 import com.hp.sh.expv3.utils.math.Precision;
 
 import java.math.BigDecimal;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * AABB价格计算器
@@ -17,6 +21,7 @@ import java.math.BigDecimal;
  * case : AABB
  */
 class PcPriceCalc {
+	private static final Logger logger = LoggerFactory.getLogger(PcPriceCalc.class);
 
     /**
      * 求强平价：即在 强平价时 平仓，收回的保证金占整个仓位价值 的比率 = 维持仓位保证金（纯粹的仓位维持保证金率，不包括其他的手续费率）
@@ -46,6 +51,9 @@ class PcPriceCalc {
              * cp =  amt * (posHoldMarginRatio + 1) / ( posMargin + (amt /op ) )
              * cp =  amt * (posHoldMarginRatio + 1) / ( posMargin + v )
              */
+        	if(BigUtils.isZero(posMargin.add(holdVolume))){
+        		logger.error("除数是0：posMargin={},holdVolume={}", posMargin, holdVolume);
+        	}
             return amt.multiply(posHoldMarginRatio.add(BigDecimal.ONE)).divide(posMargin.add(holdVolume), Precision.COMMON_PRECISION, DecimalUtil.MORE).max(BigDecimal.ZERO).stripTrailingZeros();
         } else {
             /**
