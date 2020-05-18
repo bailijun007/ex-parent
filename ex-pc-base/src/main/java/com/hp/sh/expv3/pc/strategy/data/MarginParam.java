@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  * @author wangjg
  *
  */
-public interface OrderMargin {
+public interface MarginParam {
 
 	BigDecimal getOpenFee();
 

@@ -2,7 +2,7 @@ package com.hp.sh.expv3.pc.strategy;
 
 import java.math.BigDecimal;
 
-import com.hp.sh.expv3.pc.strategy.data.OrderMargin;
+import com.hp.sh.expv3.pc.strategy.data.MarginParam;
 import com.hp.sh.expv3.pc.strategy.data.OrderFeeParam;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.utils.math.BigCalc;
@@ -31,7 +31,7 @@ public interface OrderStrategy {
 	 * @param number
 	 * @return
 	 */
-	default public OrderFeeData calcRaitoFee(OrderMargin order, BigDecimal total, BigDecimal number){
+	default public OrderFeeData calcRaitoFee(MarginParam order, BigDecimal total, BigDecimal number){
 		OrderFeeData orderAmount = new OrderFeeData();
 		
 		BigDecimal openFee; 
