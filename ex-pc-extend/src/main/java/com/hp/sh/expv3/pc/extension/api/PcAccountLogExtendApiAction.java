@@ -11,6 +11,8 @@ import com.hp.sh.expv3.pc.extension.vo.*;
 import com.hp.sh.expv3.pc.msg.PcAccountLog;
 import com.hp.sh.expv3.utils.math.Precision;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
@@ -29,11 +31,15 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
+
+    private static final Logger logger = LoggerFactory.getLogger(PcAccountLogExtendApiAction.class);
+
     @Resource(name = "templateDB0")
     private StringRedisTemplate templateDB0;
 
     @Resource(name = "templateDB5")
     private StringRedisTemplate templateDB5;
+
 
     @Autowired
     private PcAccountRecordExtendService pcAccountRecordExtendService;
@@ -68,7 +74,10 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
      */
     @Override
     public PageResult<PcAccountRecordLogVo> query(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol,Long queryId,Integer nextPage) {
+
         this.checkParam(userId, asset, tradeType, historyType, startDate, endDate, nextPage, pageSize, symbol);
+        logger.info("查询pc永续合约账户接口参数：userId={},asset={},tradeType={},historyType={},startDate={},endDate={},pageNo={},pageSize={},symbol={},queryId={},nextPage={}",
+                                                             userId,asset, tradeType,historyType,startDate,endDate,pageNo,pageSize,symbol,queryId,nextPage);
 
         // 获取面值
         BigDecimal faceValue = this.getFaceValue(asset, symbol);
