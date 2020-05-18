@@ -2,6 +2,7 @@ package com.hp.sh.expv3.bb.extension;
 
 import javax.annotation.PostConstruct;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableDiscoveryClient
+@MapperScan({"com.hp.sh.expv3.bb.**.dao", "com.hp.sh.expv3.bb.extension.**.mapper"})
 @ComponentScan("com.hp.sh.expv3")
 @SpringBootApplication
 @EnableScheduling
