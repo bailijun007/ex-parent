@@ -97,6 +97,9 @@ public class PcOrderApiAction implements PcOrderApi {
 	@Override
 	public BigDecimal getMaxOpenVolume(Long userId, String asset, String symbol, Long longFlag, BigDecimal leverage){
 		BigDecimal balance = this.pcAccountCoreService.getBalance(userId, asset);
+		if(balance==null){
+			balance = BigDecimal.ZERO;
+		}
 		BigDecimal maxOpenVolume = strategyContext.calcMaxOpenVolume(userId, asset, symbol, longFlag, leverage, balance);
 		return maxOpenVolume;
 	}
