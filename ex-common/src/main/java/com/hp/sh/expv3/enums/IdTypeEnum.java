@@ -53,6 +53,7 @@ public enum IdTypeEnum {
     PC_ACTIVE_ORDER_ID(40),
     PC_ACTIVE_POSITION_ID(41), 
     PC_COLLECTOR_ACCOUNT_RECORD_ID(42),
+    PC_MESSAGE_EXT_ID(43),
     
     ;
 
