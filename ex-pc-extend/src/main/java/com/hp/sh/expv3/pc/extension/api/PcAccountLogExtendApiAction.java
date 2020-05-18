@@ -76,7 +76,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
     public PageResult<PcAccountRecordLogVo> query(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, Integer pageNo, Integer pageSize, String symbol,Long queryId,Integer nextPage) {
 
         this.checkParam(userId, asset, tradeType, historyType, startDate, endDate, nextPage, pageSize, symbol);
-        logger.error("查询pc永续合约账户接口参数：userId={},asset={},tradeType={},historyType={},startDate={},endDate={},pageNo={},pageSize={},symbol={},queryId={},nextPage={}",
+        logger.warn("查询pc永续合约账户接口参数：userId={},asset={},tradeType={},historyType={},startDate={},endDate={},pageNo={},pageSize={},symbol={},queryId={},nextPage={}",
                                                              userId,asset, tradeType,historyType,startDate,endDate,pageNo,pageSize,symbol,queryId,nextPage);
 
         // 获取面值
