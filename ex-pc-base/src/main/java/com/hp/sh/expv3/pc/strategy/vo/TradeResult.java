@@ -22,7 +22,7 @@ public class TradeResult {
 	//此次成交的手续费
 	private BigDecimal fee;
 	//此次成交扣除的订单保证金
-	private BigDecimal orderMargin;
+	private BigDecimal tradeMargin;
 	//此次成交扣除的订单开仓手续费
 	private BigDecimal orderOpenFee;
 	//此次成交的盈亏（平仓才有）
@@ -72,12 +72,12 @@ public class TradeResult {
 		this.fee = fee;
 	}
 
-	public BigDecimal getOrderMargin() {
-		return orderMargin;
+	public BigDecimal getTradeMargin() {
+		return tradeMargin;
 	}
 
-	public void setOrderMargin(BigDecimal margin) {
-		this.orderMargin = margin;
+	public void setTradeMargin(BigDecimal margin) {
+		this.tradeMargin = margin;
 	}
 
 	public BigDecimal getPnl() {

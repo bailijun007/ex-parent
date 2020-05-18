@@ -194,8 +194,8 @@ public class PcTradeService {
 		if(BigUtils.isZero(pcPosition.getVolume())){
 			posCloseFee = pcPosition.getCloseFee();
 		}
-		BigDecimal amount = tradeResult.getOrderMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFee()).add(posCloseFee);
-		String remark = String.format("平仓。保证金：%s,收益:%s,手续费：-%s,仓位剩余手续费：%s", tradeResult.getOrderMargin(), tradeResult.getPnl(), tradeResult.getFee(), posCloseFee);
+		BigDecimal amount = tradeResult.getTradeMargin().add(tradeResult.getPnl()).subtract(tradeResult.getFee()).add(posCloseFee);
+		String remark = String.format("平仓。保证金：%s,收益:%s,手续费：-%s,仓位剩余手续费：%s", tradeResult.getTradeMargin(), tradeResult.getPnl(), tradeResult.getFee(), posCloseFee);
 		this.closeMarginToPcAccount(order.getUserId(), pcOrderTrade.getId(), order.getAsset(), amount, order.getLongFlag(), remark);
 	}
 
@@ -281,7 +281,7 @@ public class PcTradeService {
 
 	private void updateOrder4Trade(PcOrder order, TradeResult tradeResult, Long now){
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
-	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getOrderMargin()));
+	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getTradeMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getOrderOpenFee()));
 	        order.setCloseFee(order.getCloseFee().subtract(tradeResult.getOrderCloseFee()));
 		}
@@ -303,7 +303,7 @@ public class PcTradeService {
 		orderTrade.setPrice(tradeMsg.getPrice());
 		orderTrade.setMakerFlag(tradeMsg.getMakerFlag());
 
-		orderTrade.setOrderMargin(tradeResult.getOrderMargin());
+		orderTrade.setOrderMargin(tradeResult.getTradeMargin());
 		orderTrade.setFee(tradeResult.getFee());
 		orderTrade.setFeeRatio(tradeResult.getFeeRatio());
 		orderTrade.setPnl(tradeResult.getPnl());
@@ -379,11 +379,11 @@ public class PcTradeService {
 
 	private void openPositon(PcPosition pcPosition, TradeResult tradeResult) {
 		pcPosition.setVolume(pcPosition.getVolume().add(tradeResult.getNumber()));
-		pcPosition.setPosMargin(pcPosition.getPosMargin().add(tradeResult.getOrderMargin()));
+		pcPosition.setPosMargin(pcPosition.getPosMargin().add(tradeResult.getTradeMargin()));
 		pcPosition.setCloseFee(pcPosition.getCloseFee().add(tradeResult.getOrderCloseFee()));
 		
 		pcPosition.setMeanPrice(tradeResult.getNewPosMeanPrice());
-		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeResult.getOrderMargin()));
+		pcPosition.setInitMargin(pcPosition.getInitMargin().add(tradeResult.getTradeMargin()));
 //		pcPosition.setFeeCost(pcPosition.getFeeCost().add(tradeResult.getReceivableFee()));
 		
 		pcPosition.setAccuVolume(pcPosition.getAccuVolume().add(tradeResult.getNumber()));
@@ -397,10 +397,10 @@ public class PcTradeService {
 
 	private void closePostion(PcPosition pcPosition, TradeResult tradeResult) {
 		pcPosition.setVolume(pcPosition.getVolume().subtract(tradeResult.getNumber()));
-		pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(tradeResult.getOrderMargin()));
+		pcPosition.setPosMargin(pcPosition.getPosMargin().subtract(tradeResult.getTradeMargin()));
 		pcPosition.setCloseFee(pcPosition.getCloseFee().subtract(tradeResult.getFee()));
 		
-		pcPosition.setInitMargin(pcPosition.getInitMargin().subtract(tradeResult.getOrderMargin()));
+		pcPosition.setInitMargin(pcPosition.getInitMargin().subtract(tradeResult.getTradeMargin()));
 		pcPosition.setFeeCost(pcPosition.getFeeCost().subtract(tradeResult.getFee()));
 		
 		pcPosition.setRealisedPnl(pcPosition.getRealisedPnl().add(tradeResult.getPnl()));
