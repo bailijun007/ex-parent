@@ -11,7 +11,6 @@ import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
-import com.hp.sh.expv3.pc.component.MarkPriceService;
 import com.hp.sh.expv3.pc.constant.ChangeMarginOptType;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.MarginMode;
@@ -23,8 +22,6 @@ import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.symbol.service.PcAccountSymbolService;
-import com.hp.sh.expv3.pc.strategy.HoldPosStrategy;
-import com.hp.sh.expv3.pc.strategy.OrderStrategy;
 import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
@@ -53,8 +50,6 @@ public class PcPositionMarginService {
 	private PcAccountCoreService pcAccountCoreService;
 	@Autowired
 	private PcPositionDataService positionDataService;
-	@Autowired
-	private MarkPriceService markPriceService;
     @Autowired
     private PcStrategyContext strategyContext;
 	
@@ -82,7 +77,7 @@ public class PcPositionMarginService {
         pos.setLeverage(leverage);
 	}
 	
-	@LockIt(key="${userId}-${asset}-${symbol}")
+	@LockIt(key="U-${userId}")
 	public boolean changeLeverage(long userId, String asset, String symbol, int marginMode, Integer longFlag, BigDecimal leverage){
         //逐渐or全仓
         if (marginMode != MarginMode.FIXED) {
@@ -187,7 +182,7 @@ public class PcPositionMarginService {
 	 * @param optType 0-增加保证金，1-减少保证金
 	 * @param amount
 	 */
-	@LockIt(key="${userId}-${asset}-${symbol}")
+	@LockIt(key="U-${userId}")
 	public void changeMargin(Long userId, String asset, String symbol, int longFlag, int optType, BigDecimal amount){
 		//当前仓位
 		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
@@ -231,7 +226,7 @@ public class PcPositionMarginService {
 	 * @param amount
 	 */
 	@Deprecated
-	@LockIt(key="${userId}-${asset}-${symbol}")
+	@LockIt(key="U-${userId}")
 	public void cutMargin(Long userId, String asset, String symbol, Long posId, BigDecimal amount){
 		//当前仓位
 		PcPosition pos = this.positionDataService.getPosition(userId, posId);
@@ -330,7 +325,7 @@ public class PcPositionMarginService {
 		this.pcAccountCoreService.add(request);
 	}
 	
-	@LockIt(key="${userId}-${asset}-${symbol}")
+	@LockIt(key="U-${userId}")
 	public boolean setAutoAddFlag(long userId, String asset, String symbol, int longFlag, int autoAddFlag){
 		//当前仓位
 		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);

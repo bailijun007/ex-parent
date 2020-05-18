@@ -86,7 +86,7 @@ public class PcOrderService {
 	 * @param price 委托价格
 	 * @param amt 委托金额
 	 */
-	@LockIt(key="${userId}-${asset}-${symbol}")
+	@LockIt(key="U-${userId}")
 	public PcOrder create(long userId, String clientOrderId, String asset, String symbol, int closeFlag, int longFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		PcPosition pos = this.positionDataService.getCurrentPosition(userId, asset, symbol, longFlag);
 		if(closeFlag==OrderFlag.ACTION_OPEN){
@@ -313,7 +313,6 @@ public class PcOrderService {
 		return this.accountCoreService.add(request);
 	}
 	
-	@LockIt(key="${userId}-${asset}-${symbol}")
 	public boolean setPendingCancel(long userId, String asset, String symbol, long orderId){
 		
 		PcOrder order = this.orderQueryService.getOrder(userId, orderId);
@@ -334,7 +333,6 @@ public class PcOrderService {
 		return true;
 	}
 	
-	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void setNewStatus(long userId, String asset, String symbol, long orderId){
 		PcOrder order = this.orderQueryService.getOrder(userId, orderId);
 		
@@ -368,7 +366,6 @@ public class PcOrderService {
 		return true;
 	}
 
-	@LockIt(key="${userId}-${asset}-${symbol}")
 	public void setCancelled(long userId, String asset, String symbol, long orderId, BigDecimal number){
 		this.doCancel(userId, asset, symbol, orderId, number);
 	}
