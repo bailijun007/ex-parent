@@ -50,16 +50,16 @@ public final class ExtCommonConstant {
 
     static {
         TRADE_TYPE_MAP.put(TRADE_TYPE_CHANGE_MARGIN, new ArrayList<Integer>() {{
-            add(PcAccountLog.TYPE_ADD_TO_MARGIN);
-            add(PcAccountLog.TYPE_REDUCE_MARGIN);
-            add(PcAccountLog.TYPE_AUTO_ADD_MARGIN);
-            add(PcAccountLog.TYPE_LEVERAGE_ADD_MARGIN);
+            add(PcAccountLog.TYPE_ADD_TO_MARGIN);//7
+            add(PcAccountLog.TYPE_REDUCE_MARGIN);//8
+            add(PcAccountLog.TYPE_AUTO_ADD_MARGIN);//9
+            add(PcAccountLog.TYPE_LEVERAGE_ADD_MARGIN);//10
         }});
         TRADE_TYPE_MAP.put(TRADE_TYPE_MAKE_ORDER, new ArrayList<Integer>() {{
-            add(PcAccountLog.TYPE_TRAD_OPEN_LONG);
-            add(PcAccountLog.TYPE_TRAD_OPEN_SHORT);
-            add(PcAccountLog.TYPE_TRAD_CLOSE_LONG);
-            add(PcAccountLog.TYPE_TRAD_CLOSE_SHORT);
+            add(PcAccountLog.TYPE_TRAD_OPEN_LONG);//1
+            add(PcAccountLog.TYPE_TRAD_OPEN_SHORT);//2
+            add(PcAccountLog.TYPE_TRAD_CLOSE_LONG);//3
+            add(PcAccountLog.TYPE_TRAD_CLOSE_SHORT);//4
         }});
         TRADE_TYPE_MAP.put(TRADE_TYPE_DEPOSITE_AND_WITHDRAW, new ArrayList<Integer>() {{
             add(PcAccountLog.TYPE_FUND_TO_PC);
