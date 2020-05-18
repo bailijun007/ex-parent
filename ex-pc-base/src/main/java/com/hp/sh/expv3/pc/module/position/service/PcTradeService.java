@@ -203,8 +203,8 @@ public class PcTradeService {
 		////////// 仓位 ///////////
 		//如果仓位不存在则创建新仓位
 		boolean isNewPos = false;
+		PcAccountSymbol as = accountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 		if(pcPosition==null){
-			PcAccountSymbol as = accountSymbolDAO.lockUserSymbol(order.getUserId(), order.getAsset(), order.getSymbol());
 			pcPosition = this.newEmptyPostion(as.getUserId(), as.getAsset(), as.getSymbol(), order.getLongFlag(), order.getLeverage(), as.getMarginMode(), order.getFaceValue());
 			isNewPos = true;
 		}
@@ -235,6 +235,14 @@ public class PcTradeService {
 			pcPosition.setModified(now);
 			this.positionDataService.update(pcPosition);
 		}
+		
+		//修改最大杠杆
+		if(order.getLongFlag() == OrderFlag.TYPE_LONG){
+			as.setLongMaxLeverage(maxLeverage);
+		}else{
+			as.setShortMaxLeverage(maxLeverage);
+		}
+		this.accountSymbolDAO.update(as);
 		
 		return pcPosition;
     }
