@@ -140,19 +140,19 @@ public class QueryService {
 
     public BigDecimal getLockC2cNumber(Long userId, String asset) {
         // 获取到c2c 审核中的出金
-//        List<C2cOrder> c2cOrders = c2cOrderDAO.queryList(new HashMap<String, Object>() {
-//            {
-//                put("userId", userId);
-//                put("payCurrency", asset);
-//                put("type", C2cConst.C2C_SELL);
-//                put("approvalStatus", C2cConst.C2C_APPROVAL_STATUS_IN_AUDIT);
-//                put("payStatus", C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
-//
-//            }
-//        });
-//
-//        return c2cOrders.stream().map(C2cOrder::getVolume).reduce(BigDecimal.ZERO, BigDecimal::add);
-        return  c2cOrderDAO.queryC2cFrozenAsset(userId,asset);
+        List<C2cOrder> c2cOrders = c2cOrderDAO.queryList(new HashMap<String, Object>() {
+            {
+                put("userId", userId);
+                put("payCurrency", asset);
+                put("type", C2cConst.C2C_SELL);
+                put("approvalStatus", C2cConst.C2C_APPROVAL_STATUS_IN_AUDIT);
+                put("payStatus", C2cConst.C2C_PAY_STATUS_NO_PAYMENT);
+
+            }
+        });
+
+        return c2cOrders.stream().map(C2cOrder::getVolume).reduce(BigDecimal.ZERO, BigDecimal::add);
+//        return  c2cOrderDAO.queryC2cFrozenAsset(userId,asset);
     }
 
     public C2cOrder queryById(Long id) {

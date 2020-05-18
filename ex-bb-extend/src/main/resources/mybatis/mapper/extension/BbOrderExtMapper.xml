@@ -155,7 +155,7 @@
         </where>
     </select>
 
-    <select id="queryByIds" resultType="com.hp.sh.expv3.bb.extension.vo.BbOrderVo">
+    <select id="queryByIds" resultMap="BbOrderVo">
         select
         <include refid="Base_Column_List"/>
         from bb_order
@@ -298,7 +298,7 @@
             and o.order_margin_currency=#{asset}
     </select>
 
-    <select id="queryBbActiveOrders" resultType="com.hp.sh.expv3.bb.extension.vo.BbOrderVo">
+    <select id="queryBbActiveOrders" resultMap="BbOrderVo">
         SELECT
         o.*
         FROM

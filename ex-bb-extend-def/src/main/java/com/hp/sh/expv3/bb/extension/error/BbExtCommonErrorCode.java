@@ -19,6 +19,8 @@ public class BbExtCommonErrorCode extends ErrorCode {
 
     public static final BbExtCommonErrorCode SYMBOL_DOES_NOT_EXIST = new BbExtCommonErrorCode(-17055, "此交易对不存在");
 
+    public static final BbExtCommonErrorCode TABLE_NOT_EXIST = new BbExtCommonErrorCode(-17056, "该数据库表不存在");
+
 
     private BbExtCommonErrorCode(int code, String message) {
         super(code, message);

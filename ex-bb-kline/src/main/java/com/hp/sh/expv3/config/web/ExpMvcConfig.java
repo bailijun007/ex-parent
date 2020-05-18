@@ -27,27 +27,27 @@ import com.hp.sh.expv3.commons.web.LogFilter;
 @ComponentScan
 public class ExpMvcConfig implements WebMvcConfigurer {
 	private static final Logger logger = LoggerFactory.getLogger(ExpMvcConfig.class);
-	
+
 	@Autowired
 	public ObjectMapper objectMapper;
-	
+
 	@Value("${spring.application.name}")
 	private String appName;
 
 	// 添加拦截器
 	public void addInterceptors(InterceptorRegistry registry) {
-        
+
 	}
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 	}
-	
+
 	@Bean
     public LocaleResolver localeResolver(){
         return new HpLocaleResolver();
     }
-	
+
     @Bean
     public FilterRegistrationBean<LogFilter> myLogFilter(){
         FilterRegistrationBean<LogFilter> bean = new FilterRegistrationBean<LogFilter>();

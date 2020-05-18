@@ -79,6 +79,7 @@ public class PLPayService {
         c2cOrder.setUserId(userId);
         c2cOrder.setCreated(payTime);
         c2cOrder.setModified(payTime);
+        c2cOrder.setFrozenAsset(BigDecimal.ZERO);
         buyService.saveC2cOrder(c2cOrder);
 
         return url;

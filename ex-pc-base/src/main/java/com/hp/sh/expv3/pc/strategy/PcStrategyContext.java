@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,13 +28,13 @@ import com.hp.sh.expv3.pc.strategy.vo.OrderFeeParamVo;
 import com.hp.sh.expv3.pc.strategy.vo.OrderMarginVo;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.IntBool;
-import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigFormat;
 import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.Precision;
 
 @Component
 public class PcStrategyContext {
+	private static final Logger logger = LoggerFactory.getLogger(PcStrategyContext.class);
 	
 	@Autowired
 	private MetadataService metadataService;
@@ -213,9 +215,13 @@ public class PcStrategyContext {
 		if(pcPosition!=null){
 			BigDecimal _newVolume = IntBool.isTrue(closeFlag)?pcPosition.getVolume().subtract(tradeResult.getNumber()):pcPosition.getVolume().add(tradeResult.getNumber());
 			BigDecimal _newPosMargin = IntBool.isTrue(closeFlag)?pcPosition.getPosMargin().subtract(tradeResult.getOrderMargin()):pcPosition.getPosMargin().add(tradeResult.getOrderMargin());
-			tradeResult.setNewPosLiqPrice(
-				holdPosStrategy.calcLiqPrice(longFlag, order.getFaceValue(), _newVolume, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), _newPosMargin)
-			);
+			if(BigUtils.gtZero(_newVolume)){
+				tradeResult.setNewPosLiqPrice(
+						holdPosStrategy.calcLiqPrice(longFlag, order.getFaceValue(), _newVolume, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), _newPosMargin)
+					);
+			}else{
+				tradeResult.setNewPosLiqPrice(pcPosition.getLiqPrice());
+			}
 		}else{
 			BigDecimal holdRatio = feeRatioService.getHoldRatio(userId, asset, symbol, tradeResult.getNumber());
 			tradeResult.setNewPosLiqPrice(

@@ -77,7 +77,7 @@ public class C2cOrder extends UserDataEntity {
     private String bankCardName;
 
     @ApiModelProperty("银行卡号")
-    private Long bankCard;
+    private String bankCard;
 
     @ApiModelProperty("冻结资产")
     private  BigDecimal frozenAsset;
@@ -109,11 +109,11 @@ public class C2cOrder extends UserDataEntity {
         this.bankCardName = bankCardName;
     }
 
-    public Long getBankCard() {
+    public String getBankCard() {
         return bankCard;
     }
 
-    public void setBankCard(Long bankCard) {
+    public void setBankCard(String bankCard) {
         this.bankCard = bankCard;
     }
 
