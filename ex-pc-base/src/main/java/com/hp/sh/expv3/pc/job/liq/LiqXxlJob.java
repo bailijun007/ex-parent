@@ -14,12 +14,12 @@ public class LiqXxlJob {
     private static final Logger logger = LoggerFactory.getLogger(LiqXxlJob.class);
     
     @Autowired
-    private LiquidationService liquidationService;
+    private LiquidationHandler liquidationHandler;
 
 	@XxlJob("checkLiqOrder")
     public ReturnT<String> checkLiqOrder(String param) throws Exception {
 		logger.info("XXL检查强平...，{}", param);
-		liquidationService.checkLiqOrder();
+		liquidationHandler.checkLiqOrder();
     	logger.info("XXL检查强平结束。");
         return ReturnT.SUCCESS;
     }
@@ -30,7 +30,7 @@ public class LiqXxlJob {
 	@LimitTimeHandle
 //	@XxlJob("hanleLiqOrder")
 	public void hanleLiqOrder(){
-		liquidationService.hanleLiqOrder();
+		liquidationHandler.hanleLiqOrder();
 	}
 
 }
