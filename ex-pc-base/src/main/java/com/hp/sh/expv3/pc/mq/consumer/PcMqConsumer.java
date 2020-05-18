@@ -12,11 +12,8 @@ import com.gitee.hupadev.base.exceptions.ExceptionUtils;
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.pc.constant.MqTags;
-import com.hp.sh.expv3.pc.module.liq.service.PcLiqService;
-import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
-import com.hp.sh.expv3.pc.module.position.service.PcTradeService;
-import com.hp.sh.expv3.pc.mq.consumer.msg.PcNotMatchedMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcCancelledMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.PcNotMatchedMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.liq.LiqCancelledMsg;
 import com.hp.sh.rocketmq.annotation.MQListener;
@@ -28,38 +25,34 @@ public class PcMqConsumer {
 	private static final Logger logger = LoggerFactory.getLogger(PcMqConsumer.class);
 
 	@Autowired
-	private PcOrderService pcOrderService;
-	
-	@Autowired
-	private PcTradeService pcTradeService;
-	
-    @Autowired
-    private PcLiqService pcLiqService;
+    private MatchMqHandler matchMqHandler;
 
+    //撮合未成交
 	@MQListener(tags=MqTags.TAGS_NOT_MATCHED)
-	public void handleNotMatch(PcNotMatchedMsg msg){
+	public void handleNotMatchedMsg(PcNotMatchedMsg msg){
 		logger.info("收到撮合未成消息:{}", msg);
-		pcOrderService.setNewStatus(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId());
+		matchMqHandler.handleNotMatchedMsg(msg);
 	}
 	
 	//取消订单
 	@MQListener(tags=MqTags.TAGS_CANCELLED)
 	public void handleCancelledMsg(PcCancelledMsg msg){
 		logger.info("收到取消订单消息:{}", msg);
-		this.pcOrderService.setCancelled(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getOrderId(), msg.getCancelNumber());
+		matchMqHandler.handleCancelledMsg(msg);
 	}
 	
 	//成交
 	@MQListener(tags=MqTags.TAGS_TRADE)
 	public void handleTradeMsg(PcTradeMsg msg){
 		logger.info("收到成交消息:{}", msg);
-		pcTradeService.handleTradeOrder(msg);
+		matchMqHandler.handleTradeMsg(msg);
 	}
 	
+	//强平取消
 	@MQListener(tags = MqTags.TAGS_ORDER_ALL_CANCELLED)
-	public void handleCancelled(LiqCancelledMsg msg){
+	public void handleLiqCancelledMsg(LiqCancelledMsg msg){
 		logger.warn("收到强平撤销消息:{}", msg);
-		pcLiqService.cancelCloseOrder(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getLongFlag(), msg.getPosId(), msg.getCancelOrders(), msg.getLastFlag(), msg.getLiqMarkPrice());
+		matchMqHandler.handleLiqCancelledMsg(msg);
 	}
     
 	public static boolean isResendException(Exception e){
