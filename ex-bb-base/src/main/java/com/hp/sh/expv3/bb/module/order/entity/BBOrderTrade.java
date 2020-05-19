@@ -3,14 +3,11 @@ package com.hp.sh.expv3.bb.module.order.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.hp.sh.expv3.base.entity.UserData;
 import com.hp.sh.expv3.bb.strategy.data.OrderTrade;
 import com.hp.sh.expv3.commons.mybatis.TxId;
-import com.hp.sh.expv3.component.id.utils.GeneratorName;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
@@ -275,8 +272,6 @@ public class BBOrderTrade implements OrderTrade, UserData, Serializable {
 		this.userId = userId;
 	}
 
-	@Id
-	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
 	public Long getId() {
 		return id;
 	}

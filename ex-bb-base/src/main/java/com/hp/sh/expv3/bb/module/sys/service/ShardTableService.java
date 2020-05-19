@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.bb.module.sys.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -68,28 +67,23 @@ public class ShardTableService{
 	
 	public void createAllTables(Long start, Long end){
 		logger.info("nextMonth={}", new Date(end).toLocaleString());
-		List<String> symbolList = new ArrayList<String>();
-		List<String> assetList = new ArrayList<>();
+		Set<String> assetList = new HashSet<>();
 		
 		List<BBSymbolVO> symbolVoList = metadataService.getAllBBSymbol();
+
+		for(BBSymbolVO symbolVo : symbolVoList){
+			String ssa[] = symbolVo.getSymbol().split("_");
+			assetList.add(ssa[0]);
+			assetList.add(ssa[1]);
+		}
+		
+		for(String asset : assetList){
+			this.createAccountRecordTable(asset, start, end);
+		}
 		
 		for(BBSymbolVO symbolVo : symbolVoList){
-			symbolList.add(symbolVo.getSymbol());
-			assetList.add(this.getAsset(symbolVo.getSymbol()));
-		}
-		
-		assetList.add("USDT");
-		
-		for(String fullSymbol:symbolList){
-			String[] sa = fullSymbol.split("__");
-			String asset = sa[0];
-			String symbol = sa[1];
-			this.createOrderTable(asset, symbol, start, end);
-			this.createOrderTradeTable(asset, symbol, start, end);
-		}
-		
-		for(String asset:assetList){
-			this.createAccountRecordTable(asset, start, end);
+			this.createOrderTable(symbolVo.getAsset(), symbolVo.getSymbol(), start, end);
+			this.createOrderTradeTable(symbolVo.getAsset(), symbolVo.getSymbol(), start, end);
 		}
 	}
 	
@@ -106,7 +100,7 @@ public class ShardTableService{
 		
 		logger.info("nextMonth={}", nextMonth.toLocaleString());
 		
-		this.createAccountRecordTable(this.getAsset(asset+"__"+symbol), start.getTime(), nextMonth.getTime());
+		this.createAccountRecordTable(asset, start.getTime(), nextMonth.getTime());
 		
 		this.createOrderTable(asset, symbol, start.getTime(), nextMonth.getTime());
 		this.createOrderTradeTable(asset, symbol, start.getTime(), nextMonth.getTime());
@@ -151,12 +145,6 @@ public class ShardTableService{
 	
 	private boolean exist(String table){
 		return this.physicsTabls.contains(table);
-	}
-	
-	private String getAsset(String symbol){
-		String[] sa2 = symbol.split("_");
-		String asset = sa2[0];
-		return asset;
 	}
 
 //	@PostConstruct

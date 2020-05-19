@@ -70,29 +70,25 @@ public class ShardTableService{
 	
 	public void createAllTables(Long start, Long end){
 		logger.info("nextMonth={}", new Date(end).toLocaleString());
-		List<String> symbolList = new ArrayList<String>();
-		List<String> assetList = new ArrayList<>();
+		Set<String> assetList = new HashSet<>();
 		
 		List<PcContractVO> contractList = metadataService.getAllPcContract();
 		
-		for(PcContractVO symbolVo : contractList){
-			symbolList.add(symbolVo.getSymbol());
-			assetList.add(this.getAsset(symbolVo.getSymbol()));
-		}
-		
-		assetList.add("USDT");
-		
-		for(String fullSymbol:symbolList){
-			String[] sa = fullSymbol.split("__");
-			String asset = sa[0];
-			String symbol = sa[1];
-			this.createOrderTable(asset, symbol, start, end);
-			this.createOrderTradeTable(asset, symbol, start, end);
-			this.createPositionTable(asset, symbol, start, end);
+		for(PcContractVO contract : contractList){
+			String[] asa = contract.getSymbol().split("_");
+			assetList.add(contract.getAsset());
+			assetList.add(asa[0]);
+			assetList.add(asa[1]);
 		}
 		
 		for(String asset:assetList){
 			this.createAccountRecordTable(asset, start, end);
+		}
+		
+		for(PcContractVO contract : contractList){
+			this.createOrderTable(contract.getAsset(), contract.getSymbol(), start, end);
+			this.createOrderTradeTable(contract.getAsset(), contract.getSymbol(), start, end);
+			this.createPositionTable(contract.getAsset(), contract.getSymbol(), start, end);
 		}
 	}
 	
@@ -109,7 +105,7 @@ public class ShardTableService{
 		
 		logger.info("nextMonth={}", nextMonth.toLocaleString());
 		
-		this.createAccountRecordTable(this.getAsset(asset+"__"+symbol), start.getTime(), nextMonth.getTime());
+		this.createAccountRecordTable(asset, start.getTime(), nextMonth.getTime());
 		
 		this.createOrderTable(asset, symbol, start.getTime(), nextMonth.getTime());
 		this.createOrderTradeTable(asset, symbol, start.getTime(), nextMonth.getTime());
@@ -167,12 +163,6 @@ public class ShardTableService{
 	
 	private boolean exist(String table){
 		return this.physicsTabls.contains(table);
-	}
-	
-	private String getAsset(String symbol){
-		String[] sa2 = symbol.split("_");
-		String asset = sa2[0];
-		return asset;
 	}
 
 //	@PostConstruct
