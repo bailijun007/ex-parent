@@ -46,7 +46,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
 
 
     @Override
-    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, String startTime, String endTime, Integer pageSize, Long lastOrderId, Integer nextPage) {
+    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage, String startTime, String endTime) {
         long start = System.currentTimeMillis();
         checkParam(userId, asset, symbol, pageSize, nextPage);
         startTime = getDefaultDateTime(startTime);
