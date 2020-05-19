@@ -13,11 +13,11 @@ public class LiqScheduledJob {
     private static final Logger logger = LoggerFactory.getLogger(LiqScheduledJob.class);
     
     @Autowired
-    private LiquidationService liquidationService;
+    private LiquidationHandler liquidationHandler;
     
 	@Scheduled(cron = "${cron.liq.check}")
 	public void checkLiqOrder() {
-		liquidationService.checkLiqOrder();
+		liquidationHandler.checkLiqOrder();
 	}
 	
 	/**
@@ -26,7 +26,7 @@ public class LiqScheduledJob {
 	@LimitTimeHandle
 //	@Scheduled(cron = "${cron.liq.handle}")
 	public void hanleLiqOrder(){
-		liquidationService.hanleLiqOrder();
+		liquidationHandler.hanleLiqOrder();
 	}
 
 }

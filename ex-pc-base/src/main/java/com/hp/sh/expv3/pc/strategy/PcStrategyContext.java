@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,16 +25,16 @@ import com.hp.sh.expv3.pc.strategy.data.PosBaseData;
 import com.hp.sh.expv3.pc.strategy.data.PosData;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.pc.strategy.vo.OrderFeeParamVo;
-import com.hp.sh.expv3.pc.strategy.vo.OrderMarginVo;
+import com.hp.sh.expv3.pc.strategy.vo.PosMarginVo;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.utils.IntBool;
-import com.hp.sh.expv3.utils.math.BigCalc;
 import com.hp.sh.expv3.utils.math.BigFormat;
 import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.Precision;
 
 @Component
 public class PcStrategyContext {
+	private static final Logger logger = LoggerFactory.getLogger(PcStrategyContext.class);
 	
 	@Autowired
 	private MetadataService metadataService;
@@ -167,7 +169,7 @@ public class PcStrategyContext {
 			}
 			
 			tradeResult.setOrderOpenFee(feeData.getOpenFee());
-			tradeResult.setOrderMargin(feeData.getOrderMargin()); //保证金
+			tradeResult.setTradeMargin(feeData.getOrderMargin()); //保证金
 			tradeResult.setOrderCloseFee(feeData.getCloseFee());
 		}else{
 			BigDecimal tradeFee = orderStrategy.calcTradeFee(tradeResult.getNumber(), faceValue, tradeResult.getPrice(), tradeResult.getFeeRatio());
@@ -177,9 +179,10 @@ public class PcStrategyContext {
 				BigDecimal fr = tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE);
 				tradeResult.setFee(tradeFee.multiply(fr));
 			}
-			
-			OrderMarginVo posMargin = new OrderMarginVo(pcPosition.getPosMargin(), BigDecimal.ZERO, pcPosition.getCloseFee());
-			tradeResult.setOrderMargin(posMargin.getOrderMargin()); //保证金
+
+			PosMarginVo posMargin = new PosMarginVo(pcPosition.getPosMargin(), BigDecimal.ZERO, pcPosition.getCloseFee());
+			OrderFeeData feeData = orderStrategy.calcRaitoFee(posMargin, pcPosition.getVolume(), matchedVo.getNumber());
+			tradeResult.setTradeMargin(feeData.getOrderMargin()); //保证金
 			tradeResult.setOrderCloseFee(BigDecimal.ZERO);
 		}
 		
@@ -212,14 +215,18 @@ public class PcStrategyContext {
 		//强平价
 		if(pcPosition!=null){
 			BigDecimal _newVolume = IntBool.isTrue(closeFlag)?pcPosition.getVolume().subtract(tradeResult.getNumber()):pcPosition.getVolume().add(tradeResult.getNumber());
-			BigDecimal _newPosMargin = IntBool.isTrue(closeFlag)?pcPosition.getPosMargin().subtract(tradeResult.getOrderMargin()):pcPosition.getPosMargin().add(tradeResult.getOrderMargin());
-			tradeResult.setNewPosLiqPrice(
-				holdPosStrategy.calcLiqPrice(longFlag, order.getFaceValue(), _newVolume, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), _newPosMargin)
-			);
+			BigDecimal _newPosMargin = IntBool.isTrue(closeFlag)?pcPosition.getPosMargin().subtract(tradeResult.getTradeMargin()):pcPosition.getPosMargin().add(tradeResult.getTradeMargin());
+			if(BigUtils.gtZero(_newVolume)){
+				tradeResult.setNewPosLiqPrice(
+						holdPosStrategy.calcLiqPrice(longFlag, order.getFaceValue(), _newVolume, tradeResult.getNewPosMeanPrice(), pcPosition.getHoldMarginRatio(), _newPosMargin)
+					);
+			}else{
+				tradeResult.setNewPosLiqPrice(pcPosition.getLiqPrice());
+			}
 		}else{
 			BigDecimal holdRatio = feeRatioService.getHoldRatio(userId, asset, symbol, tradeResult.getNumber());
 			tradeResult.setNewPosLiqPrice(
-				holdPosStrategy.calcLiqPrice(longFlag, order.getFaceValue(), tradeResult.getNumber(), tradeResult.getNewPosMeanPrice(), holdRatio, tradeResult.getOrderMargin())
+				holdPosStrategy.calcLiqPrice(longFlag, order.getFaceValue(), tradeResult.getNumber(), tradeResult.getNewPosMeanPrice(), holdRatio, tradeResult.getTradeMargin())
 			);
 		}
 		

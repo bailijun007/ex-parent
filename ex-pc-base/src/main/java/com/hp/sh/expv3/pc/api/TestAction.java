@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.pc.component.FeeRatioService;
-import com.hp.sh.expv3.pc.job.liq.LiquidationService;
+import com.hp.sh.expv3.pc.job.liq.LiquidationHandler;
 import com.hp.sh.expv3.pc.module.liq.service.PcLiqService;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
@@ -42,7 +42,7 @@ public class TestAction{
 	private FeeRatioService feeRatioService;
 	
 	@Autowired
-	private LiquidationService liquidationJob;
+	private LiquidationHandler liquidationJob;
 	
 	@Autowired
 	private PcPositionMarginService positionMarginService;

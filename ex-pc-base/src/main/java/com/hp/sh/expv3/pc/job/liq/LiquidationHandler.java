@@ -38,8 +38,8 @@ import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
 @Component
-public class LiquidationService {
-    private static final Logger logger = LoggerFactory.getLogger(LiquidationService.class);
+public class LiquidationHandler {
+    private static final Logger logger = LoggerFactory.getLogger(LiquidationHandler.class);
     
 	@Autowired
 	private PcPositionDataService positionDataService;
@@ -66,7 +66,7 @@ public class LiquidationService {
     private MatchMqSender liqMqSender;
 
     @Autowired
-	private LiquidationService self;
+	private LiquidationHandler self;
     
     
 	@Scheduled(cron = "${cron.liq.check}")

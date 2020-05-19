@@ -1,9 +1,11 @@
 package com.hp.sh.expv3.pc.module.msg.entity;
 
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.hp.sh.expv3.base.entity.UserData;
+import com.hp.sh.expv3.component.id.utils.GeneratorName;
 
 /**
  * 币币_撮合消息
@@ -53,6 +55,8 @@ public class PcMessageExt implements UserData{
 	
 	private int status;
 	
+	@Id
+	@GeneratedValue(generator=GeneratorName.SNOWFLAKE)
 	public Long getId() {
 		return id;
 	}

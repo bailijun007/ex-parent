@@ -32,7 +32,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
 
 
     @Override
-    public PageResult<PcAccountLogVo> pageQueryPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize,Long queryId,Integer nextPage) {
+    public PageResult<PcAccountLogVo> pageQueryPcAccountLogList(Long userId, String asset, Integer tradeType, Integer historyType, Long startDate, Long endDate, String symbol, Integer pageNo, Integer pageSize, Long queryId, Integer nextPage) {
         PageResult<PcAccountLogVo> result = new PageResult<>();
         LocalDateTime localDateTime = LocalDateTime.now();
         Map<String, Object> map = new HashMap<>();
@@ -52,25 +52,29 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        List<PcAccountLogVo> list =null;
-        if(null==queryId){
+        List<PcAccountLogVo> list = null;
+        if (null == queryId) {
             if (ExtCommonConstant.TRADE_TYPE_ALL.equals(tradeType)) {
-                list = pcAccountLogDAO.queryByLimit(map);
+                map.put("type", null);
             } else if (ExtCommonConstant.TRADE_TYPE_MAP.containsKey(tradeType)) {
                 List<Integer> typeList = ExtCommonConstant.TRADE_TYPE_MAP.get(tradeType);
                 map.put("types", typeList);
-                 list = pcAccountLogDAO.queryByLimit(map);
+            } else {
+                map.put("type", tradeType);
             }
-        }else {
+            list = pcAccountLogDAO.queryByLimit(map);
+        } else {
             map.put("queryId", queryId);
             map.put("nextPage", nextPage);
             if (ExtCommonConstant.TRADE_TYPE_ALL.equals(tradeType)) {
-               list = pcAccountLogDAO.queryByNextPage(map);
-            }else if (ExtCommonConstant.TRADE_TYPE_MAP.containsKey(tradeType)) {
+                map.put("type", null);
+            } else if (ExtCommonConstant.TRADE_TYPE_MAP.containsKey(tradeType)) {
                 List<Integer> typeList = ExtCommonConstant.TRADE_TYPE_MAP.get(tradeType);
                 map.put("types", typeList);
-                list = pcAccountLogDAO.queryByNextPage(map);
+            } else {
+                map.put("type", tradeType);
             }
+            list = pcAccountLogDAO.queryByNextPage(map);
         }
         result.setPageNo(0);
         result.setRowTotal(0L);
@@ -81,6 +85,7 @@ public class PcAccountLogExtendServiceImpl implements PcAccountLogExtendService 
 
     /**
      * 重新手动分页
+     *
      * @param pageNo
      * @param pageSize
      * @param result

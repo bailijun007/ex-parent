@@ -52,7 +52,7 @@ public class DataSourceConfig {
 	@Order(3)
 	@Bean("shardingDataSource")
 	public DataSource shardingDataSource(@Qualifier("primaryDataSource") DataSource primaryDataSource, List<DataSource> dsList, TradeId2DateShard tid) throws SQLException {
-		// é…ç½®åˆ†ç‰‡è§„åˆ™
+		// ÅäÖÃ·ÖÆ¬¹æÔò
 		ExShardingBuilder builder = new ExShardingBuilder();
 		builder.setDataSourceList(dsList);
 		builder.setTableInfoCache(this.tableInfoCache);

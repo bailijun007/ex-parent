@@ -34,7 +34,6 @@ public class PcAccountSymbolService{
     @Autowired
     private ApplicationEventPublisher publisher;
 
-	@LockIt(key="${userId}-${asset}-${symbol}")
 	public PcAccountSymbol create(Long userId, String asset, String symbol){
 		PcAccountSymbol as = this.get(userId, asset, symbol);
 		if(as!=null){
