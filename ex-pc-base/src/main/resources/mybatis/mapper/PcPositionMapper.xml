@@ -120,14 +120,16 @@
         for update
     </select>
     
-    <select id="exist" resultType="boolean">
-        select
-        count(1)
-        from
-        pc_position
-        <include refid="simple_where"/>
-        limit 1
-    </select>
+	<select id="exist" resultType="long">
+		select EXISTS(
+			select 
+				1
+			from 
+				pc_position
+			<include refid="simple_where" />
+			limit 1
+		)
+	</select>
 
 	<insert id="save">
 		insert into pc_position (
@@ -145,6 +147,16 @@
 		where 
 			id=#{id} and user_id=#{userId} and version=#{version}
 	</update>
+	
+	<delete id="delete">
+        delete from 
+        	pc_position 
+		where 
+			id=#{id} 
+			and user_id=#{userId}
+			and asset=#{asset}
+			and symbol=#{symbol}
+    </delete>
 
     <!--  -->
 
@@ -166,57 +178,51 @@
         select
         	p.*
         from
-        	pc_active_position ap
-		LEFT JOIN 
-			pc_position p ON p.id = ap.id
+        	pc_position p
         where
-        	ap.user_id=#{userId} 
-        	and ap.asset=#{asset} 
-        	and ap.symbol=#{symbol} 
-        	and ap.long_flag=#{longFlag}
+        	p.user_id=#{userId} 
+        	and p.asset=#{asset} 
+        	and p.symbol=#{symbol} 
+        	and p.long_flag=#{longFlag}
     </select>
 
     <select id="queryActivePosList" resultMap="PcPosition">
         select
         	p.*
         from
-        	pc_active_position ap
-		LEFT JOIN 
-			pc_position p ON p.id = ap.id
+        	pc_position p
         where
-        	ap.user_id=#{userId} 
-        	and ap.asset=#{asset} 
-        	and ap.symbol=#{symbol} 
-        order by ap.long_flag desc
+        	p.user_id=#{userId} 
+        	and p.asset=#{asset} 
+        	and p.symbol=#{symbol} 
+        order by p.long_flag desc
     </select>
 
     <select id="queryActivePosIdList" resultType="com.hp.sh.expv3.pc.module.position.vo.PosUID">
         select
         	id,user_id,asset,symbol,long_flag
         from
-        	pc_active_position ap
+        	pc_position p
         <where>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
         </where>
         order by 
-        	ap.long_flag desc
+        	p.long_flag desc
     </select>
     
     <select id="getCutPos" resultMap="PcPosition">
         select
         	p.*
         from
-			pc_active_position ap
-		LEFT JOIN 
-			pc_position p ON p.id = ap.id
+			pc_position p
         where
-        	and ap.asset=#{asset} 
-        	and ap.symbol=#{symbol} 
+        	and p.asset=#{asset} 
+        	and p.symbol=#{symbol} 
         	and long_flag=#{longFlag} 
         order by 
-        	ap.mean_price 
+        	p.mean_price 
         <if test="longFlag=0">desc</if>
         <if test="longFlag=1">asc</if>
         limit 0,1

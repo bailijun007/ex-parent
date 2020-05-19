@@ -140,7 +140,7 @@
 			select 
 				1
 			from 
-				pc_active_order
+				pc_order
 			<include refid="simple_where" />
 			limit 1
 		)
@@ -162,6 +162,16 @@
 		where 
 			id=#{id} and user_id=#{userId} and version=#{version}
 	</update>
+	
+	<delete id="delete">
+        delete from 
+        	pc_order 
+		where 
+			id=#{id} 
+			and user_id=#{userId}
+			and asset=#{asset}
+			and symbol=#{symbol}
+    </delete>
 
 	<!--  -->
 	
@@ -188,13 +198,11 @@
 		SELECT
 			sum(o.volume - o.cancel_volume - o.filled_volume)
 		FROM
-			pc_active_order ao
-		LEFT JOIN 
-			pc_order o ON o.id = ao.id
+			pc_order o
 		where 
-			ao.user_id=#{userId}
-			and ao.asset=#{asset}
-			and ao.symbol=#{symbol}
+			o.user_id=#{userId}
+			and o.asset=#{asset}
+			and o.symbol=#{symbol}
 			and o.close_pos_id=#{posId}
 	</select>
 	
@@ -202,14 +210,12 @@
 		SELECT
 			o.*
 		FROM
-			pc_active_order ao
-		LEFT JOIN 
-			pc_order o ON o.id = ao.id
+			pc_order o
 		<where>
-			ao.user_id=#{userId}
-			<if test="startId!=null"> and ao.id &lt; #{startId}</if>
-			<if test="asset!=null and asset!=''"> and ao.asset=#{asset}</if>
-			<if test="symbol!=null and symbol!=''"> and ao.symbol=#{symbol}</if>
+			o.user_id=#{userId}
+			<if test="startId!=null"> and o.id &lt; #{startId}</if>
+			<if test="asset!=null and asset!=''"> and o.asset=#{asset}</if>
+			<if test="symbol!=null and symbol!=''"> and o.symbol=#{symbol}</if>
 			<if test="status!=null"> and o.status=#{status}</if>
 			<if test="liqFlag!=null"> and o.liq_flag=#{liqFlag}</if>
 		</where>
@@ -220,12 +226,10 @@
 		SELECT
 			o.*
 		FROM
-			pc_active_order ao
-		LEFT JOIN 
-			pc_order o ON o.id = ao.id
+			pc_order o
 		<where>
-			<if test="asset!=null and asset!=''"> and ao.asset=#{asset}</if>
-			<if test="symbol!=null and symbol!=''"> and ao.symbol=#{symbol}</if>
+			<if test="asset!=null and asset!=''"> and o.asset=#{asset}</if>
+			<if test="symbol!=null and symbol!=''"> and o.symbol=#{symbol}</if>
 			<if test="createdEnd!=null"> and o.created &lt;= #{createdEnd}</if>
 			<if test="status!=null"> and o.status=#{status}</if>
 			<if test="liqFlag!=null"> and o.liq_flag=#{liqFlag}</if>
