@@ -2,6 +2,7 @@ package com.hp.sh.expv3.pc.module.position.entity;
 
 import java.math.BigDecimal;
 
+import javax.persistence.Table;
 import javax.persistence.Version;
 
 import com.hp.sh.expv3.base.entity.UserDataEntity;
@@ -13,6 +14,7 @@ import com.hp.sh.expv3.pc.strategy.data.PosData;
  * @author wangjg
  *
  */
+@Table(name="pc_position")
 public class PcPosition extends UserDataEntity implements PosData {
 
 	private static final long serialVersionUID = 1L;

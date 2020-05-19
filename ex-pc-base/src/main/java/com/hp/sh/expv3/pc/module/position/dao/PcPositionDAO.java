@@ -55,4 +55,6 @@ public interface PcPositionDAO extends BaseUserDataMapper<PcPosition,Long> {
 		@Param("longFlag") Integer longFlag
 	);
 
+	public void delete(@Param("id") long id, @Param("userId") long userId, @Param("asset") String asset, @Param("symbol") String symbol);
+
 }

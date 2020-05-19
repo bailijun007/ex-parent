@@ -11,12 +11,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.dev.CrossDB;
-import com.hp.sh.expv3.pc.module.position.dao.PcActivePositionDAO;
 import com.hp.sh.expv3.pc.module.position.dao.PcPositionDAO;
-import com.hp.sh.expv3.pc.module.position.entity.PcActivePosition;
+import com.hp.sh.expv3.pc.module.position.dao.PcPositionHistoryDAO;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
+import com.hp.sh.expv3.pc.module.position.entity.PcPositionHistory;
 import com.hp.sh.expv3.pc.module.position.vo.PosUID;
 import com.hp.sh.expv3.utils.math.BigUtils;
 
@@ -29,7 +30,7 @@ public class PcPositionDataService {
 	private PcPositionDAO pcPositionDAO;
 	
 	@Autowired
-	private PcActivePositionDAO pcActivePositionDAO;
+	private PcPositionHistoryDAO pcPositionHistoryDAO;
 	
 	@Autowired
     private ApplicationEventPublisher publisher;
@@ -49,11 +50,9 @@ public class PcPositionDataService {
 	
 	public void save(PcPosition pcPosition) {
 		this.pcPositionDAO.save(pcPosition);
-		this.saveActivePos(pcPosition);
 	}
 
 	public void update(PcPosition pcPosition){
-		this.pcPositionDAO.update(pcPosition);
 		this.updateActivePos(pcPosition);
 		publisher.publishEvent(pcPosition);
 	}
@@ -89,19 +88,14 @@ public class PcPositionDataService {
 		return list;
 	}
 
-	private void saveActivePos(PcPosition pcPosition) {
-		PcActivePosition pcActivePosition = new PcActivePosition();
-		pcActivePosition.setId(pcPosition.getId());
-		pcActivePosition.setUserId(pcPosition.getUserId());
-		pcActivePosition.setAsset(pcPosition.getAsset());
-		pcActivePosition.setSymbol(pcPosition.getSymbol());
-		pcActivePosition.setLongFlag(pcPosition.getLongFlag());
-		this.pcActivePositionDAO.save(pcActivePosition);
-	}
-
 	private void updateActivePos(PcPosition pcPosition) {
-		if(BigUtils.isZero(pcPosition.getVolume())){
-			this.pcActivePositionDAO.delete(pcPosition.getId(), pcPosition.getUserId());
+		if(BigUtils.gtZero(pcPosition.getVolume())){
+			this.pcPositionDAO.update(pcPosition);
+		}else{
+			this.pcPositionDAO.delete(pcPosition.getId(), pcPosition.getUserId(), pcPosition.getAsset(), pcPosition.getSymbol());
+			//保存到历史订单
+			PcPositionHistory positionHistory = BeanHelper.copyBean(pcPosition, PcPositionHistory.class);
+			pcPositionHistoryDAO.save(positionHistory);
 		}
 	}
 	
