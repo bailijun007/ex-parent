@@ -30,12 +30,16 @@ public interface PcOrderExtendApi {
             @ApiImplicitParam(name = "status", value = "委托状态，多个以逗号分割"),
             @ApiImplicitParam(name = "gtOrderId ", value = "orderId,请求大于order_id的数据,gt和lt都填,以gt为准", example = "10", required = false),
             @ApiImplicitParam(name = "ltOrderId ", value = "orderId,请求小于order_id的数据", example = "10", required = false),
-            @ApiImplicitParam(name = "count", value = "返回条数最大100条", example = "10", required = true)
+            @ApiImplicitParam(name = "count", value = "返回条数最大100条", example = "10", required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false)
     })
     List<UserOrderVo> queryOrderList(@RequestParam(value = "userId") Long userId, @RequestParam(value = "asset", required = false) String asset,
                                      @RequestParam(value = "symbol", required = false) String symbol, @RequestParam(value = "gtOrderId", required = false) Long gtOrderId,
                                      @RequestParam(value = "ltOrderId", required = false) Long ltOrderId, @RequestParam("count") Integer count,
-                                     @RequestParam("status") String status);
+                                     @RequestParam("status") String status,
+                                     @RequestParam(value ="startTime", required = false) String startTime,
+                                     @RequestParam(value ="endTime", required = false) String endTime);
 
 
     @ApiOperation(value = "获取当前用户活动委托")

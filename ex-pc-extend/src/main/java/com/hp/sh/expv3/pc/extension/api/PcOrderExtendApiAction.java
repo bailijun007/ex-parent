@@ -23,6 +23,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,7 +49,9 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     private PcStrategyContext positionStrategyContext;
 
     @Override
-    public List<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status) {
+    public List<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status,String startTime,String endTime) {
+        startTime = getDefaultDateTime(startTime);
+        endTime = getDefaultDateTime(endTime);
         if (null == userId || count == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
@@ -325,5 +329,14 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         }
     }
 
+    private String getDefaultDateTime(String startTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime dateTime = LocalDateTime.now();
+        //如果开始时间，结束时间没有值则给默认今天时间
+        if (org.springframework.util.StringUtils.isEmpty(startTime)) {
+            startTime = formatter.format(dateTime);
+        }
+        return startTime;
+    }
 
 }
