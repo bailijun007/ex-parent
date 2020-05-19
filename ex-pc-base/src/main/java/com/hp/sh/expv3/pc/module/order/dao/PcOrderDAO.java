@@ -45,5 +45,9 @@ public interface PcOrderDAO extends BaseAccountDataMapper<PcOrder, Long> {
 	public List<PcOrder> queryActiveOrderList(Page page, @Param("asset") String asset, @Param("symbol") String symbol, @Param("createdEnd") Long createdEnd, @Param("status") Integer status, @Param("liqFlag") Integer liqFlag);
 
 	public PcOrder lockById(@Param(UserDataEntity.USERID_PROPERTY) Long userId, @Param(BaseBizEntity.ID_PROPERTY) Long id);
+	
+	public long exist(@Param("userId") long userId, @Param("asset") String asset, @Param("symbol") String symbol, @Param("longFlag") Integer longFlag);
+
+	public void delete(@Param("id") long id, @Param("userId") long userId, @Param("asset") String asset, @Param("symbol") String symbol);
 
 }

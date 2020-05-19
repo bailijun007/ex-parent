@@ -16,7 +16,6 @@ import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.component.lock.LockConfig;
 import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.pc.constant.OrderStatus;
-import com.hp.sh.expv3.pc.module.order.dao.PcActiveOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
@@ -34,9 +33,6 @@ public class PcOrderQueryService {
 
 	@Autowired
 	private PcOrderDAO pcOrderDAO;
-
-	@Autowired
-	private PcActiveOrderDAO pcActiveOrderDAO;
 
 	@Autowired
 	private PcOrderTradeDAO pcOrderTradeDAO;
@@ -69,7 +65,7 @@ public class PcOrderQueryService {
 	}
 	
 	public boolean hasActiveOrder(long userId, String asset, String symbol, Integer longFlag) {
-		long count = this.pcActiveOrderDAO.exist(userId, asset, symbol, longFlag);
+		long count = this.pcOrderDAO.exist(userId, asset, symbol, longFlag);
 		return count>0;
 	}
 	

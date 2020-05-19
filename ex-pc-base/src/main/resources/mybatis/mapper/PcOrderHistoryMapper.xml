@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.pc.module.order.dao.PcOrderHistoryDAO">
+
+	<resultMap type="com.hp.sh.expv3.pc.module.order.entity.PcOrderHistory" id="PcOrderHistory">
+		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="close_flag" property="closeFlag" />
+		<result column="long_flag" property="longFlag" />
+		<result column="leverage" property="leverage" />
+		<result column="volume" property="volume" />
+		<result column="face_value" property="faceValue" />
+		<result column="price" property="price" />
+		<result column="order_type" property="orderType" />
+		<result column="time_in_force" property="timeInForce" />
+		<result column="margin_mode" property="marginMode" />
+		<result column="open_fee_ratio" property="openFeeRatio" />
+		<result column="close_fee_ratio" property="closeFeeRatio" />
+		<result column="margin_ratio" property="marginRatio" />
+		<result column="client_order_id" property="clientOrderId" />
+		<result column="open_fee" property="openFee" />
+		<result column="close_fee" property="closeFee" />
+		<result column="order_margin" property="orderMargin" />
+		<result column="gross_margin" property="grossMargin" />
+		<result column="status" property="status" />
+		<result column="active_flag" property="activeFlag" />
+		<result column="remark" property="remark" />
+		<result column="cancel_time" property="cancelTime" />
+		<result column="cancel_volume" property="cancelVolume" />
+		<result column="fee_cost" property="feeCost" />
+		<result column="filled_volume" property="filledVolume" />
+		<result column="trade_mean_price" property="tradeMeanPrice" />
+		<result column="close_pos_id" property="closePosId" />
+		<result column="trigger_flag" property="triggerFlag" />
+		<result column="version" property="version" />
+		<result column="visible_flag" property="visibleFlag" />
+		<result column="liq_flag" property="liqFlag" />
+		<result column="create_operator" property="createOperator" />
+		<result column="cancel_operator" property="cancelOperator" />
+		<result column="user_id" property="userId" />
+		<result column="id" property="id" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		asset,symbol,close_flag,long_flag,leverage,volume,face_value,price,order_type,time_in_force,margin_mode,open_fee_ratio,close_fee_ratio,margin_ratio,client_order_id,open_fee,close_fee,order_margin,gross_margin,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,trade_mean_price,close_pos_id,trigger_flag,version,visible_flag,liq_flag,create_operator,cancel_operator,user_id,id,created,modified
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+			<if test="closeFlag!=null"> and close_flag=#{closeFlag}</if>
+			<if test="longFlag!=null"> and long_flag=#{longFlag}</if>
+			<if test="orderType!=null"> and order_type=#{orderType}</if>
+			<if test="timeInForce!=null"> and time_in_force=#{timeInForce}</if>
+			<if test="marginMode!=null"> and margin_mode=#{marginMode}</if>
+			<if test="status!=null"> and status=#{status}</if>
+			<if test="activeFlag!=null"> and active_flag=#{activeFlag}</if>
+			<if test="cancelTime!=null"> and cancel_time=#{cancelTime}</if>
+			<if test="closePosId!=null"> and close_pos_id=#{closePosId}</if>
+			<if test="triggerFlag!=null"> and trigger_flag=#{triggerFlag}</if>
+			<if test="version!=null"> and version=#{version}</if>
+			<if test="visibleFlag!=null"> and visible_flag=#{visibleFlag}</if>
+			<if test="liqFlag!=null"> and liq_flag=#{liqFlag}</if>
+			<if test="userId!=null"> and user_id=#{userId}</if>
+			<if test="id!=null"> and id=#{id}</if>
+			<if test="created!=null"> and created=#{created}</if>
+			<if test="modified!=null"> and modified=#{modified}</if>
+		</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from pc_order_history
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="PcOrderHistory">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="PcOrderHistory">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="PcOrderHistory">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from pc_order_history
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="PcOrderHistory">
+		select
+			<include refid="Base_Column_List" />
+		from pc_order_history
+			where id=#{id}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			pc_order_history
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		insert into pc_order_history (
+			asset,symbol,close_flag,long_flag,leverage,volume,face_value,price,order_type,time_in_force,margin_mode,open_fee_ratio,close_fee_ratio,margin_ratio,client_order_id,open_fee,close_fee,order_margin,gross_margin,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,trade_mean_price,close_pos_id,trigger_flag,version,visible_flag,liq_flag,create_operator,cancel_operator,user_id,id,created,modified
+		)values(
+			#{asset},#{symbol},#{closeFlag},#{longFlag},#{leverage},#{volume},#{faceValue},#{price},#{orderType},#{timeInForce},#{marginMode},#{openFeeRatio},#{closeFeeRatio},#{marginRatio},#{clientOrderId},#{openFee},#{closeFee},#{orderMargin},#{grossMargin},#{status},#{activeFlag},#{remark},#{cancelTime},#{cancelVolume},#{feeCost},#{filledVolume},#{tradeMeanPrice},#{closePosId},#{triggerFlag},#{version},#{visibleFlag},#{liqFlag},#{createOperator},#{cancelOperator},#{userId},#{id},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			pc_order_history
+		set 
+			asset=#{asset},symbol=#{symbol},bid_flag=#{bidFlag},leverage=#{leverage},volume=#{volume},price=#{price},order_type=#{orderType},time_in_force=#{timeInForce},fee_ratio=#{feeRatio},client_order_id=#{clientOrderId},fee=#{fee},order_margin=#{orderMargin},order_margin_currency=#{orderMarginCurrency},status=#{status},active_flag=#{activeFlag},remark=#{remark},cancel_time=#{cancelTime},cancel_volume=#{cancelVolume},fee_cost=#{feeCost},filled_volume=#{filledVolume},trade_mean_price=#{tradeMeanPrice},version=#{version},create_operator=#{createOperator},cancel_operator=#{cancelOperator},user_id=#{userId},id=#{id},created=#{created},modified=#{modified}
+		where 
+			id=#{id} 
+			and user_id=#{userId}
+			and asset=#{asset}
+			and symbol=#{symbol}
+	</update>
+
+	<delete id="delete">
+        delete from 
+        	pc_order_history 
+		where 
+			id=#{id} 
+			and user_id=#{userId}
+			and asset=#{asset}
+			and symbol=#{symbol}
+    </delete>
+
+    <delete id="condDelete">
+        delete from pc_order_history
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+</mapper>

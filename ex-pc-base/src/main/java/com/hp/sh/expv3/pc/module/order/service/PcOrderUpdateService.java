@@ -8,16 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
 import com.hp.sh.expv3.pc.constant.OrderStatus;
-import com.hp.sh.expv3.pc.constant.PcOrderLogType;
-import com.hp.sh.expv3.pc.constant.TriggerType;
-import com.hp.sh.expv3.pc.module.order.dao.PcActiveOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
-import com.hp.sh.expv3.pc.module.order.entity.PcActiveOrder;
+import com.hp.sh.expv3.pc.module.order.dao.PcOrderHistoryDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.order.entity.PcOrderHistory;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
-import com.hp.sh.expv3.utils.DbDateUtils;
 
 @Service
 @Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
@@ -26,19 +24,15 @@ public class PcOrderUpdateService {
 
 	@Autowired
 	private PcOrderDAO pcOrderDAO;
-
-	@Autowired
-	private PcActiveOrderDAO pcActiveOrderDAO;
 	
+	@Autowired
+	private PcOrderHistoryDAO pcOrderHistoryDAO;
+
     @Autowired
     private ApplicationEventPublisher publisher;
 	
 	public void createNewOrder(PcOrder pcOrder) {
 		this.pcOrderDAO.save(pcOrder);
-		this.saveActiveOrder(pcOrder);
-		
-		//日志
-		Long now = DbDateUtils.now();
 	}
 	
 	public void setNewStatus(PcOrder order, long modified) {
@@ -61,8 +55,6 @@ public class PcOrderUpdateService {
 	}
 
 	public void setCancelStatus(PcOrder order, long now) {
-		this.pcOrderDAO.update(order);
-		
 		this.updateActiveOrder(order);
 		
 		//日志
@@ -70,8 +62,6 @@ public class PcOrderUpdateService {
 	}
 
 	public void updateOrder4Trad(PcOrder order){
-		this.pcOrderDAO.update(order);
-		
 		this.updateActiveOrder(order);
 	}
 	
@@ -80,19 +70,15 @@ public class PcOrderUpdateService {
 		publisher.publishEvent(event);
 	}
 
-	private void saveActiveOrder(PcOrder pcOrder) {
-		PcActiveOrder pcActiveOrder = new PcActiveOrder();
-		pcActiveOrder.setId(pcOrder.getId());
-		pcActiveOrder.setUserId(pcOrder.getUserId());
-		pcActiveOrder.setAsset(pcOrder.getAsset());
-		pcActiveOrder.setSymbol(pcOrder.getSymbol());
-		pcActiveOrder.setLongFlag(pcOrder.getLongFlag());
-		this.pcActiveOrderDAO.save(pcActiveOrder);
-	}
-
 	private void updateActiveOrder(PcOrder order) {
-		if(order.getActiveFlag()==PcOrder.NO){
-			this.pcActiveOrderDAO.delete(order.getId(), order.getUserId());
+		if(order.getActiveFlag()==PcOrder.YES){
+			this.pcOrderDAO.update(order);
+		}else{
+			this.pcOrderDAO.delete(order.getId(), order.getUserId(), order.getAsset(), order.getSymbol());
+			//保存到历史订单
+			PcOrderHistory orderHistrory = BeanHelper.copyBean(order, PcOrderHistory.class);
+			pcOrderHistoryDAO.save(orderHistrory);
 		}
 	}
+	
 }

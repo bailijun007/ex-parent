@@ -32,6 +32,7 @@
 		<result column="cancel_volume" property="cancelVolume" />
 		<result column="fee_cost" property="feeCost" />
 		<result column="filled_volume" property="filledVolume" />
+		<result column="trade_mean_price" property="tradeMeanPrice" />
 		<result column="close_pos_id" property="closePosId" />
 		<result column="trigger_flag" property="triggerFlag" />
 		<result column="version" property="version" />
@@ -45,7 +46,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List" >
-		id,asset,symbol,close_flag,long_flag,leverage,volume,face_value,price,order_type,time_in_force,margin_mode,open_fee_ratio,close_fee_ratio,margin_ratio,client_order_id,open_fee,close_fee,order_margin,gross_margin,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,close_pos_id,trigger_flag,version,visible_flag,liq_flag,create_operator,cancel_operator,user_id,created,modified
+		id,asset,symbol,close_flag,long_flag,leverage,volume,face_value,price,order_type,time_in_force,margin_mode,open_fee_ratio,close_fee_ratio,margin_ratio,client_order_id,open_fee,close_fee,order_margin,gross_margin,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,trade_mean_price,close_pos_id,trigger_flag,version,visible_flag,liq_flag,create_operator,cancel_operator,user_id,created,modified
 	</sql>
 
 	<sql id="simple_where">
@@ -134,20 +135,22 @@
 		for update
 	</select>
 
-	<select id="exist" resultType="boolean">
-		select 
-			count(1)
-		from 
-			pc_order
-		<include refid="simple_where" />
-		limit 1
+	<select id="exist" resultType="long">
+		select EXISTS(
+			select 
+				1
+			from 
+				pc_active_order
+			<include refid="simple_where" />
+			limit 1
+		)
 	</select>
 
 	<insert id="save">
 		insert into pc_order (
-			id,asset,symbol,close_flag,long_flag,leverage,volume,face_value,price,order_type,time_in_force,margin_mode,open_fee_ratio,close_fee_ratio,margin_ratio,client_order_id,open_fee,close_fee,order_margin,gross_margin,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,close_pos_id,trigger_flag,version,visible_flag,liq_flag,create_operator,cancel_operator,user_id,created,modified
+			id,asset,symbol,close_flag,long_flag,leverage,volume,face_value,price,order_type,time_in_force,margin_mode,open_fee_ratio,close_fee_ratio,margin_ratio,client_order_id,open_fee,close_fee,order_margin,gross_margin,status,active_flag,remark,cancel_time,cancel_volume,fee_cost,filled_volume,trade_mean_price,close_pos_id,trigger_flag,version,visible_flag,liq_flag,create_operator,cancel_operator,user_id,created,modified
 		)values(
-			#{id},#{asset},#{symbol},#{closeFlag},#{longFlag},#{leverage},#{volume},#{faceValue},#{price},#{orderType},#{timeInForce},#{marginMode},#{openFeeRatio},#{closeFeeRatio},#{marginRatio},#{clientOrderId},#{openFee},#{closeFee},#{orderMargin},#{grossMargin},#{status},#{activeFlag},#{remark},#{cancelTime},#{cancelVolume},#{feeCost},#{filledVolume},#{closePosId},#{triggerFlag},#{version},#{visibleFlag},#{liqFlag},#{createOperator},#{cancelOperator},#{userId},#{created},#{modified}
+			#{id},#{asset},#{symbol},#{closeFlag},#{longFlag},#{leverage},#{volume},#{faceValue},#{price},#{orderType},#{timeInForce},#{marginMode},#{openFeeRatio},#{closeFeeRatio},#{marginRatio},#{clientOrderId},#{openFee},#{closeFee},#{orderMargin},#{grossMargin},#{status},#{activeFlag},#{remark},#{cancelTime},#{cancelVolume},#{feeCost},#{filledVolume},#{tradeMeanPrice},#{closePosId},#{triggerFlag},#{version},#{visibleFlag},#{liqFlag},#{createOperator},#{cancelOperator},#{userId},#{created},#{modified}
 		)
 	</insert>
 	
@@ -155,7 +158,7 @@
 		update 
 			pc_order
 		set 
-			asset=#{asset},symbol=#{symbol},close_flag=#{closeFlag},long_flag=#{longFlag},leverage=#{leverage},volume=#{volume},face_value=#{faceValue},price=#{price},order_type=#{orderType},time_in_force=#{timeInForce},margin_mode=#{marginMode},open_fee_ratio=#{openFeeRatio},close_fee_ratio=#{closeFeeRatio},margin_ratio=#{marginRatio},client_order_id=#{clientOrderId},open_fee=#{openFee},close_fee=#{closeFee},order_margin=#{orderMargin},gross_margin=#{grossMargin},status=#{status},active_flag=#{activeFlag},remark=#{remark},cancel_time=#{cancelTime},cancel_volume=#{cancelVolume},fee_cost=#{feeCost},filled_volume=#{filledVolume},close_pos_id=#{closePosId},trigger_flag=#{triggerFlag},version=${version}+1,visible_flag=#{visibleFlag},liq_flag=#{liqFlag},create_operator=#{createOperator},cancel_operator=#{cancelOperator},user_id=#{userId},created=#{created},modified=#{modified}
+			asset=#{asset},symbol=#{symbol},close_flag=#{closeFlag},long_flag=#{longFlag},leverage=#{leverage},volume=#{volume},face_value=#{faceValue},price=#{price},order_type=#{orderType},time_in_force=#{timeInForce},margin_mode=#{marginMode},open_fee_ratio=#{openFeeRatio},close_fee_ratio=#{closeFeeRatio},margin_ratio=#{marginRatio},client_order_id=#{clientOrderId},open_fee=#{openFee},close_fee=#{closeFee},order_margin=#{orderMargin},gross_margin=#{grossMargin},status=#{status},active_flag=#{activeFlag},remark=#{remark},cancel_time=#{cancelTime},cancel_volume=#{cancelVolume},fee_cost=#{feeCost},filled_volume=#{filledVolume},trade_mean_price=#{tradeMeanPrice},close_pos_id=#{closePosId},trigger_flag=#{triggerFlag},version=${version}+1,visible_flag=#{visibleFlag},liq_flag=#{liqFlag},create_operator=#{createOperator},cancel_operator=#{cancelOperator},user_id=#{userId},created=#{created},modified=#{modified}
 		where 
 			id=#{id} and user_id=#{userId} and version=#{version}
 	</update>
