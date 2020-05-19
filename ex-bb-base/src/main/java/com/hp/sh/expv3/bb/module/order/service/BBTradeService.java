@@ -30,7 +30,6 @@ import com.hp.sh.expv3.bb.vo.request.CollectorCutRequest;
 import com.hp.sh.expv3.bb.vo.request.ReleaseFrozenRequest;
 import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
 import com.hp.sh.expv3.commons.exception.ExSysException;
-import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.SnUtils;
