@@ -179,7 +179,7 @@ public class ShardTableService{
 	public void initSql(){
 		try {
 			FileConfig fc = new FileConfig();
-			fc.setConfigPath("bb_ddl.sql");
+			fc.setConfigPath("pc_ddl.sql");
 			String text = fc.getFileContent();
 			String[] sqls = text.split(";");
 			for(String sql:sqls){
