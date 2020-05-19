@@ -9,8 +9,16 @@ import java.math.BigDecimal;
  */
 public interface OrderTrade {
 
+	/**
+	 * 成交张数
+	 * @return
+	 */
 	BigDecimal getVolume();
 
+	/**
+	 * 成交价格
+	 * @return
+	 */
 	BigDecimal getPrice();
 
 }

@@ -144,6 +144,10 @@ public class PcOrder extends UserDataEntity implements OrderData{
 	 * 已成交量
 	 */
 	private BigDecimal filledVolume;
+	
+	//成交均价
+	private BigDecimal tradeMeanPrice;
+	
 	/**
 	 * 平仓委托对应的仓位Id
 	 */
@@ -333,6 +337,14 @@ public class PcOrder extends UserDataEntity implements OrderData{
 
 	public void setFilledVolume(BigDecimal filledVolume) {
 		this.filledVolume = filledVolume;
+	}
+
+	public BigDecimal getTradeMeanPrice() {
+		return tradeMeanPrice;
+	}
+
+	public void setTradeMeanPrice(BigDecimal tradeMeanPrice) {
+		this.tradeMeanPrice = tradeMeanPrice;
 	}
 
 	public Long getClosePosId() {

@@ -14,15 +14,20 @@ public class OrderTradeVo implements OrderTrade{
 
 	private Long id;
 
+	public OrderTradeVo() {
+	}
+
+	public OrderTradeVo(BigDecimal volume, BigDecimal price) {
+		this.volume = volume;
+		this.price = price;
+	}
+
 	public Long getOrderId() {
 		return orderId;
 	}
 
 	public void setOrderId(Long orderId) {
 		this.orderId = orderId;
-	}
-
-	public OrderTradeVo() {
 	}
 
 	public BigDecimal getVolume() {

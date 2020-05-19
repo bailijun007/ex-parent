@@ -1,6 +1,8 @@
 package com.hp.sh.expv3.pc.module.position.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,8 @@ import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 import com.hp.sh.expv3.pc.module.trade.entity.PcMatchedResult;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcTradeMsg;
 import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
+import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
+import com.hp.sh.expv3.pc.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.pc.strategy.vo.TradeResult;
 import com.hp.sh.expv3.pc.vo.request.CollectorAddRequest;
 import com.hp.sh.expv3.pc.vo.request.CollectorCutRequest;
@@ -110,6 +114,7 @@ public class PcTradeService {
 		Long now = DbDateUtils.now();
 		/*  1、修改订单数据和订单状态  */
 		order.setFilledVolume(order.getFilledVolume().add(trade.getNumber()));
+		order.setTradeMeanPrice(this.calcOrderTradeMeanPrice(order, trade));
 		boolean com = BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(order.getCancelVolume()));
         order.setStatus(com?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
 //        order.setActiveFlag(com?PcOrder.NO:PcOrder.YES);
@@ -295,6 +300,7 @@ public class PcTradeService {
 		}
 		order.setFeeCost(order.getFeeCost().add(tradeResult.getFee()));
 		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getNumber()));
+		order.setTradeMeanPrice(this.calcOrderTradeMeanPrice(order, tradeResult));
         order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setModified(now);
@@ -438,6 +444,22 @@ public class PcTradeService {
 			return false;
 		}
 		return true;
+	}
+	
+	private BigDecimal calcOrderTradeMeanPrice(PcOrder order, PcTradeMsg trade){
+		List<OrderTrade> tradeList = new ArrayList<OrderTrade>();
+		tradeList.add(new OrderTradeVo(order.getFilledVolume(), order.getTradeMeanPrice()));
+		tradeList.add(new OrderTradeVo(trade.getNumber(), trade.getPrice()));
+		BigDecimal orderTradeMeanPrice = positionStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), order.getLongFlag(), tradeList);
+		return orderTradeMeanPrice;
+	}
+	
+	private BigDecimal calcOrderTradeMeanPrice(PcOrder order, TradeResult tradeResult){
+		List<OrderTrade> tradeList = new ArrayList<OrderTrade>();
+		tradeList.add(new OrderTradeVo(order.getFilledVolume(), order.getTradeMeanPrice()));
+		tradeList.add(new OrderTradeVo(tradeResult.getNumber(), tradeResult.getPrice()));
+		BigDecimal orderTradeMeanPrice = positionStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), order.getLongFlag(), tradeList);
+		return orderTradeMeanPrice;
 	}
 	
 	/**
