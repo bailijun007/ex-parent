@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.sh.expv3.pc.module.sys.dao.DbGlobalDAO">
+
+	<select id="findTableName" resultType="string">
+		select table_name 
+			from information_schema.tables 
+		<where> 
+			<if test="dbName!=null and dbName!=''">
+			 and table_schema=#{dbName}
+			</if>
+			and table_name=#{tableName}
+		</where>
+		order by table_name desc
+	</select>
+	
+	<select id="findFirstTableByKeyword" resultType="string">
+		select table_name 
+			from information_schema.tables 
+		<where> 
+			<if test="dbName!=null and dbName!=''">
+			 and table_schema=#{dbName}
+			</if>
+			and table_name like CONCAT('',#{keyword},'%')
+			and right(table_name, 3)!='_sn'
+			and right(table_name, 3)!='_no'
+		</where>
+		order by table_name desc
+		limit 1
+	</select>
+	
+	<select id="findTableByKeyword" resultType="string">
+		select table_name 
+			from information_schema.tables 
+		<where> 
+			<if test="dbName!=null and dbName!=''">
+			 and table_schema=#{dbName}
+			</if>
+			and table_name like CONCAT('',#{keyword},'%')
+			and right(table_name, 3)!='_sn'
+			and right(table_name, 3)!='_no'
+		</where>
+		order by table_name desc
+	</select>
+	
+	<update id="createAccountRecordTable">
+		CREATE TABLE `${tableName}` (
+		  `id` bigint(20) NOT NULL COMMENT '主键',
+		  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+		  `asset` varchar(20) NOT NULL COMMENT '资产',
+		  `sn` varchar(64) NOT NULL COMMENT '流水号',
+		  `type` int(11) NOT NULL COMMENT '类型：1 收入,-1 支出',
+		  `amount` decimal(50,30) NOT NULL COMMENT '本笔金额',
+		  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+		  `balance` decimal(50,30) NOT NULL COMMENT '本笔余额',
+		  `trade_no` varchar(64) NOT NULL COMMENT '调用方支付单号',
+		  `trade_type` int(11) NOT NULL COMMENT '交易类型：1-资金转入，2-资金转出，3-下订单，4-撤单，4-追加保证金，5-平仓收益',
+		  `serial_no` bigint(20) NOT NULL COMMENT '序号:',
+		  `associated_id` bigint(20) DEFAULT NULL COMMENT '关联对象的ID',
+		  `tx_id` bigint(20) DEFAULT NULL COMMENT '事务ID',
+		  `request_id` varchar(50) DEFAULT NULL COMMENT '请求ID',
+		  `created` bigint(20) NOT NULL COMMENT '创建时间',
+		  `modified` bigint(20) NOT NULL COMMENT '修改时间',
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `un_sn` (`sn`) USING BTREE,
+		  UNIQUE KEY `un_trade_no` (`trade_no`) USING BTREE,
+		  KEY `idx_created` (`created`) USING BTREE
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='永续合约_账户明细';
+	</update>
+	
+	<update id="createOrderTable">
+		CREATE TABLE `${tableName}` (
+		  `id` bigint(20) NOT NULL COMMENT '主键',
+		  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+		  `asset` varchar(20) NOT NULL COMMENT '资产',
+		  `symbol` varchar(64) NOT NULL COMMENT '合约交易品种',
+		  `close_flag` int(11) NOT NULL COMMENT '是否:1-平仓,0-开',
+		  `long_flag` int(11) NOT NULL COMMENT '是否：1-多仓，0-空仓',
+		  `margin_mode` int(11) NOT NULL COMMENT '保证金模式:1-全仓,2-逐仓',
+		  `leverage` decimal(10,2) NOT NULL COMMENT '杠杆',
+		  `price` decimal(50,30) NOT NULL COMMENT '委托价格',
+		  `order_type` int(11) NOT NULL COMMENT '永续合约委托类型',
+		  `volume` decimal(50,20) NOT NULL COMMENT '委托数量，初始设置后，后续不会修改',
+		  `face_value` decimal(50,30) DEFAULT NULL,
+		  `status` int(11) NOT NULL COMMENT '委托状态',
+		  `margin_ratio` decimal(50,30) NOT NULL COMMENT '保证金率，初始为 杠杆的倒数',
+		  `open_fee_ratio` decimal(50,30) NOT NULL COMMENT '开仓手续费率',
+		  `close_fee_ratio` decimal(50,30) NOT NULL COMMENT '强平手续费率',
+		  `fee_cost` decimal(50,30) NOT NULL COMMENT '实收手续费,成交后计算(可能部分成交，按比例收取)',
+		  `gross_margin` decimal(50,30) NOT NULL COMMENT '总押金：保证金+开仓手续费+平仓手续费',
+		  `order_margin` decimal(50,30) NOT NULL COMMENT '委托保证金',
+		  `open_fee` decimal(50,30) NOT NULL COMMENT '开仓手续费,成交时修改(可能部分成交，按比例释放)',
+		  `close_fee` decimal(50,30) NOT NULL COMMENT '平仓手续费，在下委托时提前收取(可能部分成交，按比例释放)',
+		  `filled_volume` decimal(50,30) NOT NULL COMMENT '已成交量（单位：张）',
+		  `cancel_volume` decimal(50,30) DEFAULT NULL COMMENT '取消（单位：张）',
+		  `close_pos_id` bigint(20) DEFAULT NULL COMMENT '平仓委托对应的仓位Id',
+		  `time_in_force` int(11) DEFAULT NULL COMMENT '委托有效时间',
+		  `trigger_flag` int(11) DEFAULT NULL COMMENT '是否已触发，用于止盈止损等触发式委托',
+		  `cancel_time` bigint(20) DEFAULT NULL COMMENT '取消时间',
+		  `visible_flag` int(11) DEFAULT NULL COMMENT '可见性，强平委托，自动减仓委托 都不可见',
+		  `liq_flag` int(11) NOT NULL COMMENT '是否强平委托',
+		  `active_flag` int(11) NOT NULL COMMENT '是否活动委托',
+		  `create_operator` varchar(50) DEFAULT NULL,
+		  `cancel_operator` varchar(50) DEFAULT NULL,
+		  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+		  `client_order_id` varchar(64) DEFAULT NULL COMMENT '客户自定义委托ID，用于与客户系统关联 （open api）',
+		  `created` bigint(20) NOT NULL COMMENT '创建时间',
+		  `modified` bigint(20) NOT NULL COMMENT '修改时间',
+		  `version` bigint(20) DEFAULT '0',
+		  PRIMARY KEY (`id`),
+		  KEY `idx_created` (`created`) USING BTREE,
+		  KEY `idx_close_pos_id` (`close_pos_id`) USING BTREE,
+		  KEY `idx_user_asset_symbol` (`user_id`,`asset`,`symbol`) USING BTREE
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='永续合约_订单（委托）';
+	</update>
+	
+	<update id="createOrderTradeTable">
+		CREATE TABLE `${tableName}` (
+		  `id` bigint(20) NOT NULL COMMENT '主键',
+		  `asset` varchar(20) NOT NULL COMMENT '资产',
+		  `symbol` varchar(20) NOT NULL COMMENT '合约交易品种',
+		  `order_id` bigint(20) NOT NULL COMMENT '订单ID',
+		  `price` decimal(50,30) NOT NULL COMMENT '成交价',
+		  `volume` decimal(50,30) NOT NULL COMMENT '成交量（单位：张数）',
+		  `trade_sn` varchar(64) NOT NULL COMMENT '交易ID',
+		  `trade_id` bigint(20) NOT NULL COMMENT '交易ID',
+		  `pos_id` bigint(20) NOT NULL COMMENT '仓位ID',
+		  `maker_flag` int(11) NOT NULL COMMENT '1-marker， 0-taker',
+		  `trade_time` bigint(20) NOT NULL COMMENT '成交时间',
+		  `opponent_order_id` bigint(20) DEFAULT NULL COMMENT '对手订单ID',
+		  `fee_collector_id` bigint(20) NOT NULL COMMENT '手续费收取人',
+		  `fee_ratio` decimal(50,30) NOT NULL COMMENT '手续费率',
+		  `fee` decimal(50,30) NOT NULL COMMENT '手续费',
+		  `order_margin` decimal(50,30) DEFAULT NULL COMMENT '押金',
+		  `pnl` decimal(50,30) NOT NULL COMMENT '盈亏(此次成交的盈亏)',
+		  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+		  `created` bigint(20) NOT NULL COMMENT '创建时间',
+		  `modified` bigint(20) NOT NULL COMMENT '修改时间',
+		  `remain_volume` decimal(50,30) DEFAULT NULL COMMENT '未成交量',
+		  `match_tx_id` bigint(20) DEFAULT NULL COMMENT '撮合事务Id',
+		  `tx_id` bigint(20) DEFAULT NULL COMMENT '事务ID',
+		  `fee_synch_status` int(11) DEFAULT NULL,
+		  PRIMARY KEY (`id`),
+		  UNIQUE KEY `un_trade_no` (`trade_sn`) USING BTREE,
+		  KEY `idx_userid` (`user_id`) USING BTREE,
+		  KEY `idx_orderid` (`order_id`) USING BTREE,
+		  KEY `idx_posid` (`pos_id`) USING BTREE
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='永续合约_用户订单成交记录';
+	</update>
+	
+	<update id="createPositionTable">
+		CREATE TABLE `${tableName}` (
+		  `id` bigint(20) NOT NULL COMMENT '主键',
+		  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+		  `asset` varchar(20) NOT NULL COMMENT '资产',
+		  `symbol` varchar(20) NOT NULL COMMENT '合约交易品种',
+		  `long_flag` int(11) NOT NULL COMMENT '是否多仓(side)',
+		  `margin_mode` varchar(20) NOT NULL COMMENT '保证金模式:1-全仓,2-逐仓',
+		  `volume` decimal(50,30) NOT NULL COMMENT '仓位 张数posVolume',
+		  `face_value` decimal(50,8) NOT NULL COMMENT '面值(单位：报价货币)',
+		  `base_value` decimal(50,30) NOT NULL COMMENT '仓位 基础货币 总价值posBaseValue',
+		  `entry_leverage` decimal(50,30) NOT NULL COMMENT '开仓杠杆',
+		  `leverage` decimal(50,30) NOT NULL COMMENT '当前杠杆',
+		  `pos_margin` decimal(50,30) NOT NULL COMMENT '仓位保证金',
+		  `close_fee` decimal(50,30) NOT NULL COMMENT '平仓手续费',
+		  `mean_price` decimal(50,30) NOT NULL COMMENT '均价，仓位为0时，表示最后一次仓位变动时的均价meanPrice',
+		  `accu_base_value` decimal(50,30) NOT NULL COMMENT '累积总价值',
+		  `accu_volume` decimal(50,30) NOT NULL COMMENT '累计成交量',
+		  `init_margin` decimal(50,30) NOT NULL COMMENT '初始保证金，平仓的时候要减去对应的比例，以维持收益率一致',
+		  `hold_margin_ratio` decimal(50,30) NOT NULL COMMENT '维持保证金比率',
+		  `auto_add_flag` int(11) NOT NULL COMMENT '是否自动追加保证金标识',
+		  `fee_cost` decimal(50,30) NOT NULL COMMENT '已扣手续费',
+		  `realised_pnl` decimal(50,30) NOT NULL COMMENT '已实现盈亏',
+		  `liq_price` decimal(50,30) DEFAULT NULL COMMENT '强平价，仓位为0时，表示最后一次仓位变动时的强平价',
+		  `liq_mark_price` decimal(50,30) DEFAULT NULL COMMENT '强平',
+		  `liq_mark_time` bigint(20) DEFAULT NULL COMMENT '触发强平的标记时间',
+		  `liq_status` int(11) DEFAULT NULL COMMENT '仓位强平状态，0：未触发平仓，1：仓位被冻结，',
+		  `version` bigint(20) NOT NULL DEFAULT '0',
+		  `created` bigint(20) NOT NULL COMMENT '创建时间',
+		  `modified` bigint(20) NOT NULL COMMENT '修改时间',
+		  PRIMARY KEY (`id`),
+		  KEY `idx_userid_asset_symbol` (`user_id`,`asset`,`symbol`) USING BTREE,
+		  KEY `idx_volume` (`volume`) USING BTREE
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='永续合约_仓位';
+	</update>
+	
+	<update id="execute">
+		${sqlStr}
+	</update>
+
+</mapper>
