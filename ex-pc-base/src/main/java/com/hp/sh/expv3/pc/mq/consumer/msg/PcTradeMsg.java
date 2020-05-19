@@ -35,6 +35,8 @@ public class PcTradeMsg extends BaseSymbolMsg {
 	
 	//撮合事务Id
 	private Long matchTxId;
+	
+	private Long seqId;
 
 	public PcTradeMsg() {
 	}
@@ -117,6 +119,14 @@ public class PcTradeMsg extends BaseSymbolMsg {
 
 	public void setOpponentOrderId(Long opponentOrderId) {
 		this.opponentOrderId = opponentOrderId;
+	}
+
+	public Long getSeqId() {
+		return seqId;
+	}
+
+	public void setSeqId(Long seqId) {
+		this.seqId = seqId;
 	}
 
 	@Override

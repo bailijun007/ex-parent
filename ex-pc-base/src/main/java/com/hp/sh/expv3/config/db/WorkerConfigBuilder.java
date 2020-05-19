@@ -64,8 +64,8 @@ public class WorkerConfigBuilder {
 	private static final String PC_COLLECTOR_ACCOUNT_RECORD = PcCollectorAccountRecord.class.getName();
 	private static final int PC_COLLECTOR_ACCOUNT_RECORD_ID = IdTypeEnum.PC_COLLECTOR_ACCOUNT_RECORD_ID.getValue();
 	
-	private static final String PC_MESSAGE_EXT = PcMessageExt.class.getName();
-	private static final int PC_MESSAGE_EXT_ID = IdTypeEnum.PC_MESSAGE_EXT_ID.getValue();
+//	private static final String PC_MESSAGE_EXT = PcMessageExt.class.getName();
+//	private static final int PC_MESSAGE_EXT_ID = IdTypeEnum.PC_MESSAGE_EXT_ID.getValue();
 	
 	@Value("${id.generator.dataCenterId}")
 	private int dataCenterId;
@@ -97,7 +97,7 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, PC_ACTIVE_ORDER_ID, PC_ACTIVE_ORDER);
 		this.set(workerConfig, PC_ACTIVE_POSITION_ID, PC_ACTIVE_POSITION);
 		this.set(workerConfig, PC_COLLECTOR_ACCOUNT_RECORD_ID, PC_COLLECTOR_ACCOUNT_RECORD);
-		this.set(workerConfig, PC_MESSAGE_EXT_ID, PC_MESSAGE_EXT);
+//		this.set(workerConfig, PC_MESSAGE_EXT_ID, PC_MESSAGE_EXT);
 	}
 	
 	private void set(WorkerConfig workerConfig, int seqId, String tableUUID){

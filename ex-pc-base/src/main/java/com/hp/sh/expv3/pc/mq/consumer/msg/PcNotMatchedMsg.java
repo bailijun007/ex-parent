@@ -10,6 +10,8 @@ public class PcNotMatchedMsg extends BaseSymbolMsg{
 	private Long accountId;
 	private Long orderId;
 	
+	private Long seqId;
+	
 	public PcNotMatchedMsg() {
 	}
 
@@ -27,6 +29,14 @@ public class PcNotMatchedMsg extends BaseSymbolMsg{
 
 	public void setOrderId(Long orderId) {
 		this.orderId = orderId;
+	}
+
+	public Long getSeqId() {
+		return seqId;
+	}
+
+	public void setSeqId(Long seqId) {
+		this.seqId = seqId;
 	}
 
 	@Override

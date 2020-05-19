@@ -12,6 +12,8 @@ public class PcCancelledMsg extends BaseSymbolMsg{
 	private Long orderId;
 	private BigDecimal cancelNumber;
 	
+	private Long seqId;
+	
 	public PcCancelledMsg() {
 	}
 
@@ -37,6 +39,14 @@ public class PcCancelledMsg extends BaseSymbolMsg{
 
 	public void setCancelNumber(BigDecimal cancelNumber) {
 		this.cancelNumber = cancelNumber;
+	}
+
+	public Long getSeqId() {
+		return seqId;
+	}
+
+	public void setSeqId(Long seqId) {
+		this.seqId = seqId;
 	}
 
 	@Override

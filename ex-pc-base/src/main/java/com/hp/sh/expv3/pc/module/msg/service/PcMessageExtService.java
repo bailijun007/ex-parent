@@ -60,6 +60,8 @@ public class PcMessageExtService{
 		msgEntity.setShardId(getMsgSardId(msgEntity));
 		msgEntity.setStatus(PcMessageExt.STATUS_NEW);
 		
+		msgEntity.setId(msg.getSeqId());
+		
 		this.messageExtDAO.save(msgEntity);
 		
 		return msgEntity;
@@ -83,6 +85,8 @@ public class PcMessageExtService{
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setShardId(getMsgSardId(msgEntity));
 		msgEntity.setStatus(PcMessageExt.STATUS_NEW);
+		
+		msgEntity.setId(msg.getSeqId());
 		
 		this.messageExtDAO.save(msgEntity);
 		
@@ -110,6 +114,8 @@ public class PcMessageExtService{
 		msgEntity.setMsgBody(JsonUtils.toJson(msg));
 		msgEntity.setShardId(getMsgSardId(msgEntity));
 		msgEntity.setStatus(PcMessageExt.STATUS_NEW);
+		
+		msgEntity.setId(msg.getSeqId());
 		
 		this.messageExtDAO.save(msgEntity);
 		
