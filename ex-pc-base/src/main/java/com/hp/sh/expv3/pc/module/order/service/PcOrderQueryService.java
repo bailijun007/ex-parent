@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.bean.BeanHelper;
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.component.lock.LockConfig;
 import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.dao.PcActiveOrderDAO;
@@ -46,6 +47,9 @@ public class PcOrderQueryService {
 
     @Autowired
     private PcStrategyContext pcStrategyContext;
+    
+    @Autowired
+    private LockConfig lockConfig;
     
 	public Long queryCount(Map<String, Object> params) {
 		return this.pcOrderDAO.queryCount(params);
@@ -127,8 +131,13 @@ public class PcOrderQueryService {
 	}
 	
 	public PcOrder getOrder(long userId, Long orderId){
-		PcOrder order = this.pcOrderDAO.findById(userId, orderId);
-		return order;
+		if(lockConfig.usePessimisticLock()){
+			PcOrder order = this.pcOrderDAO.lockById(userId, orderId);
+			return order;
+		}else{
+			PcOrder order = this.pcOrderDAO.findById(userId, orderId);
+			return order;
+		}
 	}
 	
 	@CrossDB

@@ -103,11 +103,23 @@
 
     <select id="findById" resultMap="PcPosition">
         select
-        <include refid="Base_Column_List"/>
-        from pc_position
-        where id=#{id} and user_id=#{userId}
+        	<include refid="Base_Column_List"/>
+        from 
+        	pc_position
+        where 
+        	id=#{id} and user_id=#{userId}
     </select>
-
+    
+    <select id="lockById" resultMap="PcPosition">
+        select
+        	<include refid="Base_Column_List"/>
+        from 
+        	pc_position
+        where 
+        	id=#{id} and user_id=#{userId}
+        for update
+    </select>
+    
     <select id="exist" resultType="boolean">
         select
         count(1)

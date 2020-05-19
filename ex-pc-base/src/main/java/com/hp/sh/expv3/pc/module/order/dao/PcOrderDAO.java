@@ -8,6 +8,8 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.base.entity.BaseBizEntity;
+import com.hp.sh.expv3.base.entity.UserDataEntity;
 import com.hp.sh.expv3.base.mapper.BaseAccountDataMapper;
 import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
@@ -41,5 +43,7 @@ public interface PcOrderDAO extends BaseAccountDataMapper<PcOrder, Long> {
 	
 	@CrossDB
 	public List<PcOrder> queryActiveOrderList(Page page, @Param("asset") String asset, @Param("symbol") String symbol, @Param("createdEnd") Long createdEnd, @Param("status") Integer status, @Param("liqFlag") Integer liqFlag);
+
+	public PcOrder lockById(@Param(UserDataEntity.USERID_PROPERTY) Long userId, @Param(BaseBizEntity.ID_PROPERTY) Long id);
 
 }
