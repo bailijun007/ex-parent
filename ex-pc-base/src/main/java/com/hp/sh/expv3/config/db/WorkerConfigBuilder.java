@@ -46,8 +46,8 @@ public class WorkerConfigBuilder {
 //	private static final String PC_ORDER_LOG = PcOrderLog.class.getName();
 //	private static final int PC_ORDER_LOG_ID = IdTypeEnum.PC_ORDER_LOG_ID.getValue();
 
-	private static final String PC_ORDER_TRADE = PcOrderTrade.class.getName();
-	private static final int PC_ORDER_TRADE_ID = IdTypeEnum.PC_ORDER_TRADE_ID.getValue();
+//	private static final String PC_ORDER_TRADE = PcOrderTrade.class.getName();
+//	private static final int PC_ORDER_TRADE_ID = IdTypeEnum.PC_ORDER_TRADE_ID.getValue();
 
 	private static final String PC_POSITION = PcPosition.class.getName();
 	private static final int PC_POSITION_ID = IdTypeEnum.PC_POSITION_ID.getValue();
@@ -89,7 +89,7 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, PC_LIQ_RECORD_ID, PC_LIQ_RECORD);
 		this.set(workerConfig, PC_ORDER_ID, PC_ORDER);
 //		this.set(workerConfig, PC_ORDER_LOG_ID, PC_ORDER_LOG);
-		this.set(workerConfig, PC_ORDER_TRADE_ID, PC_ORDER_TRADE);
+//		this.set(workerConfig, PC_ORDER_TRADE_ID, PC_ORDER_TRADE);
 		this.set(workerConfig, PC_POSITION_ID, PC_POSITION);
 //		this.set(workerConfig, PC_ACTIVE_ORDER_ID, PC_ACTIVE_ORDER);
 //		this.set(workerConfig, PC_ACTIVE_POSITION_ID, PC_ACTIVE_POSITION);

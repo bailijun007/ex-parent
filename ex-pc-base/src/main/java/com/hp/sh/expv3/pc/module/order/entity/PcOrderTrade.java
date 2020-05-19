@@ -1,10 +1,11 @@
 package com.hp.sh.expv3.pc.module.order.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import javax.persistence.Transient;
 
-import com.hp.sh.expv3.base.entity.UserDataEntity;
+import com.hp.sh.expv3.base.entity.UserData;
 import com.hp.sh.expv3.commons.mybatis.TxId;
 import com.hp.sh.expv3.dev.Question;
 import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
@@ -13,7 +14,7 @@ import com.hp.sh.expv3.pc.strategy.data.OrderTrade;
  * 永续合约_用户订单成交记录
  * 
  */
-public class PcOrderTrade extends UserDataEntity implements OrderTrade {
+public class PcOrderTrade implements OrderTrade, UserData, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -82,6 +83,16 @@ public class PcOrderTrade extends UserDataEntity implements OrderTrade {
 	
 	@Transient
 	private Integer logType;
+	
+	//用户ID
+	private Long userId;
+	
+	private Long id;
+
+	// 创建时间
+	private Long created;
+	// 修改时间
+	private Long modified;
 
 	public PcOrderTrade() {
 		super();
@@ -263,6 +274,38 @@ public class PcOrderTrade extends UserDataEntity implements OrderTrade {
 
 	public void setOrderMargin(BigDecimal orderMargin) {
 		this.orderMargin = orderMargin;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getCreated() {
+		return created;
+	}
+
+	public void setCreated(Long created) {
+		this.created = created;
+	}
+
+	public Long getModified() {
+		return modified;
+	}
+
+	public void setModified(Long modified) {
+		this.modified = modified;
 	}
 
 }

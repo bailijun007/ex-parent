@@ -36,8 +36,8 @@ public class WorkerConfigBuilder {
 	private static final String BB_ORDER_HISTORY = BBOrderHistory.class.getName();
 	private static final int BB_ORDER_HISTORY_ID = IdTypeEnum.BB_ORDER_HISTORY_ID.getValue();
 
-	private static final String BB_ORDER_TRADE = BBOrderTrade.class.getName();
-	private static final int BB_ORDER_TRADE_ID = IdTypeEnum.BB_ORDER_TRADE_ID.getValue();
+//	private static final String BB_ORDER_TRADE = BBOrderTrade.class.getName();
+//	private static final int BB_ORDER_TRADE_ID = IdTypeEnum.BB_ORDER_TRADE_ID.getValue();
 
 //	private static final String BB_ACTIVE_ORDER = BBActiveOrder.class.getName();
 //	private static final int BB_ACTIVE_ORDER_ID = IdTypeEnum.BB_ACTIVE_ORDER_ID.getValue();
@@ -77,7 +77,7 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, BB_ACCOUNT_RECORD_ID, BB_ACCOUNT_RECORD);
 		this.set(workerConfig, BB_ORDER_ID, BB_ORDER);
 		this.set(workerConfig, BB_ORDER_HISTORY_ID, BB_ORDER_HISTORY);
-		this.set(workerConfig, BB_ORDER_TRADE_ID, BB_ORDER_TRADE);
+//		this.set(workerConfig, BB_ORDER_TRADE_ID, BB_ORDER_TRADE);
 //		this.set(workerConfig, BB_ACTIVE_ORDER_ID, BB_ACTIVE_ORDER);
 		this.set(workerConfig, BB_MATCHED_TRADE_ID, BB_MATCHED_TRADE);
 		this.set(workerConfig, BB_COLLECTOR_ACCOUNT_RECORD_ID, BB_COLLECTOR_ACCOUNT_RECORD);

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.sh.expv3.commons.lock.LockIt;
+import com.hp.sh.expv3.component.dbshard.impl.TradeId2DateShard;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
@@ -83,6 +84,9 @@ public class PcTradeService {
 	
     @Autowired
 	private PcLiqRecordDAO pcLiqRecordDAO;
+    
+	@Autowired
+	private TradeId2DateShard tradeId;
 
 	@Autowired
     private ApplicationEventPublisher publisher;
@@ -310,7 +314,7 @@ public class PcTradeService {
 	private PcOrderTrade saveOrderTrade(PcTradeMsg tradeMsg, PcOrder order, TradeResult tradeResult, Long posId, Long now) {
 		PcOrderTrade orderTrade = new PcOrderTrade();
 
-		orderTrade.setId(null);
+		orderTrade.setId(tradeId.genTradId(tradeMsg.getTradeTime()));
 		orderTrade.setAsset(tradeMsg.getAsset());
 		orderTrade.setSymbol(tradeMsg.getSymbol());
 		orderTrade.setVolume(tradeMsg.getNumber());
