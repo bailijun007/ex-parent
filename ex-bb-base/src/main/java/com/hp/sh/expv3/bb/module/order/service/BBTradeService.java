@@ -28,7 +28,6 @@ import com.hp.sh.expv3.bb.module.order.vo.BBSymbol;
 import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.data.OrderTrade;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
 import com.hp.sh.expv3.bb.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.bb.strategy.vo.TradeResult;
 import com.hp.sh.expv3.bb.vo.request.BBAddRequest;

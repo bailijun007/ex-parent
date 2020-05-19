@@ -14,7 +14,7 @@ import com.hp.sh.expv3.bb.job.MsgShardHandler;
 import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqHandler;
-import com.hp.sh.expv3.bb.strategy.vo.BBTradeVo;
+import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.component.lock.TxIdService;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
@@ -72,7 +72,7 @@ public class DbTestAction2 {
 		String ext="test";
 		
 		for(int i=0;i<RECORD_TOTAL;i++){
-			BBTradeVo msg = getBBTradeVo();
+			BBTradeMsg msg = getBBTradeMsg();
 			msgService.save(tag, msg, ext);
 		}
 	}
@@ -83,7 +83,7 @@ public class DbTestAction2 {
 		String tag="test";
 		String ext="test";
 		
-		BBTradeVo msg = getBBTradeVo();
+		BBTradeMsg msg = getBBTradeMsg();
 		long time = System.currentTimeMillis();
 		Thread[] ta = new Thread[100];
 		for(int i=0;i<100;i++){
@@ -114,7 +114,7 @@ public class DbTestAction2 {
 		FileWriter out = new FileWriter("e:\\wal.txt", true);
 		long time = System.currentTimeMillis();
 		for(int i=0;i<10000;i++){
-			BBTradeVo msg = getBBTradeVo();
+			BBTradeMsg msg = getBBTradeMsg();
 			BBMqMsg msgEntity = this.getBBMqMsg(msg);
 			String json = JsonUtils.toJson(msgEntity);
 			out.write(json);
@@ -140,7 +140,7 @@ public class DbTestAction2 {
 		return 0L;
 	}
 	
-	private BBMqMsg getBBMqMsg(BBTradeVo msg){
+	private BBMqMsg getBBMqMsg(BBTradeMsg msg){
 		BBMqMsg msgEntity = new BBMqMsg();
 		msgEntity.setUserId(msg.getAccountId());
 		
@@ -158,8 +158,8 @@ public class DbTestAction2 {
 		return msgEntity;
 	}
 
-	private BBTradeVo getBBTradeVo(){
-		BBTradeVo msg = new BBTradeVo();
+	private BBTradeMsg getBBTradeMsg(){
+		BBTradeMsg msg = new BBTradeMsg();
 		msg.setAccountId(1L);
 		msg.setAsset("USDT");
 		msg.setKeys("1234567890");
