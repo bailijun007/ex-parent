@@ -18,7 +18,6 @@ import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.module.order.dao.PcActiveOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
-import com.hp.sh.expv3.pc.module.order.dao.PcOrderLogDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
@@ -38,9 +37,6 @@ public class PcOrderQueryService {
 
 	@Autowired
 	private PcActiveOrderDAO pcActiveOrderDAO;
-
-	@Autowired
-	private PcOrderLogDAO pcOrderLogDAO;
 
 	@Autowired
 	private PcOrderTradeDAO pcOrderTradeDAO;

@@ -9,17 +9,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.mybatis.ex.UpdateException;
-import com.hp.sh.expv3.commons.exception.ExSysException;
-import com.hp.sh.expv3.error.ExSysError;
 import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.constant.PcOrderLogType;
 import com.hp.sh.expv3.pc.constant.TriggerType;
 import com.hp.sh.expv3.pc.module.order.dao.PcActiveOrderDAO;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderDAO;
-import com.hp.sh.expv3.pc.module.order.dao.PcOrderLogDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcActiveOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrderLog;
 import com.hp.sh.expv3.pc.mq.extend.msg.PcOrderEvent;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
@@ -30,9 +26,6 @@ public class PcOrderUpdateService {
 
 	@Autowired
 	private PcOrderDAO pcOrderDAO;
-
-	@Autowired
-	private PcOrderLogDAO pcOrderLogDAO;
 
 	@Autowired
 	private PcActiveOrderDAO pcActiveOrderDAO;
@@ -46,22 +39,16 @@ public class PcOrderUpdateService {
 		
 		//日志
 		Long now = DbDateUtils.now();
-		this.saveUserOrderLog(pcOrder.getUserId(), pcOrder.getId(), PcOrderLogType.CREATE, now);
 	}
 	
-	public PcOrderLog setNewStatus(PcOrder order, long modified) {
+	public void setNewStatus(PcOrder order, long modified) {
 		long count = this.pcOrderDAO.updateStatus(OrderStatus.NEW, modified, order.getId(), order.getUserId(), order.getVersion());
 		if(count==0){
 			throw new UpdateException("更新失败", order);
 		}
 		
-		//日志
-		PcOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.SET_STATUS_NEW, modified);
-		
 		//事件
-		this.publishOrderEvent(order, orderLog);
-		
-		return orderLog;
+		this.publishOrderEvent(order);
 	}
 
 	public void setPendingCancelStatus(long modified, long orderId, long userId, long version) {
@@ -71,57 +58,25 @@ public class PcOrderUpdateService {
 			logger.warn("撤单更新失败，orderId={}", orderId);
 			return;
 		}
-		
-		//日志
-		this.saveUserOrderLog(userId, orderId, PcOrderLogType.CHANGE_STATUS_CANCEL, modified);
 	}
 
-	public PcOrderLog setCancelStatus(PcOrder order, long now) {
+	public void setCancelStatus(PcOrder order, long now) {
 		this.pcOrderDAO.update(order);
 		
 		this.updateActiveOrder(order);
 		
 		//日志
-		PcOrderLog orderLog = this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.SET_STATUS_CANCEL, now);
-		this.publishOrderEvent(order, orderLog);
-		
-		return orderLog;
+		this.publishOrderEvent(order);
 	}
 
 	public void updateOrder4Trad(PcOrder order){
 		this.pcOrderDAO.update(order);
 		
 		this.updateActiveOrder(order);
-		
-		this.saveSysOrderLog(order.getUserId(), order.getId(), PcOrderLogType.TRADE, order.getModified());
-	}
-
-	private PcOrderLog saveUserOrderLog(long userId, long orderId, int type, long now){
-		PcOrderLog pcOrderLog = new PcOrderLog();
-		pcOrderLog.setUserId(userId);
-		pcOrderLog.setOrderId(orderId);
-		pcOrderLog.setTriggerType(TriggerType.USER);
-		pcOrderLog.setType(type);
-		pcOrderLog.setCreated(now);
-		pcOrderLog.setModified(now);
-		pcOrderLogDAO.save(pcOrderLog);
-		return pcOrderLog;
-	}
-
-	private PcOrderLog saveSysOrderLog(long userId, long orderId, int type, long now){
-		PcOrderLog pcOrderLog = new PcOrderLog();
-		pcOrderLog.setUserId(userId);
-		pcOrderLog.setOrderId(orderId);
-		pcOrderLog.setTriggerType(TriggerType.SYSTEM);
-		pcOrderLog.setType(type);
-		pcOrderLog.setCreated(now);
-		pcOrderLog.setModified(now);
-		pcOrderLogDAO.save(pcOrderLog);
-		return pcOrderLog;
 	}
 	
-	private void publishOrderEvent(PcOrder order, PcOrderLog pcOrderLog){
-		PcOrderEvent event = new PcOrderEvent(order, pcOrderLog);
+	private void publishOrderEvent(PcOrder order){
+		PcOrderEvent event = new PcOrderEvent(order, null);
 		publisher.publishEvent(event);
 	}
 

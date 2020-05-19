@@ -47,7 +47,7 @@ public enum IdTypeEnum {
     PC_ACCOUNT_SYMBOL_ID(34),
     PC_LIQ_RECORD_ID(35),
     PC_ORDER_ID(36),
-    PC_ORDER_LOG_ID(37),
+//    PC_ORDER_LOG_ID(37),
     PC_ORDER_TRADE_ID(38),
     PC_POSITION_ID(39),
     PC_ACTIVE_ORDER_ID(40),
