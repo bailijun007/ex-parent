@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
@@ -23,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -56,9 +55,24 @@ public class PcOrderlyConsumer {
 
 	private final Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
+	private boolean inited = false;
+	
 	@Scheduled(cron = "0 * * * * ?")
-	@PostConstruct
-	public void start123() throws MQClientException{
+	public void checkSymbolChange() throws MQClientException{
+		if(this.inited){
+			this.startConsumer();
+		}
+	}
+
+	@Order
+	@Bean("startOrderlyConsumer123")
+	public String start123() throws MQClientException{
+		this.startConsumer();
+		this.inited = true;
+		return null;
+	}
+	
+	public void startConsumer() throws MQClientException{
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 		
 		String subExpression = subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE, MqTags.TAGS_ORDER_ALL_CANCELLED);

@@ -58,10 +58,24 @@ public class BBOrderlyConsumer {
 	
 	private final Map<String,DefaultMQPushConsumer> mqMap = new LinkedHashMap<String,DefaultMQPushConsumer>();
 	
-	@Order
+	private boolean inited = false;
+
 	@Scheduled(cron = "0 * * * * ?")
+	public void checkSymbolChange() throws MQClientException{
+		if(this.inited){
+			this.startConsumer();
+		}
+	}
+
+	@Order
 	@Bean("startOrderlyConsumer123")
 	public String start123() throws MQClientException{
+		this.startConsumer();
+		this.inited = true;
+		return null;
+	}
+
+	public void startConsumer() throws MQClientException{
 		List<BBSymbolVO> symbolList = this.metadataService.getAllBBSymbol();
 		
 		String subExpression = this.subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE);
@@ -96,7 +110,6 @@ public class BBOrderlyConsumer {
 	
 		int n = this.mqMap.size();
 		logger.debug("mq:{},{}", n, this.mqMap);
-		return null;
 		
 	}
 
