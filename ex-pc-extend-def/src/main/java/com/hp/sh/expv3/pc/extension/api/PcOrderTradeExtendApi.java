@@ -28,10 +28,13 @@ public interface PcOrderTradeExtendApi {
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
-            @ApiImplicitParam(name = "orderId ", value = "委托id", example = "1", required = true)
+            @ApiImplicitParam(name = "orderId ", value = "委托id", example = "1", required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false)
     })
     List<PcOrderTradeDetailVo> queryOrderTradeDetail(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
-                                                     @RequestParam("symbol") String symbol, @RequestParam("orderId") String orderId);
+                                                     @RequestParam("symbol") String symbol, @RequestParam("orderId") String orderId,
+                                                     @RequestParam(value = "startTime",required = false) String startTime, @RequestParam(value = "endTime",required = false) String endTime);
 
 
     @ApiOperation(value = "查询成交记录")

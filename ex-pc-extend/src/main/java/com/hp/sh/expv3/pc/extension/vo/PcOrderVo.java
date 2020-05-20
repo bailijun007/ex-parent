@@ -163,6 +163,9 @@ public class PcOrderVo extends UserDataEntity{
      */
     private Integer visibleFlag;
 
+//新加字段 成交均价
+    private BigDecimal tradeMeanPrice;
+
 //    int ________log__________;
 
     private String createOperator;
@@ -172,7 +175,15 @@ public class PcOrderVo extends UserDataEntity{
     public PcOrderVo() {
 	}
 
-	public String getAsset() {
+    public BigDecimal getTradeMeanPrice() {
+        return tradeMeanPrice;
+    }
+
+    public void setTradeMeanPrice(BigDecimal tradeMeanPrice) {
+        this.tradeMeanPrice = tradeMeanPrice;
+    }
+
+    public String getAsset() {
 		return asset;
 	}
 

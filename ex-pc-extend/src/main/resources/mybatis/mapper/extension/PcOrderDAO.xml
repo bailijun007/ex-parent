@@ -39,6 +39,7 @@
         <result column="user_id" property="userId"/>
         <result column="created" property="created"/>
         <result column="modified" property="modified"/>
+        <result column="trade_mean_price" property="tradeMeanPrice"/>
     </resultMap>
 
     <sql id="simple_where">
@@ -103,10 +104,10 @@
             <if test="remark!=null and remark!=''">and remark=#{remark}</if>
             <if test="clientOrderId!=null and clientOrderId!=''">and client_order_id=#{clientOrderId}</if>
             <if test="userId!=null">and user_id=#{userId}</if>
-            <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
-            <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
-            <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
-            <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null">and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
 
             <if test="limit==null">
                 ORDER BY id desc
@@ -119,15 +120,15 @@
 		id,asset,symbol,close_flag,long_flag,margin_mode,leverage,price,order_type,volume,face_value,status,
 		margin_ratio,open_fee_ratio,close_fee_ratio,fee_cost,gross_margin,order_margin,open_fee,close_fee,filled_volume,
 		cancel_volume,close_pos_id,time_in_force,trigger_flag,cancel_time,visible_flag,active_flag,create_operator,cancel_operator,
-		remark,client_order_id,user_id,created,modified
+		remark,client_order_id,user_id,created,modified,trade_mean_price
 	</sql>
 
-    <sql id="Base_Column_List2">
-		o.id,o.asset,o.symbol,o.close_flag,o.long_flag,o.margin_mode,o.leverage,o.price,o.order_type,o.volume,o.face_value,o.status,o.margin_ratio,
-		o.open_fee_ratio,o.close_fee_ratio,o.fee_cost,o.gross_margin,o.order_margin,o.open_fee,o.close_fee,o.filled_volume,o.cancel_volume,o.close_pos_id,
-		o.time_in_force,o.trigger_flag,o.cancel_time,o.visible_flag,o.active_flag,o.create_operator,o.cancel_operator,o.remark,o.client_order_id,
-		o.user_id,o.created,o.modified
-	</sql>
+    <!--<sql id="Base_Column_List2">-->
+		<!--o.id,o.asset,o.symbol,o.close_flag,o.long_flag,o.margin_mode,o.leverage,o.price,o.order_type,o.volume,o.face_value,o.status,o.margin_ratio,-->
+		<!--o.open_fee_ratio,o.close_fee_ratio,o.fee_cost,o.gross_margin,o.order_margin,o.open_fee,o.close_fee,o.filled_volume,o.cancel_volume,o.close_pos_id,-->
+		<!--o.time_in_force,o.trigger_flag,o.cancel_time,o.visible_flag,o.active_flag,o.create_operator,o.cancel_operator,o.remark,o.client_order_id,-->
+		<!--o.user_id,o.created,o.modified-->
+	<!--</sql>-->
 
     <select id="getGrossMargin" resultType="java.math.BigDecimal">
         select IFNULL(SUM(o.gross_margin),0) from pc_active_order ao LEFT JOIN pc_order o
@@ -154,7 +155,7 @@
     <select id="queryOrderList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
         select
         <include refid="Base_Column_List"/>
-        from pc_order
+        from pc_order_history
         <where>
             <if test="assetList!=null">and asset in
                 <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
@@ -174,6 +175,8 @@
             <if test="userId!=null">
                 and user_id=#{userId}
             </if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
             <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
             <if test="gtOrderId!=null">
                 and id &gt;#{gtOrderId}
@@ -276,6 +279,8 @@
             <if test="closeFlag!=null">
                 and close_flag=#{closeFlag}
             </if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
             <choose>
                 <when test="nextPage==1 and pageSize!=null and lastOrderId!=null">
                     and id &lt; #{lastOrderId}
@@ -302,54 +307,53 @@
 
     <select id="queryActivityOrder" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
         SELECT
-        <include refid="Base_Column_List2"/>
+        <include refid="Base_Column_List"/>
         FROM
-        pc_active_order ao
-        LEFT JOIN
-        pc_order o ON o.id = ao.id
+        pc_order
         <where>
-            <if test="userId!=null">and ao.user_id=#{userId}</if>
-            <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
-            <if test="assetList!=null">and ao.asset in
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="assetList!=null">and asset in
                 <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
                     #{assetList[${i}]}
                 </foreach>
             </if>
-            <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
-            <if test="symbolList!=null">and ao.symbol in
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="symbolList!=null">and symbol in
                 <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
                     #{symbolList[${i}]}
                 </foreach>
             </if>
-            <if test="visibleFlag!=null">and o.visible_flag=#{visibleFlag}</if>
-            <if test="clientOrderId!=null and clientOrderId!=''">and o.client_order_id=#{clientOrderId}</if>
-            <if test="closeFlag!=null">and o.close_flag=#{closeFlag}</if>
-            <if test="longFlag!=null">and ao.long_flag=#{longFlag}</if>
-            <if test="orderType!=null">and o.order_type=#{orderType}</if>
-            <if test="timeInForce!=null">and o.time_in_force=#{timeInForce}</if>
-            <if test="marginMode!=null">and o.margin_mode=#{marginMode}</if>
-            <if test="status!=null">and o.status=#{status}</if>
-            <if test="statusList!=null">and o.status in
+            <if test="visibleFlag!=null">and visible_flag=#{visibleFlag}</if>
+            <if test="clientOrderId!=null and clientOrderId!=''">and client_order_id=#{clientOrderId}</if>
+            <if test="closeFlag!=null">and close_flag=#{closeFlag}</if>
+            <if test="longFlag!=null">and long_flag=#{longFlag}</if>
+            <if test="orderType!=null">and order_type=#{orderType}</if>
+            <if test="timeInForce!=null">and time_in_force=#{timeInForce}</if>
+            <if test="marginMode!=null">and margin_mode=#{marginMode}</if>
+            <if test="status!=null">and status=#{status}</if>
+            <if test="statusList!=null">and status in
                 <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
                     #{statusList[${i}]}
                 </foreach>
             </if>
-            <if test="activeFlag!=null">and o.active_flag=#{activeFlag}</if>
-            <if test="cancelTimeStart!=null">and o.cancel_time &gt;= #{cancelTimeStart}</if>
-            <if test="cancelTimeEnd!=null">and o.cancel_time &lt;= #{cancelTimeEnd}</if>
-            <if test="closePosId!=null">and o.close_pos_id=#{closePosId}</if>
-            <if test="triggerFlag!=null">and o.trigger_flag=#{triggerFlag}</if>
-
-            <if test="lastOrderId!=null">and o.id &lt; #{lastOrderId}</if>
+            <if test="activeFlag!=null">and active_flag=#{activeFlag}</if>
+            <if test="cancelTimeStart!=null">and cancel_time &gt;= #{cancelTimeStart}</if>
+            <if test="cancelTimeEnd!=null">and cancel_time &lt;= #{cancelTimeEnd}</if>
+            <if test="closePosId!=null">and close_pos_id=#{closePosId}</if>
+            <if test="triggerFlag!=null">and trigger_flag=#{triggerFlag}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+            <if test="lastOrderId!=null">and id &lt; #{lastOrderId}</if>
         </where>
-        ORDER BY ao.id desc
+        ORDER BY id desc
         LIMIT 0,${limit}
     </select>
 
     <select id="queryNextList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
         select
         <include refid="Base_Column_List"/>
-        from pc_order
+        from pc_order_history
         <where>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
@@ -367,7 +371,8 @@
             <if test="cancelTimeEnd!=null">and cancel_time &lt;= #{cancelTimeEnd}</if>
             <if test="closePosId!=null">and close_pos_id=#{closePosId}</if>
             <if test="triggerFlag!=null">and trigger_flag=#{triggerFlag}</if>
-
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
             <if test="lastOrderId!=null">and id &lt; #{lastOrderId}</if>
         </where>
         ORDER BY id desc
@@ -388,45 +393,43 @@
         and created&lt;=#{endTime}
     </select>
 
-    <select id="queryPcActivityOrder" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
+    <select id="queryPcActivityOrder" resultMap="PcOrderVo">
         SELECT
-        o.*
-        FROM
-        pc_active_order ao
-        LEFT JOIN
-        pc_order o ON o.id = ao.id
+        <include refid="Base_Column_List"/>
+        FROM  pc_order
         <where>
-            <if test="userId!=null">ao.user_id=#{userId}</if>
-            <if test="asset!=null and asset!=''">and ao.asset=#{asset}</if>
-            <if test="assetList!=null">and ao.asset in
+            <if test="userId!=null">user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="assetList!=null">and asset in
                 <foreach item="item" index="i" collection="assetList" open="(" separator="," close=")">
                     #{assetList[${i}]}
                 </foreach>
             </if>
-            <if test="symbol!=null and symbol!=''">and ao.symbol=#{symbol}</if>
-            <if test="symbolList!=null">and ao.symbol in
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="symbolList!=null">and symbol in
                 <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
                     #{symbolList[${i}]}
                 </foreach>
             </if>
-            <if test="statusList!=null">and o.status in
+            <if test="statusList!=null">and status in
                 <foreach item="item" index="i" collection="statusList" open="(" separator="," close=")">
                     #{statusList[${i}]}
                 </foreach>
             </if>
-            <if test="bidFlag!=null">and ao.bid_flag=#{bidFlag}</if>
-
+            <if test="bidFlag!=null">and bid_flag=#{bidFlag}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
             <if test="gtOrderId!=null">
-                and ao.id &gt;#{gtOrderId}
-                ORDER BY ao.id asc
+                and id &gt;#{gtOrderId}
+                ORDER BY id asc
             </if>
 
             <if test="ltOrderId!=null">
                 and ao.id &lt;#{ltOrderId}
-                ORDER BY ao.id desc
+                ORDER BY id desc
             </if>
             <if test="ltOrderId==null and gtOrderId==null">
-                ORDER BY ao.id desc
+                ORDER BY id desc
             </if>
         </where>
         LIMIT 0,${limit}

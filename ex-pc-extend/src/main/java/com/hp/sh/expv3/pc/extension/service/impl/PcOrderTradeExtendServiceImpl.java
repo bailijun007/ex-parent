@@ -62,12 +62,14 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId) {
+    public List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId,Long startTime,Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
         map.put("symbol", symbol);
         map.put("orderId", orderId);
+        map.put("tradeTimeBegin", startTime);
+        map.put("tradeTimeEnd", endTime);
         List<PcOrderTradeVo> voList = pcOrderTradeDAO.queryList(map);
         return voList;
     }

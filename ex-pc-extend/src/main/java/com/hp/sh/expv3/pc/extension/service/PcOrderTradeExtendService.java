@@ -24,7 +24,7 @@ public interface PcOrderTradeExtendService {
 
     List<PcOrderTradeVo> listPcOrderTrade(List<Long> refIds, String asset, String symbol, Long userId);
 
-    List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId);
+    List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId,Long startTime,Long endTime);
 
     /**
      * 可主键替代上面的

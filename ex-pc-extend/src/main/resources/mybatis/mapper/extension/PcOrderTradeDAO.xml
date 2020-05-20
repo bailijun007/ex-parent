@@ -26,7 +26,8 @@
     </resultMap>
 
     <sql id="simple_where">
-        where 1=1
+       <where>
+
         <if test="idList!=null">and id in
             <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
                 #{idList[${i}]}
@@ -59,16 +60,19 @@
         <if test="tradeId!=null">and trade_id=#{tradeId}</if>
         <if test="posId!=null">and pos_id=#{posId}</if>
         <if test="makerFlag!=null">and maker_flag=#{makerFlag}</if>
-        <if test="tradeTime!=null">and trade_time=#{tradeTime}</if>
+           <if test="tradeTimeBegin!=null">and trade_time&gt;= #{tradeTimeBegin}</if>
+           <if test="tradeTimeEnd!=null">and trade_time&lt;= #{tradeTimeEnd}</if>
         <if test="feeCollectorId!=null">and fee_collector_id=#{feeCollectorId}</if>
         <if test="feeRatio!=null">and fee_ratio=#{feeRatio}</if>
         <if test="fee!=null">and fee=#{fee}</if>
         <if test="pnl!=null">and pnl=#{pnl}</if>
         <if test="remainVolume!=null">and remain_volume=#{remainVolume}</if>
-        <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
-        <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
-        <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
-        <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>
+        <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+        <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+        <if test="modifiedBegin!=null">and modified &gt;= #{modifiedBegin}</if>
+        <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
+
+       </where>
     </sql>
 
     <sql id="Base_Column_List">
