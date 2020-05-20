@@ -75,7 +75,7 @@ public class BBOrderlyConsumer {
 		return null;
 	}
 
-	public void startConsumer() throws MQClientException{
+	private void startConsumer() throws MQClientException{
 		List<BBSymbolVO> symbolList = this.metadataService.getAllBBSymbol();
 		
 		String subExpression = this.subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE);
