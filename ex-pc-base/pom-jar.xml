@@ -58,6 +58,7 @@
 						<include>/com/hp/sh/expv3/pc/error/**</include>
 						<include>/com/hp/sh/expv3/pc/component/**</include>
 						<include>/com/hp/sh/expv3/pc/strategy/**</include>
+						<include>/com/hp/sh/expv3/pc/mq/consumer/msg/**</include>
 						<include>**/entity/**</include>
 					</includes>
 				</configuration>
