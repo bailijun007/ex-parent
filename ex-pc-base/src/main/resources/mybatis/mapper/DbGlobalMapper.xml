@@ -93,6 +93,7 @@
 		  `open_fee` decimal(50,30) NOT NULL COMMENT '开仓手续费,成交时修改(可能部分成交，按比例释放)',
 		  `close_fee` decimal(50,30) NOT NULL COMMENT '平仓手续费，在下委托时提前收取(可能部分成交，按比例释放)',
 		  `filled_volume` decimal(50,30) NOT NULL COMMENT '已成交量（单位：张）',
+		  `trade_mean_price` decimal(10,0) NOT NULL COMMENT '成交均价',
 		  `cancel_volume` decimal(50,30) DEFAULT NULL COMMENT '取消（单位：张）',
 		  `close_pos_id` bigint(20) DEFAULT NULL COMMENT '平仓委托对应的仓位Id',
 		  `time_in_force` int(11) DEFAULT NULL COMMENT '委托有效时间',
@@ -110,8 +111,7 @@
 		  `version` bigint(20) DEFAULT '0',
 		  PRIMARY KEY (`id`),
 		  KEY `idx_created` (`created`) USING BTREE,
-		  KEY `idx_close_pos_id` (`close_pos_id`) USING BTREE,
-		  KEY `idx_user_asset_symbol` (`user_id`,`asset`,`symbol`) USING BTREE
+		  KEY `idx_close_pos_id` (`close_pos_id`) USING BTREE
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='永续合约_订单（委托）';
 	</update>
 	

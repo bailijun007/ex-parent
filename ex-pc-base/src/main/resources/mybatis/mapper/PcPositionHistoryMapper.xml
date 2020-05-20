@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.pc.module.position.dao.PcPositionHistoryDAO">
+
+	<resultMap type="com.hp.sh.expv3.pc.module.position.entity.PcPositionHistory" id="PcPositionHistory">
+		<result column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="long_flag" property="longFlag" />
+		<result column="margin_mode" property="marginMode" />
+		<result column="entry_leverage" property="entryLeverage" />
+		<result column="auto_add_flag" property="autoAddFlag" />
+		<result column="leverage" property="leverage" />
+		<result column="face_value" property="faceValue" />
+		<result column="volume" property="volume" />
+		<result column="base_value" property="baseValue" />
+		<result column="pos_margin" property="posMargin" />
+		<result column="close_fee" property="closeFee" />
+		<result column="mean_price" property="meanPrice" />
+		<result column="accu_base_value" property="accuBaseValue" />
+		<result column="accu_volume" property="accuVolume" />
+		<result column="init_margin" property="initMargin" />
+		<result column="hold_margin_ratio" property="holdMarginRatio" />
+		<result column="fee_cost" property="feeCost" />
+		<result column="realised_pnl" property="realisedPnl" />
+		<result column="liq_price" property="liqPrice" />
+		<result column="liq_status" property="liqStatus" />
+		<result column="liq_mark_price" property="liqMarkPrice" />
+		<result column="liq_mark_time" property="liqMarkTime" />
+		<result column="version" property="version" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		id,user_id,asset,symbol,long_flag,margin_mode,entry_leverage,auto_add_flag,leverage,face_value,volume,base_value,pos_margin,close_fee,mean_price,accu_base_value,accu_volume,init_margin,hold_margin_ratio,fee_cost,realised_pnl,liq_price,liq_status,liq_mark_price,liq_mark_time,version,created,modified
+	</sql>
+
+    <sql id="simple_where">
+        <where>
+            <if test="idList!=null">
+                and id in
+                <foreach item="item" index="i" collection="idList" open="(" separator="," close=")">
+                    #{idList[${i}]}
+                </foreach>
+            </if>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="longFlag!=null">and long_flag=#{longFlag}</if>
+            <if test="marginMode!=null">and margin_mode=#{marginMode}</if>
+            <if test="autoAddFlag!=null">and auto_add_flag=#{autoAddFlag}</if>
+            <if test="liqMarkTime!=null">and liq_mark_time=#{liqMarkTime}</if>
+            <if test="liqStatus!=null">and liq_status=#{liqStatus}</if>
+            <if test="createdStart!=null">and created &gt;= #{createdStart}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedStart!=null">and modified &gt;= #{modifiedStart}</if>
+            <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
+            <if test="keyword!=null and keyword!=''">and symbol like CONCAT('%',#{keyword},'%')</if>
+        </where>
+    </sql>
+
+    <sql id="simple_query">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_position
+        <include refid="simple_where"/>
+        <if test="orderBy!=null and orderBy!=''">
+            order by ${orderBy}
+            <if test="!asc">desc</if>
+        </if>
+
+    </sql>
+
+    <select id="pageQuery" resultMap="PcPositionHistory">
+        <include refid="simple_query"/>
+    </select>
+
+    <select id="queryList" resultMap="PcPositionHistory">
+        <include refid="simple_query"/>
+    </select>
+
+    <select id="queryOne" resultMap="PcPositionHistory">
+        <include refid="simple_query"/>
+    </select>
+
+    <select id="queryCount" resultType="long">
+        select
+        <choose>
+            <when test="SUM!=null">
+                sum(${SUM})
+            </when>
+            <otherwise>
+                count(1)
+            </otherwise>
+        </choose>
+        from pc_position
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="findById" resultMap="PcPositionHistory">
+        select
+        	<include refid="Base_Column_List"/>
+        from 
+        	pc_position
+        where 
+        	id=#{id} and user_id=#{userId}
+    </select>
+    
+    <select id="lockById" resultMap="PcPositionHistory">
+        select
+        	<include refid="Base_Column_List"/>
+        from 
+        	pc_position
+        where 
+        	id=#{id} and user_id=#{userId}
+        for update
+    </select>
+    
+	<select id="exist" resultType="long">
+		select EXISTS(
+			select 
+				1
+			from 
+				pc_position
+			<include refid="simple_where" />
+			limit 1
+		)
+	</select>
+
+	<insert id="save">
+		insert into pc_position (
+			id,user_id,asset,symbol,long_flag,margin_mode,entry_leverage,auto_add_flag,leverage,face_value,volume,base_value,pos_margin,close_fee,mean_price,accu_base_value,accu_volume,init_margin,hold_margin_ratio,fee_cost,realised_pnl,liq_price,liq_status,liq_mark_price,liq_mark_time,version,created,modified
+		)values(
+			#{id},#{userId},#{asset},#{symbol},#{longFlag},#{marginMode},#{entryLeverage},#{autoAddFlag},#{leverage},#{faceValue},#{volume},#{baseValue},#{posMargin},#{closeFee},#{meanPrice},#{accuBaseValue},#{accuVolume},#{initMargin},#{holdMarginRatio},#{feeCost},#{realisedPnl},#{liqPrice},#{liqStatus},#{liqMarkPrice},#{liqMarkTime},#{version},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			pc_position
+		set 
+			id=#{id},user_id=#{userId},asset=#{asset},symbol=#{symbol},long_flag=#{longFlag},margin_mode=#{marginMode},entry_leverage=#{entryLeverage},auto_add_flag=#{autoAddFlag},leverage=#{leverage},face_value=#{faceValue},volume=#{volume},base_value=#{baseValue},pos_margin=#{posMargin},close_fee=#{closeFee},mean_price=#{meanPrice},accu_base_value=#{accuBaseValue},accu_volume=#{accuVolume},init_margin=#{initMargin},hold_margin_ratio=#{holdMarginRatio},fee_cost=#{feeCost},realised_pnl=#{realisedPnl},liq_price=#{liqPrice},liq_status=#{liqStatus},liq_mark_price=#{liqMarkPrice},liq_mark_time=#{liqMarkTime},version=${version}+1,created=#{created},modified=#{modified}
+		where 
+			id=#{id} and user_id=#{userId} and version=#{version}
+	</update>
+	
+	<delete id="delete">
+        delete from 
+        	pc_position 
+		where 
+			id=#{id} 
+			and user_id=#{userId}
+			and asset=#{asset}
+			and symbol=#{symbol}
+    </delete>
+
+    <!--  -->
+
+    <select id="queryAmount" resultType="java.math.BigDecimal">
+        select
+        <choose>
+            <when test="SUM!=null">
+                sum(${SUM})
+            </when>
+            <otherwise>
+                count(1)
+            </otherwise>
+        </choose>
+        from pc_position
+        <include refid="simple_where"/>
+    </select>
+
+    <select id="getActivePos" resultMap="PcPositionHistory">
+        select
+        	p.*
+        from
+        	pc_position p
+        where
+        	p.user_id=#{userId} 
+        	and p.asset=#{asset} 
+        	and p.symbol=#{symbol} 
+        	and p.long_flag=#{longFlag}
+    </select>
+
+    <select id="queryActivePosList" resultMap="PcPositionHistory">
+        select
+        	p.*
+        from
+        	pc_position p
+        where
+        	p.user_id=#{userId} 
+        	and p.asset=#{asset} 
+        	and p.symbol=#{symbol} 
+        order by p.long_flag desc
+    </select>
+
+    <select id="queryActivePosIdList" resultType="com.hp.sh.expv3.pc.module.position.vo.PosUID">
+        select
+        	id,user_id,asset,symbol,long_flag
+        from
+        	pc_position p
+        <where>
+            <if test="userId!=null">and user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+        </where>
+        order by 
+        	p.long_flag desc
+    </select>
+    
+    <select id="getCutPos" resultMap="PcPositionHistory">
+        select
+        	p.*
+        from
+			pc_position p
+        where
+        	and p.asset=#{asset} 
+        	and p.symbol=#{symbol} 
+        	and long_flag=#{longFlag} 
+        order by 
+        	p.mean_price 
+        <if test="longFlag=0">desc</if>
+        <if test="longFlag=1">asc</if>
+        limit 0,1
+    </select>
+
+</mapper>

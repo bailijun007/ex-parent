@@ -72,7 +72,7 @@ public class PcOrderlyConsumer {
 		return null;
 	}
 	
-	public void startConsumer() throws MQClientException{
+	private void startConsumer() throws MQClientException{
 		List<PcContractVO> pcList = this.metadataService.getAllPcContract();
 		
 		String subExpression = subExpression(MqTags.TAGS_CANCELLED, MqTags.TAGS_NOT_MATCHED, MqTags.TAGS_MATCHED, MqTags.TAGS_TRADE, MqTags.TAGS_ORDER_ALL_CANCELLED);
