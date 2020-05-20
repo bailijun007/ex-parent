@@ -23,8 +23,10 @@ import com.hp.sh.expv3.error.ExCommonError;
 import com.hp.sh.expv3.pc.error.PcAccountError;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountDAO;
 import com.hp.sh.expv3.pc.module.account.dao.PcAccountRecordDAO;
+import com.hp.sh.expv3.pc.module.account.dao.PcAccountRecordTradeNoDAO;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccount;
 import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecord;
+import com.hp.sh.expv3.pc.module.account.entity.PcAccountRecordTradeNo;
 import com.hp.sh.expv3.pc.vo.request.FundRequest;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
@@ -44,6 +46,9 @@ public class PcAccountCoreService{
 
 	@Autowired
 	private PcAccountRecordDAO fundAccountRecordDAO;
+	
+	@Autowired
+	private PcAccountRecordTradeNoDAO accountRecordTradeNoDAO;
 	
 	@Autowired
 	private SnGenerator generator;
@@ -99,19 +104,8 @@ public class PcAccountCoreService{
 	}
 	
 	public Boolean checkTradNo(Long userId, String tradeNo) {
-		PcAccountRecord rcd = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);
-		if (rcd == null) {
-			return Boolean.FALSE;
-		}
-		return Boolean.TRUE;
-	}
-
-	PcAccountRecord queryRecord(Long userId, String tradeNo){
-		PcAccountRecord record = this.fundAccountRecordDAO.findByTradeNo(userId, tradeNo);
-		if(record==null){
-			throw new ExSysException(ExCommonError.OBJ_DONT_EXIST);
-		}
-		return record;
+		PcAccountRecordTradeNo tNo = this.accountRecordTradeNoDAO.findByTradeNo(tradeNo);
+		return tNo!=null;
 	}
 
 	protected int newRecord(PcAccountRecord record){
@@ -152,9 +146,22 @@ public class PcAccountCoreService{
 		record.setModified(now);
 		this.fundAccountRecordDAO.save(record);
 		
+		//保存成交SN
+		PcAccountRecordTradeNo artn = new PcAccountRecordTradeNo(record.getTradeNo(), record.getId(), record.getTxId());
+		accountRecordTradeNoDAO.save(artn);
+		
 		publisher.publishEvent(record);
 	
 		return InvokeResult.SUCCESS;
+	}
+	
+	private PcAccountRecord findByTradeNo(String asset, Long userId, String tradeNo){
+		PcAccountRecordTradeNo tNo = this.accountRecordTradeNoDAO.findByTradeNo(tradeNo);
+		if(tNo==null){
+			return null;
+		}
+		PcAccountRecord r = this.fundAccountRecordDAO.findById(asset, userId, tNo.getRecordId());
+		return r;
 	}
 	
 	private void updateAccount(PcAccount pcAccount){
@@ -184,7 +191,7 @@ public class PcAccountCoreService{
 	}
 
 	private boolean checkExist(PcAccountRecord record) {
-		PcAccountRecord oldRcd = this.fundAccountRecordDAO.findByTradeNo(record.getUserId(), record.getTradeNo());
+		PcAccountRecord oldRcd = this.findByTradeNo(record.getAsset(), record.getUserId(), record.getTradeNo());
 		if(oldRcd == null){
 			return false;
 		}

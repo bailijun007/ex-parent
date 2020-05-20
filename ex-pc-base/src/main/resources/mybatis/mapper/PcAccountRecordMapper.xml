@@ -90,8 +90,10 @@
 	<select id="findById" resultMap="PcAccountRecord">
 		select
 			<include refid="Base_Column_List" />
-		from pc_account_record
-			where id=#{id} and user_id=#{userId}
+		from 
+			pc_account_record
+		where 
+			asset=#{asset} and id=#{id} and user_id=#{userId}
 	</select>
 
 	<select id="exist" resultType="boolean">

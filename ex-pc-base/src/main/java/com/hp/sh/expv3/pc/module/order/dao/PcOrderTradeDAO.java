@@ -23,6 +23,7 @@ public interface PcOrderTradeDAO extends BaseUserDataMapper<PcOrderTrade,Long> {
 
 	public Long queryCount(Map<String,Object> params);
 
+	@Deprecated
 	public Long exist(@Param("userId") Long userId, @Param("tradeSn") String tradeSn);
 
 	public List<OrderTradeVo> queryOrderTrade(@Param("userId") Long userId, @Param("orderIdList") List<Long> orderIdList);

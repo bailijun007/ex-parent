@@ -24,11 +24,13 @@ import com.hp.sh.expv3.pc.constant.TradingRoles;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 import com.hp.sh.expv3.pc.module.collector.service.PcCollectorCoreService;
 import com.hp.sh.expv3.pc.module.liq.dao.PcLiqRecordDAO;
-import com.hp.sh.expv3.pc.module.liq.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.module.liq.entity.LiqRecordStatus;
+import com.hp.sh.expv3.pc.module.liq.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeDAO;
+import com.hp.sh.expv3.pc.module.order.dao.PcOrderTradeSnDAO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
+import com.hp.sh.expv3.pc.module.order.entity.PcOrderTradeSn;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderUpdateService;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
@@ -84,6 +86,9 @@ public class PcTradeService {
 	
     @Autowired
 	private PcLiqRecordDAO pcLiqRecordDAO;
+    
+	@Autowired
+	private PcOrderTradeSnDAO orderTradeSnDAO;
     
 	@Autowired
 	private TradeId2DateShard tradeId;
@@ -353,6 +358,9 @@ public class PcTradeService {
 		
 		publisher.publishEvent(orderTrade);
 		
+		PcOrderTradeSn tradeSn = new PcOrderTradeSn(orderTrade.getTradeSn(), orderTrade.getId(), orderTrade.getTxId());
+		orderTradeSnDAO.save(tradeSn);
+		
 		return orderTrade;
 	}
 	
@@ -443,7 +451,7 @@ public class PcTradeService {
 		}
 		
 		//检查重复请求
-		Long count = this.orderTradeDAO.exist(order.getUserId(), tradeMsg.uniqueKey());
+		Long count = this.orderTradeSnDAO.exist(tradeMsg.uniqueKey());
 		if(count>0){
 			return false;
 		}
