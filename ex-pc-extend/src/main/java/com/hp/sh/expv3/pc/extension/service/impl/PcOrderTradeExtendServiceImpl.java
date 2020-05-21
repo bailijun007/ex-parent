@@ -2,6 +2,7 @@ package com.hp.sh.expv3.pc.extension.service.impl;
 
 import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
+import com.hp.sh.expv3.pc.extension.util.CommonDateUtils;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeExtendVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
@@ -75,12 +76,14 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds) {
+    public List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds,String startTime,String endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
         map.put("symbol", symbol);
         map.put("orderIds", orderIds);
+        map.put("tradeTimeBegin", CommonDateUtils.stringToTimestamp(startTime));
+        map.put("tradeTimeEnd", CommonDateUtils.stringToTimestamp(endTime));
         List<PcOrderTradeVo> voList = pcOrderTradeDAO.queryList(map);
         return voList;
     }
@@ -98,12 +101,14 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeVo> listPcOrderTrade(List<Long> refIds, String asset, String symbol, Long userId) {
+    public List<PcOrderTradeVo> listPcOrderTrade(List<Long> refIds, String asset, String symbol, Long userId,Long startDate,Long endDate) {
         Map<String, Object> map = new HashMap<>();
         map.put("idList", refIds);
         map.put("asset", asset);
         map.put("symbol", symbol);
         map.put("userId", userId);
+        map.put("tradeTimeBegin", startDate);
+        map.put("tradeTimeEnd", endDate);
         return pcOrderTradeDAO.queryList(map);
     }
 

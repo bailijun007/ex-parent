@@ -22,7 +22,7 @@ public interface PcOrderTradeExtendService {
 
     PcOrderTradeVo getPcOrderTrade(Long refId, String asset, String symbol, Long userId, Long time);
 
-    List<PcOrderTradeVo> listPcOrderTrade(List<Long> refIds, String asset, String symbol, Long userId);
+    List<PcOrderTradeVo> listPcOrderTrade(List<Long> refIds, String asset, String symbol, Long userId,Long startDate,Long endDate);
 
     List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId,Long startTime,Long endTime);
 
@@ -36,7 +36,7 @@ public interface PcOrderTradeExtendService {
      * @param orderIds
      * @return
      */
-    List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds);
+    List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds,String startTime,String endTime);
 
     List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count);
 

@@ -109,10 +109,7 @@
             <if test="modifiedBegin!=null">and modified &gt;= #{modifiedBegin}</if>
             <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
 
-            <if test="limit==null">
-                ORDER BY id desc
-                LIMIT 0,20
-            </if>
+
         </where>
     </sql>
 
@@ -124,11 +121,11 @@
 	</sql>
 
     <!--<sql id="Base_Column_List2">-->
-		<!--o.id,o.asset,o.symbol,o.close_flag,o.long_flag,o.margin_mode,o.leverage,o.price,o.order_type,o.volume,o.face_value,o.status,o.margin_ratio,-->
-		<!--o.open_fee_ratio,o.close_fee_ratio,o.fee_cost,o.gross_margin,o.order_margin,o.open_fee,o.close_fee,o.filled_volume,o.cancel_volume,o.close_pos_id,-->
-		<!--o.time_in_force,o.trigger_flag,o.cancel_time,o.visible_flag,o.active_flag,o.create_operator,o.cancel_operator,o.remark,o.client_order_id,-->
-		<!--o.user_id,o.created,o.modified-->
-	<!--</sql>-->
+    <!--o.id,o.asset,o.symbol,o.close_flag,o.long_flag,o.margin_mode,o.leverage,o.price,o.order_type,o.volume,o.face_value,o.status,o.margin_ratio,-->
+    <!--o.open_fee_ratio,o.close_fee_ratio,o.fee_cost,o.gross_margin,o.order_margin,o.open_fee,o.close_fee,o.filled_volume,o.cancel_volume,o.close_pos_id,-->
+    <!--o.time_in_force,o.trigger_flag,o.cancel_time,o.visible_flag,o.active_flag,o.create_operator,o.cancel_operator,o.remark,o.client_order_id,-->
+    <!--o.user_id,o.created,o.modified-->
+    <!--</sql>-->
 
     <select id="getGrossMargin" resultType="java.math.BigDecimal">
         select IFNULL(SUM(o.gross_margin),0) from pc_active_order ao LEFT JOIN pc_order o
@@ -147,7 +144,7 @@
     <select id="queryList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
         select
         <include refid="Base_Column_List"/>
-        from pc_order
+        from pc_order_history
         <include refid="simple_where"/>
     </select>
 
@@ -382,21 +379,27 @@
     </select>
 
     <select id="queryTotalFee" resultType="java.math.BigDecimal">
-        select SUM(fee_cost) from pc_order
-        where created &gt;=#{startTime}
+        select SUM(fee_cost) from pc_order_history
+        where
+         asset=#{asset}
+         and symbol=#{symbol}
+       AND  created &gt;=#{startTime}
         and created&lt;=#{endTime}
     </select>
 
     <select id="queryTotalOrder" resultType="java.math.BigDecimal">
          select count(1) from pc_order
-        where created &gt;=#{startTime}
+        where
+        asset=#{asset}
+         and symbol=#{symbol}
+        and created &gt;=#{startTime}
         and created&lt;=#{endTime}
     </select>
 
     <select id="queryPcActivityOrder" resultMap="PcOrderVo">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM  pc_order
+        FROM pc_order
         <where>
             <if test="userId!=null">user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
@@ -433,6 +436,13 @@
             </if>
         </where>
         LIMIT 0,${limit}
+    </select>
+
+    <select id="queryActiveOrderList" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderVo">
+        select
+        <include refid="Base_Column_List"/>
+        from pc_order
+        <include refid="simple_where"/>
     </select>
 
 

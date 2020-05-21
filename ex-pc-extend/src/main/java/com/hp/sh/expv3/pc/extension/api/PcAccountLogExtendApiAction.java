@@ -144,7 +144,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                 refs.addAll(type2Refs.getOrDefault(PcAccountLog.TYPE_TRAD_OPEN_SHORT, Collections.emptyList()));
                 refs.addAll(type2Refs.getOrDefault(PcAccountLog.TYPE_TRAD_CLOSE_LONG, Collections.emptyList()));
                 refs.addAll(type2Refs.getOrDefault(PcAccountLog.TYPE_TRAD_CLOSE_SHORT, Collections.emptyList()));
-                appendOrderTradeData(faceValue, asset, symbol, userId, refs);
+                appendOrderTradeData(faceValue, asset, symbol, userId, refs,startDate,endDate);
             }
 
         }
@@ -218,9 +218,9 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
     }
 
     private void appendOrderTradeData(BigDecimal faceValue, String asset, String symbol, Long userId,
-                                      List<PcAccountRecordLogVo> recordLogVos) {
+                                      List<PcAccountRecordLogVo> recordLogVos,Long startDate,Long endDate) {
         List<Long> refIds = recordLogVos.stream().map(PcAccountRecordLogVo::getRefId).collect(Collectors.toList());
-        List<PcOrderTradeVo> pcLiqRecordVo = pcOrderTradeExtendService.listPcOrderTrade(refIds, asset, symbol, userId);
+        List<PcOrderTradeVo> pcLiqRecordVo = pcOrderTradeExtendService.listPcOrderTrade(refIds, asset, symbol, userId,startDate,endDate);
         if (null != pcLiqRecordVo) {
             Map<Long, PcOrderTradeVo> id2Vo = pcLiqRecordVo.stream()
                     .collect(Collectors.toMap(PcOrderTradeVo::getId, Function.identity()));
