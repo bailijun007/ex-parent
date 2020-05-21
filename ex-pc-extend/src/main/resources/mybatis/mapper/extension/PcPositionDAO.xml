@@ -88,10 +88,10 @@
 	</sql>
 
 
-    <sql id="Base_Column_List2">
-		ap.id,ap.asset,ap.symbol,ap.long_flag,p.margin_mode,p.entry_leverage,p.volume,p.base_value,p.leverage,p.pos_margin,p.close_fee,p.auto_add_flag,p.mean_price,p.accu_base_value,
-		p.accu_volume,p.init_margin,p.hold_margin_ratio,p.fee_cost,p.realised_pnl,p.liq_price,p.liq_mark_price,p.liq_mark_time,p.liq_status,p.user_id,p.created,p.modified,p.face_value
-	</sql>
+    <!--<sql id="Base_Column_List2">-->
+		<!--ap.id,ap.asset,ap.symbol,ap.long_flag,p.margin_mode,p.entry_leverage,p.volume,p.base_value,p.leverage,p.pos_margin,p.close_fee,p.auto_add_flag,p.mean_price,p.accu_base_value,-->
+		<!--p.accu_volume,p.init_margin,p.hold_margin_ratio,p.fee_cost,p.realised_pnl,p.liq_price,p.liq_mark_price,p.liq_mark_time,p.liq_status,p.user_id,p.created,p.modified,p.face_value-->
+	<!--</sql>-->
 
     <select id="getPosMargin" resultType="java.math.BigDecimal">
 
@@ -124,13 +124,12 @@
 
     <select id="queryActivePosition" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionVo">
         select
-        <include refid="Base_Column_List2"/>
-        from pc_active_position ap LEFT JOIN pc_position p
-        on ap.id=p.id
+        <include refid="Base_Column_List"/>
+        from pc_position
         <where>
-            <if test="userId!=null">ap.user_id=#{userId}</if>
-            <if test="asset!=null and asset!=''">and ap.asset=#{asset}</if>
-            <if test="symbol!=null and symbol!=''">and ap.symbol=#{symbol}</if>
+            <if test="userId!=null">user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
         </where>
 
     </select>

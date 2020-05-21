@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +66,7 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId,Long startTime,Long endTime) {
+    public List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId, Long startTime, Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
@@ -76,7 +79,7 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds,String startTime,String endTime) {
+    public List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds, String startTime, String endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
@@ -101,7 +104,7 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeVo> listPcOrderTrade(List<Long> refIds, String asset, String symbol, Long userId,Long startDate,Long endDate) {
+    public List<PcOrderTradeVo> listPcOrderTrade(List<Long> refIds, String asset, String symbol, Long userId, Long startDate, Long endDate) {
         Map<String, Object> map = new HashMap<>();
         map.put("idList", refIds);
         map.put("asset", asset);
@@ -113,13 +116,15 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count) {
+    public List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count, String startTime, String endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("assetList", assetList);
         map.put("symbolList", symbolList);
         map.put("gtTradeId", gtTradeId);
         map.put("ltTradeId", ltTradeId);
         map.put("limit", count);
+        map.put("tradeTimeBegin", CommonDateUtils.stringToTimestamp(startTime));
+        map.put("tradeTimeEnd", CommonDateUtils.stringToTimestamp(endTime));
         List<PcOrderTradeVo> voList = pcOrderTradeDAO.queryTradeRecords(map);
 
         return voList;
@@ -130,8 +135,13 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         Map<String, Object> map = new HashMap<>();
         map.put("asset", asset);
         map.put("symbol", symbol);
-        map.put("tradeTime", statTime);
+        map.put("tradeTimeEnd", statTime);
+        LocalDate localDate = Instant.ofEpochMilli(statTime).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate minusDays = localDate.minusDays(1);
+        Long tradeTimeBegin = CommonDateUtils.localDateToTimestamp(minusDays);
+        map.put("tradeTimeBegin", tradeTimeBegin);
         PcOrderTradeVo vo = pcOrderTradeDAO.selectLessTimeTrade(map);
+
         return vo;
     }
 
@@ -170,13 +180,13 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
 
     @Override
     public List<PcOrderTradeExtendVo> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId) {
-        List<PcOrderTradeExtendVo> list = pcOrderTradeDAO.selectTradeListByUserId(asset,symbol,startTime,endTime,userId);
+        List<PcOrderTradeExtendVo> list = pcOrderTradeDAO.selectTradeListByUserId(asset, symbol, startTime, endTime, userId);
         return list;
     }
 
     @Override
     public BigDecimal queryPcTradeFee(Long userId, String asset, Integer makerFlag, Long beginTime, Long endTime) {
-        return pcOrderTradeDAO.queryPcTradeFee(userId,asset,makerFlag,beginTime,endTime);
+        return pcOrderTradeDAO.queryPcTradeFee(userId, asset, makerFlag, beginTime, endTime);
     }
 
 

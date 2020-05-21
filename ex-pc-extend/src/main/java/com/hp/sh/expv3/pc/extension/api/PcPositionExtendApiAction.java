@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hp.sh.expv3.pc.extension.util.CommonDateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -34,6 +37,8 @@ import com.hp.sh.expv3.utils.math.Precision;
  */
 @RestController
 public class PcPositionExtendApiAction implements PcPositionExtendApi {
+    private static final Logger logger = LoggerFactory.getLogger(PcPositionExtendApiAction.class);
+
     @Autowired
     private PcAccountExtendService pcAccountExtendService;
 
@@ -59,12 +64,17 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
      * @return
      */
     @Override
-    public List<CurrentPositionVo> findCurrentPosition(Long userId, String asset, String symbol) {
+    public List<CurrentPositionVo> findCurrentPosition(Long userId, String asset, String symbol, String startTime, String endTime) {
+        logger.info("进入查询当前活动仓位接口，收到的参数为：userId={},asset={},symbol={},startTime={},endTime={}", userId, asset, symbol, startTime, endTime);
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        startTime = startAndEndTime[0];
+        endTime = startAndEndTime[1];
+
         List<CurrentPositionVo> result = new ArrayList<>();
-        List<PcPositionVo> list = pcPositionExtendService.findActivePosition(userId, asset, symbol);
+        List<PcPositionVo> list = pcPositionExtendService.findActivePosition(userId, asset, symbol,startTime,endTime);
         this.convertPositionList(result, list);
 
         return result;
@@ -89,11 +99,11 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
 
     @Override
     public List<CurrentPositionVo> selectPosByAccount(Long userId, String asset, String symbol, Long startTime) {
-        if (userId == null || startTime == null||StringUtils.isEmpty(asset)||StringUtils.isEmpty(symbol)) {
+        if (userId == null || startTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
         List<CurrentPositionVo> result = new ArrayList<>();
-        List<PcPositionVo> list =pcPositionExtendService.selectPosByAccount(userId,asset,symbol,startTime);
+        List<PcPositionVo> list = pcPositionExtendService.selectPosByAccount(userId, asset, symbol, startTime);
         this.convertPositionList(result, list);
 
         return result;
@@ -104,7 +114,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
             for (PcPositionVo positionVo : list) {
                 //已实现盈亏
                 BigDecimal realisedPnl2 = positionVo.getRealisedPnl();
-                BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(positionVo.getId(), positionVo.getUserId(),null);
+                BigDecimal realisedPnl = pcOrderTradeService.getRealisedPnl(positionVo.getId(), positionVo.getUserId(), null);
                 List<PcOrderVo> pcOrderVos = pcOrderExtendService.activeOrderList(positionVo.getId(), positionVo.getUserId());
                 BigDecimal volume = pcOrderVos.stream().map(order -> order.getVolume().subtract(order.getFilledVolume())).reduce(BigDecimal.ZERO, BigDecimal::add);
                 CurrentPositionVo currentPositionVo = new CurrentPositionVo();
@@ -138,18 +148,17 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
             }
         }
     }
-    
+
     @Override
-    public List<PcSymbolPositionStatVo> getSymbolPositionStat(String asset, String symbol){
-    	List<PcSymbolPositionStatVo> list = pcPositionExtendService.getSymbolPositionStat(asset, symbol);
-    	return list;
+    public List<PcSymbolPositionStatVo> getSymbolPositionStat(String asset, String symbol) {
+        List<PcSymbolPositionStatVo> list = pcPositionExtendService.getSymbolPositionStat(asset, symbol);
+        return list;
     }
 
-	@Override
-	public PcSymbolPositionTotalVo getSymbolPositionTotal(String asset, String symbol) {
-		return pcPositionExtendService.getSymbolPositionTotal(asset, symbol);
-	}
+    @Override
+    public PcSymbolPositionTotalVo getSymbolPositionTotal(String asset, String symbol) {
+        return pcPositionExtendService.getSymbolPositionTotal(asset, symbol);
+    }
 
-    
 
 }

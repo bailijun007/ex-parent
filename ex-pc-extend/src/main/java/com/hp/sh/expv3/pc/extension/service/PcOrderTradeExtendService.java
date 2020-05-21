@@ -38,7 +38,7 @@ public interface PcOrderTradeExtendService {
      */
     List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds,String startTime,String endTime);
 
-    List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count);
+    List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count,String startTime,String endTime);
 
     PcOrderTradeVo selectLessTimeTrade(String asset, String symbol, Long statTime);
 

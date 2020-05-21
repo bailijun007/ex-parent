@@ -10,6 +10,8 @@ import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeExtendVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
 import com.hp.sh.expv3.pc.extension.vo.PcTradeVo;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -29,11 +31,15 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
+    private static final Logger logger = LoggerFactory.getLogger(PcOrderTradeExtendApiAction.class);
+
+
     @Autowired
     private PcOrderTradeExtendService pcOrderTradeService;
 
     @Override
     public List<PcOrderTradeDetailVo> queryOrderTradeDetail(Long userId, String asset, String symbol, String orderId, String startTime, String endTime) {
+        logger.info("进人查询当前委托的交易记录接口，参数为：userId={},asset={},symbol={},orderId={},startTime={},endTime={}", userId, asset, symbol, orderId, startTime, endTime);
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || StringUtils.isEmpty(orderId)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
@@ -61,31 +67,24 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
      * @return
      */
     @Override
-    public List<PcOrderTradeDetailVo> queryTradeRecord(String asset, String symbol, Long gtTradeId, Long ltTradeId, Integer count) {
+    public List<PcOrderTradeDetailVo> queryTradeRecord(String asset, String symbol, Long gtTradeId, Long ltTradeId, Integer count, String startTime, String endTime) {
+        logger.info("进人查询成交记录接口，参数为：asset={},symbol={},gtTradeId={},ltTradeId={},count={},startTime={},endTime={}", asset, symbol, gtTradeId, ltTradeId, count, startTime, endTime);
         checkParam(asset, symbol, count);
         //如果同时传了gtTradeId和ltTradeId 则以gtOrderId为查询条件，同时不传，则查全部
         if (gtTradeId != null && ltTradeId != null) {
             ltTradeId = null;
         }
+        String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+        startTime = startAndEndTime[0];
+        endTime = startAndEndTime[1];
         List<PcOrderTradeDetailVo> result = new ArrayList<>();
         List<String> assetList = Arrays.asList(asset.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
         List<String> symbolList = Arrays.asList(symbol.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
-        List<PcOrderTradeVo> voList = pcOrderTradeService.queryTradeRecords(assetList, symbolList, gtTradeId, ltTradeId, count);
+        List<PcOrderTradeVo> voList = pcOrderTradeService.queryTradeRecords(assetList, symbolList, gtTradeId, ltTradeId, count, startTime, endTime);
         //封装结果集
         this.toResult(result, voList);
 
         return result;
-    }
-
-
-    private void checkParam(String asset, String symbol, Integer count) {
-        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || count == null) {
-            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
-        }
-        if (count > 100) {
-            throw new ExException(PcCommonErrorCode.MORE_THAN_MAX_ROW);
-        }
-
     }
 
 
@@ -97,12 +96,14 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
      * @param statTime 成交时间
      * @return
      */
-    @CrossDB
     @Override
     public PcOrderTradeDetailVo selectLessTimeTrade(String asset, String symbol, Long statTime) {
+        logger.info("进人查小于某个时间点的最大的一条记录接口，参数为：asset={},symbol={},statTime={}", asset, symbol, statTime);
+
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || statTime == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
+
         PcOrderTradeVo vo = pcOrderTradeService.selectLessTimeTrade(asset, symbol, statTime);
         PcOrderTradeDetailVo detailVo = new PcOrderTradeDetailVo();
         if (vo != null) {
@@ -136,11 +137,17 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
 
     @Override
     public List<PcOrderTradeExtendVo> selectTradeListByUserId(String asset, String symbol, Long userId, Long startTime, Long endTime) {
+        logger.info("进人查某个时间区间某个用户的成交记录接口，参数为：asset={},symbol={},userId={},startTime={},endTime={}", asset, symbol, userId, startTime, endTime);
+
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
 
-        if (startTime == null && endTime == null) {
+        if (startTime == null) {
+            String s = CommonDateUtils.timestampToString(startTime);
+            startTime = CommonDateUtils.stringToTimestamp(s);
+        }
+        if (endTime == null) {
             endTime = Instant.now().toEpochMilli();
         }
 
@@ -150,14 +157,19 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
 
     @Override
     public BigDecimal queryPcTradeFee(Long userId, String asset, Integer makerFlag, Long beginTime, Long endTime) {
+
         if (StringUtils.isEmpty(asset) || userId == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
+
+
         return pcOrderTradeService.queryPcTradeFee(userId, asset, makerFlag, beginTime, endTime);
     }
 
     @Override
     public List<PcOrderTradeDetailVo> selectPcFeeCollectByAccountId(String asset, String symbol, Long userId, Long statTime, Long endTime) {
+        logger.info("进人查询成交记录列表(后台admin接口)，参数为：asset={},symbol={},userId={},statTime={},endTime={}", asset, symbol, userId, statTime, endTime);
+
         if (userId == null || statTime == null || endTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
@@ -202,6 +214,16 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
                 result.add(detailVo);
             }
         }
+    }
+
+    private void checkParam(String asset, String symbol, Integer count) {
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || count == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        if (count > 100) {
+            throw new ExException(PcCommonErrorCode.MORE_THAN_MAX_ROW);
+        }
+
     }
 
 }

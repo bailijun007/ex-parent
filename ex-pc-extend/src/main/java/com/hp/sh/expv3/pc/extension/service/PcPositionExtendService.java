@@ -46,7 +46,7 @@ public interface PcPositionExtendService {
 
     PageResult<PcPositionVo> pageQueryPositionList(Long userId, String asset, String symbol, Long posId, Integer liqStatus, Integer pageNo, Integer pageSize);
 
-    List<PcPositionVo> findActivePosition(Long userId, String asset, String symbol);
+    List<PcPositionVo> findActivePosition(Long userId, String asset, String symbol, String startTime, String endTime);
 
     //通过用户id，资产，交易对查询均价
     BigDecimal getAvgPrice(Long userId, String asset, String symbol);

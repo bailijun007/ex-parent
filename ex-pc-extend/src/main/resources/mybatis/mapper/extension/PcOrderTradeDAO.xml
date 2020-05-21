@@ -114,8 +114,11 @@
             <if test="symbol!=null and symbol!=''">
                 and symbol=#{symbol}
             </if>
-            <if test="tradeTime!=null">
-                and trade_time &lt; #{tradeTime}
+            <if test="tradeTimeBegin!=null">
+                and trade_time &gt;= #{tradeTimeBegin}
+            </if>
+            <if test="tradeTimeEnd!=null">
+                and trade_time &lt; #{tradeTimeEnd}
             </if>
         </where>
         order by trade_time desc
@@ -182,7 +185,12 @@
                     #{symbolList[${i}]}
                 </foreach>
             </if>
-
+            <if test="tradeTimeBegin!=null and tradeTimeBegin!=''">
+                and trade_time &gt;=#{tradeTimeBegin}
+            </if>
+            <if test="tradeTimeEnd!=null and tradeTimeEnd!=''">
+                and trade_time &lt;=#{tradeTimeEnd}
+            </if>
             <if test="userId!=null">and user_id=#{userId}</if>
 
             <if test="gtTradeId!=null">

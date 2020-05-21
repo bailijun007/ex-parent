@@ -1,5 +1,7 @@
 package com.hp.sh.expv3.pc.extension.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -83,6 +85,27 @@ public final class CommonDateUtils {
      */
     public static Long localDateTimeToTimestamp(LocalDateTime localDateTime){
         return  localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+    }
+
+    public static String getDefaultDateTime(String startTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime dateTime = LocalDateTime.now();
+        //如果开始时间，结束时间没有值则给默认今天时间
+        if (org.springframework.util.StringUtils.isEmpty(startTime)) {
+            startTime = formatter.format(dateTime);
+        }
+        return startTime;
+    }
+
+    public static String[] getStartAndEndTime(String startTime, String endTime) {
+        if (StringUtils.isEmpty(startTime)) {
+            startTime = getDefaultDateTime(startTime);
+            String[] split = startTime.split("-");
+            int day = Integer.parseInt(split[2]) + 1;
+            endTime = split[0] + "-" + split[1] + "-" + day;
+        }
+        String[] startAndEndTime = {startTime, endTime};
+        return startAndEndTime;
     }
 
     /**
