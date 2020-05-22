@@ -99,4 +99,18 @@ public class PcOrderTradeDetailVo implements Serializable {
     public void setFee(BigDecimal fee) {
         this.fee = fee;
     }
+
+    @Override
+    public String toString() {
+        return "PcOrderTradeDetailVo{" +
+                "id=" + id +
+                ", asset='" + asset + '\'' +
+                ", symbol='" + symbol + '\'' +
+                ", tradeTime=" + tradeTime +
+                ", price=" + price +
+                ", qty=" + qty +
+                ", amt=" + amt +
+                ", fee=" + fee +
+                '}';
+    }
 }

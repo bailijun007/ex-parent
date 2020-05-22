@@ -66,6 +66,8 @@ public class UserOrderVo implements Serializable {
     @ApiModelProperty("客户端id")
     private String clientOid;
 
+    //新加字段 成交均价
+    private BigDecimal tradeMeanPrice;
     public Long getUserId() {
         return userId;
     }
@@ -80,6 +82,14 @@ public class UserOrderVo implements Serializable {
 
     public void setRealisedPnl(BigDecimal realisedPnl) {
         this.realisedPnl = realisedPnl;
+    }
+
+    public BigDecimal getTradeMeanPrice() {
+        return tradeMeanPrice;
+    }
+
+    public void setTradeMeanPrice(BigDecimal tradeMeanPrice) {
+        this.tradeMeanPrice = tradeMeanPrice;
     }
 
     public Long getId() {
@@ -216,5 +226,30 @@ public class UserOrderVo implements Serializable {
 
     public void setClientOid(String clientOid) {
         this.clientOid = clientOid;
+    }
+
+    @Override
+    public String toString() {
+        return "UserOrderVo{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", status=" + status +
+                ", fee=" + fee +
+                ", price=" + price +
+                ", qty=" + qty +
+                ", longFlag=" + longFlag +
+                ", leverage=" + leverage +
+                ", asset='" + asset + '\'' +
+                ", symol='" + symol + '\'' +
+                ", ctime=" + ctime +
+                ", avgPrice=" + avgPrice +
+                ", filledQty=" + filledQty +
+                ", closeFlag=" + closeFlag +
+                ", tradeRatio=" + tradeRatio +
+                ", orderMargin=" + orderMargin +
+                ", orderType=" + orderType +
+                ", realisedPnl=" + realisedPnl +
+                ", clientOid='" + clientOid + '\'' +
+                '}';
     }
 }

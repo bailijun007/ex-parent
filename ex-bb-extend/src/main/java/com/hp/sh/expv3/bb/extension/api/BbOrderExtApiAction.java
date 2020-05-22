@@ -39,8 +39,9 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         if (pageSize == null || pageNo == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        startTime = getDefaultDateTime(startTime);
-        endTime = getDefaultDateTime(endTime);
+         String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+        startTime = startAndEndTime[0];
+        endTime = startAndEndTime[1];
         return bbOrderExtService.queryAllBbOrederHistory(userId, asset, symbol, startTime, endTime, pageNo, pageSize);
     }
 
@@ -49,8 +50,9 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
     public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage, String startTime, String endTime) {
         long start = System.currentTimeMillis();
         checkParam(userId, asset, symbol, pageSize, nextPage);
-        startTime = getDefaultDateTime(startTime);
-        endTime = getDefaultDateTime(endTime);
+        String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+        startTime = startAndEndTime[0];
+        endTime = startAndEndTime[1];
         PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(userId, asset, symbol, bidFlag, pageSize, lastOrderId, nextPage, startTime, endTime);
         if (result != null) {
             long end = System.currentTimeMillis();
@@ -129,6 +131,17 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
             startTime = formatter.format(dateTime);
         }
         return startTime;
+    }
+
+    private String[] getStartAndEndTime(String startTime, String endTime) {
+        if (org.apache.commons.lang3.StringUtils.isEmpty(startTime)) {
+            startTime = getDefaultDateTime(startTime);
+            String[] split = startTime.split("-");
+            int day = Integer.parseInt(split[2]) + 1;
+            endTime = split[0] + split[1] + day;
+        }
+        String[] startAndEndTime = {startTime, endTime};
+        return startAndEndTime;
     }
 
 }

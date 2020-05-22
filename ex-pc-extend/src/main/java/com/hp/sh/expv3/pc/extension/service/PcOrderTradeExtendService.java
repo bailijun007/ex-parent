@@ -22,9 +22,9 @@ public interface PcOrderTradeExtendService {
 
     PcOrderTradeVo getPcOrderTrade(Long refId, String asset, String symbol, Long userId, Long time);
 
-    List<PcOrderTradeVo> listPcOrderTrade(List<Long> refIds, String asset, String symbol, Long userId);
+    List<PcOrderTradeVo> listPcOrderTrade(List<Long> refIds, String asset, String symbol, Long userId,Long startDate,Long endDate);
 
-    List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId);
+    List<PcOrderTradeVo> queryOrderTrade(Long userId, String asset, String symbol, String orderId,Long startTime,Long endTime);
 
     /**
      * 可主键替代上面的
@@ -36,9 +36,9 @@ public interface PcOrderTradeExtendService {
      * @param orderIds
      * @return
      */
-    List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds);
+    List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds,String startTime,String endTime);
 
-    List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count);
+    List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count,String startTime,String endTime);
 
     PcOrderTradeVo selectLessTimeTrade(String asset, String symbol, Long statTime);
 

@@ -10,6 +10,7 @@ import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.dao.PcPositionDAO;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
+import com.hp.sh.expv3.pc.extension.util.CommonDateUtils;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionNumStatVo;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVo;
 import com.hp.sh.expv3.pc.extension.vo.PcPositionVolumeStatVo;
@@ -82,11 +83,13 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
     }
 
     @Override
-    public List<PcPositionVo> findActivePosition(Long userId, String asset, String symbol) {
+    public List<PcPositionVo> findActivePosition(Long userId, String asset, String symbol, String startTime, String endTime) {
         Map<String, Object> map=new HashMap<>();
         map.put("userId",userId);
         map.put("asset",asset);
         map.put("symbol",symbol);
+        map.put("createdBegin", CommonDateUtils.stringToTimestamp(startTime));
+        map.put("createdEnd", CommonDateUtils.stringToTimestamp(endTime));
         List<PcPositionVo> pcPositionVos = pcPositionDAO.queryActivePosition(map);
         return pcPositionVos;
     }

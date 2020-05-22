@@ -31,10 +31,15 @@ public interface PcPositionExtendApi {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
-            @ApiImplicitParam(name = "symbol ", value = "交易对", required = true)
+            @ApiImplicitParam(name = "symbol ", value = "交易对", required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false)
     })
-    List<CurrentPositionVo> findCurrentPosition(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
-                                                @RequestParam("symbol") String symbol);
+    List<CurrentPositionVo> findCurrentPosition(@RequestParam("userId") Long userId,
+                                                @RequestParam("asset") String asset,
+                                                @RequestParam("symbol") String symbol,
+                                                @RequestParam(value = "startTime",required = false) String startTime,
+                                                @RequestParam(value = "endTime",required = false) String endTime);
 
 
     @ApiOperation(value = "查询仓位列表")

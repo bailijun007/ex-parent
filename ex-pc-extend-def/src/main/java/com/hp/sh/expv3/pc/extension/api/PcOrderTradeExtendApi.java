@@ -28,10 +28,13 @@ public interface PcOrderTradeExtendApi {
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
-            @ApiImplicitParam(name = "orderId ", value = "委托id", example = "1", required = true)
+            @ApiImplicitParam(name = "orderId ", value = "委托id", example = "1", required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false)
     })
     List<PcOrderTradeDetailVo> queryOrderTradeDetail(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
-                                                     @RequestParam("symbol") String symbol, @RequestParam("orderId") String orderId);
+                                                     @RequestParam("symbol") String symbol, @RequestParam("orderId") String orderId,
+                                                     @RequestParam(value = "startTime",required = false) String startTime, @RequestParam(value = "endTime",required = false) String endTime);
 
 
     @ApiOperation(value = "查询成交记录")
@@ -41,14 +44,18 @@ public interface PcOrderTradeExtendApi {
             @ApiImplicitParam(name = "symbol", value = "交易对，多个以逗号分割", example = "BTC_USDT,BTC_ETH", required = true),
             @ApiImplicitParam(name = "gtTradeId ", value = "成交记录id,请求大于trade_id的数据,gt和lt都填,以gt为准", example = "10", required = false),
             @ApiImplicitParam(name = "ltTradeId ", value = "成交记录id,请求小于trade_id的数据", example = "10", required = false),
-            @ApiImplicitParam(name = "count ", value = "返回条数,最大100条", example = "10", required = false)
+            @ApiImplicitParam(name = "count ", value = "返回条数,最大100条", example = "10", required = false),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false)
     })
     List<PcOrderTradeDetailVo> queryTradeRecord(
             @RequestParam(value = "asset") String asset,
             @RequestParam(value = "symbol", required = true) String symbol,
             @RequestParam(value = "gtTradeId", required = false) Long gtTradeId,
             @RequestParam(value = "ltTradeId", required = false) Long ltTradeId,
-            @RequestParam(value = "count", required = true) Integer count);
+            @RequestParam(value = "count", required = true) Integer count,
+            @RequestParam(value = "startTime", required = false) String startTime,
+            @RequestParam(value = "endTime", required = false) String endTime);
 
     @ApiOperation(value = "查小于某个时间点的最大的一条记录")
     @GetMapping(value = "/api/extension/pc/orderTrade/selectLessTimeTrade")
@@ -79,7 +86,7 @@ public interface PcOrderTradeExtendApi {
     );
 
 
-    @ApiOperation(value = "查询 成交记录列表(后台admin接口)")
+    @ApiOperation(value = "查询成交记录列表(后台admin接口)")
     @GetMapping(value = "/api/extension/pc/orderTrade/selectPcFeeCollectByAccountId")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
@@ -92,7 +99,7 @@ public interface PcOrderTradeExtendApi {
                                                     @RequestParam("userId") Long userId, @RequestParam("statTime") Long statTime, @RequestParam("endTime") Long endTime);
 
 
-    @ApiOperation(value = "查某个时间区间某个用户的成交记录 (不传时间则默认查今天以前的所有数据)")
+    @ApiOperation(value = "查某个时间区间某个用户的成交记录(不传时间则默认查今天以前的所有数据)")
     @GetMapping(value = "/api/extension/pc/orderTrade/selectTradeListByUserId")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
@@ -109,7 +116,7 @@ public interface PcOrderTradeExtendApi {
             @RequestParam(value = "endTime", required = false) Long endTime
     );
 
-    @ApiOperation(value = "查询交易手续费")
+    @ApiOperation(value = "查询交易手续费(暂不支持分表)")
     @GetMapping(value = "/api/extension/pc/orderTrade/queryPcTradeFee")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId ", value = "用户id", required = true),
