@@ -75,10 +75,10 @@
             <if test="liqMarkTime!=null">and liq_mark_time=#{liqMarkTime}</if>
             <if test="liqStatus!=null">and liq_status=#{liqStatus}</if>
             <if test="faceValue!=null">and face_value=#{faceValue}</if>
-            <if test="createdBegin!=null and createdBegin!=''">and created &gt;= #{createdBegin}</if>
-            <if test="createdEnd!=null and createdEnd!=''">and created &lt;= #{createdEnd}</if>
-            <if test="modifiedBegin!=null and modifiedBegin!=''">and modified &gt;= #{modifiedBegin}</if>
-            <if test="modifiedEnd!=null and modifiedEnd!=''">and modified &lt;= #{modifiedEnd}</if>
+            <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
+            <if test="modifiedBegin!=null">and modified &gt;= #{modifiedBegin}</if>
+            <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
         </where>
     </sql>
 
@@ -95,14 +95,13 @@
 
     <select id="getPosMargin" resultType="java.math.BigDecimal">
 
-         select  IFNULL(SUM(p.pos_margin),0) from pc_active_position ap LEFT JOIN pc_position p
-        on ap.id=p.id
+         select  IFNULL(SUM(pos_margin),0) from pc_position ap
         where ap.user_id=#{userId}
         and  ap.asset=#{asset}
     </select>
 
     <select id="getInitMargin" resultType="java.math.BigDecimal">
-        select init_margin from pc_position
+        select init_margin from pc_position_history
         where user_id=#{userId}
         and asset=#{asset}
         and id=#{posId}
@@ -111,25 +110,27 @@
     <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionVo">
         select
         <include refid="Base_Column_List"/>
-        from pc_position
+        from pc_position_history
         <include refid="simple_where"/>
     </select>
 
     <select id="queryList" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionVo">
         select
         <include refid="Base_Column_List"/>
-        from pc_position
+        from pc_position_history
         <include refid="simple_where"/>
     </select>
 
     <select id="queryActivePosition" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionVo">
         select
         <include refid="Base_Column_List"/>
-        from pc_position
+        from pc_position ap
         <where>
-            <if test="userId!=null">user_id=#{userId}</if>
-            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
-            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="userId!=null">ap.user_id=#{userId}</if>
+            <if test="asset!=null and asset!=''">and ap.asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and ap.symbol=#{symbol}</if>
+            <if test="createdBegin!=null">and ap.created &gt;= #{createdBegin}</if>
+            <if test="createdEnd!=null">and ap.created &lt;= #{createdEnd}</if>
         </where>
 
     </select>
@@ -137,12 +138,12 @@
     <select id="selectPosByAccount" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionVo">
         select
         <include refid="Base_Column_List"/>
-        from pc_position
+        from pc_position_history
         <include refid="simple_where"/>
     </select>
 
     <select id="getAvgPrice" resultType="java.math.BigDecimal">
-        select mean_price  from pc_position
+        select mean_price  from pc_position_history
         where user_id=#{userId}
         and asset=#{asset}
         and symbol=#{symbol}
@@ -151,37 +152,34 @@
 
     <select id="getSymbolPositionStat" resultType="com.hp.sh.expv3.pc.extension.vo.PcSymbolPositionStatVo">
 		select 
-			ap.user_id, ap.long_flag, sum(p.volume) as volume
-		from pc_active_position ap LEFT JOIN pc_position p
-        on ap.id=p.id
+			user_id, long_flag, sum(volume) as volume
+		from pc_position
         where
-	         ap.asset=#{asset}
-	        and ap.symbol=#{symbol}
+	   asset=#{asset}
+	        and symbol=#{symbol}
 		group 
-			by ap.user_id, ap.long_flag
+			by user_id, long_flag
     </select>
 
 
     <select id="getPositionVolumeStat" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionVolumeStatVo">
 		select 
-			ap.long_flag, sum(p.volume) as volume
-		from pc_active_position ap LEFT JOIN pc_position p
-            ON ap.id=p.id
-             where  ap.asset=#{asset}
-	        and ap.symbol=#{symbol}
+			long_flag, sum(volume) as volume
+		from pc_position
+             where  asset=#{asset}
+	        and symbol=#{symbol}
 		group by
-			ap.long_flag
+			long_flag
     </select>
 
     <select id="getPositionNumStat" resultType="com.hp.sh.expv3.pc.extension.vo.PcPositionNumStatVo">
 	select
-		ap.long_flag, count(1) as pos_num
-		from pc_active_position ap LEFT JOIN pc_position p
-        ON ap.id=p.id
-          where  ap.asset=#{asset}
-	        and ap.symbol=#{symbol}
+		long_flag, count(1) as pos_num
+		from pc_position
+          where  asset=#{asset}
+	        and symbol=#{symbol}
 		group by
-			ap.long_flag
+			long_flag
     </select>
 
 </mapper>

@@ -15,7 +15,6 @@ import java.util.Map;
 public interface PcOrderTradeDAO {
 
 
-    BigDecimal getPl(@Param("userId") Long userId, @Param("asset") String asset,@Param("posId") Long posId);
 
     PcOrderTradeVo queryOne(Map<String,Object> map);
 
