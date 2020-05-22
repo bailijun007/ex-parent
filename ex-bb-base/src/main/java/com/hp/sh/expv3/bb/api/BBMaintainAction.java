@@ -158,11 +158,8 @@ public class BBMaintainAction{
 			}
 			
 			for(BBOrder order : list){
-				boolean isExist = matchMqSender.exist(order.getAsset(), order.getSymbol(), ""+order.getId(), order.getCreated());
-				if(!isExist){
-					orderApiAction.sendOrderMsg(order);
-					n++;
-				}
+				orderApiAction.sendOrderMsg(order);
+				n++;
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
@@ -183,16 +180,15 @@ public class BBMaintainAction{
 		long now = DbDateUtils.now()-2000;
 		while(true){
 			List<BBOrder> list = orderQueryService.queryPendingActive(page, symbol, now, OrderStatus.PENDING_NEW);
+			List<BBOrder> list2 = orderQueryService.queryPendingActive(page, symbol, now, OrderStatus.NEW);
+			list.addAll(list2);
 			if(list==null||list.isEmpty()){
 				break;
 			}
 			
 			for(BBOrder order : list){
-				boolean isExist = matchMqSender.exist(order.getAsset(), order.getSymbol(), ""+order.getId(), order.getCreated());
-				if(!isExist){
-					orderApiAction.sendOrderMsg(order);
-					n++;
-				}
+				orderApiAction.sendOrderMsg(order);
+				n++;
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
