@@ -1,3 +1,17 @@
+/*
+Navicat MySQL Data Transfer
+
+Source Server         : 192.168.0.190-ex
+Source Server Version : 50726
+Source Host           : 192.168.0.190:3306
+Source Database       : expv3_bb
+
+Target Server Type    : MYSQL
+Target Server Version : 50599
+File Encoding         : 65001
+
+Date: 2020-05-22 11:42:18
+*/
 
 SET FOREIGN_KEY_CHECKS=0;
 
@@ -178,7 +192,7 @@ PARTITION BY LINEAR KEY (shard_id) PARTITIONS 32
 -- ----------------------------
 DROP TABLE IF EXISTS `bb_message_offset`;
 CREATE TABLE `bb_message_offset` (
-`shard_id`  int(11) NOT NULL COMMENT '分片Id' ,
+`shard_id`  bigint(11) NOT NULL COMMENT '分片Id' ,
 `readed_offset`  bigint(20) NULL DEFAULT NULL COMMENT '读取位置' ,
 `modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
 PRIMARY KEY (`shard_id`)
