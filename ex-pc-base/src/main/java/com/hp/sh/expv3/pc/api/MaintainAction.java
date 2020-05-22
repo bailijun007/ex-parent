@@ -129,6 +129,10 @@ public class MaintainAction{
 		long now = DbDateUtils.now()-2000;
 		while(true){
 			List<PcOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW);
+			List<PcOrder> _list2 = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.NEW);
+			
+			list.addAll(_list2);
+			
 			if(list==null||list.isEmpty()){
 				break;
 			}
