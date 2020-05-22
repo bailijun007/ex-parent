@@ -181,6 +181,8 @@ public class BBMaintainAction{
 		long now = DbDateUtils.now()-2000;
 		while(true){
 			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW);
+			List<BBOrder> _list2 = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.NEW);
+			list.addAll(_list2);
 			if(list==null||list.isEmpty()){
 				break;
 			}
