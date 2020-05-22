@@ -61,8 +61,8 @@ COMMENT='账户日志'
 -- ----------------------------
 -- Table structure for `bb_account_record`
 -- ----------------------------
-DROP TABLE IF EXISTS `bb_account_record`;
-CREATE TABLE `bb_account_record` (
+DROP TABLE IF EXISTS `bb_account_record_x`;
+CREATE TABLE `bb_account_record_x` (
 `id`  bigint(20) NOT NULL COMMENT '主键' ,
 `user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
@@ -93,25 +93,13 @@ COMMENT='币币_账户明细'
 
 ;
 
--- ----------------------------
--- Table structure for `bb_active_order`
--- ----------------------------
-DROP TABLE IF EXISTS `bb_active_order`;
-CREATE TABLE `bb_active_order` (
-`id`  bigint(20) NOT NULL COMMENT '订单ID' ,
-`user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
-`symbol`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '合约交易品种' ,
-`bid_flag`  int(11) NOT NULL COMMENT '多空' ,
-PRIMARY KEY (`id`),
-INDEX `idx_userid` (`user_id`) USING BTREE ,
-INDEX `idx_symbol` (`symbol`) USING BTREE 
-)
-ENGINE=InnoDB
-DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_活动订单（委托）'
-
-;
+CREATE TABLE `bb_account_record_trade_no` (
+  `trade_no` varchar(64) NOT NULL COMMENT '调用方支付单号',
+  `record_id` bigint(20) NOT NULL COMMENT '记录Id',
+  `tx_id` bigint(20) NOT NULL COMMENT '事务ID',
+  PRIMARY KEY (`trade_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='币币_账户明细SN'
+PARTITION BY LINEAR KEY (trade_no) PARTITIONS 100;
 
 -- ----------------------------
 -- Table structure for `bb_collector_account`
@@ -261,37 +249,14 @@ INDEX `idx_created` (`created`) USING BTREE
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='币币_订单（委托）'
-
-;
-
--- ----------------------------
--- Table structure for `bb_order_log`
--- ----------------------------
-DROP TABLE IF EXISTS `bb_order_log`;
-CREATE TABLE `bb_order_log` (
-`order_id`  bigint(20) NOT NULL ,
-`type`  int(11) NOT NULL ,
-`trigger_type`  int(11) NOT NULL ,
-`tx_id`  bigint(20) NOT NULL COMMENT '事务ID' ,
-`request_id`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '请求ID' ,
-`user_id`  bigint(20) NOT NULL COMMENT '用户ID' ,
-`id`  bigint(20) NOT NULL ,
-`created`  bigint(20) NOT NULL COMMENT '创建时间' ,
-`modified`  bigint(20) NOT NULL COMMENT '修改时间' ,
-PRIMARY KEY (`id`),
-INDEX `idx_order_id` (`order_id`) USING BTREE 
-)
-ENGINE=InnoDB
-DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-COMMENT='订单日志'
+COMMENT='币币_订单（活动委托）'
 
 ;
 
 -- ----------------------------
 -- Table structure for `bb_order_trade`
 -- ----------------------------
-DROP TABLE IF EXISTS `bb_order_trade`;
+DROP TABLE IF EXISTS `bb_order_trade_x`;
 CREATE TABLE `bb_order_trade` (
 `id`  bigint(20) NOT NULL COMMENT '主键' ,
 `asset`  varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '资产' ,
@@ -329,6 +294,14 @@ DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 COMMENT='币币_用户订单成交记录'
 
 ;
+
+CREATE TABLE `bb_order_trade_sn` (
+  `trade_sn` varchar(64) NOT NULL COMMENT '交易序号',
+  `id` bigint(20) NOT NULL,
+  `tx_id` bigint(20) NOT NULL COMMENT '事务ID',
+  PRIMARY KEY (`trade_sn`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='币币_用户订单成交记录SN'
+PARTITION BY KEY (trade_sn) PARTITIONS 100;
 
 -- ----------------------------
 -- Table structure for `bb_trade`
