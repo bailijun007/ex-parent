@@ -59,6 +59,7 @@ public class DataSourceConfig {
 		
 		builder.addAssetSubTable("pc_account_record", "id", "created");
 		builder.addSymbolSubTable("pc_order_history", "id", "created");
+		builder.addSymbolSubTable("pc_position_history", "id", "created");
 		builder.addSymbolSubTable("pc_order_trade", "id", "trade_time", tid);
 		return builder.build();
 	}
