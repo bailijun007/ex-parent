@@ -1,6 +1,10 @@
 package com.hp.sh.expv3.pc.extension.api;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,20 +78,25 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
         endTime = startAndEndTime[1];
 
         List<CurrentPositionVo> result = new ArrayList<>();
-        List<PcPositionVo> list = pcPositionExtendService.findActivePosition(userId, asset, symbol,startTime,endTime);
+        List<PcPositionVo> list = pcPositionExtendService.findActivePosition(userId, asset, symbol, startTime, endTime);
         this.convertPositionList(result, list);
 
         return result;
     }
 
     @Override
-    public PageResult<CurrentPositionVo> findPositionList(Long userId, String asset, Long posId, Integer liqStatus, String symbol, Integer pageNo, Integer pageSize) {
-        if (pageNo == null || pageSize == null) {
+    public PageResult<CurrentPositionVo> findPositionList(Long userId, String asset, Long posId, Integer liqStatus, String symbol, Integer pageNo, Integer pageSize, String startTime, String endTime) {
+        logger.info("进入查询仓位列表接口，收到的参数为：userId={},asset={},symbol={},posId={},liqStatus={},pageNo={},pageSize={},startTime={},endTime={}", userId, asset, symbol, posId, liqStatus, pageNo, pageSize, startTime, endTime);
+
+        if (pageNo == null || pageSize == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        startTime = startAndEndTime[0];
+        endTime = startAndEndTime[1];
         PageResult<CurrentPositionVo> result = new PageResult<>();
         List<CurrentPositionVo> list = new ArrayList<>();
-        PageResult<PcPositionVo> voList = pcPositionExtendService.pageQueryPositionList(userId, asset, symbol, posId, liqStatus, pageNo, pageSize);
+        PageResult<PcPositionVo> voList = pcPositionExtendService.pageQueryPositionList(userId, asset, symbol, posId, liqStatus, pageNo, pageSize, startTime, endTime);
         result.setPageNo(voList.getPageNo());
         result.setPageCount(voList.getPageCount());
         result.setRowTotal(voList.getRowTotal());
@@ -99,14 +108,30 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
 
     @Override
     public List<CurrentPositionVo> selectPosByAccount(Long userId, String asset, String symbol, Long startTime) {
+        logger.info("进入查询已平仓位信息列表接口，收到的参数为：userId={},asset={},symbol={},startTime={}", userId, asset, symbol, startTime);
         if (userId == null || startTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
+        LocalDateTime localDateTime = LocalDateTime.now();
+        Long endTime = CommonDateUtils.localDateTimeToTimestamp(localDateTime);
         List<CurrentPositionVo> result = new ArrayList<>();
-        List<PcPositionVo> list = pcPositionExtendService.selectPosByAccount(userId, asset, symbol, startTime);
+        List<PcPositionVo> list = pcPositionExtendService.selectPosByAccount(userId, asset, symbol, startTime, endTime);
         this.convertPositionList(result, list);
 
         return result;
+    }
+
+
+    @Override
+    public List<PcSymbolPositionStatVo> getSymbolPositionStat(String asset, String symbol) {
+        List<PcSymbolPositionStatVo> list = pcPositionExtendService.getSymbolPositionStat(asset, symbol);
+        return list;
+    }
+
+    @Override
+    public PcSymbolPositionTotalVo getSymbolPositionTotal(String asset, String symbol) {
+        logger.info("进入查询合约持仓量总数接口，收到的参数为：asset={},symbol={}", asset, symbol);
+        return pcPositionExtendService.getSymbolPositionTotal(asset, symbol);
     }
 
     private void convertPositionList(List<CurrentPositionVo> result, List<PcPositionVo> list) {
@@ -148,17 +173,4 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
             }
         }
     }
-
-    @Override
-    public List<PcSymbolPositionStatVo> getSymbolPositionStat(String asset, String symbol) {
-        List<PcSymbolPositionStatVo> list = pcPositionExtendService.getSymbolPositionStat(asset, symbol);
-        return list;
-    }
-
-    @Override
-    public PcSymbolPositionTotalVo getSymbolPositionTotal(String asset, String symbol) {
-        return pcPositionExtendService.getSymbolPositionTotal(asset, symbol);
-    }
-
-
 }

@@ -46,12 +46,14 @@ public interface PcPositionExtendApi {
     @GetMapping(value = "/api/extension/pc/position/findPositionList")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
-            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = false),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "posId", value = "仓位id", example = "1", required = false),
             @ApiImplicitParam(name = "liqStatus", value = "仓位强平状态，0：未触发平仓，1：仓位被冻结", example = "0", required = false),
-            @ApiImplicitParam(name = "symbol", value = "交易对", required = false),
+            @ApiImplicitParam(name = "symbol", value = "交易对", required = true),
             @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
-            @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "10", required = true)
+            @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "10", required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false)
     })
     PageResult<CurrentPositionVo> findPositionList(@RequestParam("userId") Long userId,
                                                    @RequestParam("asset") String asset,
@@ -59,7 +61,9 @@ public interface PcPositionExtendApi {
                                                    @RequestParam("liqStatus") Integer liqStatus,
                                                    @RequestParam("symbol") String symbol,
                                                    @RequestParam("pageNo") Integer pageNo,
-                                                   @RequestParam("pageSize") Integer pageSize);
+                                                   @RequestParam("pageSize") Integer pageSize,
+                                                   @RequestParam("startTime") String startTime,
+                                                   @RequestParam("endTime") String endTime);
 
 
 
@@ -81,7 +85,7 @@ public interface PcPositionExtendApi {
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true)
     })
 	List<PcSymbolPositionStatVo> getSymbolPositionStat(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol);
-    
+
     @ApiOperation(value = "查询合约持仓量总数")
     @GetMapping(value = "/api/extension/pc/position/symbolPositionTotal")
     @ApiImplicitParams({

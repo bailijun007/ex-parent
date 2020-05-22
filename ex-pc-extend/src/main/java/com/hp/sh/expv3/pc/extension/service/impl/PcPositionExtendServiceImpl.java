@@ -46,25 +46,10 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
         return pcPositionDAO.getPosMargin(userId, asset);
     }
 
-    @Override
-    public BigDecimal getPl(Long userId, String asset, Long posId) {
-        BigDecimal bigDecimal = pcOrderTradeDAO.getPl(userId, asset, posId);
-        return bigDecimal;
-    }
+
 
     @Override
-    public BigDecimal getPlRatio(Long userId, String asset, Long posId) {
-        BigDecimal pl = this.getPl(userId, asset, posId);
-        BigDecimal initMargin = pcPositionDAO.getInitMargin(userId, asset, posId);
-        if(initMargin.compareTo(new BigDecimal(0))==0){
-            //初始保证金不能为0
-            throw new ExException(PcCommonErrorCode.INIT_MARGIN_NOT_EQUAL_ZERO);
-        }
-        return pl.divide(initMargin);
-    }
-
-    @Override
-    public PageResult<PcPositionVo> pageQueryPositionList(Long userId, String asset, String symbol, Long posId, Integer liqStatus, Integer pageNo, Integer pageSize) {
+    public PageResult<PcPositionVo> pageQueryPositionList(Long userId, String asset, String symbol, Long posId, Integer liqStatus, Integer pageNo, Integer pageSize,String startTime,String endTime) {
         PageHelper.startPage(pageNo,pageSize);
         PageResult<PcPositionVo> pageResult=new PageResult<>();
         Map<String, Object> map=new HashMap<>();
@@ -73,6 +58,8 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
         map.put("symbol",symbol);
         map.put("id",posId);
         map.put("liqStatus",liqStatus);
+        map.put("createdBegin",CommonDateUtils.stringToTimestamp(startTime));
+        map.put("createdEnd",CommonDateUtils.stringToTimestamp(endTime));
         List<PcPositionVo> pcPositionVos = pcPositionDAO.queryList(map);
         PageInfo<PcPositionVo> info = new PageInfo<>(pcPositionVos);
         pageResult.setList(pcPositionVos);
@@ -109,12 +96,15 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
     }
 
     @Override
-    public List<PcPositionVo> selectPosByAccount(Long userId, String asset, String symbol, Long startTime) {
+    public List<PcPositionVo> selectPosByAccount(Long userId, String asset, String symbol, Long startTime,Long endTime) {
         Map<String, Object> map=new HashMap<>();
         map.put("userId",userId);
         map.put("asset",asset);
         map.put("symbol",symbol);
+        map.put("createdBegin",startTime);
+        map.put("createdEnd",endTime);
         map.put("modifiedBegin",startTime);
+        map.put("modifiedEnd",endTime);
         List<PcPositionVo> pcPositionVos = pcPositionDAO.selectPosByAccount(map);
         return pcPositionVos;
     }

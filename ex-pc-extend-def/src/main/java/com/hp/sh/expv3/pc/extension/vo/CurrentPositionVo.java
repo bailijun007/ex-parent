@@ -225,4 +225,30 @@ public class CurrentPositionVo implements Serializable {
     public void setAccuVolume(BigDecimal accuVolume) {
         this.accuVolume = accuVolume;
     }
+
+    @Override
+    public String toString() {
+        return "CurrentPositionVo{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", asset='" + asset + '\'' +
+                ", symbol='" + symbol + '\'' +
+                ", marginMode=" + marginMode +
+                ", availQty=" + availQty +
+                ", entryPrice=" + entryPrice +
+                ", leverage=" + leverage +
+                ", liquidationPrice=" + liquidationPrice +
+                ", posMargin=" + posMargin +
+                ", posMarginRatio=" + posMarginRatio +
+                ", maintMarginRatio=" + maintMarginRatio +
+                ", qty=" + qty +
+                ", posPnlRatio=" + posPnlRatio +
+                ", realisedPnl=" + realisedPnl +
+                ", pnl=" + pnl +
+                ", bidFlag=" + bidFlag +
+                ", autoIncreaseFlag=" + autoIncreaseFlag +
+                ", ctime=" + ctime +
+                ", accuVolume=" + accuVolume +
+                '}';
+    }
 }

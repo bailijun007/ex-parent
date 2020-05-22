@@ -81,12 +81,7 @@
 	</sql>
 
 
-    <select id="getPl" resultType="java.math.BigDecimal">
-      select IFNULL(sum(pnl),0)  from pc_order_trade
-      where pos_id = #{posId}
-      and asset = #{asset}
-      and user_id = #{userId}
-    </select>
+
 
 
     <select id="queryOne" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo">
