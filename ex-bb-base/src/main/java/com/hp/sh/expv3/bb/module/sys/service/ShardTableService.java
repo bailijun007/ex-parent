@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,17 +149,20 @@ public class ShardTableService{
 	}
 
 //	@PostConstruct
-	public void initSql(){
-		try {
-			FileConfig fc = new FileConfig();
-			fc.setConfigPath("bb_ddl.sql");
-			String text = fc.getFileContent();
-			String[] sqls = text.split(";");
-			for(String sql:sqls){
-				this.dbGlobalDAO.execute(sql);
+	public void initSql() throws Exception{
+		FileConfig fc = new FileConfig();
+		fc.setConfigPath("script/ddl2.sql");
+		String text = fc.getFileContent();
+		String[] sqls = text.split(";");
+		for(String sql:sqls){
+			try {
+				if(StringUtils.isNotBlank(sql)){
+					this.dbGlobalDAO.execute(sql);
+					logger.warn("建表成功！");
+				}
+			} catch (Exception e) {
+				throw e;
 			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
 		}
 	}
 

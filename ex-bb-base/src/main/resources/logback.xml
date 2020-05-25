@@ -207,8 +207,8 @@
         
         <!-- 
         <logger name="com.hp.sh.expv3.commons.lock" level="debug"></logger>
-        	 -->
 		<logger name="com.hp.sh.expv3" level="debug"></logger>
+        -->
 	
 		
 		<logger name="com.gitee.hupadev.base.spring.interceptor" level="info"></logger>
