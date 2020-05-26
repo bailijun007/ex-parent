@@ -22,7 +22,7 @@
 
     <select id="queryKlineDataByThirdData" resultMap="KlineDataPo">
         select  * from ${tableName}
-        where kline_type=#{klineType}
+        where kline_type=1
         and pair=#{pair}
         and `interval`=#{interval}
         and exp_name=#{expName}

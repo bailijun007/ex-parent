@@ -1,10 +1,13 @@
 package com.hp.sh.expv3.service.impl;
 
 
+import com.hp.sh.expv3.controller.QueryKlineDataByThirdDataController;
 import com.hp.sh.expv3.mapper.KlineDataMapper;
 import com.hp.sh.expv3.pojo.KlineDataPo;
 import com.hp.sh.expv3.service.IQueryKlineDataByThirdDataService;
 import com.hp.sh.expv3.util.KlineUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -19,6 +22,9 @@ import java.util.List;
  */
 @Service
 public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByThirdDataService {
+
+    private static final Logger logger = LoggerFactory.getLogger(QueryKlineDataByThirdDataServiceImpl.class);
+
 
     @Autowired
     private KlineDataMapper klineDataMapper;
@@ -53,6 +59,7 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
             klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
         }
 
+        logger.info("第三方k线数据，klineDataPos={}",klineDataPos);
         String dataRedisKey = null;
         String updateRedisKey = null;
         if (klineType == 1) {
