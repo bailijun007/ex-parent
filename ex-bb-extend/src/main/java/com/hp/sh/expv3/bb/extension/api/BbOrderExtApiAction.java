@@ -3,6 +3,7 @@ package com.hp.sh.expv3.bb.extension.api;
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
+import com.hp.sh.expv3.bb.extension.util.CommonDateUtils;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderVo;
 import com.hp.sh.expv3.bb.extension.vo.BbHistoryOrderVo;
 import com.hp.sh.expv3.commons.exception.ExException;
@@ -39,7 +40,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         if (pageSize == null || pageNo == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-         String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+         String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         return bbOrderExtService.queryAllBbOrederHistory(userId, asset, symbol, startTime, endTime, pageNo, pageSize);
@@ -50,7 +51,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
     public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage, String startTime, String endTime) {
         long start = System.currentTimeMillis();
         checkParam(userId, asset, symbol, pageSize, nextPage);
-        String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(userId, asset, symbol, bidFlag, pageSize, lastOrderId, nextPage, startTime, endTime);
@@ -92,6 +93,9 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(status)) {
             statusList = Arrays.asList(status.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
         }
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        startTime = startAndEndTime[0];
+        endTime = startAndEndTime[1];
         List<BbHistoryOrderVo> list = bbOrderExtService.queryOrderList(userId, assetList, symbolList, gtOrderId, ltOrderId, count, statusList, startTime, endTime);
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyList();
@@ -105,12 +109,13 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         if (null == startTime || endTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
+
         return bbOrderExtService.queryTotalFee(asset, symbol, startTime, endTime);
     }
 
     @Override
     public BigDecimal queryTotalOrder(String asset, String symbol, Long startTime, Long endTime) {
-        if (null == startTime || endTime == null) {
+        if (null == startTime || endTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
         return bbOrderExtService.queryTotalOrder(asset, symbol, startTime, endTime);
@@ -123,25 +128,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         }
     }
 
-    private String getDefaultDateTime(String startTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDateTime dateTime = LocalDateTime.now();
-        //如果开始时间，结束时间没有值则给默认今天时间
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = formatter.format(dateTime);
-        }
-        return startTime;
-    }
 
-    private String[] getStartAndEndTime(String startTime, String endTime) {
-        if (org.apache.commons.lang3.StringUtils.isEmpty(startTime)) {
-            startTime = getDefaultDateTime(startTime);
-            String[] split = startTime.split("-");
-            int day = Integer.parseInt(split[2]) + 1;
-            endTime = split[0] + split[1] + day;
-        }
-        String[] startAndEndTime = {startTime, endTime};
-        return startAndEndTime;
-    }
+
 
 }

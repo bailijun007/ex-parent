@@ -45,7 +45,8 @@
             <if test="orderId!=null">and order_id=#{orderId}</if>
             <if test="tradeSn!=null and tradeSn!=''">and trade_sn=#{tradeSn}</if>
             <if test="makerFlag!=null">and maker_flag=#{makerFlag}</if>
-            <if test="tradeTime!=null">and trade_time=#{tradeTime}</if>
+            <if test="tradeTimeBegin!=null">and trade_time&gt;=#{tradeTimeBegin}</if>
+            <if test="tradeTimeEnd!=null">and trade_time&lt;=#{tradeTimeEnd}</if>
             <if test="feeCollectorId!=null">and fee_collector_id=#{feeCollectorId}</if>
             <if test="createdBegin!=null">and created &gt;= #{createdBegin}</if>
             <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
@@ -151,6 +152,12 @@
         user_id=#{userId}
         and asset=#{asset}
         and symbol=#{symbol}
+        <if test="tradeTimeBegin!=null">
+            and trade_time &gt;=#{tradeTimeBegin}
+        </if>
+        <if test="tradeTimeEnd!=null">
+            and trade_time &lt;#{tradeTimeEnd}
+        </if>
         order by trade_time desc
         LIMIT 0,${limit}
     </select>
@@ -162,7 +169,8 @@
         <where>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
-            <if test="tradeTime!=null">and trade_time &lt; #{tradeTime}</if>
+            <if test="tradeTimeBegin!=null">and trade_time &gt;= #{tradeTimeBegin}</if>
+            <if test="tradeTimeEnd!=null">and trade_time &lt; #{tradeTimeEnd}</if>
         </where>
         order by trade_time desc
         limit 0,1

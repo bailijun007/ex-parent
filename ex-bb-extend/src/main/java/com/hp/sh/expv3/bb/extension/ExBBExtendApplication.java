@@ -13,7 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableDiscoveryClient
-@MapperScan({"com.hp.sh.expv3.bb.**.dao", "com.hp.sh.expv3.bb.extension.thirdKlineData.mapper"})
+@MapperScan({"com.hp.sh.expv3.bb.**.dao"})
 @ComponentScan("com.hp.sh.expv3")
 @SpringBootApplication
 @EnableScheduling

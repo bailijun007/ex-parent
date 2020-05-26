@@ -2,6 +2,7 @@ package com.hp.sh.expv3.bb.extension.service.impl;
 
 import com.hp.sh.expv3.bb.extension.dao.BbTradeExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbTradeExtService;
+import com.hp.sh.expv3.bb.extension.util.CommonDateUtils;
 import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
 import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,20 +36,26 @@ public class BbTradeExtServiceImpl implements BbTradeExtService {
     }
 
     @Override
-    public List<BbTradeVo> queryTradeList(Long userId, String asset, String symbol, Integer count) {
-        return bbTradeExtMapper.queryTradeList(userId,asset,symbol,count);
+    public List<BbTradeVo> queryTradeList(Long userId, String asset, String symbol, Integer count,String startTime,String endTime) {
+        Long tradeTimeBegin = CommonDateUtils.stringToTimestamp(startTime);
+        Long tradeTimeEnd = CommonDateUtils.stringToTimestamp(endTime);
+        return bbTradeExtMapper.queryTradeList(userId,asset,symbol,count,tradeTimeBegin,tradeTimeEnd);
     }
 
     @Override
-    public BbTradeVo queryLastTradeByLtTime(String asset, String symbol, Long startTime) {
-        return bbTradeExtMapper.queryLastTradeByLtTime(asset,symbol,startTime);
+    public BbTradeVo queryLastTradeByLtTime(String asset, String symbol, Long endTime) {
+         LocalDate localDate = LocalDate.now();
+         Long startTime = CommonDateUtils.localDateToTimestamp(localDate);
+        return bbTradeExtMapper.queryLastTradeByLtTime(asset,symbol,startTime,endTime);
     }
 
     @Override
-    public List<BbTradeVo> queryLastTrade(String asset, String symbol, Integer count) {
+    public List<BbTradeVo> queryLastTrade(String asset, String symbol, Integer count,String startTime,String endTime) {
         Map<String, Object> map=new HashMap<>();
         map.put("asset",asset);
         map.put("symbol",symbol);
+        map.put("tradeTimeBegin",CommonDateUtils.stringToTimestamp(startTime));
+        map.put("tradeTimeEnd",CommonDateUtils.stringToTimestamp(endTime));
         map.put("orderBy","trade_time");
         map.put("limit",count);
          List<BbTradeVo> list = bbTradeExtMapper.queryLastTrade(map);

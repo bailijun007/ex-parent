@@ -2,6 +2,7 @@ package com.hp.sh.expv3.bb.extension.api;
 
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
+import com.hp.sh.expv3.bb.extension.util.CommonDateUtils;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeDetailVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,15 +50,18 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
 //        }
 //        return bbOrderTradeExtService.selectAllTradeListByUser(asset, symbol, userId);
 //    }
-
     @Override
     public List<BbUserOrderTrade> selectTradeListByUserId(String asset, String symbol, Long userId, Long id, Long startTime, Long endTime) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
 
-        if (startTime == null && endTime == null) {
-            endTime = Instant.now().toEpochMilli();
+        if (startTime == null) {
+            LocalDate localDate = LocalDate.now();
+            startTime = CommonDateUtils.localDateToTimestamp(localDate);
+            if (endTime == null) {
+                endTime = Instant.now().toEpochMilli();
+            }
         }
         List<BbUserOrderTrade> tradeVo = bbOrderTradeExtService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId, id);
         return tradeVo;

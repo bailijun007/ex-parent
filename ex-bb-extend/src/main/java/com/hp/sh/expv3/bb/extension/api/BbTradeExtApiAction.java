@@ -2,6 +2,7 @@ package com.hp.sh.expv3.bb.extension.api;
 
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbTradeExtService;
+import com.hp.sh.expv3.bb.extension.util.CommonDateUtils;
 import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import org.apache.commons.lang3.StringUtils;
@@ -17,18 +18,21 @@ import java.util.TimeZone;
  */
 @RestController
 public class BbTradeExtApiAction implements BbTradeExtApi {
-   @Autowired
+    @Autowired
     private BbTradeExtService bbTradeExtService;
 
     @Override
-    public List<BbTradeVo> queryTradeList(String asset, String symbol, Long userId,Integer count) {
+    public List<BbTradeVo> queryTradeList(String asset, String symbol, Long userId, Integer count) {
         if (userId == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
         if (count > 100) {
             throw new ExException(BbExtCommonErrorCode.MORE_THAN_MAX_ROW);
         }
-        return bbTradeExtService.queryTradeList(userId,asset,symbol,count);
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(null, null);
+        String startTime = startAndEndTime[0];
+        String endTime = startAndEndTime[1];
+        return bbTradeExtService.queryTradeList(userId, asset, symbol, count, startTime, endTime);
     }
 
     @Override
@@ -36,10 +40,10 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
         if (null == startTime || endTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        return bbTradeExtService.selectTradeListByTimeInterval(asset,symbol,startTime,endTime);
+        return bbTradeExtService.selectTradeListByTimeInterval(asset, symbol, startTime, endTime);
     }
 
-//    @Override
+    //    @Override
     public List<BbTradeVo> selectTradeListByUser(String asset, String symbol, Long userId, Long startTime, Long endTime) {
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
@@ -49,7 +53,7 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
             endTime = Instant.now().toEpochMilli();
             startTime = endTime - ((endTime + TimeZone.getDefault().getRawOffset()) % (24 * 60 * 60 * 1000L));
         }
-        return bbTradeExtService.selectTradeListByUser(userId,asset, symbol, startTime, endTime);
+        return bbTradeExtService.selectTradeListByUser(userId, asset, symbol, startTime, endTime);
     }
 
     @Override
@@ -57,7 +61,7 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
         if (null == startTime || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        return bbTradeExtService.queryLastTradeByLtTime(asset,symbol,startTime);
+        return bbTradeExtService.queryLastTradeByLtTime(asset, symbol, startTime);
     }
 
     @Override
@@ -68,7 +72,10 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
         if (count > 100) {
             throw new ExException(BbExtCommonErrorCode.MORE_THAN_MAX_ROW);
         }
-        return bbTradeExtService.queryLastTrade(asset,symbol,count);
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(null, null);
+        String startTime = startAndEndTime[0];
+        String endTime = startAndEndTime[1];
+        return bbTradeExtService.queryLastTrade(asset, symbol, count,startTime,endTime);
     }
 
 //    @Override

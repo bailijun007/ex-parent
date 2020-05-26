@@ -26,17 +26,16 @@ public interface BbAccountRecordExtApi {
             {
                     @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = false),
                     @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+                    @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
+                    @ApiImplicitParam(name = "pageSize", value = "页大小", example = "10", required = true),
                     @ApiImplicitParam(name = "startTime", value = "开始时间", required = false),
                     @ApiImplicitParam(name = "endTime", value = "结束时间", required = false),
-                    @ApiImplicitParam(name = "pageNo", value = "当前页", example = "1", required = true),
-                    @ApiImplicitParam(name = "pageSize", value = "页大小", example = "10", required = true)
             }
     )
     @GetMapping(value = "/api/bb/trade/ext/queryHistory")
-    PageResult<BbAccountRecordVo> queryHistory(@RequestParam(value = "userId",required = false) Long userId, @RequestParam(value = "asset",required = true) String asset,
-                                                @RequestParam(value = "startTime",required = false) String startTime, @RequestParam(value = "endTime",required = false) String endTime,
-                                                @RequestParam(value = "pageSize")  Integer pageSize,  @RequestParam(value = "pageNo") Integer pageNo);
-
+    PageResult<BbAccountRecordVo> queryHistory(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "asset", required = true) String asset,
+                                               @RequestParam(value = "pageSize") Integer pageSize, @RequestParam(value = "pageNo") Integer pageNo,
+                                               @RequestParam(value = "startTime", required = false) String startTime, @RequestParam(value = "endTime", required = false) String endTime);
 
 
     @ApiOperation(value = "查询币币账单")
@@ -45,7 +44,7 @@ public interface BbAccountRecordExtApi {
             @ApiImplicitParam(name = "userId", value = "用户id", example = "122036898980999296", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "USDT", required = false),
             @ApiImplicitParam(name = "historyType", value = "1.最近两天,2.两天到三个月", example = "1", required = true),
-            @ApiImplicitParam(name = "tradeType",value = "类型0.全部,9.卖出,10.买入,3.从资金账户转入,4.转出至资金账户,5.从永续合约转入,6.转出至永续合约" , example = "1", required = true),
+            @ApiImplicitParam(name = "tradeType", value = "类型0.全部,9.卖出,10.买入,3.从资金账户转入,4.转出至资金账户,5.从永续合约转入,6.转出至永续合约", example = "1", required = true),
             @ApiImplicitParam(name = "startDate", value = "开始时间", required = false),
             @ApiImplicitParam(name = "endDate", value = "结束时间", required = false),
             @ApiImplicitParam(name = "nextPage", value = "翻页标记,-1 上一页,1.下一页", example = "1", required = true),
@@ -60,7 +59,7 @@ public interface BbAccountRecordExtApi {
                                      @RequestParam(value = "endDate", required = false) Long endDate,
                                      @RequestParam(value = "nextPage", required = true) Integer nextPage,
                                      @RequestParam(value = "lastId", required = false) Long lastId,
-                                     @RequestParam(value = "pageSize", required = true, defaultValue = "20") Integer pageSize );
+                                     @RequestParam(value = "pageSize", required = true, defaultValue = "20") Integer pageSize);
 
 
 }

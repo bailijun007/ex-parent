@@ -6,6 +6,7 @@ import com.hp.sh.expv3.bb.extension.constant.BbextendConst;
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.service.BbAccountRecordExtService;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
+import com.hp.sh.expv3.bb.extension.util.CommonDateUtils;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountRecordExtVo;
 import com.hp.sh.expv3.bb.extension.vo.BbAccountRecordVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
@@ -39,21 +40,14 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
     private BbOrderTradeExtService bbOrderTradeExtService;
 
     @Override
-    public PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, String startTime, String endTime, Integer pageSize, Integer pageNo) {
+    public PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, Integer pageSize, Integer pageNo, String startTime, String endTime) {
         if (pageSize == null || pageNo == null || StringUtils.isEmpty(asset)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDateTime dateTime = LocalDateTime.now();
         //如果开始时间，结束时间没有值则给默认今天时间
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = formatter.format(dateTime);
-        }
-
-        if (StringUtils.isEmpty(endTime)) {
-            endTime = formatter.format(dateTime);
-        }
-
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        startTime = startAndEndTime[0];
+        endTime = startAndEndTime[1];
         return bbAccountRecordExtService.queryHistory(userId, asset, startTime, endTime, pageNo, pageSize);
     }
 

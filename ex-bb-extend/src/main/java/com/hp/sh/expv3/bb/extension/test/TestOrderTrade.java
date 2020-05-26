@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.bb.extension.dao.BbAccountExtMapper;
 import com.hp.sh.expv3.bb.extension.pojo.BBSymbol;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
-import com.hp.sh.expv3.bb.extension.thirdKlineData.mapper.ThirdKlineDataMapper;
 import com.hp.sh.expv3.bb.extension.vo.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,8 +32,8 @@ public class TestOrderTrade {
     private BbAccountExtMapper bbAccountExtMapper;
 
 
-    @Autowired
-    private ThirdKlineDataMapper klineDataMapper;
+//    @Autowired
+//    private ThirdKlineDataMapper klineDataMapper;
 
     @Autowired
     private BbOrderTradeExtService bbOrderTradeExtService;
