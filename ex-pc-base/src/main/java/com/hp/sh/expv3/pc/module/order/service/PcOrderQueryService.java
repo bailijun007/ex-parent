@@ -143,13 +143,15 @@ public class PcOrderQueryService {
 		return list;
 	}
 
-	public List<PcOrderTrade> querySynchFee(Page page, Long startTime) {
+	public List<PcOrderTrade> querySynchFee(Page page, String asset, String symbol, Long startTime) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", page);
+		params.put("asset", asset);
+		params.put("symbol", symbol);
 		params.put("feeSynchStatus", IntBool.NO);
 		params.put("tradeTimeStart", startTime);
 		params.put("tradeTimeEnd", DbDateUtils.now());
-		params.put("orderBy", "created");
+		params.put("orderBy", "trade_time");
 		List<PcOrderTrade> list = this.pcOrderTradeDAO.queryList(params);
 		return list;
 	}
