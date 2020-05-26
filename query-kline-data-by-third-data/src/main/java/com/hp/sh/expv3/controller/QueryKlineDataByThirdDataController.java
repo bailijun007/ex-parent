@@ -17,6 +17,9 @@ public class QueryKlineDataByThirdDataController implements QueryKlineDataByThir
 
     @Override
     public void queryKlineDataByThirdData(String tableName, Integer klineType, String asset, String pair, String interval, Long openTimeBegin, Long openTimeEnd) {
+        if (klineType == 2) {
+            klineType=1;
+        }
         queryKlineDataByThirdDataService.queryKlineDataByThirdData(tableName, klineType, asset, pair, interval, openTimeBegin, openTimeEnd);
     }
 
