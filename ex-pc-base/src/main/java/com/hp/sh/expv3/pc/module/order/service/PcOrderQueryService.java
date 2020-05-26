@@ -24,6 +24,7 @@ import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.strategy.PcStrategyContext;
 import com.hp.sh.expv3.pc.strategy.vo.OrderTradeVo;
 import com.hp.sh.expv3.pc.vo.response.ActiveOrderVo;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
 
@@ -147,6 +148,7 @@ public class PcOrderQueryService {
 		params.put("page", page);
 		params.put("feeSynchStatus", IntBool.NO);
 		params.put("tradeTimeStart", startTime);
+		params.put("tradeTimeEnd", DbDateUtils.now());
 		params.put("orderBy", "created");
 		List<PcOrderTrade> list = this.pcOrderTradeDAO.queryList(params);
 		return list;

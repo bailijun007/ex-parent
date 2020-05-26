@@ -11,11 +11,14 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author wangjg
  */
 public class TableShardingByDateSymbol extends TableShardingByDate {
+	private static final Logger logger = LoggerFactory.getLogger(TableShardingByDateSymbol.class);
 	
 	public TableShardingByDateSymbol() {
 		super("id", "created");
@@ -42,7 +45,7 @@ public class TableShardingByDateSymbol extends TableShardingByDate {
 		
 		List<String> dateShards = this.getDateShards(shardingValue);
 		
-		if(dateShards!=null){
+		if(dateShards!=null && assets!=null && symbols!=null){
 			for(String asset : assets){
 				for(String symbol : symbols){
 					for(String dateShard : dateShards){
@@ -51,6 +54,10 @@ public class TableShardingByDateSymbol extends TableShardingByDate {
 					}
 				}
 			}
+		}
+		
+		if(tableSet.isEmpty()){
+			logger.error("没有表：availableTargetNames={}, shardingValue={}", availableTargetNames, shardingValue);
 		}
 		
 		return this.filter(tableSet);

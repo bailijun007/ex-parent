@@ -59,6 +59,7 @@
 		<if test="keyword!=null and keyword!=''"> and symbol like CONCAT('%',#{keyword},'%')</if>	</where>
 		
 		<if test="tradeTimeStart!=null"> and trade_time &gt;= #{tradeTimeStart}</if>
+		<if test="tradeTimeEnd!=null"> and trade_time &lt;= #{tradeTimeEnd}</if>
 	</sql>
 
 	<sql id="simple_query" >

@@ -19,6 +19,7 @@ import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
 import com.hp.sh.expv3.bb.vo.response.ActiveOrderVo;
 import com.hp.sh.expv3.component.lock.LockConfig;
 import com.hp.sh.expv3.dev.CrossDB;
+import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
 import com.hp.sh.expv3.utils.math.Precision;
 
@@ -101,6 +102,7 @@ public class BBOrderQueryService {
 		params.put("page", page);
 		params.put("feeSynchStatus", IntBool.NO);
 		params.put("tradeTimeStart", tradeTimeStart);
+		params.put("tradeTimeEnd", DbDateUtils.now());
 		params.put("orderBy", "trade_time");
 		params.put("asset", asset);
 		params.put("symbol", symbol);

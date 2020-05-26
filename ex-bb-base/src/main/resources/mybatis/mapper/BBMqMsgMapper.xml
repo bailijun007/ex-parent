@@ -91,9 +91,6 @@
 
 
 	<insert id="save">
-		<selectKey resultType="long" order="AFTER" keyProperty="id">
-			SELECT LAST_INSERT_ID() AS id
-		</selectKey>
 		insert into bb_mq_msg (
 			id,message_id,`tag`,`key`,body,ex_message,method,user_id,asset,symbol,sort_id,created
 		)values(

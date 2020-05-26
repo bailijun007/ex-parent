@@ -2,15 +2,26 @@ package com.hp.sh.expv3.bb.api;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.json.JsonUtils;
 import com.hp.sh.expv3.bb.job.MsgShardHandler;
+import com.hp.sh.expv3.bb.module.fail.dao.BBMqMsgDAO;
 import com.hp.sh.expv3.bb.module.fail.entity.BBMqMsg;
 import com.hp.sh.expv3.bb.module.fail.service.BBMqMsgService;
 import com.hp.sh.expv3.bb.mq.listen.mq.MatchMqHandler;
@@ -21,10 +32,16 @@ import com.hp.sh.expv3.utils.DbDateUtils;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-public class DbTestAction2 {
+public class DbTestAction {
 
 	@Autowired
 	private BBMqMsgService msgService;
+	
+	@Autowired
+	private BBMqMsgDAO bBMqMsgDAO;
+	
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 	
 	@Autowired
 	private MsgShardHandler msgHandler;
@@ -35,7 +52,15 @@ public class DbTestAction2 {
 	@Autowired
 	private MatchMqHandler mqHandler;
 	
-	private static final int RECORD_TOTAL = 10000;
+	@Autowired
+	private DbTestService dbTestService;
+	
+	@Autowired
+	private DataSource dataSource;
+	
+	private static final long RECORD_TOTAL = 100000;
+	
+	long idseq = 0;
 
 	@ApiOperation(value = "测试Lock")
 	@GetMapping(value = "/api/bb/test/lock")
@@ -52,7 +77,7 @@ public class DbTestAction2 {
 	@GetMapping(value = "/api/bb/test/dbsave1")
 	public Long dbsave1(){
 		long time = System.currentTimeMillis();
-		this.doDbsave();
+		this.doDbsave(RECORD_TOTAL);
 		time = System.currentTimeMillis()-time;
 		return time;
 	}
@@ -62,19 +87,9 @@ public class DbTestAction2 {
 	@Transactional(rollbackFor=Exception.class)
 	public Long dbsave2(){
 		long time = System.currentTimeMillis();
-		this.doDbsave();
+		this.doDbsave(RECORD_TOTAL);
 		time = System.currentTimeMillis()-time;
 		return time;
-	}
-	
-	private void doDbsave(){
-		String tag="test";
-		String ext="test";
-		
-		for(int i=0;i<RECORD_TOTAL;i++){
-			BBTradeMsg msg = getBBTradeMsg();
-			msgService.save(tag, msg, ext);
-		}
 	}
 	
 	@ApiOperation(value = "测试多线程保存数据库（多线程多事务）")
@@ -83,27 +98,37 @@ public class DbTestAction2 {
 		String tag="test";
 		String ext="test";
 		
-		BBTradeMsg msg = getBBTradeMsg();
 		long time = System.currentTimeMillis();
-		Thread[] ta = new Thread[100];
-		for(int i=0;i<100;i++){
+		final int threadNum = 100;
+		final long msgNumPerThread = RECORD_TOTAL/threadNum;
+		Thread[] ta = new Thread[threadNum];
+		for(int i=0;i<threadNum;i++){
 			Thread t = new Thread(){
 				public void run(){
-					for(int i=0;i<RECORD_TOTAL/100;i++){
-						msgService.save(tag, msg, ext);
-					}
+					doDbsave(msgNumPerThread);
 				}
 			};
 			t.start();
 			ta[i] = t;
 		}
 		
-		for(int i=0;i<100;i++){
+		for(int i=0;i<threadNum;i++){
 			ta[i].join();
 		}
 		
 		time = System.currentTimeMillis()-time;
 		return time;
+	}
+	
+	private void doDbsave(long msgNum){
+		String tag="test";
+		String ext="test";
+		
+		for(long i=0;i<msgNum;i++){
+			BBTradeMsg msg = getBBTradeMsg();
+			BBMqMsg entity = this.getBBMqMsg(msg);
+			dbTestService.save5(entity);
+		}
 	}
 
 	@ApiOperation(value = "测试保存文件")
@@ -119,6 +144,27 @@ public class DbTestAction2 {
 			String json = JsonUtils.toJson(msgEntity);
 			out.write(json);
 			out.write('\n');
+//			out.flush();
+		}
+		out.close();
+		time = System.currentTimeMillis()-time;
+		return time;
+	}
+
+	@ApiOperation(value = "测试保存文件(随机)")
+	@GetMapping(value = "/api/bb/test/filesave2")
+	public Long filesave2() throws IOException{
+		String tag="test";
+		String ext="test";
+		RandomAccessFile out = new RandomAccessFile("e:\\wal.txt", "rw");
+		long time = System.currentTimeMillis();
+		for(int i=0;i<10000;i++){
+			BBTradeMsg msg = getBBTradeMsg();
+			BBMqMsg msgEntity = this.getBBMqMsg(msg);
+			String json = JsonUtils.toJson(msgEntity);
+			out.write(json.getBytes());
+			out.write('\n');
+//			System.out.println(out.getFilePointer());
 		}
 		out.close();
 		time = System.currentTimeMillis()-time;
@@ -155,6 +201,9 @@ public class DbTestAction2 {
 		
 		msgEntity.setCreated(DbDateUtils.now());
 		msgEntity.setSortId(1L);
+		
+		msgEntity.setId(txIdService.getTxId());
+		
 		return msgEntity;
 	}
 
