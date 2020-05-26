@@ -5,8 +5,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.shardingsphere.api.sharding.complex.ComplexKeysShardingAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class ExBaseShardingAlgorithm implements ComplexKeysShardingAlgorithm{
+	private static final Logger logger = LoggerFactory.getLogger(ExBaseShardingAlgorithm.class);
 
 	public abstract String getShardingColumns();
 	
@@ -21,6 +24,7 @@ public abstract class ExBaseShardingAlgorithm implements ComplexKeysShardingAlgo
 			String table = it.next();
 			if(!this.tableInfoCache.have(table)){
 				it.remove();
+				logger.error("分表不存在：{}", table);
 			}
 		}
 		return tableSet;

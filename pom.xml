@@ -251,6 +251,7 @@
 	            	<include>i18n/**</include>
 	            	<include>static/**</include>
 	            	<include>com/**</include>
+	            	<include>script/**</include>
 	            </includes>
 	        </resource>
 	    </resources>

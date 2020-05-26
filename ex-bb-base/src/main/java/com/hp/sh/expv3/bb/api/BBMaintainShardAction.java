@@ -53,5 +53,12 @@ public class BBMaintainShardAction{
 		Long shardId = shardGroup.getMsgSardId(userId);
 		return shardId;
 	}
+	
+	@ApiOperation(value = "initSql")
+	@GetMapping(value = "/initSql")
+	public void initSql() throws Exception{
+		this.shardTableService.initSql();
+	}
+	
 
 }

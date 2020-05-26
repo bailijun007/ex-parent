@@ -1,6 +1,5 @@
 package com.hp.sh.expv3.pc.module.sys.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -15,14 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.date.DateUtils;
-import com.hp.sh.expv3.pc.component.MetadataService;
-import com.hp.sh.expv3.pc.component.vo.PcContractVO;
-import com.hp.sh.expv3.pc.constant.LogicTable;
-import com.hp.sh.expv3.pc.module.sys.dao.DbGlobalDAO;
 import com.hp.sh.expv3.commons.config.FileConfig;
 import com.hp.sh.expv3.component.dbshard.DateShardUtils;
 import com.hp.sh.expv3.component.dbshard.TableShardingByDateAsset;
 import com.hp.sh.expv3.component.dbshard.TableShardingByDateSymbol;
+import com.hp.sh.expv3.pc.component.MetadataService;
+import com.hp.sh.expv3.pc.component.vo.PcContractVO;
+import com.hp.sh.expv3.pc.constant.LogicTable;
+import com.hp.sh.expv3.pc.module.sys.dao.DbGlobalDAO;
 
 @Service
 @Transactional(rollbackFor=Exception.class)
@@ -118,6 +117,7 @@ public class ShardTableService{
 			String table = TableShardingByDateAsset.getTableName(LogicTable.ACCOUNT_RECORD, asset, date);
 			if(!exist(table)){
 				dbGlobalDAO.createAccountRecordTable(table);
+				logger.error("建表成功：{}", table);
 			}else{
 				logger.error("表已存在：{}", table);
 			}
@@ -131,6 +131,7 @@ public class ShardTableService{
 			String table = TableShardingByDateSymbol.getTableName(LogicTable.ORDER_HISTORY, asset, symbol, date);
 			if(!exist(table)){
 				dbGlobalDAO.createOrderTable(table);
+				logger.error("建表成功：{}", table);
 			}else{
 				logger.error("表已存在：{}", table);
 			}
@@ -143,6 +144,7 @@ public class ShardTableService{
 			String table = TableShardingByDateSymbol.getTableName(LogicTable.ORDER_TRADE, asset, symbol, date);
 			if(!exist(table)){
 				dbGlobalDAO.createOrderTradeTable(table);
+				logger.error("建表成功：{}", table);
 			}else{
 				logger.error("表已存在：{}", table);
 			}
@@ -155,6 +157,7 @@ public class ShardTableService{
 			String table = TableShardingByDateSymbol.getTableName(LogicTable.POSITION_HISTORY, asset, symbol, date);
 			if(!exist(table)){
 				dbGlobalDAO.createPositionTable(table);
+				logger.error("建表成功：{}", table);
 			}else{
 				logger.error("表已存在：{}", table);
 			}

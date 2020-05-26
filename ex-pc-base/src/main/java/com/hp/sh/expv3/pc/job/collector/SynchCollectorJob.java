@@ -10,6 +10,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.dev.LimitTimeHandle;
+import com.hp.sh.expv3.pc.component.MetadataService;
+import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderQueryService;
 import com.hp.sh.expv3.pc.module.position.service.PcTradeService;
@@ -24,7 +27,9 @@ public class SynchCollectorJob {
 	@Autowired
 	private PcOrderQueryService orderQueryService;
 	@Autowired
-	private PcTradeService tradeService;
+	private PcTradeService tradeService;	
+	@Autowired
+	private MetadataService metadataService;
 
 	
 	@XxlJob("pcSynchCollector")
@@ -47,23 +52,25 @@ public class SynchCollectorJob {
 		logger.info("SCHEDULED同步手续费结束。");
 	}
 	
+	@LimitTimeHandle
 	private void handleJob(Long startTime, Integer pageSize) {
 		Page page = new Page(1, pageSize, 1000L);
 		while(true){
-			List<PcOrderTrade> list = orderQueryService.querySynchFee(page, startTime);
-			
-			if(list==null || list.isEmpty()){
-				break;
-			}
-			
-			for(PcOrderTrade orderTrade : list){
-				try{
-					handleOrderTrade(orderTrade);
-				}catch(Exception e){
-					logger.error(e.getMessage(), e);
+			List<PcContractVO> symbolList = metadataService.getAllPcContract();
+			for(PcContractVO vo : symbolList){
+				List<PcOrderTrade> list = orderQueryService.querySynchFee(page, vo.getAsset(), vo.getSymbol(), startTime);
+				if(list==null || list.isEmpty()){
+					break;
+				}
+				for(PcOrderTrade orderTrade : list){
+					try{
+						handleOrderTrade(orderTrade);
+					}catch(Exception e){
+						logger.error(e.getMessage(), e);
+					}
 				}
 			}
-			
+			break;
 		}
 	}
 
