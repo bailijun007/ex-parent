@@ -29,4 +29,6 @@ public interface BbOrderTradeExtMapper {
     List<BbOrderTradeDetailVo> selectPcFeeCollectByAccountId(Map<String, Object> map);
 
     List<BbOrderTradeVo> queryByIds(@Param("idList") List<Long> idList);
+
+    List<BbOrderTradeDetailVo> queryHistory(Map<String, Object> map);
 }

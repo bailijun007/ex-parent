@@ -81,4 +81,22 @@ public interface BbOrderTradeExtApi {
                                                              @RequestParam("userId") Long userId, @RequestParam("statTime") Long statTime, @RequestParam("endTime") Long endTime);
 
 
+
+    @ApiOperation(value = "获取当前用户交易明细")
+    @GetMapping(value = "/api/extension/bb/orderTrade/queryHistory")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "lastTradeId  ", value = "主键id,不传返回最新的20条数据", example = "1", required = false),
+            @ApiImplicitParam(name = "nextPage", value = "-1.上一页,1.下一页", example = "1", required = true),
+            @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "20", required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-29", required = false)
+    })
+    List<BbOrderTradeDetailVo> queryHistory(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
+                                            @RequestParam("symbol") String symbol, @RequestParam(value = "lastTradeId", required = false) Long lastTradeId,
+                                            @RequestParam("nextPage") Integer nextPage, @RequestParam("pageSize") Integer pageSize,
+                                            @RequestParam(value = "startTime", required = false) String startTime, @RequestParam(value = "endTime", required = false) String endTime);
+
 }

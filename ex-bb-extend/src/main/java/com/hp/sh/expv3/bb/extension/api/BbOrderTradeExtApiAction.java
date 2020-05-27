@@ -1,6 +1,7 @@
 package com.hp.sh.expv3.bb.extension.api;
 
 import com.hp.sh.expv3.bb.extension.error.BbExtCommonErrorCode;
+import com.hp.sh.expv3.bb.extension.service.BbOrderExtService;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
 import com.hp.sh.expv3.bb.extension.util.CommonDateUtils;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeDetailVo;
@@ -10,10 +11,15 @@ import com.hp.sh.expv3.bb.extension.vo.BbUserOrderTrade;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.dev.CrossDB;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,8 +30,12 @@ import java.util.List;
  */
 @RestController
 public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
+
+    private static final Logger logger = LoggerFactory.getLogger(BbOrderTradeExtApiAction.class);
+
     @Autowired
     private BbOrderTradeExtService bbOrderTradeExtService;
+
 
     /**
      * 查小于某个时间点的最大的一条记录
@@ -75,5 +85,23 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
 
         List<BbOrderTradeDetailVo> result = bbOrderTradeExtService.selectPcFeeCollectByAccountId(asset, symbol, userId, statTime, endTime);
         return result;
+    }
+
+    @Override
+    public List<BbOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime) {
+        logger.info("进入获取当前用户交易明细接口，参数为：userId={},asset={},symbol={},lastTradeId={},nextPage={},pageSize={},startTime={},endTime={}", userId, asset, symbol, lastTradeId, nextPage, pageSize, startTime, endTime);
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || pageSize == null || nextPage > 1 || nextPage < -1) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        startTime = startAndEndTime[0];
+        endTime = startAndEndTime[1];
+        List<BbOrderTradeDetailVo> list = bbOrderTradeExtService.queryHistory(userId, asset, symbol, lastTradeId, nextPage, pageSize, startTime, endTime);
+        if (CollectionUtils.isEmpty(list)) {
+            return Lists.emptyList();
+        }
+
+        return list;
     }
 }

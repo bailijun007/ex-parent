@@ -177,4 +177,35 @@
             #{orderIdList[${i}]}
         </foreach>
     </select>
+
+    <select id="queryHistory" resultType="com.hp.sh.expv3.bb.extension.vo.BbOrderTradeDetailVo">
+        SELECT id,asset,symbol,price,volume qty,trade_time tradeTime  ,bid_flag bidFlag,fee
+        from bb_order_trade
+        <where>
+            user_id=#{userId}
+            and asset=#{asset}
+            and symbol=#{symbol}
+            <if test="tradeTimeBegin!=null">
+                and trade_time &gt;= #{tradeTimeBegin}
+            </if>
+            <if test="tradeTimeEnd!=null">
+                and trade_time &lt;= #{tradeTimeEnd}
+            </if>
+            <choose>
+                <when test="nextPage==1  and lastTradeId!=null">
+                    and id &lt; #{lastTradeId}
+                    ORDER BY id desc
+                </when>
+                <when test="nextPage==-1 and lastTradeId!=null">
+                    and id &gt;= #{lastTradeId}
+                    ORDER BY id asc
+                </when>
+                <otherwise>
+                    ORDER BY id desc
+                </otherwise>
+            </choose>
+        </where>
+        limit 0,${limit}
+    </select>
+
 </mapper>
