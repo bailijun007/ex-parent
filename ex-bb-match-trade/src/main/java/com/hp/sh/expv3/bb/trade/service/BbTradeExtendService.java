@@ -9,14 +9,14 @@ import java.util.List;
  * @author BaiLiJun  on 2019/12/23
  */
 public interface BbTradeExtendService {
-    List<BbTradeVo> queryTradeResult(String asset, String symbol, Integer count);
+    List<BbTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long startTime, Long endTime);
 
-    List<BbTradeVo> queryTradeByGtTime(String asset, String symbol, Long startTime, Long endTime, Integer type);
+    List<BbTradeVo> selectTradeListByUser(Long userId, String asset, String symbol, Long startTime, Long endTime);
 
+    List<BbTradeVo> queryTradeList(Long userId, String asset, String symbol, Integer count,String startTime,String endTime);
 
-    BbTradeVo queryLastTrade(String asset, String symbol, Long startTime);
+    BbTradeVo queryLastTradeByLtTime(String asset, String symbol, Long startTime1);
 
-    List<BbTradeVo> selectTradeListByTimeInterval(String asset, String symbol, Long startTime, Long endTime, Long userId);
+    List<BbTradeVo> queryTradeResult(String asset, String symbol, Integer count,String startTime,String endTime);
 
-//    List<BbTradeVo> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId);
-}
+    }

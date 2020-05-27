@@ -55,7 +55,7 @@
     <sql id="simple_query">
         select
         <include refid="Base_Column_List"/>
-        from bb_trade
+        from bb_match
         <include refid="simple_where"/>
 
     </sql>
@@ -89,6 +89,68 @@
             order by ${orderBy} desc
         </if>
             LIMIT 0,${limit}
+    </select>
+
+    <select id="selectTradeListByTimeInterval" resultMap="BbTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_match
+        where
+        asset=#{asset}
+        and symbol=#{symbol}
+        and trade_time &gt;=#{tradeTimeBegin}
+        and trade_time &lt;#{tradeTimeEnd}
+        order by trade_time asc
+    </select>
+
+    <select id="selectTradeListByUser" resultMap="BbTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_match
+        where
+        user_id=#{userId}
+        and asset=#{asset}
+        and symbol=#{symbol}
+        <if test="tradeTimeBegin!=null">
+            and trade_time &gt;=#{tradeTimeBegin}
+        </if>
+        <if test="tradeTimeEnd!=null">
+            and trade_time &lt;#{tradeTimeEnd}
+        </if>
+        order by trade_time asc
+    </select>
+
+
+    <select id="queryTradeList" resultMap="BbTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_match
+        where
+        user_id=#{userId}
+        and asset=#{asset}
+        and symbol=#{symbol}
+        <if test="tradeTimeBegin!=null">
+            and trade_time &gt;=#{tradeTimeBegin}
+        </if>
+        <if test="tradeTimeEnd!=null">
+            and trade_time &lt;#{tradeTimeEnd}
+        </if>
+        order by trade_time desc
+        LIMIT 0,${limit}
+    </select>
+
+    <select id="queryLastTradeByLtTime" resultMap="BbTradeVo">
+        select
+        <include refid="Base_Column_List"/>
+        from bb_match
+        <where>
+            <if test="asset!=null and asset!=''">and asset=#{asset}</if>
+            <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="tradeTimeBegin!=null">and trade_time &gt;= #{tradeTimeBegin}</if>
+            <if test="tradeTimeEnd!=null">and trade_time &lt; #{tradeTimeEnd}</if>
+        </where>
+        order by trade_time desc
+        limit 0,1
     </select>
 
 </mapper>
