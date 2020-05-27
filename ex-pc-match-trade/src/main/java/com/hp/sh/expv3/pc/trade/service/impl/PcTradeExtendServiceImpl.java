@@ -57,9 +57,4 @@ public class PcTradeExtendServiceImpl implements PcTradeExtendService {
         return list;
     }
 
-//    @Override
-//    public List<PcTradeVo> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId) {
-//        List<PcTradeVo> list = pcTradeDAO.selectTradeListByUserId(asset,symbol,startTime,endTime,userId);
-//        return list;
-//    }
 }

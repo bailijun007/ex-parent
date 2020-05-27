@@ -1,6 +1,6 @@
 package com.hp.sh.expv3.pc.trade.api;
 
-import com.hp.sh.expv3.api.PcTradeExtendApi;
+import com.hp.sh.expv3.api.PcTradeApi;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.trade.service.PcTradeExtendService;
@@ -18,7 +18,7 @@ import java.util.TimeZone;
  * @author BaiLiJun  on 2020/1/2
  */
 @RestController
-public class PcTradeExtendApiAction implements PcTradeExtendApi {
+public class PcTradeExtendApiAction implements PcTradeApi {
     @Autowired
     private PcTradeExtendService pcTradeExtendService;
 

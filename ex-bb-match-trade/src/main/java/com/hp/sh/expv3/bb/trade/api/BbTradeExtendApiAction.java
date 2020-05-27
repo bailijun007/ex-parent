@@ -1,6 +1,6 @@
 package com.hp.sh.expv3.bb.trade.api;
 
-import com.hp.sh.expv3.bb.extension.api.BbTradeExtendApi;
+import com.hp.sh.expv3.bb.extension.api.BbTradeApi;
 import com.hp.sh.expv3.bb.extension.error.BbCommonErrorCode;
 import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
 import com.hp.sh.expv3.bb.trade.service.BbTradeExtendService;
@@ -9,16 +9,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * @author BaiLiJun  on 2020/1/2
  */
 @RestController
-public class BbTradeExtendApiAction implements BbTradeExtendApi {
+public class BbTradeExtendApiAction implements BbTradeApi {
     @Autowired
     private BbTradeExtendService bbTradeExtendService;
 

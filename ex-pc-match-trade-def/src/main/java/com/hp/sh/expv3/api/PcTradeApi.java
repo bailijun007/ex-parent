@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Api(tags = "永续合约_成交(撮合结果)")
 @FeignClient(value = "ex-pc-match-trade")
-public interface PcTradeExtendApi {
+public interface PcTradeApi {
 
     @ApiOperation(value = "查询最新成交记录(撮合结果)")
     @GetMapping(value = "/api/extension/pc/trade/queryLastTrade")
