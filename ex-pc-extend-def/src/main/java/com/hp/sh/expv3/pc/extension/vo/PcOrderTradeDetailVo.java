@@ -12,6 +12,9 @@ public class PcOrderTradeDetailVo implements Serializable {
     @ApiModelProperty("id")
     private Long id;
 
+    @ApiModelProperty("订单id")
+    private Long orderId;
+
     @ApiModelProperty("资产")
     private String asset;
 
@@ -33,7 +36,33 @@ public class PcOrderTradeDetailVo implements Serializable {
     @ApiModelProperty("手续费")
     private BigDecimal fee;
 
+    private Integer closeFlag;
+    private Integer longFlag;
     public PcOrderTradeDetailVo() {
+    }
+
+    public Integer getCloseFlag() {
+        return closeFlag;
+    }
+
+    public void setCloseFlag(Integer closeFlag) {
+        this.closeFlag = closeFlag;
+    }
+
+    public Integer getLongFlag() {
+        return longFlag;
+    }
+
+    public void setLongFlag(Integer longFlag) {
+        this.longFlag = longFlag;
+    }
+
+    public Long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 
     public String getAsset() {

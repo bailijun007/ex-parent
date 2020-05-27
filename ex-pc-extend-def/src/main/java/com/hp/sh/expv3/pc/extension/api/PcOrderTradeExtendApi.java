@@ -34,7 +34,25 @@ public interface PcOrderTradeExtendApi {
     })
     List<PcOrderTradeDetailVo> queryOrderTradeDetail(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
                                                      @RequestParam("symbol") String symbol, @RequestParam("orderId") String orderId,
-                                                     @RequestParam(value = "startTime",required = false) String startTime, @RequestParam(value = "endTime",required = false) String endTime);
+                                                     @RequestParam(value = "startTime", required = false) String startTime, @RequestParam(value = "endTime", required = false) String endTime);
+
+
+    @ApiOperation(value = "获取当前用户交易明细")
+    @GetMapping(value = "/api/extension/pc/orderTrade/queryHistory")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "lastTradeId  ", value = "主键id,不传返回最新的20条数据", example = "1", required = false),
+            @ApiImplicitParam(name = "nextPage", value = "-1.上一页,1.下一页", example = "1", required = true),
+            @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "20", required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false)
+    })
+    List<PcOrderTradeDetailVo> queryHistory(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
+                                            @RequestParam("symbol") String symbol, @RequestParam(value = "lastTradeId", required = false) Long lastTradeId,
+                                            @RequestParam("nextPage") Integer nextPage, @RequestParam("pageSize") Integer pageSize,
+                                            @RequestParam(value = "startTime", required = false) String startTime, @RequestParam(value = "endTime", required = false) String endTime);
 
 
     @ApiOperation(value = "查询成交记录")
@@ -71,7 +89,6 @@ public interface PcOrderTradeExtendApi {
     );
 
 
-
     @ApiOperation(value = "查某个用户的所有成交记录")
     @GetMapping(value = "/api/extension/pc/orderTrade/selectAllTradeListByUser")
     @ApiImplicitParams({
@@ -96,7 +113,7 @@ public interface PcOrderTradeExtendApi {
             @ApiImplicitParam(name = "endTime", value = "结束时间", example = "1578891531000", required = true)
     })
     List<PcOrderTradeDetailVo> selectPcFeeCollectByAccountId(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol,
-                                                    @RequestParam("userId") Long userId, @RequestParam("statTime") Long statTime, @RequestParam("endTime") Long endTime);
+                                                             @RequestParam("userId") Long userId, @RequestParam("statTime") Long statTime, @RequestParam("endTime") Long endTime);
 
 
     @ApiOperation(value = "查某个时间区间某个用户的成交记录(不传时间则默认查今天以前的所有数据)")
@@ -116,7 +133,7 @@ public interface PcOrderTradeExtendApi {
             @RequestParam(value = "endTime", required = false) Long endTime
     );
 
-    @ApiOperation(value = "查询交易手续费(暂不支持分表)")
+    @ApiOperation(value = "查询交易手续费")
     @GetMapping(value = "/api/extension/pc/orderTrade/queryPcTradeFee")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId ", value = "用户id", required = true),
@@ -125,8 +142,8 @@ public interface PcOrderTradeExtendApi {
             @ApiImplicitParam(name = "beginTime ", value = "开始时间", required = false),
             @ApiImplicitParam(name = "endTime ", value = "结束时间", required = false)
     })
-    BigDecimal queryPcTradeFee(@RequestParam(value = "userId", required = true) Long userId,  @RequestParam(value = "asset", required = true) String asset,
-                               @RequestParam(value = "makerFlag", required = false)  Integer makerFlag,@RequestParam(value = "beginTime", required = false) Long beginTime,
+    BigDecimal queryPcTradeFee(@RequestParam(value = "userId", required = true) Long userId, @RequestParam(value = "asset", required = true) String asset,
+                               @RequestParam(value = "makerFlag", required = false) Integer makerFlag, @RequestParam(value = "beginTime", required = false) Long beginTime,
                                @RequestParam(value = "endTime", required = false) Long endTime);
 
 }

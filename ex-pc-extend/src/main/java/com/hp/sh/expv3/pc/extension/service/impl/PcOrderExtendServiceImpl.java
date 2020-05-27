@@ -153,13 +153,13 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
-    public PcOrderVo getPcOrder(Long orderId, String asset, String symbol, Long userId) {
+    public PcOrderVo getPcOrder(Long orderId, String asset, String symbol, Long startTime,  Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", orderId);
         map.put("asset", asset);
         map.put("symbol", symbol);
-        map.put("userId", userId);
-        map.put("limit", null);
+        map.put("createdBegin", startTime);
+        map.put("createdBegin",endTime);
         PcOrderVo pcOrderVo = pcOrderDAO.queryOne(map);
         return pcOrderVo;
     }

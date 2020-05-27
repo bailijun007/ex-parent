@@ -3,13 +3,12 @@ package com.hp.sh.expv3.pc.extension.api;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
+import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
 import com.hp.sh.expv3.pc.extension.util.CommonDateUtils;
-import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeDetailVo;
-import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeExtendVo;
-import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
-import com.hp.sh.expv3.pc.extension.vo.PcTradeVo;
+import com.hp.sh.expv3.pc.extension.vo.*;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -37,14 +36,17 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
     @Autowired
     private PcOrderTradeExtendService pcOrderTradeService;
 
+    @Autowired
+    private PcOrderExtendService pcOrderExtendService;
+
     @Override
     public List<PcOrderTradeDetailVo> queryOrderTradeDetail(Long userId, String asset, String symbol, String orderId, String startTime, String endTime) {
-        logger.info("进人查询当前委托的交易记录接口，参数为：userId={},asset={},symbol={},orderId={},startTime={},endTime={}", userId, asset, symbol, orderId, startTime, endTime);
+        logger.info("进入查询当前委托的交易记录接口，参数为：userId={},asset={},symbol={},orderId={},startTime={},endTime={}", userId, asset, symbol, orderId, startTime, endTime);
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || StringUtils.isEmpty(orderId)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
 
-        String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         List<PcOrderTradeDetailVo> result = new ArrayList<>();
@@ -53,6 +55,31 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         this.toResult(result, voList);
 
         return result;
+    }
+
+    @Override
+    public List<PcOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime) {
+        logger.info("进入获取当前用户交易明细接口，参数为：userId={},asset={},symbol={},lastTradeId={},nextPage={},pageSize={},startTime={},endTime={}", userId, asset, symbol, lastTradeId, nextPage, pageSize, startTime, endTime);
+        if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || pageSize == null || nextPage > 1 || nextPage < -1) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        startTime = startAndEndTime[0];
+        endTime = startAndEndTime[1];
+        List<PcOrderTradeDetailVo> list = pcOrderTradeService.queryHistory(userId, asset, symbol, lastTradeId, nextPage, pageSize, startTime, endTime);
+        if (CollectionUtils.isEmpty(list)) {
+            return Lists.emptyList();
+        }
+
+        for (PcOrderTradeDetailVo detailVo : list) {
+            PcOrderVo pcOrder = pcOrderExtendService.getPcOrder(detailVo.getOrderId(), detailVo.getAsset(), detailVo.getSymbol(), CommonDateUtils.stringToTimestamp(startTime), CommonDateUtils.stringToTimestamp(endTime));
+            Integer longFlag = pcOrder.getLongFlag();
+            BigDecimal closeFlag = pcOrder.getCloseFlag();
+            detailVo.setLongFlag(longFlag);
+            detailVo.setCloseFlag(Integer.parseInt(closeFlag + ""));
+        }
+        return list;
     }
 
 
@@ -68,13 +95,13 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
      */
     @Override
     public List<PcOrderTradeDetailVo> queryTradeRecord(String asset, String symbol, Long gtTradeId, Long ltTradeId, Integer count, String startTime, String endTime) {
-        logger.info("进人查询成交记录接口，参数为：asset={},symbol={},gtTradeId={},ltTradeId={},count={},startTime={},endTime={}", asset, symbol, gtTradeId, ltTradeId, count, startTime, endTime);
+        logger.info("进入查询成交记录接口，参数为：asset={},symbol={},gtTradeId={},ltTradeId={},count={},startTime={},endTime={}", asset, symbol, gtTradeId, ltTradeId, count, startTime, endTime);
         checkParam(asset, symbol, count);
         //如果同时传了gtTradeId和ltTradeId 则以gtOrderId为查询条件，同时不传，则查全部
         if (gtTradeId != null && ltTradeId != null) {
             ltTradeId = null;
         }
-        String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         List<PcOrderTradeDetailVo> result = new ArrayList<>();
@@ -98,7 +125,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
      */
     @Override
     public PcOrderTradeDetailVo selectLessTimeTrade(String asset, String symbol, Long statTime) {
-        logger.info("进人查小于某个时间点的最大的一条记录接口，参数为：asset={},symbol={},statTime={}", asset, symbol, statTime);
+        logger.info("进入查小于某个时间点的最大的一条记录接口，参数为：asset={},symbol={},statTime={}", asset, symbol, statTime);
 
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || statTime == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
@@ -137,7 +164,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
 
     @Override
     public List<PcOrderTradeExtendVo> selectTradeListByUserId(String asset, String symbol, Long userId, Long startTime, Long endTime) {
-        logger.info("进人查某个时间区间某个用户的成交记录接口，参数为：asset={},symbol={},userId={},startTime={},endTime={}", asset, symbol, userId, startTime, endTime);
+        logger.info("进入查某个时间区间某个用户的成交记录接口，参数为：asset={},symbol={},userId={},startTime={},endTime={}", asset, symbol, userId, startTime, endTime);
 
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
@@ -168,7 +195,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
 
     @Override
     public List<PcOrderTradeDetailVo> selectPcFeeCollectByAccountId(String asset, String symbol, Long userId, Long statTime, Long endTime) {
-        logger.info("进人查询成交记录列表(后台admin接口)，参数为：asset={},symbol={},userId={},statTime={},endTime={}", asset, symbol, userId, statTime, endTime);
+        logger.info("进入查询成交记录列表(后台admin接口)，参数为：asset={},symbol={},userId={},statTime={},endTime={}", asset, symbol, userId, statTime, endTime);
 
         if (userId == null || statTime == null || endTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
@@ -179,26 +206,6 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         return result;
     }
 
-    private String getDefaultDateTime(String startTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDateTime dateTime = LocalDateTime.now();
-        //如果开始时间，结束时间没有值则给默认今天时间
-        if (org.springframework.util.StringUtils.isEmpty(startTime)) {
-            startTime = formatter.format(dateTime);
-        }
-        return startTime;
-    }
-
-    private String[] getStartAndEndTime(String startTime, String endTime) {
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = getDefaultDateTime(startTime);
-            String[] split = startTime.split("-");
-            int day = Integer.parseInt(split[2]) + 1;
-            endTime = split[0] + "-" + split[1] + "-" + day;
-        }
-        String[] startAndEndTime = {startTime, endTime};
-        return startAndEndTime;
-    }
 
     //封装结果集
     private void toResult(List<PcOrderTradeDetailVo> result, List<PcOrderTradeVo> voList) {
@@ -206,7 +213,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
             for (PcOrderTradeVo pcOrderTradeVo : voList) {
                 PcOrderTradeDetailVo detailVo = new PcOrderTradeDetailVo();
                 BeanUtils.copyProperties(pcOrderTradeVo, detailVo);
-                detailVo.setFee(detailVo.getFee().negate());
+                detailVo.setFee(pcOrderTradeVo.getFee().negate());
                 detailVo.setAsset(pcOrderTradeVo.getAsset());
                 detailVo.setSymbol(pcOrderTradeVo.getSymbol());
                 detailVo.setQty(pcOrderTradeVo.getVolume());

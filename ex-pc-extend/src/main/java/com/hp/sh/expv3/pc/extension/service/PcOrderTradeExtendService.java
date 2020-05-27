@@ -1,9 +1,6 @@
 package com.hp.sh.expv3.pc.extension.service;
 
-import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeExtendVo;
-import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
-import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
-import com.hp.sh.expv3.pc.extension.vo.PcTradeVo;
+import com.hp.sh.expv3.pc.extension.vo.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -51,4 +48,6 @@ public interface PcOrderTradeExtendService {
     List<PcOrderTradeExtendVo> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId);
 
     BigDecimal queryPcTradeFee(Long userId, String asset, Integer makerFlag, Long beginTime, Long endTime);
+
+    List<PcOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime);
 }

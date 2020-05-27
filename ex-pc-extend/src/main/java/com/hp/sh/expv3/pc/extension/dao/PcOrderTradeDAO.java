@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.pc.extension.dao;
 
+import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeDetailVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeExtendVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
 import com.hp.sh.expv3.pc.extension.vo.PcTradeVo;
@@ -37,4 +38,6 @@ public interface PcOrderTradeDAO {
     List<PcOrderTradeExtendVo> selectTradeListByUserId(@Param("asset") String asset, @Param("symbol") String symbol, @Param("tradeTimeBegin")  Long tradeTimeBegin, @Param("tradeTimeEnd") Long tradeTimeEnd, @Param("userId") Long userId);
 
     BigDecimal queryPcTradeFee(@Param("userId") Long userId, @Param("asset")String asset,@Param("makerFlag") Integer makerFlag,@Param("beginTime") Long beginTime, @Param("endTime") Long endTime);
+
+    List<PcOrderTradeDetailVo> queryHistory(Map<String, Object> map);
 }

@@ -3,23 +3,19 @@ package com.hp.sh.expv3.pc.extension.service.impl;
 import com.hp.sh.expv3.pc.extension.dao.PcOrderTradeDAO;
 import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
 import com.hp.sh.expv3.pc.extension.util.CommonDateUtils;
-import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeExtendVo;
-import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
-import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
-import com.hp.sh.expv3.pc.extension.vo.PcTradeVo;
+import com.hp.sh.expv3.pc.extension.vo.*;
 import com.hp.sh.expv3.utils.IntBool;
+import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author BaiLiJun  on 2019/12/23
@@ -187,6 +183,19 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     @Override
     public BigDecimal queryPcTradeFee(Long userId, String asset, Integer makerFlag, Long beginTime, Long endTime) {
         return pcOrderTradeDAO.queryPcTradeFee(userId, asset, makerFlag, beginTime, endTime);
+    }
+
+    @Override
+    public List<PcOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("tradeTimeBegin", CommonDateUtils.stringToTimestamp(startTime));
+        map.put("tradeTimeEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("limit", pageSize);
+        List<PcOrderTradeDetailVo> list = pcOrderTradeDAO.queryHistory(map);
+        return list;
     }
 
 

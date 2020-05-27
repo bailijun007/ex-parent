@@ -108,8 +108,6 @@
             <if test="createdEnd!=null">and created &lt;= #{createdEnd}</if>
             <if test="modifiedBegin!=null">and modified &gt;= #{modifiedBegin}</if>
             <if test="modifiedEnd!=null">and modified &lt;= #{modifiedEnd}</if>
-
-
         </where>
     </sql>
 

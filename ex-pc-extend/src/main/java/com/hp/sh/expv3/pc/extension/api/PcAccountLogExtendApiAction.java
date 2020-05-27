@@ -190,32 +190,6 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
         }
     }
 
-    // 封装开平仓数据
-    @Deprecated
-    private void getOrderTradeData(BigDecimal faceValue, PcAccountLogVo pcAccountLogVo,
-                                   PcAccountRecordLogVo recordLogVo) {
-        PcOrderTradeVo pcOrderTradeVo = pcOrderTradeExtendService.getPcOrderTrade(pcAccountLogVo.getRefId(),
-                pcAccountLogVo.getAsset(), pcAccountLogVo.getSymbol(), pcAccountLogVo.getUserId(),
-                pcAccountLogVo.getTime());
-        if (null != pcOrderTradeVo) {
-            recordLogVo.setTradeAmt(pcOrderTradeVo.getVolume());
-            recordLogVo.setNoTradeAmt(pcOrderTradeVo.getRemainVolume());
-            recordLogVo.setVolume(pcOrderTradeVo.getPnl());
-            recordLogVo.setTradePrice(pcOrderTradeVo.getPrice());
-            recordLogVo.setFeeRatio(pcOrderTradeVo.getFeeRatio());
-            recordLogVo.setFee(pcOrderTradeVo.getFee());
-            recordLogVo.setOrderId(pcOrderTradeVo.getOrderId());
-            Long orderId = pcOrderTradeVo.getOrderId();
-            String asset = pcAccountLogVo.getAsset();
-            String symbol = pcAccountLogVo.getSymbol();
-            Long userId = pcAccountLogVo.getUserId();
-            PcOrderVo pcOrderVo = pcOrderExtendService.getPcOrder(orderId, asset, symbol, userId);
-            Optional<PcOrderVo> orderVoOptional = Optional.ofNullable(pcOrderVo);
-            recordLogVo.setOrderAmt(orderVoOptional.map(o -> o.getVolume()).orElse(BigDecimal.ZERO));
-            recordLogVo.setOrderType(orderVoOptional.map(o -> o.getOrderType()).orElse(null));
-            recordLogVo.setOrderPrice(orderVoOptional.map(o -> o.getPrice()).orElse(null));
-        }
-    }
 
     private void appendOrderTradeData(BigDecimal faceValue, String asset, String symbol, Long userId,
                                       List<PcAccountRecordLogVo> recordLogVos,Long startDate,Long endDate) {
@@ -235,7 +209,7 @@ public class PcAccountLogExtendApiAction implements PcAccountLogExtendApi {
                 recordLogVo.setFee(pcOrderTradeVo.map(pt->pt.getFee().negate()).orElse(BigDecimal.ZERO));
                 Long orderId = pcOrderTradeVo.map(PcOrderTradeVo::getOrderId).orElse(null);
                 recordLogVo.setOrderId(orderId);
-                PcOrderVo pcOrderVo = pcOrderExtendService.getPcOrder(orderId, asset, symbol, userId);
+                PcOrderVo pcOrderVo = pcOrderExtendService.getPcOrder(orderId, asset, symbol, startDate,endDate);
                 Optional<PcOrderVo> orderVoOptional = Optional.ofNullable(pcOrderVo);
                 recordLogVo.setOrderAmt(orderVoOptional.map(o -> o.getVolume()).orElse(BigDecimal.ZERO));
                 recordLogVo.setOrderType(orderVoOptional.map(o -> o.getOrderType()).orElse(null));
