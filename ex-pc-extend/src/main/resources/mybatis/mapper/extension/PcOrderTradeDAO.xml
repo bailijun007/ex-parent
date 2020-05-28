@@ -272,7 +272,8 @@
     </select>
 
     <select id="queryHistory" resultType="com.hp.sh.expv3.pc.extension.vo.PcOrderTradeDetailVo">
-        SELECT id,asset,symbol,price,volume number,trade_time tradeTime ,order_id orderId from pc_order_trade
+        SELECT id,asset,symbol,price,volume number,trade_time tradeTime ,order_id orderId ,fee
+        from pc_order_trade
         <where>
             user_id=#{userId}
             and asset=#{asset}

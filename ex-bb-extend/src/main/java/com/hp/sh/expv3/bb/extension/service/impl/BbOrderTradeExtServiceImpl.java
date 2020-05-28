@@ -2,6 +2,7 @@ package com.hp.sh.expv3.bb.extension.service.impl;
 
 import com.hp.sh.expv3.bb.extension.dao.BbOrderTradeExtMapper;
 import com.hp.sh.expv3.bb.extension.service.BbOrderTradeExtService;
+import com.hp.sh.expv3.bb.extension.util.CommonDateUtils;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeDetailVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.bb.extension.vo.BbTradeVo;
@@ -9,6 +10,7 @@ import com.hp.sh.expv3.bb.extension.vo.BbUserOrderTrade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,22 +27,22 @@ public class BbOrderTradeExtServiceImpl implements BbOrderTradeExtService {
 
     @Override
     public BbOrderTradeVo selectLessTimeTrade(String asset, String symbol, Long statTime) {
-        return bbOrderTradeExtMapper.selectLessTimeTrade(asset,symbol,statTime);
+        return bbOrderTradeExtMapper.selectLessTimeTrade(asset, symbol, statTime);
     }
 
     @Override
     public List<BbOrderTradeVo> selectAllTradeListByUser(String asset, String symbol, Long userId) {
-        return bbOrderTradeExtMapper.selectAllTradeListByUser(asset,symbol,userId);
+        return bbOrderTradeExtMapper.selectAllTradeListByUser(asset, symbol, userId);
     }
 
     @Override
     public List<BbOrderTradeVo> queryOrderTrade(Long userId, List<Long> orderIdList) {
-        return bbOrderTradeExtMapper.queryOrderTrade(userId,orderIdList);
+        return bbOrderTradeExtMapper.queryOrderTrade(userId, orderIdList);
     }
 
     @Override
     public List<BbUserOrderTrade> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId, Long id) {
-        List<BbUserOrderTrade> list = bbOrderTradeExtMapper.selectTradeListByUserId(asset,symbol,startTime,endTime,userId,id);
+        List<BbUserOrderTrade> list = bbOrderTradeExtMapper.selectTradeListByUserId(asset, symbol, startTime, endTime, userId, id);
         return list;
     }
 
@@ -63,5 +65,23 @@ public class BbOrderTradeExtServiceImpl implements BbOrderTradeExtService {
     public List<BbOrderTradeVo> queryByIds(List<Long> refIds) {
 
         return bbOrderTradeExtMapper.queryByIds(refIds);
+    }
+
+    @Override
+    public List<BbOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("asset", asset);
+        map.put("symbol", symbol);
+        map.put("tradeTimeBegin", CommonDateUtils.stringToTimestamp(startTime));
+        map.put("tradeTimeEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("limit", pageSize);
+        List<BbOrderTradeDetailVo> list = bbOrderTradeExtMapper.queryHistory(map);
+        if (!CollectionUtils.isEmpty(list)) {
+            for (BbOrderTradeDetailVo detailVo : list) {
+                detailVo.setAmt(detailVo.getPrice().multiply(detailVo.getQty()));
+            }
+        }
+        return list;
     }
 }

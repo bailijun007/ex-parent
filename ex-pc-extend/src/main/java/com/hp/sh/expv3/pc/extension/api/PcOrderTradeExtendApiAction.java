@@ -52,7 +52,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         List<PcOrderTradeDetailVo> result = new ArrayList<>();
         List<PcOrderTradeVo> voList = pcOrderTradeService.queryOrderTrade(userId, asset, symbol, orderId, CommonDateUtils.stringToTimestamp(startTime), CommonDateUtils.stringToTimestamp(endTime));
         //封装结果集
-        this.toResult(result, voList);
+        this.toResult(result, voList,startTime,endTime);
 
         return result;
     }
@@ -109,7 +109,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         List<String> symbolList = Arrays.asList(symbol.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
         List<PcOrderTradeVo> voList = pcOrderTradeService.queryTradeRecords(assetList, symbolList, gtTradeId, ltTradeId, count, startTime, endTime);
         //封装结果集
-        this.toResult(result, voList);
+        this.toResult(result, voList,startTime,endTime);
 
         return result;
     }
@@ -158,7 +158,10 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         }
         List<PcOrderTradeDetailVo> result = new ArrayList<>();
         List<PcOrderTradeVo> voList = pcOrderTradeService.selectAllTradeListByUser(asset, symbol, userId);
-        this.toResult(result, voList);
+        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(null, null);
+        String  startTime = startAndEndTime[0];
+        String endTime = startAndEndTime[1];
+        this.toResult(result, voList,startTime,endTime);
         return result;
     }
 
@@ -202,13 +205,13 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         }
         List<PcOrderTradeDetailVo> result = new ArrayList<>();
         List<PcOrderTradeVo> voList = pcOrderTradeService.selectPcFeeCollectByAccountId(asset, symbol, userId, statTime, endTime);
-        this.toResult(result, voList);
+        this.toResult(result, voList,CommonDateUtils.timestampToString(statTime),CommonDateUtils.timestampToString(endTime));
         return result;
     }
 
 
     //封装结果集
-    private void toResult(List<PcOrderTradeDetailVo> result, List<PcOrderTradeVo> voList) {
+    private void toResult(List<PcOrderTradeDetailVo> result, List<PcOrderTradeVo> voList, String startTime, String endTime) {
         if (!CollectionUtils.isEmpty(voList)) {
             for (PcOrderTradeVo pcOrderTradeVo : voList) {
                 PcOrderTradeDetailVo detailVo = new PcOrderTradeDetailVo();
@@ -218,6 +221,9 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
                 detailVo.setSymbol(pcOrderTradeVo.getSymbol());
                 detailVo.setQty(pcOrderTradeVo.getVolume());
                 detailVo.setAmt(pcOrderTradeVo.getPrice().multiply(pcOrderTradeVo.getVolume()));
+                PcOrderVo pcOrder = pcOrderExtendService.getPcOrder(detailVo.getOrderId(), detailVo.getAsset(), detailVo.getSymbol(), CommonDateUtils.stringToTimestamp(startTime), CommonDateUtils.stringToTimestamp(endTime));
+                detailVo.setLongFlag(pcOrder.getLongFlag());
+                detailVo.setCloseFlag(Integer.parseInt(pcOrder.getCloseFlag()+""));
                 result.add(detailVo);
             }
         }

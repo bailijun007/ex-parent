@@ -195,6 +195,12 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         map.put("tradeTimeEnd", CommonDateUtils.stringToTimestamp(endTime));
         map.put("limit", pageSize);
         List<PcOrderTradeDetailVo> list = pcOrderTradeDAO.queryHistory(map);
+        if (!CollectionUtils.isEmpty(list)) {
+            for (PcOrderTradeDetailVo pcOrderTradeDetailVo : list) {
+                pcOrderTradeDetailVo.setAmt(pcOrderTradeDetailVo.getPrice().multiply(pcOrderTradeDetailVo.getQty()));
+            }
+        }
+
         return list;
     }
 
