@@ -3,7 +3,6 @@ package com.hp.sh.expv3.bb.api;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -89,29 +88,32 @@ public class DbTestService {
 	}
 
 	@Transactional(rollbackFor=Exception.class)
-	public Number save4(BBMqMsg entity){
-        String sql = "insert into bb_mq_msg (id,message_id,`tag`,`key`,body,ex_message,method,user_id,asset,symbol,sort_id,created)values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        int resRow = jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-            	PreparedStatement ps = prepareStatement(connection, sql);
-                ps.setLong(1, entity.getId());
-                ps.setString(2, entity.getMessageId());
-                ps.setString(3, entity.getTag());
-                ps.setString(4, entity.getKey());
-                ps.setString(5, entity.getBody());
-                ps.setString(6, entity.getExMessage());
-                ps.setString(7, entity.getMethod());
-                ps.setLong(8, entity.getUserId());
-                ps.setString(9, entity.getAsset());
-                ps.setString(10, entity.getSymbol());
-                ps.setLong(11, entity.getSortId());
-                ps.setLong(12, entity.getCreated());
-                return ps;
-            }
-        },keyHolder);
-        return keyHolder.getKey();
+	public Number save4(BBMqMsg entity) {
+		try {
+	        String sql = "insert into bb_mq_msg (id,message_id,`tag`,`key`,body,ex_message,method,user_id,asset,symbol,sort_id,created)values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	        Connection conn = this.dataSource.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql);
+	        
+	        ps.setLong(1, entity.getId());
+	        ps.setString(2, entity.getMessageId());
+	        ps.setString(3, entity.getTag());
+	        ps.setString(4, entity.getKey());
+	        ps.setString(5, entity.getBody());
+	        ps.setString(6, entity.getExMessage());
+	        ps.setString(7, entity.getMethod());
+	        ps.setLong(8, entity.getUserId());
+	        ps.setString(9, entity.getAsset());
+	        ps.setString(10, entity.getSymbol());
+	        ps.setLong(11, entity.getSortId());
+	        ps.setLong(12, entity.getCreated());
+	        ps.execute();
+	        ps.close();
+	        conn.close();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+
+        return 0;
 	}
 	
 	private Map map = new ConcurrentHashMap();

@@ -127,7 +127,7 @@ public class DbTestAction {
 		for(long i=0;i<msgNum;i++){
 			BBTradeMsg msg = getBBTradeMsg();
 			BBMqMsg entity = this.getBBMqMsg(msg);
-			dbTestService.save5(entity);
+			dbTestService.save4(entity);
 		}
 	}
 
