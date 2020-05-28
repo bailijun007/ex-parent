@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.module.account.service.PcAccountCoreService;
 import com.hp.sh.expv3.pc.vo.request.PcAddRequest;
 import com.hp.sh.expv3.pc.vo.request.PcCutRequest;
@@ -34,11 +35,13 @@ public class PcAccountCoreApiAction implements PcAccountCoreApi {
 	}
 
 	@Override
+	@LockIt(key="U-${request.userId}")
 	public Integer add(@RequestBody PcAddRequest request) {
 		return pcAccountCoreService.add(request);
 	}
 
 	@Override
+	@LockIt(key="U-${request.userId}")
 	public Integer cut(@RequestBody PcCutRequest request) {
 		return pcAccountCoreService.cut(request);
 	}

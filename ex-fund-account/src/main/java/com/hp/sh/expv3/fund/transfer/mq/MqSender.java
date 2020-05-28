@@ -33,7 +33,7 @@ public class MqSender {
 		try{
 			String json = JsonUtils.toJson(msg);
 	        byte[] msgBuff = json.getBytes(RemotingHelper.DEFAULT_CHARSET);
-			Message mqMsg = new Message(MQConstant.TOPIC_TRANSFER, msg.getClass().getSimpleName(), msgBuff);
+			Message mqMsg = new Message(MQConstant.TOPIC_TRANSFER, msg.getClass().getSimpleName(), ""+msg.getId(), msgBuff);
 	        SendResult sendResult = producer().send(mqMsg);
 	        System.out.printf("%s%n", sendResult);
 		}catch(Exception e){
