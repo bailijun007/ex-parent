@@ -134,9 +134,10 @@ public class PcStrategyContext {
 		tradeResult.setOrderCompleted(BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(matchedVo.getNumber())));
 		
 		//手续费率
+		BigDecimal makerFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
+		BigDecimal takerFeeRatio = this.feeRatioService.getTakerFeeRatio(userId, asset, symbol);
 		if(closeFlag==OrderFlag.ACTION_OPEN){
 			if(matchedVo.getMakerFlag()==TradingRoles.MAKER){
-				BigDecimal makerFeeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
 				if(BigUtils.lt(makerFeeRatio, order.getOpenFeeRatio())){
 					tradeResult.setFeeRatio(makerFeeRatio);
 				}else{
@@ -147,11 +148,9 @@ public class PcStrategyContext {
 			}
 		}else{
 			if(matchedVo.getMakerFlag()==TradingRoles.MAKER){
-				BigDecimal feeRatio = feeRatioService.getMakerFeeRatio(userId, asset, symbol);
-				tradeResult.setFeeRatio(feeRatio);
+				tradeResult.setFeeRatio(makerFeeRatio);
 			}else{
-				BigDecimal feeRatio = this.feeRatioService.getTakerFeeRatio(userId, asset, symbol);
-				tradeResult.setFeeRatio(feeRatio);
+				tradeResult.setFeeRatio(takerFeeRatio);
 			}
 			
 		}
@@ -173,10 +172,10 @@ public class PcStrategyContext {
 			tradeResult.setOrderCloseFee(feeData.getCloseFee());
 		}else{
 			BigDecimal tradeFee = orderStrategy.calcTradeFee(tradeResult.getNumber(), faceValue, tradeResult.getPrice(), tradeResult.getFeeRatio());
-			if(BigUtils.isZero(order.getOpenFeeRatio())){
+			if(BigUtils.isZero(takerFeeRatio)){
 				tradeResult.setFee(BigDecimal.ZERO);
 			}else{
-				BigDecimal fr = tradeResult.getFeeRatio().divide(order.getOpenFeeRatio(), Precision.PERCENT_PRECISION, Precision.MORE);
+				BigDecimal fr = tradeResult.getFeeRatio().divide(takerFeeRatio, Precision.PERCENT_PRECISION, Precision.MORE);
 				tradeResult.setFee(tradeFee.multiply(fr));
 			}
 
