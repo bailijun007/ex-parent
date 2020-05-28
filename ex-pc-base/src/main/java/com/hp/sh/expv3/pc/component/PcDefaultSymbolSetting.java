@@ -24,11 +24,11 @@ public class PcDefaultSymbolSetting {
 	};
 
 	public BigDecimal getLongMaxLeverage(String asset, String symbol) {
-		return new BigDecimal(50);
+		return new BigDecimal(100);
 	};
 
 	public BigDecimal getShortMaxLeverage(String asset, String symbol) {
-		return new BigDecimal(50);
+		return new BigDecimal(100);
 	};
 
 	public BigDecimal getLongLeverage(String asset, String symbol) {
