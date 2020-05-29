@@ -84,8 +84,8 @@ public class PcPositionDataService {
 		return list;
 	}
 
-	public List<PosUID> queryActivePosIdList(Page page, Long userId, String asset, String symbol) {
-		List<PosUID> list = this.pcPositionDAO.queryActivePosIdList(page, userId, asset, symbol);
+	public List<PosUID> queryActivePosIdList(Page page, Long userId, String asset, String symbol, Long startId) {
+		List<PosUID> list = this.pcPositionDAO.queryActivePosIdList(page, userId, asset, symbol, startId);
 		return list;
 	}
 

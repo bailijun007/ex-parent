@@ -160,7 +160,6 @@ public class MaintainAction{
 				}
 			}
 			
-			page.setPageNo(page.getPageNo()+1);
 		}
 		return n;
 	}
@@ -190,7 +189,6 @@ public class MaintainAction{
 				}
 			}
 			
-			page.setPageNo(page.getPageNo()+1);
 		}
 		return n;
 	}

@@ -196,12 +196,13 @@
         from
         	pc_active_position ap
         <where>
+        	<if test="startId!=null"> and id &gt; #{startId}</if>
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
         </where>
         order by 
-        	ap.long_flag desc
+        	id asc
     </select>
     
     <select id="getCutPos" resultMap="PcPosition">

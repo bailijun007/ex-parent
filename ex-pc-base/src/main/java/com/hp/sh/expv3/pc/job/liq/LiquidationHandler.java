@@ -72,8 +72,9 @@ public class LiquidationHandler {
 	@Scheduled(cron = "${cron.liq.check}")
 	public void checkLiqOrder() {
 		Page page = new Page(1, 200, 1000L);
+		Long startId = null;
 		while(true){
-			List<PosUID> list = positionDataService.queryActivePosIdList(page, null, null, null);
+			List<PosUID> list = positionDataService.queryActivePosIdList(page, null, null, null, startId);
 			
 			if(list==null || list.isEmpty()){
 				break;
@@ -87,12 +88,12 @@ public class LiquidationHandler {
 						logger.warn("触发强平:{}", pos);
 						this.sendLiqMsg(liqResult);
 					}
+					startId = pos.getId();
 				}catch(Exception e){
 					logger.error("检查强平错误:"+e.getMessage(), e);
 				}
 			}
 			
-			page.setPageNo(page.getPageNo()+1);
 		}
 	}
 	
