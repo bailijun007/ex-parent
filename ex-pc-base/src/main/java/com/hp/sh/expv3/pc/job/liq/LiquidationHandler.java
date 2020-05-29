@@ -178,7 +178,7 @@ public class LiquidationHandler {
 		Page page = new Page(1, 50, 1000L);
 		Long startId = null;
 		while(true){
-			List<PcOrder> list = this.orderQueryService.queryLiqCutOrders(page, startTime);
+			List<PcOrder> list = this.orderQueryService.queryLiqCutOrders(page, startTime, startId);
 			
 			if(list==null || list.isEmpty()){
 				break;

@@ -221,13 +221,14 @@
 		LEFT JOIN 
 			pc_order o ON o.id = ao.id
 		<where>
+			<if test="startId!=null"> and ao.id &lt; #{startId}</if>
 			<if test="asset!=null and asset!=''"> and ao.asset=#{asset}</if>
 			<if test="symbol!=null and symbol!=''"> and ao.symbol=#{symbol}</if>
 			<if test="createdEnd!=null"> and o.created &lt;= #{createdEnd}</if>
 			<if test="status!=null"> and o.status=#{status}</if>
 			<if test="liqFlag!=null"> and o.liq_flag=#{liqFlag}</if>
 		</where>
-			order by id asc
+			order by ao.id asc
 	</select>
 
 </mapper>
