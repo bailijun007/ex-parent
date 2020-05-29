@@ -98,7 +98,6 @@ public class PcTradeService {
 
 	
 	//处理成交订单
-    @LockIt(key="U-${trade.accountId}")
 	public void handleTradeOrder(PcTradeMsg trade){
 		PcOrder order = this.orderQueryService.getOrder(trade.getAccountId(), trade.getOrderId());
 		boolean yes = this.canTrade(order, trade);
