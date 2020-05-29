@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.dev.LimitTimeHandle;
 import com.hp.sh.expv3.dev.TransWarn;
@@ -212,7 +213,7 @@ public class LiquidationHandler {
 						trade.setPrice(cutOrder.getPrice());
 						trade.setTradeId(0L);
 						trade.setTradeTime(now);
-						tradeService.handleTradeOrder(trade);
+						self.handleTradeOrder(trade);
 						
 						cv = cv.subtract(pos.getVolume());
 					}
@@ -225,6 +226,11 @@ public class LiquidationHandler {
 			
 		}
 	}
+	
+    @LockIt(key="U-${trade.accountId}")
+	public void handleTradeOrder(PcTradeMsg trade){
+    	tradeService.handleTradeOrder(trade);
+    }
 
 	private void sendLiqMsg(LiqHandleResult liqResut){
 		PcPosition pos = liqResut.getPcPosition();
