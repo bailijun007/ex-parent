@@ -41,6 +41,7 @@ public interface PcOrderDAO extends BaseAccountDataMapper<PcOrder, Long> {
 	
 	public List<PcOrder> queryUserActiveOrderList(Page page, @Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol, @Param("status") Integer status, @Param("liqFlag") Integer liqFlag, @Param("startId") Long startId);
 	
+	//按id正序
 	@CrossDB
 	public List<PcOrder> queryActiveOrderList(Page page, @Param("asset") String asset, @Param("symbol") String symbol, @Param("createdEnd") Long createdEnd, @Param("status") Integer status, @Param("liqFlag") Integer liqFlag, @Param("startId") Long startId);
 
