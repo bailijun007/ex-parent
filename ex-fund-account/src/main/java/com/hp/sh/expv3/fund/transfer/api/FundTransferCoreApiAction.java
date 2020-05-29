@@ -34,6 +34,9 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	
 	@Autowired
 	private MqSender mqSender;
+	
+	@Autowired
+	private FundTransferCoreApiAction self;
 
 	@Override
 	@LockIt(key="transfer-${userId}-${asset}")
@@ -67,7 +70,7 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			}
 			for(FundTransfer record : list){
 				try{
-					this.handleOne(record);
+					self.handleOne(record);
 				}catch(Exception e){
 					logger.error(e.getMessage(), e);
 				}
@@ -78,10 +81,11 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 	@Override
 	public void handleOne(Long userId, Long id){
 		FundTransfer transfer = this.fundTransferCoreService.findById(userId, id);
-		this.handleOne(transfer);
+		self.handleOne(transfer);
 	}
 	
-	private void handleOne(FundTransfer record){
+	@LockIt(key="FundTransfer-${record.id}")
+	public void handleOne(FundTransfer record){
 		switch (record.getStatus()) {
 		case FundTransferStatus.STATUS_NEW : 
 			//扣减源账户
@@ -96,7 +100,13 @@ public class FundTransferCoreApiAction implements FundTransferCoreApi {
 			this.fundTransferCoreService.changeStatus(record, FundTransferStatus.STATUS_SRC_COMPLETE, null);
 		case FundTransferStatus.STATUS_SRC_COMPLETE : 
 			//增加目标账户
-			fundServiceContext.addTargetFund(record);
+			try{
+				fundServiceContext.addTargetFund(record);
+			}catch(Exception e){
+				logger.error("处理转账失败，{}", e.toString(), e);
+				this.fundTransferCoreService.changeStatus(record, FundTransferStatus.STATUS_SRC_COMPLETE, record.getStatus()+":"+e.getMessage());
+				return;
+			}
 			//修改状态
 //			this.fundTransferCoreService.changeStatus(record, FundTransfer.STATUS_TARGET_COMPLETE);
 		case FundTransferStatus.STATUS_TARGET_COMPLETE : 

@@ -191,6 +191,7 @@
 		FROM
 			bb_order o
 		<where> 
+			<if test="startId!=null"> and id &gt; #{startId} </if>
 			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 			<if test="status!=null"> and status=#{status}</if>
 			<if test="symbol!=null"> and symbol=#{symbol}</if>

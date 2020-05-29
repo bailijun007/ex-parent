@@ -39,7 +39,7 @@ public interface BBOrderDAO extends BaseMapper<BBOrder, Long> {
 	public List<BBOrder> queryActiveOrderList(@Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol);
 	
 	@CrossDB
-	public List<BBOrder> queryPendingActiveOrders(Page page, @Param("asset") String asset, @Param("symbol") String symbol, @Param("createdEnd") long createdEnd, @Param("status") int status);
+	public List<BBOrder> queryPendingActiveOrders(Page page, @Param("symbol") String symbol, @Param("createdEnd") long createdEnd, @Param("status") int status, @Param("startId") Long startId);
 
 	public void delete(@Param("id") Long id, @Param("userId") Long userId, @Param("asset") String asset, @Param("symbol") String symbol);
 	
