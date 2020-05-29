@@ -213,7 +213,7 @@
 			pc_order o
 		<where>
 			o.user_id=#{userId}
-			<if test="startId!=null"> and o.id &lt; #{startId}</if>
+			<if test="startId!=null"> and o.id &gt; #{startId}</if>
 			<if test="asset!=null and asset!=''"> and o.asset=#{asset}</if>
 			<if test="symbol!=null and symbol!=''"> and o.symbol=#{symbol}</if>
 			<if test="status!=null"> and o.status=#{status}</if>
@@ -228,6 +228,7 @@
 		FROM
 			pc_order o
 		<where>
+			<if test="startId!=null"> and o.id &gt; #{startId}</if>
 			<if test="asset!=null and asset!=''"> and o.asset=#{asset}</if>
 			<if test="symbol!=null and symbol!=''"> and o.symbol=#{symbol}</if>
 			<if test="createdEnd!=null"> and o.created &lt;= #{createdEnd}</if>

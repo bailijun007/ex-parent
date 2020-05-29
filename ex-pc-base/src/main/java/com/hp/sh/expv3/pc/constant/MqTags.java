@@ -10,6 +10,8 @@ public class MqTags {
 	public static final String TAGS_BOOK_RESET = "PC_BOOK_RESET";
 	
 	public static final String TAGS_POS_LIQ_LOCKED = "PC_POS_LIQ_LOCKED";
+	
+	public static final String TAGS_ORDER_REBASE = "PC_ORDER_REBASE";
 
 	//consumer
 	public static final String TAGS_CANCELLED = "PC_MATCH_ORDER_CANCELLED";

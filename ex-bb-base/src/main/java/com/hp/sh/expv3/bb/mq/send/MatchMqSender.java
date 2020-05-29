@@ -73,7 +73,7 @@ public class MatchMqSender extends BaseMqSender{
 		}
 	}
 
-	public void sendBookRebaseMsg(OrderRebaseMsg msg) {
+	public void sendRebaseMsg(OrderRebaseMsg msg) {
 		this.sendOrderMsg(msg, MqTags.TAGS_ORDER_REBASE, MqTags.TAGS_ORDER_REBASE);
 	}
 

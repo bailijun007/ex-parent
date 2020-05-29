@@ -47,7 +47,8 @@ public interface PcPositionDAO extends BaseUserDataMapper<PcPosition,Long> {
 			Page page,
 			@Param("userId") Long userId, 
 			@Param("asset") String asset,
-			@Param("symbol") String symbol);
+			@Param("symbol") String symbol,
+			@Param("startId") Long startId);
 
 	public PcPosition getCutPos(
 		@Param("asset") String asset,
