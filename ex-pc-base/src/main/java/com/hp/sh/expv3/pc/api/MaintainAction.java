@@ -29,6 +29,7 @@ import com.hp.sh.expv3.utils.DbDateUtils;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class MaintainAction{
 	private static final Logger logger = LoggerFactory.getLogger(MaintainAction.class);
 	@Autowired
@@ -78,7 +79,6 @@ public class MaintainAction{
 		return n;
 	}
 
-
 	@ApiOperation(value = "resendPending")
 	@GetMapping(value = "/api/pc/maintain/resendPending")	
 	public Map resendPending(String asset, String symbol){
@@ -89,10 +89,12 @@ public class MaintainAction{
 		Integer resendPendingCancel = this.resendPendingCancel(asset, symbol);
 		Integer resendPendingNew = this.resendPendingNew(asset, symbol);
 		Integer resendNew = this.resendNew(asset, symbol);
+		Integer resendPartVolum = this.resendPartVolum(asset, symbol);
 		
 		map.put("resendPendingCancel", resendPendingCancel);
 		map.put("resendPendingNew", resendPendingNew);
 		map.put("resendNew", resendNew);
+		map.put("resendPartVolum", resendPartVolum);
 		return map;
 	}
 	
@@ -192,6 +194,36 @@ public class MaintainAction{
 		}
 		return n;
 	}
+
+	@ApiOperation(value = "resendPartFilled")
+	@GetMapping(value = "/api/pc/maintain/resendPartFilled")	
+	public Integer resendPartVolum(String asset, String symbol){
+		int n = 0;
+		Page page = new Page(1, 200, 1000L);
+		long now = DbDateUtils.now()-2000;
+		Long startId = null;
+		while(true){
+			List<PcOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PARTIALLY_FILLED, startId);
+			
+			if(list==null||list.isEmpty()){
+				break;
+			}
+			
+			for(PcOrder order : list){
+				startId = order.getId();
+				matchMqSender.sendPartVolum(order);
+				n++;
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+			
+		}
+		return n;
+	}
+	
 
 	@ApiOperation(value = "liqmargin")
 	@GetMapping(value = "/api/pc/maintain/liq/liqmargin")

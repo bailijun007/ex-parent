@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.pc.mq;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.rocketmq.client.QueryResult;
@@ -40,6 +41,27 @@ public class MatchMqSender extends BaseMqSender{
 		msg.setCloseFlag(order.getCloseFlag());
 		msg.setDisplayNumber(order.getVolume());
 		msg.setNumber(order.getVolume());
+		msg.setOrderId(order.getId());
+		msg.setPrice(order.getPrice());
+		msg.setSymbol(order.getSymbol());
+		msg.setOrderType(order.getOrderType());
+		msg.setOrderTime(order.getCreated());
+		msg.setTimeInForce(order.getTimeInForce());
+		this.sendPendingNew(msg);
+	}
+	
+	public void sendPartVolum(PcOrder order){
+		//send mq
+		OrderPendingNewMsg msg = new OrderPendingNewMsg();
+		msg.setAccountId(order.getUserId());
+		msg.setAsset(order.getAsset());
+		msg.setBidFlag(BidUtils.getBidFlag(order.getCloseFlag(), order.getLongFlag()));
+		msg.setCloseFlag(order.getCloseFlag());
+		
+		BigDecimal remaining = order.getVolume().subtract(order.getFilledVolume());
+		msg.setDisplayNumber(remaining);
+		msg.setNumber(remaining);
+		
 		msg.setOrderId(order.getId());
 		msg.setPrice(order.getPrice());
 		msg.setSymbol(order.getSymbol());
