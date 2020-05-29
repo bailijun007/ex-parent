@@ -119,6 +119,7 @@ public class BBMaintainAction{
 	@GetMapping(value = "/resendPending")	
 	public Map resendPending(String asset, String symbol){
 		this.sendRebase(asset, symbol);
+		
 		Map map = new HashMap();
 		Integer resendPendingCancel = this.resendPendingCancel(asset, symbol);
 		Integer resendPendingNew = this.resendPendingNew(asset, symbol);
@@ -130,7 +131,7 @@ public class BBMaintainAction{
 	@ApiOperation(value = "sendRebase")
 	@GetMapping(value = "/sendRebase")	
 	public void sendRebase(String asset, String symbol){
-		this.matchMqSender.sendBookRebaseMsg(new OrderRebaseMsg(asset, symbol));
+		this.matchMqSender.sendRebaseMsg(new OrderRebaseMsg(asset, symbol));
 	}
 
 	@ApiOperation(value = "sendAllRebase")
@@ -139,7 +140,7 @@ public class BBMaintainAction{
 		String asset = "USDT";
 		String[] symbols = {"BTC_USDT","EOS_USDT","ETH_USDT","LTC_USDT","BCH_USDT","BSV_USDT","BYS_USDT","ETC_USDT","XRP_USDT"};
 		for(String symbol : symbols){
-			this.matchMqSender.sendBookRebaseMsg(new OrderRebaseMsg(asset, symbol));
+			this.matchMqSender.sendRebaseMsg(new OrderRebaseMsg(asset, symbol));
 		}
 	}
 

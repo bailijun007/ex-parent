@@ -23,6 +23,7 @@ import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.consumer.msg.OrderPendingCancelMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.OrderRebaseMsg;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
@@ -80,12 +81,20 @@ public class MaintainAction{
 	@ApiOperation(value = "resendPending")
 	@GetMapping(value = "/api/pc/maintain/resendPending")	
 	public Map resendPending(String asset, String symbol){
+		this.sendRebase(asset, symbol);
+		
 		Map map = new HashMap();
 		Integer resendPendingCancel = this.resendPendingCancel(asset, symbol);
 		Integer resendPendingNew = this.resendPendingNew(asset, symbol);
 		map.put("resendPendingCancel", resendPendingCancel);
 		map.put("resendPendingNew", resendPendingNew);
 		return map;
+	}
+	
+	@ApiOperation(value = "sendRebase")
+	@GetMapping(value = "/sendRebase")	
+	public void sendRebase(String asset, String symbol){
+		this.matchMqSender.sendRebaseMsg(new OrderRebaseMsg(asset, symbol));
 	}
 
 	@ApiOperation(value = "resendPendingCancel")

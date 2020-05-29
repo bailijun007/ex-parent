@@ -16,6 +16,7 @@ import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.mq.consumer.msg.BookResetMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.OrderPendingCancelMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.OrderPendingNewMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.OrderRebaseMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.liq.LiqLockMsg;
 import com.hp.sh.expv3.utils.BidUtils;
 
@@ -77,6 +78,10 @@ public class MatchMqSender extends BaseMqSender{
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void sendRebaseMsg(OrderRebaseMsg msg) {
+		this.sendOrderMsg(msg, MqTags.TAGS_ORDER_REBASE, MqTags.TAGS_ORDER_REBASE);
 	}
 
 }
