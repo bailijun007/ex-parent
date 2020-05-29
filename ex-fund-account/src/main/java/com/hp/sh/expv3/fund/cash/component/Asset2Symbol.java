@@ -6,6 +6,8 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +18,8 @@ import com.hp.sh.expv3.fund.cash.entity.AssetVo;
 
 @Component
 public class Asset2Symbol {
+	private static final Logger logger = LoggerFactory.getLogger(Asset2Symbol.class);
+	
     private static final String KEY = "asset";
 
     @Resource(name = "templateDB0")
@@ -35,6 +39,10 @@ public class Asset2Symbol {
     public void buildMap() {
         HashOperations<String, String, String> hashOperations = templateDB0.opsForHash();
         final Map<String, String> entries = hashOperations.entries(KEY);
+        
+        if(entries==null || entries.isEmpty()){
+        	logger.error("配置不存在：KEY={}", KEY);
+        }
 
         final Map<String, Integer> asset2symbolMap = new HashMap<>();
         final Map<Integer, String> symbol2assetMap = new HashMap<>();
