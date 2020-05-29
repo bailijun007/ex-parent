@@ -55,7 +55,7 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
     @Override
     public List<BbAccountRecordExtVo> query(Long userId, String asset, Integer historyType, Integer tradeType, Long startDate, Long endDate, Integer nextPage, Long lastId, Integer pageSize) {
         this.checkParam(userId, historyType, tradeType, startDate, endDate, nextPage, pageSize);
-        logger.info("userId={},asset={},historyType={},tradeType={},startDate={},endDate={},nextPage={},lastId={},pageSize={}", userId, asset, historyType, tradeType, startDate, endDate, nextPage, lastId, pageSize);
+        logger.info("进入查询币币账单接口，收到参数为：userId={},asset={},historyType={},tradeType={},startDate={},endDate={},nextPage={},lastId={},pageSize={}", userId, asset, historyType, tradeType, startDate, endDate, nextPage, lastId, pageSize);
         List<BbAccountRecordExtVo> voList = null;
         try {
             if (null == lastId) {
@@ -104,7 +104,7 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
                 }
             }
         } catch (Exception e) {
-            logger.error("查询币币账单报错，报错message={}", e.getMessage());
+            logger.error("查询币币账单报错，报错message={},收到参数为：userId={},asset={},historyType={},tradeType={},startDate={},endDate={},nextPage={},lastId={},pageSize={}", e.getMessage(),userId, asset, historyType, tradeType, startDate, endDate, nextPage, lastId, pageSize);
         }
         return voList;
     }
