@@ -100,19 +100,6 @@ public final class CommonDateUtils {
         return startTime;
     }
 
-    public static String[] getStartAndEndTime(String startTime, String endTime) {
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = getDefaultDateTime(startTime);
-            String[] split = startTime.split("-");
-            int day = Integer.parseInt(split[2]) + 1;
-            endTime = split[0] + "-" + split[1] + "-" + day;
-            if (!isData("yyyy-MM-dd", endTime)) {
-                endTime = startTime + " 23:59:59";
-            }
-        }
-        String[] startAndEndTime = {startTime, endTime};
-        return startAndEndTime;
-    }
 
     /**
      * 判断是否是日期
@@ -131,4 +118,25 @@ public final class CommonDateUtils {
         }
         return true;
     }
+
+    // String -->LocalDate
+        public static LocalDate stringToLocalDate(CharSequence text) {
+            DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate localDate = LocalDate.parse(text, pattern);
+            return localDate;
+        }
+
+        public static String[] getStartAndEndTime(String startTime, String endTime) {
+            DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            if (org.apache.commons.lang3.StringUtils.isEmpty(startTime)) {
+                startTime = getDefaultDateTime(startTime);
+                LocalDate startDate = stringToLocalDate(startTime);
+                startTime = startDate.format(pattern);
+                LocalDate endDate = startDate.plusDays(1);
+                endTime = endDate.format(pattern);
+            }
+        String[] startAndEndTime = {startTime, endTime};
+        return startAndEndTime;
+    }
+
 }
