@@ -167,7 +167,7 @@ public class C2cOrderExtApiAction implements C2cOrderExtApi {
         }
         C2cOrder order = new C2cOrder();
         order.setPayFinishTime(Instant.now().toEpochMilli());
-        order.setFrozenAsset(BigDecimal.ZERO);
+//       order.setFrozenAsset(BigDecimal.ZERO);
         order.setApprovalStatus(auditStatus);
         order.setPayStatus(C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
         order.setId(id);
