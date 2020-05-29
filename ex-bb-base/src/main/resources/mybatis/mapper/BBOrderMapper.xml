@@ -177,6 +177,7 @@
 		LEFT JOIN 
 			bb_order o ON o.id = ao.id
 		<where> 
+			<if test="startId!=null"> and id &gt; #{startId} </if>
 			<if test="createdEnd!=null"> and created &lt;= #{createdEnd}</if>
 			<if test="status!=null"> and status=#{status}</if>
 			<if test="symbol!=null"> and ao.symbol=#{symbol}</if>
