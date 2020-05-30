@@ -40,9 +40,9 @@ public class TradeId2DateShard implements IdDateShard{
 		
 		YearMonth ym2 = this.getYearMonth(time);
 		
-		int months = (ym2.year*12+ym2.month) - (ym1.year*12+ym1.month);
+		int type = ym2.diffMonths(ym1);
 		
-		return months;
+		return type;
 	}
 	
 	public void setSnowflakeIdWorker(SnowflakeIdWorker snowflakeIdWorker) {
@@ -71,9 +71,14 @@ public class TradeId2DateShard implements IdDateShard{
 		public void addMonths(int months){
 			int m = this.month+months;
 			this.year += m/12;
-			this.month = m%12+1;
+			this.month = m%12;
 		}
-
+		
+		public int diffMonths(YearMonth ym1){
+			int months = (this.year*12+this.month) - (ym1.year*12+ym1.month);
+			return months;
+		}
+		
 		@Override
 		public String toString() {
 			return year+StringUtils.leftPad(String.valueOf(month), 2, '0');
@@ -84,12 +89,15 @@ public class TradeId2DateShard implements IdDateShard{
 		TradeId2DateShard tid = new TradeId2DateShard();
 		SnowflakeIdWorker idw=new SnowflakeIdWorker(IdBitSetting.dataCenterBits, IdBitSetting.serverBits, IdBitSetting.idTypeBits, IdBitSetting.sequenceBits);
 		tid.setSnowflakeIdWorker(idw);
-		long newId = tid.genTradId(1589255046516L);
+		long newId = tid.genTradId(System.currentTimeMillis());
 		System.out.println(newId);
 		
 		System.out.println(idw.getIdType(newId));
 		System.out.println(idw.getTime(newId));
 		System.out.println(new Date(idw.getTime(newId)).toLocaleString());
+		
+
+		System.out.println(tid.getDateShardById(newId));
 	}
 
 }
