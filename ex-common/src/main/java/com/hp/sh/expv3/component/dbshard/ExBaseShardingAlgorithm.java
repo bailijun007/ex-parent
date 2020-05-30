@@ -24,7 +24,7 @@ public abstract class ExBaseShardingAlgorithm implements ComplexKeysShardingAlgo
 			String table = it.next();
 			if(!this.tableInfoCache.have(table)){
 				it.remove();
-				logger.error("分表不存在：{}", table);
+				logger.error("分表不存在：{}", table, new Exception("xxx"));
 			}
 		}
 		return tableSet;
