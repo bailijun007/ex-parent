@@ -14,8 +14,8 @@ import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
 @EnableScheduling
-public class TransferHandler {
-    private static final Logger logger = LoggerFactory.getLogger(TransferHandler.class);
+public class TransferMqHandler {
+    private static final Logger logger = LoggerFactory.getLogger(TransferMqHandler.class);
     
     @Autowired
     private FundTransferCoreApi fundTransferCoreApi;
@@ -23,7 +23,7 @@ public class TransferHandler {
 	/**
 	 * 处理已付款，未同步余额的记录
 	 */
-//	@Scheduled(cron = "0 * * * * ?")
+	@Scheduled(cron = "0 * * * * ?")
 	public void handlePendingSynch() {
 		fundTransferCoreApi.handlePending();
 	}

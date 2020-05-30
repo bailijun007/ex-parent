@@ -60,29 +60,6 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
         return list;
     }
 
-    private void findBbAccountRecords(String asset, Long startDate, Long endDate, List<BbAccountRecordExtVo> list, Map<String, Object> map) {
-        String startTime = CommonDateUtils.timestampToString(startDate);
-        String endTime = CommonDateUtils.timestampToString(endDate);
-        List<Integer> timeDifference = CommonDateUtils.getTimeDifference(startTime, endTime);
-        String tableName = null;
-        for (Integer date : timeDifference) {
-            //tableName  eg: bb_account_record_btc__202005
-            tableName = BbExtCommonConstant.BB_ACCOUNT_RECORD_PREFIX + asset.toLowerCase() + "__" + date;
-            map.put("tableName", tableName);
-
-            int existTable = bbAccountRecordExtMapper.existTable(BbExtCommonConstant.DB_NAME_EXPV3_BB, tableName);
-            //表不存在则直接跳过
-            if (existTable != 1) {
-                continue;
-            }
-             List<BbAccountRecordExtVo> recordExtVos = bbAccountRecordExtMapper.queryByLimit(map);
-            if(!CollectionUtils.isEmpty(recordExtVos)){
-                list.addAll(recordExtVos);
-            }
-
-        }
-    }
-
     @Override
     public List<BbAccountRecordExtVo> listBbAccountRecordsByPage(Long userId, String asset, Integer historyType, Integer tradeType, Long lastId, Integer nextPage, Long startDate, Long endDate, Integer pageSize) {
         Map<String, Object> map = new HashMap<>();

@@ -34,7 +34,7 @@ public final class CommonDateUtils {
 
         List<Integer> list = new ArrayList<>();
         for (int i = p1; i <= p2; i++) {
-            Boolean b = isData(i + "");
+            Boolean b = isData("yyyyMM",i + "");
             if (b) {
                 list.add(i);
             }
@@ -60,6 +60,7 @@ public final class CommonDateUtils {
 
     /**
      * 时间戳转String
+     *
      * @param timestamp
      * @return
      */
@@ -71,20 +72,22 @@ public final class CommonDateUtils {
 
     /**
      * LocalDate 转时间戳
+     *
      * @param localDate
      * @return
      */
-    public static Long localDateToTimestamp(LocalDate localDate){
-        return  localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    public static Long localDateToTimestamp(LocalDate localDate) {
+        return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     /**
      * LocalDateTime 转时间戳
+     *
      * @param localDateTime
      * @return
      */
-    public static Long localDateTimeToTimestamp(LocalDateTime localDateTime){
-        return  localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+    public static Long localDateTimeToTimestamp(LocalDateTime localDateTime) {
+        return localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
     }
 
     public static String getDefaultDateTime(String startTime) {
@@ -97,25 +100,16 @@ public final class CommonDateUtils {
         return startTime;
     }
 
-    public static String[] getStartAndEndTime(String startTime, String endTime) {
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = getDefaultDateTime(startTime);
-            String[] split = startTime.split("-");
-            int day = Integer.parseInt(split[2]) + 1;
-            endTime = split[0] + "-" + split[1] + "-" + day;
-        }
-        String[] startAndEndTime = {startTime, endTime};
-        return startAndEndTime;
-    }
 
     /**
      * 判断是否是日期
      *
-     * @param s
+     * @param pattern 指定的格式
+     * @param s 需格式化的字符串
      * @return
      */
-    public static Boolean isData(String s) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMM");
+    public static Boolean isData(String pattern, String s) {
+        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         formatter.setLenient(false);
         try {
             Date date = formatter.parse(s);  //抛出转换异常
@@ -124,4 +118,25 @@ public final class CommonDateUtils {
         }
         return true;
     }
+
+    // String -->LocalDate
+        public static LocalDate stringToLocalDate(CharSequence text) {
+            DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate localDate = LocalDate.parse(text, pattern);
+            return localDate;
+        }
+
+        public static String[] getStartAndEndTime(String startTime, String endTime) {
+            DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            if (org.apache.commons.lang3.StringUtils.isEmpty(startTime)) {
+                startTime = getDefaultDateTime(startTime);
+                LocalDate startDate = stringToLocalDate(startTime);
+                startTime = startDate.format(pattern);
+                LocalDate endDate = startDate.plusDays(1);
+                endTime = endDate.format(pattern);
+            }
+        String[] startAndEndTime = {startTime, endTime};
+        return startAndEndTime;
+    }
+
 }

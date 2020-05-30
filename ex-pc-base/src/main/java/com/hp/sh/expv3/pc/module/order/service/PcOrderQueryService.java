@@ -113,13 +113,13 @@ public class PcOrderQueryService {
 		return result;
 	}
 
-	public List<PcOrder> queryPendingActive(Page page, String asset, String symbol, Long createdEnd, Integer status) {
-		List<PcOrder> list = this.pcOrderDAO.queryActiveOrderList(page, asset, symbol, createdEnd, status, IntBool.NO);
+	public List<PcOrder> queryPendingActive(Page page, String asset, String symbol, Long createdEnd, Integer status, Long startId) {
+		List<PcOrder> list = this.pcOrderDAO.queryActiveOrderList(page, asset, symbol, createdEnd, status, IntBool.NO, startId);
 		return list;
 	}
 
-	public List<PcOrder> queryLiqCutOrders(Page page, Long createdEnd) {
-		List<PcOrder> list = this.pcOrderDAO.queryActiveOrderList(page, null, null, createdEnd, OrderStatus.CANCELED, IntBool.YES);
+	public List<PcOrder> queryLiqCutOrders(Page page, Long createdEnd, Long startId) {
+		List<PcOrder> list = this.pcOrderDAO.queryActiveOrderList(page, null, null, createdEnd, OrderStatus.CANCELED, IntBool.YES, startId);
 		return list;
 	}
 	

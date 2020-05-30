@@ -23,11 +23,13 @@ import com.hp.sh.expv3.pc.module.position.service.PcPositionDataService;
 import com.hp.sh.expv3.pc.module.position.service.PcPositionMarginService;
 import com.hp.sh.expv3.pc.mq.MatchMqSender;
 import com.hp.sh.expv3.pc.mq.consumer.msg.OrderPendingCancelMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.OrderRebaseMsg;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 import io.swagger.annotations.ApiOperation;
 
 @RestController
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class MaintainAction{
 	private static final Logger logger = LoggerFactory.getLogger(MaintainAction.class);
 	@Autowired
@@ -65,27 +67,41 @@ public class MaintainAction{
 		long now = DbDateUtils.now()-2000;
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
+		Long startId = null;
 		while(true){
-			List<PcOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW);
+			List<PcOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW, startId);
 			if(list==null||list.isEmpty()){
 				break;
 			}
 			n += list.size();
-			page.setPageNo(page.getPageNo()+1);
+			startId = list.get(list.size()-1).getId();
 		}
 		return n;
 	}
 
-
 	@ApiOperation(value = "resendPending")
 	@GetMapping(value = "/api/pc/maintain/resendPending")	
 	public Map resendPending(String asset, String symbol){
+		this.sendRebase(asset, symbol);
+		
 		Map map = new HashMap();
+		
 		Integer resendPendingCancel = this.resendPendingCancel(asset, symbol);
 		Integer resendPendingNew = this.resendPendingNew(asset, symbol);
+		Integer resendNew = this.resendNew(asset, symbol);
+		Integer resendPartVolum = this.resendPartVolum(asset, symbol);
+		
 		map.put("resendPendingCancel", resendPendingCancel);
 		map.put("resendPendingNew", resendPendingNew);
+		map.put("resendNew", resendNew);
+		map.put("resendPartVolum", resendPartVolum);
 		return map;
+	}
+	
+	@ApiOperation(value = "sendRebase")
+	@GetMapping(value = "/sendRebase")	
+	public void sendRebase(String asset, String symbol){
+		this.matchMqSender.sendRebaseMsg(new OrderRebaseMsg(asset, symbol));
 	}
 
 	@ApiOperation(value = "resendPendingCancel")
@@ -94,8 +110,9 @@ public class MaintainAction{
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		long now = DbDateUtils.now()-2000;
+		Long startId = null;
 		while(true){
-			List<PcOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_CANCEL);
+			List<PcOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_CANCEL, startId);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -107,7 +124,7 @@ public class MaintainAction{
 				mqMsg.setOrderId(order.getId());
 				mqMsg.setSymbol(order.getSymbol());
 				this.matchMqSender.sendPendingCancel(mqMsg);
-				
+				startId = order.getId();
 				n++;
 				try {
 					Thread.sleep(10);
@@ -116,7 +133,6 @@ public class MaintainAction{
 				}
 			}
 			
-			page.setPageNo(page.getPageNo()+1);
 		}
 		return n;
 	}
@@ -127,11 +143,9 @@ public class MaintainAction{
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		long now = DbDateUtils.now()-2000;
+		Long startId = null;
 		while(true){
-			List<PcOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW);
-			List<PcOrder> _list2 = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.NEW);
-			
-			list.addAll(_list2);
+			List<PcOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW, startId);
 			
 			if(list==null||list.isEmpty()){
 				break;
@@ -139,6 +153,7 @@ public class MaintainAction{
 			
 			for(PcOrder order : list){
 				matchMqSender.sendPendingNew(order);
+				startId = order.getId();
 				n++;
 				try {
 					Thread.sleep(10);
@@ -147,10 +162,68 @@ public class MaintainAction{
 				}
 			}
 			
-			page.setPageNo(page.getPageNo()+1);
 		}
 		return n;
 	}
+
+	@ApiOperation(value = "resendNew")
+	@GetMapping(value = "/api/pc/maintain/resendNew")	
+	public Integer resendNew(String asset, String symbol){
+		int n = 0;
+		Page page = new Page(1, 200, 1000L);
+		long now = DbDateUtils.now()-2000;
+		Long startId = null;
+		while(true){
+			List<PcOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.NEW, startId);
+			
+			if(list==null||list.isEmpty()){
+				break;
+			}
+			
+			for(PcOrder order : list){
+				matchMqSender.sendPendingNew(order);
+				startId = order.getId();
+				n++;
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+			
+		}
+		return n;
+	}
+
+	@ApiOperation(value = "resendPartFilled")
+	@GetMapping(value = "/api/pc/maintain/resendPartFilled")	
+	public Integer resendPartVolum(String asset, String symbol){
+		int n = 0;
+		Page page = new Page(1, 200, 1000L);
+		long now = DbDateUtils.now()-2000;
+		Long startId = null;
+		while(true){
+			List<PcOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PARTIALLY_FILLED, startId);
+			
+			if(list==null||list.isEmpty()){
+				break;
+			}
+			
+			for(PcOrder order : list){
+				startId = order.getId();
+				matchMqSender.sendPartVolum(order);
+				n++;
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+			
+		}
+		return n;
+	}
+	
 
 	@ApiOperation(value = "liqmargin")
 	@GetMapping(value = "/api/pc/maintain/liq/liqmargin")

@@ -95,9 +95,10 @@ public class BBMaintainAction{
 	public Integer queryResend(String asset, String symbol){
 		long now = DbDateUtils.now()-2000;
 		int n = 0;
+		Long startId = null;
 		Page page = new Page(1, 200, 1000L);
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW, startId);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -107,9 +108,10 @@ public class BBMaintainAction{
 				if(!isExist){
 					n++;
 				}
+				
+				startId = order.getId();
 			}
 			
-			page.setPageNo(page.getPageNo()+1);
 		}
 		return n;
 	}
@@ -119,18 +121,23 @@ public class BBMaintainAction{
 	@GetMapping(value = "/resendPending")	
 	public Map resendPending(String asset, String symbol){
 		this.sendRebase(asset, symbol);
+		
 		Map map = new HashMap();
+		
 		Integer resendPendingCancel = this.resendPendingCancel(asset, symbol);
 		Integer resendPendingNew = this.resendPendingNew(asset, symbol);
+		Integer resendNew = this.resendNew(asset, symbol);
+		
 		map.put("resendPendingCancel", resendPendingCancel);
 		map.put("resendPendingNew", resendPendingNew);
+		map.put("resendNew", resendNew);
 		return map;
 	}
 
 	@ApiOperation(value = "sendRebase")
 	@GetMapping(value = "/sendRebase")	
 	public void sendRebase(String asset, String symbol){
-		this.matchMqSender.sendBookRebaseMsg(new OrderRebaseMsg(asset, symbol));
+		this.matchMqSender.sendRebaseMsg(new OrderRebaseMsg(asset, symbol));
 	}
 
 	@ApiOperation(value = "sendAllRebase")
@@ -139,7 +146,7 @@ public class BBMaintainAction{
 		String asset = "USDT";
 		String[] symbols = {"BTC_USDT","EOS_USDT","ETH_USDT","LTC_USDT","BCH_USDT","BSV_USDT","BYS_USDT","ETC_USDT","XRP_USDT"};
 		for(String symbol : symbols){
-			this.matchMqSender.sendBookRebaseMsg(new OrderRebaseMsg(asset, symbol));
+			this.matchMqSender.sendRebaseMsg(new OrderRebaseMsg(asset, symbol));
 		}
 	}
 
@@ -149,8 +156,9 @@ public class BBMaintainAction{
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		long now = DbDateUtils.now()-2000;
+		Long startId = null;
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_CANCEL);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_CANCEL, startId);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -161,14 +169,13 @@ public class BBMaintainAction{
 					orderApiAction.sendOrderMsg(order);
 					n++;
 				}
+				startId = order.getId();
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
 					logger.error(e.getMessage(), e);
 				}
 			}
-			
-			page.setPageNo(page.getPageNo()+1);
 		}
 		return n;
 	}
@@ -179,10 +186,9 @@ public class BBMaintainAction{
 		int n = 0;
 		Page page = new Page(1, 200, 1000L);
 		long now = DbDateUtils.now()-2000;
+		Long startId = null;
 		while(true){
-			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW);
-			List<BBOrder> _list2 = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.NEW);
-			list.addAll(_list2);
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.PENDING_NEW, startId);
 			if(list==null||list.isEmpty()){
 				break;
 			}
@@ -193,6 +199,7 @@ public class BBMaintainAction{
 					orderApiAction.sendOrderMsg(order);
 					n++;
 				}
+				startId = order.getId();
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
@@ -200,7 +207,37 @@ public class BBMaintainAction{
 				}
 			}
 			
-			page.setPageNo(page.getPageNo()+1);
+		}
+		return n;
+	}
+
+	@ApiOperation(value = "resendNew")
+	@GetMapping(value = "/resendNew")	
+	public Integer resendNew(String asset, String symbol){
+		int n = 0;
+		Page page = new Page(1, 200, 1000L);
+		long now = DbDateUtils.now()-2000;
+		Long startId = null;
+		while(true){
+			List<BBOrder> list = orderQueryService.queryPendingActive(page, asset, symbol, now, OrderStatus.NEW, startId);
+			if(list==null||list.isEmpty()){
+				break;
+			}
+			
+			for(BBOrder order : list){
+				boolean isExist = matchMqSender.exist(order.getAsset(), order.getSymbol(), ""+order.getId(), order.getCreated());
+				if(!isExist){
+					orderApiAction.sendOrderMsg(order);
+					n++;
+				}
+				startId = order.getId();
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+			
 		}
 		return n;
 	}

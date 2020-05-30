@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.dev.CrossDB;
 import com.hp.sh.expv3.dev.LimitTimeHandle;
 import com.hp.sh.expv3.dev.TransWarn;
@@ -72,8 +73,9 @@ public class LiquidationHandler {
 	@Scheduled(cron = "${cron.liq.check}")
 	public void checkLiqOrder() {
 		Page page = new Page(1, 200, 1000L);
+		Long startId = null;
 		while(true){
-			List<PosUID> list = positionDataService.queryActivePosIdList(page, null, null, null);
+			List<PosUID> list = positionDataService.queryActivePosIdList(page, null, null, null, startId);
 			
 			if(list==null || list.isEmpty()){
 				break;
@@ -87,12 +89,12 @@ public class LiquidationHandler {
 						logger.warn("触发强平:{}", pos);
 						this.sendLiqMsg(liqResult);
 					}
+					startId = pos.getId();
 				}catch(Exception e){
 					logger.error("检查强平错误:"+e.getMessage(), e);
 				}
 			}
 			
-			page.setPageNo(page.getPageNo()+1);
 		}
 	}
 	
@@ -178,7 +180,7 @@ public class LiquidationHandler {
 		Page page = new Page(1, 50, 1000L);
 		Long startId = null;
 		while(true){
-			List<PcOrder> list = this.orderQueryService.queryLiqCutOrders(page, startTime);
+			List<PcOrder> list = this.orderQueryService.queryLiqCutOrders(page, startTime, startId);
 			
 			if(list==null || list.isEmpty()){
 				break;
@@ -211,7 +213,7 @@ public class LiquidationHandler {
 						trade.setPrice(cutOrder.getPrice());
 						trade.setTradeId(0L);
 						trade.setTradeTime(now);
-						tradeService.handleTradeOrder(trade);
+						self.handleTradeOrder(trade);
 						
 						cv = cv.subtract(pos.getVolume());
 					}
@@ -224,6 +226,11 @@ public class LiquidationHandler {
 			
 		}
 	}
+	
+    @LockIt(key="U-${trade.accountId}")
+	public void handleTradeOrder(PcTradeMsg trade){
+    	tradeService.handleTradeOrder(trade);
+    }
 
 	private void sendLiqMsg(LiqHandleResult liqResut){
 		PcPosition pos = liqResut.getPcPosition();

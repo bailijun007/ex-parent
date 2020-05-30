@@ -34,7 +34,7 @@ public final class CommonDateUtils {
 
         List<Integer> list = new ArrayList<>();
         for (int i = p1; i <= p2; i++) {
-            Boolean b = isData(i + "");
+            Boolean b = isData("yyyyMM",i + "");
             if (b) {
                 list.add(i);
             }
@@ -93,8 +93,8 @@ public final class CommonDateUtils {
      * @param s
      * @return
      */
-    public static Boolean isData(String s) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMM");
+    public static Boolean isData(String pattern,String s) {
+        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         formatter.setLenient(false);
         try {
             Date date = formatter.parse(s);  //抛出转换异常
@@ -116,14 +116,24 @@ public final class CommonDateUtils {
     }
 
 
+    // String -->LocalDate
+    public static LocalDate stringToLocalDate(CharSequence text) {
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(text, pattern);
+        return localDate;
+    }
+
     public static String[] getStartAndEndTime(String startTime, String endTime) {
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         if (org.apache.commons.lang3.StringUtils.isEmpty(startTime)) {
             startTime = getDefaultDateTime(startTime);
-            String[] split = startTime.split("-");
-            int day = Integer.parseInt(split[2]) + 1;
-            endTime = split[0] +"-"+ split[1]+"-" + day;
+            LocalDate startDate = stringToLocalDate(startTime);
+            startTime = startDate.format(pattern);
+            LocalDate endDate = startDate.plusDays(1);
+            endTime = endDate.format(pattern);
         }
         String[] startAndEndTime = {startTime, endTime};
         return startAndEndTime;
     }
+
 }
