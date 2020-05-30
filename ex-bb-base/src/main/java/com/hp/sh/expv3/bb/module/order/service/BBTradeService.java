@@ -302,14 +302,14 @@ public class BBTradeService {
 	
 	//检查订单状态
 	private boolean canTrade(BBOrder order, BBTradeMsg tradeMsg) {
-		if(order==null){
-			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
-		}
-		
 		//检查重复请求
 		Long count = this.orderTradeSnDAO.exist(tradeMsg.uniqueKey());
 		if(count>0){
 			return false;
+		}
+		
+		if(order==null){
+			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
 		}
 		
 		////////////////

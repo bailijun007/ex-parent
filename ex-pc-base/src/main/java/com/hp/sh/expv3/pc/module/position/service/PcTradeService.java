@@ -11,6 +11,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gitee.hupadev.base.exceptions.CommonError;
+import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.component.dbshard.impl.TradeId2DateShard;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
@@ -437,23 +439,23 @@ public class PcTradeService {
 	}
 
 	//检查订单状态
-	private boolean canTrade(PcOrder order, PcTradeMsg tradeMsg) {
+	private boolean canTrade(PcOrder order, PcTradeMsg tradeMsg) {		
+		//检查重复请求
+		Long count = this.orderTradeSnDAO.exist(tradeMsg.uniqueKey());
+		if(count>0){
+			return false;
+		}
+		
 		if(order==null){
 			logger.error("成交订单不存在：orderId={}", tradeMsg.getOrderId());
-//			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
-			return false;
+			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
 		}
 		
 		BigDecimal remainVol = order.getVolume().subtract(order.getFilledVolume());
 		if(BigUtils.gt(tradeMsg.getNumber(), remainVol)){
 			return false;
 		}
-		
-		//检查重复请求
-		Long count = this.orderTradeSnDAO.exist(tradeMsg.uniqueKey());
-		if(count>0){
-			return false;
-		}
+
 		return true;
 	}
 	
