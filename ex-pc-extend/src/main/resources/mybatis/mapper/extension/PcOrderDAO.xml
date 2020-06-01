@@ -265,6 +265,11 @@
             <if test="symbol!=null and symbol!=''">
                 and symbol=#{symbol}
             </if>
+            <if test="symbolList!=null">and symbol in
+                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
+                    #{symbolList[${i}]}
+                </foreach>
+            </if>
             <if test="orderType!=null">
                 and order_type=#{orderType}
             </if>
@@ -353,6 +358,11 @@
             <if test="userId!=null">and user_id=#{userId}</if>
             <if test="asset!=null and asset!=''">and asset=#{asset}</if>
             <if test="symbol!=null and symbol!=''">and symbol=#{symbol}</if>
+            <if test="symbolList!=null">and symbol in
+                <foreach item="item" index="i" collection="symbolList" open="(" separator="," close=")">
+                    #{symbolList[${i}]}
+                </foreach>
+            </if>
             <if test="visibleFlag!=null">and visible_flag=#{visibleFlag}</if>
             <if test="clientOrderId!=null and clientOrderId!=''">and client_order_id=#{clientOrderId}</if>
             <if test="closeFlag!=null">and close_flag=#{closeFlag}</if>

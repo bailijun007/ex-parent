@@ -116,12 +116,13 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
-    public PageResult<PcOrderVo> queryHistoryOrders(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, Long startTime, Long endTime) {
+    public PageResult<PcOrderVo> queryHistoryOrders(Long userId, String asset, List<String> symbolList, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, Long startTime, Long endTime) {
         PageResult<PcOrderVo> result = new PageResult<PcOrderVo>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("symbol", symbol);
+//        map.put("symbol", symbol);
+        map.put("symbolList", symbolList);
         map.put("status", status);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
@@ -135,11 +136,12 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
-    public List<PcOrderVo> queryHistory(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, Long startTime, Long endTime) {
+    public List<PcOrderVo> queryHistory(Long userId, String asset, List<String> symbolList, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, Long startTime, Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("symbol", symbol);
+//        map.put("symbol", symbol);
+        map.put("symbolList", symbolList);
         map.put("status", status);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
@@ -270,12 +272,13 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
-    public PageResult<PcOrderVo> queryActivityOrder(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, Long startTime, Long endTime) {
+    public PageResult<PcOrderVo> queryActivityOrder(Long userId, String asset, List<String> symbolList, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, Long startTime, Long endTime) {
         PageResult<PcOrderVo> result = new PageResult<PcOrderVo>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("symbol", symbol);
+//        map.put("symbol", symbol);
+        map.put("symbolList", symbolList);
         map.put("status", status);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);

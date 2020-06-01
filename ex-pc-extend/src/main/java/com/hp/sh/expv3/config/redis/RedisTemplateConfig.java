@@ -20,11 +20,11 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 @Configuration
 public class RedisTemplateConfig {
 
-	@Value("${meta.redis.host}")
+	@Value("${spring.redis.host}")
 	private String hostName;
-	@Value("${meta.redis.port}")
+	@Value("${spring.redis.port}")
 	private Integer port;
-	@Value("${meta.redis.password}")
+	@Value("${spring.redis.password}")
 	private String password;
 
     @Primary
