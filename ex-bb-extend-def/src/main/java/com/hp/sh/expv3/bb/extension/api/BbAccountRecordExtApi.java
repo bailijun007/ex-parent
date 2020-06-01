@@ -35,7 +35,7 @@ public interface BbAccountRecordExtApi {
     @GetMapping(value = "/api/bb/trade/ext/queryHistory")
     PageResult<BbAccountRecordVo> queryHistory(@RequestParam(value = "userId", required = false) Long userId, @RequestParam(value = "asset", required = true) String asset,
                                                @RequestParam(value = "pageSize") Integer pageSize, @RequestParam(value = "pageNo") Integer pageNo,
-                                               @RequestParam(value = "startTime", required = false) String startTime, @RequestParam(value = "endTime", required = false) String endTime);
+                                               @RequestParam(value = "startTime", required = false) Long startTime, @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "查询币币账单")

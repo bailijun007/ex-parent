@@ -97,6 +97,6 @@ public interface BbOrderTradeExtApi {
     List<BbOrderTradeDetailVo> queryHistory(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
                                             @RequestParam("symbol") String symbol, @RequestParam(value = "lastTradeId", required = false) Long lastTradeId,
                                             @RequestParam("nextPage") Integer nextPage, @RequestParam("pageSize") Integer pageSize,
-                                            @RequestParam(value = "startTime", required = false) String startTime, @RequestParam(value = "endTime", required = false) String endTime);
+                                            @RequestParam(value = "startTime", required = false) Long startTime, @RequestParam(value = "endTime", required = false) Long endTime);
 
 }

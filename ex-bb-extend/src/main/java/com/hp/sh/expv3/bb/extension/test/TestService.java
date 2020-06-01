@@ -33,7 +33,7 @@ public class TestService {
 
     @Test
     public void queryHistory(){
-         PageResult<BbAccountRecordVo> pageResult = bbAccountRecordExtService.queryHistory(null, "btc", "2020-04-08", "2020-05-09", 1, 20);
+         PageResult<BbAccountRecordVo> pageResult = bbAccountRecordExtService.queryHistory(null, "btc", null, null, 1, 20);
 
          if(null!=pageResult){
              System.out.println("pageResult.getList()="+pageResult.getList());
@@ -51,7 +51,7 @@ public class TestService {
 
     @Test
     public void queryAllBbOrederHistory(){
-        final PageResult<BbOrderVo> pageResult = bbOrderExtService.queryAllBbOrederHistory(null, "USDT", "BTC_USDT", "2020-04-12", "2020-05-09", 1, 2);
+        final PageResult<BbOrderVo> pageResult = bbOrderExtService.queryAllBbOrederHistory(null, "USDT", "BTC_USDT", null, null, 1, 2);
         if (!CollectionUtils.isEmpty(pageResult.getList())){
             System.out.println("pageResult.getList()="+pageResult.getList());
         }
@@ -60,7 +60,7 @@ public class TestService {
 
     @Test
     public void testqueryHistoryOrderList(){
-        final PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(null, "USDT", "BTC_USDT", 1, 2, 1L, -1, "2020-03-12", "2020-05-09");
+        final PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(null, "USDT", "BTC_USDT", 1, 2, 1L, -1, null, null);
         System.out.println("result.getList()="+result.getList());
     }
 
@@ -72,7 +72,7 @@ public class TestService {
         assetList.add("USDT");
         List<String> symbolList=new ArrayList<>();
         symbolList.add("BTC_USDT");
-        final List<BbHistoryOrderVo> bbHistoryOrderVos = bbOrderExtService.queryOrderList(null, assetList, symbolList, null, null, 20, statusList, "2020-04-12", "2020-05-09");
+        final List<BbHistoryOrderVo> bbHistoryOrderVos = bbOrderExtService.queryOrderList(null, assetList, symbolList, null, null, 20, statusList, null, null);
         System.out.println("bbHistoryOrderVos = " + bbHistoryOrderVos);
     }
 
@@ -84,7 +84,7 @@ public class TestService {
 
     @Test
     public void queryHistoryOrderList(){
-        final PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(null, "USDT", "BTC_USDT", 1, 2, 1L, -1, "2020-04-12", "2020-05-09");
+        final PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(null, "USDT", "BTC_USDT", 1, 2, 1L, -1, null, null);
         System.out.println("result.getList()="+result.getList());
     }
 

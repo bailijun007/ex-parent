@@ -84,16 +84,16 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
     }
 
     @Override
-    public PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, String startTime, String endTime, Integer pageNo, Integer pageSize) {
+    public PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, Long startTime, Long endTime, Integer pageNo, Integer pageSize) {
         PageResult<BbAccountRecordVo> pageResult = new PageResult<>();
 
-        long begin = CommonDateUtils.stringToTimestamp(startTime);
-        long end = CommonDateUtils.stringToTimestamp(endTime);
+//        long begin = CommonDateUtils.stringToTimestamp(startTime);
+//        long end = CommonDateUtils.stringToTimestamp(endTime);
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("createdBegin", begin);
-        map.put("createdEnd", end);
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
 
         Long count=bbAccountRecordExtMapper.queryCount(map);
         map.put("offset", pageNo-1);

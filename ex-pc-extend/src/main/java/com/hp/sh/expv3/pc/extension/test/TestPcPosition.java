@@ -27,14 +27,14 @@ public class TestPcPosition {
     //添加开始结束时间
     @Test
     public void findCurrentPosition() {
-        final List<CurrentPositionVo> currentPosition = pcPositionExtendApiAction.findCurrentPosition(1L, "BTC", "BTC_USDT", "2020-05-21", "2020-05-22");
+        final List<CurrentPositionVo> currentPosition = pcPositionExtendApiAction.findCurrentPosition(1L, "BTC", "BTC_USDT", null, null);
         System.out.println("currentPosition = " + currentPosition);
     }
 
     //asset symbol 改成必填， 添加开始结束时间
     @Test
     public void findPositionList() {
-        final PageResult<CurrentPositionVo> positionList = pcPositionExtendApiAction.findPositionList(1L, "BTC", null, null, "BTC_USDT", 1, 20, "2020-05-21", "2020-05-22");
+        final PageResult<CurrentPositionVo> positionList = pcPositionExtendApiAction.findPositionList(1L, "BTC", null, null, "BTC_USDT", 1, 20, null, null);
         System.out.println("positionList = " + positionList.getList());
     }
 

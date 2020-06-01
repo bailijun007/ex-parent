@@ -49,7 +49,7 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
 
 
     @Override
-    public PageResult<PcPositionVo> pageQueryPositionList(Long userId, String asset, String symbol, Long posId, Integer liqStatus, Integer pageNo, Integer pageSize,String startTime,String endTime) {
+    public PageResult<PcPositionVo> pageQueryPositionList(Long userId, String asset, String symbol, Long posId, Integer liqStatus, Integer pageNo, Integer pageSize,Long startTime,Long endTime) {
         PageHelper.startPage(pageNo,pageSize);
         PageResult<PcPositionVo> pageResult=new PageResult<>();
         Map<String, Object> map=new HashMap<>();
@@ -58,8 +58,8 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
         map.put("symbol",symbol);
         map.put("id",posId);
         map.put("liqStatus",liqStatus);
-        map.put("createdBegin",CommonDateUtils.stringToTimestamp(startTime));
-        map.put("createdEnd",CommonDateUtils.stringToTimestamp(endTime));
+        map.put("createdBegin",startTime);
+        map.put("createdEnd",endTime);
         List<PcPositionVo> pcPositionVos = pcPositionDAO.queryList(map);
         PageInfo<PcPositionVo> info = new PageInfo<>(pcPositionVos);
         pageResult.setList(pcPositionVos);
@@ -70,13 +70,13 @@ public class PcPositionExtendServiceImpl implements PcPositionExtendService {
     }
 
     @Override
-    public List<PcPositionVo> findActivePosition(Long userId, String asset, String symbol, String startTime, String endTime) {
+    public List<PcPositionVo> findActivePosition(Long userId, String asset, String symbol, Long startTime, Long endTime) {
         Map<String, Object> map=new HashMap<>();
         map.put("userId",userId);
         map.put("asset",asset);
         map.put("symbol",symbol);
-        map.put("createdBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("createdEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
         List<PcPositionVo> pcPositionVos = pcPositionDAO.queryActivePosition(map);
         return pcPositionVos;
     }

@@ -68,12 +68,12 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
      * @return
      */
     @Override
-    public List<CurrentPositionVo> findCurrentPosition(Long userId, String asset, String symbol, String startTime, String endTime) {
+    public List<CurrentPositionVo> findCurrentPosition(Long userId, String asset, String symbol, Long startTime, Long endTime) {
         logger.info("进入查询当前活动仓位接口，收到的参数为：userId={},asset={},symbol={},startTime={},endTime={}", userId, asset, symbol, startTime, endTime);
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || userId == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
 
@@ -85,13 +85,13 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
     }
 
     @Override
-    public PageResult<CurrentPositionVo> findPositionList(Long userId, String asset, Long posId, Integer liqStatus, String symbol, Integer pageNo, Integer pageSize, String startTime, String endTime) {
+    public PageResult<CurrentPositionVo> findPositionList(Long userId, String asset, Long posId, Integer liqStatus, String symbol, Integer pageNo, Integer pageSize, Long startTime, Long endTime) {
         logger.info("进入查询仓位列表接口，收到的参数为：userId={},asset={},symbol={},posId={},liqStatus={},pageNo={},pageSize={},startTime={},endTime={}", userId, asset, symbol, posId, liqStatus, pageNo, pageSize, startTime, endTime);
 
         if (pageNo == null || pageSize == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         PageResult<CurrentPositionVo> result = new PageResult<>();

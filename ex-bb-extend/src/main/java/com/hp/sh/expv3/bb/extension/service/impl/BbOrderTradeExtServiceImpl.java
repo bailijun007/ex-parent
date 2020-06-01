@@ -68,13 +68,13 @@ public class BbOrderTradeExtServiceImpl implements BbOrderTradeExtService {
     }
 
     @Override
-    public List<BbOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime) {
+    public List<BbOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, Long startTime, Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
         map.put("symbol", symbol);
-        map.put("tradeTimeBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("tradeTimeEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("tradeTimeBegin", startTime);
+        map.put("tradeTimeEnd", endTime);
         map.put("limit", pageSize);
         List<BbOrderTradeDetailVo> list = bbOrderTradeExtMapper.queryHistory(map);
         if (!CollectionUtils.isEmpty(list)) {

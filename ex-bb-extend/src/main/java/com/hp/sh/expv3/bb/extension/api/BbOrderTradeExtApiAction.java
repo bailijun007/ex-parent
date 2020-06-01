@@ -88,13 +88,13 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
     }
 
     @Override
-    public List<BbOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime) {
+    public List<BbOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, Long startTime, Long endTime) {
         logger.info("进入获取当前用户交易明细接口，参数为：userId={},asset={},symbol={},lastTradeId={},nextPage={},pageSize={},startTime={},endTime={}", userId, asset, symbol, lastTradeId, nextPage, pageSize, startTime, endTime);
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || pageSize == null || nextPage > 1 || nextPage < -1) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
 
-        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         List<BbOrderTradeDetailVo> list = bbOrderTradeExtService.queryHistory(userId, asset, symbol, lastTradeId, nextPage, pageSize, startTime, endTime);

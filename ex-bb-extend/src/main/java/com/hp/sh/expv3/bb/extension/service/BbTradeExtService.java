@@ -12,11 +12,11 @@ public interface BbTradeExtService {
 
     List<BbTradeVo> selectTradeListByUser(Long userId, String asset, String symbol, Long startTime, Long endTime);
 
-    List<BbTradeVo> queryTradeList(Long userId, String asset, String symbol, Integer count,String startTime,String endTime);
+    List<BbTradeVo> queryTradeList(Long userId, String asset, String symbol, Integer count,Long startTime,Long endTime);
 
     BbTradeVo queryLastTradeByLtTime(String asset, String symbol, Long startTime1);
 
-    List<BbTradeVo> queryLastTrade(String asset, String symbol, Integer count,String startTime,String endTime);
+    List<BbTradeVo> queryLastTrade(String asset, String symbol, Integer count,Long startTime,Long endTime);
 
 //    List<BbTradeVo> selectTradeListByUserId(String asset, String symbol, Long startTime, Long endTime, Long userId);
 
