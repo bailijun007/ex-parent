@@ -15,6 +15,7 @@ import com.hp.sh.expv3.pc.module.collector.entity.PcCollectorAccountRecord;
 import com.hp.sh.expv3.pc.module.liq.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.module.order.entity.PcAccountLog;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
+import com.hp.sh.expv3.pc.module.order.entity.PcOrderHistory;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
@@ -43,8 +44,8 @@ public class WorkerConfigBuilder {
 	private static final String PC_ORDER = PcOrder.class.getName();
 	private static final int PC_ORDER_ID = IdTypeEnum.PC_ORDER_ID.getValue();
 	
-//	private static final String PC_ORDER_LOG = PcOrderLog.class.getName();
-//	private static final int PC_ORDER_LOG_ID = IdTypeEnum.PC_ORDER_LOG_ID.getValue();
+	private static final String PC_ORDER_HISTORY = PcOrderHistory.class.getName();
+	private static final int PC_ORDER_HISTORY_ID = IdTypeEnum.PC_ORDER_HISTORY_ID.getValue();
 
 //	private static final String PC_ORDER_TRADE = PcOrderTrade.class.getName();
 //	private static final int PC_ORDER_TRADE_ID = IdTypeEnum.PC_ORDER_TRADE_ID.getValue();
@@ -88,7 +89,7 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, PC_ACCOUNT_SYMBOL_ID, PC_ACCOUNT_SYMBOL);
 		this.set(workerConfig, PC_LIQ_RECORD_ID, PC_LIQ_RECORD);
 		this.set(workerConfig, PC_ORDER_ID, PC_ORDER);
-//		this.set(workerConfig, PC_ORDER_LOG_ID, PC_ORDER_LOG);
+		this.set(workerConfig, PC_ORDER_HISTORY_ID, PC_ORDER_HISTORY);
 //		this.set(workerConfig, PC_ORDER_TRADE_ID, PC_ORDER_TRADE);
 		this.set(workerConfig, PC_POSITION_ID, PC_POSITION);
 //		this.set(workerConfig, PC_ACTIVE_ORDER_ID, PC_ACTIVE_ORDER);
