@@ -38,7 +38,7 @@ public interface PcOrderTradeExtendApi {
 
 
     @ApiOperation(value = "获取当前用户交易明细")
-    @GetMapping(value = "/api/extension/pc/orderTrade/queryHistory")
+    @GetMapping(value = "/api/pc/ext/orderTrade/queryHistory")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),

@@ -54,14 +54,14 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     private PcStrategyContext positionStrategyContext;
 
     @Override
-    public List<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status, String startTime, String endTime) {
+    public List<UserOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status, Long startTime, Long endTime) {
         logger.info("进入pc查询委托接口，参数为：userId={},asset={},symbol={},gtOrderId={},ltOrderId={},count={},status={},startTime={},endTime={}", userId, asset, symbol, gtOrderId, ltOrderId, count, status, startTime, endTime);
         List<UserOrderVo> result = new ArrayList<>();
         List<String> assetList = null;
         List<String> symbolList = null;
         List<Integer> statusList = null;
 
-        String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
 
@@ -92,13 +92,13 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
 
 
     @Override
-    public PageResult<UserOrderVo> queryUserActivityOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer isTotalNumber, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage, String startTime, String endTime) {
+    public PageResult<UserOrderVo> queryUserActivityOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer isTotalNumber, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage, Long startTime, Long endTime) {
         logger.info("进入获取当前用户活动委托接口，参数为：userId={},asset={},symbol={},orderType={},longFlag={},closeFlag={},isTotalNumber={},currentPage={},pageSize={},lastOrderId={},nextPage={},startTime={},endTime={}",userId,asset,symbol, orderType,longFlag,closeFlag,isTotalNumber,currentPage,pageSize,lastOrderId,nextPage,startTime,endTime);
 
         if (StringUtils.isEmpty(asset) ||StringUtils.isEmpty(symbol) || null == userId || currentPage == null || pageSize == null || nextPage == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         PageResult<UserOrderVo> result = new PageResult<>();
@@ -119,8 +119,8 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
      * @param list   最终返回的结果集
      * @param voList 需要转换的list集合
      */
-    private void convertOrderList2(List<UserOrderVo> list, List<PcOrderVo> voList, String startTime, String endTime) {
-        String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+    private void convertOrderList2(List<UserOrderVo> list, List<PcOrderVo> voList, Long startTime, Long endTime) {
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         for (PcOrderVo orderVo : voList) {
@@ -131,7 +131,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
             vo.setLongFlag(orderVo.getLongFlag());
             vo.setCtime(orderVo.getCreated());
 
-            List<PcOrderTradeVo> orderTradeVoList = pcOrderTradeService.queryOrderTrade(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymbol(), orderVo.getId() + "", CommonDateUtils.stringToTimestamp(startTime), CommonDateUtils.stringToTimestamp(endTime));
+            List<PcOrderTradeVo> orderTradeVoList = pcOrderTradeService.queryOrderTrade(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymbol(), orderVo.getId() + "", startTime, endTime);
             List<OrderTrade> ots = new ArrayList<>();
             for (PcOrderTradeVo pcOrderTradeVo : orderTradeVoList) {
                 OrderTrade ot = new OrderTrade() {
@@ -169,7 +169,7 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
      * @param userList  最终返回的结果集
      * @param orderList 需要转换的list集合
      */
-    private void convertOrderList(Long userId, String asset, String symbol, List<UserOrderVo> userList, List<PcOrderVo> orderList, String startTime, String endTime) {
+    private void convertOrderList(Long userId, String asset, String symbol, List<UserOrderVo> userList, List<PcOrderVo> orderList, Long startTime, Long endTime) {
         if (!CollectionUtils.isEmpty(orderList)) {
 
             // 获取到所有入参集合的委托Id列表，作为批量查询的入参
@@ -233,13 +233,13 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
      * @return
      */
     @Override
-    public List<UserOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage, String startTime, String endTime) {
+    public List<UserOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage, Long startTime, Long endTime) {
         logger.info("进入获取当前用户历史委托接口，参数为：userId={},asset={},symbol={},orderType={},longFlag={},closeFlag={},currentPage={},pageSize={},lastOrderId={},nextPage={},startTime={},endTime={}",userId,asset,symbol,orderType,longFlag,closeFlag,currentPage,pageSize,lastOrderId,nextPage,startTime,endTime);
 
         this.checkParam(userId, asset, currentPage, pageSize, nextPage, symbol);
         List<UserOrderVo> result = new ArrayList<>();
         PageResult<PcOrderVo> list = null;
-        String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         if (lastOrderId == null) {
@@ -269,14 +269,14 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
      * @return
      */
     @Override
-    public PageResult<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage,String startTime,String endTime) {
+    public PageResult<UserOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage,Long startTime,Long endTime) {
         logger.info("进入获取当前用户所有委托接口，参数为：userId={},asset={},symbol={},status={},longFlag={},closeFlag={},currentPage={},pageSize={},lastOrderId={},nextPage={},startTime={},endTime={}",userId,asset,symbol,status,longFlag,closeFlag,currentPage,pageSize,lastOrderId,nextPage,startTime,endTime);
 
         this.checkParam(userId, asset, currentPage, pageSize, nextPage, symbol);
         PageResult<UserOrderVo> pageResult = new PageResult<UserOrderVo>();
         List<UserOrderVo> list = new ArrayList<>();
         PageResult<PcOrderVo> voPageResult = null;
-        String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         if (lastOrderId == null) {
@@ -292,32 +292,22 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         return pageResult;
     }
 
-    private String[] getStartAndEndTime(String startTime, String endTime) {
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = getDefaultDateTime(startTime);
-            String[] split = startTime.split("-");
-            int day = Integer.parseInt(split[2]) + 1;
-            endTime = split[0] + "-" + split[1] + "-" + day;
-        }
-        String[] startAndEndTime = {startTime, endTime};
-        return startAndEndTime;
-    }
 
     @Override
-    public PageResult<UserOrderVo> pageQueryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag, Long orderId, Integer pageNo, Integer pageSize, String startTime, String endTime) {
+    public PageResult<UserOrderVo> pageQueryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag, Long orderId, Integer pageNo, Integer pageSize, Long startTime, Long endTime) {
         logger.info("进入订单列表查询(后台admin接口)，参数为：userId={},asset={},symbol={},status={},closeFlag={},pageNo={},pageSize={},startTime={},endTime={}",userId,asset,symbol,status,closeFlag,pageNo,pageSize,startTime,endTime);
 
         if (pageNo == null || pageSize == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        String[] startAndEndTime = getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
 
         PageResult<UserOrderVo> result = pcOrderExtendService.pageQueryOrderList(userId, asset, symbol, status, closeFlag, orderId, pageNo, pageSize,startTime,endTime);
         if (!CollectionUtils.isEmpty(result.getList())) {
             for (UserOrderVo orderVo : result.getList()) {
-                List<PcOrderTradeVo> orderTradeVoList = pcOrderTradeService.queryOrderTrade(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymol(), String.valueOf(orderVo.getId()), CommonDateUtils.stringToTimestamp(startTime), CommonDateUtils.stringToTimestamp(endTime));
+                List<PcOrderTradeVo> orderTradeVoList = pcOrderTradeService.queryOrderTrade(orderVo.getUserId(), orderVo.getAsset(), orderVo.getSymol(), String.valueOf(orderVo.getId()), startTime, endTime);
                 BigDecimal pnl = pcOrderTradeService.getOrderRealisedPnl(IntBool.isTrue(orderVo.getCloseFlag().intValue()), orderTradeVoList);
                 orderVo.setAvgPrice(orderVo.getTradeMeanPrice());
                 orderVo.setRealisedPnl(pnl);
@@ -350,15 +340,6 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         }
     }
 
-    private String getDefaultDateTime(String startTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDateTime dateTime = LocalDateTime.now();
-        //如果开始时间，结束时间没有值则给默认今天时间
-        if (org.springframework.util.StringUtils.isEmpty(startTime)) {
-            startTime = formatter.format(dateTime);
-        }
-        return startTime;
-    }
 
 
 }
