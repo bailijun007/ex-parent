@@ -38,8 +38,8 @@ public interface PcOrderExtendApi {
                                      @RequestParam(value = "symbol", required = true) String symbol, @RequestParam(value = "gtOrderId", required = false) Long gtOrderId,
                                      @RequestParam(value = "ltOrderId", required = false) Long ltOrderId, @RequestParam("count") Integer count,
                                      @RequestParam("status") String status,
-                                     @RequestParam(value = "startTime", required = false) String startTime,
-                                     @RequestParam(value = "endTime", required = false) String endTime);
+                                     @RequestParam(value = "startTime", required = false) Long startTime,
+                                     @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "获取当前用户活动委托")
@@ -70,8 +70,8 @@ public interface PcOrderExtendApi {
                                                    @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize,
                                                    @RequestParam(value = "lastOrderId", required = false) Long lastOrderId,
                                                    @RequestParam("nextPage") Integer nextPage,
-                                                   @RequestParam(value = "startTime", required = false) String startTime,
-                                                   @RequestParam(value = "endTime", required = false) String endTime);
+                                                   @RequestParam(value = "startTime", required = false) Long startTime,
+                                                   @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "获取当前用户历史委托")
@@ -100,8 +100,8 @@ public interface PcOrderExtendApi {
                                    @RequestParam("pageSize") Integer pageSize,
                                    @RequestParam(value = "lastOrderId", required = false) Long lastOrderId,
                                    @RequestParam("nextPage") Integer nextPage,
-                                   @RequestParam(value = "startTime", required = false) String startTime,
-                                   @RequestParam(value = "endTime", required = false) String endTime);
+                                   @RequestParam(value = "startTime", required = false) Long startTime,
+                                   @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "获取当前用户所有委托,条件查询")
@@ -130,8 +130,8 @@ public interface PcOrderExtendApi {
                                      @RequestParam("pageSize") Integer pageSize,
                                      @RequestParam("lastOrderId") Long lastOrderId,
                                      @RequestParam("nextPage") Integer nextPage,
-                                     @RequestParam(value = "startTime", required = false) String startTime,
-                                     @RequestParam(value = "endTime", required = false) String endTime);
+                                     @RequestParam(value = "startTime", required = false) Long startTime,
+                                     @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "订单列表查询(后台admin接口)")
@@ -156,8 +156,8 @@ public interface PcOrderExtendApi {
                                                @RequestParam("orderId") Long orderId,
                                                @RequestParam("pageNo") Integer pageNo,
                                                @RequestParam("pageSize") Integer pageSize,
-                                               @RequestParam(value = "startTime", required = false) String startTime,
-                                               @RequestParam(value = "endTime", required = false) String endTime);
+                                               @RequestParam(value = "startTime", required = false) Long startTime,
+                                               @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "查询当天平台实收合约手续费总计")

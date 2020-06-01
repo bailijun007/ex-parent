@@ -33,7 +33,7 @@ public interface PcOrderTradeExtendService {
      * @param orderIds
      * @return
      */
-    List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds,String startTime,String endTime);
+    List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds,Long startTime,Long endTime);
 
     List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count,Long startTime,Long endTime);
 

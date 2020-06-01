@@ -28,34 +28,34 @@ public class TestOrder {
     //接口参数asset，symbol 改成了必填，并且添加了开始时间，结束时间
     @Test
     public void queryOrderList() {
-        List<UserOrderVo> list = pcOrderExtendApiAction.queryOrderList(1L, "BTC", "BTC_USDT", null, null, 50, "32", "2020-04-20", "2020-05-22");
+        List<UserOrderVo> list = pcOrderExtendApiAction.queryOrderList(1L, "BTC", "BTC_USDT", null, null, 50, "32", null, null);
         System.out.println("list = " + list);
     }
 
     //接口参数symbol 改成了必填，并且添加了开始时间，结束时间
     @Test
     public void queryUserActivityOrder() {
-        PageResult<UserOrderVo> result = pcOrderExtendApiAction.queryUserActivityOrder(1L, "BTC", "BTC_USDT", null, null, null, null, 1, 20, null, 1, "2020-05-20", "2020-05-21");
+        PageResult<UserOrderVo> result = pcOrderExtendApiAction.queryUserActivityOrder(1L, "BTC", "BTC_USDT", null, null, null, null, 1, 20, null, 1, null, null);
         System.out.println("result = " + result.getList());
     }
 
     //添加了开始时间，结束时间
     @Test
     public void queryHistory() {
-        final List<UserOrderVo> list = pcOrderExtendApiAction.queryHistory(1L, "BTC", "BTC_USDT", null, null, null, 1, 20, null, 1, "2020-05-20", "2020-05-21");
+        final List<UserOrderVo> list = pcOrderExtendApiAction.queryHistory(1L, "BTC", "BTC_USDT", null, null, null, 1, 20, null, 1, null, null);
         System.out.println("list = " + list);
     }
 
     //添加了开始时间，结束时间
     @Test
     public void queryAll() {
-        final PageResult<UserOrderVo> result = pcOrderExtendApiAction.queryAll(1L, "BTC", "BTC_USDT", null, null, null, 1, 20, null, 1, "2020-05-20", "2020-05-21");
+        final PageResult<UserOrderVo> result = pcOrderExtendApiAction.queryAll(1L, "BTC", "BTC_USDT", null, null, null, 1, 20, null, 1, null, null);
         System.out.println("result = " + result);
     }
 
     @Test
     public void pageQueryOrderList(){
-        final PageResult<UserOrderVo> result = pcOrderExtendApiAction.pageQueryOrderList(null, "BTC", "BTC_USDT", null, null, null, 1, 20, "2020-05-20", "2020-05-21");
+        final PageResult<UserOrderVo> result = pcOrderExtendApiAction.pageQueryOrderList(null, "BTC", "BTC_USDT", null, null, null, 1, 20, null, null);
         System.out.println("result = " + result);
 
     }
