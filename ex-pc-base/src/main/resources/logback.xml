@@ -143,6 +143,7 @@
     
     <springProfile name="dev">
         <root level="INFO">
+	        <appender-ref ref="STDOUT"/>
 	        <appender-ref ref="ERROR"/>
 	        <appender-ref ref="WARN"/>
 	        <appender-ref ref="INFO"/>
