@@ -181,4 +181,11 @@ public class PcMessageExt implements UserData{
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "PcMessageExt [id=" + id + ", msgId=" + msgId + ", tags=" + tags + ", keys=" + keys + ", msgBody="
+				+ msgBody + ", errorInfo=" + errorInfo + ", userId=" + userId + ", asset=" + asset + ", symbol="
+				+ symbol + ", created=" + created + ", shardId=" + shardId + ", status=" + status + "]";
+	}
+
 }

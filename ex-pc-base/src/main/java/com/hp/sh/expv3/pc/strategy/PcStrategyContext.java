@@ -268,6 +268,9 @@ public class PcStrategyContext {
 		BigDecimal totalVp = BigDecimal.ZERO;
 		
 		for(OrderTrade trade : tradeList){
+			if(BigUtils.isZero(trade.getVolume()) || BigUtils.isZero(trade.getPrice())){
+				continue;
+			}
 			totalVol.add(trade.getVolume());
 			totalVp.add(trade.getVolume().divide(trade.getPrice(), Precision.COMMON_PRECISION, Precision.LESS));
 		}
@@ -286,6 +289,9 @@ public class PcStrategyContext {
 		HoldPosStrategy hps = this.getHoldPosStrategy(asset, symbol);
 		OrderStrategy ops = this.getOrderStrategy(asset, symbol);
 		for(OrderTrade trade : tradeList){
+			if(BigUtils.isZero(trade.getVolume()) || BigUtils.isZero(trade.getPrice())){
+				continue;
+			}
 			amount = amount.add(ops.calcAmount(trade.getVolume(), faceValue, trade.getPrice()));
 			baseValue = baseValue.add(ops.calcBaseValue(trade.getVolume(), faceValue, trade.getPrice()));
 		}
