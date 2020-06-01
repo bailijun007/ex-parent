@@ -29,9 +29,9 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
         if (count > 100) {
             throw new ExException(BbExtCommonErrorCode.MORE_THAN_MAX_ROW);
         }
-        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(null, null);
-        String startTime = startAndEndTime[0];
-        String endTime = startAndEndTime[1];
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(null, null);
+        Long startTime = startAndEndTime[0];
+        Long endTime = startAndEndTime[1];
         return bbTradeExtService.queryTradeList(userId, asset, symbol, count, startTime, endTime);
     }
 
@@ -72,9 +72,9 @@ public class BbTradeExtApiAction implements BbTradeExtApi {
         if (count > 100) {
             throw new ExException(BbExtCommonErrorCode.MORE_THAN_MAX_ROW);
         }
-        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(null, null);
-        String startTime = startAndEndTime[0];
-        String endTime = startAndEndTime[1];
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(null, null);
+        Long startTime = startAndEndTime[0];
+        Long endTime = startAndEndTime[1];
         return bbTradeExtService.queryLastTrade(asset, symbol, count,startTime,endTime);
     }
 

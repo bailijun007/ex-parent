@@ -36,11 +36,11 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
     private BbOrderExtService bbOrderExtService;
 
     @Override
-    public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, String symbol, String startTime, String endTime, Integer pageSize, Integer pageNo) {
+    public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, String symbol, Long startTime, Long endTime, Integer pageSize, Integer pageNo) {
         if (pageSize == null || pageNo == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
-        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         return bbOrderExtService.queryAllBbOrederHistory(userId, asset, symbol, startTime, endTime, pageNo, pageSize);
@@ -48,11 +48,11 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
 
 
     @Override
-    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage, String startTime, String endTime) {
+    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage, Long startTime, Long endTime) {
        logger.info("进入查询历史委托接口，收到参数为：userId={}，asset={},symbol={},bidFlag={},pageSize={},lastOrderId={},nextPage={},startTime={},endTime={}",userId,asset,symbol,bidFlag,pageSize,lastOrderId,nextPage,startTime,endTime);
         long start = System.currentTimeMillis();
         checkParam(userId, asset, symbol, pageSize, nextPage);
-        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(userId, asset, symbol, bidFlag, pageSize, lastOrderId, nextPage, startTime, endTime);
@@ -74,7 +74,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
     }
 
     @Override
-    public List<BbHistoryOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status, String startTime, String endTime) {
+    public List<BbHistoryOrderVo> queryOrderList(Long userId, String asset, String symbol, Long gtOrderId, Long ltOrderId, Integer count, String status, Long startTime, Long endTime) {
         logger.info("进入查询委托接口，收到参数为：userId={},asset={},symbol={},gtOrderId={},ltOrderId={},count={},status={},startTime={},endTime={}",userId, asset, symbol,gtOrderId,ltOrderId,count,status,startTime,endTime);
         if (null == userId || count == null) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
@@ -96,7 +96,7 @@ public class BbOrderExtApiAction implements BbOrderExtApi {
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(status)) {
             statusList = Arrays.asList(status.split(",")).stream().map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
         }
-        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        Long [] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         List<BbHistoryOrderVo> list = bbOrderExtService.queryOrderList(userId, assetList, symbolList, gtOrderId, ltOrderId, count, statusList, startTime, endTime);

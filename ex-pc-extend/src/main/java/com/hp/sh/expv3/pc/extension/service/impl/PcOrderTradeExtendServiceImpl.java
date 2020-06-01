@@ -112,15 +112,15 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count, String startTime, String endTime) {
+    public List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count, Long startTime, Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("assetList", assetList);
         map.put("symbolList", symbolList);
         map.put("gtTradeId", gtTradeId);
         map.put("ltTradeId", ltTradeId);
         map.put("limit", count);
-        map.put("tradeTimeBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("tradeTimeEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("tradeTimeBegin", startTime);
+        map.put("tradeTimeEnd", endTime);
         List<PcOrderTradeVo> voList = pcOrderTradeDAO.queryTradeRecords(map);
 
         return voList;
@@ -186,13 +186,13 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime) {
+    public List<PcOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, Long startTime, Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
         map.put("symbol", symbol);
-        map.put("tradeTimeBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("tradeTimeEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("tradeTimeBegin", startTime);
+        map.put("tradeTimeEnd", endTime);
         map.put("limit", pageSize);
         List<PcOrderTradeDetailVo> list = pcOrderTradeDAO.queryHistory(map);
         if (!CollectionUtils.isEmpty(list)) {

@@ -40,12 +40,12 @@ public class BbAccountRecordExtApiAction implements BbAccountRecordExtApi {
     private BbOrderTradeExtService bbOrderTradeExtService;
 
     @Override
-    public PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, Integer pageSize, Integer pageNo, String startTime, String endTime) {
+    public PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, Integer pageSize, Integer pageNo, Long startTime, Long endTime) {
         if (pageSize == null || pageNo == null || StringUtils.isEmpty(asset)) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
         //如果开始时间，结束时间没有值则给默认今天时间
-        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         return bbAccountRecordExtService.queryHistory(userId, asset, startTime, endTime, pageNo, pageSize);

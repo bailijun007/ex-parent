@@ -21,9 +21,9 @@ public interface PcPositionExtendService {
      */
     BigDecimal getPosMargin(Long userId, String asset);
 
-    PageResult<PcPositionVo> pageQueryPositionList(Long userId, String asset, String symbol, Long posId, Integer liqStatus, Integer pageNo, Integer pageSize, String startTime, String endTime);
+    PageResult<PcPositionVo> pageQueryPositionList(Long userId, String asset, String symbol, Long posId, Integer liqStatus, Integer pageNo, Integer pageSize, Long startTime, Long endTime);
 
-    List<PcPositionVo> findActivePosition(Long userId, String asset, String symbol, String startTime, String endTime);
+    List<PcPositionVo> findActivePosition(Long userId, String asset, String symbol, Long startTime, Long endTime);
 
     //通过用户id，资产，交易对查询均价
     BigDecimal getAvgPrice(Long userId, String asset, String symbol);

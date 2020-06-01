@@ -22,7 +22,7 @@ public interface BbOrderTradeExtService {
 
     List<BbOrderTradeVo> queryByIds(List<Long> refIds);
 
-    List<BbOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime);
+    List<BbOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, Long startTime, Long endTime);
 
 }
 

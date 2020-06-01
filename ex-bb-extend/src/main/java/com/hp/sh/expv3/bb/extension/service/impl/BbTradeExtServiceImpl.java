@@ -36,10 +36,8 @@ public class BbTradeExtServiceImpl implements BbTradeExtService {
     }
 
     @Override
-    public List<BbTradeVo> queryTradeList(Long userId, String asset, String symbol, Integer count,String startTime,String endTime) {
-        Long tradeTimeBegin = CommonDateUtils.stringToTimestamp(startTime);
-        Long tradeTimeEnd = CommonDateUtils.stringToTimestamp(endTime);
-        return bbTradeExtMapper.queryTradeList(userId,asset,symbol,count,tradeTimeBegin,tradeTimeEnd);
+    public List<BbTradeVo> queryTradeList(Long userId, String asset, String symbol, Integer count,Long startTime,Long endTime) {
+        return bbTradeExtMapper.queryTradeList(userId,asset,symbol,count,startTime,endTime);
     }
 
     @Override
@@ -50,12 +48,12 @@ public class BbTradeExtServiceImpl implements BbTradeExtService {
     }
 
     @Override
-    public List<BbTradeVo> queryLastTrade(String asset, String symbol, Integer count,String startTime,String endTime) {
+    public List<BbTradeVo> queryLastTrade(String asset, String symbol, Integer count,Long startTime,Long endTime) {
         Map<String, Object> map=new HashMap<>();
         map.put("asset",asset);
         map.put("symbol",symbol);
-        map.put("tradeTimeBegin",CommonDateUtils.stringToTimestamp(startTime));
-        map.put("tradeTimeEnd",CommonDateUtils.stringToTimestamp(endTime));
+        map.put("tradeTimeBegin",startTime);
+        map.put("tradeTimeEnd",endTime);
         map.put("orderBy","trade_time");
         map.put("limit",count);
          List<BbTradeVo> list = bbTradeExtMapper.queryLastTrade(map);

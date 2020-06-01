@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.pc.extension.util;
 
+import com.hp.sh.expv3.constant.ExpTimeZone;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -136,6 +137,17 @@ public final class CommonDateUtils {
                 endTime = endDate.format(pattern);
             }
         String[] startAndEndTime = {startTime, endTime};
+        return startAndEndTime;
+    }
+
+    public static Long[] getStartAndEndTimeByLong(Long startTime, Long endTime) {
+        if (null == startTime) {
+            LocalDate localDate = LocalDate.now();
+            startTime = localDate.atStartOfDay(ExpTimeZone.timeZone.toZoneId()).toInstant().toEpochMilli();
+            LocalDate plusDays = localDate.plusDays(1);
+            endTime = plusDays.atStartOfDay(ExpTimeZone.timeZone.toZoneId()).toInstant().toEpochMilli();
+        }
+        Long[] startAndEndTime = {startTime, endTime};
         return startAndEndTime;
     }
 
