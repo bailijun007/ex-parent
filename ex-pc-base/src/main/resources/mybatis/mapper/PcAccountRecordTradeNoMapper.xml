@@ -23,7 +23,7 @@
 	<sql id="simple_query" >
 		select
 			<include refid="Base_Column_List" />
-		from bb_account_record_trade_no
+		from pc_account_record_trade_no
 			<include refid="simple_where" />
 		<if test="orderBy!=null and orderBy!=''">
 			order by ${orderBy} <if test="!asc">desc</if>
@@ -53,19 +53,19 @@
 				count(1)
 			</otherwise>
 		</choose>
-		from bb_account_record_trade_no
+		from pc_account_record_trade_no
 		<include refid="simple_where" />
 	</select>
 
 	<select id="findById" resultMap="PcAccountRecordTradeNo">
 		select
 			<include refid="Base_Column_List" />
-		from bb_account_record_trade_no
+		from pc_account_record_trade_no
 			where id=#{id}
 	</select>
 
 	<insert id="save">
-		insert into bb_account_record_trade_no (
+		insert into pc_account_record_trade_no (
 			trade_no,record_id,tx_id
 		)values(
 			#{tradeNo},#{recordId},#{txId}
@@ -77,7 +77,7 @@
 	<select id="findByTradeNo" resultMap="PcAccountRecordTradeNo">
 		select
 			<include refid="Base_Column_List" />
-		from bb_account_record_trade_no
+		from pc_account_record_trade_no
 			where trade_no=#{tradeNo}
 	</select>
 	
