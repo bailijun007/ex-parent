@@ -19,7 +19,12 @@ public class CreateTableJob {
 	private ShardTableService shardTableService;
 	
 	@Scheduled(cron = "0 0 11 20 * ?")
-	public void handle() {
+	public void handle1() {
+		shardTableService.createNextMonthTables();
+	}
+	
+	@Scheduled(cron = "0 0 11 28 * ?")
+	public void handle2() {
 		shardTableService.createNextMonthTables();
 	}
 
