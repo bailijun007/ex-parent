@@ -20,9 +20,9 @@ public interface PcOrderExtendService {
 
     PageResult<PcOrderVo> queryAllOrders(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber,Long startTime,Long endTime);
 
-    PageResult<PcOrderVo> queryHistoryOrders(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, Long startTime, Long endTime);
+    PageResult<PcOrderVo> queryHistoryOrders(Long userId, String asset, List<String> symbolList, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, Long startTime, Long endTime);
 
-    List<PcOrderVo> queryHistory(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, Long startTime, Long endTime);
+    List<PcOrderVo> queryHistory(Long userId, String asset, List<String> symbolList, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, Long startTime, Long endTime);
 
     PcOrderVo getPcOrder(Long orderId, String asset, String symbol,  Long startTime,  Long endTime);
 
@@ -35,7 +35,7 @@ public interface PcOrderExtendService {
 
     PageResult<PcOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, Integer isPageYes,Long startTime,Long endTime);
 
-    PageResult<PcOrderVo> queryActivityOrder(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber,Long startTime,Long endTime);
+    PageResult<PcOrderVo> queryActivityOrder(Long userId, String asset, List<String> symbolList, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber,Long startTime,Long endTime);
 
     BigDecimal queryTotalFee(Long startTime, Long endTime, String asset, String symbol);
 

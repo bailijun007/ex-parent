@@ -37,6 +37,37 @@ public class PcContractVO {
         return asset;
     }
 
+    @Override
+    public String toString() {
+        return "PcContractVO{" +
+                "asset='" + asset + '\'' +
+                ", baseCurrency='" + baseCurrency + '\'' +
+                ", contractGroup=" + contractGroup +
+                ", contractName='" + contractName + '\'' +
+                ", contractNameSplit='" + contractNameSplit + '\'' +
+                ", contractType=" + contractType +
+                ", ctime=" + ctime +
+                ", defaultPrice=" + defaultPrice +
+                ", displayName='" + displayName + '\'' +
+                ", displayNameSplit='" + displayNameSplit + '\'' +
+                ", faceCurrency='" + faceCurrency + '\'' +
+                ", faceValue=" + faceValue +
+                ", id=" + id +
+                ", lastPrice=" + lastPrice +
+                ", mtime=" + mtime +
+                ", precision=" + precision +
+                ", privilege=" + privilege +
+                ", quoteCurrency='" + quoteCurrency + '\'' +
+                ", settleCurrency='" + settleCurrency + '\'' +
+                ", settlePrice=" + settlePrice +
+                ", sort=" + sort +
+                ", status=" + status +
+                ", step=" + step +
+                ", symbol='" + symbol + '\'' +
+                ", symbolType=" + symbolType +
+                '}';
+    }
+
     public void setAsset(String asset) {
         this.asset = asset;
     }

@@ -75,11 +75,12 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds, Long startTime, Long endTime) {
+    public List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, List<String> symbolList, List<Long> orderIds, Long startTime, Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("symbol", symbol);
+//        map.put("symbol", symbol);
+        map.put("symbolList", symbolList);
         map.put("orderIds", orderIds);
         map.put("tradeTimeBegin", startTime);
         map.put("tradeTimeEnd", endTime);

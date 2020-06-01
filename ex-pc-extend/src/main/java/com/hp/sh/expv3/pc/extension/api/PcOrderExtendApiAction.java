@@ -1,8 +1,10 @@
 package com.hp.sh.expv3.pc.extension.api;
 
+import com.alibaba.fastjson.JSON;
 import com.gitee.hupadev.base.api.PageResult;
 import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.dev.CrossDB;
+import com.hp.sh.expv3.pc.constant.RedisKey;
 import com.hp.sh.expv3.pc.extension.constant.ExtCommonConstant;
 import com.hp.sh.expv3.pc.extension.error.PcCommonErrorCode;
 import com.hp.sh.expv3.pc.extension.service.PcOrderExtendService;
@@ -10,6 +12,7 @@ import com.hp.sh.expv3.pc.extension.service.PcOrderTradeExtendService;
 import com.hp.sh.expv3.pc.extension.service.PcPositionExtendService;
 import com.hp.sh.expv3.pc.extension.service.impl.PcAccountExtendServiceImpl;
 import com.hp.sh.expv3.pc.extension.util.CommonDateUtils;
+import com.hp.sh.expv3.pc.extension.vo.PcContractVO;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderTradeVo;
 import com.hp.sh.expv3.pc.extension.vo.PcOrderVo;
 import com.hp.sh.expv3.pc.extension.vo.UserOrderVo;
@@ -22,9 +25,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,6 +44,9 @@ import java.util.stream.Collectors;
 @RestController
 public class PcOrderExtendApiAction implements PcOrderExtendApi {
     private static final Logger logger = LoggerFactory.getLogger(PcOrderExtendApiAction.class);
+
+    @Resource(name = "templateDB0")
+    private StringRedisTemplate templateDB0;
 
     @Autowired
     private PcAccountExtendServiceImpl pcAccountExtendService;
@@ -95,16 +105,22 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     public PageResult<UserOrderVo> queryUserActivityOrder(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer isTotalNumber, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage, Long startTime, Long endTime) {
         logger.info("进入获取当前用户活动委托接口，参数为：userId={},asset={},symbol={},orderType={},longFlag={},closeFlag={},isTotalNumber={},currentPage={},pageSize={},lastOrderId={},nextPage={},startTime={},endTime={}",userId,asset,symbol, orderType,longFlag,closeFlag,isTotalNumber,currentPage,pageSize,lastOrderId,nextPage,startTime,endTime);
 
-        if (StringUtils.isEmpty(asset) ||StringUtils.isEmpty(symbol) || null == userId || currentPage == null || pageSize == null || nextPage == null) {
+        if (StringUtils.isEmpty(asset) || null == userId || currentPage == null || pageSize == null || nextPage == null) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
+        List<String> symbolList =new ArrayList<>();
+        if(StringUtils.isEmpty(symbol)){
+            symbolList = getAllSymbols();
+        }else {
+            symbolList.add(symbol);
         }
         Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         PageResult<UserOrderVo> result = new PageResult<>();
         List<UserOrderVo> list = new ArrayList<>();
-        PageResult<PcOrderVo> voList = pcOrderExtendService.queryActivityOrder(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber, startTime, endTime);
-        convertOrderList(userId, asset, symbol, list, voList.getList(),startTime,endTime);
+        PageResult<PcOrderVo> voList = pcOrderExtendService.queryActivityOrder(userId, asset, symbolList, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, isTotalNumber, startTime, endTime);
+        convertOrderList(userId, asset, symbolList, list, voList.getList(),startTime,endTime);
 
         result.setList(list);
         result.setRowTotal(voList.getRowTotal());
@@ -169,14 +185,14 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
      * @param userList  最终返回的结果集
      * @param orderList 需要转换的list集合
      */
-    private void convertOrderList(Long userId, String asset, String symbol, List<UserOrderVo> userList, List<PcOrderVo> orderList, Long startTime, Long endTime) {
+    private void convertOrderList(Long userId, String asset, List<String> symbolList, List<UserOrderVo> userList, List<PcOrderVo> orderList, Long startTime, Long endTime) {
         if (!CollectionUtils.isEmpty(orderList)) {
 
             // 获取到所有入参集合的委托Id列表，作为批量查询的入参
             List<Long> orderIds = orderList.stream().map(PcOrderVo::getId).collect(Collectors.toList());
 
             // 查询多个委托对应的成交记录(order trade)
-            List<PcOrderTradeVo> orderTradeList = pcOrderTradeService.listOrderTrade(userId, asset, symbol, orderIds,startTime,endTime);
+            List<PcOrderTradeVo> orderTradeList = pcOrderTradeService.listOrderTrade(userId, asset, symbolList, orderIds,startTime,endTime);
 
             Map<Long, List<PcOrderTradeVo>> orderId2OrderTradeList = new HashMap<>();
 
@@ -235,19 +251,28 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
     @Override
     public List<UserOrderVo> queryHistory(Long userId, String asset, String symbol, Integer orderType, Integer longFlag, Integer closeFlag, Integer currentPage, Integer pageSize, Long lastOrderId, Integer nextPage, Long startTime, Long endTime) {
         logger.info("进入获取当前用户历史委托接口，参数为：userId={},asset={},symbol={},orderType={},longFlag={},closeFlag={},currentPage={},pageSize={},lastOrderId={},nextPage={},startTime={},endTime={}",userId,asset,symbol,orderType,longFlag,closeFlag,currentPage,pageSize,lastOrderId,nextPage,startTime,endTime);
-
-        this.checkParam(userId, asset, currentPage, pageSize, nextPage, symbol);
+        if (StringUtils.isEmpty(asset) || null == userId || currentPage == null || pageSize == null || nextPage == null) {
+            throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
+        }
         List<UserOrderVo> result = new ArrayList<>();
         PageResult<PcOrderVo> list = null;
         Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
+
+        List<String> symbolList =new ArrayList<>();
+        if(StringUtils.isEmpty(symbol)){
+            symbolList = getAllSymbols();
+        }else {
+            symbolList.add(symbol);
+        }
+
         if (lastOrderId == null) {
-            List<PcOrderVo> voList = pcOrderExtendService.queryHistory(userId, asset, symbol, orderType, longFlag, closeFlag, null, pageSize, startTime, endTime);
-            convertOrderList(userId, asset, symbol, result, voList,startTime,endTime);
+            List<PcOrderVo> voList = pcOrderExtendService.queryHistory(userId, asset, symbolList, orderType, longFlag, closeFlag, null, pageSize, startTime, endTime);
+            convertOrderList(userId, asset, symbolList, result, voList,startTime,endTime);
         } else {
-            list = pcOrderExtendService.queryHistoryOrders(userId, asset, symbol, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, null, startTime, endTime);
-            convertOrderList(userId, asset, symbol, result, list.getList(),startTime,endTime);
+            list = pcOrderExtendService.queryHistoryOrders(userId, asset, symbolList, orderType, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, null, startTime, endTime);
+            convertOrderList(userId, asset, symbolList, result, list.getList(),startTime,endTime);
         }
         return result;
     }
@@ -284,7 +309,10 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         } else {
             voPageResult = pcOrderExtendService.queryAllOrders(userId, asset, symbol, status, longFlag, closeFlag, lastOrderId, currentPage, pageSize, nextPage, ExtCommonConstant.IS_PAGE_YES,startTime,endTime);
         }
-        convertOrderList(userId, asset, symbol, list, voPageResult.getList(),startTime,endTime);
+
+        List<String> symbolList =new ArrayList<>();
+        symbolList.add(symbol);
+        convertOrderList(userId, asset, symbolList, list, voPageResult.getList(),startTime,endTime);
         pageResult.setList(list);
         pageResult.setRowTotal(voPageResult.getRowTotal());
         pageResult.setPageNo(currentPage);
@@ -340,6 +368,17 @@ public class PcOrderExtendApiAction implements PcOrderExtendApi {
         }
     }
 
+    private List<String> getAllSymbols() {
+        Cursor<Map.Entry<Object, Object>> curosr = templateDB0.opsForHash().scan(RedisKey.PC_CONTRACT, ScanOptions.NONE);
+        List<String> list = new ArrayList<>();
+        while (curosr.hasNext()) {
+            Map.Entry<Object, Object> entry = curosr.next();
+            Object o = entry.getValue();
+            PcContractVO pcContractVO = JSON.parseObject(o.toString(), PcContractVO.class);
+            list.add(pcContractVO.getSymbol());
+        }
 
+        return list;
+    }
 
 }
