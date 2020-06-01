@@ -291,14 +291,12 @@
 
     <select id="getLockAsset" resultType="java.math.BigDecimal">
      SELECT
-		sum(o.fee+o.order_margin)
+		sum(fee+order_margin)
 		FROM
-			bb_active_order ao
-		LEFT JOIN
-			bb_order o ON o.id = ao.id
+			bb_order
 		where
-			ao.user_id=#{userId}
-            and o.order_margin_currency=#{asset}
+			user_id=#{userId}
+            and order_margin_currency=#{asset}
     </select>
 
     <select id="queryBbActiveOrders" resultMap="BbOrderVo">
