@@ -18,7 +18,7 @@ public class CreateTableJob {
 	@Autowired
 	private ShardTableService shardTableService;
 	
-	@Scheduled(cron = "0 0 11 20 * ?")
+	@Scheduled(cron = "0 0 11 25 * ?")
 	public void handle1() {
 		shardTableService.createNextMonthTables();
 	}
