@@ -23,7 +23,7 @@
 	<sql id="simple_query" >
 		select
 			<include refid="Base_Column_List" />
-		from bb_order_trade_sn
+		from pc_order_trade_sn
 			<include refid="simple_where" />
 		<if test="orderBy!=null and orderBy!=''">
 			order by ${orderBy} <if test="!asc">desc</if>
@@ -53,14 +53,14 @@
 				count(1)
 			</otherwise>
 		</choose>
-		from bb_order_trade_sn
+		from pc_order_trade_sn
 		<include refid="simple_where" />
 	</select>
 
 	<select id="findById" resultMap="PcOrderTradeSn">
 		select
 			<include refid="Base_Column_List" />
-		from bb_order_trade_sn
+		from pc_order_trade_sn
 			where id=#{id}
 	</select>
 
@@ -69,7 +69,7 @@
 			select 
 				1
 			from 
-				bb_order_trade_sn
+				pc_order_trade_sn
 			where 
 				trade_sn=#{tradeSn}
 			limit 1
@@ -77,7 +77,7 @@
 	</select>
 
 	<insert id="save">
-		insert into bb_order_trade_sn (
+		insert into pc_order_trade_sn (
 			trade_sn,id,tx_id
 		)values(
 			#{tradeSn},#{id},#{txId}
