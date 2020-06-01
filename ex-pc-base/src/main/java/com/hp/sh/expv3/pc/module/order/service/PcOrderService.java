@@ -274,6 +274,8 @@ public class PcOrderService {
 		
 		///////////其他///
 		pcOrder.setCancelVolume(BigDecimal.ZERO);
+		
+		pcOrder.setTradeMeanPrice(BigDecimal.ZERO);
 	}
 	
 	private void cutBalance(Long userId, String asset, Long orderId, BigDecimal amount, int longFlag){

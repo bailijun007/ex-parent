@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExSysException;
-import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.component.dbshard.impl.TradeId2DateShard;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
