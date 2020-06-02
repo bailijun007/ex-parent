@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : localhost
-Source Server Version : 50722
-Source Host           : localhost:3306
-Source Database       : expv3_pc
+Source Server         : 192.168.0.190-ex
+Source Server Version : 50726
+Source Host           : 192.168.0.190:3306
+Source Database       : expv3_shard
 
 Target Server Type    : MYSQL
 Target Server Version : 50599
 File Encoding         : 65001
 
-Date: 2020-05-22 15:14:18
+Date: 2020-06-02 15:50:00
 */
 
 SET FOREIGN_KEY_CHECKS=0;
