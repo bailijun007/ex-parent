@@ -159,7 +159,7 @@ DROP TABLE IF EXISTS `bb_message_ext`;
 CREATE TABLE `bb_message_ext` (
   `id` bigint(20) NOT NULL,
   `msg_id` varchar(64) NOT NULL,
-  `tags` varchar(40) NOT NULL,
+  `tags` varchar(50) NOT NULL,
   `keys` varchar(64) NOT NULL,
   `msg_body` varchar(2000) NOT NULL,
   `error_info` varchar(3000) DEFAULT NULL COMMENT '异常信息',
