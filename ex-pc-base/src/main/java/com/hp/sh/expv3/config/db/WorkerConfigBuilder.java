@@ -16,54 +16,54 @@ import com.hp.sh.expv3.pc.module.liq.entity.PcLiqRecord;
 import com.hp.sh.expv3.pc.module.order.entity.PcAccountLog;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrderHistory;
-import com.hp.sh.expv3.pc.module.order.entity.PcOrderTrade;
 import com.hp.sh.expv3.pc.module.position.entity.PcPosition;
+import com.hp.sh.expv3.pc.module.position.entity.PcPositionHistory;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
 
 @Component
 public class WorkerConfigBuilder {
 	
-	public static final String TX = "tx";
-	private static final int TX_ID = IdTypeEnum.PC_TX_ID.getValue();
+	public static final String  TX = "tx";
+	private static final int 	TX_ID = IdTypeEnum.PC_TX_ID.getValue();
 	
 	private static final String PC_ACCOUNT = PcAccount.class.getName();
-	private static final int PC_ACCOUNT_ID = IdTypeEnum.PC_ACCOUNT_ID.getValue();
+	private static final int 	PC_ACCOUNT_ID = IdTypeEnum.PC_ACCOUNT_ID.getValue();
 
 	private static final String PC_ACCOUNT_LOG = PcAccountLog.class.getName();
-	private static final int PC_ACCOUNT_LOG_ID = IdTypeEnum.PC_ACCOUNT_LOG_ID.getValue();
+	private static final int 	PC_ACCOUNT_LOG_ID = IdTypeEnum.PC_ACCOUNT_LOG_ID.getValue();
 
 	private static final String PC_ACCOUNT_RECORD = PcAccountRecord.class.getName();
-	private static final int PC_ACCOUNT_RECORD_ID = IdTypeEnum.PC_ACCOUNT_RECORD_ID.getValue();
+	private static final int 	PC_ACCOUNT_RECORD_ID = IdTypeEnum.PC_ACCOUNT_RECORD_ID.getValue();
 
 	private static final String PC_ACCOUNT_SYMBOL = PcAccountSymbol.class.getName();
-	private static final int PC_ACCOUNT_SYMBOL_ID = IdTypeEnum.PC_ACCOUNT_SYMBOL_ID.getValue();
+	private static final int 	PC_ACCOUNT_SYMBOL_ID = IdTypeEnum.PC_ACCOUNT_SYMBOL_ID.getValue();
 
 	private static final String PC_LIQ_RECORD = PcLiqRecord.class.getName();
-	private static final int PC_LIQ_RECORD_ID = IdTypeEnum.PC_LIQ_RECORD_ID.getValue();
+	private static final int 	PC_LIQ_RECORD_ID = IdTypeEnum.PC_LIQ_RECORD_ID.getValue();
 
 	private static final String PC_ORDER = PcOrder.class.getName();
-	private static final int PC_ORDER_ID = IdTypeEnum.PC_ORDER_ID.getValue();
+	private static final int 	PC_ORDER_ID = IdTypeEnum.PC_ORDER_ID.getValue();
 	
 	private static final String PC_ORDER_HISTORY = PcOrderHistory.class.getName();
-	private static final int PC_ORDER_HISTORY_ID = IdTypeEnum.PC_ORDER_HISTORY_ID.getValue();
+	private static final int 	PC_ORDER_HISTORY_ID = IdTypeEnum.PC_ORDER_HISTORY_ID.getValue();
 
 //	private static final String PC_ORDER_TRADE = PcOrderTrade.class.getName();
 //	private static final int PC_ORDER_TRADE_ID = IdTypeEnum.PC_ORDER_TRADE_ID.getValue();
 
 	private static final String PC_POSITION = PcPosition.class.getName();
-	private static final int PC_POSITION_ID = IdTypeEnum.PC_POSITION_ID.getValue();
+	private static final int 	PC_POSITION_ID = IdTypeEnum.PC_POSITION_ID.getValue();
 	
-//	private static final String PC_ACTIVE_ORDER = PcActiveOrder.class.getName();
-//	private static final int PC_ACTIVE_ORDER_ID = IdTypeEnum.PC_ACTIVE_ORDER_ID.getValue();
+	private static final String PC_POSITION_HISTORY = PcPositionHistory.class.getName();
+	private static final int 	PC_POSITION_HISTORY_ID = IdTypeEnum.PC_POSITION_HISTORY_ID.getValue();
 	
 //	private static final String PC_ACTIVE_POSITION = PcActivePosition.class.getName();
-//	private static final int PC_ACTIVE_POSITION_ID = IdTypeEnum.PC_ACTIVE_POSITION_ID.getValue();
+//	private static final int 	PC_ACTIVE_POSITION_ID = IdTypeEnum.PC_ACTIVE_POSITION_ID.getValue();
 	
 	private static final String PC_COLLECTOR_ACCOUNT_RECORD = PcCollectorAccountRecord.class.getName();
-	private static final int PC_COLLECTOR_ACCOUNT_RECORD_ID = IdTypeEnum.PC_COLLECTOR_ACCOUNT_RECORD_ID.getValue();
+	private static final int 	PC_COLLECTOR_ACCOUNT_RECORD_ID = IdTypeEnum.PC_COLLECTOR_ACCOUNT_RECORD_ID.getValue();
 	
 //	private static final String PC_MESSAGE_EXT = PcMessageExt.class.getName();
-//	private static final int PC_MESSAGE_EXT_ID = IdTypeEnum.PC_MESSAGE_EXT_ID.getValue();
+//	private static final int 	PC_MESSAGE_EXT_ID = IdTypeEnum.PC_MESSAGE_EXT_ID.getValue();
 	
 	@Value("${id.generator.dataCenterId}")
 	private int dataCenterId;
@@ -90,7 +90,7 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, PC_LIQ_RECORD_ID, PC_LIQ_RECORD);
 		this.set(workerConfig, PC_ORDER_ID, PC_ORDER);
 		this.set(workerConfig, PC_ORDER_HISTORY_ID, PC_ORDER_HISTORY);
-//		this.set(workerConfig, PC_ORDER_TRADE_ID, PC_ORDER_TRADE);
+		this.set(workerConfig, PC_POSITION_HISTORY_ID, PC_POSITION_HISTORY);
 		this.set(workerConfig, PC_POSITION_ID, PC_POSITION);
 //		this.set(workerConfig, PC_ACTIVE_ORDER_ID, PC_ACTIVE_ORDER);
 //		this.set(workerConfig, PC_ACTIVE_POSITION_ID, PC_ACTIVE_POSITION);

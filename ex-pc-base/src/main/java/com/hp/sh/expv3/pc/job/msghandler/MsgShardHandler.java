@@ -22,6 +22,7 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.component.lock.impl.RedissonDistributedLocker;
 import com.hp.sh.expv3.pc.constant.MqTags;
+import com.hp.sh.expv3.pc.module.liq.service.PcLiqService;
 import com.hp.sh.expv3.pc.module.msg.entity.PcMessageExt;
 import com.hp.sh.expv3.pc.module.msg.service.PcMessageExtService;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
@@ -29,6 +30,7 @@ import com.hp.sh.expv3.pc.module.position.service.PcTradeService;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcNotMatchedMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcCancelledMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcTradeMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.liq.LiqCancelledMsg;
 
 @Component
 public class MsgShardHandler {
@@ -39,6 +41,9 @@ public class MsgShardHandler {
 	
 	@Autowired
 	private PcOrderService orderService;
+	
+    @Autowired
+    private PcLiqService pcLiqService;
 	
 	@Autowired
 	private PcMessageExtService msgService;
@@ -158,14 +163,21 @@ public class MsgShardHandler {
 	
 	private void handleMsg(PcMessageExt msgExt){
 		if(msgExt.getTags().equals(MqTags.TAGS_TRADE)){
+			
 			PcTradeMsg tradeMsg = JsonUtils.toObject(msgExt.getMsgBody(), PcTradeMsg.class);
 			this.tradeService.handleTradeOrder(tradeMsg);
 		}else if(msgExt.getTags().equals(MqTags.TAGS_CANCELLED)){
+			
 			PcCancelledMsg cancelMsg = JsonUtils.toObject(msgExt.getMsgBody(), PcCancelledMsg.class);
 			this.orderService.setCancelled(cancelMsg.getAccountId(), cancelMsg.getAsset(), cancelMsg.getSymbol(), cancelMsg.getOrderId(), cancelMsg.getCancelNumber());
 		}else if(msgExt.getTags().equals(MqTags.TAGS_NOT_MATCHED)){
+			
 			PcNotMatchedMsg cancelMsg = JsonUtils.toObject(msgExt.getMsgBody(), PcNotMatchedMsg.class);
 			orderService.setNewStatus(cancelMsg.getAccountId(), cancelMsg.getAsset(), cancelMsg.getSymbol(), cancelMsg.getOrderId());
+		}else if(msgExt.getTags().equals(MqTags.TAGS_ORDER_ALL_CANCELLED)){
+			
+			LiqCancelledMsg msg = JsonUtils.toObject(msgExt.getMsgBody(), LiqCancelledMsg.class);
+			pcLiqService.cancelCloseOrder(msg.getAccountId(), msg.getAsset(), msg.getSymbol(), msg.getLongFlag(), msg.getPosId(), msg.getCancelOrders(), msg.getLastFlag(), msg.getLiqMarkPrice());
 		}else{
 			throw new RuntimeException("位置的tag类型!!! : " + msgExt.getTags());
 		}

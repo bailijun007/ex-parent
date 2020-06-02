@@ -28,6 +28,8 @@ public class LiqCancelledMsg extends BaseSymbolMsg{
     
     private List<CancelOrder> cancelOrders;
     
+    private Long seqId;
+    
 	public LiqCancelledMsg() {
 		super();
 	}
@@ -86,6 +88,14 @@ public class LiqCancelledMsg extends BaseSymbolMsg{
 
 	public void setLiqMarkTime(Long liqMarkTime) {
 		this.liqMarkTime = liqMarkTime;
+	}
+
+	public Long getSeqId() {
+		return seqId;
+	}
+
+	public void setSeqId(Long seqId) {
+		this.seqId = seqId;
 	}
 
 	@Override

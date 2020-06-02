@@ -13,6 +13,7 @@ import com.hp.sh.expv3.pc.module.msg.service.PcMessageExtService;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcCancelledMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcNotMatchedMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcTradeMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.liq.LiqCancelledMsg;
 import com.hp.sh.rocketmq.annotation.MQListener;
 
 @Component
@@ -68,6 +69,24 @@ public class MatchMqConsumer4Persist {
 		logger.info("收到用户成交消息:{}", msg);
 		try{
 			PcMessageExt entity = msgService.saveTradeMsg(MqTags.TAGS_TRADE, msg, null);
+			this.triggerShardThread(entity.getShardId());
+		}catch(Exception e){
+			String s = e.getMessage();
+			if(s!=null && s.contains("Duplicate entry")){
+				if(msgService.existMsgId(msg.getAccountId(), msg.getMsgId())){
+					return;
+				}
+			}
+			throw e;
+		}
+	}
+	
+	//强平取消
+	@MQListener(tags = MqTags.TAGS_ORDER_ALL_CANCELLED)
+	public void handleLiqCancelledMsg(LiqCancelledMsg msg){
+		logger.warn("收到强平撤销消息:{}", msg);
+		try{
+			PcMessageExt entity = msgService.saveLiqCancel(MqTags.TAGS_ORDER_ALL_CANCELLED, msg, null);
 			this.triggerShardThread(entity.getShardId());
 		}catch(Exception e){
 			String s = e.getMessage();
