@@ -79,7 +79,7 @@ public final class CommonDateUtils {
      * @return
      */
     public static Long localDateToTimestamp(LocalDate localDate) {
-        return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return localDate.atStartOfDay(ExpTimeZone.timeZone.toZoneId()).toInstant().toEpochMilli();
     }
 
     /**
@@ -88,9 +88,9 @@ public final class CommonDateUtils {
      * @param localDateTime
      * @return
      */
-    public static Long localDateTimeToTimestamp(LocalDateTime localDateTime) {
-        return localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
-    }
+//    public static Long localDateTimeToTimestamp(LocalDateTime localDateTime) {
+//        return localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+//    }
 
     /**
      * 判断是否是日期

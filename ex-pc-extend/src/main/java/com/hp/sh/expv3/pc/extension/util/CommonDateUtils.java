@@ -54,7 +54,7 @@ public final class CommonDateUtils {
     public static Long stringToTimestamp(String str) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate startLdt = LocalDate.parse(str, dtf);
-        Long begin = startLdt.atStartOfDay(ZoneOffset.systemDefault()).toInstant().toEpochMilli();
+        Long begin = startLdt.atStartOfDay(ExpTimeZone.timeZone.toZoneId()).toInstant().toEpochMilli();
         return begin;
     }
 
@@ -67,7 +67,7 @@ public final class CommonDateUtils {
      */
     public static String timestampToString(Long timestamp) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate beginDate = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate beginDate = Instant.ofEpochMilli(timestamp).atZone(ExpTimeZone.timeZone.toZoneId()).toLocalDate();
         return dtf.format(beginDate);
     }
 
@@ -78,7 +78,7 @@ public final class CommonDateUtils {
      * @return
      */
     public static Long localDateToTimestamp(LocalDate localDate) {
-        return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return localDate.atStartOfDay(ExpTimeZone.timeZone.toZoneId()).toInstant().toEpochMilli();
     }
 
     /**
@@ -87,9 +87,9 @@ public final class CommonDateUtils {
      * @param localDateTime
      * @return
      */
-    public static Long localDateTimeToTimestamp(LocalDateTime localDateTime) {
-        return localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
-    }
+//    public static Long localDateTimeToTimestamp(LocalDateTime localDateTime) {
+//        return localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+//    }
 
     public static String getDefaultDateTime(String startTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
