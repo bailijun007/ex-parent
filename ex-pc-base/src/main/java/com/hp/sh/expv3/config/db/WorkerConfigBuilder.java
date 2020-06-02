@@ -47,17 +47,11 @@ public class WorkerConfigBuilder {
 	private static final String PC_ORDER_HISTORY = PcOrderHistory.class.getName();
 	private static final int 	PC_ORDER_HISTORY_ID = IdTypeEnum.PC_ORDER_HISTORY_ID.getValue();
 
-//	private static final String PC_ORDER_TRADE = PcOrderTrade.class.getName();
-//	private static final int PC_ORDER_TRADE_ID = IdTypeEnum.PC_ORDER_TRADE_ID.getValue();
-
 	private static final String PC_POSITION = PcPosition.class.getName();
 	private static final int 	PC_POSITION_ID = IdTypeEnum.PC_POSITION_ID.getValue();
 	
 	private static final String PC_POSITION_HISTORY = PcPositionHistory.class.getName();
 	private static final int 	PC_POSITION_HISTORY_ID = IdTypeEnum.PC_POSITION_HISTORY_ID.getValue();
-	
-//	private static final String PC_ACTIVE_POSITION = PcActivePosition.class.getName();
-//	private static final int 	PC_ACTIVE_POSITION_ID = IdTypeEnum.PC_ACTIVE_POSITION_ID.getValue();
 	
 	private static final String PC_COLLECTOR_ACCOUNT_RECORD = PcCollectorAccountRecord.class.getName();
 	private static final int 	PC_COLLECTOR_ACCOUNT_RECORD_ID = IdTypeEnum.PC_COLLECTOR_ACCOUNT_RECORD_ID.getValue();
@@ -92,8 +86,6 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, PC_ORDER_HISTORY_ID, PC_ORDER_HISTORY);
 		this.set(workerConfig, PC_POSITION_HISTORY_ID, PC_POSITION_HISTORY);
 		this.set(workerConfig, PC_POSITION_ID, PC_POSITION);
-//		this.set(workerConfig, PC_ACTIVE_ORDER_ID, PC_ACTIVE_ORDER);
-//		this.set(workerConfig, PC_ACTIVE_POSITION_ID, PC_ACTIVE_POSITION);
 		this.set(workerConfig, PC_COLLECTOR_ACCOUNT_RECORD_ID, PC_COLLECTOR_ACCOUNT_RECORD);
 //		this.set(workerConfig, PC_MESSAGE_EXT_ID, PC_MESSAGE_EXT);
 	}
