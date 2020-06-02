@@ -3,7 +3,7 @@
 <configuration scan="false">
     <property name="maxHistory" value="60"/>
     
-    <property name="log_dir" value="/data/hupa/logs/extend"></property>
+    <property name="log_dir" value="/data/expv3/logs/extend"></property>
 
     <!-- ConsoleAppender 控制台输出日志 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
