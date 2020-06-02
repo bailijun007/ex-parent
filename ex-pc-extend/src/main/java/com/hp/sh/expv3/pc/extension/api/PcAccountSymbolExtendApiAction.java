@@ -51,7 +51,7 @@ public class PcAccountSymbolExtendApiAction implements PcAccountSymbolExtendApi 
         }else {
         	BigDecimal maxLeverage = metadataService.getMaxLeverage(userId, asset, symbol, BigDecimal.ZERO);
         	if(maxLeverage==null){
-        		maxLeverage = new BigDecimal(49);
+        		maxLeverage = new BigDecimal("49.9");
         	}
         	
             result.setCrossMaxLeverage(maxLeverage);
