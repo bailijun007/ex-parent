@@ -35,7 +35,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(tags="BYS充值回掉接口GET请求")
 @RestController
-@RequestMapping("/callback/bys")
+@RequestMapping("/callback/bys/get")
 public class BysCallbackAction4Get extends BaseApiAction{
 	private static final Logger logger = LoggerFactory.getLogger(BysCallbackAction4Get.class);
 
