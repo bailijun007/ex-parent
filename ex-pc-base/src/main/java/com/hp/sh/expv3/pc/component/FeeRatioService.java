@@ -47,8 +47,5 @@ public interface FeeRatioService {
 	 */
 	BigDecimal getHoldRatio(Long userId, String asset, String symbol, BigDecimal volume);
 
-	default BigDecimal getMaxLeverage(Long userId, String asset, String symbol, BigDecimal posVolume){
-		return new BigDecimal(50);
-	}
 
 }

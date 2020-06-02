@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hp.sh.expv3.pc.component.FeeRatioService;
+import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.component.PcDefaultSymbolSetting;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
@@ -35,8 +35,8 @@ public class PcAccountSymbolService{
     @Autowired
     private ApplicationEventPublisher publisher;
     
-    @Autowired
-    private FeeRatioService feeRatioService;
+	@Autowired
+	private MetadataService metadataService;
 
 	public PcAccountSymbol create(Long userId, String asset, String symbol){
 		PcAccountSymbol as = this.get(userId, asset, symbol);
@@ -47,7 +47,7 @@ public class PcAccountSymbolService{
 	}
 	
 	private PcAccountSymbol doCreate(Long userId, String asset, String symbol){
-		BigDecimal maxLeverage = feeRatioService.getMaxLeverage(userId, asset, symbol, BigDecimal.ZERO);
+		BigDecimal maxLeverage = metadataService.getMaxLeverage(userId, asset, symbol, BigDecimal.ZERO);
 		Long now = DbDateUtils.now();
 		PcAccountSymbol entity = new PcAccountSymbol();
 		entity.setAsset(asset);

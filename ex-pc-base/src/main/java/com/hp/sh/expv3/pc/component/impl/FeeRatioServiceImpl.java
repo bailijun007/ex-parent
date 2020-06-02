@@ -17,7 +17,6 @@ import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
 import com.hp.sh.expv3.pc.component.vo.PosLevelVo;
 import com.hp.sh.expv3.pc.constant.RedisKey;
-import com.hp.sh.expv3.utils.math.BigUtils;
 import com.hp.sh.expv3.utils.math.Precision;
 
 /**
@@ -104,30 +103,6 @@ public class FeeRatioServiceImpl implements FeeRatioService {
         return BigDecimal.ZERO;
     }
     
-    @Override
-    public BigDecimal getMaxLeverage(Long userId, String asset, String symbol, BigDecimal posVolume){
-    	PosLevelVo vo = this.findPosLevelVo(userId, asset, symbol, posVolume);
-    	if(vo==null){
-    		logger.error("{}__{}:{} is null", asset, symbol, posVolume);
-    	}
-    	return vo.getMaxLeverage();
-    }
-    
-    private PosLevelVo findPosLevelVo(Long userId, String asset, String symbol, BigDecimal volume) {
-        HashOperations hashOperations = templateDB0.opsForHash();
-        String hashKey = asset + "__" + symbol;
-        Object s = hashOperations.get(RedisKey.PC_POS_LEVEL, hashKey);
-        List<PosLevelVo> voList = JSON.parseArray(s.toString(), PosLevelVo.class);
-        Optional<PosLevelVo> first = voList.stream().filter(vo -> vo.getMinAmt().compareTo(volume) <= 0 && vo.getMaxAmt().compareTo(volume) >= 0).findFirst();
-        PosLevelVo result = null;
-        for(PosLevelVo vo : voList){
-        	if(BigUtils.between(volume, vo.getMinAmt(), vo.getMaxAmt())){
-        		result = vo;
-        	}
-        }
-        return result;
-    }
-
     private BigDecimal findFeeRatio(long userId, String key, String prefix,StringRedisTemplate template) {
         HashOperations hashOperations = template.opsForHash();
         Object pcFee = hashOperations.get(key, prefix + userId);
