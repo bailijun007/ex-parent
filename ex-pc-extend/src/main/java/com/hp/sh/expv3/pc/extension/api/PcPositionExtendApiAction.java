@@ -112,8 +112,7 @@ public class PcPositionExtendApiAction implements PcPositionExtendApi {
         if (userId == null || startTime == null || StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
             throw new ExException(PcCommonErrorCode.PARAM_EMPTY);
         }
-        LocalDateTime localDateTime = LocalDateTime.now();
-        Long endTime = CommonDateUtils.localDateTimeToTimestamp(localDateTime);
+        Long endTime = Instant.now().toEpochMilli();
         List<CurrentPositionVo> result = new ArrayList<>();
         List<PcPositionVo> list = pcPositionExtendService.selectPosByAccount(userId, asset, symbol, startTime, endTime);
         this.convertPositionList(result, list);

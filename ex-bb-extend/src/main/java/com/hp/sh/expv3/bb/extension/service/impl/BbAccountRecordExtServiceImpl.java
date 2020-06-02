@@ -109,16 +109,16 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
 
 
     private void simpleMap(Long userId, String asset, Integer historyType, Long startDate, Long endDate, Integer pageSize, Map<String, Object> map) {
-        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDate localDate = LocalDate.now();
         map.put("userId", userId);
         map.put("asset", asset);
         map.put("limit", pageSize);
         try {
             if (BbextendConst.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {
-                LocalDateTime minusDays = localDateTime.minusDays(2L);
-                long timeBegin = CommonDateUtils.localDateTimeToTimestamp(minusDays);
+                LocalDate minusDays = localDate.minusDays(2L);
+                long timeBegin = CommonDateUtils.localDateToTimestamp(minusDays);
                 map.put("createdBegin", timeBegin);
-                map.put("createdEnd", CommonDateUtils.localDateTimeToTimestamp(localDateTime));
+                map.put("createdEnd", CommonDateUtils.localDateToTimestamp(localDate));
             } else if (BbextendConst.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
                 map.put("createdBegin", startDate);
                 map.put("createdEnd", endDate);
