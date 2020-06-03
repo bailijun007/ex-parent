@@ -138,13 +138,15 @@ public class DbTestAction {
 		String ext="test";
 		FileWriter out = new FileWriter("e:\\wal.txt", true);
 		long time = System.currentTimeMillis();
-		for(int i=0;i<10000;i++){
-			BBTradeMsg msg = getBBTradeMsg();
-			BBMqMsg msgEntity = this.getBBMqMsg(msg);
-			String json = JsonUtils.toJson(msgEntity);
+		
+		BBTradeMsg msg = getBBTradeMsg();
+		BBMqMsg msgEntity = this.getBBMqMsg(msg);
+		String json = JsonUtils.toJson(msgEntity);
+		
+		for(int i=0; i<RECORD_TOTAL; i++){
 			out.write(json);
 			out.write('\n');
-//			out.flush();
+			out.flush();
 		}
 		out.close();
 		time = System.currentTimeMillis()-time;
@@ -158,11 +160,13 @@ public class DbTestAction {
 		String ext="test";
 		RandomAccessFile out = new RandomAccessFile("e:\\wal.txt", "rw");
 		long time = System.currentTimeMillis();
-		for(int i=0;i<10000;i++){
-			BBTradeMsg msg = getBBTradeMsg();
-			BBMqMsg msgEntity = this.getBBMqMsg(msg);
-			String json = JsonUtils.toJson(msgEntity);
-			out.write(json.getBytes());
+		
+		BBTradeMsg msg = getBBTradeMsg();
+		BBMqMsg msgEntity = this.getBBMqMsg(msg);
+		String json = JsonUtils.toJson(msgEntity);
+		byte[] buf = json.getBytes();
+		for(int i=0; i<RECORD_TOTAL*1000; i++){
+			out.write(buf);
 			out.write('\n');
 //			System.out.println(out.getFilePointer());
 		}
@@ -225,6 +229,16 @@ public class DbTestAction {
 		msg.setTradeId(1L);
 		msg.setTradeTime(1L);
 		return msg;
+	}
+	
+	private void startExitThread(){
+		new ExitThread().start();
+	}
+	
+	static class ExitThread extends Thread{
+		public void run(){
+			System.exit(-1);
+		}
 	}
 	
 }
