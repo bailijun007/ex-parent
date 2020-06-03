@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * @author BaiLiJun  on 2020/2/15
@@ -42,8 +43,8 @@ public class BbTradeExtServiceImpl implements BbTradeExtService {
 
     @Override
     public BbTradeVo queryLastTradeByLtTime(String asset, String symbol, Long endTime) {
-         LocalDate localDate = LocalDate.now();
-         Long startTime = CommonDateUtils.localDateToTimestamp(localDate);
+        LocalDateTime localDateTime = LocalDateTime.now(TimeZone.getTimeZone("UTC").toZoneId());
+         Long startTime = CommonDateUtils.localDateTimeToTimestamp(localDateTime);
         return bbTradeExtMapper.queryLastTradeByLtTime(asset,symbol,startTime,endTime);
     }
 

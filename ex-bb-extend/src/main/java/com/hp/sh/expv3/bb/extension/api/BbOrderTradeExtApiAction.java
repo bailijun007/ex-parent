@@ -22,8 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * @author BaiLiJun  on 2020/2/15
@@ -67,11 +69,10 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
         }
 
         if (startTime == null) {
-            LocalDate localDate = LocalDate.now();
-            startTime = CommonDateUtils.localDateToTimestamp(localDate);
-            if (endTime == null) {
-                endTime = Instant.now().toEpochMilli();
-            }
+            LocalDateTime localDateTime = LocalDateTime.now(TimeZone.getTimeZone("UTC").toZoneId());
+            endTime = CommonDateUtils.localDateTimeToTimestamp(localDateTime);
+            long minusDay = 24 * 60 * 60 * 1000;
+            startTime = endTime - minusDay;
         }
         List<BbUserOrderTrade> tradeVo = bbOrderTradeExtService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId, id);
         return tradeVo;

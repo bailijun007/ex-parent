@@ -9,4 +9,7 @@ public final class BbExtCommonConstant {
     public static final String BB_ORDER_HISTORY_PREFIX = "bb_order_history_";
 
     public static final String DB_NAME_EXPV3_BB = "expv3_bb";
+
+    public static final String REDIS_KEY_BB_SYMBOL = "bb_symbol";
+
 }

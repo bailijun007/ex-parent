@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 /**
@@ -52,7 +54,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         List<PcOrderTradeDetailVo> result = new ArrayList<>();
         List<PcOrderTradeVo> voList = pcOrderTradeService.queryOrderTrade(userId, asset, symbol, orderId, startTime, endTime);
         //封装结果集
-        this.toResult(result, voList,startTime,endTime);
+        this.toResult(result, voList, startTime, endTime);
 
         return result;
     }
@@ -83,8 +85,6 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
     }
 
 
-
-
     /**
      * 查询成交记录
      *
@@ -111,7 +111,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         List<String> symbolList = Arrays.asList(symbol.split(",")).stream().map(s -> s.trim()).collect(Collectors.toList());
         List<PcOrderTradeVo> voList = pcOrderTradeService.queryTradeRecords(assetList, symbolList, gtTradeId, ltTradeId, count, startTime, endTime);
         //封装结果集
-        this.toResult(result, voList,startTime,endTime);
+        this.toResult(result, voList, startTime, endTime);
 
         return result;
     }
@@ -161,9 +161,9 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         List<PcOrderTradeDetailVo> result = new ArrayList<>();
         List<PcOrderTradeVo> voList = pcOrderTradeService.selectAllTradeListByUser(asset, symbol, userId);
         Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(null, null);
-        Long  startTime = startAndEndTime[0];
+        Long startTime = startAndEndTime[0];
         Long endTime = startAndEndTime[1];
-        this.toResult(result, voList,startTime,endTime);
+        this.toResult(result, voList, startTime, endTime);
         return result;
     }
 
@@ -176,12 +176,13 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         }
 
         if (startTime == null) {
-            String s = CommonDateUtils.timestampToString(startTime);
-            startTime = CommonDateUtils.stringToTimestamp(s);
+            Instant instant = LocalDateTime.now(TimeZone.getTimeZone("UTC").toZoneId()).toInstant(ZoneOffset.UTC);
+            //一天等于多少毫秒：24*3600*1000
+            long minusDay = 24 * 60 * 60 * 1000;
+            endTime = instant.toEpochMilli();
+            startTime =endTime-minusDay;
         }
-        if (endTime == null) {
-            endTime = Instant.now().toEpochMilli();
-        }
+
 
         List<PcOrderTradeExtendVo> pcTradeVo = pcOrderTradeService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId);
         return pcTradeVo;
@@ -207,7 +208,7 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
         }
         List<PcOrderTradeDetailVo> result = new ArrayList<>();
         List<PcOrderTradeVo> voList = pcOrderTradeService.selectPcFeeCollectByAccountId(asset, symbol, userId, statTime, endTime);
-        this.toResult(result, voList,statTime,endTime);
+        this.toResult(result, voList, statTime, endTime);
         return result;
     }
 
@@ -223,9 +224,9 @@ public class PcOrderTradeExtendApiAction implements PcOrderTradeExtendApi {
                 detailVo.setSymbol(pcOrderTradeVo.getSymbol());
                 detailVo.setQty(pcOrderTradeVo.getVolume());
                 detailVo.setAmt(pcOrderTradeVo.getPrice().multiply(pcOrderTradeVo.getVolume()));
-                PcOrderVo pcOrder = pcOrderExtendService.getPcOrder(detailVo.getOrderId(), detailVo.getAsset(), detailVo.getSymbol(), startTime,endTime);
+                PcOrderVo pcOrder = pcOrderExtendService.getPcOrder(detailVo.getOrderId(), detailVo.getAsset(), detailVo.getSymbol(), startTime, endTime);
                 detailVo.setLongFlag(pcOrder.getLongFlag());
-                detailVo.setCloseFlag(Integer.parseInt(pcOrder.getCloseFlag()+""));
+                detailVo.setCloseFlag(Integer.parseInt(pcOrder.getCloseFlag() + ""));
                 result.add(detailVo);
             }
         }

@@ -45,10 +45,7 @@ public class TestRedis {
             list.add(bBSymbolVO);
         }
         for (BBSymbol bbSymbol : list) {
-            String asset = "USDT";
-            if (bbSymbol.getAsset().equals(asset)) {
-                System.out.println(bbSymbol.getSymbol());
-            }
+            System.out.println("bbSymbol = " + bbSymbol);
         }
     }
 

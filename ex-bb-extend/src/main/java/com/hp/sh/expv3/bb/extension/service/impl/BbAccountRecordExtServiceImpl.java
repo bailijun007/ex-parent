@@ -113,18 +113,20 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
         map.put("userId", userId);
         map.put("asset", asset);
         map.put("limit", pageSize);
-        try {
-            if (BbextendConst.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {
-                LocalDate minusDays = localDate.minusDays(2L);
-                long timeBegin = CommonDateUtils.localDateToTimestamp(minusDays);
-                map.put("createdBegin", timeBegin);
-                map.put("createdEnd", CommonDateUtils.localDateToTimestamp(localDate));
-            } else if (BbextendConst.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
-                map.put("createdBegin", startDate);
-                map.put("createdEnd", endDate);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        map.put("createdBegin", startDate);
+        map.put("createdEnd", endDate);
+//        try {
+//            if (BbextendConst.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {
+//                LocalDate minusDays = localDate.minusDays(2L);
+//                long timeBegin = CommonDateUtils.localDateToTimestamp(minusDays);
+//                map.put("createdBegin", timeBegin);
+//                map.put("createdEnd", CommonDateUtils.localDateToTimestamp(localDate));
+//            } else if (BbextendConst.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
+//                map.put("createdBegin", startDate);
+//                map.put("createdEnd", endDate);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 }
