@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * @author BaiLiJun  on 2020/5/9
@@ -35,7 +36,7 @@ public final class CommonDateUtils {
 
         List<Integer> list = new ArrayList<>();
         for (int i = p1; i <= p2; i++) {
-            Boolean b = isData("yyyyMM",i + "");
+            Boolean b = isData("yyyyMM", i + "");
             if (b) {
                 list.add(i);
             }
@@ -87,9 +88,9 @@ public final class CommonDateUtils {
      * @param localDateTime
      * @return
      */
-//    public static Long localDateTimeToTimestamp(LocalDateTime localDateTime) {
-//        return localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
-//    }
+    public static Long localDateTimeToTimestamp(LocalDateTime localDateTime) {
+        return localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+    }
 
     public static String getDefaultDateTime(String startTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -106,7 +107,7 @@ public final class CommonDateUtils {
      * 判断是否是日期
      *
      * @param pattern 指定的格式
-     * @param s 需格式化的字符串
+     * @param s       需格式化的字符串
      * @return
      */
     public static Boolean isData(String pattern, String s) {
@@ -121,31 +122,21 @@ public final class CommonDateUtils {
     }
 
     // String -->LocalDate
-        public static LocalDate stringToLocalDate(CharSequence text) {
-            DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate localDate = LocalDate.parse(text, pattern);
-            return localDate;
-        }
-
-        public static String[] getStartAndEndTime(String startTime, String endTime) {
-            DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            if (org.apache.commons.lang3.StringUtils.isEmpty(startTime)) {
-                startTime = getDefaultDateTime(startTime);
-                LocalDate startDate = stringToLocalDate(startTime);
-                startTime = startDate.format(pattern);
-                LocalDate endDate = startDate.plusDays(1);
-                endTime = endDate.format(pattern);
-            }
-        String[] startAndEndTime = {startTime, endTime};
-        return startAndEndTime;
+    public static LocalDate stringToLocalDate(CharSequence text) {
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(text, pattern);
+        return localDate;
     }
+
 
     public static Long[] getStartAndEndTimeByLong(Long startTime, Long endTime) {
         if (null == startTime) {
-            LocalDate localDate = LocalDate.now();
-            startTime = localDate.atStartOfDay(ExpTimeZone.timeZone.toZoneId()).toInstant().toEpochMilli();
-            LocalDate plusDays = localDate.plusDays(1);
-            endTime = plusDays.atStartOfDay(ExpTimeZone.timeZone.toZoneId()).toInstant().toEpochMilli();
+            LocalDateTime localDateTime = LocalDateTime.now(TimeZone.getTimeZone("UTC").toZoneId());
+            Instant instant = localDateTime.toInstant(ZoneOffset.UTC);
+            endTime = instant.toEpochMilli();
+            //一天等于多少毫秒：24*3600*1000
+            long minusDay = 24 * 60 * 60 * 1000;
+            startTime = endTime - minusDay;
         }
         Long[] startAndEndTime = {startTime, endTime};
         return startAndEndTime;

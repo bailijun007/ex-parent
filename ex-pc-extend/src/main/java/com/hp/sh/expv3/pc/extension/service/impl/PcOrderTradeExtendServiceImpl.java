@@ -133,9 +133,8 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         map.put("asset", asset);
         map.put("symbol", symbol);
         map.put("tradeTimeEnd", statTime);
-        LocalDate localDate = Instant.ofEpochMilli(statTime).atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate minusDays = localDate.minusDays(1);
-        Long tradeTimeBegin = CommonDateUtils.localDateToTimestamp(minusDays);
+        long minusDay = 24 * 60 * 60 * 1000;
+        Long tradeTimeBegin = statTime - minusDay;
         map.put("tradeTimeBegin", tradeTimeBegin);
         PcOrderTradeVo vo = pcOrderTradeDAO.selectLessTimeTrade(map);
 

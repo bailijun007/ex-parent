@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,9 +63,14 @@ public class BbOrderTradeExtServiceImpl implements BbOrderTradeExtService {
     }
 
     @Override
-    public List<BbOrderTradeVo> queryByIds(List<Long> refIds) {
-
-        return bbOrderTradeExtMapper.queryByIds(refIds);
+    public List<BbOrderTradeVo> queryByIds(List<Long> refIds, String asset, ArrayList<String> symbols, Long startDate, Long endDate) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("idList",refIds);
+        map.put("asset",asset);
+        map.put("symbolList",symbols);
+        map.put("tradeTimeBegin",startDate);
+        map.put("tradeTimeEnd",endDate);
+        return bbOrderTradeExtMapper.queryList(map);
     }
 
     @Override
