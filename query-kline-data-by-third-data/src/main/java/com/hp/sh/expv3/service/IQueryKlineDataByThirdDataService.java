@@ -6,5 +6,4 @@ package com.hp.sh.expv3.service;
 public interface IQueryKlineDataByThirdDataService {
     void queryKlineDataByThirdData(String tableName, Integer klineType, String asset, String pair, String interval, Long openTimeBegin, Long openTimeEnd);
 
-    void queryKlineDataByProd(String tableName, Integer klineType, String asset, String pair, String interval, Long openTimeBegin, Long openTimeEnd);
-}
+    }

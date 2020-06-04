@@ -1,8 +1,10 @@
 package com.hp.sh.expv3;
 
+import com.hp.sh.expv3.controller.NewAssetDefaultKlineDataController;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,9 +30,17 @@ public class KlineDataByThirdData {
     @Value("${spring.profiles.active:}")
     private String profile;
 
+    @Autowired
+    private NewAssetDefaultKlineDataController assetDefaultKlineDataController;
+
     @PostConstruct
     private Object printEnv() {
         logger.warn("===========profile:{}============", profile);
         return null;
+    }
+
+    @PostConstruct
+    private void start(){
+        assetDefaultKlineDataController.getDefaultKlineData(null,null,null,null);
     }
 }

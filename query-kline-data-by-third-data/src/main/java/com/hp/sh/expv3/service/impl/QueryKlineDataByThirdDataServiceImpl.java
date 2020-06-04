@@ -36,8 +36,6 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
     @Resource(name = "metadataTemplateDB5")
     private StringRedisTemplate templateDB5;
 
-    @Resource(name = "prodMetadataTemplateDB5")
-    private StringRedisTemplate prodTemplateDB5;
 
     /**
      * 获取第三方k线数据，
@@ -72,26 +70,7 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
         saveAndNotify(dataRedisKey,updateRedisKey,openTimeBegin,openTimeEnd,klineDataPos);
     }
 
-    @Override
-    public void queryKlineDataByProd(String tableName, Integer klineType, String asset, String pair, String interval, Long openTimeBegin, Long openTimeEnd) {
-        String expName = "zb";
-        List<KlineDataPo> klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
-        if (CollectionUtils.isEmpty(klineDataPos)) {
-            expName = "binance";
-            klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
-        }
 
-        String dataRedisKey = null;
-        String updateRedisKey = null;
-        if (klineType == 1) {
-            dataRedisKey = "candle:bb:" + asset + ":" + pair + ":" + 1;
-            updateRedisKey = "bb:kline:updateEvent:" + asset + ":" + pair + ":" + 1;
-        } else if (klineType == 2) {
-            dataRedisKey = "candle:pc:" + asset + ":" + pair + ":" + 1;
-            updateRedisKey = "pc:kline:updateEvent:" + asset + ":" + pair + ":" + 1;
-        }
-        saveAndNotifyByProd(dataRedisKey,updateRedisKey,openTimeBegin,openTimeEnd,klineDataPos);
-    }
 
     /**
      * 保存并发出通知
@@ -119,22 +98,6 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
 
     }
 
-    public void saveAndNotifyByProd(String dataRedisKey,String updateRedisKey,Long openTimeBegin,Long openTimeEnd,List<KlineDataPo> klineDataPos) {
-        if(CollectionUtils.isEmpty(klineDataPos)){
-            return;
-        }
-        //删除旧数据
-        prodTemplateDB5.opsForZSet().removeRangeByScore(dataRedisKey,openTimeBegin.doubleValue(),openTimeEnd.doubleValue());
 
-        for (KlineDataPo klineDataPo : klineDataPos) {
-            String data = KlineUtil.kline2ArrayData(klineDataPo);
-            //保存新数据
-            double score = klineDataPo.getOpenTime().doubleValue();
-            prodTemplateDB5.opsForZSet().add(dataRedisKey,data, score);
-            //通知
-            prodTemplateDB5.opsForZSet().add(updateRedisKey,score+"",score);
-        }
-
-    }
 
 }

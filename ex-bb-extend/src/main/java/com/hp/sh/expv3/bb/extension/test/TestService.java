@@ -60,7 +60,7 @@ public class TestService {
 
     @Test
     public void testqueryHistoryOrderList(){
-        final PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(null, "USDT", "BTC_USDT", 1, 2, 1L, -1, null, null);
+        final PageResult<BbHistoryOrderVo> result = bbOrderExtService.queryHistoryOrderList(null, "USDT", "BTC_USDT", 0, 20, null, 1, 1590940800000L, 1591113600000L);
         System.out.println("result.getList()="+result.getList());
     }
 
