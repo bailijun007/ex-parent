@@ -200,6 +200,13 @@ public class BBTradeService {
         	order.setFee(orderTrade.getRemainFee());
         }
         
+		//成交均价
+		List<OrderTrade> orderTradeList = new ArrayList<>();
+		orderTradeList.add(orderTrade);
+		orderTradeList.add(new OrderTradeVo(order.getFilledVolume(), order.getTradeMeanPrice()));
+		BigDecimal tradeMeanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
+		order.setTradeMeanPrice(tradeMeanPrice);
+        
         //增加已扣手续费
 		order.setFeeCost(order.getFeeCost().add(orderTrade.getFee()));
 		//增加已成交金额
@@ -210,13 +217,6 @@ public class BBTradeService {
         order.setActiveFlag(orderTrade.isOrderCompleted()?BBOrder.NO:BBOrder.YES);
         //修改时间
 		order.setModified(now);
-		
-		//成交均价
-		List<OrderTrade> orderTradeList = new ArrayList<>();
-		orderTradeList.add(orderTrade);
-		orderTradeList.add(new OrderTradeVo(order.getFilledVolume(), order.getTradeMeanPrice()));
-		BigDecimal tradeMeanPrice = orderStrategy.calcOrderMeanPrice(order.getAsset(), order.getSymbol(), orderTradeList);
-		order.setTradeMeanPrice(tradeMeanPrice);
 		
 		this.orderUpdateService.updateOrder4Trad(order);
 		
