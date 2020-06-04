@@ -49,9 +49,16 @@ public class NewAssetDefaultKlineDataServiceImpl implements INewAssetDefaultKlin
                 price = price.subtract(sub);
             }
             list.add(price);
-            startInMin = startInMin + minusMin;
-            minTimeList.add(startInMin);
+
         }
+
+        for (int i = 0; i < dayTimeList.size(); i++) {
+            for (int j = 0; j < 1440; j++) {
+                startInMin = startInMin + minusMin;
+                minTimeList.add(startInMin);
+            }
+        }
+
 
         list.add(price);
         minTimeList.add(timestamp);
@@ -79,7 +86,7 @@ public class NewAssetDefaultKlineDataServiceImpl implements INewAssetDefaultKlin
         String dataRedisKey = "candle:bb:" + asset + ":" + symbol + ":" + 1;
         String updateRedisKey = "bb:kline:updateEvent:" + asset + ":" + symbol + ":" + 1;
 
-       saveAndNotify(dataRedisKey, updateRedisKey, timestamp - minusDay * 60, timestamp, map);
+        saveAndNotify(dataRedisKey, updateRedisKey, timestamp - minusDay * 60, timestamp, map);
 
     }
 
