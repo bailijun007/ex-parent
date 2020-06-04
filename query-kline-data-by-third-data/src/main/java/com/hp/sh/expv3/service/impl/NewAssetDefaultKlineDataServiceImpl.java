@@ -79,7 +79,7 @@ public class NewAssetDefaultKlineDataServiceImpl implements INewAssetDefaultKlin
         String dataRedisKey = "candle:bb:" + asset + ":" + symbol + ":" + 1;
         String updateRedisKey = "bb:kline:updateEvent:" + asset + ":" + symbol + ":" + 1;
 
-       saveAndNotify(dataRedisKey, updateRedisKey, start, timestamp, map);
+       saveAndNotify(dataRedisKey, updateRedisKey, timestamp - minusDay * 60, timestamp, map);
 
     }
 
