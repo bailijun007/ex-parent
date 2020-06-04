@@ -63,9 +63,9 @@ public class NewAssetDefaultKlineDataServiceImpl implements INewAssetDefaultKlin
         list.add(price);
         minTimeList.add(timestamp);
 //        List<BigDecimal> sortedlist = list.stream().sorted().collect(Collectors.toList());
-        Map<Long, List<KlineDataPo>> map = new HashMap<>();
+//        Map<Long, List<KlineDataPo>> map = new HashMap<>();
+        List<KlineDataPo> poList = new ArrayList<>();
         for (int i = 0; i < dayTimeList.size(); i++) {
-            List<KlineDataPo> poList = new ArrayList<>();
             for (int j = 0; j < 1440; j++) {
                 BigDecimal sub = getSub();
                 KlineDataPo klineDataPo = new KlineDataPo();
@@ -79,14 +79,18 @@ public class NewAssetDefaultKlineDataServiceImpl implements INewAssetDefaultKlin
                 klineDataPo.setVolume(volume.add(BigDecimal.TEN));
                 poList.add(klineDataPo);
             }
-            map.put(dayTimeList.get(i), poList);
+//            map.put(dayTimeList.get(i), poList);
+        }
+
+        for (int i = 0; i < poList.size(); i++) {
+            poList.get(i).setOpenTime(minTimeList.get(i));
         }
 
 //        logger.info("生成的k线数据为：{}", JSON.toJSONString(map));
         String dataRedisKey = "candle:bb:" + asset + ":" + symbol + ":" + 1;
         String updateRedisKey = "bb:kline:updateEvent:" + asset + ":" + symbol + ":" + 1;
 
-        saveAndNotify(dataRedisKey, updateRedisKey, timestamp - minusDay * 60, timestamp, map);
+        saveAndNotify(dataRedisKey, updateRedisKey, timestamp - minusDay * 60, timestamp, poList);
 
     }
 
@@ -104,27 +108,23 @@ public class NewAssetDefaultKlineDataServiceImpl implements INewAssetDefaultKlin
      * @param updateRedisKey 通知的redis key
      * @param openTimeBegin  开始时间
      * @param openTimeEnd    结束时间
-     * @param map            数据
+     * @param klineDataPos    数据
      */
-    public void saveAndNotify(String dataRedisKey, String updateRedisKey, Long openTimeBegin, Long openTimeEnd, Map<Long, List<KlineDataPo>> map) {
-        if (CollectionUtils.isEmpty(map)) {
+    public void saveAndNotify(String dataRedisKey,String updateRedisKey,Long openTimeBegin,Long openTimeEnd,List<KlineDataPo> klineDataPos) {
+        if(CollectionUtils.isEmpty(klineDataPos)){
             return;
         }
         //删除旧数据
-        templateDB5.opsForZSet().removeRangeByScore(dataRedisKey, openTimeBegin.doubleValue(), openTimeEnd.doubleValue());
-        for (Long key : map.keySet()) {
-            List<KlineDataPo> klineDataPos = map.get(key);
-            for (KlineDataPo klineDataPo : klineDataPos) {
-                String data = KlineUtil.kline2ArrayData(klineDataPo);
-                //保存新数据
-                double score = klineDataPo.getOpenTime().doubleValue();
-                templateDB5.opsForZSet().add(dataRedisKey, data, score);
-                //通知
-                templateDB5.opsForZSet().add(updateRedisKey, score + "", score);
-            }
+        templateDB5.opsForZSet().removeRangeByScore(dataRedisKey,openTimeBegin.doubleValue(),openTimeEnd.doubleValue());
 
+        for (KlineDataPo klineDataPo : klineDataPos) {
+            String data = KlineUtil.kline2ArrayData(klineDataPo);
+            //保存新数据
+            double score = klineDataPo.getOpenTime().doubleValue();
+            templateDB5.opsForZSet().add(dataRedisKey,data, score);
+            //通知
+            templateDB5.opsForZSet().add(updateRedisKey,score+"",score);
         }
-
 
     }
 
