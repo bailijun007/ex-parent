@@ -41,7 +41,7 @@ public class NewAssetDefaultKlineDataServiceImpl implements INewAssetDefaultKlin
             dayTimeList.add(start);
         }
 
-        BigDecimal minPrice = new BigDecimal("0.12");
+        BigDecimal minPrice = new BigDecimal("0.09");
         for (int i = 0; i < 1440; i++) {
             BigDecimal sub = getSub();
             if (i % 2 == 0) {
@@ -49,8 +49,9 @@ public class NewAssetDefaultKlineDataServiceImpl implements INewAssetDefaultKlin
             } else {
                 minPrice = minPrice.add(new BigDecimal("0.0001"));
             }
-            if (minPrice.compareTo(new BigDecimal("0.145")) >= 0) {
-                minPrice = minPrice.subtract(sub).subtract(sub);
+            if (minPrice.compareTo(new BigDecimal("0.155")) >= 0) {
+                 BigDecimal multiply = sub.multiply(new BigDecimal("100"));
+                minPrice = minPrice.subtract(multiply).add(sub);
             }
 //            System.out.println("minPrice = " + minPrice);
             list.add(minPrice);
@@ -96,7 +97,7 @@ public class NewAssetDefaultKlineDataServiceImpl implements INewAssetDefaultKlin
     }
 
     private BigDecimal getSub() {
-        BigDecimal[] arr = {new BigDecimal("0.0001"), new BigDecimal("0.0002"), new BigDecimal("0.0003"), new BigDecimal("0.0004"), new BigDecimal("0.0005")};
+        BigDecimal[] arr = {new BigDecimal("0.0001"),new BigDecimal("0.00012"), new BigDecimal("0.00015"), new BigDecimal("0.00020"), new BigDecimal("0.00023"), new BigDecimal("0.00028"), new BigDecimal("0.0003")};
         int index = (int) (Math.random() * arr.length);
         BigDecimal sub = arr[index];
         return sub;
