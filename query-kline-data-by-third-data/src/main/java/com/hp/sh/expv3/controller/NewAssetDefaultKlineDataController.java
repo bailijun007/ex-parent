@@ -36,7 +36,7 @@ public class NewAssetDefaultKlineDataController {
     public void getDefaultKlineData(BigDecimal lastPrice,Long time,String asset,String symbol) {
         logger.info("进入新币种默认k线数据接口，收到参数为:lastPrice={},time={},asset={},symbol={}", lastPrice,time,asset,symbol);
 
-        //如果没有给定成交价，则默认以 1/7 USDT 作为最新成交价
+        //如果没有给定成交价，则默认以 1/6 USDT 作为最新成交价
         if (lastPrice == null) {
             lastPrice = new BigDecimal("1").divide(new BigDecimal("7"), 4, RoundingMode.DOWN);
         }
