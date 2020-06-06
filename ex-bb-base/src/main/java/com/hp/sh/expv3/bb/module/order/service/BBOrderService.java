@@ -295,6 +295,10 @@ public class BBOrderService {
 
 	public void setNewStatus(long userId, String asset, String symbol, long orderId){
 		BBOrder order = this.orderQueryService.getOrder(asset, symbol, userId, orderId);
+		if(order==null){
+			logger.error("新订单不存在:orderId={}", orderId);
+			return;
+		}
 		if(order.getStatus()!=OrderStatus.PENDING_NEW){
 			logger.warn("NEW状态错误，orderId={}", orderId, order.getStatus());
 			return ;
