@@ -171,21 +171,6 @@ public class DbTestAction {
 		return time;
 	}
 	
-	@ApiOperation(value = "测试提交任务")
-	@GetMapping(value = "/api/bb/test/submitTask")
-	public Long submitTask(Long shardId) throws Exception{
-		long time = System.currentTimeMillis();
-		msgHandler.handlePending(shardId);
-		time = System.currentTimeMillis()-time;
-		return time;
-	}
-	
-	@ApiOperation(value = "任务执行结果")
-	@GetMapping(value = "/api/bb/test/taskResult")
-	public Long taskResult() throws IOException{
-		return 0L;
-	}
-	
 	private BBMqMsg getBBMqMsg(BBTradeMsg msg){
 		BBMqMsg msgEntity = new BBMqMsg();
 		msgEntity.setUserId(msg.getAccountId());
