@@ -113,7 +113,7 @@ public class MsgShardHandler {
 				}
 			}else{
 				for(BBMessageExt msgExt: userMsgList){
-					this.handleMsgAndErr(userId, msgExt);
+					self.handleMsgAndErr(userId, msgExt);
 				}
 			}
 		}
