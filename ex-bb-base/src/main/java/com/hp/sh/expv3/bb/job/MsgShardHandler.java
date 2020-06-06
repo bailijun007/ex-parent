@@ -148,7 +148,7 @@ public class MsgShardHandler {
 				logger.info("处理单个消息成功，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId());
 			}catch(Exception e){
 				errorMsgCache.saveErrorMsgIdCache(msgExt.getKeys(), msgExt.getId());
-				logger.error("处理单个消息失败，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId(), e);
+				logger.error("处理单个消息失败，shardId={}, msgId={},err={}", msgExt.getShardId(), msgExt.getId(), e.toString(), e);
 				this.msgService.setStatus(msgExt.getUserId(), msgExt.getId(), BBMessageExt.STATUS_ERR, e.getMessage());
 			}
 			

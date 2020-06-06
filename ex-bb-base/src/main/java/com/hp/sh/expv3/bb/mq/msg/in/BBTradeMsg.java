@@ -136,7 +136,7 @@ public class BBTradeMsg extends BaseSymbolMsg{
 		return "BBTradeMsg [asset=" + asset + ", symbol=" + symbol + ", accountId=" + accountId + ", price=" + price
 				+ ", number=" + number + ", orderId=" + orderId + ", tradeId=" + tradeId + ", tradeTime=" + tradeTime
 				+ ", makerFlag=" + makerFlag + ", matchTxId=" + matchTxId + ", opponentOrderId=" + opponentOrderId
-				+ ", topic=" + topic + ", tags=" + tags + ", keys=" + keys + ", msgId=" + msgId + "]";
+				+ ", topic=" + topic + ", tags=" + tags + ", keys=" + keys + ", msgId=" + msgId + ", uniqueKey="+this.uniqueKey()+"]";
 	}
 
 
