@@ -104,7 +104,7 @@ public class MsgShardHandler {
 			}
 		}catch(Exception e1){
 			Exception cause = (Exception) ExceptionUtils.getCause(e1);
-			logger.error("批量处理用户消息失败:{},{}", e1.getMessage(), cause.toString(), e1);
+			logger.error("批量处理用户消息失败:{},{}", e1.getMessage(), cause, e1);
 			if(isResendException(e1)){
 				try {
 					Thread.sleep(50);
