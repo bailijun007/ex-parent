@@ -112,16 +112,12 @@ public class MsgShardHandler {
 					logger.error(te.getMessage(), te);
 				}
 			}else{
-				this.handleMsgAndErr(userId, userMsgList);
+				for(BBMessageExt msgExt: userMsgList){
+					this.handleMsgAndErr(userId, msgExt);
+				}
 			}
 		}
 		return offsetId;
-	}
-	
-	public void handleMsgAndErr(Long userId, List<BBMessageExt> userMsgList) {
-		for(BBMessageExt msgExt: userMsgList){
-			self.handleMsgAndErr(userId, msgExt);
-		}
 	}
 
 	@LockIt(key="U-${userId}")
@@ -133,7 +129,6 @@ public class MsgShardHandler {
 	}
 
 	@LockIt(key="U-${userId}")
-	@Transactional(rollbackFor=Exception.class)
 	public void handleMsgAndErr(Long userId, BBMessageExt msgExt){
 		Long errMsgId = errorMsgCache.getErrorMsgIdCache(msgExt.getKeys());
 		if(errMsgId!=null && msgExt.getId() > errMsgId){
@@ -141,7 +136,7 @@ public class MsgShardHandler {
 		}else{
 			logger.info("处理单个消息，shardId={}, msgId={}", msgExt.getShardId(), msgExt.getId());
 			try{
-				this.handleMsg(msgExt);
+				self.handleMsg(msgExt);
 				if(errMsgId!=null){
 					errorMsgCache.evictErrorMsgIdCache(msgExt.getKeys());
 				}
@@ -156,7 +151,8 @@ public class MsgShardHandler {
 		
 	}
 	
-	private void handleMsg(BBMessageExt msgExt){
+	@Transactional(rollbackFor=Exception.class)
+	public void handleMsg(BBMessageExt msgExt){
 		if(msgExt.getTags().equals(MqTags.TAGS_TRADE)){
 			BBTradeMsg tradeMsg = JsonUtils.toObject(msgExt.getMsgBody(), BBTradeMsg.class);
 			this.tradeService.handleTrade(tradeMsg);
