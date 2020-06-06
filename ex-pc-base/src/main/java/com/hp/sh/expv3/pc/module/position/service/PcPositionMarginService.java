@@ -10,7 +10,7 @@ import com.hp.sh.expv3.commons.exception.ExException;
 import com.hp.sh.expv3.commons.exception.ExSysException;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.error.ExCommonError;
-import com.hp.sh.expv3.pc.component.FeeRatioService;
+import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.constant.ChangeMarginOptType;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.MarginMode;
@@ -41,7 +41,7 @@ public class PcPositionMarginService {
 	private PcOrderQueryService orderQueryService;
 	
 	@Autowired
-	private FeeRatioService feeRatioService;
+	private MetadataService metadataService;
 	
 	@Autowired
 	private PcAccountSymbolService accountSymbolService;
@@ -100,7 +100,7 @@ public class PcPositionMarginService {
         }
         
 		//检查参数
-        BigDecimal _maxLeverage = feeRatioService.getMaxLeverage(userId, asset, symbol, posVolume);
+        BigDecimal _maxLeverage = metadataService.getMaxLeverage(userId, asset, symbol, posVolume);
         if(BigUtils.ltZero(leverage) || BigUtils.gt(leverage, _maxLeverage)){
         	throw new ExException(PcPositonError.PARAM_GT_MAX_LEVERAGE);
         }

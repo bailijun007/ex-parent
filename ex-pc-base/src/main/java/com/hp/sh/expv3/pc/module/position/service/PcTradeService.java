@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.hupadev.base.exceptions.CommonError;
 import com.hp.sh.expv3.commons.exception.ExSysException;
-import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.component.dbshard.impl.TradeId2DateShard;
 import com.hp.sh.expv3.pc.component.FeeCollectorSelector;
 import com.hp.sh.expv3.pc.component.FeeRatioService;
+import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.constant.LiqStatus;
 import com.hp.sh.expv3.pc.constant.LogType;
 import com.hp.sh.expv3.pc.constant.OrderFlag;
@@ -75,6 +75,9 @@ public class PcTradeService {
 	private FeeRatioService feeRatioService;
 	
 	@Autowired
+	private MetadataService metadataService;
+	
+	@Autowired
 	private PcAccountCoreService accountCoreService;
 	
 	@Autowired
@@ -123,8 +126,8 @@ public class PcTradeService {
     protected void handleTradeLiqOrder(PcOrder order, PcTradeMsg trade) {
 		Long now = DbDateUtils.now();
 		/*  1、修改订单数据和订单状态  */
-		order.setFilledVolume(order.getFilledVolume().add(trade.getNumber()));
 		order.setTradeMeanPrice(this.calcOrderTradeMeanPrice(order, trade));
+		order.setFilledVolume(order.getFilledVolume().add(trade.getNumber()));
 		boolean com = BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(order.getCancelVolume()));
         order.setStatus(com?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
 //        order.setActiveFlag(com?PcOrder.NO:PcOrder.YES);
@@ -236,7 +239,7 @@ public class PcTradeService {
 		pcPosition.setHoldMarginRatio(holdRatio);
 		
 		//如果升档
-		BigDecimal maxLeverage = this.feeRatioService.getMaxLeverage(pcPosition.getUserId(), pcPosition.getAsset(), pcPosition.getSymbol(), pcPosition.getVolume());
+		BigDecimal maxLeverage = this.metadataService.getMaxLeverage(pcPosition.getUserId(), pcPosition.getAsset(), pcPosition.getSymbol(), pcPosition.getVolume());
 		if(BigUtils.gt(pcPosition.getLeverage(), maxLeverage)){
 			positionMarginService.downLeverage(pcPosition, maxLeverage, now);
 		}
@@ -303,6 +306,7 @@ public class PcTradeService {
 	}
 
 	private void updateOrder4Trade(PcOrder order, TradeResult tradeResult, Long now){
+		order.setTradeMeanPrice(this.calcOrderTradeMeanPrice(order, tradeResult));
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getTradeMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getOrderOpenFee()));
@@ -310,7 +314,6 @@ public class PcTradeService {
 		}
 		order.setFeeCost(order.getFeeCost().add(tradeResult.getFee()));
 		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getNumber()));
-		order.setTradeMeanPrice(this.calcOrderTradeMeanPrice(order, tradeResult));
         order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setModified(now);

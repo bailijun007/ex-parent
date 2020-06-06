@@ -17,6 +17,6 @@ public interface BbAccountRecordExtService {
 
     List<BbAccountRecordExtVo> listBbAccountRecordsByPage(Long userId, String asset, Integer historyType, Integer tradeType, Long lastId, Integer nextPage, Long startDate, Long endDate, Integer pageSize);
 
-    PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, String startTime, String endTime, Integer pageNo, Integer pageSize);
+    PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, Long startTime, Long endTime, Integer pageNo, Integer pageSize);
 
 }

@@ -29,13 +29,13 @@ public interface PcOrderTradeExtendService {
      *
      * @param userId
      * @param asset
-     * @param symbol
+     * @param symbolList
      * @param orderIds
      * @return
      */
-    List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds,String startTime,String endTime);
+    List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, List<String> symbolList, List<Long> orderIds,Long startTime,Long endTime);
 
-    List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count,String startTime,String endTime);
+    List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count,Long startTime,Long endTime);
 
     PcOrderTradeVo selectLessTimeTrade(String asset, String symbol, Long statTime);
 
@@ -49,5 +49,5 @@ public interface PcOrderTradeExtendService {
 
     BigDecimal queryPcTradeFee(Long userId, String asset, Integer makerFlag, Long beginTime, Long endTime);
 
-    List<PcOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime);
+    List<PcOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, Long startTime, Long endTime);
 }

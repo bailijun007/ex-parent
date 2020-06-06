@@ -19,6 +19,7 @@ import com.hp.sh.expv3.pc.module.msg.entity.PcMessageExt;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcNotMatchedMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcCancelledMsg;
 import com.hp.sh.expv3.pc.mq.consumer.msg.PcTradeMsg;
+import com.hp.sh.expv3.pc.mq.consumer.msg.liq.LiqCancelledMsg;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
 /**
@@ -93,11 +94,11 @@ public class PcMessageExtService{
 		return msgEntity;
 	}
 
-	public PcMessageExt saveCancelIfNotExists(String tag, PcCancelledMsg msg, String exMessage) {
+	public PcMessageExt saveCancelIfNotExists(String tags, PcCancelledMsg msg, String exMessage) {
 		
 		exMessage = this.cutExMsg(exMessage);
 		
-		boolean existCancelledMsg = this.exist(msg.getAccountId(), tag, ""+msg.getOrderId());
+		boolean existCancelledMsg = this.exist(msg.getAccountId(), tags, ""+msg.getOrderId());
 		if(existCancelledMsg){
 			return null;
 		}
@@ -108,7 +109,7 @@ public class PcMessageExtService{
 		msgEntity.setAsset(msg.getAsset());
 		msgEntity.setSymbol(msg.getSymbol());
 		msgEntity.setErrorInfo(exMessage);
-		msgEntity.setTags(tag);
+		msgEntity.setTags(tags);
 		msgEntity.setMsgId(msg.getMsgId());
 		msgEntity.setKeys(""+msg.getOrderId());
 		msgEntity.setMsgBody(JsonUtils.toJson(msg));
@@ -122,6 +123,32 @@ public class PcMessageExtService{
 		return msgEntity;
 	}
 	
+	public PcMessageExt saveLiqCancel(String tags, LiqCancelledMsg msg, String exMessage) {
+		exMessage = this.cutExMsg(exMessage);
+		
+		PcMessageExt msgEntity = new PcMessageExt();
+		msgEntity.setUserId(msg.getAccountId());
+		
+		msgEntity.setAsset(msg.getAsset());
+		msgEntity.setSymbol(msg.getSymbol());
+		msgEntity.setErrorInfo(exMessage);
+		
+		msgEntity.setMsgId(msg.getMsgId());
+		msgEntity.setTags(tags);
+		msgEntity.setKeys(msg.getKeys());
+		msgEntity.setMsgBody(JsonUtils.toJson(msg));
+		
+		msgEntity.setCreated(DbDateUtils.now());
+		msgEntity.setShardId(getMsgSardId(msgEntity));
+		msgEntity.setStatus(PcMessageExt.STATUS_NEW);
+		
+		msgEntity.setId(msg.getSeqId());
+		
+		this.messageExtDAO.save(msgEntity);
+		
+		return msgEntity;
+	}
+
 	public void setStatus(Long userId, Long id, int status, String errInfo) {
 		this.messageExtDAO.setStatus(userId, id, status, this.cutExMsg(errInfo));
 	}

@@ -84,16 +84,16 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
     }
 
     @Override
-    public PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, String startTime, String endTime, Integer pageNo, Integer pageSize) {
+    public PageResult<BbAccountRecordVo> queryHistory(Long userId, String asset, Long startTime, Long endTime, Integer pageNo, Integer pageSize) {
         PageResult<BbAccountRecordVo> pageResult = new PageResult<>();
 
-        long begin = CommonDateUtils.stringToTimestamp(startTime);
-        long end = CommonDateUtils.stringToTimestamp(endTime);
+//        long begin = CommonDateUtils.stringToTimestamp(startTime);
+//        long end = CommonDateUtils.stringToTimestamp(endTime);
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("createdBegin", begin);
-        map.put("createdEnd", end);
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
 
         Long count=bbAccountRecordExtMapper.queryCount(map);
         map.put("offset", pageNo-1);
@@ -109,22 +109,24 @@ public class BbAccountRecordExtServiceImpl implements BbAccountRecordExtService 
 
 
     private void simpleMap(Long userId, String asset, Integer historyType, Long startDate, Long endDate, Integer pageSize, Map<String, Object> map) {
-        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDate localDate = LocalDate.now();
         map.put("userId", userId);
         map.put("asset", asset);
         map.put("limit", pageSize);
-        try {
-            if (BbextendConst.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {
-                LocalDateTime minusDays = localDateTime.minusDays(2L);
-                long timeBegin = CommonDateUtils.localDateTimeToTimestamp(minusDays);
-                map.put("createdBegin", timeBegin);
-                map.put("createdEnd", CommonDateUtils.localDateTimeToTimestamp(localDateTime));
-            } else if (BbextendConst.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
-                map.put("createdBegin", startDate);
-                map.put("createdEnd", endDate);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        map.put("createdBegin", startDate);
+        map.put("createdEnd", endDate);
+//        try {
+//            if (BbextendConst.HISTORY_TYPE_LAST_TWO_DAYS.equals(historyType)) {
+//                LocalDate minusDays = localDate.minusDays(2L);
+//                long timeBegin = CommonDateUtils.localDateToTimestamp(minusDays);
+//                map.put("createdBegin", timeBegin);
+//                map.put("createdEnd", CommonDateUtils.localDateToTimestamp(localDate));
+//            } else if (BbextendConst.HISTORY_TYPE_LAST_THREE_MONTHS.equals(historyType)) {
+//                map.put("createdBegin", startDate);
+//                map.put("createdEnd", endDate);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 }

@@ -13,7 +13,7 @@ import com.hp.sh.expv3.pc.module.sys.service.ShardTableService;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping("/api/bb/maintain2")
+@RequestMapping("/api/pc/maintain2")
 public class MaintainShardAction{
 	private static final Logger logger = LoggerFactory.getLogger(MaintainShardAction.class);
 

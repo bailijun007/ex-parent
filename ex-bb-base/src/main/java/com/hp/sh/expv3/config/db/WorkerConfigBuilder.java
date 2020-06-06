@@ -11,10 +11,8 @@ import org.springframework.stereotype.Component;
 import com.hp.sh.expv3.bb.module.account.entity.BBAccountRecord;
 import com.hp.sh.expv3.bb.module.collector.entity.BBCollectorAccountRecord;
 import com.hp.sh.expv3.bb.module.log.entity.BBAccountLog;
-import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrder;
 import com.hp.sh.expv3.bb.module.order.entity.BBOrderHistory;
-import com.hp.sh.expv3.bb.module.order.entity.BBOrderTrade;
 import com.hp.sh.expv3.bb.module.trade.entity.BBMatchedTrade;
 import com.hp.sh.expv3.component.id.config.SequencConfig;
 import com.hp.sh.expv3.component.id.config.WorkerConfig;
@@ -36,12 +34,6 @@ public class WorkerConfigBuilder {
 	private static final String BB_ORDER_HISTORY = BBOrderHistory.class.getName();
 	private static final int BB_ORDER_HISTORY_ID = IdTypeEnum.BB_ORDER_HISTORY_ID.getValue();
 
-//	private static final String BB_ORDER_TRADE = BBOrderTrade.class.getName();
-//	private static final int BB_ORDER_TRADE_ID = IdTypeEnum.BB_ORDER_TRADE_ID.getValue();
-
-//	private static final String BB_ACTIVE_ORDER = BBActiveOrder.class.getName();
-//	private static final int BB_ACTIVE_ORDER_ID = IdTypeEnum.BB_ACTIVE_ORDER_ID.getValue();
-
 	private static final String BB_MATCHED_TRADE = BBMatchedTrade.class.getName();
 	private static final int BB_MATCHED_TRADE_ID = IdTypeEnum.BB_MATCHED_TRADE_ID.getValue();
 
@@ -51,10 +43,6 @@ public class WorkerConfigBuilder {
 	private static final String BB_ACCOUNT_LOG = BBAccountLog.class.getName();
 	private static final int BB_ACCOUNT_LOG_ID = IdTypeEnum.BB_ACCOUNT_LOG_ID.getValue();
 
-//	private static final String BB_MESSAGE_EXT = BBMessageExt.class.getName();
-//	private static final int BB_MESSAGE_EXT_ID = IdTypeEnum.BB_MESSAGE_EXT_ID.getValue();
-	
-	
 	@Value("${id.generator.dataCenterId}")
 	private int dataCenterId;
 	
@@ -77,11 +65,8 @@ public class WorkerConfigBuilder {
 		this.set(workerConfig, BB_ACCOUNT_RECORD_ID, BB_ACCOUNT_RECORD);
 		this.set(workerConfig, BB_ORDER_ID, BB_ORDER);
 		this.set(workerConfig, BB_ORDER_HISTORY_ID, BB_ORDER_HISTORY);
-//		this.set(workerConfig, BB_ORDER_TRADE_ID, BB_ORDER_TRADE);
-//		this.set(workerConfig, BB_ACTIVE_ORDER_ID, BB_ACTIVE_ORDER);
 		this.set(workerConfig, BB_MATCHED_TRADE_ID, BB_MATCHED_TRADE);
 		this.set(workerConfig, BB_COLLECTOR_ACCOUNT_RECORD_ID, BB_COLLECTOR_ACCOUNT_RECORD);
-//		this.set(workerConfig, BB_MESSAGE_EXT_ID, BB_MESSAGE_EXT);
 	}
 	
 	private void set(WorkerConfig workerConfig, int seqId, String tableUUID){

@@ -79,7 +79,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
      * @return
      */
     @Override
-    public PageResult<PcOrderVo> queryAllOrders(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, String startTime, String endTime) {
+    public PageResult<PcOrderVo> queryAllOrders(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, Long startTime, Long endTime) {
         PageResult<PcOrderVo> result = new PageResult<PcOrderVo>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
@@ -89,8 +89,8 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
         map.put("pageSize", pageSize);
-        map.put("createdBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("createdEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
         isPage(lastOrderId, currentPage, pageSize, nextPage, isTotalNumber, result, map);
         return result;
     }
@@ -116,38 +116,40 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
-    public PageResult<PcOrderVo> queryHistoryOrders(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, String startTime, String endTime) {
+    public PageResult<PcOrderVo> queryHistoryOrders(Long userId, String asset, List<String> symbolList, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, Long startTime, Long endTime) {
         PageResult<PcOrderVo> result = new PageResult<PcOrderVo>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("symbol", symbol);
+//        map.put("symbol", symbol);
+        map.put("symbolList", symbolList);
         map.put("status", status);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
         map.put("activeFlag", IntBool.NO);
         map.put("pageSize", pageSize);
-        map.put("createdBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("createdEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
         isPage(lastOrderId, currentPage, pageSize, nextPage, isTotalNumber, result, map);
 
         return result;
     }
 
     @Override
-    public List<PcOrderVo> queryHistory(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, String startTime, String endTime) {
+    public List<PcOrderVo> queryHistory(Long userId, String asset, List<String> symbolList, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, Long startTime, Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("symbol", symbol);
+//        map.put("symbol", symbol);
+        map.put("symbolList", symbolList);
         map.put("status", status);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
         map.put("activeFlag", IntBool.NO);
         map.put("lastOrderId", lastOrderId);
         map.put("limit", pageSize);
-        map.put("createdBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("createdEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
         List<PcOrderVo> list = this.pcOrderDAO.queryNextList(map);
         return list;
     }
@@ -165,7 +167,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
-    public List<PcOrderVo> queryOrderList(Long userId, List<String> assetList, List<String> symbolList, Long gtOrderId, Long ltOrderId, Integer count, List<Integer> statusList, String startTime, String endTime) {
+    public List<PcOrderVo> queryOrderList(Long userId, List<String> assetList, List<String> symbolList, Long gtOrderId, Long ltOrderId, Integer count, List<Integer> statusList, Long startTime, Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("assetList", assetList);
@@ -174,8 +176,8 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("gtOrderId", gtOrderId);
         map.put("ltOrderId", ltOrderId);
         map.put("limit", count);
-        map.put("createdBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("createdEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
 
         List<PcOrderVo> list = null;
         //如果状态为已取消 或者部分成交，则直接查pc_order_history表
@@ -190,7 +192,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
-    public PageResult<UserOrderVo> pageQueryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag, Long orderId, Integer pageNo, Integer pageSize, String startTime, String endTime) {
+    public PageResult<UserOrderVo> pageQueryOrderList(Long userId, String asset, String symbol, Integer status, Integer closeFlag, Long orderId, Integer pageNo, Integer pageSize, Long startTime, Long endTime) {
         PageResult<UserOrderVo> result = new PageResult<>();
         PageHelper.startPage(pageNo, pageSize);
         Map<String, Object> map = new HashMap<>();
@@ -200,8 +202,8 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("symbol", symbol);
         map.put("status", status);
         map.put("closeFlag", closeFlag);
-        map.put("createdBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("createdEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
         List<UserOrderVo> list = new ArrayList<>();
         List<PcOrderVo> voList = pcOrderDAO.queryList(map);
         PageInfo<PcOrderVo> info = new PageInfo<>(voList);
@@ -249,7 +251,7 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
-    public PageResult<PcOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, Integer isPageYes, String startTime, String endTime) {
+    public PageResult<PcOrderVo> queryAll(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer pageSize, Integer isPageYes, Long startTime, Long endTime) {
         PageResult<PcOrderVo> result = new PageResult<>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
@@ -260,8 +262,8 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
         map.put("closeFlag", closeFlag);
         map.put("lastOrderId", lastOrderId);
         map.put("limit", pageSize);
-        map.put("createdBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("createdEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
 
         List<PcOrderVo> list = this.pcOrderDAO.queryNextList(map);
         result.setRowTotal(Long.parseLong(String.valueOf(list.size())));
@@ -270,20 +272,21 @@ public class PcOrderExtendServiceImpl implements PcOrderExtendService {
     }
 
     @Override
-    public PageResult<PcOrderVo> queryActivityOrder(Long userId, String asset, String symbol, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, String startTime, String endTime) {
+    public PageResult<PcOrderVo> queryActivityOrder(Long userId, String asset, List<String> symbolList, Integer status, Integer longFlag, Integer closeFlag, Long lastOrderId, Integer currentPage, Integer pageSize, Integer nextPage, Integer isTotalNumber, Long startTime, Long endTime) {
         PageResult<PcOrderVo> result = new PageResult<PcOrderVo>();
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("symbol", symbol);
+//        map.put("symbol", symbol);
+        map.put("symbolList", symbolList);
         map.put("status", status);
         map.put("longFlag", longFlag);
         map.put("closeFlag", closeFlag);
         map.put("activeFlag", IntBool.YES);
         map.put("lastOrderId", lastOrderId);
         map.put("limit", pageSize);
-        map.put("createdBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("createdEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
 
 
         List<PcOrderVo> list = this.pcOrderDAO.queryActivityOrder(map);

@@ -141,13 +141,34 @@ public class BBMaintainAction{
 	}
 
 	@ApiOperation(value = "sendAllRebase")
-	@GetMapping(value = "/sendAllRebase")	
-	public void sendAllRebase(){
+	@GetMapping(value = "/sendAllRebase")
+	public Map sendAllRebase(){
+		Map result = new HashMap();
 		String asset = "USDT";
 		String[] symbols = {"BTC_USDT","EOS_USDT","ETH_USDT","LTC_USDT","BCH_USDT","BSV_USDT","BYS_USDT","ETC_USDT","XRP_USDT"};
 		for(String symbol : symbols){
 			this.matchMqSender.sendRebaseMsg(new OrderRebaseMsg(asset, symbol));
+			Map map = this.resendPending(asset, symbol);
+			result.put(asset+"__"+symbol, map);
 		}
+		
+		return result;
+	}
+
+	@ApiOperation(value = "cancelAll")
+	@GetMapping(value = "/cancelAll")
+	public Map cancelAll(){
+		Map result = new HashMap();
+		String asset = "USDT";
+		String[] symbols = {"BTC_USDT","EOS_USDT","ETH_USDT","LTC_USDT","BCH_USDT","BSV_USDT","BYS_USDT","ETC_USDT","XRP_USDT"};
+		for(String symbol : symbols){
+			List<BBOrder> list1 = this.orderQueryService.queryPendingActive(null, asset, symbol, null, null, null);
+			for(BBOrder order: list1){
+				this.orderApiAction.setCancelled(order.getUserId(), asset, symbol, order.getId());
+			}
+		}
+		
+		return result;
 	}
 
 	@ApiOperation(value = "resendPendingCancel")

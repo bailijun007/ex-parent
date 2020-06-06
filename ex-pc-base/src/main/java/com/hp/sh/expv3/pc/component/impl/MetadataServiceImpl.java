@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.HashOperations;
@@ -18,7 +20,9 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.component.vo.PcContractVO;
+import com.hp.sh.expv3.pc.component.vo.PosLevelVo;
 import com.hp.sh.expv3.pc.constant.RedisKey;
+import com.hp.sh.expv3.utils.math.BigUtils;
 
 /**
  * @author BaiLiJun  on 2019/12/18
@@ -26,12 +30,10 @@ import com.hp.sh.expv3.pc.constant.RedisKey;
 @Primary
 @Component
 public class MetadataServiceImpl implements MetadataService {
+	private static final Logger logger = LoggerFactory.getLogger(MetadataServiceImpl.class);
 
     @Resource(name = "templateDB0")
     private StringRedisTemplate templateDB0;
-
-    @Resource(name = "templateDB5")
-    private StringRedisTemplate templateDB5;
 
     /**
      * redis :
@@ -79,5 +81,28 @@ public class MetadataServiceImpl implements MetadataService {
         return list;
     }
 
+    @Override
+    public BigDecimal getMaxLeverage(Long userId, String asset, String symbol, BigDecimal posVolume){
+    	PosLevelVo vo = this.findPosLevelVo(userId, asset, symbol, posVolume);
+    	if(vo==null){
+    		logger.error("{}__{}:{} is null", asset, symbol, posVolume);
+    	}
+    	return vo.getMaxLeverage();
+    }
+    
+    private PosLevelVo findPosLevelVo(Long userId, String asset, String symbol, BigDecimal volume) {
+        HashOperations hashOperations = templateDB0.opsForHash();
+        String hashKey = asset + "__" + symbol;
+        Object s = hashOperations.get(RedisKey.PC_POS_LEVEL, hashKey);
+        List<PosLevelVo> voList = JSON.parseArray(s.toString(), PosLevelVo.class);
+        Optional<PosLevelVo> first = voList.stream().filter(vo -> vo.getMinAmt().compareTo(volume) <= 0 && vo.getMaxAmt().compareTo(volume) >= 0).findFirst();
+        PosLevelVo result = null;
+        for(PosLevelVo vo : voList){
+        	if(BigUtils.between(volume, vo.getMinAmt(), vo.getMaxAmt())){
+        		result = vo;
+        	}
+        }
+        return result;
+    }
 
 }

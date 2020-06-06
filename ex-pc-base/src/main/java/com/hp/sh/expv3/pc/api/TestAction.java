@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.pc.component.FeeRatioService;
+import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.job.liq.LiquidationHandler;
 import com.hp.sh.expv3.pc.module.liq.service.PcLiqService;
 import com.hp.sh.expv3.pc.module.order.service.PcOrderService;
@@ -40,6 +41,9 @@ public class TestAction{
 	
 	@Autowired
 	private FeeRatioService feeRatioService;
+
+	@Autowired
+	private MetadataService metadataService;
 	
 	@Autowired
 	private LiquidationHandler liquidationJob;
@@ -79,7 +83,7 @@ public class TestAction{
 		BigDecimal fee2 = feeRatioService.getMakerFeeRatio(109027203634737280L, "BTC", "BTC_USDT");
 		BigDecimal hr = feeRatioService.getHoldRatio(109027203634737280L, "BTC", "BTC_USDT", BigDecimal.ZERO);
 		
-		BigDecimal maxlev = feeRatioService.getMaxLeverage(109027203634737280L, "BTC", "BTC_USDT", BigDecimal.ZERO);
+		BigDecimal maxlev = metadataService.getMaxLeverage(109027203634737280L, "BTC", "BTC_USDT", BigDecimal.ZERO);
 		
 		return fee2;
 	}

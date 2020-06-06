@@ -1,13 +1,12 @@
 package com.hp.sh.expv3.bb.extension.util;
 
+import com.hp.sh.expv3.constant.ExpTimeZone;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author BaiLiJun  on 2020/5/9
@@ -34,7 +33,7 @@ public final class CommonDateUtils {
 
         List<Integer> list = new ArrayList<>();
         for (int i = p1; i <= p2; i++) {
-            Boolean b = isData("yyyyMM",i + "");
+            Boolean b = isData("yyyyMM", i + "");
             if (b) {
                 list.add(i);
             }
@@ -53,38 +52,51 @@ public final class CommonDateUtils {
     public static Long stringToTimestamp(String str) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         java.time.LocalDate startLdt = java.time.LocalDate.parse(str, dtf);
-        Long begin = startLdt.atStartOfDay(ZoneOffset.systemDefault()).toInstant().toEpochMilli();
+        Long begin = startLdt.atStartOfDay(ExpTimeZone.timeZone.toZoneId()).toInstant().toEpochMilli();
         return begin;
     }
 
 
     /**
      * 时间戳转String
+     *
      * @param timestamp
      * @return
      */
     public static String timestampToString(Long timestamp) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate beginDate = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate beginDate = Instant.ofEpochMilli(timestamp).atZone(ExpTimeZone.timeZone.toZoneId()).toLocalDate();
         return dtf.format(beginDate);
     }
 
     /**
      * LocalDate 转时间戳
+     *
      * @param localDate
      * @return
      */
-    public static Long localDateToTimestamp(LocalDate localDate){
-        return  localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    public static Long localDateToTimestamp(LocalDate localDate) {
+        return localDate.atStartOfDay(ExpTimeZone.timeZone.toZoneId()).toInstant().toEpochMilli();
     }
 
+    // 返回的UTC时间戳
+    public static Long getUTCTime() throws Exception {
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        cal.setTimeZone(tz);
+        Long timeInMillis = cal.getTimeInMillis();
+        return timeInMillis;
+    }
+
+
     /**
-     * LocalDateTime 转时间戳
+     * LocalDateTime 转 UTC 时间戳
+     *
      * @param localDateTime
      * @return
      */
-    public static Long localDateTimeToTimestamp(LocalDateTime localDateTime){
-        return  localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+    public static Long localDateTimeToTimestamp(LocalDateTime localDateTime) {
+        return localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
     /**
@@ -93,7 +105,7 @@ public final class CommonDateUtils {
      * @param s
      * @return
      */
-    public static Boolean isData(String pattern,String s) {
+    public static Boolean isData(String pattern, String s) {
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         formatter.setLenient(false);
         try {
@@ -123,17 +135,19 @@ public final class CommonDateUtils {
         return localDate;
     }
 
-    public static String[] getStartAndEndTime(String startTime, String endTime) {
-        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        if (org.apache.commons.lang3.StringUtils.isEmpty(startTime)) {
-            startTime = getDefaultDateTime(startTime);
-            LocalDate startDate = stringToLocalDate(startTime);
-            startTime = startDate.format(pattern);
-            LocalDate endDate = startDate.plusDays(1);
-            endTime = endDate.format(pattern);
+
+    public static Long[] getStartAndEndTimeByLong(Long startTime, Long endTime) {
+        if (null == startTime) {
+            LocalDateTime localDateTime = LocalDateTime.now(TimeZone.getTimeZone("UTC").toZoneId());
+            Instant instant = localDateTime.toInstant(ZoneOffset.UTC);
+            endTime = instant.toEpochMilli();
+            //一天等于多少毫秒：24*3600*1000
+            long minusDay = 24 * 60 * 60 * 1000;
+            startTime = endTime - minusDay;
         }
-        String[] startAndEndTime = {startTime, endTime};
+        Long[] startAndEndTime = {startTime, endTime};
         return startAndEndTime;
     }
+
 
 }

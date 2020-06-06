@@ -50,7 +50,7 @@ public interface BbOrderTradeExtApi {
 //    );
 
     @ApiOperation(value = "查某个时间区间某个用户的成交记录 (不传时间则默认查今天以前的所有数据)")
-    @GetMapping(value = "/api/bb/trade/ext/selectTradeListByUserId")
+    @GetMapping(value = "/api/bb/orderTrade/ext/selectTradeListByUserId")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
@@ -69,7 +69,7 @@ public interface BbOrderTradeExtApi {
     );
 
     @ApiOperation(value = "查询成交记录列表(后台admin接口)")
-    @GetMapping(value = "/api/bb/trade/ext/selectBbFeeCollectByAccountId")
+    @GetMapping(value = "/api/bb/orderTrade/ext/selectBbFeeCollectByAccountId")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
@@ -83,7 +83,7 @@ public interface BbOrderTradeExtApi {
 
 
     @ApiOperation(value = "获取当前用户交易明细")
-    @GetMapping(value = "/api/extension/bb/orderTrade/queryHistory")
+    @GetMapping(value = "/api/bb/ext/orderTrade/queryHistory")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
@@ -97,6 +97,6 @@ public interface BbOrderTradeExtApi {
     List<BbOrderTradeDetailVo> queryHistory(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
                                             @RequestParam("symbol") String symbol, @RequestParam(value = "lastTradeId", required = false) Long lastTradeId,
                                             @RequestParam("nextPage") Integer nextPage, @RequestParam("pageSize") Integer pageSize,
-                                            @RequestParam(value = "startTime", required = false) String startTime, @RequestParam(value = "endTime", required = false) String endTime);
+                                            @RequestParam(value = "startTime", required = false) Long startTime, @RequestParam(value = "endTime", required = false) Long endTime);
 
 }

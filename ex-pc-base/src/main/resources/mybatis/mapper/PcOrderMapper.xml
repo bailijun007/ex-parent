@@ -141,7 +141,8 @@
 				1
 			from 
 				pc_order
-			<include refid="simple_where" />
+			where
+				user_id=#{userId} and asset=#{asset} and symbol=#{symbol} and long_flag=#{longFlag}
 			limit 1
 		)
 	</select>

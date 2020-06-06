@@ -29,16 +29,16 @@ public interface PcOrderTradeExtendApi {
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
             @ApiImplicitParam(name = "orderId ", value = "委托id", example = "1", required = true),
-            @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
-            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false)
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间",  required = false)
     })
     List<PcOrderTradeDetailVo> queryOrderTradeDetail(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
                                                      @RequestParam("symbol") String symbol, @RequestParam("orderId") String orderId,
-                                                     @RequestParam(value = "startTime", required = false) String startTime, @RequestParam(value = "endTime", required = false) String endTime);
+                                                     @RequestParam(value = "startTime", required = false) Long startTime, @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "获取当前用户交易明细")
-    @GetMapping(value = "/api/extension/pc/orderTrade/queryHistory")
+    @GetMapping(value = "/api/pc/ext/orderTrade/queryHistory")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
@@ -46,13 +46,13 @@ public interface PcOrderTradeExtendApi {
             @ApiImplicitParam(name = "lastTradeId  ", value = "主键id,不传返回最新的20条数据", example = "1", required = false),
             @ApiImplicitParam(name = "nextPage", value = "-1.上一页,1.下一页", example = "1", required = true),
             @ApiImplicitParam(name = "pageSize ", value = "页行数", example = "20", required = true),
-            @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
-            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false)
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间",  required = false)
     })
     List<PcOrderTradeDetailVo> queryHistory(@RequestParam("userId") Long userId, @RequestParam("asset") String asset,
                                             @RequestParam("symbol") String symbol, @RequestParam(value = "lastTradeId", required = false) Long lastTradeId,
                                             @RequestParam("nextPage") Integer nextPage, @RequestParam("pageSize") Integer pageSize,
-                                            @RequestParam(value = "startTime", required = false) String startTime, @RequestParam(value = "endTime", required = false) String endTime);
+                                            @RequestParam(value = "startTime", required = false) Long startTime, @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "查询成交记录")
@@ -63,8 +63,8 @@ public interface PcOrderTradeExtendApi {
             @ApiImplicitParam(name = "gtTradeId ", value = "成交记录id,请求大于trade_id的数据,gt和lt都填,以gt为准", example = "10", required = false),
             @ApiImplicitParam(name = "ltTradeId ", value = "成交记录id,请求小于trade_id的数据", example = "10", required = false),
             @ApiImplicitParam(name = "count ", value = "返回条数,最大100条", example = "10", required = false),
-            @ApiImplicitParam(name = "startTime", value = "开始时间", example = "2020-05-01", required = false),
-            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "2020-05-09", required = false)
+            @ApiImplicitParam(name = "startTime", value = "开始时间",  required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false)
     })
     List<PcOrderTradeDetailVo> queryTradeRecord(
             @RequestParam(value = "asset") String asset,
@@ -72,8 +72,8 @@ public interface PcOrderTradeExtendApi {
             @RequestParam(value = "gtTradeId", required = false) Long gtTradeId,
             @RequestParam(value = "ltTradeId", required = false) Long ltTradeId,
             @RequestParam(value = "count", required = true) Integer count,
-            @RequestParam(value = "startTime", required = false) String startTime,
-            @RequestParam(value = "endTime", required = false) String endTime);
+            @RequestParam(value = "startTime", required = false) Long startTime,
+            @RequestParam(value = "endTime", required = false) Long endTime);
 
     @ApiOperation(value = "查小于某个时间点的最大的一条记录")
     @GetMapping(value = "/api/extension/pc/orderTrade/selectLessTimeTrade")
@@ -109,8 +109,8 @@ public interface PcOrderTradeExtendApi {
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
-            @ApiImplicitParam(name = "statTime", value = "开始时间", example = "1578886491000", required = true),
-            @ApiImplicitParam(name = "endTime", value = "结束时间", example = "1578891531000", required = true)
+            @ApiImplicitParam(name = "statTime", value = "开始时间",  required = true),
+            @ApiImplicitParam(name = "endTime", value = "结束时间",  required = true)
     })
     List<PcOrderTradeDetailVo> selectPcFeeCollectByAccountId(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol,
                                                              @RequestParam("userId") Long userId, @RequestParam("statTime") Long statTime, @RequestParam("endTime") Long endTime);
@@ -122,8 +122,8 @@ public interface PcOrderTradeExtendApi {
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
             @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
             @ApiImplicitParam(name = "userId ", value = "用户id", required = true),
-            @ApiImplicitParam(name = "startTime ", value = "开始时间", required = false),
-            @ApiImplicitParam(name = "endTime ", value = "结束时间", required = false)
+            @ApiImplicitParam(name = "startTime ", required = false),
+            @ApiImplicitParam(name = "endTime ",  required = false)
     })
     List<PcOrderTradeExtendVo> selectTradeListByUserId(
             @RequestParam(value = "asset", required = true) String asset,

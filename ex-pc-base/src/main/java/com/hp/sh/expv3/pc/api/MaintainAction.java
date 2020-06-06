@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gitee.hupadev.commons.page.Page;
+import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.pc.component.MarkPriceService;
+import com.hp.sh.expv3.pc.component.MetadataService;
+import com.hp.sh.expv3.pc.component.vo.PcContractVO;
 import com.hp.sh.expv3.pc.constant.OrderStatus;
 import com.hp.sh.expv3.pc.module.liq.service.PcLiqService;
 import com.hp.sh.expv3.pc.module.order.entity.PcOrder;
@@ -54,6 +57,12 @@ public class MaintainAction{
     
     @Autowired
     private MarkPriceService markPriceService;
+
+    @Autowired
+    private MetadataService metadataService;
+    
+    @Autowired
+    private MaintainAction self;
 	
 	@ApiOperation(value = "version")
 	@GetMapping(value = "/api/pc/maintain/version")
@@ -99,7 +108,7 @@ public class MaintainAction{
 	}
 	
 	@ApiOperation(value = "sendRebase")
-	@GetMapping(value = "/sendRebase")	
+	@GetMapping(value = "/api/pc/maintain/rebase/sendRebase")	
 	public void sendRebase(String asset, String symbol){
 		this.matchMqSender.sendRebaseMsg(new OrderRebaseMsg(asset, symbol));
 	}
@@ -252,6 +261,30 @@ public class MaintainAction{
 		PcPosition pos = this.positionDataService.getPosition(userId, posId);
 		BigDecimal liqMarkPrice = this.markPriceService.getCurrentMarkPrice(asset, symbol);
 		liqService.forceClose(pos, liqMarkPrice);
+	}
+	
+	@ApiOperation(value = "cancelAll")
+	@GetMapping(value = "/api/pc/maintain/order/cancelAll")
+	public Map cancelAll(){
+		Map result = new HashMap();
+		
+		List<PcContractVO> pcList = metadataService.getAllPcContract();
+		for(PcContractVO pc : pcList){
+			String asset = pc.getAsset();
+			String symbol = pc.getSymbol();
+			this.resendPendingCancel(asset, symbol);
+		}
+		
+		return result;
+	}
+	
+	@ApiOperation(value = "rebaseAll")
+	@GetMapping(value = "/api/pc/maintain/rebase/rebaseAll")	
+	public void rebaseAll(){
+		List<PcContractVO> pcList = metadataService.getAllPcContract();
+		for(PcContractVO pc : pcList){
+			this.resendPending(pc.getAsset(), pc.getSymbol());
+		}
 	}
 	
 }

@@ -75,14 +75,15 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, String symbol, List<Long> orderIds, String startTime, String endTime) {
+    public List<PcOrderTradeVo> listOrderTrade(Long userId, String asset, List<String> symbolList, List<Long> orderIds, Long startTime, Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
-        map.put("symbol", symbol);
+//        map.put("symbol", symbol);
+        map.put("symbolList", symbolList);
         map.put("orderIds", orderIds);
-        map.put("tradeTimeBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("tradeTimeEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("tradeTimeBegin", startTime);
+        map.put("tradeTimeEnd", endTime);
         List<PcOrderTradeVo> voList = pcOrderTradeDAO.queryList(map);
         return voList;
     }
@@ -112,15 +113,15 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count, String startTime, String endTime) {
+    public List<PcOrderTradeVo> queryTradeRecords(List<String> assetList, List<String> symbolList, Long gtTradeId, Long ltTradeId, Integer count, Long startTime, Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("assetList", assetList);
         map.put("symbolList", symbolList);
         map.put("gtTradeId", gtTradeId);
         map.put("ltTradeId", ltTradeId);
         map.put("limit", count);
-        map.put("tradeTimeBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("tradeTimeEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("tradeTimeBegin", startTime);
+        map.put("tradeTimeEnd", endTime);
         List<PcOrderTradeVo> voList = pcOrderTradeDAO.queryTradeRecords(map);
 
         return voList;
@@ -132,9 +133,8 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
         map.put("asset", asset);
         map.put("symbol", symbol);
         map.put("tradeTimeEnd", statTime);
-        LocalDate localDate = Instant.ofEpochMilli(statTime).atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate minusDays = localDate.minusDays(1);
-        Long tradeTimeBegin = CommonDateUtils.localDateToTimestamp(minusDays);
+        long minusDay = 24 * 60 * 60 * 1000;
+        Long tradeTimeBegin = statTime - minusDay;
         map.put("tradeTimeBegin", tradeTimeBegin);
         PcOrderTradeVo vo = pcOrderTradeDAO.selectLessTimeTrade(map);
 
@@ -186,13 +186,13 @@ public class PcOrderTradeExtendServiceImpl implements PcOrderTradeExtendService 
     }
 
     @Override
-    public List<PcOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime) {
+    public List<PcOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, Long startTime, Long endTime) {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
         map.put("symbol", symbol);
-        map.put("tradeTimeBegin", CommonDateUtils.stringToTimestamp(startTime));
-        map.put("tradeTimeEnd", CommonDateUtils.stringToTimestamp(endTime));
+        map.put("tradeTimeBegin", startTime);
+        map.put("tradeTimeEnd", endTime);
         map.put("limit", pageSize);
         List<PcOrderTradeDetailVo> list = pcOrderTradeDAO.queryHistory(map);
         if (!CollectionUtils.isEmpty(list)) {

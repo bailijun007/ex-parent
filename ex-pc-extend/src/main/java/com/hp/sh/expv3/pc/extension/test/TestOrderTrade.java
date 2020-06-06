@@ -36,13 +36,13 @@ public class TestOrderTrade {
 
     @Test
     public void queryOrderTradeDetail() {
-        final List<PcOrderTradeDetailVo> detailVos = pcOrderTradeExtendApiAction.queryOrderTradeDetail(1L, "BTC", "BTC_USDT", "1", "2020-05-20", "2020-05-22");
+        final List<PcOrderTradeDetailVo> detailVos = pcOrderTradeExtendApiAction.queryOrderTradeDetail(1L, "BTC", "BTC_USDT", "1", null, null);
         System.out.println("detailVos = " + detailVos);
     }
 
     @Test
     public void queryTradeRecord() {
-        final List<PcOrderTradeDetailVo> pcOrderTradeDetailVos = pcOrderTradeExtendApiAction.queryTradeRecord("BTC", "BTC_USDT", null, null, 50, "2020-05-20", "2020-05-22");
+        final List<PcOrderTradeDetailVo> pcOrderTradeDetailVos = pcOrderTradeExtendApiAction.queryTradeRecord("BTC", "BTC_USDT", null, null, 50, null, null);
         System.out.println("pcOrderTradeDetailVos = " + pcOrderTradeDetailVos);
     }
 

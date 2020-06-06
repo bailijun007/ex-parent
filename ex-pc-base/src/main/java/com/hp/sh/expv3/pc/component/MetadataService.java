@@ -17,4 +17,8 @@ public interface MetadataService {
 	PcContractVO getPcContract(String asset, String symbol);
 
 	List<PcContractVO> getAllPcContract();
+	
+	default BigDecimal getMaxLeverage(Long userId, String asset, String symbol, BigDecimal posVolume){
+		return new BigDecimal(50);
+	}
 }

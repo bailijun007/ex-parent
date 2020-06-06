@@ -140,7 +140,9 @@ public class PcOrderlyConsumer {
         				Throwable cause = ExceptionUtils.getRootCause(e);
         				logger.error("未捕获异常 Cause, {}", cause.toString());
         			}else{
+        				Throwable cause = ExceptionUtils.getRootCause(e);
         				logger.error("未捕获异常 e, {}", e.getMessage(), e);
+        				logger.error("未捕获异常 Cause, {}", cause.toString());
         			}
         			return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
         		}

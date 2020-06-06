@@ -25,10 +25,6 @@ public class QueryKlineDataByThirdDataController implements QueryKlineDataByThir
         queryKlineDataByThirdDataService.queryKlineDataByThirdData(tableName, klineType, asset, pair, interval, openTimeBegin, openTimeEnd);
     }
 
-    @Override
-    public void queryKlineDataByProd(String tableName, Integer klineType, String asset, String pair, String interval, Long openTimeBegin, Long openTimeEnd) {
-        queryKlineDataByThirdDataService.queryKlineDataByProd(tableName, klineType, asset, pair, interval, openTimeBegin, openTimeEnd);
 
-    }
 
 }

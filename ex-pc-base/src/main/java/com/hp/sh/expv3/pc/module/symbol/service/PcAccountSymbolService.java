@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hp.sh.expv3.commons.lock.LockIt;
+import com.hp.sh.expv3.pc.component.MetadataService;
 import com.hp.sh.expv3.pc.component.PcDefaultSymbolSetting;
 import com.hp.sh.expv3.pc.module.symbol.dao.PcAccountSymbolDAO;
 import com.hp.sh.expv3.pc.module.symbol.entity.PcAccountSymbol;
@@ -31,8 +31,12 @@ public class PcAccountSymbolService{
 	
 	@Autowired
 	private PcDefaultSymbolSetting pcDefaultSymbolSetting;
+	
     @Autowired
     private ApplicationEventPublisher publisher;
+    
+	@Autowired
+	private MetadataService metadataService;
 
 	public PcAccountSymbol create(Long userId, String asset, String symbol){
 		PcAccountSymbol as = this.get(userId, asset, symbol);
@@ -43,16 +47,17 @@ public class PcAccountSymbolService{
 	}
 	
 	private PcAccountSymbol doCreate(Long userId, String asset, String symbol){
+		BigDecimal maxLeverage = metadataService.getMaxLeverage(userId, asset, symbol, BigDecimal.ZERO);
 		Long now = DbDateUtils.now();
 		PcAccountSymbol entity = new PcAccountSymbol();
 		entity.setAsset(asset);
+		entity.setLongMaxLeverage(maxLeverage);
+		entity.setShortMaxLeverage(maxLeverage);
+		entity.setCrossMaxLeverage(maxLeverage);
 		entity.setMarginMode(pcDefaultSymbolSetting.getMarginMode());
-		entity.setLongMaxLeverage(pcDefaultSymbolSetting.getLongMaxLeverage(asset, symbol));
-		entity.setShortMaxLeverage(pcDefaultSymbolSetting.getShortMaxLeverage(asset, symbol));
 		entity.setCrossLeverage(pcDefaultSymbolSetting.getCrossLeverage(asset, symbol));
 		entity.setLongLeverage(pcDefaultSymbolSetting.getLongLeverage(asset, symbol));
 		entity.setShortLeverage(pcDefaultSymbolSetting.getShortLeverage(asset, symbol));
-		entity.setCrossMaxLeverage(pcDefaultSymbolSetting.getCrossMaxLeverage(asset, symbol));
 		entity.setSymbol(symbol);
 		entity.setUserId(userId);
 		entity.setVersion(0L);

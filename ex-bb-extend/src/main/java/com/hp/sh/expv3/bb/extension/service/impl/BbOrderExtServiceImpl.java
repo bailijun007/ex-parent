@@ -46,17 +46,17 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     private BBExtCommonOrderStrategy orderStrategy;
 
     @Override
-    public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, String symbol, String startTime, String endTime, Integer pageNo, Integer pageSize) {
+    public PageResult<BbOrderVo> queryAllBbOrederHistory(Long userId, String asset, String symbol, Long startTime, Long endTime, Integer pageNo, Integer pageSize) {
         PageResult<BbOrderVo> pageResult = new PageResult<>();
         List<BbOrderVo> list = null;
-        long begin = CommonDateUtils.stringToTimestamp(startTime);
-        long end = CommonDateUtils.stringToTimestamp(endTime);
+//        long begin = CommonDateUtils.stringToTimestamp(startTime);
+//        long end = CommonDateUtils.stringToTimestamp(endTime);
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
         map.put("symbol", symbol);
-        map.put("createdBegin", begin);
-        map.put("createdEnd", end);
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
 
         Long count=bbOrderExtMapper.queryCount(map);
         map.put("offset", pageNo-1);
@@ -71,12 +71,12 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     }
 
     @Override
-    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage, String startTime, String endTime) {
+    public PageResult<BbHistoryOrderVo> queryHistoryOrderList(Long userId, String asset, String symbol, Integer bidFlag, Integer pageSize, Long lastOrderId, Integer nextPage, Long startTime, Long endTime) {
         PageResult<BbHistoryOrderVo> result = new PageResult<>();
         result.setRowTotal(0L);
         List<BbHistoryOrderVo> listResult = new ArrayList<>();
-        long begin = CommonDateUtils.stringToTimestamp(startTime);
-        long end = CommonDateUtils.stringToTimestamp(endTime);
+//        long begin = CommonDateUtils.stringToTimestamp(startTime);
+//        long end = CommonDateUtils.stringToTimestamp(endTime);
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("asset", asset);
@@ -84,25 +84,9 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("bidFlag", bidFlag);
         map.put("activeFlag", IntBool.NO);
         map.put("lastOrderId", lastOrderId);
-        map.put("createdBegin", begin);
-        map.put("createdEnd", end);
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
         map.put("limit", pageSize);
-
-//        List<Integer> timeDifference = CommonDateUtils.getTimeDifference(startTime, endTime);
-//        String tableName = null;
-//
-//        for (Integer date : timeDifference) {
-//            //tableName   eg:bb_order_history_usdt__bys_usdt_202005
-//            tableName = BbExtCommonConstant.BB_ORDER_HISTORY_PREFIX + asset.toLowerCase() + "__" + symbol.toLowerCase() + "_" + date;
-//            int existTable = bbOrderExtMapper.existTable(BbExtCommonConstant.DB_NAME_EXPV3_BB, tableName);
-//            //表不存在则直接跳过
-//            if (existTable != 1) {
-//                continue;
-//            }
-//            map.put("tableName", tableName);
-//
-//            //////
-//        }
 
         List<BbOrderVo> list = null;
         if (lastOrderId == null) {
@@ -190,10 +174,10 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
     }
 
     @Override
-    public List<BbHistoryOrderVo> queryOrderList(Long userId, List<String> assetList, List<String> symbolList, Long gtOrderId, Long ltOrderId, Integer count, List<Integer> statusList, String startTime, String endTime) {
+    public List<BbHistoryOrderVo> queryOrderList(Long userId, List<String> assetList, List<String> symbolList, Long gtOrderId, Long ltOrderId, Integer count, List<Integer> statusList, Long startTime, Long endTime) {
         List<BbHistoryOrderVo> result = new ArrayList<>();
-        Long begin = CommonDateUtils.stringToTimestamp(startTime);
-        Long end = CommonDateUtils.stringToTimestamp(endTime);
+//        Long begin = CommonDateUtils.stringToTimestamp(startTime);
+//        Long end = CommonDateUtils.stringToTimestamp(endTime);
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("assetList", assetList);
@@ -201,8 +185,8 @@ public class BbOrderExtServiceImpl implements BbOrderExtService {
         map.put("statusList", statusList);
         map.put("gtOrderId", gtOrderId);
         map.put("ltOrderId", ltOrderId);
-        map.put("createdBegin", begin);
-        map.put("createdEnd", end);
+        map.put("createdBegin", startTime);
+        map.put("createdEnd", endTime);
         map.put("limit", count);
         List<BbOrderVo> list = null;
         //如果状态为已取消 或者部分成交，则直接查bb_order表

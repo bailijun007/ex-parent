@@ -22,8 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * @author BaiLiJun  on 2020/2/15
@@ -67,11 +69,10 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
         }
 
         if (startTime == null) {
-            LocalDate localDate = LocalDate.now();
-            startTime = CommonDateUtils.localDateToTimestamp(localDate);
-            if (endTime == null) {
-                endTime = Instant.now().toEpochMilli();
-            }
+            LocalDateTime localDateTime = LocalDateTime.now(TimeZone.getTimeZone("UTC").toZoneId());
+            endTime = CommonDateUtils.localDateTimeToTimestamp(localDateTime);
+            long minusDay = 24 * 60 * 60 * 1000;
+            startTime = endTime - minusDay;
         }
         List<BbUserOrderTrade> tradeVo = bbOrderTradeExtService.selectTradeListByUserId(asset, symbol, startTime, endTime, userId, id);
         return tradeVo;
@@ -88,13 +89,13 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
     }
 
     @Override
-    public List<BbOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, String startTime, String endTime) {
+    public List<BbOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, Long startTime, Long endTime) {
         logger.info("进入获取当前用户交易明细接口，参数为：userId={},asset={},symbol={},lastTradeId={},nextPage={},pageSize={},startTime={},endTime={}", userId, asset, symbol, lastTradeId, nextPage, pageSize, startTime, endTime);
         if (StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol) || null == userId || pageSize == null || nextPage > 1 || nextPage < -1) {
             throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
         }
 
-        String[] startAndEndTime = CommonDateUtils.getStartAndEndTime(startTime, endTime);
+        Long[] startAndEndTime = CommonDateUtils.getStartAndEndTimeByLong(startTime, endTime);
         startTime = startAndEndTime[0];
         endTime = startAndEndTime[1];
         List<BbOrderTradeDetailVo> list = bbOrderTradeExtService.queryHistory(userId, asset, symbol, lastTradeId, nextPage, pageSize, startTime, endTime);

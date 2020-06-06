@@ -38,8 +38,8 @@ public interface PcOrderExtendApi {
                                      @RequestParam(value = "symbol", required = true) String symbol, @RequestParam(value = "gtOrderId", required = false) Long gtOrderId,
                                      @RequestParam(value = "ltOrderId", required = false) Long ltOrderId, @RequestParam("count") Integer count,
                                      @RequestParam("status") String status,
-                                     @RequestParam(value = "startTime", required = false) String startTime,
-                                     @RequestParam(value = "endTime", required = false) String endTime);
+                                     @RequestParam(value = "startTime", required = false) Long startTime,
+                                     @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "获取当前用户活动委托")
@@ -47,7 +47,7 @@ public interface PcOrderExtendApi {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
-            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
             @ApiImplicitParam(name = "orderType ", value = "委托类型,1:限价,非必填 ,不填为全部类型"),
             @ApiImplicitParam(name = "longFlag", value = "是否：1-多仓，0-空仓", example = "1"),
             @ApiImplicitParam(name = "closeFlag", value = "是否:1-平仓,0-开", example = "1"),
@@ -61,7 +61,7 @@ public interface PcOrderExtendApi {
     })
     PageResult<UserOrderVo> queryUserActivityOrder(@RequestParam("userId") Long userId,
                                                    @RequestParam("asset") String asset,
-                                                   @RequestParam(value = "symbol", required = true) String symbol,
+                                                   @RequestParam(value = "symbol", required = false) String symbol,
                                                    @RequestParam(value = "orderType", required = false) Integer orderType,
                                                    @RequestParam(value = "longFlag", required = false) Integer longFlag,
                                                    @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
@@ -70,8 +70,8 @@ public interface PcOrderExtendApi {
                                                    @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize,
                                                    @RequestParam(value = "lastOrderId", required = false) Long lastOrderId,
                                                    @RequestParam("nextPage") Integer nextPage,
-                                                   @RequestParam(value = "startTime", required = false) String startTime,
-                                                   @RequestParam(value = "endTime", required = false) String endTime);
+                                                   @RequestParam(value = "startTime", required = false) Long startTime,
+                                                   @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "获取当前用户历史委托")
@@ -79,7 +79,7 @@ public interface PcOrderExtendApi {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户id", example = "1", required = true),
             @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
-            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = false),
             @ApiImplicitParam(name = "orderType ", value = "委托类型,1:限价,非必填 ,不填为全部类型"),
             @ApiImplicitParam(name = "longFlag", value = "是否：1-多仓，0-空仓", example = "1"),
             @ApiImplicitParam(name = "closeFlag", value = "是否:1-平仓,0-开", example = "1"),
@@ -92,7 +92,7 @@ public interface PcOrderExtendApi {
     })
     List<UserOrderVo> queryHistory(@RequestParam("userId") Long userId,
                                    @RequestParam(value = "asset") String asset,
-                                   @RequestParam(value = "symbol", required = true) String symbol,
+                                   @RequestParam(value = "symbol", required = false) String symbol,
                                    @RequestParam(value = "orderType", required = false) Integer orderType,
                                    @RequestParam(value = "longFlag", required = false) Integer longFlag,
                                    @RequestParam(value = "closeFlag", required = false) Integer closeFlag,
@@ -100,8 +100,8 @@ public interface PcOrderExtendApi {
                                    @RequestParam("pageSize") Integer pageSize,
                                    @RequestParam(value = "lastOrderId", required = false) Long lastOrderId,
                                    @RequestParam("nextPage") Integer nextPage,
-                                   @RequestParam(value = "startTime", required = false) String startTime,
-                                   @RequestParam(value = "endTime", required = false) String endTime);
+                                   @RequestParam(value = "startTime", required = false) Long startTime,
+                                   @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "获取当前用户所有委托,条件查询")
@@ -130,8 +130,8 @@ public interface PcOrderExtendApi {
                                      @RequestParam("pageSize") Integer pageSize,
                                      @RequestParam("lastOrderId") Long lastOrderId,
                                      @RequestParam("nextPage") Integer nextPage,
-                                     @RequestParam(value = "startTime", required = false) String startTime,
-                                     @RequestParam(value = "endTime", required = false) String endTime);
+                                     @RequestParam(value = "startTime", required = false) Long startTime,
+                                     @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "订单列表查询(后台admin接口)")
@@ -156,8 +156,8 @@ public interface PcOrderExtendApi {
                                                @RequestParam("orderId") Long orderId,
                                                @RequestParam("pageNo") Integer pageNo,
                                                @RequestParam("pageSize") Integer pageSize,
-                                               @RequestParam(value = "startTime", required = false) String startTime,
-                                               @RequestParam(value = "endTime", required = false) String endTime);
+                                               @RequestParam(value = "startTime", required = false) Long startTime,
+                                               @RequestParam(value = "endTime", required = false) Long endTime);
 
 
     @ApiOperation(value = "查询当天平台实收合约手续费总计")
