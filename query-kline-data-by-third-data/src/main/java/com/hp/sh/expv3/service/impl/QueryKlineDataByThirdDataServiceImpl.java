@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -49,15 +51,34 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
      * @param openTimeEnd
      */
     @Override
-    public void queryKlineDataByThirdData(String tableName, Integer klineType, String asset,String pair, String interval, Long openTimeBegin, Long openTimeEnd) {
+    public void queryKlineDataByThirdData(String tableName, Integer klineType, String asset, String pair, String interval, Long openTimeBegin, Long openTimeEnd) {
         String expName = "zb";
-        List<KlineDataPo> klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
-        if (CollectionUtils.isEmpty(klineDataPos)) {
-            expName = "binance";
+        List<KlineDataPo> klineDataPos = null;
+        if (pair.equals("BYM_USDT")) {
+            pair = "ETH_USDT";
             klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
+            if (CollectionUtils.isEmpty(klineDataPos)) {
+                expName = "binance";
+                klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
+                for (KlineDataPo klineDataPo : klineDataPos) {
+                    klineDataPo.setOpen(klineDataPo.getOpen().divide(new BigDecimal("1500"),8, RoundingMode.DOWN));
+                    klineDataPo.setHigh(klineDataPo.getHigh().divide(new BigDecimal("1500"),8, RoundingMode.DOWN));
+                    klineDataPo.setLow(klineDataPo.getLow().divide(new BigDecimal("1500"),8, RoundingMode.DOWN));
+                    klineDataPo.setClose(klineDataPo.getClose().divide(new BigDecimal("1500"),8, RoundingMode.DOWN));
+                    klineDataPo.setVolume(klineDataPo.getVolume().divide(BigDecimal.TEN,8, RoundingMode.DOWN));
+                }
+            }
+        } else {
+            klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
+            if (CollectionUtils.isEmpty(klineDataPos)) {
+                expName = "binance";
+                klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
+            }
         }
-
-        logger.info("第三方k线数据，klineDataPos={}",klineDataPos);
+        logger.info("第三方k线数据，klineDataPos={}", klineDataPos);
+        if (CollectionUtils.isEmpty(klineDataPos)) {
+            return;
+        }
         String dataRedisKey = null;
         String updateRedisKey = null;
         if (klineType == 1) {
@@ -67,37 +88,36 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
             dataRedisKey = "candle:pc:" + asset + ":" + pair + ":" + 1;
             updateRedisKey = "pc:kline:updateEvent:" + asset + ":" + pair + ":" + 1;
         }
-        saveAndNotify(dataRedisKey,updateRedisKey,openTimeBegin,openTimeEnd,klineDataPos);
+        saveAndNotify(dataRedisKey, updateRedisKey, openTimeBegin, openTimeEnd, klineDataPos);
     }
-
 
 
     /**
      * 保存并发出通知
-     * @param dataRedisKey 保存数据的redis key
+     *
+     * @param dataRedisKey   保存数据的redis key
      * @param updateRedisKey 通知的redis key
-     * @param openTimeBegin 开始时间
-     * @param openTimeEnd 结束时间
-     * @param klineDataPos 数据
+     * @param openTimeBegin  开始时间
+     * @param openTimeEnd    结束时间
+     * @param klineDataPos   数据
      */
-    public void saveAndNotify(String dataRedisKey,String updateRedisKey,Long openTimeBegin,Long openTimeEnd,List<KlineDataPo> klineDataPos) {
-       if(CollectionUtils.isEmpty(klineDataPos)){
-           return;
-       }
+    public void saveAndNotify(String dataRedisKey, String updateRedisKey, Long openTimeBegin, Long openTimeEnd, List<KlineDataPo> klineDataPos) {
+        if (CollectionUtils.isEmpty(klineDataPos)) {
+            return;
+        }
         //删除旧数据
-        templateDB5.opsForZSet().removeRangeByScore(dataRedisKey,openTimeBegin.doubleValue(),openTimeEnd.doubleValue());
+        templateDB5.opsForZSet().removeRangeByScore(dataRedisKey, openTimeBegin.doubleValue(), openTimeEnd.doubleValue());
 
         for (KlineDataPo klineDataPo : klineDataPos) {
             String data = KlineUtil.kline2ArrayData(klineDataPo);
             //保存新数据
-             double score = klineDataPo.getOpenTime().doubleValue();
-            templateDB5.opsForZSet().add(dataRedisKey,data, score);
+            double score = klineDataPo.getOpenTime().doubleValue();
+            templateDB5.opsForZSet().add(dataRedisKey, data, score);
             //通知
-            templateDB5.opsForZSet().add(updateRedisKey,score+"",score);
+            templateDB5.opsForZSet().add(updateRedisKey, score + "", score);
         }
 
     }
-
 
 
 }

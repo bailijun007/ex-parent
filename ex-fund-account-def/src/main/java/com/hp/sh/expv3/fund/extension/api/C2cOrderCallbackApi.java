@@ -27,7 +27,7 @@ public interface C2cOrderCallbackApi {
     @ApiOperation(value = "订单成功回调通知")
     @RequestMapping(value = "/api/callback/c2c/deposit/notify",method = RequestMethod.GET)
     public String notify(@RequestParam("pid") int pid, @RequestParam("trade_no") String trade_no,
-                         @RequestParam("orderid") String orderid, @RequestParam(value = "type") String type,
+                         @RequestParam(value = "orderid",required = false) String orderid, @RequestParam(value = "type") String type,
                          @RequestParam("name") String name, @RequestParam("money") String money,
                          @RequestParam("usdt") String usdt, @RequestParam("trade_status") String trade_status,
                          @RequestParam("sign") String sign, @RequestParam("sign_type") String sign_type);

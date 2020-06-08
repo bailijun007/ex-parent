@@ -110,10 +110,10 @@ public class PLpayClient {
      *
      * @return
      */
-    public boolean getNotifySign(int pid, String trade_no, String orderid, String type, String name, String money, String usdt, String trade_status, String sign, String sign_type) {
+    public boolean getNotifySign(int pid, String trade_no, String type, String name, String money, String usdt, String trade_status, String sign, String sign_type) {
 //        String str = param.getSignType() + param.getOrderNo() + param.getOrderAmount() + param.getOrderCurrency() + param.getTransactionId() + param.getStatus() + md5Key;
  //money,name,orderid,pid,sign,sign_type,trade_no,trade_status,type,usdt
-        String str = "money="+money+"&name="+name+"&orderid="+orderid+"&pid="+pid+"&trade_no="+trade_no+"&trade_status="+trade_status+"&type="+type+"&usdt="+usdt+md5Key;
+        String str = "money="+money+"&name="+name+"&pid="+pid+"&trade_no="+trade_no+"&trade_status="+trade_status+"&type="+type+"&usdt="+usdt+md5Key;
         String md5 = DigestUtils.md5DigestAsHex(str.getBytes());
         if (sign.equals(md5)) {
             return Boolean.TRUE;

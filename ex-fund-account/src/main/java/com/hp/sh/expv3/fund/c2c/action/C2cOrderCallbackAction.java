@@ -124,7 +124,7 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
         logger.info("收到订单成功回调通知:pid={},trade_no={},orderid={},type={},name={},money={},usdt={},trade_status={},sign={},sign_type={}", pid,trade_no,orderid,type,name,money,usdt,trade_status,sign,sign_type);
 
         //验证签名是否是伪造的
-        boolean b = pLpayClient.getNotifySign(pid,trade_no,orderid,type,name,money,usdt,trade_status,sign,sign_type);
+        boolean b = pLpayClient.getNotifySign(pid,trade_no,type,name,money,usdt,trade_status,sign,sign_type);
         if (!b) {
             throw new ExException(ExFundError.ORDER_CALLBACK_NOTIFY_FIND_SIGN_ERROR);
         }
