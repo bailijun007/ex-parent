@@ -22,7 +22,18 @@ public class GenerateOrderNumUtils {
 
         return sn;
     }
-    
 
+    //生成并返回订单编号
+    public static String getOrderNo() {
+        String s = "";
+        for (int i = 0; i < 19; i++) {
+            int random = (int) (Math.random() * 10);
+            s += random;
+        }
+        String prefix = "c";
+        String sn = prefix  + s;
+
+        return sn;
+    }
 
 }

@@ -45,7 +45,7 @@ public class PLPayService {
         logger.info("userId={},ratio={},srcCurrency={},tarCurrency={},tarVolume={},fabiAmt={},receiveUrl={},pickupUrl={}",userId,ratio,srcCurrency,tarCurrency,tarVolume,fabiAmt,receiveUrl,pickupUrl);
 
         //生成订单号
-        String orderNo = GenerateOrderNumUtils.getOrderNo(userId);
+        String orderNo = GenerateOrderNumUtils.getOrderNo();
         //订单币种
         String orderCurrency =srcCurrency;
 //        if(srcCurrency.equals("CNY")){

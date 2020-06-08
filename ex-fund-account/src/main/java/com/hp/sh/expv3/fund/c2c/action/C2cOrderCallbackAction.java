@@ -130,9 +130,9 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
         }
 
         //c2c订单验证
-        String[] split = trade_no.split("-");
-        Long userId = Long.parseLong(split[1]);
-        C2cOrder c2cOrder1 = buyService.queryBySnAndUserId(trade_no, userId);
+//        String[] split = trade_no.split("-");
+//        Long userId = Long.parseLong(split[1]);
+        C2cOrder c2cOrder1 = buyService.queryBySn(trade_no);
         if (c2cOrder1 != null) {
 //            lock.writeLock().lock();
 
@@ -149,12 +149,12 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
             c2cOrder.setApprovalStatus(C2cConst.C2C_APPROVAL_STATUS_PASS);
             c2cOrder.setModified(Instant.now().toEpochMilli());
             c2cOrder.setSn(trade_no);
-            c2cOrder.setUserId(userId);
+            c2cOrder.setUserId(c2cOrder1.getUserId());
             buyService.updateBySnAndUserId(c2cOrder);
 
             // 调用价钱方法和增加流水记录
             FundAddRequest request=new FundAddRequest();
-            request.setUserId(userId);
+            request.setUserId(c2cOrder1.getUserId());
             request.setAmount(c2cOrder1.getVolume());
             request.setAsset(c2cOrder1.getExchangeCurrency());
             request.setRemark(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
