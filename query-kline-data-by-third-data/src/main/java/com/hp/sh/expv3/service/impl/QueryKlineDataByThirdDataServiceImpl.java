@@ -75,7 +75,7 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
                 klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
             }
         }
-        logger.info("第三方k线数据，klineDataPos={}", klineDataPos);
+        logger.info("成功修复pair={} k线数据，数量为：{}", pair,klineDataPos.size());
         if (CollectionUtils.isEmpty(klineDataPos)) {
             return;
         }
