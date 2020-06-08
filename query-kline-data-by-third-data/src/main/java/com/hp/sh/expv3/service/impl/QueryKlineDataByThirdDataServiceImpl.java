@@ -68,27 +68,42 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
                     klineDataPo.setVolume(klineDataPo.getVolume().divide(BigDecimal.TEN,8, RoundingMode.DOWN));
                 }
             }
+            logger.info("成功修复pair={} k线数据，数量为：{}", pair,klineDataPos.size());
+            if (CollectionUtils.isEmpty(klineDataPos)) {
+                return;
+            }
+            String dataRedisKey = null;
+            String updateRedisKey = null;
+            if (klineType == 1) {
+                dataRedisKey = "candle:bb:" + asset + ":" + pair + ":" + 1;
+                updateRedisKey = "bb:kline:updateEvent:" + asset + ":" + pair + ":" + 1;
+            } else if (klineType == 2) {
+                dataRedisKey = "candle:pc:" + asset + ":" + pair + ":" + 1;
+                updateRedisKey = "pc:kline:updateEvent:" + asset + ":" + pair + ":" + 1;
+            }
+            saveAndNotify(dataRedisKey, updateRedisKey, openTimeBegin, openTimeEnd, klineDataPos);
         } else {
             klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
             if (CollectionUtils.isEmpty(klineDataPos)) {
                 expName = "binance";
                 klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
             }
+            logger.info("成功修复pair={} k线数据，数量为：{}", pair,klineDataPos.size());
+            if (CollectionUtils.isEmpty(klineDataPos)) {
+                return;
+            }
+            String dataRedisKey = null;
+            String updateRedisKey = null;
+            if (klineType == 1) {
+                dataRedisKey = "candle:bb:" + asset + ":" + pair + ":" + 1;
+                updateRedisKey = "bb:kline:updateEvent:" + asset + ":" + pair + ":" + 1;
+            } else if (klineType == 2) {
+                dataRedisKey = "candle:pc:" + asset + ":" + pair + ":" + 1;
+                updateRedisKey = "pc:kline:updateEvent:" + asset + ":" + pair + ":" + 1;
+            }
+            saveAndNotify(dataRedisKey, updateRedisKey, openTimeBegin, openTimeEnd, klineDataPos);
         }
-        logger.info("成功修复pair={} k线数据，数量为：{}", pair,klineDataPos.size());
-        if (CollectionUtils.isEmpty(klineDataPos)) {
-            return;
-        }
-        String dataRedisKey = null;
-        String updateRedisKey = null;
-        if (klineType == 1) {
-            dataRedisKey = "candle:bb:" + asset + ":" + pair + ":" + 1;
-            updateRedisKey = "bb:kline:updateEvent:" + asset + ":" + pair + ":" + 1;
-        } else if (klineType == 2) {
-            dataRedisKey = "candle:pc:" + asset + ":" + pair + ":" + 1;
-            updateRedisKey = "pc:kline:updateEvent:" + asset + ":" + pair + ":" + 1;
-        }
-        saveAndNotify(dataRedisKey, updateRedisKey, openTimeBegin, openTimeEnd, klineDataPos);
+
     }
 
 
