@@ -46,7 +46,19 @@ public class ExShardingBuilder{
 		dbShardTableNames.add(tableName);
 		return this;
     }
-
+	
+	/**
+	 * 添加分表表名
+	 * @param tableName
+	 * @return
+	 */
+	public ExShardingBuilder addDateSubTable(String tableName, String idColumn, String dateColumn){
+		TableShardingByDate ts = new TableShardingByDate(idColumn, dateColumn);
+		ts.setTableInfoCache(tableInfoCache);
+		algorithms.put(tableName, ts);
+		return this;
+    }
+	
 	/**
 	 * 添加分表表名
 	 * @param tableName

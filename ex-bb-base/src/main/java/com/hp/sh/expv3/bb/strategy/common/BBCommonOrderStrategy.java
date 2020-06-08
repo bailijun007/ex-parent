@@ -68,6 +68,9 @@ public class BBCommonOrderStrategy implements OrderStrategy {
 		BigDecimal amount = BigDecimal.ZERO;
 		BigDecimal vols = BigDecimal.ZERO;
 		for(OrderTrade trade : tradeList){
+			if(BigUtils.isZero(trade.getVolume()) || BigUtils.isZero(trade.getPrice())){
+				continue;
+			}
 			amount = amount.add(calcAmount(trade.getVolume(), trade.getPrice()));
 			vols = vols.add(trade.getVolume());
 		}

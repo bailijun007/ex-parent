@@ -25,6 +25,8 @@ public class ExCommonError extends ErrorCode {
 
     public static final ExCommonError REQUIRE_BOOL = new ExCommonError(10106, "必须是布尔值:0/1!");
     
+    public static final ExCommonError PARAM_RANGE_ERROR = new ExCommonError(10107, "区间参数错误，最大值最小值不能颠倒!");
+    
 	public static final ExCommonError DATA_EXPIRED = new ExCommonError(-5014, "服务器忙！");
 	
 	public static final ExCommonError LOCK = new ExCommonError(-5015, "服务器忙！！");

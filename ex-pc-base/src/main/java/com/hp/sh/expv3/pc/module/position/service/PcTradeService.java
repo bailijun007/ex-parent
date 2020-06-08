@@ -126,8 +126,8 @@ public class PcTradeService {
     protected void handleTradeLiqOrder(PcOrder order, PcTradeMsg trade) {
 		Long now = DbDateUtils.now();
 		/*  1、修改订单数据和订单状态  */
-		order.setFilledVolume(order.getFilledVolume().add(trade.getNumber()));
 		order.setTradeMeanPrice(this.calcOrderTradeMeanPrice(order, trade));
+		order.setFilledVolume(order.getFilledVolume().add(trade.getNumber()));
 		boolean com = BigUtils.isZero(order.getVolume().subtract(order.getFilledVolume()).subtract(order.getCancelVolume()));
         order.setStatus(com?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
 //        order.setActiveFlag(com?PcOrder.NO:PcOrder.YES);
@@ -306,6 +306,7 @@ public class PcTradeService {
 	}
 
 	private void updateOrder4Trade(PcOrder order, TradeResult tradeResult, Long now){
+		order.setTradeMeanPrice(this.calcOrderTradeMeanPrice(order, tradeResult));
 		if(order.getCloseFlag() == OrderFlag.ACTION_OPEN){
 	        order.setOrderMargin(order.getOrderMargin().subtract(tradeResult.getTradeMargin()));
 	        order.setOpenFee(order.getOpenFee().subtract(tradeResult.getOrderOpenFee()));
@@ -313,7 +314,6 @@ public class PcTradeService {
 		}
 		order.setFeeCost(order.getFeeCost().add(tradeResult.getFee()));
 		order.setFilledVolume(order.getFilledVolume().add(tradeResult.getNumber()));
-		order.setTradeMeanPrice(this.calcOrderTradeMeanPrice(order, tradeResult));
         order.setStatus(tradeResult.getOrderCompleted()?OrderStatus.FILLED:OrderStatus.PARTIALLY_FILLED);
         order.setActiveFlag(tradeResult.getOrderCompleted()?PcOrder.NO:PcOrder.YES);
 		order.setModified(now);

@@ -52,4 +52,11 @@ public class CheckUtils {
 		}
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void checkRange(Comparable small, Comparable bigger) {
+		if(small.compareTo(bigger) > 0){
+			throw new ExSysException(ExCommonError.PARAM_RANGE_ERROR);
+		}
+	}
+	
 }

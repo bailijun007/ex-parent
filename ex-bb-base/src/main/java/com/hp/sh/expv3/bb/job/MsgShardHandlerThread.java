@@ -2,6 +2,9 @@ package com.hp.sh.expv3.bb.job;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.hp.sh.expv3.component.lock.impl.RedissonDistributedLocker;
 
 public class MsgShardHandlerThread extends Thread{
 
@@ -9,9 +12,12 @@ public class MsgShardHandlerThread extends Thread{
 
 	private final MsgShardHandler msgShardHandler;
 
-	private final Object lock = new Object();
+	private final Object notifyLock = new Object();
 	
 	private final Long shardId;
+	
+	@Autowired
+	private RedissonDistributedLocker distributedLocker;
 	
 	public MsgShardHandlerThread(MsgShardHandler msgShardHandler, Long shardId) {
 		super("MsgShardHandlerThread-"+shardId);
@@ -31,9 +37,9 @@ public class MsgShardHandlerThread extends Thread{
 					logger.error(e.getMessage(), e);
 				}
 			}
-			synchronized (lock) {
+			synchronized (notifyLock) {
 				try {
-					lock.wait();
+					notifyLock.wait();
 				} catch (InterruptedException e) {
 					logger.error(e.getMessage(), e);
 				}
@@ -42,8 +48,8 @@ public class MsgShardHandlerThread extends Thread{
 	}
 	
 	public void trigger(){
-        synchronized (lock) {
-            lock.notifyAll();
+        synchronized (notifyLock) {
+            notifyLock.notifyAll();
         }
 	}
 	
