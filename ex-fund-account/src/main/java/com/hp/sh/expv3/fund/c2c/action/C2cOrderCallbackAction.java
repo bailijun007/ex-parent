@@ -53,59 +53,114 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
     @Value("${plpay.server.c2c_fee_ratio}")
     private String c2cFeeRatio;
 
+    @Value("${usdtPlpay.server.md5Key}")
+    private String md5Key;
+
 //    ReadWriteLock lock = new ReentrantReadWriteLock();
 
 
+//    @Override
+//    public String notify(@RequestParam("orderAmount") BigDecimal orderAmount, @RequestParam("orderCurrency") String orderCurrency,
+//                         @RequestParam("orderNo") String orderNo, @RequestParam(value = "paymentAmount", required = false) BigDecimal paymentAmount,
+//                         @RequestParam("sign") String sign, @RequestParam("signType") String signType,
+//                         @RequestParam("status") String status, @RequestParam("transactionId") String transactionId) {
+//
+//        NotifyParam param = new NotifyParam();
+//        getNotifyParam(orderAmount, orderCurrency, orderNo, paymentAmount, sign, signType, status, transactionId, param);
+//
+//        logger.info("收到订单成功回调通知:{}", param);
+//
+//        //验证签名是否是伪造的
+//        boolean b = pLpayClient.getNotifySign(param);
+//        if (!b) {
+//            throw new ExException(ExFundError.ORDER_CALLBACK_NOTIFY_FIND_SIGN_ERROR);
+//        }
+//
+//        //c2c订单验证
+//        String[] split = orderNo.split("-");
+//        Long userId = Long.parseLong(split[1]);
+//        C2cOrder c2cOrder1 = buyService.queryBySnAndUserId(orderNo, userId);
+//        if (c2cOrder1 != null && param.getStatus().equals("success")) {
+////            lock.writeLock().lock();
+//
+//                //更新一条c2c订单记录
+//                C2cOrder c2cOrder = new C2cOrder();
+////                c2cOrder.setAmount(orderAmount);
+//                //计算USDT 就是 orderAmount*( 1 - 手续费率) / 你系统的CNY:USD汇率;
+////                BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
+////                BigDecimal qty = param.getOrderAmount().multiply(feeRatio).divide(c2cOrder1.getPrice(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
+////                c2cOrder.setVolume(qty);
+//                c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
+//                c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
+//                c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_TRUE);
+//                c2cOrder.setApprovalStatus(C2cConst.C2C_APPROVAL_STATUS_PASS);
+//                c2cOrder.setModified(Instant.now().toEpochMilli());
+//                c2cOrder.setSn(orderNo);
+//                c2cOrder.setUserId(userId);
+//                buyService.updateBySnAndUserId(c2cOrder);
+//
+//                // 调用价钱方法和增加流水记录
+//                FundAddRequest request=new FundAddRequest();
+//                request.setUserId(userId);
+//                request.setAmount(c2cOrder1.getVolume());
+//                request.setAsset(c2cOrder1.getExchangeCurrency());
+//                request.setRemark(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
+//                request.setTradeNo(c2cOrder1.getSn());
+//                request.setTradeType(TradeType.C2C_IN);
+//                fundAccountCoreApi.add(request);
+//
+//        } else {
+//            throw new ExException(ExFundError.ORDER_CALLBACK_NOTIFY_FAIL);
+//        }
+//        return "success";
+//    }
+
+
     @Override
-    public String notify(@RequestParam("orderAmount") BigDecimal orderAmount, @RequestParam("orderCurrency") String orderCurrency,
-                         @RequestParam("orderNo") String orderNo, @RequestParam(value = "paymentAmount", required = false) BigDecimal paymentAmount,
-                         @RequestParam("sign") String sign, @RequestParam("signType") String signType,
-                         @RequestParam("status") String status, @RequestParam("transactionId") String transactionId) {
+    public String notify(int pid, String trade_no, String orderid, String type, String name, String money, String usdt, String trade_status, String sign, String sign_type) {
+//        NotifyParam param = new NotifyParam();
+//        getNotifyParam(orderAmount, orderCurrency, orderNo, paymentAmount, sign, signType, status, transactionId, param);
 
-        NotifyParam param = new NotifyParam();
-        getNotifyParam(orderAmount, orderCurrency, orderNo, paymentAmount, sign, signType, status, transactionId, param);
-
-        logger.info("收到订单成功回调通知:{}", param);
+        logger.info("收到订单成功回调通知:pid={},trade_no={},orderid={},type={},name={},money={},usdt={},trade_status={},sign={},sign_type={}", pid,trade_no,orderid,type,name,money,usdt,trade_status,sign,sign_type);
 
         //验证签名是否是伪造的
-        boolean b = pLpayClient.getNotifySign(param);
+        boolean b = pLpayClient.getNotifySign(pid,trade_no,orderid,type,name,money,usdt,trade_status,sign,sign_type);
         if (!b) {
             throw new ExException(ExFundError.ORDER_CALLBACK_NOTIFY_FIND_SIGN_ERROR);
         }
 
         //c2c订单验证
-        String[] split = orderNo.split("-");
+        String[] split = trade_no.split("-");
         Long userId = Long.parseLong(split[1]);
-        C2cOrder c2cOrder1 = buyService.queryBySnAndUserId(orderNo, userId);
-        if (c2cOrder1 != null && param.getStatus().equals("success")) {
+        C2cOrder c2cOrder1 = buyService.queryBySnAndUserId(trade_no, userId);
+        if (c2cOrder1 != null) {
 //            lock.writeLock().lock();
 
-                //更新一条c2c订单记录
-                C2cOrder c2cOrder = new C2cOrder();
+            //更新一条c2c订单记录
+            C2cOrder c2cOrder = new C2cOrder();
 //                c2cOrder.setAmount(orderAmount);
-                //计算USDT 就是 orderAmount*( 1 - 手续费率) / 你系统的CNY:USD汇率;
+            //计算USDT 就是 orderAmount*( 1 - 手续费率) / 你系统的CNY:USD汇率;
 //                BigDecimal feeRatio = BigDecimal.ONE.subtract(new BigDecimal(c2cFeeRatio));
 //                BigDecimal qty = param.getOrderAmount().multiply(feeRatio).divide(c2cOrder1.getPrice(), Precision.COMMON_PRECISION, Precision.LESS).stripTrailingZeros();
 //                c2cOrder.setVolume(qty);
-                c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
-                c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
-                c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_TRUE);
-                c2cOrder.setApprovalStatus(C2cConst.C2C_APPROVAL_STATUS_PASS);
-                c2cOrder.setModified(Instant.now().toEpochMilli());
-                c2cOrder.setSn(orderNo);
-                c2cOrder.setUserId(userId);
-                buyService.updateBySnAndUserId(c2cOrder);
+            c2cOrder.setPayStatus(C2cConst.C2C_PAY_STATUS_PAY_SUCCESS);
+            c2cOrder.setPayFinishTime(Instant.now().toEpochMilli());
+            c2cOrder.setSynchStatus(C2cConst.C2C_SYNCH_STATUS_TRUE);
+            c2cOrder.setApprovalStatus(C2cConst.C2C_APPROVAL_STATUS_PASS);
+            c2cOrder.setModified(Instant.now().toEpochMilli());
+            c2cOrder.setSn(trade_no);
+            c2cOrder.setUserId(userId);
+            buyService.updateBySnAndUserId(c2cOrder);
 
-                // 调用价钱方法和增加流水记录
-                FundAddRequest request=new FundAddRequest();
-                request.setUserId(userId);
-                request.setAmount(c2cOrder1.getVolume());
-                request.setAsset(c2cOrder1.getExchangeCurrency());
-                request.setRemark(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
-                request.setTradeNo(c2cOrder1.getSn());
-                request.setTradeType(TradeType.C2C_IN);
-                fundAccountCoreApi.add(request);
-
+            // 调用价钱方法和增加流水记录
+            FundAddRequest request=new FundAddRequest();
+            request.setUserId(userId);
+            request.setAmount(c2cOrder1.getVolume());
+            request.setAsset(c2cOrder1.getExchangeCurrency());
+            request.setRemark(C2cConst.C2C_PAY_STATUS_DESC_RECHARGE);
+            request.setTradeNo(c2cOrder1.getSn());
+            request.setTradeType(TradeType.C2C_IN);
+            fundAccountCoreApi.add(request);
 
         } else {
             throw new ExException(ExFundError.ORDER_CALLBACK_NOTIFY_FAIL);
@@ -132,5 +187,6 @@ public class C2cOrderCallbackAction implements C2cOrderCallbackApi {
         logger.info("进入交易完成跳转接口");
         return "success";
     }
+
 
 }

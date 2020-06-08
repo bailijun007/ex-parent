@@ -17,11 +17,20 @@ import java.math.BigDecimal;
 @FeignClient(value = "ex-fund-account")
 public interface C2cOrderCallbackApi {
 
+//    @ApiOperation(value = "订单成功回调通知")
+//    @RequestMapping(value = "/api/callback/c2c/deposit/notify",method = RequestMethod.POST)
+//    public String notify(@RequestParam("orderAmount") BigDecimal orderAmount, @RequestParam("orderCurrency") String orderCurrency,
+//                         @RequestParam("orderNo") String orderNo, @RequestParam(value = "paymentAmount", required = false) BigDecimal paymentAmount,
+//                         @RequestParam("sign") String sign, @RequestParam("signType") String signType,
+//                         @RequestParam("status") String status, @RequestParam("transactionId") String transactionId);
+
     @ApiOperation(value = "订单成功回调通知")
-    @RequestMapping(value = "/api/callback/c2c/deposit/notify",method = RequestMethod.POST)
-    public String notify(@RequestParam("orderAmount") BigDecimal orderAmount, @RequestParam("orderCurrency") String orderCurrency,
-                         @RequestParam("orderNo") String orderNo, @RequestParam(value = "paymentAmount", required = false) BigDecimal paymentAmount,
-                         @RequestParam("sign") String sign, @RequestParam("signType") String signType,
-                         @RequestParam("status") String status, @RequestParam("transactionId") String transactionId);
+    @RequestMapping(value = "/api/callback/c2c/deposit/notify",method = RequestMethod.GET)
+    public String notify(@RequestParam("pid") int pid, @RequestParam("trade_no") String trade_no,
+                         @RequestParam("orderid") String orderid, @RequestParam(value = "type") String type,
+                         @RequestParam("name") String name, @RequestParam("money") String money,
+                         @RequestParam("usdt") String usdt, @RequestParam("trade_status") String trade_status,
+                         @RequestParam("sign") String sign, @RequestParam("sign_type") String sign_type);
+
 
 }
