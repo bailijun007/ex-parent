@@ -33,12 +33,12 @@ public class NewAssetDefaultKlineDataServiceImpl2 implements INewAssetDefaultKli
     public void getDefaultKlineData(BigDecimal price, Long timestamp, String asset, String symbol) {
         long minusDay = 24 * 60 * 60 * 1000;
         long minusMin = 60 * 1000;
-        Long start = timestamp - minusDay * 60;
+        Long start = timestamp - minusDay * 62;
         Long startInMin = start;
         List<BigDecimal> list = new ArrayList<>();
         List<Long> minTimeList = new ArrayList<>();
 
-        for (int j = 0; j < 86400; j++) {
+        for (int j = 0; j < 89280; j++) {
             startInMin = startInMin + minusMin;
             minTimeList.add(startInMin);
         }
@@ -48,7 +48,7 @@ public class NewAssetDefaultKlineDataServiceImpl2 implements INewAssetDefaultKli
         minTimeList.add(timestamp);
 
         List<KlineDataPo> poList = new ArrayList<>();
-        for (int j = 0; j < 86400; j++) {
+        for (int j = 0; j < 89280; j++) {
             BigDecimal sub = getSub();
             KlineDataPo klineDataPo = new KlineDataPo();
             BigDecimal basePrice = list.get(j);
@@ -67,12 +67,12 @@ public class NewAssetDefaultKlineDataServiceImpl2 implements INewAssetDefaultKli
         String dataRedisKey = "candle:bb:" + asset + ":" + symbol + ":" + 1;
         String updateRedisKey = "bb:kline:updateEvent:" + asset + ":" + symbol + ":" + 1;
 
-        saveAndNotify(dataRedisKey, updateRedisKey, timestamp - minusDay * 60, timestamp, poList);
+        saveAndNotify(dataRedisKey, updateRedisKey, timestamp - minusDay * 62, timestamp, poList);
 
     }
 
     private BigDecimal getSub() {
-        BigDecimal[] arr = {new BigDecimal("0.001"), new BigDecimal("0.0028"), new BigDecimal("0.0015"), new BigDecimal("0.002"), new BigDecimal("0.0023"), new BigDecimal("0.003"), new BigDecimal("0.0031")};
+        BigDecimal[] arr = {new BigDecimal("0.0001"), new BigDecimal("0.0002"), new BigDecimal("0.00015"), new BigDecimal("0.0002"), new BigDecimal("0.00021"), new BigDecimal("0.00026"), new BigDecimal("0.00027")};
         int index = (int) (Math.random() * arr.length);
         BigDecimal sub = arr[index];
         return sub;
