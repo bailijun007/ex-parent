@@ -55,11 +55,11 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
         String expName = "zb";
         List<KlineDataPo> klineDataPos = null;
         if (pair.equals("BYM_USDT")) {
-            pair = "ETH_USDT";
-            klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
+           String pair2 = "ETH_USDT";
+            klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair2, interval, openTimeBegin, openTimeEnd, expName);
             if (CollectionUtils.isEmpty(klineDataPos)) {
                 expName = "binance";
-                klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
+                klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair2, interval, openTimeBegin, openTimeEnd, expName);
                 for (KlineDataPo klineDataPo : klineDataPos) {
                     klineDataPo.setOpen(klineDataPo.getOpen().divide(new BigDecimal("1500"),8, RoundingMode.DOWN));
                     klineDataPo.setHigh(klineDataPo.getHigh().divide(new BigDecimal("1500"),8, RoundingMode.DOWN));
@@ -82,6 +82,7 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
                 updateRedisKey = "pc:kline:updateEvent:" + asset + ":" + pair + ":" + 1;
             }
             saveAndNotify(dataRedisKey, updateRedisKey, openTimeBegin, openTimeEnd, klineDataPos);
+            logger.info("修复完成");
         } else {
             klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
             if (CollectionUtils.isEmpty(klineDataPos)) {
@@ -102,6 +103,7 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
                 updateRedisKey = "pc:kline:updateEvent:" + asset + ":" + pair + ":" + 1;
             }
             saveAndNotify(dataRedisKey, updateRedisKey, openTimeBegin, openTimeEnd, klineDataPos);
+            logger.info("修复完成");
         }
 
     }

@@ -43,8 +43,8 @@
         <module>query-third-kline-data-def</module>
         <module>ex-bb-match-trade-def</module>
         <module>ex-pc-match-trade-def</module>
-        <!--<module>ex_grab_bb_3rdData</module>-->
-        <!--<module>ex_grab_pc_3rdData</module>-->
+        <module>ex_grab_bb_3rdData</module>
+        <module>ex_grab_pc_3rdData</module>
     </modules>
 
     <dependencies>
