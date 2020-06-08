@@ -51,12 +51,12 @@ public class ZwIdGenerator implements IdGenerator{
 		return GeneratorName.SNOWFLAKE;
 	}
 	
-	public long getTimeStamp(String className, Long id){
+	public Long getTimeStamp(String className, Long id){
 		String entityId = className;
 		Integer seqId = this.entitySequenceMap.get(entityId);
 		SnowflakeIdWorker idworker = idWorkerMap.get(seqId);
 		if(idworker==null){
-			logger.error("idworker不存在：{}", className);
+			return null;
 		}
 		long time = idworker.getTime(id);
 		return time;

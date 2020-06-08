@@ -60,9 +60,11 @@ public class ExpUpdateInterceptor extends AbstractInterceptor {
     private void setCreatedTime(final Object entity){
     	if(entity instanceof BaseBizEntity){
     		BaseBizEntity be = (BaseBizEntity)entity;
-    		long time = IdGeneratorContext.getSnowIdTime(entity.getClass().getName(), be.getId());
-    		be.setCreated(time);
-    		be.setModified(time);
+    		Long time = IdGeneratorContext.getSnowIdTime(entity.getClass().getName(), be.getId());
+    		if(time!=null){
+        		be.setCreated(time);
+        		be.setModified(time);
+    		}
     	}
     }
     
