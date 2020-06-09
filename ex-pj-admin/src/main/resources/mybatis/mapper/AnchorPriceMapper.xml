@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.pj.module.plate.dao.AnchorPriceDAO">
+
+	<resultMap type="com.hp.sh.expv3.pj.module.plate.entity.AnchorPrice" id="AnchorPrice">
+		<result column="id" property="id" />
+		<result column="price" property="price" />
+		<result column="created" property="created" />
+		<result column="ps_id" property="psId" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		id,price,created,ps_id
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="id!=null"> and id=#{id}</if>
+		<if test="price!=null"> and price=#{price}</if>
+		<if test="created!=null"> and created=#{created}</if>
+		<if test="psId!=null"> and ps_id=#{psId}</if>	</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from anchor_price
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="AnchorPrice">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="AnchorPrice">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="AnchorPrice">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from anchor_price
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="AnchorPrice">
+		select
+			<include refid="Base_Column_List" />
+		from anchor_price
+			where id=#{id}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			anchor_price
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		insert into anchor_price (
+			id,price,created,ps_id
+		)values(
+			#{id},#{price},#{created},#{psId}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			anchor_price
+		set 
+			id=#{id},price=#{price},created=#{created},ps_id=#{psId}
+		where 
+			id=#{id}
+	</update>
+
+	<delete id="delete">
+        delete from anchor_price where id=#{id}
+    </delete>
+
+    <delete id="condDelete">
+        delete from anchor_price
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+</mapper>

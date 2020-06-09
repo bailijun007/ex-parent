@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head runat="server">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+
+    <link rel="shortcut icon" href="../../static/img/favicon.ico">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../static/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.1.0" rel="stylesheet">
+
+	<script src="../../static/js/jquery.min.js?v=2.1.4"></script>
+	<script src="../../static/js/bootstrap.min.js?v=3.3.6"></script>
+	<script src="../../static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+	<script src="../../static/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+	<script src="../../static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+	<script src="../../static/js/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+	<script src="../../static/js/plugins/layer/layer.min.js"></script>
+	<script src="../../static/js/LayerTool.js"></script>
+	<script src="../../static/js/common.js"></script>
+	<script src="/sys/config.jsx"></script>
+	
+	<script src="user.js"></script>
+
+</head>
+
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInRight">
+		<div class="ibox float-e-margins">
+			<div class="ibox-content">
+				<div class="row row-lg">
+
+					<div class="col-sm-11 query-bar">
+					
+						<form id="queryForm">
+							<div class="form-group" style="width: 15%; float: left;">
+								<label class="sr-only">用户账号</label> <input type="text" name="username" placeholder="用户账号" id="title" class="form-control">
+							</div>
+							
+							<div class="form-group" style="width: 15%; float: left;">
+								<input type="text" name="beginTime" placeholder="开始时间" id="beginTime" class="form-control time-input">
+							</div>
+							
+							<div class="form-group" style="width: 15%; float: left;">
+								<input type="text" name="endTime" placeholder="开始时间" id="endTime" class="form-control time-input">
+							</div>
+							
+							<div class="input-group">
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-primary" id="btn_query">搜索</button>
+								</span>
+							</div>
+						</form>
+					</div>
+
+					<div class="col-sm-12">
+
+						<div class="example-wrap">
+							<div class="example">
+								<div class="bootstrap-table">
+								
+									<div class="fixed-table-toolbar">
+										<div class="bars pull-left">
+											<div class="btn-group hidden-xs" id="toolbar" role="group">
+											
+												<a class="btn btn-outline btn-default btn-add" href="javascript:void(0)">
+													<i class="glyphicon glyphicon-plus" aria-hidden="true"></i>
+													新增
+												</a>
+												
+												<a class="btn btn-outline btn-default btn-del" href="javascript:void(0)">
+													<i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
+													删除
+												</a>
+													
+											</div>
+										</div>
+									</div>
+									
+									<table id="data_table"></table>
+									
+								</div>
+								<div class="clearfix"></div>
+							</div>
+						</div>
+						<!-- End Example Events -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Panel Other -->
+	</div>
+</body>
+</html>
+
+
+
+

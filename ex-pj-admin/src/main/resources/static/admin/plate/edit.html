@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<title>编辑信息</title>
+
+<link rel="shortcut icon" href="../../static/img/favicon.ico" />
+<link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet" />
+<link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet" />
+<link href="../../static/css/animate.css" rel="stylesheet" />
+<link href="../../static/css/Validformstyle.css" rel="stylesheet" />
+<link href="../../static/js/skin/default/style.css" rel="stylesheet" />
+<link href="../../static/css/style.css" rel="stylesheet" />
+
+<!-- 全局js -->
+<script src="../../static/js/jquery.min.js"></script>
+<script src="../../static/js/bootstrap.min.js"></script>
+<script src="../../static/js/Validform_v5.3.2.js"></script>
+<!-- 自定义js -->
+<script src="../../static/js/layout.js"></script>
+<script src="../../static/js/content.js?v=1.0.0"></script>
+<script src="../../static/js/plugins/layer/layer.min.js"></script>
+<script src="../../static/js/LayerTool.js"></script>
+<script src="../../static/js/common.js"></script>
+
+<script src="../../static/js/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="/sys/config.jsx"></script>
+<script src="plate.js"></script>
+
+</head>
+<body class="gray-bg">
+	<div class="form-horizontal">
+		<div class="wrapper wrapper-content animated fadeInRight">
+			<div class="row">
+				<div class="col-sm-12">
+
+					<div class="ibox float-e-margins">
+						<div class="ibox-content">
+
+							<form id="editForm" class="form-horizontal">
+								<input type="hidden" name="id" class="form-control" value="" />
+								
+								<div class="form-group">
+									<label for="name" class="col-sm-2 control-label">asset</label>
+									<div class="col-sm-10">
+										<input type="text" name="asset" value="" maxlength="20" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="name" class="col-sm-2 control-label">symbol</label>
+									<div class="col-sm-10">
+										<input type="text" name="symbol" value="" maxlength="20" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="stepMin" class="col-sm-2 control-label">摆动区间（最小）</label>
+									<div class="col-sm-10">
+										<input type="text" name="stepMin" value="" maxlength="255"
+											class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="stepMax" class="col-sm-2 control-label">摆动区间（最大）</label>
+									<div class="col-sm-10">
+										<input type="text" name="stepMax" value="" maxlength="255"
+											class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="priceMin" class="col-sm-2 control-label">价格区间（最小）</label>
+									<div class="col-sm-10">
+										<input type="text" name="priceMin" value="" maxlength="255"
+											class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="priceMax" class="col-sm-2 control-label">价格区间（最大）</label>
+									<div class="col-sm-10">
+										<input type="text" name="priceMax" value="" maxlength="255"
+											class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="delayMin" class="col-sm-2 control-label">频率区间（最小）</label>
+									<div class="col-sm-10">
+										<input type="text" name="delayMin" value="" maxlength="10"
+											class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="delayMax" class="col-sm-2 control-label">频率区间（最大）</label>
+									<div class="col-sm-10">
+										<input type="text" name="delayMax" value="" maxlength="10"
+											class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="volumeMin" class="col-sm-2 control-label">数量区间</label>
+									<div class="col-sm-10">
+										<input type="text" name="volumeMin" value="" maxlength="10"
+										 class="form-control" placeholder="" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="volumeMax" class="col-sm-2 control-label">数量区间</label>
+									<div class="col-sm-10">
+										<input type="text" name="volumeMax" value="" maxlength="10"
+										 class="form-control" placeholder="" />
+									</div>
+								</div>
+								<!-- 
+								<div class="form-group">
+									<label for="remark" class="col-sm-2 control-label">备注</label>
+									<div class="col-sm-10">
+										<input type="text" name="remark" value="" maxlength="255"
+											class="form-control" />
+									</div>
+								</div>
+								 -->
+								 
+			  	  				<div class="form-group">
+									<label for="enabled" class="col-sm-2 control-label">启用</label>
+									<div class="col-sm-10">
+										<select name="enabled" class="form-control opt">
+											<option value="1">启用</option>
+											<option value="0">禁用</option>
+										</select>
+										
+									</div>
+								</div>
+								 
+			  	  				<div class="form-group">
+									<label for="enabled" class="col-sm-2 control-label">模块</label>
+									<div class="col-sm-10">
+										<select name="module" class="form-control opt">
+											<option value="bb">bb</option>
+											<option value="pc">pc</option>
+										</select>
+										
+									</div>
+								</div>
+								 
+								<div class="form-group">
+									<div class="col-sm-offset-2 col-sm-10">
+										<input type="button" class="btn btn-primary btn-save" @click="saveOrUpdate" value="确定" />
+										<!-- 
+											<button type="button" class="btn btn-default" @click="cancel">取消</button>
+										-->
+									</div>
+								</div>
+							</form>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,91 @@
+<html>
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>管理后台 -登录</title>
+<meta name="keywords" content="">
+<meta name="description" content="">
+
+<link rel="shortcut icon" href="../static/img/favicon.ico">
+<link href="../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+<link href="../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+
+<link href="../static/css/animate.css" rel="stylesheet">
+<link href="../static/css/style.css?v=4.1.0" rel="stylesheet">
+
+<!-- 全局js -->
+<script src="../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../static/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../static/js/plugins/layer/layer.min.js"></script>
+<script src="../static/js/md5.js"></script>
+
+<script src="../static/js/common.js"></script>
+<script src="/sys/config.jsx"></script>
+
+<!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+<script>
+	if (window.top !== window.self) {
+		window.top.location = window.location;
+	}
+</script>
+
+<script>
+	$(function() {
+		$('#subLogin').click(function() {
+			var url = appConfig.host + '/admin/api/passport/login';
+			ajaxRequest(url, {
+				username : $('#username').val(),
+				password : $('#password').val()
+			}, function(data) {
+				top.token = data.token;
+				localStorage.setItem("xtoken", token);
+				location.href = 'index.html';
+			}, 'POST');
+		});
+	});
+</script>
+
+</head>
+
+<body class="gray-bg">
+
+	<div class="middle-box text-center loginscreen  animated fadeInDown">
+		<div>
+			<div style="padding-top: 75%">
+				<!--<h1 class="logo-name">H+</h1>-->
+			</div>
+			<h3>欢迎使用</h3>
+			<div class="form-group">
+				<input type="text" id="username" class="form-control" value="admin"
+					placeholder="用户名" required="">
+			</div>
+			<div class="form-group">
+				<input type="password" id="password" class="form-control "
+					value="123456" placeholder="密码" required="">
+			</div>
+			<div class="form-group hidden">
+				<div class="col-sm-7"
+					style="padding-left: 0px; margin-bottom: 15px;">
+					<input type="text" class="form-control" id="verifyCode"
+						placeholder="验证码" required="">
+				</div>
+				<div class="col-sm-5">
+					<img src="/v1/http/login/get_verify_code?ts=123" id="VerifyCodeImg"
+						onclick="getVerifyCode()">
+				</div>
+			</div>
+			<button type="button" id="subLogin"
+				class="btn btn-primary block full-width m-b">登 录</button>
+
+			<p class="text-muted text-center">
+				<a href="login.html#"><small>忘记密码了？</small></a>
+			</p>
+
+		</div>
+	</div>
+</body>
+</html>

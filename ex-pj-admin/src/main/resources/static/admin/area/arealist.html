@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link rel="shortcut icon" href="../../../static/img/favicon.ico">
+    <link href="../../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../../static/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../../static/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+    <link href="../../../static/css/style.css?v=4.1.0" rel="stylesheet">
+
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="row row-lg">
+                <!--<div class="col-sm-11">-->
+                    <!--<div class="form-group" style="width: 15%; float: left;">-->
+                        <!--<label class="sr-only">标的符号</label>-->
+                        <!--<input type="text" placeholder="请输入区号" id="pair" class="form-control">-->
+                    <!--</div>-->
+                    <!--<div class="input-group">-->
+
+                                <!--<span class="input-group-btn">-->
+                                    <!--<button type="button" class="btn btn-primary" id="btn_query">搜索</button>-->
+                                <!--</span>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="col-sm-12">
+
+                    <div class="example-wrap">
+                        <div class="example">
+                            <div class="bootstrap-table">
+                                <div class="fixed-table-toolbar">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group hidden-xs" id="toolbar" role="group">
+
+                                            <a class="btn btn-outline btn-default" href="javascript:addCatalogEvent('Add','0')"><i class="glyphicon glyphicon-plus" aria-hidden="true"></i>新增</a>
+                                            <a class="btn btn-outline btn-default" href="javascript:del_ck_confirm('tb_departments','/v1/http/area/delete')"><i class="glyphicon glyphicon-trash" aria-hidden="true"></i>删除</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table id="tb_departments"></table>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <!-- End Example Events -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Panel Other -->
+</div>
+<script src="../../../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../../../static/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../../../static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script src="../../../static/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+<script src="../../../static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="../../../static/js/plugins/layer/layer.min.js"></script>
+<script src="../../../static/js/LayerTool.js"></script>
+</body>
+</html>
+<script type="text/javascript">
+    var oTable;
+    $(function () {
+        //1.初始化Table
+        oTable = new TableInit();
+        oTable.Init();
+
+        $("#btn_query").click(function () {
+            $('#tb_departments').bootstrapTable('destroy');
+            oTable.Init();
+        });
+
+        // var oButtonInit = new ButtonInit();
+        // oTable.Init();
+
+    });
+
+    function ShowParam(id) {
+        alert(id);
+    }
+
+    var addCatalogEvent = function (action,id) {
+        var text = "添加短信模板"
+        url = "/sys/area/edit.html?id="+id+"&action="+action+"";
+
+        parent.layer.open({
+            type: 2,
+            title: text,
+            shadeClose: true,
+            shade: 0.8,
+            area: ['800px', '65%'],
+            content: url,
+            success: function (layero, index) {
+
+            },
+            end: function () {
+                $('#tb_departments').bootstrapTable('destroy');
+                oTable.Init();
+            }
+        });
+    }
+
+
+
+    function DoAction(action) {
+        var RowSelects = $('#tb_departments').bootstrapTable('getSelections'); //获取表选择的行
+        var SelectRow = $.parseJSON(JSON.stringify(RowSelects));
+
+        if (action == "add")
+            window.location.href = "ModuleEdit.aspx?action=Add&typeId=" + GetQueryString('typeId') + "";
+        else if (SelectRow.length != 0)
+            window.location.href = "ModuleEdit.aspx?id=" + SelectRow[0].id + "&action=Edit";
+        else
+            alert("请勾选要操作的记录");
+    }
+
+    var TableInit = function () {
+        var oTableInit = new Object();
+        //初始化Table
+        oTableInit.Init = function () {
+                    $('#tb_departments').bootstrapTable({
+                        url: '/v1/http/area/query_list',//+param,         //请求后台的URL（*）
+                        method: 'get',                      //请求方式（*）
+                        // ajax : function (request) {
+                        //     var param="?page_size="+pageSize+"&current_page="+currentPag;
+                        //     param+="";
+                        //     $.ajax({
+                        //         type : "GET",
+                        //         url : "/v1/http/area/query_list"+param,
+                        //         contentType: "application/json;charset=utf-8",
+                        //         // dataType:"jsonp",
+                        //         //data:oTableInit.queryParams,
+                        //         // jsonp:'callback',
+                        //         success : function (msg) {
+                        //             request.success({
+                        //                 row : msg.data
+                        //             });
+                        //             $('#table').bootstrapTable('load', msg.data);
+                        //         },
+                        //         error:function(){
+                        //             //alert("错误");
+                        //         }
+                        //     });
+                        // },
+                        //toolbar: '#toolbar',                //工具按钮用哪个容器
+                        //striped: true,                      //是否显示行间隔色
+                        //cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                        pagination: true,                   //是否显示分页（*）
+                        //sortable: true,                     //是否启用排序
+                        //sortOrder: "asc",                   //排序方式
+                        queryParams: oTableInit.queryParams,//传递参数（*）
+                        sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                        pageNumber: 1,                       //初始化加载第一页，默认第一页
+                        pageSize: 10,                       //每页的记录行数（*）
+                        pageList: [10, 20, 50, 100],        //可供选择的每页的行数（*）
+                        //search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                        //strictSearch: true,
+                        //showColumns: true,                  //是否显示所有的列
+                        showRefresh: true,                  //是否显示刷新按钮
+                        //minimumCountColumns: 2,             //最少允许的列数
+                        //clickToSelect: false,               //是否启用点击选中行
+                        //singleSelect:false,
+                        //height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                        uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+                        //showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+                        //cardView: false,                    //是否显示详细视图
+                        //detailView: false,                   //是否显示父子表
+                        columns: [
+                            {
+                                checkbox: true
+                            }
+                            , {
+                                title: '区号',
+                                field: 'areaCode'
+                            }, {
+                                title: '名称',
+                                field: 'areaName'
+                            }
+                             , {
+                                title: '是否启用',
+                                formatter: function (value, row, index) {
+                                    if (row.enable == true)
+                                        return "是";
+                                    else
+                                        return "否";
+                                }
+
+                            },
+                             {
+                                title: '操作', field: '#', align: 'center',
+                                formatter: function (value, row, index) {
+                                    var d = "<a href=\"javascript:addCatalogEvent('Edit'," + row.id + ")\">修改</a>";
+                                    return d;
+                                }
+                            }]
+                        // responseHandler:function(res) {
+                        //     //console.log(res);
+                        //     return res.rows;
+                        // }
+                    });
+
+
+
+
+        };
+        oTableInit.queryParams = function (params) {
+            var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                page_size: params.limit,   //页面大小
+                current_page: params.offset==0?1:(params.offset/params.limit)+1,  //页码
+                //pair: $("#pair").val()
+                //action: "GetBakModuleList"
+            };
+            //console.log(temp);
+            return temp;
+        };
+        return oTableInit;
+    };
+    $('#tb_departments').on('page-change.bs.table', function (number,size) {
+        //debugger;
+        //alert("1213");
+        // $('#tb_departments').bootstrapTable('destroy');
+        // oTable.Init(size,10);
+        // ...
+    });
+    $('#tb_departments').on('load-success.bs.table', function (e) {
+        //debugger;
+        //alert("1213");
+        $(".fixed-table-loading").attr("style","display:none");//不知道什么鬼原因  反正先加载时候先去掉
+        // ...
+    });
+
+
+
+
+
+
+
+</script>
+
+
+
+

@@ -1,0 +1,126 @@
+<html><head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>管理后台 - 登录</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+
+    <link rel="shortcut icon" href="../static/img/favicon.ico">
+    <link href="../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+
+    <link href="../static/css/animate.css" rel="stylesheet">
+    <link href="../static/css/style.css?v=4.1.0" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <script>if(window.top !== window.self){ window.top.location = window.location;}</script>
+</head>
+
+<body class="gray-bg">
+
+<div class="middle-box text-center loginscreen  animated fadeInDown">
+    <div>
+        <div style="padding-top: 75%">
+            <!--<h1 class="logo-name">H+</h1>-->
+        </div>
+        <h3>欢迎使用</h3>
+            <div class="form-group">
+                <input type="text" id="username" class="form-control" placeholder="用户名" required="">
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" class="form-control " placeholder="密码" required="">
+            </div>
+            <div class="form-group">
+                <div class="col-sm-7" style="padding-left:0px;margin-bottom:15px;">
+                <input type="text" class="form-control" id="verifyCode" placeholder="验证码" required="">
+                </div>
+                <div class="col-sm-5">
+                    <img src="/v1/http/login/get_verify_code?ts=123" id="VerifyCodeImg" onclick="getVerifyCode()">
+                </div>
+            </div>
+            <button type="button" id="subLogin" class="btn btn-primary block full-width m-b">登 录</button>
+
+
+            <p class="text-muted text-center"> <a href="login.html#"><small>忘记密码了？</small></a>
+            </p>
+
+
+    </div>
+</div>
+
+<!-- 全局js -->
+<script src="../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../static/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../static/js/plugins/layer/layer.min.js"></script>
+<script src="../static/js/md5.js"></script>
+
+<!--<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>-->
+<!--统计代码，可删除-->
+<script type="text/javascript">
+    //刷新验证码
+    function getVerifyCode()
+    {
+        $("#VerifyCodeImg").attr("src","/v1/http/login/get_verify_code?ts="+new Date().getTime()+"");
+    }
+    $(function () {
+        var input = document.getElementById("verifyCode");
+        $("input").each(function(index, element) {
+            this.addEventListener("keyup", function(event) {
+                event.preventDefault();
+                if (event.keyCode === 13) {
+                    $("#subLogin").click();
+                }
+            });
+        })
+
+        //getVerifyCode();
+
+        $("#subLogin").click(function(){
+            var hasError;
+            $("input[type=text]").each(function () {
+                if($(this).val()=="")
+                {
+                    hasError=true;
+                    layer.msg($(this).prop("placeholder")+"不能为空！");
+                    return false;
+                }
+            })
+            if(!hasError)
+            {
+                $.ajax({
+                    type: "post",
+                    url: "/v1/http/login/",
+                    contentType: "application/json;charset=UTF-8",  //发送信息至服务器时内容编码类型。
+                    async: false,
+                    //dataType:"json",  // 预期服务器返回的数据类型。如果不指定，jQuery 将自动根据 HTTP 包 MIME 信息来智能判断，比如XML MIME类型就被识别为XML。
+                    data:JSON.stringify(
+                        {
+                            userName:$("#username").val(),
+                            pwd:hex_md5($("#password").val()),
+                            verifyCode:$("#verifyCode").val()
+                        }),
+                    success: function (data) {
+                        //console.log(data);
+
+                        if(data.code==0)
+                        {
+                            document.cookie
+                            sessionStorage.setItem('token',data.data.loginBizBo.token);
+                            window.location.href="index.html";
+                        }
+                        else
+                            layer.msg(data.msg, { offset: '37.5%' });
+                    }
+                });
+            }
+        })
+    })
+</script>
+
+
+
+</body></html>
