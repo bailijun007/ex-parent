@@ -29,6 +29,7 @@ import com.gitee.hupadev.commons.cache.CacheSerializer;
 import com.gitee.hupadev.commons.cache.JsonCacheSerializer;
 import com.gitee.hupadev.commons.cache.RedisCache;
 import com.gitee.hupadev.commons.cache.RedisPool;
+import com.gitee.hupadev.commons.json.JsonUtils;
 
 @EnableCaching
 @Configuration
@@ -85,6 +86,8 @@ public class BaseCacheConfig {
 	@Lazy
 	@Bean
 	public RedisCache redisCache(@Qualifier("baseRedisPool") RedisPool redisPool) {
+		JsonUtils.setMapper(objectMapper);
+		
 		RedisCache rc = new RedisCache(redisPool);
 		rc.setDbIndex(15);
 		CacheSerializer cacheSerializer = new JsonCacheSerializer();

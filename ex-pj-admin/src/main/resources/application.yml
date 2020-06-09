@@ -13,6 +13,7 @@ spring:
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
+      WRITE_BIGDECIMAL_AS_PLAIN: true
     ignoreNull: true
     defaultPropertyInclusion: NON_EMPTY 
 
