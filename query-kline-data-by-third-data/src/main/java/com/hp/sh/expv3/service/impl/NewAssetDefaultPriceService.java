@@ -21,15 +21,15 @@ public class NewAssetDefaultPriceService {
     private BigDecimal startPrice = new BigDecimal(0.04);
 
 //    @Value("${min.price}")
-    private BigDecimal minPrice = new BigDecimal(0.04);
+    private BigDecimal minPrice = new BigDecimal(0.03);
 
 //    @Value("${stepMax.price}")
     private BigDecimal stepMaxPrice = new BigDecimal(+0.000015);
 //    @Value("${stepMin.price}")
-    private BigDecimal stepMinPrice = new BigDecimal(-0.000012);
+    private BigDecimal stepMinPrice = new BigDecimal(-0.0000125);
 
 //    @Value("${count}")
-    private int count = 86400;
+    private int count = 89280;
 
     public List<BigDecimal> buildPrice() {
         ArrayList<BigDecimal> price = new ArrayList<>(count);
@@ -58,6 +58,11 @@ public class NewAssetDefaultPriceService {
         return new BigDecimal(pDouble);
     }
 
-
+public static void main(String[] args) {
+    final List<BigDecimal> bigDecimals = new NewAssetDefaultPriceService().buildPrice();
+    for (BigDecimal bigDecimal : bigDecimals) {
+        System.out.println(bigDecimal);
+    }
+}
 
 }
