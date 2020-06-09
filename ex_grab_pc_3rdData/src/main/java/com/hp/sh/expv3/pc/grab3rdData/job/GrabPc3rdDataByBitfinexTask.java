@@ -56,9 +56,9 @@ public class GrabPc3rdDataByBitfinexTask {
     @Qualifier("metadataDb5RedisUtil")
     private RedisUtil metadataDb5RedisUtil;
 
-    @Autowired
-    @Qualifier("originaldataDb5RedisUtil")
-    private RedisUtil originaldataDb5RedisUtil;
+//    @Autowired
+//    @Qualifier("originaldataDb5RedisUtil")
+//    private RedisUtil originaldataDb5RedisUtil;
 
     @Value("${grab.pc.3rdDataByBitfinexHttps.enable}")
     private Integer enableByHttps;
@@ -119,7 +119,7 @@ public class GrabPc3rdDataByBitfinexTask {
                     if(map.size()==1){
                         //批量保存
                         metadataDb5RedisUtil.mset(map);
-                        originaldataDb5RedisUtil.mset(map);
+//                        originaldataDb5RedisUtil.mset(map);
                     }
 
                 } catch (Exception e) {

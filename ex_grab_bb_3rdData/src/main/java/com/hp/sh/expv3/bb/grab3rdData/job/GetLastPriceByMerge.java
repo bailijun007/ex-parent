@@ -68,9 +68,9 @@ public class GetLastPriceByMerge {
     @Value("${bb.trade.bbGroupIds}")
     private Integer bbGroupId;
 
-    @Autowired
-    @Qualifier("originaldataDb5RedisUtil")
-    private RedisUtil originaldataDb5RedisUtil;
+//    @Autowired
+//    @Qualifier("originaldataDb5RedisUtil")
+//    private RedisUtil originaldataDb5RedisUtil;
 
     @Autowired
     @Qualifier("metadataDb5RedisUtil")
@@ -346,7 +346,7 @@ public class GetLastPriceByMerge {
         }
         map.put(symbol, avgLastPrice);
         metadataDb5RedisUtil.hmset(key, map);
-        originaldataDb5RedisUtil.hmset(key, map);
+//        originaldataDb5RedisUtil.hmset(key, map);
 //        metadataDb5RedisUtil.zadd("his:" + key, new HashMap<String, Double>() {{
 //            put(bbSymbol.getSymbol(), Double.valueOf(format));
 //        }});
@@ -358,7 +358,7 @@ public class GetLastPriceByMerge {
             map.clear();
             map.put("BYS_USDT",bysValue);
             metadataDb5RedisUtil.hmset(key, map);
-            originaldataDb5RedisUtil.hmset(key, map);
+//            originaldataDb5RedisUtil.hmset(key, map);
         }
 
         logger.info("当前时间={},asset={},symbol={},最终最新成交均价为:{},", format, bbSymbol.getAsset(), bbSymbol.getSymbol(), avgLastPrice);

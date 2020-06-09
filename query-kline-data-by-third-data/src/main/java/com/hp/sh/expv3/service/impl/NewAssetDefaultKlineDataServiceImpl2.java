@@ -1,5 +1,6 @@
 package com.hp.sh.expv3.service.impl;
 
+import com.hp.sh.expv3.mapper.KlineDataMapper;
 import com.hp.sh.expv3.pojo.KlineDataPo;
 import com.hp.sh.expv3.service.INewAssetDefaultKlineDataService;
 import com.hp.sh.expv3.util.KlineUtil;
@@ -12,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,9 @@ public class NewAssetDefaultKlineDataServiceImpl2 implements INewAssetDefaultKli
     @Autowired
     private NewAssetDefaultPriceService newAssetDefaultPriceService;
 
+    @Autowired
+    private KlineDataMapper klineDataMapper;
+
     @Override
     public void getDefaultKlineData(BigDecimal price, Long timestamp, String asset, String symbol) {
         long minusDay = 24 * 60 * 60 * 1000;
@@ -36,7 +41,7 @@ public class NewAssetDefaultKlineDataServiceImpl2 implements INewAssetDefaultKli
         Long start = timestamp - minusDay * 10;
 //        Long start = 1590964200000L;
         Long startInMin = start;
-        List<BigDecimal> list = new ArrayList<>();
+//        List<BigDecimal> list = new ArrayList<>();
         List<Long> minTimeList = new ArrayList<>();
 
         for (int j = 0; j < 14400; j++) {
@@ -44,31 +49,40 @@ public class NewAssetDefaultKlineDataServiceImpl2 implements INewAssetDefaultKli
             minTimeList.add(startInMin);
         }
 
-        list = newAssetDefaultPriceService.buildPrice();
-        list.add(new BigDecimal("0.1559564114"));
         minTimeList.add(timestamp);
-
-        List<KlineDataPo> poList = new ArrayList<>();
-        for (int j = 0; j < 14400; j++) {
-            BigDecimal sub = getSub();
-            KlineDataPo klineDataPo = new KlineDataPo();
-            BigDecimal basePrice = list.get(j);
-            klineDataPo.setOpenTime(minTimeList.get(j));
-            klineDataPo.setOpen(basePrice);
-            klineDataPo.setHigh(basePrice.add(sub));
-            klineDataPo.setLow(basePrice.subtract(sub));
-            klineDataPo.setClose(list.get(j + 1));
-            BigDecimal volume = basePrice.multiply(new BigDecimal("" + (int) (Math.random() * 20)));
-            klineDataPo.setVolume(volume.add(BigDecimal.TEN));
-            poList.add(klineDataPo);
-//            System.out.println(klineDataPo.getOpenTime()+","+klineDataPo.getOpen());
+        List<KlineDataPo> klineDataPos = klineDataMapper.queryKlineDataByThirdData("kline_data_202005", 1, "ETH_USDT", "1min", 1588348800000L, 1589212800000L, "binance");
+        for (int i = 0; i < klineDataPos.size(); i++) {
+            klineDataPos.get(i).setOpenTime(minTimeList.get(i));
+            klineDataPos.get(i).setOpen(klineDataPos.get(i).getOpen().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
+            klineDataPos.get(i).setHigh(klineDataPos.get(i).getHigh().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
+            klineDataPos.get(i).setLow(klineDataPos.get(i).getLow().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
+            klineDataPos.get(i).setClose(klineDataPos.get(i).getClose().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
+            klineDataPos.get(i).setVolume(klineDataPos.get(i).getVolume().divide(BigDecimal.TEN, 8, RoundingMode.DOWN));
         }
+//        list.add(price);
+
+
+//        List<KlineDataPo> poList = new ArrayList<>();
+//        for (int j = 0; j < 14400; j++) {
+//            BigDecimal sub = getSub();
+//            KlineDataPo klineDataPo = new KlineDataPo();
+//            BigDecimal basePrice = list.get(j);
+//            klineDataPo.setOpenTime(minTimeList.get(j));
+//            klineDataPo.setOpen(basePrice);
+//            klineDataPo.setHigh(basePrice.add(sub));
+//            klineDataPo.setLow(basePrice.subtract(sub));
+//            klineDataPo.setClose(list.get(j + 1));
+//            BigDecimal volume = basePrice.multiply(new BigDecimal("" + (int) (Math.random() * 20)));
+//            klineDataPo.setVolume(volume.add(BigDecimal.TEN));
+//            poList.add(klineDataPo);
+////            System.out.println(klineDataPo.getOpenTime()+","+klineDataPo.getOpen());
+//        }
 
 
         String dataRedisKey = "candle:bb:" + asset + ":" + symbol + ":" + 1;
         String updateRedisKey = "bb:kline:updateEvent:" + asset + ":" + symbol + ":" + 1;
 
-        saveAndNotify(dataRedisKey, updateRedisKey, timestamp - minusDay * 10, timestamp, poList);
+        saveAndNotify(dataRedisKey, updateRedisKey, timestamp - minusDay * 10, timestamp, klineDataPos);
 
     }
 

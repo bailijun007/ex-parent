@@ -70,9 +70,9 @@ public class GrabBb3rdDataByBinanceTask {
     @Value("${bb.trade.bbGroupIds}")
     private Integer bbGroupId;
 
-    @Autowired
-    @Qualifier("originaldataDb5RedisUtil")
-    private RedisUtil originaldataDb5RedisUtil;
+//    @Autowired
+//    @Qualifier("originaldataDb5RedisUtil")
+//    private RedisUtil originaldataDb5RedisUtil;
 
     @Autowired
     @Qualifier("metadataDb5RedisUtil")
@@ -143,7 +143,7 @@ public class GrabBb3rdDataByBinanceTask {
 //                                map.put(key, value);
                                 if(map.size()==4){
                                     metadataDb5RedisUtil.mset(map);
-                                    originaldataDb5RedisUtil.mset(map);
+//                                    originaldataDb5RedisUtil.mset(map);
                                     map.clear();
                                 }
                             }
@@ -223,7 +223,7 @@ public class GrabBb3rdDataByBinanceTask {
                 }
                 //批量保存
                 metadataDb5RedisUtil.mset(map);
-                originaldataDb5RedisUtil.mset(map);
+//                originaldataDb5RedisUtil.mset(map);
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.error("通过https请求获取binance交易所最新成交价定时任务报错！，cause()={},message={}", e.getCause(), e.getMessage());

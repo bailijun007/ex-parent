@@ -41,7 +41,7 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
 
     /**
      * 获取第三方k线数据，
-     * 这里取zb 或 binance 交易所数据（可修改）
+     * 这里取bitfinex 或 binance 交易所数据（可修改）
      *
      * @param tableName
      * @param klineType
@@ -60,13 +60,13 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
             if (CollectionUtils.isEmpty(klineDataPos)) {
                 expName = "bitfinex";
                 klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair2, interval, openTimeBegin, openTimeEnd, expName);
-                for (KlineDataPo klineDataPo : klineDataPos) {
-                    klineDataPo.setOpen(klineDataPo.getOpen().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
-                    klineDataPo.setHigh(klineDataPo.getHigh().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
-                    klineDataPo.setLow(klineDataPo.getLow().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
-                    klineDataPo.setClose(klineDataPo.getClose().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
-                    klineDataPo.setVolume(klineDataPo.getVolume().divide(BigDecimal.TEN, 8, RoundingMode.DOWN));
-                }
+            }
+            for (KlineDataPo klineDataPo : klineDataPos) {
+                klineDataPo.setOpen(klineDataPo.getOpen().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
+                klineDataPo.setHigh(klineDataPo.getHigh().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
+                klineDataPo.setLow(klineDataPo.getLow().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
+                klineDataPo.setClose(klineDataPo.getClose().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
+                klineDataPo.setVolume(klineDataPo.getVolume().divide(BigDecimal.TEN, 8, RoundingMode.DOWN));
             }
         } else {
             klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
