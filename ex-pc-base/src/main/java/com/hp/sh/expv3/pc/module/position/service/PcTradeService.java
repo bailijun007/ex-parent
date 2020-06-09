@@ -450,7 +450,7 @@ public class PcTradeService {
 		}
 		
 		if(order==null){
-			logger.error("成交订单不存在：orderId={}", tradeMsg.getOrderId());
+			logger.error("PC成交订单不存在：orderId={}", tradeMsg.getOrderId());
 			throw new ExSysException(CommonError.OBJ_DONT_EXIST);
 		}
 		

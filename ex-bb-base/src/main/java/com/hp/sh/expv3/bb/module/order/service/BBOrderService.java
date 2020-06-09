@@ -211,7 +211,7 @@ public class BBOrderService {
 	
 	private boolean canCancel(BBOrder order, Long orderId){
 		if(order==null){
-			logger.error("订单不存在：orderId={}", orderId);
+			logger.error("请求取消的订单不存在：orderId={}", orderId);
 			return false;
 		}
 		if(order.getStatus() == OrderStatus.CANCELED){
@@ -243,7 +243,7 @@ public class BBOrderService {
 	private void doCancel(long userId, String asset, String symbol, long orderId){
 		BBOrder order = this.orderQueryService.getOrder(asset, symbol, userId, orderId);
 		if(order==null){
-			logger.error("订单不存在:orderId={}", orderId);
+			logger.error("被取消的订单不存在:orderId={}", orderId);
 			return;
 		}
 		if(order.getStatus() == OrderStatus.CANCELED){

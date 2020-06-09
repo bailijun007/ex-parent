@@ -9,7 +9,7 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- 对日志进行格式化 -->
 		<encoder>
-			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
+			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger#%M - %line - [%X] %msg%n</pattern>
 		</encoder>
     </appender>
 
@@ -36,7 +36,7 @@
         </rollingPolicy>
 
 		<encoder>
-			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger - %line - [%X] %msg%n</pattern>
+			<pattern>[%level] %d{yy-MM-dd HH:mm:ss.SSS} %logger#%M - %line - [%X] %msg%n</pattern>
 		</encoder>
     </appender>
 
