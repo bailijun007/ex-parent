@@ -33,22 +33,23 @@ public class NewAssetDefaultKlineDataServiceImpl2 implements INewAssetDefaultKli
     public void getDefaultKlineData(BigDecimal price, Long timestamp, String asset, String symbol) {
         long minusDay = 24 * 60 * 60 * 1000;
         long minusMin = 60 * 1000;
-        Long start = timestamp - minusDay * 62;
+        Long start = timestamp - minusDay * 10;
+//        Long start = 1590964200000L;
         Long startInMin = start;
         List<BigDecimal> list = new ArrayList<>();
         List<Long> minTimeList = new ArrayList<>();
 
-        for (int j = 0; j < 89280; j++) {
+        for (int j = 0; j < 14400; j++) {
             startInMin = startInMin + minusMin;
             minTimeList.add(startInMin);
         }
 
         list = newAssetDefaultPriceService.buildPrice();
-        list.add(price);
+        list.add(new BigDecimal("0.1559564114"));
         minTimeList.add(timestamp);
 
         List<KlineDataPo> poList = new ArrayList<>();
-        for (int j = 0; j < 89280; j++) {
+        for (int j = 0; j < 14400; j++) {
             BigDecimal sub = getSub();
             KlineDataPo klineDataPo = new KlineDataPo();
             BigDecimal basePrice = list.get(j);
@@ -67,7 +68,7 @@ public class NewAssetDefaultKlineDataServiceImpl2 implements INewAssetDefaultKli
         String dataRedisKey = "candle:bb:" + asset + ":" + symbol + ":" + 1;
         String updateRedisKey = "bb:kline:updateEvent:" + asset + ":" + symbol + ":" + 1;
 
-        saveAndNotify(dataRedisKey, updateRedisKey, timestamp - minusDay * 62, timestamp, poList);
+        saveAndNotify(dataRedisKey, updateRedisKey, timestamp - minusDay * 10, timestamp, poList);
 
     }
 

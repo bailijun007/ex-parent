@@ -52,13 +52,13 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
      */
     @Override
     public void queryKlineDataByThirdData(String tableName, Integer klineType, String asset, String pair, String interval, Long openTimeBegin, Long openTimeEnd) {
-        String expName = "zb";
+        String expName = "binance";
         List<KlineDataPo> klineDataPos = null;
         if (pair.equals("BYM_USDT")) {
             String pair2 = "ETH_USDT";
             klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair2, interval, openTimeBegin, openTimeEnd, expName);
             if (CollectionUtils.isEmpty(klineDataPos)) {
-                expName = "binance";
+                expName = "bitfinex";
                 klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair2, interval, openTimeBegin, openTimeEnd, expName);
                 for (KlineDataPo klineDataPo : klineDataPos) {
                     klineDataPo.setOpen(klineDataPo.getOpen().divide(new BigDecimal("1500"), 8, RoundingMode.DOWN));
@@ -71,7 +71,7 @@ public class QueryKlineDataByThirdDataServiceImpl implements IQueryKlineDataByTh
         } else {
             klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
             if (CollectionUtils.isEmpty(klineDataPos)) {
-                expName = "binance";
+                expName = "bitfinex";
                 klineDataPos = klineDataMapper.queryKlineDataByThirdData(tableName, klineType, pair, interval, openTimeBegin, openTimeEnd, expName);
             }
         }

@@ -39,7 +39,7 @@ public class KlineDataByThirdData {
         return null;
     }
 
-//    @PostConstruct
+    @PostConstruct
     private void start(){
         assetDefaultKlineDataController.getDefaultKlineData(null,null,null,null);
     }
