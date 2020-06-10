@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hp.sh.expv3.pj.module.plate.dao.AnchorSettingDAO">
+
+	<resultMap type="com.hp.sh.expv3.pj.module.plate.entity.AnchorSetting" id="AnchorSetting">
+		<result column="asset" property="asset" />
+		<result column="symbol" property="symbol" />
+		<result column="anchor_asset" property="anchorAsset" />
+		<result column="anchor_symbol" property="anchorSymbol" />
+		<result column="expected_price" property="expectedPrice" />
+		<result column="anchor_price" property="anchorPrice" />
+		<result column="anchor_ratio" property="anchorRatio" />
+		<result column="swing_min" property="swingMin" />
+		<result column="swing_max" property="swingMax" />
+		<result column="id" property="id" />
+		<result column="created" property="created" />
+		<result column="modified" property="modified" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		asset,symbol,anchor_asset,anchor_symbol,expected_price,anchor_price,anchor_ratio,swing_min,swing_max,id,created,modified
+	</sql>
+
+	<sql id="simple_where" >
+		<where>
+		<if test="swingMin!=null"> and swing_min=#{swingMin}</if>
+		<if test="swingMax!=null"> and swing_max=#{swingMax}</if>
+		<if test="id!=null"> and id=#{id}</if>
+		<if test="created!=null"> and created=#{created}</if>
+		<if test="modified!=null"> and modified=#{modified}</if>
+		<if test="keyword!=null and keyword!=''"> and CONCAT(IFNULL(asset,''),IFNULL(symbol,''),IFNULL(anchor_asset,''),IFNULL(anchor_symbol,''),'') like CONCAT('%',#{keyword},'%')</if>	</where>
+	</sql>
+
+	<sql id="simple_query" >
+		select
+			<include refid="Base_Column_List" />
+		from anchor_setting
+			<include refid="simple_where" />
+		<if test="orderBy!=null and orderBy!=''">
+			order by ${orderBy} <if test="!asc">desc</if>
+		</if>
+
+	</sql>
+
+	<select id="pageQuery" resultMap="AnchorSetting">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryList" resultMap="AnchorSetting">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryOne" resultMap="AnchorSetting">
+		<include refid="simple_query" />
+	</select>
+
+	<select id="queryCount" resultType="long">
+		select 
+		<choose>
+			<when test="SUM!=null">
+				sum(${SUM})
+			</when>
+			<otherwise>
+				count(1)
+			</otherwise>
+		</choose>
+		from anchor_setting
+		<include refid="simple_where" />
+	</select>
+
+	<select id="findById" resultMap="AnchorSetting">
+		select
+			<include refid="Base_Column_List" />
+		from anchor_setting
+			where id=#{id}
+	</select>
+
+	<select id="exist" resultType="boolean">
+		select 
+			count(1)
+		from 
+			anchor_setting
+		<include refid="simple_where" />
+		limit 1
+	</select>
+
+
+	<insert id="save">
+		<selectKey resultType="long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+		insert into anchor_setting (
+			asset,symbol,anchor_asset,anchor_symbol,expected_price,anchor_price,anchor_ratio,swing_min,swing_max,id,created,modified
+		)values(
+			#{asset},#{symbol},#{anchorAsset},#{anchorSymbol},#{expectedPrice},#{anchorPrice},#{anchorRatio},#{swingMin},#{swingMax},#{id},#{created},#{modified}
+		)
+	</insert>
+	
+	<update id="update">
+		update 
+			anchor_setting
+		set 
+			asset=#{asset},symbol=#{symbol},anchor_asset=#{anchorAsset},anchor_symbol=#{anchorSymbol},expected_price=#{expectedPrice},anchor_price=#{anchorPrice},anchor_ratio=#{anchorRatio},swing_min=#{swingMin},swing_max=#{swingMax},id=#{id},created=#{created},modified=#{modified}
+		where 
+			id=#{id}
+	</update>
+
+	<delete id="delete">
+        delete from anchor_setting where id=#{id}
+    </delete>
+
+    <delete id="condDelete">
+        delete from anchor_setting
+		<include refid="simple_where" />
+    </delete>
+
+	<!--  -->
+	
+	<select id="findBySymbol" resultMap="AnchorSetting">
+		select
+			<include refid="Base_Column_List" />
+		from anchor_setting
+			where asset=#{asset} and symbol=#{symbol}
+	</select>
+	
+</mapper>

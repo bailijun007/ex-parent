@@ -6,14 +6,17 @@ import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.hp.sh.expv3.pj.module.plate.component.CacheService;
+import com.hp.sh.expv3.pj.module.plate.entity.AnchorSetting;
 import com.hp.sh.expv3.pj.module.plate.entity.PlateStrategy;
 import com.hp.sh.expv3.pj.module.plate.service.AnchorPriceService;
+import com.hp.sh.expv3.pj.module.plate.service.AnchorSettingService;
 import com.hp.sh.expv3.pj.module.plate.service.PlateStrategyService;
 import com.hp.sh.expv3.utils.IntBool;
 
@@ -27,15 +30,23 @@ public class PlateStrategyJob extends Thread{
     
     @Autowired
     private AnchorPriceService anchorPriceService;
+    
+    @Autowired
+    private AnchorSettingService anchorSettingService;
 	
 	@Autowired
 	private CacheService cacheService;
+	
+	@Value("${plate.strategy.start:true}")
+	private boolean startPlateStrategy;
 	
 	@Bean
 	@Order(Ordered.LOWEST_PRECEDENCE)
 	int start1234567890(){
 		this.pause(1000*5);
-//		this.start();
+		if(startPlateStrategy){
+			this.start();
+		}
 		return -1;
 	}
 	
@@ -44,12 +55,22 @@ public class PlateStrategyJob extends Thread{
 			try{
 				
 				PlateStrategy ps = this.getCachedPlateStrategy("USDT", "BYM_USDT");
-				if(ps==null || ps.getEnabled()!=IntBool.YES){
+				if(ps==null){
 					this.pause(1000*60);
 					continue;
 				}
+				BigDecimal newPrice = null;
 				
-				this.genPrice(ps);
+				if(ps.getEnabled()==IntBool.YES){
+					newPrice = this.genPlatePrice(ps);
+				}else{
+					newPrice = this.genAnchorPrice(ps);
+				}
+				
+				newPrice = newPrice.setScale(8, BigDecimal.ROUND_HALF_DOWN);
+				
+				this.anchorPriceService.save(ps.getId(), newPrice);
+				this.cacheService.cacheNewestPrice(ps.getAsset(), ps.getSymbol(), newPrice);
 				
 				long millis = 1000L*RandomUtils.nextInt(ps.getDelayMin(), ps.getDelayMax());
 				this.pause(millis);
@@ -60,25 +81,43 @@ public class PlateStrategyJob extends Thread{
 		}
 	}
 	
-	private PlateStrategy getCachedPlateStrategy(String asset, String symbol) {
-		PlateStrategy ps = this.cacheService.getCachedPlateStrategy(asset, symbol);
-		if(ps==null){
-			ps = this.plateStrategyService.findBySymbol(asset, symbol);
-			this.cacheService.cachePlateStrategy(ps);
+	private BigDecimal genAnchorPrice(PlateStrategy ps) {
+		AnchorSetting as = this.anchorSettingService.findBySymbol(ps.getAsset(), ps.getSymbol());
+		Double anchorPrice = this.cacheService.getCachedNewestPrice(as.getAnchorAsset(), as.getAnchorSymbol());
+		
+		double newPrice = anchorPrice*as.getAnchorRatio();
+		
+		double step = randomDouble(as.getSwingMin(),as.getSwingMax());
+		
+		if(step>0){
+			if(newPrice > as.getExpectedPrice().doubleValue()){
+				newPrice -= step;
+			}else{
+				newPrice += step;
+			}
+		}else{
+			step = step * -1;
+			if(newPrice > as.getExpectedPrice().doubleValue()){
+				newPrice += step;
+			}else{
+				newPrice -= step;
+			}
 		}
-		return ps;
+		
+		return new BigDecimal(newPrice);
 	}
 
-	private void genPrice(PlateStrategy ps) {
-		Double lastPrice = this.cacheService.getCachedNewPrice(ps.getAsset(), ps.getSymbol());
+	private BigDecimal genPlatePrice(PlateStrategy ps) {
+		Double lastPrice = this.cacheService.getCachedNewestPrice(ps.getAsset(), ps.getSymbol());
 		if(lastPrice==null){
 			lastPrice = ps.getPriceMin();
 		}
 		double step = randomDouble(ps.getStepMin(),ps.getStepMax());
-		double priceMin = ps.getPriceMin();
-		double priceMax = ps.getPriceMax();
 
 		double newPrice = lastPrice+step;
+		
+		double priceMin = ps.getPriceMin();
+		double priceMax = ps.getPriceMax();
 		
 		if(newPrice < priceMin){
 			newPrice = priceMin;
@@ -90,12 +129,18 @@ public class PlateStrategyJob extends Thread{
 		
 		BigDecimal bdNewPrice = new BigDecimal(newPrice);
 		
-		bdNewPrice = bdNewPrice.setScale(8, BigDecimal.ROUND_HALF_DOWN);
-		
-		this.anchorPriceService.save(ps.getId(), bdNewPrice);
-		this.cacheService.cacheNewPrice(ps.getAsset(), ps.getSymbol(), bdNewPrice);
+		return bdNewPrice;
 	}
 	
+	private PlateStrategy getCachedPlateStrategy(String asset, String symbol) {
+		PlateStrategy ps = this.cacheService.getCachedPlateStrategy(asset, symbol);
+		if(ps==null){
+			ps = this.plateStrategyService.findBySymbol(asset, symbol);
+			this.cacheService.cachePlateStrategy(ps);
+		}
+		return ps;
+	}
+
 	private void pause(long millis){
 		try {
 			Thread.sleep(millis);

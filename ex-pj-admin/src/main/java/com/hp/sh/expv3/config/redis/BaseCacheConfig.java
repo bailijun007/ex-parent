@@ -26,6 +26,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gitee.hupadev.commons.cache.CacheSerializer;
+import com.gitee.hupadev.commons.cache.JacksonCacheSerializer;
 import com.gitee.hupadev.commons.cache.JsonCacheSerializer;
 import com.gitee.hupadev.commons.cache.RedisCache;
 import com.gitee.hupadev.commons.cache.RedisPool;
@@ -90,8 +91,10 @@ public class BaseCacheConfig {
 		
 		RedisCache rc = new RedisCache(redisPool);
 		rc.setDbIndex(15);
-		CacheSerializer cacheSerializer = new JsonCacheSerializer();
-		rc.setCacheSerializer(cacheSerializer);
+		
+		JacksonCacheSerializer jsonCs = new JacksonCacheSerializer();
+		jsonCs.setMapper(objectMapper);
+		rc.setCacheSerializer(jsonCs);
 		return rc;
 	}
 	

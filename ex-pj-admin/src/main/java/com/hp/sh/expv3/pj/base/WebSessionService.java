@@ -1,4 +1,3 @@
-
 package com.hp.sh.expv3.pj.base;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +25,9 @@ public class WebSessionService {
 	protected Long currentUserId() {
 		String sid = this.getXToken();
 		Object cv = cache.get(userCacheKey(sid));
+		if(cv==null){
+			return null;
+		}
 		Long userId = Long.valueOf(""+cv);
 		if(userId==null){
 			throw new BizException(CommonError.AUTH);
@@ -34,7 +36,7 @@ public class WebSessionService {
 	}
 	
 	protected String userCacheKey(String sid){
-		return "user:login::"+sid;
+		return "login::"+sid;
 	}
 	
 	protected String getXToken(){

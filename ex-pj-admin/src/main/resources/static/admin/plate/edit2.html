@@ -25,9 +25,16 @@
 <script src="../../static/js/LayerTool.js"></script>
 <script src="../../static/js/common.js"></script>
 
-<script src="../../static/js/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<style>
+	.red{
+		color:#e00;
+	}
+</style>
+
+<script
+	src="../../static/js/plugins/datetimepicker/bootstrap-datetimepicker.min.js"></script>
 <script src="/sys/config.jsx"></script>
-<script src="plate.js"></script>
+<script src="plate2.js"></script>
 
 </head>
 <body class="gray-bg">
@@ -39,30 +46,32 @@
 					<div class="ibox float-e-margins">
 						<div class="ibox-content">
 
-							<form id="editForm" class="form-horizontal">
+							<form id="ps_form" class="form-horizontal">
 								<input type="hidden" name="id" class="form-control" value="" />
-								 
-			  	  				<div class="form-group">
+
+								<div class="form-group">
 									<label for="enabled" class="col-sm-2 control-label">模块</label>
 									<div class="col-sm-10">
 										<select name="module" class="form-control opt">
 											<option value="bb">币币</option>
 											<option value="pc">合约</option>
 										</select>
-										
+
 									</div>
 								</div>
-								
+
 								<div class="form-group">
 									<label for="name" class="col-sm-2 control-label">资产</label>
 									<div class="col-sm-10">
-										<input type="text" name="asset" value="" maxlength="20" class="form-control" readOnly="readOnly" />
+										<input type="text" name="asset" value="" maxlength="20"
+											class="form-control" readOnly="readOnly" />
 									</div>
 								</div>
 								<div class="form-group">
 									<label for="name" class="col-sm-2 control-label">交易对</label>
 									<div class="col-sm-10">
-										<input type="text" name="symbol" value="" maxlength="20" class="form-control" readOnly="readOnly" />
+										<input type="text" name="symbol" value="" maxlength="20"
+											class="form-control" readOnly="readOnly" />
 									</div>
 								</div>
 								<div class="form-group">
@@ -94,6 +103,20 @@
 									</div>
 								</div>
 								<div class="form-group">
+									<label for="volumeMin" class="col-sm-2 control-label">数量区间</label>
+									<div class="col-sm-10">
+										<input type="text" name="volumeMin" value="" maxlength="10"
+											class="form-control" placeholder="" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="volumeMax" class="col-sm-2 control-label">数量区间</label>
+									<div class="col-sm-10">
+										<input type="text" name="volumeMax" value="" maxlength="10"
+											class="form-control" placeholder="" />
+									</div>
+								</div>
+								<div class="form-group">
 									<label for="delayMin" class="col-sm-2 control-label">频率区间（最小）</label>
 									<div class="col-sm-10">
 										<input type="text" name="delayMin" value="" maxlength="10"
@@ -107,20 +130,6 @@
 											class="form-control" />
 									</div>
 								</div>
-								<div class="form-group">
-									<label for="volumeMin" class="col-sm-2 control-label">数量区间</label>
-									<div class="col-sm-10">
-										<input type="text" name="volumeMin" value="" maxlength="10"
-										 class="form-control" placeholder="" />
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="volumeMax" class="col-sm-2 control-label">数量区间</label>
-									<div class="col-sm-10">
-										<input type="text" name="volumeMax" value="" maxlength="10"
-										 class="form-control" placeholder="" />
-									</div>
-								</div>
 								<!-- 
 								<div class="form-group">
 									<label for="remark" class="col-sm-2 control-label">备注</label>
@@ -130,8 +139,8 @@
 									</div>
 								</div>
 								 -->
-								 
-			  	  				<div class="form-group">
+
+								<div class="form-group">
 									<label for="enabled" class="col-sm-2 control-label">启用</label>
 									<div class="col-sm-10">
 										<select name="enabled" class="form-control opt">
@@ -141,74 +150,82 @@
 									</div>
 								</div>
 								
-			  	  				<div class="form-group hidden" id="anchorPanel">
+							</form>
+
+								<div class="form-group hidden" id="anchorPanel">
 									<label for="enabled" class="col-sm-2 control-label"></label>
 									<div class="col-sm-10">
-<div class="panel panel-default">
-	<div class="panel-heading">
-		锚定价格设置
-	</div>
-	<div class="panel-body">
-		
-		<div>
-								<div class="form-group">
-									<label for="anchorPrice" class="col-sm-2 control-label">最新锚定价格</label>
-									<div class="col-sm-10">
-										<input type="text" name="newestAnchorPrice" value="" maxlength="255" readOnly="readOnly"
-											name="anchorPrice" class="form-control" />
+										<div class="panel panel-default">
+											<div class="panel-heading">锚定价格设置</div>
+											<div class="panel-body">
+
+												<form id="as_form" class="form-horizontal">
+													<div class="form-group">
+														<label for="anchorPrice" class="col-sm-2 control-label">最新锚定价格</label>
+														<div class="col-sm-10">
+															<input type="text" name="newestAnchorPrice" value=""
+																maxlength="255" readOnly="readOnly" name="anchorPrice"
+																class="form-control" />
+														</div>
+													</div>
+
+													<div class="form-group">
+														<label for="anchorPrice" class="col-sm-2 control-label">最新价格</label>
+														<div class="col-sm-10">
+															<input type="text" name="newestPrice" value=""
+																maxlength="255" readOnly="readOnly" name="anchorPrice"
+																class="form-control" />
+														</div>
+													</div>
+
+													<div class="form-group">
+														<label for="expectedPrice" class="col-sm-2 control-label">期望价格</label>
+														<div class="col-sm-10">
+															<input type="text" name="expectedPrice" id="expectedPrice" value=""
+																maxlength="255" name="expectedPrice" placeholder=""
+																class="form-control" />
+														</div>
+													</div>
+
+													<hr />
+
+													<div class="form-group">
+														<label for="swingMin" class="col-sm-2 control-label">摆动区间（最大）</label>
+														<div class="col-sm-10">
+															<input type="text" name="swingMin" value=""
+																maxlength="22" name="swingMin" class="form-control" />
+														</div>
+													</div>
+													<div class="form-group">
+														<label for="swingMax" class="col-sm-2 control-label">摆动区间（最小）</label>
+														<div class="col-sm-10">
+															<input type="text" name="swingMax" value=""
+																maxlength="22" name="swingMax" class="form-control" />
+														</div>
+													</div>
+													
+													<input type="hidden" name="id" />
+													<input type="hidden" name="asset" />
+													<input type="hidden" name="symbol" />
+													<input type="hidden" name="anchorAsset" />
+													<input type="hidden" name="anchorSymbol" />
+
+												</form>
+
+											</div>
+										</div>
 									</div>
 								</div>
-								
-								<div class="form-group">
-									<label for="anchorPrice" class="col-sm-2 control-label">最新价格</label>
-									<div class="col-sm-10">
-										<input type="text" name="newestPrice" value="" maxlength="255" readOnly="readOnly"
-											name="anchorPrice" class="form-control" />
-									</div>
-								</div>
-								
-								<div class="form-group">
-									<label for="expectedPrice" class="col-sm-2 control-label">期望价格</label>
-									<div class="col-sm-10">
-										<input type="text" name="expectedPrice" value=""
-											maxlength="255" name="expectedPrice" class="form-control" />
-									</div>
-								</div>
-								
-								<hr/>
-								
-								<div class="form-group">
-									<label for="swingMin" class="col-sm-2 control-label">摆动区间（最大）</label>
-									<div class="col-sm-10">
-										<input type="text" name="swingMin" value="" maxlength="22"
-											name="swingMin" class="form-control" />
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="swingMax" class="col-sm-2 control-label">摆动区间（最小）</label>
-									<div class="col-sm-10">
-										<input type="text" name="swingMax" value="" maxlength="22"
-											name="swingMax" class="form-control" />
-									</div>
-								</div>
-								
-								<input type="hidden" name="id" value="" maxlength="20" name="id" class="form-control" />
-		</div>
-		
-	</div>
-</div>
-									</div>
-								</div>
-								 
+
 								<div class="form-group">
 									<div class="col-sm-offset-2 col-sm-10">
-										<input type="button" class="btn btn-primary btn-save" @click="saveOrUpdate" value="确定" />
+										<input type="button" class="btn btn-primary btn-save"
+											@click="saveOrUpdate" value="确定" />
 										<!-- 
 											<button type="button" class="btn btn-default" @click="cancel">取消</button>
 										-->
 									</div>
 								</div>
-							</form>
 						</div>
 
 					</div>

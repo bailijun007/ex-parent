@@ -4,8 +4,8 @@ $(function(){
 	// config
 	var plateCtx = {
 		URL_PAGE_QUERY : "/admin/api/plate/list",
-		URL_GET : "/admin/api/plate/get",
-		URL_SAVE : "/admin/api/plate/save"
+		URL_GET : "/admin/api/plate/get2",
+		URL_SAVE : "/admin/api/plate/save2"
 	};
 	
 	BeanUtil.setPrefix(plateCtx, appConfig.host);
@@ -56,6 +56,7 @@ $(function(){
 			edit(event);
 		}
 	}
+	
 	function del(){
 		var idList = table.getSelectedIds();
 		if(idList==null || idList.length==0){
@@ -75,14 +76,30 @@ $(function(){
 	function bindEditor(id) {
 		if(id){
 			ajaxRequest(plateCtx.URL_GET, {id:id}, function(data){
-				json2form(data, 'editForm');
+				json2form(data.ps, 'ps_form');
+				json2form(data.as, 'as_form');
+				
+				if(data.as.expectedPrice!=data.as.newestPrice){
+					$('#expectedPrice').addClass('red');
+					$('#expectedPrice').val(data.as.newestPrice);
+				}
+				
+				$('#ps_form [name=enabled]').trigger("change");
+				
 			});
 		}
 	}
 
 	function saveOrUpdate() {
-		var postData = form2json('editForm');
-		ajaxRequest(plateCtx.URL_SAVE, postData, function(data){
+		var vo = {};
+		vo.ps = form2json('ps_form');
+		vo.as = form2json('as_form');
+		
+		if(!as.expectedPrice){
+			alert('期望价格必填');
+		}
+		
+		ajaxRequest(plateCtx.URL_SAVE, vo, function(data){
 			alert('保存成功');
 			refreshTable();
 		},'POST');
@@ -115,17 +132,21 @@ $(function(){
 	
 	$('#data_table').click(other);
 	
-	if($('#editForm').attr('id')){
+	if($('#ps_form').attr('id')){
 		bindEditor(T.p('id'));
 	}
 	
-	$('#editForm [name=enabled]').change(function(){
+	$('#ps_form [name=enabled]').change(function(){
 		var val = $(this).val();
 		if(val==1){
 			$('#anchorPanel').addClass("hidden");
 		}else{
 			$('#anchorPanel').removeClass("hidden");
 		}
+	});
+	
+	$('#expectedPrice').mouseover(function(){
+		this.select();
 	});
 	
 });

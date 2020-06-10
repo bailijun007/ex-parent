@@ -229,28 +229,15 @@ function json2form(jsonObj, formId) {
 	if(!jsonObj || !formId){
 		return;
 	}
+	
 	var form = $('#' + formId);
-	var paramArray = form.serializeArray();  
-	$(paramArray).each(function(a){
-		var name = this.name;
+	
+	for(name in jsonObj){
 		var val = jsonObj[name];
 		var input = form.find('[name='+name+']');
 		input.val(val);
-	});
-}
+	}
 
-function json2form2(jsonObj, formId) {
-	if(!jsonObj || !formId){
-		return;
-	}
-	var form = document.getElementById(formId);
-	var els = form.elements;
-	for(var i=0;i<els.length;i++){
-		var el = els[i];
-		var name = el.name;
-		var val = jsonObj[el.name];
-		el.value = val;
-	}
 }
 
 function toKvPair(map){
@@ -287,7 +274,7 @@ Dialog.openUrl = function(url, title, width, buttons){
 	var opts = {
 	  	type:2,
 	  	title:title,
-	  	area:[width+'px', '65%'],
+	  	area:[width+'px', '70%'],
 	  	content : url,
         shadeClose: true,
         shade: 0.8
@@ -296,6 +283,14 @@ Dialog.openUrl = function(url, title, width, buttons){
 	this.setButtons(opts, buttons);
 	  
 	this.index = this.layer.open(opts);
+}
+
+Dialog.loadUrl = function(container, url, title, width, buttons){
+	var open = function(data){
+		Dialog.open(container, title, width, buttons);
+	}
+	$(container).load(url, open);
+	
 }
 
 Dialog.close = function(){

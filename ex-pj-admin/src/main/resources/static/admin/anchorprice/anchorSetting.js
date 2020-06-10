@@ -3,9 +3,9 @@ $(function(){
 	
 	// config
 	var plateCtx = {
-		URL_PAGE_QUERY : "/admin/api/plate/list",
-		URL_GET : "/admin/api/plate/get",
-		URL_SAVE : "/admin/api/plate/save"
+		URL_PAGE_QUERY : "/admin/api/anchorSetting/list",
+		URL_GET : "/admin/api/anchorSetting/get",
+		URL_SAVE : "/admin/api/anchorSetting/save"
 	};
 	
 	BeanUtil.setPrefix(plateCtx, appConfig.host);
@@ -118,15 +118,6 @@ $(function(){
 	if($('#editForm').attr('id')){
 		bindEditor(T.p('id'));
 	}
-	
-	$('#editForm [name=enabled]').change(function(){
-		var val = $(this).val();
-		if(val==1){
-			$('#anchorPanel').addClass("hidden");
-		}else{
-			$('#anchorPanel').removeClass("hidden");
-		}
-	});
 	
 });
 
