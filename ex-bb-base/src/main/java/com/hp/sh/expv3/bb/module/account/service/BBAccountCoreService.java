@@ -222,7 +222,12 @@ public class BBAccountCoreService{
 	private BBAccount getAccount(Long userId, String asset){
 		BBAccount account;
 		if(lockConfig.usePessimisticLock()){
-			account = this.accountDAO.getAndLock(userId, asset);
+			try{
+				account = this.accountDAO.getAndLock(userId, asset);
+			}catch(Exception e){
+				logger.error("获取账号失败:{}, {}", userId, asset);
+				throw e;
+			}
 		}else{
 			account = this.accountDAO.get(userId, asset);
 		}

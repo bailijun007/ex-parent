@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import com.hp.sh.expv3.bb.module.msg.dao.BBMessageExtDAO;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
+import com.hp.sh.expv3.bb.vo.result.StatItem;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.config.shard.ShardGroup;
@@ -175,6 +177,10 @@ public class BBMessageExtService{
 		params.put("asc", true);
 		List<BBMessageExt> msgList = this.messageExtDAO.queryList(params);
 		return msgList;
+	}
+	
+	public List<StatItem> getSymbolStat(){
+		return this.messageExtDAO.countBysymbol();
 	}
 	
 	private Long getMsgSardId(BBMessageExt msgEntity){
