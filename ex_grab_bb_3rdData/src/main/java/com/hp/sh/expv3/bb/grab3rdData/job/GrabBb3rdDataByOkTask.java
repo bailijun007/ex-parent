@@ -61,9 +61,9 @@ public class GrabBb3rdDataByOkTask {
     private String symbols;
 
 
-    @Autowired
-    @Qualifier("originaldataDb5RedisUtil")
-    private RedisUtil originaldataDb5RedisUtil;
+//    @Autowired
+//    @Qualifier("originaldataDb5RedisUtil")
+//    private RedisUtil originaldataDb5RedisUtil;
 
     @Autowired
     @Qualifier("metadataDb5RedisUtil")
@@ -135,7 +135,7 @@ public class GrabBb3rdDataByOkTask {
                         }
                         //批量保存
                         metadataDb5RedisUtil.mset(map);
-                        originaldataDb5RedisUtil.mset(map);
+//                        originaldataDb5RedisUtil.mset(map);
 
                     }
                 } catch (Exception e) {

@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 public class BinanceWsClient extends WebSocketListener {
     private static final Logger logger = LoggerFactory.getLogger(BinanceWsClient.class);
-
     private String wsurl;
 
     private Boolean isClosed = true;
@@ -24,7 +23,7 @@ public class BinanceWsClient extends WebSocketListener {
 
     private WebSocket ws;
 
-    public static BlockingQueue<BinanceResponseEntity> queue = new ArrayBlockingQueue<BinanceResponseEntity>(10240);
+    public static final BlockingQueue<BinanceResponseEntity> queue = new ArrayBlockingQueue<BinanceResponseEntity>(1024000);
 
     private BinanceWsClient(String wsurl) {
         this.wsurl = wsurl;

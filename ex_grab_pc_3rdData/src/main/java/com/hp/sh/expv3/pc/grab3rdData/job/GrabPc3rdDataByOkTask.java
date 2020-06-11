@@ -62,9 +62,9 @@ public class GrabPc3rdDataByOkTask {
     @Qualifier("metadataDb5RedisUtil")
     private RedisUtil metadataDb5RedisUtil;
 
-    @Autowired
-    @Qualifier("originaldataDb5RedisUtil")
-    private RedisUtil originaldataDb5RedisUtil;
+//    @Autowired
+//    @Qualifier("originaldataDb5RedisUtil")
+//    private RedisUtil originaldataDb5RedisUtil;
 
     @Autowired
     private SupportBbGroupIdsJobService supportBbGroupIdsJobService;
@@ -133,7 +133,7 @@ public class GrabPc3rdDataByOkTask {
                     //批量保存
                     if(map.size()==2){
                         metadataDb5RedisUtil.mset(map);
-                        originaldataDb5RedisUtil.mset(map);
+//                        originaldataDb5RedisUtil.mset(map);
                     }
 
                 } catch (Exception e) {

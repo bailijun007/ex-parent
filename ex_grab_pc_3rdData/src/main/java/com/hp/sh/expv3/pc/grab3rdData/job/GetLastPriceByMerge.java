@@ -65,9 +65,9 @@ public class GetLastPriceByMerge {
     @Value("${bitfinex.https.redisKey.prefix}")
     private String bitfinexHttpsRedisKey;
 
-    @Autowired
-    @Qualifier("originaldataDb5RedisUtil")
-    private RedisUtil originaldataDb5RedisUtil;
+//    @Autowired
+//    @Qualifier("originaldataDb5RedisUtil")
+//    private RedisUtil originaldataDb5RedisUtil;
 
     @Autowired
     @Qualifier("metadataDb5RedisUtil")
@@ -288,7 +288,7 @@ public class GetLastPriceByMerge {
         HashMap<String, BigDecimal> map = new HashMap<>();
         map.put(bbSymbol.getSymbol(), avgLastPrice);
         metadataDb5RedisUtil.hmset(key, map);
-        originaldataDb5RedisUtil.hmset(key, map);
+//        originaldataDb5RedisUtil.hmset(key, map);
     }
 
     public BigDecimal mergeByBinance(PcSymbol bbSymbol) {

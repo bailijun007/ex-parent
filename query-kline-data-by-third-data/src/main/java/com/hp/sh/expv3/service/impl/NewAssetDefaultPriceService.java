@@ -15,21 +15,21 @@ import java.util.List;
 public class NewAssetDefaultPriceService {
 
 //    @Value("${max.price}")
-    private BigDecimal maxPrice = new BigDecimal(0.145);
+    private BigDecimal maxPrice = new BigDecimal(0.16);
 
 //    @Value("${start.price}")
-    private BigDecimal startPrice = new BigDecimal(0.04);
+    private BigDecimal startPrice = new BigDecimal(0.155);
 
 //    @Value("${min.price}")
-    private BigDecimal minPrice = new BigDecimal(0.03);
+    private BigDecimal minPrice = new BigDecimal(0.122);
 
 //    @Value("${stepMax.price}")
     private BigDecimal stepMaxPrice = new BigDecimal(+0.000015);
 //    @Value("${stepMin.price}")
-    private BigDecimal stepMinPrice = new BigDecimal(-0.0000125);
+    private BigDecimal stepMinPrice = new BigDecimal(-0.000015);
 
 //    @Value("${count}")
-    private int count = 89280;
+    private int count = 14400;
 
     public List<BigDecimal> buildPrice() {
         ArrayList<BigDecimal> price = new ArrayList<>(count);

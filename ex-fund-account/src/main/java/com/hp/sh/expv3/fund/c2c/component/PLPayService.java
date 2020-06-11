@@ -45,15 +45,17 @@ public class PLPayService {
         logger.info("userId={},ratio={},srcCurrency={},tarCurrency={},tarVolume={},fabiAmt={},receiveUrl={},pickupUrl={}",userId,ratio,srcCurrency,tarCurrency,tarVolume,fabiAmt,receiveUrl,pickupUrl);
 
         //生成订单号
-        String orderNo = GenerateOrderNumUtils.getOrderNo(userId);
+        String orderNo = GenerateOrderNumUtils.getOrderNo();
         //订单币种
         String orderCurrency =srcCurrency;
-        if(srcCurrency.equals("CNY")){
-             orderCurrency = "CNY";
-        }
+//        if(srcCurrency.equals("CNY")){
+//             orderCurrency = "CNY";
+//        }
 
         //订单金额
-        BigDecimal orderAmount = ratio.multiply(tarVolume).setScale(2, RoundingMode.UP);
+//        BigDecimal orderAmount = ratio.multiply(tarVolume).setScale(2, RoundingMode.UP);
+        BigDecimal orderAmount = ratio.multiply(tarVolume);
+
         //获取加密后的签名
         String sign = pLpayClient.getSign(pickupUrl, receiveUrl, orderNo, orderAmount+"", orderCurrency);
         //转发请求到第三方支付，并返回支付路径

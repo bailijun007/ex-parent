@@ -39,11 +39,8 @@ public class BuyService {
     }
 
     //通过sn和userId查询订单
-    public C2cOrder queryBySnAndUserId(String sn, Long userId) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("sn", sn);
-        map.put("userId", userId);
-        C2cOrder c2cOrder = c2cOrderDAO.queryOne(map);
+    public C2cOrder queryBySn(String sn) {
+        C2cOrder c2cOrder = c2cOrderDAO.queryBySn(sn);
         return c2cOrder;
     }
 

@@ -57,9 +57,9 @@ public class GrabPc3rdDataByBinanceTask {
     @Value("${binance.https.redisKey.prefix}")
     private String binanceHttpsRedisKey;
 
-    @Autowired
-    @Qualifier("originaldataDb5RedisUtil")
-    private RedisUtil originaldataDb5RedisUtil;
+//    @Autowired
+//    @Qualifier("originaldataDb5RedisUtil")
+//    private RedisUtil originaldataDb5RedisUtil;
 
     @Autowired
     @Qualifier("metadataDb5RedisUtil")
@@ -134,7 +134,7 @@ public class GrabPc3rdDataByBinanceTask {
                 if(map.size()==3){
                     //批量保存
                     metadataDb5RedisUtil.mset(map);
-                    originaldataDb5RedisUtil.mset(map);
+//                    originaldataDb5RedisUtil.mset(map);
                 }
 
             } catch (Exception e) {
@@ -196,7 +196,7 @@ public class GrabPc3rdDataByBinanceTask {
                 }
                 if (map.size() == 1) {
                     metadataDb5RedisUtil.mset(map);
-                    originaldataDb5RedisUtil.mset(map);
+//                    originaldataDb5RedisUtil.mset(map);
                     map.clear();
                 }
             }

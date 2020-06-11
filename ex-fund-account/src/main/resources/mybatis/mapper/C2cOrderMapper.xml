@@ -377,4 +377,9 @@
           and pay_currency=#{asset}
     </select>
 
+    <select id="queryBySn" resultType="com.hp.sh.expv3.fund.c2c.entity.C2cOrder">
+        select * from c2c_order
+        where sn=#{sn}
+    </select>
+
 </mapper>
