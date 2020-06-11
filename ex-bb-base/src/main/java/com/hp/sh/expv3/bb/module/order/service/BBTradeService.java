@@ -309,9 +309,9 @@ public class BBTradeService {
 		}
 		
 		if(order==null){
-			logger.error("币币成交订单不存在：orderId={}", tradeMsg.getOrderId());
-			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
-//			return false;
+			logger.error("币币成交订单不存在：orderId={},{},{},{}", tradeMsg.getOrderId(), tradeMsg.getAsset(), tradeMsg.getSymbol(), tradeMsg.getAccountId());
+//			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
+			return false;
 		}
 		
 		////////////////
