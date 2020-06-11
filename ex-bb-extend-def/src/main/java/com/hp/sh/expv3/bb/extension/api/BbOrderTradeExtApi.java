@@ -12,6 +12,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -81,7 +82,6 @@ public interface BbOrderTradeExtApi {
                                                              @RequestParam("userId") Long userId, @RequestParam("statTime") Long statTime, @RequestParam("endTime") Long endTime);
 
 
-
     @ApiOperation(value = "获取当前用户交易明细")
     @GetMapping(value = "/api/bb/ext/orderTrade/queryHistory")
     @ApiImplicitParams({
@@ -98,5 +98,18 @@ public interface BbOrderTradeExtApi {
                                             @RequestParam("symbol") String symbol, @RequestParam(value = "lastTradeId", required = false) Long lastTradeId,
                                             @RequestParam("nextPage") Integer nextPage, @RequestParam("pageSize") Integer pageSize,
                                             @RequestParam(value = "startTime", required = false) Long startTime, @RequestParam(value = "endTime", required = false) Long endTime);
+
+
+    @ApiOperation(value = "通过时间段查询成交总量")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "symbol", value = "交易对", example = "BTC_USDT", required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = true)
+    })
+    @GetMapping(value = "/api/bb/ext/orderTrade/queryTradeNumberTotal")
+    BigDecimal queryTradeNumberTotalByTime(@RequestParam("asset") String asset, @RequestParam("symbol") String symbol,
+                                           @RequestParam(value = "startTime", required = true) Long startTime, @RequestParam(value = "endTime", required = true) Long endTime);
+
 
 }

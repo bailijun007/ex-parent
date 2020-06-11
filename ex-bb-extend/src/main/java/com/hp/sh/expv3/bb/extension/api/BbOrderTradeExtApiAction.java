@@ -105,4 +105,13 @@ public class BbOrderTradeExtApiAction implements BbOrderTradeExtApi {
 
         return list;
     }
+
+    @Override
+    public BigDecimal queryTradeNumberTotalByTime( String asset, String symbol,Long startTime, Long endTime) {
+        logger.info("进入通过时间段查询成交总量接口，收到参数为：asset={},symbol={},startTime={},endTime={}", asset,symbol,startTime, endTime);
+        if (startTime == null || endTime == null||StringUtils.isEmpty(asset) || StringUtils.isEmpty(symbol)) {
+            throw new ExException(BbExtCommonErrorCode.PARAM_EMPTY);
+        }
+        return bbOrderTradeExtService.queryTradeNumberTotalByTime(asset,symbol,startTime,endTime);
+    }
 }

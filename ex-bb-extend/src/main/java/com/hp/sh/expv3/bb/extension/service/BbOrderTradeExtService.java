@@ -4,6 +4,7 @@ import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeDetailVo;
 import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.bb.extension.vo.BbUserOrderTrade;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,5 +26,6 @@ public interface BbOrderTradeExtService {
 
     List<BbOrderTradeDetailVo> queryHistory(Long userId, String asset, String symbol, Long lastTradeId, Integer nextPage, Integer pageSize, Long startTime, Long endTime);
 
+    BigDecimal queryTradeNumberTotalByTime(String asset, String symbol,Long startTime, Long endTime);
 }
 

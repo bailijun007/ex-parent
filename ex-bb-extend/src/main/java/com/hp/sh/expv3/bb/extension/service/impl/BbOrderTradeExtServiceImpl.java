@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -89,5 +90,10 @@ public class BbOrderTradeExtServiceImpl implements BbOrderTradeExtService {
             }
         }
         return list;
+    }
+
+    @Override
+    public BigDecimal queryTradeNumberTotalByTime(String asset, String symbol,Long startTime, Long endTime) {
+        return bbOrderTradeExtMapper.queryTradeNumberTotalByTime(asset,symbol,startTime,endTime);
     }
 }

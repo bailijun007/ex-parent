@@ -21,5 +21,5 @@ public interface BbAccountExtMapper {
 
     BbAccountExtVo getBBAccount(@Param("userId") Long userId, @Param("asset") String asset);
 
-    BigDecimal queryTotalNumber( @Param("asset") String asset);
+    BigDecimal queryTotalNumber( @Param("asset") String asset,@Param("time") Long time);
 }

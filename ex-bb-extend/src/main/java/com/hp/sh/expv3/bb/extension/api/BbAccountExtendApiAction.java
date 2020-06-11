@@ -8,6 +8,7 @@ import com.hp.sh.expv3.bb.extension.vo.BbAccountVo;
 import com.hp.sh.expv3.commons.exception.ExException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
@@ -84,8 +85,8 @@ public class BbAccountExtendApiAction implements BbAccountExtendApi {
     }
 
     @Override
-    public BigDecimal queryTotalNumber(String asset) {
-        BigDecimal total = bbAccountExtService.queryTotalNumber(asset);
+    public BigDecimal queryTotalNumber(String asset,Long time) {
+        BigDecimal total = bbAccountExtService.queryTotalNumber(asset,time);
         return total;
     }
 }

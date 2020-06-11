@@ -5,6 +5,7 @@ import com.hp.sh.expv3.bb.extension.vo.BbOrderTradeVo;
 import com.hp.sh.expv3.bb.extension.vo.BbUserOrderTrade;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -31,4 +32,6 @@ public interface BbOrderTradeExtMapper {
     List<BbOrderTradeVo> queryByIds(@Param("idList") List<Long> idList);
 
     List<BbOrderTradeDetailVo> queryHistory(Map<String, Object> map);
+
+    BigDecimal queryTradeNumberTotalByTime(@Param("asset")  String asset,@Param("symbol")  String symbol,@Param("tradeTimeBegin") Long tradeTimeBegin, @Param("tradeTimeEnd") Long tradeTimeEnd);
 }

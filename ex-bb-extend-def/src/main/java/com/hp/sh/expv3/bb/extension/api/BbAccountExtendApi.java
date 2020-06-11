@@ -47,9 +47,10 @@ public interface BbAccountExtendApi {
 
     @ApiOperation("根据币种查询平台所有用户的币币账户总额")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true)
+            @ApiImplicitParam(name = "asset", value = "资产类型", example = "BTC", required = true),
+            @ApiImplicitParam(name = "time", value = "时间点", required = true)
     })
     @GetMapping(value = "/api/extension/bbAccount/queryTotalNumber")
-    public BigDecimal queryTotalNumber(@RequestParam(value = "asset") String asset);
+    public BigDecimal queryTotalNumber(@RequestParam(value = "asset") String asset,@RequestParam(value = "time") Long time);
 
 }
