@@ -37,7 +37,7 @@ public class PlateStrategyJob extends Thread{
 	@Autowired
 	private CacheService cacheService;
 	
-	@Value("${plate.strategy.start:true}")
+	@Value("${plate.strategy.start}")
 	private boolean startPlateStrategy;
 	
 	@Bean
