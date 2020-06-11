@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 public class BinanceWsClient extends WebSocketListener {
     private static final Logger logger = LoggerFactory.getLogger(BinanceWsClient.class);
-
     private String wsurl;
 
     private Boolean isClosed = true;
