@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.sh.expv3.bb.job.MsgShardHandler;
+import com.hp.sh.expv3.bb.job.MsgTradeHandler;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.module.msg.service.BBMessageExtService;
 
@@ -23,6 +24,9 @@ public class ExpPerformAction {
 	@Autowired
 	private BBMessageExtService msgService;
 	
+	@Autowired
+	private MsgTradeHandler msgTradeHandler;
+	
 	@ApiOperation(value = "")
 	@GetMapping(value = "/oneShard")
 	public void handleOneShard(Long shardId) throws Exception{
@@ -34,7 +38,7 @@ public class ExpPerformAction {
 	@GetMapping(value = "/oneUser")
 	public void handleOneUser(Long userId, Integer num) throws Exception{
 		List<BBMessageExt> userMsgList = msgService.findFirstList(num, null, userId, null);
-		msgHandler.handleBatch(userId, userMsgList);
+		msgTradeHandler.handleBatch(userId, userMsgList);
 		return ;
 	}
 

@@ -9,7 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 
 @EnableDiscoveryClient
-@EnableFeignClients({"com.hp.sh.expv3"})
+@EnableFeignClients({"com.hp.sh.expv3.pc", "com.hp.sh.expv3.bb"})
 @ComponentScan("com.hp.sh.expv3")
 @SpringBootApplication
 //@SpringBootApplication(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class})

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
-import org.springframework.data.util.Pair;
 
 import com.hp.sh.expv3.base.mapper.BaseUserDataMapper;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;

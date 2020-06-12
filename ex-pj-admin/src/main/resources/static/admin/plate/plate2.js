@@ -95,7 +95,7 @@ $(function(){
 		vo.ps = form2json('ps_form');
 		vo.as = form2json('as_form');
 		
-		if(!as.expectedPrice){
+		if(!vo.as.expectedPrice){
 			alert('期望价格必填');
 		}
 		

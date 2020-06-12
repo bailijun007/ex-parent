@@ -22,7 +22,6 @@ import com.hp.sh.expv3.bb.strategy.common.BBCommonOrderStrategy;
 import com.hp.sh.expv3.bb.strategy.vo.OrderFeeData;
 import com.hp.sh.expv3.bb.vo.request.FreezeRequest;
 import com.hp.sh.expv3.bb.vo.request.UnFreezeRequest;
-import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.constant.InvokeResult;
 import com.hp.sh.expv3.utils.DbDateUtils;
 import com.hp.sh.expv3.utils.IntBool;
@@ -66,7 +65,6 @@ public class BBOrderService {
 	 * @param price 委托价格
 	 * @param amt 委托金额
 	 */
-	@LockIt(key="U-${userId}")
 	public BBOrder create(long userId, String cliOrderId, String asset, String symbol, int bidFlag, int timeInForce, BigDecimal price, BigDecimal number){
 		
 //		if(this.existClientOrderId(asset, symbol, userId, cliOrderId)){
@@ -185,11 +183,15 @@ public class BBOrderService {
 		order.setOrderMarginCurrency(bs.getMarginCurrency());
 	}
 	
-	@LockIt(key="U-${userId}")
 	public boolean setPendingCancel(long userId, String asset, String symbol, long orderId){
 		Long now = DbDateUtils.now();
 		
 		BBOrder order = this.orderQueryService.getOrder(asset, symbol, userId, orderId);
+		
+		if(order==null){
+			logger.error("被取消的订单不存在:orderId={}, {}, {}, {}", orderId, asset, symbol, userId);
+			return false;
+		}
 		
 		if(!this.canCancel(order, orderId)){
 			logger.info("订单无法取消：{}", order);
@@ -197,7 +199,7 @@ public class BBOrderService {
 		}
 		
 		if(order.getStatus()==OrderStatus.PENDING_CANCEL){
-			if(now - order.getModified() > 1000*60*60){
+			if(now - order.getModified() > 1000*60){
 				return true;
 			}else{
 				logger.warn("订单状态是PENDING_CANCEL,{}-{}", now, order.getModified());
@@ -210,10 +212,6 @@ public class BBOrderService {
 	}
 	
 	private boolean canCancel(BBOrder order, Long orderId){
-		if(order==null){
-			logger.error("请求取消的订单不存在：orderId={}", orderId);
-			return false;
-		}
 		if(order.getStatus() == OrderStatus.CANCELED){
 			return false;
 		}
@@ -243,7 +241,7 @@ public class BBOrderService {
 	private void doCancel(long userId, String asset, String symbol, long orderId){
 		BBOrder order = this.orderQueryService.getOrder(asset, symbol, userId, orderId);
 		if(order==null){
-			logger.error("被取消的订单不存在:orderId={}", orderId);
+			logger.error("被取消的订单不存在:orderId={}, {}, {}, {}", orderId, asset, symbol, userId);
 			return;
 		}
 		if(order.getStatus() == OrderStatus.CANCELED){
@@ -296,7 +294,7 @@ public class BBOrderService {
 	public void setNewStatus(long userId, String asset, String symbol, long orderId){
 		BBOrder order = this.orderQueryService.getOrder(asset, symbol, userId, orderId);
 		if(order==null){
-			logger.error("新订单不存在:orderId={}", orderId);
+			logger.error("新订单不存在:orderId={}, {}, {}, {}", orderId, asset, symbol, userId);
 			return;
 		}
 		if(order.getStatus()!=OrderStatus.PENDING_NEW){

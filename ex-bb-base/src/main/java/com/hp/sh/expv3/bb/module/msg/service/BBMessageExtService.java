@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +14,10 @@ import com.gitee.hupadev.commons.page.Page;
 import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.module.msg.dao.BBMessageExtDAO;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
+import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
 import com.hp.sh.expv3.bb.vo.result.StatItem;
-import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
-import com.hp.sh.expv3.commons.lock.LockIt;
 import com.hp.sh.expv3.config.shard.ShardGroup;
 import com.hp.sh.expv3.utils.DbDateUtils;
 
@@ -40,7 +38,7 @@ public class BBMessageExtService{
 	
 	@Autowired
 	private ShardGroup shardGroup;
-
+	
 	public void delete(Long userId, Long id){
 		this.messageExtDAO.delete(userId, id);
 	}
@@ -95,14 +93,9 @@ public class BBMessageExtService{
 		return msgEntity;
 	}
 
-	public BBMessageExt saveCancelIfNotExists(String tag, BBCancelledMsg msg, String exMessage) {
+	public BBMessageExt saveCancelMsg(String tag, BBCancelledMsg msg, String exMessage) {
 		
 		exMessage = this.cutExMsg(exMessage);
-		
-		boolean existCancelledMsg = this.exist(msg.getAccountId(), tag, ""+msg.getOrderId());
-		if(existCancelledMsg){
-			return null;
-		}
 		
 		BBMessageExt msgEntity = new BBMessageExt();
 		msgEntity.setCreated(DbDateUtils.now());
@@ -128,20 +121,7 @@ public class BBMessageExtService{
 		this.messageExtDAO.setStatus(userId, id, status, this.cutExMsg(errInfo));
 	}
 
-	@LockIt(key="mm-${userId}-${key}")
-	public boolean exist(Long userId, String tags, String keys){
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("page", new Page(1, 1, 1000L));
-		params.put("asc", true);
-
-		params.put("userId", userId);
-		params.put("tags", tags);
-		params.put("keys", keys);
-		
-		BBMessageExt msg = this.messageExtDAO.queryOne(params);
-		return msg!=null;
-	}
-	
+	@Transactional(readOnly=true)
 	public boolean existMsgId(Long userId, String msgId){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, 1, 1000L));
@@ -154,6 +134,7 @@ public class BBMessageExtService{
 		return msg!=null;
 	}
 
+	@Transactional(readOnly=true)
 	public BBMessageExt findFirst(String tag, String symbol){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, 1, 1000L));
@@ -166,6 +147,7 @@ public class BBMessageExtService{
 		return msg;
 	}
 
+	@Transactional(readOnly=true)
 	public List<BBMessageExt> findFirstList(int pageSize, Long shardId, Long userId, Long startId){
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("page", new Page(1, pageSize, 10000L));

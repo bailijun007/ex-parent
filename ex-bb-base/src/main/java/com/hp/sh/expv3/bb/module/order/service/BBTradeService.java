@@ -79,7 +79,9 @@ public class BBTradeService {
 	//处理成交订单
 	public void handleTrade(BBTradeMsg msg){
 		BBOrder order = this.orderQueryService.getOrder(msg.getAsset(), msg.getSymbol(), msg.getAccountId(), msg.getOrderId());
+		
 		boolean yes = this.canTrade(order, msg);
+		
 		if(!yes){
 			logger.warn("成交已处理过了,trade={}", msg);
 			return;
@@ -309,9 +311,9 @@ public class BBTradeService {
 		}
 		
 		if(order==null){
-			logger.error("币币成交订单不存在：orderId={}", tradeMsg.getOrderId());
-			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
-//			return false;
+			logger.error("币币成交订单不存在：orderId={},{},{},{}", tradeMsg.getOrderId(), tradeMsg.getAsset(), tradeMsg.getSymbol(), tradeMsg.getAccountId());
+//			throw new ExSysException(CommonError.OBJ_DONT_EXIST, tradeMsg);
+			return false;
 		}
 		
 		////////////////

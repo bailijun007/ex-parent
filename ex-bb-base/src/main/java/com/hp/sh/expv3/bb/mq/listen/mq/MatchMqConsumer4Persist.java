@@ -10,6 +10,7 @@ import com.hp.sh.expv3.bb.constant.MqTags;
 import com.hp.sh.expv3.bb.job.BBMsgHandleThreadJobConfig;
 import com.hp.sh.expv3.bb.module.msg.entity.BBMessageExt;
 import com.hp.sh.expv3.bb.module.msg.service.BBMessageExtService;
+import com.hp.sh.expv3.bb.module.msg.service.CancelMsgCache;
 import com.hp.sh.expv3.bb.mq.msg.in.BBCancelledMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBNotMatchMsg;
 import com.hp.sh.expv3.bb.mq.msg.in.BBTradeMsg;
@@ -26,9 +27,11 @@ public class MatchMqConsumer4Persist {
 	
 	@Autowired
 	private BBMsgHandleThreadJobConfig msgHandleThreadJob;
+	
+	@Autowired
+	private CancelMsgCache cancelMsgCache;
 
 	public MatchMqConsumer4Persist() {
-		super();
 		logger.info("init");
 	}
 
@@ -54,12 +57,16 @@ public class MatchMqConsumer4Persist {
 	@MQListener(tags=MqTags.TAGS_CANCELLED)
 	public void handleCancelledMsg(BBCancelledMsg msg){
 		logger.info("收到取消订单消息:{}", msg);
-		BBMessageExt entity = msgService.saveCancelIfNotExists(MqTags.TAGS_CANCELLED, msg, null);
-		if(entity!=null){
-			msgHandleThreadJob.trigger(entity.getShardId());
-		}else{
+		
+		if(cancelMsgCache.existCancelMsg(msg.getAccountId(), MqTags.TAGS_CANCELLED, ""+msg.getOrderId())){
 			logger.warn("订单取消msg已存在："+msg.getOrderId());
+			return;
 		}
+		
+		BBMessageExt entity = msgService.saveCancelMsg(MqTags.TAGS_CANCELLED, msg, null);
+		this.cancelMsgCache.cacheCancelMsg(msg.getAccountId(), MqTags.TAGS_CANCELLED, ""+msg.getOrderId());
+		msgHandleThreadJob.trigger(entity.getShardId());
+
 	}
 	
 	//成交
