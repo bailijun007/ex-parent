@@ -79,7 +79,9 @@ public class BBTradeService {
 	//处理成交订单
 	public void handleTrade(BBTradeMsg msg){
 		BBOrder order = this.orderQueryService.getOrder(msg.getAsset(), msg.getSymbol(), msg.getAccountId(), msg.getOrderId());
+		
 		boolean yes = this.canTrade(order, msg);
+		
 		if(!yes){
 			logger.warn("成交已处理过了,trade={}", msg);
 			return;
