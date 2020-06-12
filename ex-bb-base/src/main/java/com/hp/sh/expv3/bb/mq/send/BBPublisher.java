@@ -24,7 +24,7 @@ public class BBPublisher {
 	
 	public void sendEventMsg(EventMsg eventMsg) {
 		String channel = this.getChannel(eventMsg);
-		logger.info("publish:{},{}", channel, eventMsg);
+		logger.debug("publish:{},{}", channel, eventMsg);
 		publisher.publish(channel, eventMsg);
 	}
 	
@@ -61,4 +61,5 @@ public class BBPublisher {
 		channel.toString();
 		return channel;
 	}
+	
 }

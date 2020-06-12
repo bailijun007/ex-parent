@@ -45,6 +45,7 @@ public class BBOrderApiAction implements BBOrderApi {
 	 * @throws Exception 
 	 */
 	@Override
+	@LockIt(key="U-${userId}")
 	public Long create(Long userId, String asset, String symbol, Integer bidFlag, Integer timeInForce, BigDecimal price, BigDecimal number, String cliOrderId){
 		
 		CheckUtils.checkPositiveNum(price, number);
@@ -60,6 +61,7 @@ public class BBOrderApiAction implements BBOrderApi {
 	}
 	
 	@Override
+	@LockIt(key="U-${userId}")
 	public void cancel(Long userId, String asset, String symbol, Long orderId) {
 
 		boolean ok = this.orderService.setPendingCancel(userId, asset, symbol, orderId);
@@ -67,6 +69,7 @@ public class BBOrderApiAction implements BBOrderApi {
 		if(!ok){
 			return;
 		}
+		
 		//发送消息
 		OrderPendingCancelMsg mqMsg = new OrderPendingCancelMsg(userId, asset, symbol, orderId);
 		mqMsg.setAccountId(userId);
