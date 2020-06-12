@@ -85,8 +85,8 @@ public class BbAccountExtendApiAction implements BbAccountExtendApi {
     }
 
     @Override
-    public BigDecimal queryTotalNumber(String asset,Long time) {
-        BigDecimal total = bbAccountExtService.queryTotalNumber(asset,time);
+    public BigDecimal queryTotalNumber(String asset,Long beginTime,Long endTime) {
+        BigDecimal total = bbAccountExtService.queryTotalNumber(asset,beginTime,endTime);
         return total;
     }
 }

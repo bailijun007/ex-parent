@@ -67,7 +67,8 @@
 
     <select id="queryTotalNumber" resultType="java.math.BigDecimal">
         SELECT IFNULL(SUM(balance),0) AS total from bb_account b where b.asset=#{asset}
-        and b.modified =#{time}
+        and b.modified &gt;=#{modifiedBegin}
+         and b.modified &lt;=#{modifiedEnd}
     </select>
 
 

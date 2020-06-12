@@ -93,8 +93,8 @@ public class BbAccountExtServiceImpl implements BbAccountExtService {
     }
 
     @Override
-    public BigDecimal queryTotalNumber(String asset,Long time) {
-        BigDecimal total = bbAccountExtMapper.queryTotalNumber(asset,time);
+    public BigDecimal queryTotalNumber(String asset,Long beginTime, Long endTime) {
+        BigDecimal total = bbAccountExtMapper.queryTotalNumber(asset,beginTime,endTime);
         return total;
     }
 }

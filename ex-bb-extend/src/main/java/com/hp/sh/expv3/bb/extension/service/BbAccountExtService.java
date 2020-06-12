@@ -17,5 +17,5 @@ public interface BbAccountExtService {
 
     BbAccountExtVo getNewBBAccount(Long userId, String asset);
 
-    BigDecimal queryTotalNumber(String asset,Long time);
+    BigDecimal queryTotalNumber(String asset,Long beginTime,Long endTime);
 }

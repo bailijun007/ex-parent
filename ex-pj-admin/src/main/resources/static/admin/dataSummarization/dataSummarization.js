@@ -1,121 +1,65 @@
+$(function () {
 
-$(function(){
-	
-	// config
-	var userCtx = {
-		URL_PAGE_QUERY : "/admin/user/list",
-		URL_GET : "/admin/user/get",
-		URL_SAVE : "/admin/user/save",
-		URL_BATCH_ENABLE : "/admin/user/enable/batch"
-	};
-	
-	BeanUtil.setPrefix(userCtx, appConfig.host);
-	
-	var id = 'data_table';
-	var url = userCtx.URL_PAGE_QUERY;
-	var data_label = '用户';
-	var columns = [
-		{
-			checkbox : true
-		}, {
-			title : '编号',
-			field : 'id'
-		}, {
-			title : '昵称',
-			field : 'nickname'
-		},
-		{
-			title : '操作',
-			field : '#',
-			align : 'center',
-			formatter : function(value, row, index) {
-				return '<a data-id="'+row.id+'" class="btn-edit" href="javascript:void(0)">修改</a>';
-			}
-		}
-	];
-	
-	//以下基本固定
-	
-	var table = new MyDataTable(id, url, columns);
+    // config
+    var userCtx = {
+        // URL_PAGE_QUERY : "/admin/user/list",
+        URL_ASSET_LIST: "/admin/dataSummarization/query",
+        // URL_SAVE : "/admin/user/save",
+        // URL_BATCH_ENABLE : "/admin/user/enable/batch"
+    };
 
-	function add(){
-		Dialog.openUrl('edit.html', '添加'+data_label, 800);
-	}
+    BeanUtil.setPrefix(userCtx, appConfig.host);
 
-	function edit(event){
-		var id = $(event.target).data('id');
-		Dialog.openUrl('edit.html?id='+id, '修改'+data_label, 800);
-	}
-	
-	function other(event){
-		console.log(event);
-		console.log($(event));
-		
-		if($(event.target).hasClass('btn-edit')){
-			edit(event);
-		}
-	}
+    var url = userCtx.URL_ASSET_LIST;
 
-	function del(){
-		var idList = table.getSelectedIds();
-		if(idList==null || idList.length==0){
-			alert('没有选中');
-			return;
-		}
-		var idseq = idList.join(',');
-		if(idseq){
-			AppUtil.confirm('确定删除吗', function(){
-				ajaxRequest(userCtx.URL_BATCH_DEL, {idseq:idseq}, function(data){
-					refreshQuery();
-				});
-			});
-		}
-	}
 
-	function bindEditor(id) {
-		if(id){
-			ajaxRequest(userCtx.URL_GET, {id:id}, function(data){
-				json2form(data, 'editForm');
-			});
-		}
-	}
+    //1.初始化加载
+    queryDataSummarization();
 
-	function saveOrUpdate() {
-		var postData = form2json('editForm');
-		ajaxRequest(userCtx.URL_SAVE, postData, function(data){
-			refreshTable();
-		},'POST');
-	}
-	
-	function refreshTable(){
-		$('#queryForm')[0].reset();
-		search();
-	}
+    $('#btn_query').click(search);
 
-	function search(){
-		var formData = form2json('queryForm');
-		console.log(formData);
-		table.filterParams=formData;
-		table.reload();
-		
-		$('#queryForm')[0].reset();
-	}
+    function search(){
+        var param = "?";
+        param += "&asset=" + $("#asset").val();
+        param += "&symbol=" + $("#symbol").val();
+        param += "&begin_time=" + $("#beginTime").val();
+        param += "&end_time=" + $("#endTime").val();
+        $.ajax({
+            type: "get",
+            url: url + param,
+            contentType: "application/json;charset=UTF-8",  //发送信息至服务器时内容编码类型。
+            async: false,
+            //dataType:"json",  // 预期服务器返回的数据类型。如果不指定，jQuery 将自动根据 HTTP 包 MIME 信息来智能判断，比如XML MIME类型就被识别为XML。
+            //data:JSON.stringify({id:id}),
+            success: function (data) {
+                $("#user_register_count").text(data.data.userRegisterCount);
+                $("#every_4_hours_user_trade_number").text(data.data.every4HoursUserTradeNumber);
+                $("#current_user_hold_number").text(data.data.currentUserHoldNumber);
+                $("#today_user_trade_number").text(data.data.todayUserTradeNumber);
+            }
+        })
+    }
 
-	$('.btn-add').click(add);
-	
-	$('.btn-save').click(saveOrUpdate);
-
-	$('.btn-edit').click(edit);
-	
-	$('.btn-del').click(del);
-	
-	$('#btn_query').click(search);
-	
-	$('#data_table').click(other);
-	
-	if($('#editForm').attr('id')){
-		bindEditor(T.p('id'));
-	}
-	
+    function queryDataSummarization() {
+        var param = "?";
+        param += "&asset=" + $("#asset").val();
+        param += "&symbol=" + $("#symbol").val();
+        param += "&begin_time=" + $("#beginTime").val();
+        param += "&end_time=" + $("#endTime").val();
+        $.ajax({
+            type: "get",
+            url: url + param,
+            contentType: "application/json;charset=UTF-8",  //发送信息至服务器时内容编码类型。
+            async: false,
+            //dataType:"json",  // 预期服务器返回的数据类型。如果不指定，jQuery 将自动根据 HTTP 包 MIME 信息来智能判断，比如XML MIME类型就被识别为XML。
+            //data:JSON.stringify({id:id}),
+            success: function (data) {
+                $("#user_register_count").text(data.data.userRegisterCount);
+                $("#every_4_hours_user_trade_number").text(data.data.every4HoursUserTradeNumber);
+                $("#current_user_hold_number").text(data.data.currentUserHoldNumber);
+                $("#today_user_trade_number").text(data.data.todayUserTradeNumber);
+            }
+        })
+    }
 });
 
