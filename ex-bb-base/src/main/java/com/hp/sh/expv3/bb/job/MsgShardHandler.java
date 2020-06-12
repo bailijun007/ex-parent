@@ -43,6 +43,7 @@ public class MsgShardHandler {
 		Lock lock = locker.getLock("msgHandlerSardJobLock-"+shardId, -1);
 		boolean isLocked = lock.tryLock(0L, TimeUnit.SECONDS);
 		if(isLocked){
+			logger.warn("成功抢到ShardJob锁：{}, {}", shardId, System.currentTimeMillis());
 			try{
 				if(this.batch){
 					this.handleMsgGroupByUserId(shardId);
@@ -50,6 +51,7 @@ public class MsgShardHandler {
 					this.handleEachMsg(shardId);
 				}
 			}finally{
+				logger.warn("释放ShardJob锁：{}, {}", shardId, System.currentTimeMillis());
 				lock.unlock();
 			}
 		}else{
